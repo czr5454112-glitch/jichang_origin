@@ -21,3 +21,14 @@
 - Tests / validation: target repo under `czr005` Conda env passed `6 passed`.
 - Safety / parity notes: simulator is headless, deterministic, and returns structured logs; no GUI, RL, or hidden step-time file writes were added.
 - Follow-up: implement Phase1C C++ graph/task/A*/reservation/metrics core, then Python/C++ parity tests and pybind boundary.
+
+## 2026-06-16 19:45 - Phase1C C++ core smoke
+
+- Request: Continue the Python/C++ port by starting the C++ high-performance core.
+- Branch: `main`.
+- Files changed: added header-only C++ graph, task stream, reservation, A*, and metrics modules; added `cpp/tests/test_cpp_core_smoke.cpp`; updated CMake.
+- Commands run: CMake configure/build/CTest attempts with Ninja, Visual Studio, and NMake; final successful command used `NMake Makefiles` with `cl` inside the `czr005` activated environment.
+- Key observations: `cl.exe` is available after `conda activate czr005`; Ninja is not on PATH; Visual Studio generator probing failed to resolve the compiler, but NMake + explicit `CMAKE_CXX_COMPILER=cl` works.
+- Tests / validation: `cpp_core_smoke` passed 1/1 under CTest in both scaffold and target repo; Python pytest still passed `6 passed`.
+- Safety / parity notes: C++ smoke covers deterministic graph routing, node reservation conflicts, fault-edge blocking, and metrics. It does not yet load `map2.json` or compare against Python on map2.
+- Follow-up: add C++ JSON/JSONL loading or a generated fixture bridge, then Python/C++ parser and A* parity tests.
