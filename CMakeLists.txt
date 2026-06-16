@@ -12,4 +12,5 @@ target_include_directories(ics_core INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/cpp)
 
 add_executable(test_cpp_core_smoke cpp/tests/test_cpp_core_smoke.cpp)
 target_link_libraries(test_cpp_core_smoke PRIVATE ics_core)
+target_compile_definitions(test_cpp_core_smoke PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME cpp_core_smoke COMMAND test_cpp_core_smoke)

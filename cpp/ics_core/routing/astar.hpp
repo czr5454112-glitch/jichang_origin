@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <set>
 #include <vector>
 
@@ -33,7 +34,7 @@ class AStarPlanner {
 
     while (!open.empty()) {
       const int current_index = pop_min_f(open, records);
-      const auto& current = records.at(static_cast<std::size_t>(current_index)).node;
+      const auto current = records.at(static_cast<std::size_t>(current_index)).node;
       closed.insert(current.location);
 
       if (current.location == goal) {
@@ -91,13 +92,16 @@ class AStarPlanner {
   }
 
   static int pop_min_f(std::vector<int>& open, const std::vector<Record>& records) {
-    std::stable_sort(open.begin(), open.end(), [&records](int left, int right) {
-      const auto diff = records.at(static_cast<std::size_t>(left)).node.fcost -
-                        records.at(static_cast<std::size_t>(right)).node.fcost;
-      return static_cast<int>(diff) < 0;
-    });
-    const int value = open.front();
-    open.erase(open.begin());
+    std::size_t best_pos = 0;
+    for (std::size_t pos = 1; pos < open.size(); ++pos) {
+      const auto diff = records.at(static_cast<std::size_t>(open[pos])).node.fcost -
+                        records.at(static_cast<std::size_t>(open[best_pos])).node.fcost;
+      if (static_cast<int>(diff) < 0) {
+        best_pos = pos;
+      }
+    }
+    const int value = open[best_pos];
+    open.erase(open.begin() + static_cast<std::ptrdiff_t>(best_pos));
     return value;
   }
 
@@ -116,4 +120,3 @@ class AStarPlanner {
 };
 
 }  // namespace czr005::ics
-

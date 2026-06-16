@@ -32,3 +32,14 @@
 - Tests / validation: `cpp_core_smoke` passed 1/1 under CTest in both scaffold and target repo; Python pytest still passed `6 passed`.
 - Safety / parity notes: C++ smoke covers deterministic graph routing, node reservation conflicts, fault-edge blocking, and metrics. It does not yet load `map2.json` or compare against Python on map2.
 - Follow-up: add C++ JSON/JSONL loading or a generated fixture bridge, then Python/C++ parser and A* parity tests.
+
+## 2026-06-16 20:05 - Phase1C legacy map reader
+
+- Request: Strengthen the C++ port with a parser/parity step closer to the Phase1C gate.
+- Branch: `main`.
+- Files changed: added `cpp/ics_core/io/legacy_map_reader.hpp`, extended graph type counts and C++ smoke test, and fixed A* current-record lifetime during open-list expansion.
+- Commands run: CMake configure/build/CTest using `NMake Makefiles` and explicit `cl`; `C:\Users\38908\.conda\envs\czr005\python.exe -m pytest`.
+- Key observations: C++ can now read legacy `map2.txt` directly, parse 54 nodes, 54 heuristic rows, and 69 edges, and reproduce the `0 -> 47` map2 A* path. The smoke test now reports failures through stderr/exit code instead of MSVC debug `assert` dialogs.
+- Tests / validation: target CTest passed 1/1; target Python pytest passed `6 passed`.
+- Safety / parity notes: This improves parser parity evidence but still does not cover `inputdata.txt`/JSONL task loading or broad Python/C++ A* parity.
+- Follow-up: add task stream reader and multi-case Python/C++ parity table.

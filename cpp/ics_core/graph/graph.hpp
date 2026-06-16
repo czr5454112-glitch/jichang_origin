@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
@@ -33,7 +34,9 @@ class Graph {
     const auto key = edge_key(edge.start, edge.end);
     edges_.emplace(key, edge);
     auto& outgoing = node(edge.start).outgoing;
-    outgoing.push_back(edge.end);
+    if (std::find(outgoing.begin(), outgoing.end(), edge.end) == outgoing.end()) {
+      outgoing.push_back(edge.end);
+    }
   }
 
   void set_heuristic(std::vector<std::vector<double>> heuristic) {
@@ -83,6 +86,16 @@ class Graph {
   [[nodiscard]] std::size_t node_count() const { return nodes_.size(); }
   [[nodiscard]] std::size_t edge_count() const { return edges_.size(); }
 
+  [[nodiscard]] int node_type_count(int node_type) const {
+    int count = 0;
+    for (const auto& entry : nodes_) {
+      if (entry.second.node_type == node_type) {
+        ++count;
+      }
+    }
+    return count;
+  }
+
  private:
   static long long edge_key(int start, int end) {
     return (static_cast<long long>(start) << 32) ^ static_cast<unsigned int>(end);
@@ -94,4 +107,3 @@ class Graph {
 };
 
 }  // namespace czr005::ics
-
