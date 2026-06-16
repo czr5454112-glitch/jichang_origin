@@ -1,5 +1,7 @@
+#include <chrono>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <pybind11/pybind11.h>
@@ -61,6 +63,47 @@ std::vector<int> plan_legacy_map_path(const std::string& map_path, int start, in
   return route_locations(planner.plan(start, goal));
 }
 
+std::vector<std::vector<int>> plan_legacy_map_paths(
+    const std::string& map_path,
+    const std::vector<std::pair<int, int>>& cases) {
+  const auto legacy = czr005::ics::read_legacy_map2(map_path);
+  const czr005::ics::AStarPlanner planner(legacy.graph);
+
+  std::vector<std::vector<int>> routes;
+  routes.reserve(cases.size());
+  for (const auto& path_case : cases) {
+    routes.push_back(route_locations(planner.plan(path_case.first, path_case.second)));
+  }
+  return routes;
+}
+
+py::dict benchmark_legacy_map_paths(const std::string& map_path,
+                                    const std::vector<std::pair<int, int>>& cases,
+                                    int repeats) {
+  const auto legacy = czr005::ics::read_legacy_map2(map_path);
+  const czr005::ics::AStarPlanner planner(legacy.graph);
+
+  int checksum = 0;
+  const auto start_time = std::chrono::steady_clock::now();
+  for (int repeat = 0; repeat < repeats; ++repeat) {
+    for (const auto& path_case : cases) {
+      checksum += static_cast<int>(planner.plan(path_case.first, path_case.second).size());
+    }
+  }
+  const auto end_time = std::chrono::steady_clock::now();
+  const std::chrono::duration<double> elapsed = end_time - start_time;
+
+  py::dict result;
+  result["case_count"] = cases.size();
+  result["repeats"] = repeats;
+  result["total_plans"] = static_cast<int>(cases.size()) * repeats;
+  result["elapsed_seconds"] = elapsed.count();
+  result["plans_per_second"] =
+      elapsed.count() > 0.0 ? (static_cast<double>(cases.size()) * repeats) / elapsed.count() : 0.0;
+  result["checksum"] = checksum;
+  return result;
+}
+
 }  // namespace
 
 PYBIND11_MODULE(czr005_cpp, module) {
@@ -72,4 +115,13 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("map_path"),
              py::arg("start"),
              py::arg("goal"));
+  module.def("plan_legacy_map_paths",
+             &plan_legacy_map_paths,
+             py::arg("map_path"),
+             py::arg("cases"));
+  module.def("benchmark_legacy_map_paths",
+             &benchmark_legacy_map_paths,
+             py::arg("map_path"),
+             py::arg("cases"),
+             py::arg("repeats") = 100);
 }

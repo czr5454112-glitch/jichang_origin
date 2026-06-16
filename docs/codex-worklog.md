@@ -76,3 +76,14 @@
 - Tests / validation: scaffold CTest passed 2/2; target CTest passed 2/2; target Python pytest passed `6 passed`.
 - Safety / parity notes: The binding exposes parser summaries and A* path planning only; no learning/runtime policy code is bound yet.
 - Follow-up: add Phase1E parity/speed smoke using the binding.
+
+## 2026-06-16 21:25 - Phase1E Python/C++ parity and speed smoke
+
+- Request: Continue into Phase1E by producing a reproducible Python/C++ parity and speed smoke.
+- Branch: `main`.
+- Files changed: extended `czr005_cpp` with batched path planning and an internal benchmark helper; added `scripts/eval/run_phase1e_py_cpp_parity_speed.py`; generated `outputs/tables/phase1e_astar_py_cpp_parity.csv` and `outputs/reports/phase1e_py_cpp_parity_speed_report.md`.
+- Commands run: CMake build/CTest using `NMake Makefiles` and explicit `cl`; Phase1E parity/speed script.
+- Key observations: target run matched 40/40 map2 start/end route cases. With 100 repeats, Python reference measured 4,445.23 plans/s and C++ pybind core measured 5,687.79 plans/s on this smoke.
+- Tests / validation: scaffold CTest passed 2/2; target CTest passed 2/2; target Phase1E script passed; target Python pytest passed `6 passed`.
+- Safety / parity notes: This is a small map2 A* smoke, not a large-scale event-simulation benchmark. It does not yet include task stream replay or reservation-heavy scaling.
+- Follow-up: begin Phase1a A* scalability diagnosis or Phase2 baseline/shield work.

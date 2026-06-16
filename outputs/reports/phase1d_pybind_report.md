@@ -17,6 +17,8 @@ The binding module is named `czr005_cpp` and is emitted into `build_nmake/python
 - `read_legacy_map_summary(path)`: reads `map2.txt` through the C++ reader and returns node/edge/type counts.
 - `read_legacy_task_summary(path)`: reads `inputdata.txt` through the C++ reader and returns raw/expanded task counts and start-node distribution.
 - `plan_legacy_map_path(map_path, start, goal)`: runs the C++ A* planner and returns route locations.
+- `plan_legacy_map_paths(map_path, cases)`: reads the map once and returns route locations for a batch of start/goal cases.
+- `benchmark_legacy_map_paths(map_path, cases, repeats)`: reads the map once and times repeated C++ A* planning loops.
 
 ## Validation
 

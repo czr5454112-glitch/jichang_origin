@@ -38,6 +38,13 @@ def main() -> None:
         37,
         49,
     ]
+    assert czr005_cpp.plan_legacy_map_paths(str(LEGACY / "map2.txt"), [(0, 47), (52, 49)]) == [
+        [0, 6, 12, 13, 23, 24, 27, 28, 47],
+        [52, 29, 30, 31, 32, 37, 49],
+    ]
+    benchmark = czr005_cpp.benchmark_legacy_map_paths(str(LEGACY / "map2.txt"), [(0, 47), (52, 49)], 2)
+    assert benchmark["total_plans"] == 4
+    assert benchmark["checksum"] == 32
 
     task_summary = czr005_cpp.read_legacy_task_summary(str(LEGACY / "inputdata.txt"))
     assert task_summary["raw_task_count"] == 28506
