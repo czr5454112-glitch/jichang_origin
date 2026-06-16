@@ -87,3 +87,14 @@
 - Tests / validation: scaffold CTest passed 2/2; target CTest passed 2/2; target Phase1E script passed; target Python pytest passed `6 passed`.
 - Safety / parity notes: This is a small map2 A* smoke, not a large-scale event-simulation benchmark. It does not yet include task stream replay or reservation-heavy scaling.
 - Follow-up: begin Phase1a A* scalability diagnosis or Phase2 baseline/shield work.
+
+## 2026-06-16 21:50 - Phase1a planner-only A* scalability diagnosis
+
+- Request: Continue after Phase1E with preliminary A* scalability evidence from the real task stream.
+- Branch: `main`.
+- Files changed: added `scripts/eval/run_phase1a_astar_scalability.py`, generated `outputs/tables/phase1a_astar_scalability.csv`, `outputs/reports/phase1a_astar_scalability_diagnosis.md`, and `outputs/figures/phase1a_runtime_vs_active_bags.png`.
+- Commands run: Phase1a scalability script against the scaffold and target build-tree `czr005_cpp` modules.
+- Key observations: 500/1000/2000/4000/8000 planner-only task-leg sweeps all matched Python/C++ checksums. In the target run at 8,000 plans, Python reference took 1.837983s and C++ pybind core took 1.516141s, a 1.212x speedup.
+- Tests / validation: scaffold and target scripts passed and generated CSV/report/PNG. Matplotlib triggered a native `python.exe` application error in this Windows session, so the script now uses Pillow to draw the PNG without GUI/native plotting backends.
+- Safety / parity notes: This is planner-only; it does not yet include reservation-heavy event replay, faults, rolling replans, or active queue pressure.
+- Follow-up: move to Phase2 baseline/shield work.
