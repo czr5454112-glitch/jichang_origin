@@ -65,3 +65,14 @@
 - Tests / validation: scaffold CTest passed 1/1; target CTest passed 1/1; target Python pytest passed `6 passed`.
 - Safety / parity notes: This is still smoke parity, not a full generated parity table or timing report.
 - Follow-up: move to Phase1D pybind or a generated Phase1E parity/speed table.
+
+## 2026-06-16 21:05 - Phase1D pybind boundary
+
+- Request: Continue from Phase1C into the Python/C++ boundary required by the master plan.
+- Branch: `main`.
+- Files changed: added `cpp/ics_core/bindings/czr005_cpp.cpp`, `cpp/tests/test_pybind_smoke.py`, `outputs/reports/phase1d_pybind_report.md`, and CMake pybind wiring.
+- Commands run: CMake configure/build/CTest using `NMake Makefiles`, explicit `cl`, and pybind11 from the `czr005` Conda environment.
+- Key observations: CMake finds Python 3.11.15 and pybind11 3.0.3 in the Conda env; the build emits `czr005_cpp.cp311-win_amd64.pyd` under `build_nmake/python`.
+- Tests / validation: scaffold CTest passed 2/2; target CTest passed 2/2; target Python pytest passed `6 passed`.
+- Safety / parity notes: The binding exposes parser summaries and A* path planning only; no learning/runtime policy code is bound yet.
+- Follow-up: add Phase1E parity/speed smoke using the binding.

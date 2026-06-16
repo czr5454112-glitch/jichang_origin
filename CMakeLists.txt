@@ -7,6 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 enable_testing()
 
+option(CZR005_BUILD_PYBIND "Build Python bindings with pybind11" ON)
+
 add_library(ics_core INTERFACE)
 target_include_directories(ics_core INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/cpp)
 
@@ -14,3 +16,26 @@ add_executable(test_cpp_core_smoke cpp/tests/test_cpp_core_smoke.cpp)
 target_link_libraries(test_cpp_core_smoke PRIVATE ics_core)
 target_compile_definitions(test_cpp_core_smoke PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME cpp_core_smoke COMMAND test_cpp_core_smoke)
+
+if(CZR005_BUILD_PYBIND)
+  find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+  find_package(pybind11 CONFIG REQUIRED)
+
+  pybind11_add_module(czr005_cpp cpp/ics_core/bindings/czr005_cpp.cpp)
+  target_link_libraries(czr005_cpp PRIVATE ics_core)
+  set_target_properties(
+    czr005_cpp
+    PROPERTIES
+      LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python
+      RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python
+      ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+
+  add_test(
+    NAME pybind_smoke
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cpp/tests/test_pybind_smoke.py)
+  set_tests_properties(
+    pybind_smoke
+    PROPERTIES
+      ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/python"
+      DEPENDS czr005_cpp)
+endif()
