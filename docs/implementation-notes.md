@@ -12,7 +12,16 @@ The first faithful port boundary is data-level:
 
 ## Current Phase
 
-Phase1A implements legacy parsers only. It intentionally avoids:
+Phase1A implements legacy parsers only. Phase1B adds a headless Python reference simulator with:
+
+- typed graph loading,
+- expanded task stream loading,
+- Java-compatible node reservation intervals,
+- legacy-style A* route planning,
+- structured episode replay logs,
+- shared episode metrics.
+
+It intentionally avoids:
 
 - reinforcement learning code,
 - Gym/PettingZoo environments,
@@ -24,4 +33,3 @@ Phase1A implements legacy parsers only. It intentionally avoids:
 1. Build a headless Python reference simulator around the parsed graph/task stream.
 2. Implement the C++ graph/task/event/reservation primitives.
 3. Add parity tests that compare Python and C++ outputs on the same fixtures.
-
