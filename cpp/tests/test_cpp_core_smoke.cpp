@@ -1,11 +1,13 @@
 #include <cmath>
 #include <iostream>
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
 
 #include "ics_core/graph/graph.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
+#include "ics_core/io/legacy_task_reader.hpp"
 #include "ics_core/metrics/metrics.hpp"
 #include "ics_core/reservation/reservation.hpp"
 #include "ics_core/routing/astar.hpp"
@@ -16,6 +18,7 @@ using czr005::ics::Graph;
 using czr005::ics::Node;
 using czr005::ics::ReservationTable;
 using czr005::ics::compute_episode_metrics;
+using czr005::ics::read_legacy_inputdata;
 using czr005::ics::read_legacy_map2;
 
 namespace {
@@ -50,6 +53,11 @@ void print_route(const std::vector<czr005::ics::PathNode>& route) {
     std::cerr << ' ' << node.location;
   }
   std::cerr << '\n';
+}
+
+int map_value_or(const std::map<int, int>& values, int key, int fallback = -1) {
+  const auto found = values.find(key);
+  return found == values.end() ? fallback : found->second;
 }
 
 }  // namespace
@@ -123,6 +131,45 @@ int main() {
   }
   if (legacy_route.size() != expected_path.size() || test.failures > 0) {
     print_route(legacy_route);
+  }
+
+  const auto legacy_tasks = read_legacy_inputdata(std::string(CZR005_SOURCE_DIR) +
+                                                  "/legacy/jichang_origin_readonly/inputdata.txt");
+  test.check(legacy_tasks.header == "ID EntryTime(s) STD(s) star end Unloader Loader",
+             "legacy inputdata header should match Java file");
+  test.check(legacy_tasks.raw_task_count == 28506, "legacy raw task count should be 28506");
+  test.check(legacy_tasks.direct_raw_task_count == 13409, "legacy direct raw task count should be 13409");
+  test.check(legacy_tasks.early_split_raw_task_count == 15097,
+             "legacy early split raw task count should be 15097");
+  test.check(legacy_tasks.stream.size() == 43603, "legacy expanded task count should be 43603");
+  test.check(map_value_or(legacy_tasks.expanded_by_start, 0) == 3200,
+             "legacy expanded start 0 count should be 3200");
+  test.check(map_value_or(legacy_tasks.expanded_by_start, 1) == 3193,
+             "legacy expanded start 1 count should be 3193");
+  test.check(map_value_or(legacy_tasks.expanded_by_start, 2) == 3199,
+             "legacy expanded start 2 count should be 3199");
+  test.check(map_value_or(legacy_tasks.expanded_by_start, 3) == 4887,
+             "legacy expanded start 3 count should be 4887");
+  test.check(map_value_or(legacy_tasks.expanded_by_start, 4) == 4887,
+             "legacy expanded start 4 count should be 4887");
+  test.check(map_value_or(legacy_tasks.expanded_by_start, 5) == 4886,
+             "legacy expanded start 5 count should be 4886");
+  test.check(map_value_or(legacy_tasks.expanded_by_start, 52) == 15097,
+             "legacy expanded start 52 count should be 15097");
+  test.check(map_value_or(legacy_tasks.expanded_by_start, 53) == 4254,
+             "legacy expanded start 53 count should be 4254");
+
+  const auto& task_list = legacy_tasks.stream.tasks();
+  test.check(!task_list.empty(), "legacy task stream should not be empty");
+  if (!task_list.empty()) {
+    const auto& first = task_list.front();
+    test.check(first.segment_id == "0:storage_in", "legacy first sorted segment id should match Python");
+    test.check(near(first.pass_time, 8267.845453), "legacy first sorted pass time should match Python");
+    test.check(first.start == 3, "legacy first sorted start should match Python");
+    test.check(first.goal == 47, "legacy first sorted goal should match Python");
+    test.check(first.leg == "storage_in", "legacy first sorted leg should match Python");
+    test.check(first.early_bag_split, "legacy first sorted task should be marked early split");
+    test.check(first.source_line == 2, "legacy first sorted source line should match Python");
   }
 
   return test.failures == 0 ? 0 : 1;

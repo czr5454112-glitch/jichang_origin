@@ -8,6 +8,7 @@ Started the Phase1C C++ high-performance core with a dependency-light, header-on
 
 - `cpp/ics_core/graph/graph.hpp`
 - `cpp/ics_core/io/legacy_map_reader.hpp`
+- `cpp/ics_core/io/legacy_task_reader.hpp`
 - `cpp/ics_core/task_stream/task_stream.hpp`
 - `cpp/ics_core/reservation/reservation.hpp`
 - `cpp/ics_core/routing/astar_types.hpp`
@@ -21,6 +22,7 @@ Started the Phase1C C++ high-performance core with a dependency-light, header-on
 
 - Directed graph with service times, edge travel time, and heuristic table.
 - Legacy `map2.txt` reader with Java-equivalent heuristic scaling.
+- Legacy `inputdata.txt` reader with Java-equivalent early-bag storage splitting.
 - Java-compatible node reservation intervals using strict non-overlap.
 - A* route planning over directed outgoing edges.
 - Fault-edge blocking.
@@ -62,6 +64,15 @@ The smoke test now also reads `legacy/jichang_origin_readonly/map2.txt`, checks 
 
 During the map2 smoke expansion, a C++ A* lifetime bug was fixed by copying the current record before appending children to the `records` vector. This avoids invalid references after vector reallocation and prevents the MSVC debug-runtime dialog that was previously triggered by `assert`/abort behavior.
 
+The smoke test also reads `legacy/jichang_origin_readonly/inputdata.txt` and checks Python parser parity for:
+
+- raw task count: 28,506
+- direct raw tasks: 13,409
+- early-split raw tasks: 15,097
+- expanded task legs: 43,603
+- expanded start-node distribution: `{0: 3200, 1: 3193, 2: 3199, 3: 4887, 4: 4887, 5: 4886, 52: 15097, 53: 4254}`
+- first Python-sorted task leg: `0:storage_in`, pass time `8267.845453`, start `3`, goal `47`
+
 ## Current Gate Status
 
 - C++17 boundary: implemented in CMake.
@@ -73,7 +84,5 @@ During the map2 smoke expansion, a C++ A* lifetime bug was fixed by copying the 
 ## Remaining Phase1C Work
 
 - Decide whether C++ should load normalized JSON directly or keep the legacy txt reader plus generated parity fixtures.
-- Load/represent expanded task stream from JSONL.
-- Compare C++ task parser counts against Python parser output.
 - Compare C++ A* against Python A* on a broader map2 smoke set.
 - Add larger deterministic simulation parity cases.

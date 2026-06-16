@@ -19,6 +19,7 @@ struct TaskLeg {
   double original_entry_time = 0.0;
   std::string leg;
   bool early_bag_split = false;
+  int source_line = -1;
 };
 
 class TaskStream {
@@ -30,7 +31,10 @@ class TaskStream {
       if (left.pass_time != right.pass_time) {
         return left.pass_time < right.pass_time;
       }
-      return left.task_id < right.task_id;
+      if (left.task_id != right.task_id) {
+        return left.task_id < right.task_id;
+      }
+      return left.leg < right.leg;
     });
   }
 
@@ -42,4 +46,3 @@ class TaskStream {
 };
 
 }  // namespace czr005::ics
-

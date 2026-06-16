@@ -43,3 +43,14 @@
 - Tests / validation: target CTest passed 1/1; target Python pytest passed `6 passed`.
 - Safety / parity notes: This improves parser parity evidence but still does not cover `inputdata.txt`/JSONL task loading or broad Python/C++ A* parity.
 - Follow-up: add task stream reader and multi-case Python/C++ parity table.
+
+## 2026-06-16 20:30 - Phase1C legacy task stream reader
+
+- Request: Continue Phase1C by bringing C++ task parsing closer to Python parser parity.
+- Branch: `main`.
+- Files changed: added `cpp/ics_core/io/legacy_task_reader.hpp`, extended `TaskLeg` with `source_line`, aligned C++ task stream ordering with Python, and expanded the C++ smoke test.
+- Commands run: CMake build/CTest using `NMake Makefiles` and explicit `cl`.
+- Key observations: C++ now reads legacy `inputdata.txt`, applies the same early-bag split constants as Python, and validates 28,506 raw tasks -> 43,603 expanded task legs with the same start-node distribution.
+- Tests / validation: scaffold CTest passed 1/1; target CTest passed 1/1; target Python pytest passed `6 passed`.
+- Safety / parity notes: This adds parser parity coverage only; it does not yet run full task-stream simulation parity or pybind bindings.
+- Follow-up: add broader Python/C++ A* parity and Phase1D pybind.
