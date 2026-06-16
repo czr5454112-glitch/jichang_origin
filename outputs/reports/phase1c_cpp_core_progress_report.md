@@ -56,11 +56,15 @@ Target result under `C:\PROGRAMING\czr005`:
 
 Ninja was not available on PATH, and Visual Studio generator probing did not find `CMAKE_CXX_COMPILER` in this shell. NMake with explicit `cl` is the current verified Windows build path.
 
-The smoke test now also reads `legacy/jichang_origin_readonly/map2.txt`, checks 54 nodes, 54 heuristic rows, 69 edges, start/end node type counts, and verifies the `0 -> 47` path:
+The smoke test now also reads `legacy/jichang_origin_readonly/map2.txt`, checks 54 nodes, 54 heuristic rows, 69 edges, start/end node type counts, and verifies these Python-reference A* paths:
 
 ```text
-0 6 12 13 23 24 27 28 47
+0 -> 47:  0 6 12 13 23 24 27 28 47
+52 -> 49: 52 29 30 31 32 37 49
+53 -> 50: 53 20 10 15 14 46 36 44 50
 ```
+
+The historical Java output for `3 -> 49` is inconsistent with current Java/map behavior, so C++ keeps it as a structural smoke only: non-empty route, correct start, correct goal.
 
 During the map2 smoke expansion, a C++ A* lifetime bug was fixed by copying the current record before appending children to the `records` vector. This avoids invalid references after vector reallocation and prevents the MSVC debug-runtime dialog that was previously triggered by `assert`/abort behavior.
 
@@ -84,5 +88,5 @@ The smoke test also reads `legacy/jichang_origin_readonly/inputdata.txt` and che
 ## Remaining Phase1C Work
 
 - Decide whether C++ should load normalized JSON directly or keep the legacy txt reader plus generated parity fixtures.
-- Compare C++ A* against Python A* on a broader map2 smoke set.
+- Expand Python/C++ A* parity beyond smoke paths into a generated table with timings.
 - Add larger deterministic simulation parity cases.

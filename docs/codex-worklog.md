@@ -54,3 +54,14 @@
 - Tests / validation: scaffold CTest passed 1/1; target CTest passed 1/1; target Python pytest passed `6 passed`.
 - Safety / parity notes: This adds parser parity coverage only; it does not yet run full task-stream simulation parity or pybind bindings.
 - Follow-up: add broader Python/C++ A* parity and Phase1D pybind.
+
+## 2026-06-16 20:45 - Phase1C map2 A* parity smoke expansion
+
+- Request: Continue Phase1C by broadening C++ A* smoke parity against the Python reference.
+- Branch: `main`.
+- Files changed: extended `cpp/tests/test_cpp_core_smoke.cpp` with three Python-reference map2 paths and one structural route check for the historically inconsistent `3 -> 49` case.
+- Commands run: CMake build/CTest using `NMake Makefiles` and explicit `cl`.
+- Key observations: C++ matches Python exact routes for `0 -> 47`, `52 -> 49`, and `53 -> 50`; `3 -> 49` remains structural only for the same reason documented in the Python tests.
+- Tests / validation: scaffold CTest passed 1/1; target CTest passed 1/1; target Python pytest passed `6 passed`.
+- Safety / parity notes: This is still smoke parity, not a full generated parity table or timing report.
+- Follow-up: move to Phase1D pybind or a generated Phase1E parity/speed table.

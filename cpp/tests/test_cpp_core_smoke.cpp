@@ -39,7 +39,7 @@ bool near(double left, double right) { return std::fabs(left - right) < 1e-9; }
 struct TestContext {
   int failures = 0;
 
-  void check(bool condition, const char* message) {
+  void check(bool condition, const std::string& message) {
     if (!condition) {
       std::cerr << "FAIL: " << message << '\n';
       ++failures;
@@ -53,6 +53,29 @@ void print_route(const std::vector<czr005::ics::PathNode>& route) {
     std::cerr << ' ' << node.location;
   }
   std::cerr << '\n';
+}
+
+void check_route_locations(TestContext& test,
+                           const std::vector<czr005::ics::PathNode>& route,
+                           const std::vector<int>& expected,
+                           const std::string& label) {
+  bool route_ok = true;
+  if (route.size() != expected.size()) {
+    test.check(false, label + " route size should match Python reference");
+    route_ok = false;
+  } else {
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+      if (route[i].location != expected[i]) {
+        std::cerr << "FAIL: " << label << " route differs at index " << i << ", expected "
+                  << expected[i] << ", got " << route[i].location << '\n';
+        ++test.failures;
+        route_ok = false;
+      }
+    }
+  }
+  if (!route_ok) {
+    print_route(route);
+  }
 }
 
 int map_value_or(const std::map<int, int>& values, int key, int fallback = -1) {
@@ -117,20 +140,24 @@ int main() {
   test.check(legacy.graph.node_type_count(2) == 5, "legacy map type-2 node count should be 5");
 
   const AStarPlanner legacy_planner(legacy.graph);
-  const auto legacy_route = legacy_planner.plan(0, 47);
-  const std::vector<int> expected_path{0, 6, 12, 13, 23, 24, 27, 28, 47};
-  test.check(legacy_route.size() == expected_path.size(), "legacy 0->47 route size should match Python reference");
-  if (legacy_route.size() == expected_path.size()) {
-    for (std::size_t i = 0; i < expected_path.size(); ++i) {
-      if (legacy_route[i].location != expected_path[i]) {
-        std::cerr << "FAIL: legacy 0->47 route differs at index " << i << ", expected "
-                  << expected_path[i] << ", got " << legacy_route[i].location << '\n';
-        ++test.failures;
-      }
-    }
-  }
-  if (legacy_route.size() != expected_path.size() || test.failures > 0) {
-    print_route(legacy_route);
+  check_route_locations(test,
+                        legacy_planner.plan(0, 47),
+                        {0, 6, 12, 13, 23, 24, 27, 28, 47},
+                        "legacy 0->47");
+  check_route_locations(test,
+                        legacy_planner.plan(52, 49),
+                        {52, 29, 30, 31, 32, 37, 49},
+                        "legacy 52->49");
+  check_route_locations(test,
+                        legacy_planner.plan(53, 50),
+                        {53, 20, 10, 15, 14, 46, 36, 44, 50},
+                        "legacy 53->50");
+
+  const auto structural_route = legacy_planner.plan(3, 49);
+  test.check(!structural_route.empty(), "legacy 3->49 structural route should not be empty");
+  if (!structural_route.empty()) {
+    test.check(structural_route.front().location == 3, "legacy 3->49 structural route should start at 3");
+    test.check(structural_route.back().location == 49, "legacy 3->49 structural route should end at 49");
   }
 
   const auto legacy_tasks = read_legacy_inputdata(std::string(CZR005_SOURCE_DIR) +
