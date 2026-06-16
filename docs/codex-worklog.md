@@ -98,3 +98,14 @@
 - Tests / validation: scaffold and target scripts passed and generated CSV/report/PNG. Matplotlib triggered a native `python.exe` application error in this Windows session, so the script now uses Pillow to draw the PNG without GUI/native plotting backends.
 - Safety / parity notes: This is planner-only; it does not yet include reservation-heavy event replay, faults, rolling replans, or active queue pressure.
 - Follow-up: move to Phase2 baseline/shield work.
+
+## 2026-06-16 22:15 - Phase2A junction shield skeleton
+
+- Request: Start Phase2 baseline/shield work after Phase1 parity and scalability smoke.
+- Branch: `main`.
+- Files changed: added `cpp/ics_core/shield/junction_shield.hpp`, expanded C++ smoke tests, and updated safety/C++ docs plus `outputs/reports/phase2a_reservation_shield_report.md`.
+- Commands run: CMake build/CTest using `NMake Makefiles` and explicit `cl`.
+- Key observations: The initial C++ shield rejects missing edges, faulted edges, node reservation conflicts, edge capacity conflicts, edge headway conflicts, and next-hop choices that make the goal unreachable.
+- Tests / validation: scaffold CTest passed 2/2; target CTest passed 2/2; target Python pytest passed `6 passed`.
+- Safety / parity notes: This is a deterministic shield skeleton only; buffer capacity, merge groups, SIPP, rolling horizon, and PIBT-style resolver remain pending.
+- Follow-up: expand Phase2 baselines.

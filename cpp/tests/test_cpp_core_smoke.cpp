@@ -11,12 +11,17 @@
 #include "ics_core/metrics/metrics.hpp"
 #include "ics_core/reservation/reservation.hpp"
 #include "ics_core/routing/astar.hpp"
+#include "ics_core/shield/junction_shield.hpp"
 
 using czr005::ics::AStarPlanner;
 using czr005::ics::Edge;
+using czr005::ics::EdgeReservationTable;
 using czr005::ics::Graph;
+using czr005::ics::JunctionShield;
+using czr005::ics::JunctionShieldConfig;
 using czr005::ics::Node;
 using czr005::ics::ReservationTable;
+using czr005::ics::SafetyStatus;
 using czr005::ics::compute_episode_metrics;
 using czr005::ics::read_legacy_inputdata;
 using czr005::ics::read_legacy_map2;
@@ -120,6 +125,89 @@ int main() {
   const std::set<std::pair<int, int>> fault_edges{{1, 2}};
   const auto fault_blocked = planner.plan(0, 2, 10.0, &reservations, fault_edges, 4);
   test.check(fault_blocked.empty(), "sample faulted edge should block the route");
+
+  JunctionShieldConfig shield_config;
+  shield_config.edge_capacity = 1;
+  shield_config.edge_headway_seconds = 2.0;
+  const JunctionShield shield(graph, shield_config);
+  const ReservationTable empty_node_reservations;
+  const EdgeReservationTable empty_edge_reservations;
+  auto decision = shield.validate_edge_action(10,
+                                              0,
+                                              1,
+                                              2,
+                                              0.0,
+                                              empty_node_reservations,
+                                              empty_edge_reservations);
+  test.check(decision.allowed(), "shield should allow a safe sample edge action");
+  test.check(near(decision.edge_start, 0.0), "shield allowed edge start should be 0.0");
+  test.check(near(decision.edge_end, 2.0), "shield allowed edge end should be 2.0");
+
+  decision = shield.validate_edge_action(10,
+                                         1,
+                                         0,
+                                         2,
+                                         0.0,
+                                         empty_node_reservations,
+                                         empty_edge_reservations);
+  test.check(decision.status == SafetyStatus::kMissingEdge, "shield should reject missing edges");
+
+  decision = shield.validate_edge_action(10,
+                                         0,
+                                         1,
+                                         2,
+                                         0.0,
+                                         empty_node_reservations,
+                                         empty_edge_reservations,
+                                         {{0, 1}});
+  test.check(decision.status == SafetyStatus::kFaultedEdge, "shield should reject faulted edges");
+
+  ReservationTable node_conflicts;
+  node_conflicts.reserve(99, 1, 2.0, 3.0);
+  decision = shield.validate_edge_action(10,
+                                         0,
+                                         1,
+                                         2,
+                                         0.0,
+                                         node_conflicts,
+                                         empty_edge_reservations);
+  test.check(decision.status == SafetyStatus::kNodeReservationConflict,
+             "shield should reject node reservation conflicts");
+
+  EdgeReservationTable edge_capacity_conflicts;
+  edge_capacity_conflicts.reserve(99, 0, 1, 0.0, 2.0);
+  decision = shield.validate_edge_action(10,
+                                         0,
+                                         1,
+                                         2,
+                                         0.0,
+                                         empty_node_reservations,
+                                         edge_capacity_conflicts);
+  test.check(decision.status == SafetyStatus::kEdgeCapacityConflict,
+             "shield should reject edge capacity conflicts");
+
+  EdgeReservationTable edge_headway_conflicts;
+  edge_headway_conflicts.reserve(99, 0, 1, 0.0, 0.5);
+  decision = shield.validate_edge_action(10,
+                                         0,
+                                         1,
+                                         2,
+                                         1.0,
+                                         empty_node_reservations,
+                                         edge_headway_conflicts);
+  test.check(decision.status == SafetyStatus::kEdgeHeadwayConflict,
+             "shield should reject edge headway conflicts");
+
+  decision = shield.validate_edge_action(10,
+                                         0,
+                                         1,
+                                         2,
+                                         8.0,
+                                         empty_node_reservations,
+                                         empty_edge_reservations,
+                                         {{1, 2}});
+  test.check(decision.status == SafetyStatus::kUnreachableGoal,
+             "shield should reject actions that make the goal unreachable");
 
   const auto metrics = compute_episode_metrics(std::vector<std::vector<czr005::ics::PathNode>>{route, later},
                                                1,

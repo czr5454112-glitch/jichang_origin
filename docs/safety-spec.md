@@ -24,5 +24,22 @@ headway_violation_count == 0
 node_capacity_violation_count == 0
 ```
 
-Phase1A only defines parsed input data. Runtime shield enforcement begins in Phase2.
+## Implementation Status
 
+Phase2A has started with a C++ junction shield skeleton in `cpp/ics_core/shield/junction_shield.hpp`.
+
+Currently covered by C++ smoke tests:
+
+- edge existence
+- faulted edge rejection
+- edge capacity conflict
+- edge headway conflict
+- node reservation conflict
+- next-hop reachability to goal
+
+Still pending:
+
+- explicit buffer capacity
+- merge conflict groups
+- event-simulation safety counters
+- SIPP / rolling-horizon / PIBT-style baseline integration
