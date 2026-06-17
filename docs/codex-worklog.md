@@ -516,3 +516,14 @@
 - Tests / validation: target Phase2 pytest passed `15 passed`; CTest passed 2/2; Phase2 C++ PIBT parity reported `8` strict PASS rows; full Python pytest passed `41 passed`; SIPP, rolling-horizon, periodic replanning, Phase8 event parity, and Phase8 trace diagnostics all passed.
 - Safety / parity notes: Bounded recursive current-node handoff is covered for simultaneous slices. Full active-bag PIBT/CS-PIBT replay integration, merge-group/buffer semantics, real heldout-map validation, and Phase9 runtime comparisons remain pending.
 - Follow-up: continue with merge/buffer semantics or full active-bag PIBT replay integration.
+
+## 2026-06-17 19:25 - Phase2 explicit buffer-capacity shield checks
+
+- Request: Continue closing Phase2 safety prerequisites from the master plan by addressing explicit buffer/node capacity semantics in both Python and C++.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added capacity-aware node reservation checks to Python and C++, threaded `node_capacities` through the Python action mask, observation builder, and junction environment, extended C++ `JunctionShieldConfig` with per-node capacities, added Python action-mask and C++ shield smoke coverage, and refreshed safety/status reports.
+- Commands run: target Phase3 env pytest, target Phase2 baseline pytest, CMake build through the VS developer environment with CTest, Phase2 baseline smoke, Phase3 learning-env smoke, full Python pytest, Phase2 C++ SIPP parity, Phase2 C++ PIBT parity, Phase2 periodic replanning parity, Phase2 C++ rolling-horizon parity, Phase8 native C++ event parity, and Phase8 event trace diagnostic.
+- Key observations: Default behavior remains binary node reservation capacity. When an explicit node capacity is configured, both Python action masks and C++ shield allow overlaps below capacity and block the next overlap once the buffer is full.
+- Tests / validation: Phase3 env pytest passed `8 passed`; Phase2 baseline pytest passed `15 passed`; CTest passed 2/2; Phase2 baseline smoke reported zero post-shield conflicts; Phase3 learning-env smoke reported zero post-shield conflicts; full Python pytest passed `42 passed`; SIPP, PIBT, periodic replanning, rolling-horizon, Phase8 event parity, and Phase8 trace diagnostics all passed.
+- Safety / parity notes: Explicit node/buffer capacity checks are covered at the action-mask/shield layer. Full buffer-capacity replay integration across every baseline, merge-group semantics, real heldout-map validation, and Phase9 runtime comparisons remain pending.
+- Follow-up: carry node-capacity configuration into broader replay/parity scripts or implement merge-group conflict semantics.

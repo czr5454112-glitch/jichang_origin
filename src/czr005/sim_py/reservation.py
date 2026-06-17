@@ -70,6 +70,24 @@ class ReservationTable:
                 return True
         return False
 
+    def has_capacity_conflict(
+        self,
+        node: int,
+        start: float,
+        end: float,
+        capacity: int = 1,
+        task_id: int | None = None,
+    ) -> bool:
+        if capacity <= 0:
+            return True
+        overlapping = 0
+        for interval in self._by_node.get(node, ()):
+            if task_id is not None and interval.task_id == task_id:
+                continue
+            if interval.overlaps(start, end):
+                overlapping += 1
+        return overlapping >= capacity
+
     def reserve(self, task_id: int, node: int, start: float, end: float) -> NodeReservation:
         existing = self._by_node.setdefault(node, [])
         existing[:] = [interval for interval in existing if interval.task_id != task_id]

@@ -20,4 +20,4 @@ CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 
 ## Notes
 
-The edge reservation search remains a deterministic baseline implementation. It is sufficient for the current capacity/headway regression tests and smoke replay, but it is not yet a full interval-capacity optimizer. Merge groups, buffer-capacity constraints, full active-bag replanning, recursive PIBT replay integration, C++ SIPP parity, and multi-seed density/fault sweeps remain open.
+The edge reservation search remains a deterministic baseline implementation. It is sufficient for the current capacity/headway regression tests and smoke replay, but it is not yet a full interval-capacity optimizer. Merge groups, full buffer-capacity replay integration, full active-bag replanning, recursive PIBT replay integration, C++ SIPP parity, and multi-seed density/fault sweeps remain open.

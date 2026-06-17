@@ -26,4 +26,4 @@ CSV: `outputs/tables/phase2_cpp_rolling_horizon_parity.csv`
 - C++ rolling-horizon Python/C++ parity: PASS
 - rolling-horizon post-shield safety: PASS
 - persisted synthetic manifest schedules: covered
-- recursive PIBT and merge/buffer constraints: not covered
+- full active-bag PIBT replay, merge-group, and full buffer-capacity replay constraints: not covered

@@ -120,7 +120,7 @@ def write_outputs(rows: list[dict[str, float | int | str | bool]]) -> None:
             "## Remaining Work",
             "",
             "- PettingZoo-compatible multi-agent wrapper or custom batched decision dataset",
-            "- richer local occupancy and merge/buffer features",
+            "- richer local occupancy, merge-group, and buffer-occupancy features",
             "- queue-aware scripted policy baseline inside the environment",
             "- teacher slice export for imitation learning",
         ]

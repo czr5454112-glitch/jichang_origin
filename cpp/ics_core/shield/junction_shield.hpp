@@ -219,6 +219,7 @@ class EdgeReservationTable {
 struct JunctionShieldConfig {
   int edge_capacity = 1;
   double edge_headway_seconds = 0.0;
+  std::unordered_map<int, int> node_capacities;
   bool require_reachable_goal = true;
   bool allow_goal_node_overlap = true;
 };
@@ -274,7 +275,11 @@ class JunctionShield {
                             node_end};
     }
     if ((!config_.allow_goal_node_overlap || next != goal) &&
-        node_reservations.has_conflict(next, node_start, node_end, task_id)) {
+        node_reservations.has_capacity_conflict(next,
+                                                node_start,
+                                                node_end,
+                                                node_capacity(next),
+                                                task_id)) {
       return ShieldDecision{SafetyStatus::kNodeReservationConflict,
                             edge_start,
                             edge_end,
@@ -297,6 +302,11 @@ class JunctionShield {
                                        const std::set<std::pair<int, int>>& fault_edges) const {
     AStarPlanner planner(graph_);
     return !planner.plan(start, goal, 0.0, nullptr, fault_edges).empty();
+  }
+
+  [[nodiscard]] int node_capacity(int node) const {
+    const auto found = config_.node_capacities.find(node);
+    return found == config_.node_capacities.end() ? 1 : found->second;
   }
 
   const Graph& graph_;

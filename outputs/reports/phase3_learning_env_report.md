@@ -10,8 +10,8 @@ This smoke validates the first Python junction-decision learning environment. Th
 
 | Policy | Max tasks | Planned | Unplanned | Steps | Post-shield conflicts | Shield blocks | Unsafe proposals | Mean travel | P95 travel | Runtime seconds |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| astar_guided_safe | 8 | 8 | 0 | 78 | 0 | 0 | 0 | 49.750000 | 55.390000 | 0.019879 |
-| random_safe | 16 | 1 | 15 | 1927 | 0 | 0 | 0 | 53.200000 | 53.200000 | 0.050782 |
+| astar_guided_safe | 8 | 8 | 0 | 78 | 0 | 0 | 0 | 49.750000 | 55.390000 | 0.050145 |
+| random_safe | 16 | 16 | 0 | 429 | 0 | 0 | 0 | 169.162500 | 361.200000 | 0.179228 |
 
 CSV: `outputs/tables/phase3_learning_env_smoke_metrics.csv`
 
@@ -26,6 +26,6 @@ CSV: `outputs/tables/phase3_learning_env_smoke_metrics.csv`
 ## Remaining Work
 
 - PettingZoo-compatible multi-agent wrapper or custom batched decision dataset
-- richer local occupancy and merge/buffer features
+- richer local occupancy, merge-group, and buffer-occupancy features
 - queue-aware scripted policy baseline inside the environment
 - teacher slice export for imitation learning

@@ -40,6 +40,30 @@ class ReservationTable {
     return false;
   }
 
+  [[nodiscard]] bool has_capacity_conflict(int node,
+                                           double start,
+                                           double end,
+                                           int capacity = 1,
+                                           int task_id = -1) const {
+    if (capacity <= 0) {
+      return true;
+    }
+    const auto found = by_node_.find(node);
+    if (found == by_node_.end()) {
+      return false;
+    }
+    int overlapping = 0;
+    for (const auto& interval : found->second) {
+      if (task_id >= 0 && interval.task_id == task_id) {
+        continue;
+      }
+      if (interval.overlaps(start, end)) {
+        ++overlapping;
+      }
+    }
+    return overlapping >= capacity;
+  }
+
   void reserve(int task_id, int node, double start, double end) {
     auto& intervals = by_node_[node];
     intervals.erase(std::remove_if(intervals.begin(), intervals.end(),

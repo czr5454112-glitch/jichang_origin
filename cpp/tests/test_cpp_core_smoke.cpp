@@ -400,6 +400,29 @@ int main() {
   test.check(decision.status == SafetyStatus::kNodeReservationConflict,
              "shield should reject node reservation conflicts");
 
+  JunctionShieldConfig buffer_shield_config = shield_config;
+  buffer_shield_config.node_capacities[1] = 2;
+  const JunctionShield buffer_shield(graph, buffer_shield_config);
+  decision = buffer_shield.validate_edge_action(10,
+                                                0,
+                                                1,
+                                                2,
+                                                0.0,
+                                                node_conflicts,
+                                                empty_edge_reservations);
+  test.check(decision.allowed(),
+             "shield should allow a target node overlap below explicit buffer capacity");
+  node_conflicts.reserve(98, 1, 2.0, 3.0);
+  decision = buffer_shield.validate_edge_action(10,
+                                                0,
+                                                1,
+                                                2,
+                                                0.0,
+                                                node_conflicts,
+                                                empty_edge_reservations);
+  test.check(decision.status == SafetyStatus::kNodeReservationConflict,
+             "shield should reject target node overlap once buffer capacity is full");
+
   EdgeReservationTable edge_capacity_conflicts;
   edge_capacity_conflicts.reserve(99, 0, 1, 0.0, 2.0);
   decision = shield.validate_edge_action(10,

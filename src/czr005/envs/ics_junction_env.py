@@ -56,6 +56,7 @@ class IcsJunctionEnv:
         hold_seconds: float = 1.0,
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
+        node_capacities: dict[int, int] | None = None,
         fault_edges: set[tuple[int, int]] | None = None,
         fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
         require_reachable_goal: bool = True,
@@ -75,6 +76,7 @@ class IcsJunctionEnv:
         self.hold_seconds = hold_seconds
         self.edge_capacity = edge_capacity
         self.edge_headway_seconds = edge_headway_seconds
+        self.node_capacities = dict(node_capacities or {})
         self.fault_edges = fault_edges or set()
         self.fault_windows = tuple(fault_windows or ())
         self.require_reachable_goal = require_reachable_goal
@@ -376,6 +378,7 @@ class IcsJunctionEnv:
             edge_reservations=self.edge_reservations,
             edge_capacity=self.edge_capacity,
             edge_headway_seconds=self.edge_headway_seconds,
+            node_capacities=self.node_capacities,
             fault_edges=self.fault_edges,
             fault_windows=self.fault_windows,
             hold_seconds=self.hold_seconds,
@@ -395,6 +398,7 @@ class IcsJunctionEnv:
             edge_reservations=self.edge_reservations,
             edge_capacity=self.edge_capacity,
             edge_headway_seconds=self.edge_headway_seconds,
+            node_capacities=self.node_capacities,
             fault_edges=self.fault_edges,
             fault_windows=self.fault_windows,
             hold_seconds=self.hold_seconds,
@@ -442,15 +446,30 @@ class IcsJunctionEnv:
         task_id: int,
     ) -> float:
         candidate = earliest_start
-        for interval in sorted(
+        intervals = sorted(
             self.reservations.intervals(node),
             key=lambda item: (item.start, item.end, item.task_id),
-        ):
-            if interval.task_id == task_id:
-                continue
-            if _node_interval_safe(interval, candidate, candidate + duration):
-                continue
-            candidate = interval.end + 1e-9
+        )
+        for _ in range(len(intervals) + 1):
+            moved = False
+            for interval in intervals:
+                if interval.task_id == task_id:
+                    continue
+                if _node_interval_safe(interval, candidate, candidate + duration):
+                    continue
+                if not self.reservations.has_capacity_conflict(
+                    node,
+                    candidate,
+                    candidate + duration,
+                    capacity=self.node_capacities.get(node, 1),
+                    task_id=task_id,
+                ):
+                    continue
+                candidate = interval.end + 1e-9
+                moved = True
+                break
+            if not moved:
+                return candidate
         return candidate
 
 

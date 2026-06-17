@@ -73,6 +73,7 @@ def build_action_candidates(
     edge_reservations: EdgeReservationTable,
     edge_capacity: int = 1,
     edge_headway_seconds: float = 0.0,
+    node_capacities: dict[int, int] | None = None,
     fault_edges: set[tuple[int, int]] | None = None,
     fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
     hold_seconds: float = 1.0,
@@ -83,6 +84,7 @@ def build_action_candidates(
     if hold_seconds <= 0.0:
         raise ValueError("hold_seconds must be positive")
 
+    node_capacities = node_capacities or {}
     active_faults = active_fault_edges(fault_edges, fault_windows, ready_time)
     planner = AStarPlanner(graph) if require_reachable_goal else None
     candidates: list[ActionCandidate] = []
@@ -115,7 +117,14 @@ def build_action_candidates(
             task_id=task.task_id,
         ):
             reasons.append("edge_headway")
-        if reservations.has_conflict(next_node, node_start, node_end, task_id=task.task_id):
+        node_capacity = node_capacities.get(next_node, 1)
+        if reservations.has_capacity_conflict(
+            next_node,
+            node_start,
+            node_end,
+            capacity=node_capacity,
+            task_id=task.task_id,
+        ):
             reasons.append("node_reservation")
         if (
             planner is not None
@@ -146,7 +155,14 @@ def build_action_candidates(
     hold_start = ready_time
     hold_end = hold_start + hold_seconds
     hold_reasons: list[str] = []
-    if reservations.has_conflict(current, hold_start, hold_end, task_id=task.task_id):
+    hold_capacity = node_capacities.get(current, 1)
+    if reservations.has_capacity_conflict(
+        current,
+        hold_start,
+        hold_end,
+        capacity=hold_capacity,
+        task_id=task.task_id,
+    ):
         hold_reasons.append("node_reservation")
     candidates.append(
         ActionCandidate(

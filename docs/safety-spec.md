@@ -35,6 +35,7 @@ Currently covered by C++ smoke tests:
 - edge capacity conflict
 - edge headway conflict
 - node reservation conflict
+- explicit node/buffer capacity below/full-capacity behavior
 - next-hop reachability to goal
 
 Currently covered by Python baseline tests:
@@ -44,11 +45,11 @@ Currently covered by Python baseline tests:
 - rolling-horizon SIPP priority and reservation reuse
 - PIBT-style one-step merge conflict resolution
 - PIBT-style fault-edge fallback
+- action masks respect explicit node/buffer capacity
 
 Still pending:
 
-- explicit buffer capacity
 - merge conflict groups
 - event-simulation safety counters
-- C++ SIPP integration
-- full recursive PIBT-style baseline integration
+- full buffer-capacity replay integration across every baseline
+- full active-bag PIBT-style replay integration

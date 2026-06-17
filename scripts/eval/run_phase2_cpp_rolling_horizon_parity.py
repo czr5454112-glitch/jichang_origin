@@ -437,7 +437,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
                 else "- rolling-horizon post-shield safety: FAIL"
             ),
             "- persisted synthetic manifest schedules: covered",
-            "- recursive PIBT and merge/buffer constraints: not covered",
+            "- full active-bag PIBT replay, merge-group, and full buffer-capacity replay constraints: not covered",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

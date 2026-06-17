@@ -28,4 +28,4 @@ CSV: `outputs/tables/phase2_cpp_sipp_parity.csv`
 - node and edge reservation waiting cases: covered
 - persisted synthetic manifest first-task cases: covered
 - rolling-horizon C++ replay: not covered
-- merge/buffer constraints: not covered
+- merge-group/full buffer-capacity replay constraints: not covered

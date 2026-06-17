@@ -39,5 +39,5 @@ Target CTest:
 ## Limitations
 
 - Edge reservations are available to SIPP but are not yet emitted by the rolling-horizon replay.
-- Merge groups and buffer capacity are still pending.
+- Merge groups and full buffer-capacity replay integration are still pending.
 - C++ SIPP parity is still pending.

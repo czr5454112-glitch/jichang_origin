@@ -131,6 +131,48 @@ def test_action_mask_blocks_fault_and_edge_capacity() -> None:
     assert "fault_edge" in fault_candidates[0].blocked_reasons
 
 
+def test_action_mask_respects_buffer_node_capacity() -> None:
+    graph = _line_graph()
+    task = _task("buffer-capacity", 1, pass_time=0.0, std=20.0)
+    reservations = ReservationTable()
+    reservations.reserve(task_id=99, node=1, start=2.0, end=3.0)
+
+    blocked_candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=reservations,
+        edge_reservations=EdgeReservationTable(),
+    )
+    assert blocked_candidates[0].safe is False
+    assert "node_reservation" in blocked_candidates[0].blocked_reasons
+
+    buffer_candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=reservations,
+        edge_reservations=EdgeReservationTable(),
+        node_capacities={1: 2},
+    )
+    assert buffer_candidates[0].safe is True
+
+    reservations.reserve(task_id=98, node=1, start=2.0, end=3.0)
+    full_buffer_candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=reservations,
+        edge_reservations=EdgeReservationTable(),
+        node_capacities={1: 2},
+    )
+    assert full_buffer_candidates[0].safe is False
+    assert "node_reservation" in full_buffer_candidates[0].blocked_reasons
+
+
 def test_action_mask_applies_repair_windows_by_ready_time() -> None:
     graph = _branch_graph()
     task = _task("repair-window", 1, pass_time=0.0, std=20.0, goal=3)
