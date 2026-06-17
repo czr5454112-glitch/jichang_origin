@@ -9,6 +9,7 @@
 
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
+#include "ics_core/models/edge_score.hpp"
 #include "ics_core/routing/astar.hpp"
 
 namespace py = pybind11;
@@ -104,6 +105,25 @@ py::dict benchmark_legacy_map_paths(const std::string& map_path,
   return result;
 }
 
+std::vector<double> edge_score_scores(const std::vector<std::vector<double>>& w1,
+                                      const std::vector<double>& b1,
+                                      const std::vector<double>& w2,
+                                      double b2,
+                                      const std::vector<std::vector<double>>& features) {
+  const czr005::ics::EdgeScoreModel model(w1, b1, w2, b2);
+  return model.scores(features);
+}
+
+int edge_score_predict(const std::vector<std::vector<double>>& w1,
+                       const std::vector<double>& b1,
+                       const std::vector<double>& w2,
+                       double b2,
+                       const std::vector<std::vector<double>>& features,
+                       const std::vector<bool>& action_mask) {
+  const czr005::ics::EdgeScoreModel model(w1, b1, w2, b2);
+  return model.predict(features, action_mask);
+}
+
 }  // namespace
 
 PYBIND11_MODULE(czr005_cpp, module) {
@@ -124,4 +144,19 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("map_path"),
              py::arg("cases"),
              py::arg("repeats") = 100);
+  module.def("edge_score_scores",
+             &edge_score_scores,
+             py::arg("w1"),
+             py::arg("b1"),
+             py::arg("w2"),
+             py::arg("b2"),
+             py::arg("features"));
+  module.def("edge_score_predict",
+             &edge_score_predict,
+             py::arg("w1"),
+             py::arg("b1"),
+             py::arg("w2"),
+             py::arg("b2"),
+             py::arg("features"),
+             py::arg("action_mask"));
 }

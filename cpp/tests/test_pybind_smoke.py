@@ -46,6 +46,15 @@ def main() -> None:
     assert benchmark["total_plans"] == 4
     assert benchmark["checksum"] == 32
 
+    w1 = [[0.1, -0.2], [0.3, 0.4], [-0.5, 0.25]]
+    b1 = [0.01, -0.02]
+    w2 = [0.7, -0.6]
+    b2 = 0.05
+    features = [[1.0, 0.5, -0.25], [0.0, 1.0, 0.5]]
+    scores = czr005_cpp.edge_score_scores(w1, b1, w2, b2, features)
+    assert len(scores) == 2
+    assert czr005_cpp.edge_score_predict(w1, b1, w2, b2, features, [False, True]) == 1
+
     task_summary = czr005_cpp.read_legacy_task_summary(str(LEGACY / "inputdata.txt"))
     assert task_summary["raw_task_count"] == 28506
     assert task_summary["direct_raw_task_count"] == 13409

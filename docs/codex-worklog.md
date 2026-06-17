@@ -263,3 +263,14 @@
 - Tests / validation: target Python pytest passed `28 passed`; Phase5 fault curriculum smoke passed with zero post-shield conflicts; target CTest passed 2/2.
 - Safety / parity notes: This is still same-map BC curriculum evidence, not RL and not heldout-map validation. It is a stronger starting checkpoint candidate for Phase6 but does not satisfy Phase6 gates by itself.
 - Follow-up: add model-visited fault DAgger relabeling, larger fault/repair sweeps, and then a conservative Phase6 fine-tuning smoke.
+
+## 2026-06-17 07:10 - Phase8 C++ MLP-EdgeScore runtime parity smoke
+
+- Request: Move some learned-policy runtime work back toward C++ instead of only improving Python-side learning prerequisites.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `cpp/ics_core/models/edge_score.hpp`, exposed `edge_score_scores` and `edge_score_predict` through `cpp/ics_core/bindings/czr005_cpp.cpp`, expanded C++ and pybind smoke tests, updated `cpp/ics_core/README.md`, added `scripts/eval/run_phase8_edge_score_cpp_parity.py`, and generated `outputs/tables/phase8_edge_score_cpp_parity.csv` plus `outputs/reports/phase8_edge_score_cpp_parity_report.md`.
+- Commands run: CMake build, target CTest, target Python pytest, and Phase8 edge-score Python/C++ parity smoke.
+- Key observations: The C++ header-only MLP scorer matches Python scorer outputs on 32 real teacher-slice feature rows using deterministic weights. The maximum score difference is within `1e-12`, and masked argmax predictions match.
+- Tests / validation: target Python pytest passed `28 passed`; target CTest passed 2/2; Phase8 parity smoke passed.
+- Safety / parity notes: This is scorer parity only. Production model loading, C++ closed-loop replay, runtime latency, and C++ shielded policy execution remain pending.
+- Follow-up: export trained model artifacts into a stable C++ format, then add C++ closed-loop replay and latency measurement.

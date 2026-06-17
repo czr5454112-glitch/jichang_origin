@@ -9,12 +9,14 @@
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
 #include "ics_core/metrics/metrics.hpp"
+#include "ics_core/models/edge_score.hpp"
 #include "ics_core/reservation/reservation.hpp"
 #include "ics_core/routing/astar.hpp"
 #include "ics_core/shield/junction_shield.hpp"
 
 using czr005::ics::AStarPlanner;
 using czr005::ics::Edge;
+using czr005::ics::EdgeScoreModel;
 using czr005::ics::EdgeReservationTable;
 using czr005::ics::Graph;
 using czr005::ics::JunctionShield;
@@ -216,6 +218,21 @@ int main() {
   test.check(metrics.unplanned_count == 1, "metrics unplanned count should be 1");
   test.check(metrics.reservation_conflicts == 0, "metrics reservation conflicts should be 0");
   test.check(metrics.makespan > 0.0, "metrics makespan should be positive");
+
+  const EdgeScoreModel edge_score_model(
+      {{0.1, -0.2}, {0.3, 0.4}, {-0.5, 0.25}},
+      {0.01, -0.02},
+      {0.7, -0.6},
+      0.05);
+  const std::vector<std::vector<double>> edge_features{{1.0, 0.5, -0.25}, {0.0, 1.0, 0.5}};
+  const auto edge_scores = edge_score_model.scores(edge_features);
+  test.check(edge_scores.size() == 2, "edge score model should return two scores");
+  test.check(near(edge_scores[0],
+                  std::tanh(0.1 + 0.15 + 0.125 + 0.01) * 0.7 +
+                      std::tanh(-0.2 + 0.2 - 0.0625 - 0.02) * -0.6 + 0.05),
+             "edge score first row should match manual tanh MLP");
+  test.check(edge_score_model.predict(edge_features, {false, true}) == 1,
+             "edge score masked prediction should choose the only safe action");
 
   const auto legacy = read_legacy_map2(std::string(CZR005_SOURCE_DIR) +
                                        "/legacy/jichang_origin_readonly/map2.txt");

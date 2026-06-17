@@ -8,6 +8,7 @@ Implemented so far:
 - A* planner and route smoke parity
 - node and edge reservation primitives
 - initial junction shield checks
+- header-only MLP edge-score inference smoke
 - pybind smoke boundary
 
-The full event simulator, SIPP baseline, rolling-horizon baseline, and PIBT-style resolver are still pending.
+The full C++ event simulator, C++ SIPP baseline, C++ rolling-horizon baseline, recursive PIBT-style resolver, and production model loader are still pending.
