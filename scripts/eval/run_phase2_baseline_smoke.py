@@ -106,6 +106,15 @@ plus baseline logging on real task-stream inputs.
 
 CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 
+Active-bag/replan-cost evidence is tracked separately in
+`outputs/reports/phase2_active_bag_replanning_audit_report.md`.
+
+Route-discarding periodic active-bag replanning parity is tracked in
+`outputs/reports/phase2_periodic_replanning_parity_report.md`.
+
+PIBT-style recursive current-node handoff parity is tracked in
+`outputs/reports/phase2_cpp_pibt_parity_report.md`.
+
 ## Gate Status
 
 - post-shield/reservation conflicts: {conflict_gate}
@@ -116,7 +125,8 @@ CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 
 - merge-group and buffer-capacity constraints
 - rolling-horizon active-bag replanning rather than sequential task-leg replay
-- recursive PIBT/CS-PIBT-style replay integration
+- full PIBT/CS-PIBT-style active-bag replay integration
+- real heldout airport-map fixtures
 - larger multi-seed task-density/fault sweeps
 """
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)

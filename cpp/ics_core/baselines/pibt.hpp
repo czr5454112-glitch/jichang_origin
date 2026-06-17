@@ -4,6 +4,8 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -70,27 +72,49 @@ class PIBTStyleOneStepResolver {
       return left.task_id < right.task_id;
     });
 
-    std::vector<PIBTResolvedAction> chosen;
-    chosen.reserve(agents.size());
+    std::unordered_map<int, int> priority_ranks;
+    std::unordered_map<int, PIBTAgentState> agents_by_task;
+    std::unordered_map<int, int> current_owner;
+    for (std::size_t index = 0; index < agents.size(); ++index) {
+      priority_ranks[agents[index].task_id] = static_cast<int>(index);
+      agents_by_task[agents[index].task_id] = agents[index];
+      current_owner.emplace(agents[index].current, agents[index].task_id);
+    }
+
+    std::unordered_map<int, PIBTResolvedAction> chosen_by_task;
     std::vector<LocalNodeWindow> local_node_windows;
     local_node_windows.reserve(agents.size());
     std::set<std::pair<int, int>> local_edges;
 
-    for (std::size_t index = 0; index < agents.size(); ++index) {
-      const auto action = choose_action(agents[index],
-                                        static_cast<int>(index),
-                                        node_reservations,
-                                        fault_edges,
-                                        local_node_windows,
-                                        local_edges);
-      chosen.push_back(action);
-      local_node_windows.push_back(LocalNodeWindow{
-          action.next_node, action.node_start, action.node_end, action.task_id});
-      if (action.action == "move") {
-        local_edges.insert({action.current, action.next_node});
+    for (const auto& agent : agents) {
+      if (chosen_by_task.find(agent.task_id) != chosen_by_task.end()) {
+        continue;
+      }
+      std::unordered_set<int> blocked_targets;
+      std::unordered_set<int> visiting;
+      const bool assigned = assign_recursive(agent,
+                                             priority_ranks.at(agent.task_id),
+                                             node_reservations,
+                                             fault_edges,
+                                             agents_by_task,
+                                             current_owner,
+                                             priority_ranks,
+                                             chosen_by_task,
+                                             local_node_windows,
+                                             local_edges,
+                                             blocked_targets,
+                                             false,
+                                             visiting);
+      if (!assigned) {
+        throw std::logic_error("top-level PIBT assignment failed");
       }
     }
 
+    std::vector<PIBTResolvedAction> chosen;
+    chosen.reserve(agents.size());
+    for (const auto& agent : agents) {
+      chosen.push_back(chosen_by_task.at(agent.task_id));
+    }
     return chosen;
   }
 
@@ -102,14 +126,33 @@ class PIBTStyleOneStepResolver {
     int task_id = -1;
   };
 
-  [[nodiscard]] PIBTResolvedAction choose_action(
+  [[nodiscard]] bool assign_recursive(
       const PIBTAgentState& agent,
       int priority_rank,
       const ReservationTable& reservations,
       const std::set<std::pair<int, int>>& fault_edges,
-      const std::vector<LocalNodeWindow>& local_node_windows,
-      const std::set<std::pair<int, int>>& local_edges) const {
+      const std::unordered_map<int, PIBTAgentState>& agents_by_task,
+      const std::unordered_map<int, int>& current_owner,
+      const std::unordered_map<int, int>& priority_ranks,
+      std::unordered_map<int, PIBTResolvedAction>& chosen_by_task,
+      std::vector<LocalNodeWindow>& local_node_windows,
+      std::set<std::pair<int, int>>& local_edges,
+      const std::unordered_set<int>& blocked_targets,
+      bool inherited,
+      std::unordered_set<int>& visiting) const {
+    const auto assigned = chosen_by_task.find(agent.task_id);
+    if (assigned != chosen_by_task.end()) {
+      return assigned->second.action == "move";
+    }
+    if (visiting.find(agent.task_id) != visiting.end()) {
+      return false;
+    }
+
+    visiting.insert(agent.task_id);
     for (const int next_node : candidate_edges(agent)) {
+      if (blocked_targets.find(next_node) != blocked_targets.end()) {
+        continue;
+      }
       if (fault_edges.find({agent.current, next_node}) != fault_edges.end()) {
         continue;
       }
@@ -138,28 +181,85 @@ class PIBTStyleOneStepResolver {
         continue;
       }
 
-      return PIBTResolvedAction{agent.task_id,
-                                "move",
-                                agent.current,
-                                next_node,
-                                edge_start,
-                                edge_end,
+      bool inherited_move = false;
+      const auto blocker_found = current_owner.find(next_node);
+      if (blocker_found != current_owner.end() && blocker_found->second != agent.task_id) {
+        const int blocker_id = blocker_found->second;
+        auto blocker_action = chosen_by_task.find(blocker_id);
+        if (blocker_action == chosen_by_task.end()) {
+          const auto blocker = agents_by_task.at(blocker_id);
+          const std::unordered_set<int> blocker_blocked_targets{agent.current, next_node};
+          if (!assign_recursive(blocker,
+                                priority_ranks.at(blocker.task_id),
+                                reservations,
+                                fault_edges,
+                                agents_by_task,
+                                current_owner,
+                                priority_ranks,
+                                chosen_by_task,
+                                local_node_windows,
+                                local_edges,
+                                blocker_blocked_targets,
+                                true,
+                                visiting)) {
+            continue;
+          }
+          blocker_action = chosen_by_task.find(blocker_id);
+          inherited_move = true;
+        }
+        if (blocker_action == chosen_by_task.end() ||
+            blocker_action->second.is_hold() ||
+            blocker_action->second.next_node == next_node ||
+            blocker_action->second.edge_start > node_start) {
+          continue;
+        }
+        if (local_edges.find({agent.current, next_node}) != local_edges.end()) {
+          continue;
+        }
+        if (local_node_conflict(next_node,
                                 node_start,
                                 node_end,
-                                "best_safe_edge",
-                                priority_rank};
+                                agent.task_id,
+                                local_node_windows)) {
+          continue;
+        }
+      }
+
+      const std::string reason =
+          inherited_move ? "priority_inheritance" : (inherited ? "inherited_move" : "best_safe_edge");
+      chosen_by_task[agent.task_id] = PIBTResolvedAction{agent.task_id,
+                                                         "move",
+                                                         agent.current,
+                                                         next_node,
+                                                         edge_start,
+                                                         edge_end,
+                                                         node_start,
+                                                         node_end,
+                                                         reason,
+                                                         priority_rank};
+      local_node_windows.push_back(LocalNodeWindow{next_node, node_start, node_end, agent.task_id});
+      local_edges.insert({agent.current, next_node});
+      visiting.erase(agent.task_id);
+      return true;
     }
 
-    return PIBTResolvedAction{agent.task_id,
-                              "hold",
-                              agent.current,
-                              agent.current,
-                              agent.ready_time,
-                              agent.ready_time,
-                              agent.ready_time,
-                              agent.ready_time + hold_seconds_,
-                              "no_safe_edge",
-                              priority_rank};
+    visiting.erase(agent.task_id);
+    if (inherited) {
+      return false;
+    }
+    chosen_by_task[agent.task_id] = PIBTResolvedAction{agent.task_id,
+                                                       "hold",
+                                                       agent.current,
+                                                       agent.current,
+                                                       agent.ready_time,
+                                                       agent.ready_time,
+                                                       agent.ready_time,
+                                                       agent.ready_time + hold_seconds_,
+                                                       "no_safe_edge",
+                                                       priority_rank};
+    local_node_windows.push_back(LocalNodeWindow{
+        agent.current, agent.ready_time, agent.ready_time + hold_seconds_, agent.task_id});
+    return true;
   }
 
   [[nodiscard]] std::vector<int> candidate_edges(const PIBTAgentState& agent) const {

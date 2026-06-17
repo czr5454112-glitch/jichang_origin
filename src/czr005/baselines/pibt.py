@@ -44,12 +44,12 @@ class ResolvedAction:
 class PIBTStyleOneStepResolver:
     """Resolve a simultaneous junction-decision slice with deterministic priority.
 
-    This is a compact Phase2D baseline, not a full recursive PIBT
-    implementation. Agents are ordered by deadline pressure and waiting time;
-    each agent takes the best safe outgoing edge by shortest heuristic-to-goal,
-    otherwise it holds. The resolver screens against existing node
-    reservations, same-slice target-node conflicts, same-slice edge conflicts,
-    faulted edges, and next-hop reachability.
+    Agents are ordered by deadline pressure and waiting time; each agent takes
+    the best safe outgoing edge by shortest heuristic-to-goal, otherwise it
+    holds. When a preferred next node is currently occupied by another active
+    agent in the same decision slice, the resolver recursively tries to move
+    the blocking lower-priority agent away before falling back to an
+    alternative edge or hold.
     """
 
     def __init__(self, graph: IcsGraph, hold_seconds: float = 1.0) -> None:
@@ -71,36 +71,61 @@ class PIBTStyleOneStepResolver:
             agents,
             key=lambda agent: (agent.slack, -agent.waiting_time, agent.ready_time, agent.task_id),
         )
-        chosen: list[ResolvedAction] = []
+        priority_ranks = {agent.task_id: priority_rank for priority_rank, agent in enumerate(ordered)}
+        agents_by_task = {agent.task_id: agent for agent in ordered}
+        current_owner: dict[int, int] = {}
+        for agent in ordered:
+            current_owner.setdefault(agent.current, agent.task_id)
+        chosen_by_task: dict[int, ResolvedAction] = {}
         local_node_windows: list[tuple[int, float, float, int]] = []
         local_edges: set[tuple[int, int]] = set()
 
-        for priority_rank, agent in enumerate(ordered):
-            action = self._choose_action(
+        for agent in ordered:
+            if agent.task_id in chosen_by_task:
+                continue
+            self._assign_recursive(
                 agent=agent,
-                priority_rank=priority_rank,
+                priority_rank=priority_ranks[agent.task_id],
                 reservations=reservations,
                 fault_edges=fault_edges,
+                agents_by_task=agents_by_task,
+                current_owner=current_owner,
+                priority_ranks=priority_ranks,
+                chosen_by_task=chosen_by_task,
                 local_node_windows=local_node_windows,
                 local_edges=local_edges,
+                blocked_targets=set(),
+                inherited=False,
+                visiting=set(),
             )
-            chosen.append(action)
-            local_node_windows.append((action.next_node, action.node_start, action.node_end, action.task_id))
-            if action.action == "move":
-                local_edges.add((action.current, action.next_node))
 
-        return chosen
+        return [chosen_by_task[agent.task_id] for agent in ordered]
 
-    def _choose_action(
+    def _assign_recursive(
         self,
         agent: AgentState,
         priority_rank: int,
         reservations: ReservationTable,
         fault_edges: set[tuple[int, int]],
+        agents_by_task: dict[int, AgentState],
+        current_owner: dict[int, int],
+        priority_ranks: dict[int, int],
+        chosen_by_task: dict[int, ResolvedAction],
         local_node_windows: list[tuple[int, float, float, int]],
         local_edges: set[tuple[int, int]],
-    ) -> ResolvedAction:
+        blocked_targets: set[int],
+        inherited: bool,
+        visiting: set[int],
+    ) -> bool:
+        if agent.task_id in chosen_by_task:
+            return chosen_by_task[agent.task_id].action == "move"
+        if agent.task_id in visiting:
+            return False
+
+        visiting.add(agent.task_id)
         for next_node in self._candidate_edges(agent):
+            if next_node in blocked_targets:
+                continue
             if (agent.current, next_node) in fault_edges:
                 continue
             if (agent.current, next_node) in local_edges:
@@ -121,7 +146,50 @@ class PIBTStyleOneStepResolver:
             if self._local_node_conflict(next_node, node_start, node_end, agent.task_id, local_node_windows):
                 continue
 
-            return ResolvedAction(
+            blocker_id = current_owner.get(next_node)
+            inherited_move = False
+            if blocker_id is not None and blocker_id != agent.task_id:
+                blocker_action = chosen_by_task.get(blocker_id)
+                if blocker_action is None:
+                    blocker = agents_by_task[blocker_id]
+                    if not self._assign_recursive(
+                        agent=blocker,
+                        priority_rank=priority_ranks[blocker.task_id],
+                        reservations=reservations,
+                        fault_edges=fault_edges,
+                        agents_by_task=agents_by_task,
+                        current_owner=current_owner,
+                        priority_ranks=priority_ranks,
+                        chosen_by_task=chosen_by_task,
+                        local_node_windows=local_node_windows,
+                        local_edges=local_edges,
+                        blocked_targets={agent.current, next_node},
+                        inherited=True,
+                        visiting=visiting,
+                    ):
+                        continue
+                    blocker_action = chosen_by_task.get(blocker_id)
+                    inherited_move = True
+                if (
+                    blocker_action is None
+                    or blocker_action.is_hold
+                    or blocker_action.next_node == next_node
+                    or blocker_action.edge_start > node_start
+                ):
+                    continue
+                if (agent.current, next_node) in local_edges:
+                    continue
+                if self._local_node_conflict(next_node, node_start, node_end, agent.task_id, local_node_windows):
+                    continue
+
+            reason = (
+                "priority_inheritance"
+                if inherited_move
+                else "inherited_move"
+                if inherited
+                else "best_safe_edge"
+            )
+            chosen_by_task[agent.task_id] = ResolvedAction(
                 task_id=agent.task_id,
                 action="move",
                 current=agent.current,
@@ -130,11 +198,18 @@ class PIBTStyleOneStepResolver:
                 edge_end=edge_end,
                 node_start=node_start,
                 node_end=node_end,
-                reason="best_safe_edge",
+                reason=reason,
                 priority_rank=priority_rank,
             )
+            local_node_windows.append((next_node, node_start, node_end, agent.task_id))
+            local_edges.add((agent.current, next_node))
+            visiting.remove(agent.task_id)
+            return True
 
-        return ResolvedAction(
+        visiting.remove(agent.task_id)
+        if inherited:
+            return False
+        chosen_by_task[agent.task_id] = ResolvedAction(
             task_id=agent.task_id,
             action="hold",
             current=agent.current,
@@ -146,6 +221,10 @@ class PIBTStyleOneStepResolver:
             reason="no_safe_edge",
             priority_rank=priority_rank,
         )
+        local_node_windows.append(
+            (agent.current, agent.ready_time, agent.ready_time + self.hold_seconds, agent.task_id)
+        )
+        return True
 
     def _candidate_edges(self, agent: AgentState) -> list[int]:
         return sorted(

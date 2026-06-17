@@ -137,6 +137,34 @@ def _branch_graph_inputs() -> tuple[
     return _graph_from_records(node_records, edge_records, heuristic_time), node_records, edge_records, heuristic_time
 
 
+def _handoff_graph_inputs() -> tuple[
+    Any,
+    tuple[NodeRecord, ...],
+    tuple[EdgeRecord, ...],
+    tuple[tuple[float, ...], ...],
+]:
+    node_records = (
+        (0, 1, 0.0, 0, 0, [1, 2]),
+        (1, 4, 0.0, 1, 0, [0, 3]),
+        (2, 4, 0.0, 1, 1, [3]),
+        (3, 2, 0.0, 2, 0, []),
+    )
+    edge_records = (
+        (0, 1, 5.0, 2.5),
+        (0, 2, 7.5, 2.5),
+        (1, 0, 5.0, 2.5),
+        (1, 3, 5.0, 2.5),
+        (2, 3, 5.0, 2.5),
+    )
+    heuristic_time = (
+        (0.0, 2.0, 3.0, 4.0),
+        (2.0, 0.0, 5.0, 2.0),
+        (999.0, 999.0, 0.0, 2.0),
+        (999.0, 999.0, 999.0, 0.0),
+    )
+    return _graph_from_records(node_records, edge_records, heuristic_time), node_records, edge_records, heuristic_time
+
+
 def _python_actions(case: PIBTParityCase) -> list[ActionRow]:
     from czr005.baselines import AgentState, PIBTStyleOneStepResolver  # pylint: disable=import-outside-toplevel
     from czr005.sim_py import ReservationTable  # pylint: disable=import-outside-toplevel
@@ -237,7 +265,7 @@ def _action_summary(actions: list[ActionRow]) -> str:
     if not actions:
         return "none"
     return ";".join(
-        f"{action['task_id']}:{action['action']}:{action['current']}->{action['next_node']}"
+        f"{action['task_id']}:{action['action']}:{action['current']}->{action['next_node']}:{action['reason']}"
         for action in actions
     )
 
@@ -311,6 +339,7 @@ def _synthetic_manifest_case() -> PIBTParityCase:
 def _cases() -> tuple[PIBTParityCase, ...]:
     merge_graph, merge_nodes, merge_edges, merge_heuristic = _merge_graph_inputs()
     branch_graph, branch_nodes, branch_edges, branch_heuristic = _branch_graph_inputs()
+    handoff_graph, handoff_nodes, handoff_edges, handoff_heuristic = _handoff_graph_inputs()
     return (
         PIBTParityCase(
             "merge_priority_conflict",
@@ -364,6 +393,28 @@ def _cases() -> tuple[PIBTParityCase, ...]:
             ((4, 0, 3, 0.0, 20.0, 0.0),),
             node_reservations=((99, 1, 2.0, 2.0),),
         ),
+        PIBTParityCase(
+            "handoff_priority_inheritance",
+            handoff_graph,
+            handoff_nodes,
+            handoff_edges,
+            handoff_heuristic,
+            (
+                (1, 0, 3, 0.0, 10.0, 0.0),
+                (2, 1, 3, 0.0, 100.0, 0.0),
+            ),
+        ),
+        PIBTParityCase(
+            "handoff_blocked_uses_alternative",
+            handoff_graph,
+            handoff_nodes,
+            handoff_edges,
+            handoff_heuristic,
+            (
+                (1, 0, 3, 0.0, 10.0, 0.0),
+                (2, 1, 0, 0.0, 100.0, 0.0),
+            ),
+        ),
         _synthetic_manifest_case(),
     )
 
@@ -380,7 +431,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     strict_pass = all(bool(row["parity_pass"]) for row in rows)
     lines = [
-        "# Phase2 C++ PIBT-Style One-Step Parity Report",
+        "# Phase2 C++ PIBT-Style Recursive Parity Report",
         "",
         "Date: 2026-06-17",
         "",
@@ -388,12 +439,13 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This diagnostic compares the Python PIBTStyleOneStepResolver against the C++ "
-            "one-step resolver exposed through pybind. It covers deterministic priority "
-            "ordering, same-slice merge conflicts, fault-edge fallback, existing node "
-            "reservations, custom hold duration, and one persisted synthetic manifest slice."
+            "resolver exposed through pybind. It covers deterministic priority ordering, "
+            "same-slice merge conflicts, fault-edge fallback, existing node reservations, "
+            "custom hold duration, bounded recursive current-node handoff, and one "
+            "persisted synthetic manifest slice."
         ),
         "",
-        "This is one-step PIBT-style shield parity, not recursive PIBT/backtracking replay.",
+        "This is slice-level PIBT-style shield parity, not full active-bag PIBT replay integration.",
         "",
         "## Metrics",
         "",
@@ -419,13 +471,13 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "## Gate Status",
             "",
             (
-                "- C++ PIBT-style one-step Python/C++ parity: PASS"
+                "- C++ PIBT-style Python/C++ parity: PASS"
                 if strict_pass
-                else "- C++ PIBT-style one-step Python/C++ parity: FAIL"
+                else "- C++ PIBT-style Python/C++ parity: FAIL"
             ),
             "- merge/fault/reservation one-step shield cases: covered",
+            "- bounded recursive current-node handoff: covered",
             "- persisted synthetic manifest one-step slice: covered",
-            "- recursive priority inheritance/backtracking: not covered",
             "- full active-bag replay integration: not covered",
         ]
     )
@@ -439,7 +491,7 @@ def main() -> None:
     write_table(rows)
     write_report(rows)
     if not all(bool(row["parity_pass"]) for row in rows):
-        raise AssertionError("C++ PIBT-style one-step parity failed")
+        raise AssertionError("C++ PIBT-style parity failed")
     print(f"phase2_cpp_pibt_parity rows={len(rows)} strict_pass=True")
     print(f"report={REPORT_PATH}")
 

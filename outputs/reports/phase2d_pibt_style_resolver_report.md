@@ -1,16 +1,16 @@
-# Phase2D PIBT-Style One-Step Resolver Report
+# Phase2D PIBT-Style Resolver Report
 
 Date: 2026-06-17
 
 ## Scope
 
-Added a deterministic one-step conflict resolver inspired by PIBT / CS-PIBT:
+Added a deterministic conflict resolver inspired by PIBT / CS-PIBT:
 
 - `src/czr005/baselines/pibt.py`
 - updated `src/czr005/baselines/__init__.py`
 - expanded `tests/test_phase2_baselines.py`
 
-C++ one-step parity is tracked separately in
+C++ parity is tracked separately in
 `outputs/reports/phase2_cpp_pibt_parity_report.md`.
 
 ## Behavior
@@ -19,6 +19,7 @@ The resolver handles one simultaneous junction-decision slice:
 
 - ranks agents by deadline slack, waiting time, ready time, and task id
 - tries outgoing edges by shortest heuristic-to-goal
+- recursively moves a lower-priority blocker away when a preferred next node is currently occupied
 - rejects faulted edges
 - rejects same-slice target-node conflicts
 - rejects same-slice same-edge conflicts
@@ -31,7 +32,7 @@ The resolver handles one simultaneous junction-decision slice:
 Target pytest:
 
 ```text
-12 passed
+15 passed
 ```
 
 Target CTest:
@@ -44,10 +45,9 @@ Target CTest:
 
 ## Limitations
 
-This is a compact one-step resolver, not a full recursive PIBT implementation. Remaining work:
+This is a compact slice-level resolver with bounded current-node handoff, not full active-bag PIBT replay integration. Remaining work:
 
-- recursive priority inheritance/backtracking
 - edge capacity/headway inside Python resolver
 - merge-group semantics beyond shared target nodes
-- integration into full rolling-horizon replay
-- full runtime replay integration
+- full PIBT/CS-PIBT-style active-bag replay integration
+- broad runtime replay integration

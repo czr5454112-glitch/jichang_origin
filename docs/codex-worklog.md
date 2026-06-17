@@ -505,3 +505,14 @@
 - Tests / validation: target Phase2 pytest passed `13 passed`; CTest passed 2/2; full Python pytest passed `39 passed`; Phase2 periodic replanning parity reported `7` strict PASS rows; SIPP, rolling-horizon, PIBT, Phase8 event parity, and Phase8 trace diagnostics all passed.
 - Safety / parity notes: Repair-window periodic replanning parity is now covered. Recursive PIBT priority inheritance/backtracking, merge-group/buffer semantics, real heldout-map validation, and final Phase9 large-scale runtime comparisons remain pending.
 - Follow-up: continue with recursive PIBT or heldout-map/runtime validation.
+
+## 2026-06-17 18:55 - Phase2 PIBT recursive current-node handoff parity
+
+- Request: Continue closing Python/C++ port prerequisites from the master plan by addressing the remaining recursive PIBT/backtracking gap at the simultaneous junction-slice level.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: extended Python and C++ `PIBTStyleOneStepResolver` with bounded recursive current-node handoff, added handoff and blocked-handoff smoke coverage in Python/C++/pybind tests, expanded `scripts/eval/run_phase2_cpp_pibt_parity.py` to `8` rows, regenerated the PIBT parity CSV/report, and refreshed Phase2/C++ status docs.
+- Commands run: target Phase2 pytest, CMake build through the VS developer environment with CTest, Phase2 C++ PIBT parity, full Python pytest, Phase2 baseline smoke, Phase2 C++ SIPP parity, Phase2 C++ rolling-horizon parity, Phase2 periodic replanning parity, Phase8 native C++ event parity, and Phase8 event trace diagnostic.
+- Key observations: When a high-priority agent wants a node currently occupied by a lower-priority active bag, Python and C++ now recursively try to move the blocker away before assigning the high-priority move. If the blocker cannot provide that handoff, the high-priority agent uses the next safe candidate and the blocker is resolved later in priority order.
+- Tests / validation: target Phase2 pytest passed `15 passed`; CTest passed 2/2; Phase2 C++ PIBT parity reported `8` strict PASS rows; full Python pytest passed `41 passed`; SIPP, rolling-horizon, periodic replanning, Phase8 event parity, and Phase8 trace diagnostics all passed.
+- Safety / parity notes: Bounded recursive current-node handoff is covered for simultaneous slices. Full active-bag PIBT/CS-PIBT replay integration, merge-group/buffer semantics, real heldout-map validation, and Phase9 runtime comparisons remain pending.
+- Follow-up: continue with merge/buffer semantics or full active-bag PIBT replay integration.

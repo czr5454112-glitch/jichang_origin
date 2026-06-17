@@ -94,6 +94,24 @@ Graph make_branch_graph() {
   return graph;
 }
 
+Graph make_handoff_graph() {
+  Graph graph;
+  graph.add_node(Node{0, 1, 0.0, 0, 0, {1, 2}});
+  graph.add_node(Node{1, 4, 0.0, 1, 0, {0, 3}});
+  graph.add_node(Node{2, 4, 0.0, 1, 1, {3}});
+  graph.add_node(Node{3, 2, 0.0, 2, 0, {}});
+  graph.set_heuristic({{0.0, 2.0, 3.0, 4.0},
+                       {2.0, 0.0, 5.0, 2.0},
+                       {999.0, 999.0, 0.0, 2.0},
+                       {999.0, 999.0, 999.0, 0.0}});
+  graph.add_edge(Edge{0, 1, 5.0, 2.5});
+  graph.add_edge(Edge{0, 2, 7.5, 2.5});
+  graph.add_edge(Edge{1, 0, 5.0, 2.5});
+  graph.add_edge(Edge{1, 3, 5.0, 2.5});
+  graph.add_edge(Edge{2, 3, 5.0, 2.5});
+  return graph;
+}
+
 bool near(double left, double right) { return std::fabs(left - right) < 1e-9; }
 
 struct TestContext {
@@ -285,6 +303,44 @@ int main() {
                "PIBT resolver should move on the safe branch edge");
     test.check(pibt_branch_actions[0].next_node == 2,
                "PIBT resolver should choose the non-faulted branch");
+  }
+
+  const Graph pibt_handoff_graph = make_handoff_graph();
+  const PIBTStyleOneStepResolver pibt_handoff_resolver(pibt_handoff_graph);
+  const auto pibt_handoff_actions = pibt_handoff_resolver.resolve({
+      PIBTAgentState{1, 0, 3, 0.0, 10.0, 0.0},
+      PIBTAgentState{2, 1, 3, 0.0, 100.0, 0.0},
+  });
+  test.check(pibt_handoff_actions.size() == 2,
+             "PIBT resolver should produce two handoff actions");
+  if (pibt_handoff_actions.size() == 2) {
+    test.check(pibt_handoff_actions[0].task_id == 1,
+               "PIBT handoff should keep high-priority task first");
+    test.check(pibt_handoff_actions[0].next_node == 1,
+               "PIBT handoff should move high-priority task into the vacated node");
+    test.check(pibt_handoff_actions[0].reason == "priority_inheritance",
+               "PIBT handoff should label the inherited move");
+    test.check(pibt_handoff_actions[1].task_id == 2,
+               "PIBT handoff should return the inherited blocker second");
+    test.check(pibt_handoff_actions[1].next_node == 3,
+               "PIBT handoff should move the blocker toward its goal");
+    test.check(pibt_handoff_actions[1].reason == "inherited_move",
+               "PIBT handoff should label the blocker move");
+  }
+
+  const auto pibt_handoff_blocked_actions = pibt_handoff_resolver.resolve({
+      PIBTAgentState{1, 0, 3, 0.0, 10.0, 0.0},
+      PIBTAgentState{2, 1, 0, 0.0, 100.0, 0.0},
+  });
+  test.check(pibt_handoff_blocked_actions.size() == 2,
+             "PIBT blocked handoff should still produce two actions");
+  if (pibt_handoff_blocked_actions.size() == 2) {
+    test.check(pibt_handoff_blocked_actions[0].next_node == 2,
+               "PIBT blocked handoff should use the high-priority alternative");
+    test.check(pibt_handoff_blocked_actions[0].reason == "best_safe_edge",
+               "PIBT blocked handoff should label the alternative normally");
+    test.check(pibt_handoff_blocked_actions[1].next_node == 0,
+               "PIBT blocked handoff should let the blocker move after the high-priority task reroutes");
   }
 
   const auto later = planner.plan(0, 2, 6.0, &reservations, {}, 3);

@@ -293,6 +293,40 @@ def main() -> None:
     assert pibt_branch[0]["action"] == "move"
     assert pibt_branch[0]["next_node"] == 2
 
+    pibt_handoff_node_records = [
+        (0, 1, 0.0, 0, 0, [1, 2]),
+        (1, 4, 0.0, 1, 0, [0, 3]),
+        (2, 4, 0.0, 1, 1, [3]),
+        (3, 2, 0.0, 2, 0, []),
+    ]
+    pibt_handoff_edge_records = [
+        (0, 1, 5.0, 2.5),
+        (0, 2, 7.5, 2.5),
+        (1, 0, 5.0, 2.5),
+        (1, 3, 5.0, 2.5),
+        (2, 3, 5.0, 2.5),
+    ]
+    pibt_handoff_heuristic_time = [
+        [0.0, 2.0, 3.0, 4.0],
+        [2.0, 0.0, 5.0, 2.0],
+        [999.0, 999.0, 0.0, 2.0],
+        [999.0, 999.0, 999.0, 0.0],
+    ]
+    pibt_handoff = czr005_cpp.pibt_resolve_from_records(
+        pibt_handoff_node_records,
+        pibt_handoff_edge_records,
+        pibt_handoff_heuristic_time,
+        [
+            (1, 0, 3, 0.0, 10.0, 0.0),
+            (2, 1, 3, 0.0, 100.0, 0.0),
+        ],
+    )
+    assert [action["task_id"] for action in pibt_handoff] == [1, 2]
+    assert pibt_handoff[0]["next_node"] == 1
+    assert pibt_handoff[0]["reason"] == "priority_inheritance"
+    assert pibt_handoff[1]["next_node"] == 3
+    assert pibt_handoff[1]["reason"] == "inherited_move"
+
     records_replay = czr005_cpp.edge_score_native_replay_summary_from_records(
         node_records,
         edge_records,

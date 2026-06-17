@@ -17,8 +17,8 @@ plus baseline logging on real task-stream inputs.
 
 | Baseline | Planned | Unplanned | Post-shield conflicts | Mean travel | P95 travel | Runtime seconds |
 |---|---:|---:|---:|---:|---:|---:|
-| reference_astar | 113 | 15 | 0 | 51.529204 | 76.800000 | 0.032216 |
-| rolling_horizon_sipp | 128 | 0 | 0 | 87.705494 | 161.469291 | 0.092915 |
+| reference_astar | 113 | 15 | 0 | 51.529204 | 76.800000 | 0.035791 |
+| rolling_horizon_sipp | 128 | 0 | 0 | 87.705494 | 161.469291 | 0.101607 |
 
 CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 
@@ -27,6 +27,9 @@ Active-bag/replan-cost evidence is tracked separately in
 
 Route-discarding periodic active-bag replanning parity is tracked in
 `outputs/reports/phase2_periodic_replanning_parity_report.md`.
+
+PIBT-style recursive current-node handoff parity is tracked in
+`outputs/reports/phase2_cpp_pibt_parity_report.md`.
 
 ## Gate Status
 
@@ -37,6 +40,7 @@ Route-discarding periodic active-bag replanning parity is tracked in
 ## Remaining Work
 
 - merge-group and buffer-capacity constraints
-- recursive PIBT/CS-PIBT-style replay integration
+- rolling-horizon active-bag replanning rather than sequential task-leg replay
+- full PIBT/CS-PIBT-style active-bag replay integration
 - real heldout airport-map fixtures
 - larger multi-seed task-density/fault sweeps
