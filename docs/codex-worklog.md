@@ -109,3 +109,14 @@
 - Tests / validation: scaffold CTest passed 2/2; target CTest passed 2/2; target Python pytest passed `6 passed`.
 - Safety / parity notes: This is a deterministic shield skeleton only; buffer capacity, merge groups, SIPP, rolling horizon, and PIBT-style resolver remain pending.
 - Follow-up: expand Phase2 baselines.
+
+## 2026-06-16 22:35 - Phase2B minimal Python SIPP baseline
+
+- Request: Expand Phase2 baselines after the initial C++ shield skeleton.
+- Branch: `main`.
+- Files changed: added `src/czr005/baselines/sipp.py`, `src/czr005/baselines/__init__.py`, `tests/test_phase2_baselines.py`, and `outputs/reports/phase2b_sipp_baseline_report.md`.
+- Commands run: Python pytest in scaffold.
+- Key observations: The SIPP baseline can wait for the next safe node interval; on a three-node test graph, legacy-compatible A* fails against a node reservation while SIPP waits and reaches the goal.
+- Tests / validation: scaffold Python pytest passed `8 passed`; target Python pytest passed `8 passed`; target CTest passed 2/2.
+- Safety / parity notes: This is Python-only and node-reservation focused. Edge capacity/headway, buffers, merge groups, C++ parity, and event replay remain pending.
+- Follow-up: continue Phase2 baseline expansion.

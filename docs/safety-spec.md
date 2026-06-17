@@ -42,4 +42,5 @@ Still pending:
 - explicit buffer capacity
 - merge conflict groups
 - event-simulation safety counters
-- SIPP / rolling-horizon / PIBT-style baseline integration
+- C++ / full-constraint SIPP integration
+- rolling-horizon / PIBT-style baseline integration

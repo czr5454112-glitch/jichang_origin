@@ -1,0 +1,145 @@
+"""Safe-interval path planning baseline for the Python reference graph."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+import heapq
+from itertools import count
+
+from czr005.sim_py.graph import IcsGraph
+from czr005.sim_py.reservation import NodeReservation, ReservationTable
+
+
+EPSILON = 1e-9
+
+
+@dataclass
+class SIPPNode:
+    location: int
+    t1: float
+    t2: float
+    gcost: float
+    hcost: float
+    fcost: float
+    parent: "SIPPNode | None" = None
+
+    def to_dict(self) -> dict[str, float | int]:
+        return {
+            "location": self.location,
+            "t1": self.t1,
+            "t2": self.t2,
+            "gcost": self.gcost,
+            "hcost": self.hcost,
+            "fcost": self.fcost,
+        }
+
+
+class SIPPPlanner:
+    """Minimal SIPP-style planner that waits for safe target-node intervals.
+
+    This first Phase2 baseline keeps the same directed graph and node service
+    semantics as the Python A* reference. It can wait before traversing an edge
+    so that arrival at the target node lands in the next reservation-free
+    interval. Edge reservations and buffer/merge rules are intentionally left
+    for later Phase2 work.
+    """
+
+    def __init__(self, graph: IcsGraph, max_time: float = 86_400.0) -> None:
+        self.graph = graph
+        self.max_time = max_time
+
+    def plan(
+        self,
+        start: int,
+        goal: int,
+        start_time: float = 0.0,
+        reservations: ReservationTable | None = None,
+        fault_edges: set[tuple[int, int]] | None = None,
+        task_id: int | None = None,
+    ) -> list[SIPPNode]:
+        reservations = reservations or ReservationTable()
+        fault_edges = fault_edges or set()
+        sequence = count()
+        open_heap: list[tuple[float, int, SIPPNode]] = []
+        start_node = SIPPNode(
+            location=start,
+            t1=start_time,
+            t2=start_time + self.graph.service_time(start),
+            gcost=start_time,
+            hcost=self.graph.heuristic(start, goal),
+            fcost=start_time + self.graph.heuristic(start, goal),
+        )
+        heapq.heappush(open_heap, (start_node.fcost, next(sequence), start_node))
+        best_t2: dict[int, float] = {start: start_node.t2}
+
+        while open_heap:
+            _, _, current = heapq.heappop(open_heap)
+            if current.t2 > best_t2.get(current.location, float("inf")) + EPSILON:
+                continue
+            if current.location == goal:
+                return self._reconstruct(current)
+
+            for next_location in self.graph.outgoing(current.location):
+                if (current.location, next_location) in fault_edges:
+                    continue
+                edge = self.graph.edge(current.location, next_location)
+                earliest_node_start = current.t2 + edge.travel_time
+                service_time = self.graph.service_time(next_location)
+                if next_location == goal:
+                    node_start = earliest_node_start
+                else:
+                    node_start = self._earliest_safe_node_start(
+                        reservations.intervals(next_location),
+                        earliest_node_start,
+                        service_time,
+                        task_id,
+                    )
+                if node_start is None or node_start > self.max_time:
+                    continue
+
+                node_end = node_start + service_time
+                if node_end >= best_t2.get(next_location, float("inf")) - EPSILON:
+                    continue
+                hcost = self.graph.heuristic(next_location, goal)
+                child = SIPPNode(
+                    location=next_location,
+                    t1=node_start,
+                    t2=node_end,
+                    gcost=node_start,
+                    hcost=hcost,
+                    fcost=node_start + hcost,
+                    parent=current,
+                )
+                best_t2[next_location] = node_end
+                heapq.heappush(open_heap, (child.fcost, next(sequence), child))
+
+        return []
+
+    def _earliest_safe_node_start(
+        self,
+        intervals: tuple[NodeReservation, ...],
+        earliest_start: float,
+        duration: float,
+        task_id: int | None,
+    ) -> float | None:
+        candidate = earliest_start
+        for interval in sorted(intervals, key=lambda item: (item.start, item.end, item.task_id)):
+            if task_id is not None and interval.task_id == task_id:
+                continue
+            candidate_end = candidate + duration
+            if candidate_end < interval.start:
+                return candidate
+            if candidate > interval.end:
+                continue
+            candidate = interval.end + EPSILON
+        return candidate if candidate <= self.max_time else None
+
+    @staticmethod
+    def _reconstruct(goal_node: SIPPNode) -> list[SIPPNode]:
+        route: list[SIPPNode] = []
+        current: SIPPNode | None = goal_node
+        while current is not None:
+            route.append(current)
+            current = current.parent
+        route.reverse()
+        return route
