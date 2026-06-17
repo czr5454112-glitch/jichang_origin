@@ -193,6 +193,15 @@ int main() {
                                          edge_capacity_conflicts);
   test.check(decision.status == SafetyStatus::kEdgeCapacityConflict,
              "shield should reject edge capacity conflicts");
+  edge_capacity_conflicts.remove_task(99);
+  decision = shield.validate_edge_action(10,
+                                         0,
+                                         1,
+                                         2,
+                                         0.0,
+                                         empty_node_reservations,
+                                         edge_capacity_conflicts);
+  test.check(decision.allowed(), "edge reservation remove_task should clear capacity conflicts");
 
   EdgeReservationTable edge_headway_conflicts;
   edge_headway_conflicts.reserve(99, 0, 1, 0.0, 0.5);

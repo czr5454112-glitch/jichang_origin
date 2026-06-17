@@ -86,6 +86,7 @@ def _python_runtime_trace(graph: Any, tasks: tuple[Any, ...], runtime_model: Any
             break
         task = obs["task"]
         candidates = list(obs["candidates"])
+        task_decision_ordinal = env.task_decisions + 1
         action, proposed_position, fallback_used = _runtime_action(runtime_model, obs, info)
         next_obs, _, terminated, truncated_step, next_info = env.step(action)
         executed_index = next_info.get("executed_action")
@@ -97,7 +98,7 @@ def _python_runtime_trace(graph: Any, tasks: tuple[Any, ...], runtime_model: Any
         trace.append(
             {
                 "decision_ordinal": steps + 1,
-                "task_decision_ordinal": env.task_decisions + 1,
+                "task_decision_ordinal": task_decision_ordinal,
                 "event": str(next_info.get("event", "step")),
                 "terminal_reason": str(next_info.get("reason", "")),
                 "task_index": int(info["task_index"]),
@@ -109,7 +110,7 @@ def _python_runtime_trace(graph: Any, tasks: tuple[Any, ...], runtime_model: Any
                 "waiting_time": float(task["waiting_time"]),
                 "proposed_position": proposed_position,
                 "executed_index": int(executed_index) if executed_index is not None else -1,
-                "executed_next": int(executed["next_node"]) if executed is not None else -1,
+                "executed_next": int(executed["next_node"]) if executed is not None else int(task["current"]),
                 "executed_kind": str(executed["kind"]) if executed is not None else "none",
                 "executed_safe": bool(executed["safe"]) if executed is not None else False,
                 "unsafe_proposal": bool(next_info.get("unsafe_proposal", False)),
@@ -257,6 +258,12 @@ def _write_report(
         and int(cpp_summary["post_shield_conflicts"]) == 0
         and not bool(python_summary["truncated"])
     )
+    trace_match = mismatch["status"] == "match"
+    notes = (
+        "The configured 24-task decision trace now matches exactly between Python and compact native C++ replay. This validates the previously mismatching unreachable-goal safety and unplanned-task cleanup semantics on this window."
+        if trace_match
+        else "This report narrows the larger-window mismatch from aggregate counts to a concrete decision-level comparison. It is intended to guide the next implementation step: aligning compact replay semantics or replacing them with the full C++ event scheduler."
+    )
     lines = [
         "# Phase8 Native C++ Trace Diagnostic",
         "",
@@ -264,7 +271,7 @@ def _write_report(
         "",
         "## Scope",
         "",
-        f"This diagnostic compares Python and compact native C++ EdgeScore decision traces on the first `{MAX_TASKS}` same-map tasks. It localizes the first larger-window replay divergence for the future full C++ event scheduler work.",
+        f"This diagnostic compares Python and compact native C++ EdgeScore decision traces on the first `{MAX_TASKS}` same-map tasks. It verifies trace parity on this window and localizes the first divergence when parity does not hold.",
         "",
         "## Summary",
         "",
@@ -285,11 +292,12 @@ def _write_report(
         "## Gate Status",
         "",
         "- trace diagnostic safety: PASS" if safety_pass else "- trace diagnostic safety: FAIL",
-        "- strict larger-window parity: not claimed",
+        "- 24-task decision trace parity: PASS" if trace_match else "- 24-task decision trace parity: FAIL",
+        "- full high-throughput event-scheduler parity: not covered",
         "",
         "## Notes",
         "",
-        "This report narrows the larger-window mismatch from aggregate counts to a concrete decision-level comparison. It is intended to guide the next implementation step: aligning compact replay semantics or replacing them with the full C++ event scheduler.",
+        notes,
     ]
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

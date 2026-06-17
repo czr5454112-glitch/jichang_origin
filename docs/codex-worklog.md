@@ -351,3 +351,14 @@
 - Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `32 passed`; Phase8 trace diagnostic passed safety gates; Phase8 parity diagnostic kept `edge_strict_pass=True`; Phase8 scaling diagnostic still reports zero conflicts with expected larger-window divergence.
 - Safety / parity notes: This is localization evidence, not a final parity claim. Small-window EdgeScore parity remains strict; larger-window compact replay parity remains open until the C++ candidate safety semantics are aligned or replaced by the full event scheduler.
 - Follow-up: inspect the C++ vs Python node/edge reservation state at task `17:storage_in`, decision `216`, then either align compact replay safety checks or move the full event scheduler implementation forward.
+
+## 2026-06-17 11:30 - Phase8 compact replay safety parity alignment
+
+- Request: Continue closing the Python/C++ compact native replay divergence exposed by the Phase8 trace diagnostic.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added Python `unreachable_goal` action-mask safety with a regression test, propagated `require_reachable_goal` through the observation/env layer, added C++ `EdgeReservationTable::remove_task`, cleaned node/edge reservations on C++ unplanned-task exits, fixed Python trace task-decision indexing, and refreshed Phase8 parity/scaling/trace/native replay reports and CSVs.
+- Commands run: CMake build, target CTest, target Python pytest, Phase8 native trace diagnostic, Phase8 native scaling diagnostic, Phase8 native C++ / Python parity diagnostic, and Phase8 native replay smoke.
+- Key observations: The old first mismatch at task `17:storage_in`, decision `216` was caused by Python missing the shield's no-route-to-goal check. After aligning that rule, the next mismatch exposed stale C++ reservations from unplanned tasks; clearing node/edge reservations on C++ unplanned exits removed it. The 24-task decision trace now matches exactly, and 24/32/48/64 larger-window aggregate parity is PASS with zero mean-travel difference and zero post-shield conflicts.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `33 passed`; Phase8 trace diagnostic reports 24-task decision trace parity PASS; Phase8 scaling diagnostic reports `divergences=0`; Phase8 parity diagnostic reports EdgeScore and fallback strict replay parity PASS; Phase8 native replay smoke passed with zero conflicts.
+- Safety / parity notes: This closes the compact-replay same-map parity gap for the configured windows, but it is still not the final high-throughput C++ event scheduler and does not cover repair-event schedules, randomized density, or heldout maps.
+- Follow-up: expand trace/scaling parity to repair and randomized schedules, then implement the full C++ event scheduler required for final runtime claims.

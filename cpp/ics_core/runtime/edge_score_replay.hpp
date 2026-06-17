@@ -373,6 +373,8 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
                                                       static_cast<int>(candidates.size()),
                                                       safe_candidate_count,
                                                       static_cast<int>(route.size())});
+        node_reservations.remove_task(task.task_id);
+        edge_reservations.remove_task(task.task_id);
         ++result.unplanned_count;
         counted_unplanned = true;
         break;
@@ -409,6 +411,8 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
                                                         static_cast<int>(candidates.size()),
                                                         safe_candidate_count,
                                                         static_cast<int>(route.size())});
+          node_reservations.remove_task(task.task_id);
+          edge_reservations.remove_task(task.task_id);
           ++result.unplanned_count;
           counted_unplanned = true;
           break;
@@ -480,6 +484,8 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
       result.makespan = std::max(result.makespan, route.back().t2);
       result.mean_travel_time += route.back().t2 - route.front().t1;
     } else if (!counted_unplanned) {
+      node_reservations.remove_task(task.task_id);
+      edge_reservations.remove_task(task.task_id);
       ++result.unplanned_count;
     }
   }

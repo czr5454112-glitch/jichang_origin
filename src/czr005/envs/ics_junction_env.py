@@ -51,6 +51,7 @@ class IcsJunctionEnv:
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
         fault_edges: set[tuple[int, int]] | None = None,
+        require_reachable_goal: bool = True,
         max_decisions_per_task: int = 256,
         reward_config: DecisionRewardConfig | None = None,
     ) -> None:
@@ -68,6 +69,7 @@ class IcsJunctionEnv:
         self.edge_capacity = edge_capacity
         self.edge_headway_seconds = edge_headway_seconds
         self.fault_edges = fault_edges or set()
+        self.require_reachable_goal = require_reachable_goal
         self.max_decisions_per_task = max_decisions_per_task
         self.reward_config = reward_config or DecisionRewardConfig()
         self._rng = random.Random()
@@ -96,6 +98,7 @@ class IcsJunctionEnv:
             reward = self._mark_unplanned(reason="no_safe_action", shield_blocked=shield_blocked)
             return self._observation(), reward, self.terminated, False, self._info(
                 event="unplanned",
+                reason="no_safe_action",
                 proposed_action=action,
                 executed_action=None,
                 shield_blocked=shield_blocked,
@@ -367,6 +370,7 @@ class IcsJunctionEnv:
             edge_headway_seconds=self.edge_headway_seconds,
             fault_edges=self.fault_edges,
             hold_seconds=self.hold_seconds,
+            require_reachable_goal=self.require_reachable_goal,
         )
 
     def _candidates(self) -> tuple[ActionCandidate, ...]:
@@ -384,6 +388,7 @@ class IcsJunctionEnv:
             edge_headway_seconds=self.edge_headway_seconds,
             fault_edges=self.fault_edges,
             hold_seconds=self.hold_seconds,
+            require_reachable_goal=self.require_reachable_goal,
         )
 
     @staticmethod

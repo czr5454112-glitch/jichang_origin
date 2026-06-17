@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from czr005.sim_py.astar import AStarPlanner
 from czr005.sim_py.graph import IcsGraph
 from czr005.sim_py.reservation import EdgeReservationTable, ReservationTable
 from czr005.sim_py.task_stream import TaskLeg
@@ -58,6 +59,7 @@ def build_action_candidates(
     edge_headway_seconds: float = 0.0,
     fault_edges: set[tuple[int, int]] | None = None,
     hold_seconds: float = 1.0,
+    require_reachable_goal: bool = True,
 ) -> tuple[ActionCandidate, ...]:
     if edge_capacity <= 0:
         raise ValueError("edge_capacity must be positive")
@@ -65,6 +67,7 @@ def build_action_candidates(
         raise ValueError("hold_seconds must be positive")
 
     fault_edges = fault_edges or set()
+    planner = AStarPlanner(graph) if require_reachable_goal else None
     candidates: list[ActionCandidate] = []
 
     for index, next_node in enumerate(graph.outgoing(current)):
@@ -97,6 +100,12 @@ def build_action_candidates(
             reasons.append("edge_headway")
         if reservations.has_conflict(next_node, node_start, node_end, task_id=task.task_id):
             reasons.append("node_reservation")
+        if (
+            planner is not None
+            and next_node != task.goal
+            and not planner.plan(next_node, task.goal, fault_edges=fault_edges)
+        ):
+            reasons.append("unreachable_goal")
 
         candidates.append(
             ActionCandidate(

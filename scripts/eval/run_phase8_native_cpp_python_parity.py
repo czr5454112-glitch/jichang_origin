@@ -40,6 +40,17 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
     edge_strict_pass = all(bool(row["strict_parity_pass"]) for row in edge_rows)
     fallback_safety_pass = all(bool(row["safety_pass"]) for row in fallback_rows)
     fallback_strict_matches = sum(1 for row in fallback_rows if bool(row["strict_parity_pass"]))
+    fallback_strict_pass = fallback_strict_matches == len(fallback_rows)
+    fallback_scope = (
+        "The model-unavailable shortest-safe fallback is also checked for strict parity on these small windows; it remains a runtime contingency rather than the learned-policy claim."
+        if fallback_strict_pass
+        else "The model-unavailable shortest-safe fallback is reported as a safety diagnostic because the compact C++ fallback and Python fallback can differ in tie-breaking or task-cleanup behavior."
+    )
+    fallback_follow_up = (
+        "- keep fallback parity covered when expanding to repair events, randomized density, and heldout maps"
+        if fallback_strict_pass
+        else "- align fallback tie-breaking and goal-node reservation semantics if fallback metric parity becomes a paper claim"
+    )
 
     lines = [
         "# Phase8 Native C++ / Python Replay Parity Report",
@@ -50,7 +61,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         "This diagnostic compares the compact native C++ EdgeScore replay against the existing Python junction environment on identical map2 task windows and fault schedules.",
         "",
-        "The strict parity gate applies to the loaded EdgeScore runtime policy. The model-unavailable shortest-safe fallback is reported as a safety diagnostic because the compact C++ fallback and Python fallback use slightly different fallback tie-breaking and goal-node handling.",
+        "The strict parity gate applies to the loaded EdgeScore runtime policy. " + fallback_scope,
         "",
         "## Metrics",
         "",
@@ -72,12 +83,13 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "",
             "- EdgeScore native C++ vs Python strict replay parity: PASS" if edge_strict_pass else "- EdgeScore native C++ vs Python strict replay parity: FAIL",
             "- fallback safety diagnostic: PASS" if fallback_safety_pass else "- fallback safety diagnostic: FAIL",
+            "- fallback strict replay parity: PASS" if fallback_strict_pass else "- fallback strict replay parity: FAIL",
             f"- fallback strict parity rows: `{fallback_strict_matches}/{len(fallback_rows)}`",
             "- full high-throughput C++ event simulator parity: not covered",
             "",
             "## Remaining Work",
             "",
-            "- align fallback tie-breaking and goal-node reservation semantics if fallback metric parity becomes a paper claim",
+            fallback_follow_up,
             "- expand parity to larger windows, repair events, randomized density, and heldout maps",
             "- replace the compact replay with the full C++ event scheduler before final runtime claims",
         ]

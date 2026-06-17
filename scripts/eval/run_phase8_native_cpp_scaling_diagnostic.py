@@ -31,6 +31,19 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
     no_conflicts = all(int(row["python_conflicts"]) == 0 and int(row["cpp_conflicts"]) == 0 for row in rows)
     no_crashes = all(not bool(row["python_truncated"]) for row in rows)
     any_divergence = any(not bool(row["planned_match"]) or not bool(row["decision_match"]) for row in rows)
+    aggregate_parity = all(
+        bool(row["planned_match"])
+        and bool(row["unplanned_match"])
+        and bool(row["decision_match"])
+        and float(row["mean_travel_abs_diff"]) <= 1.0e-9
+        and int(row["python_conflicts"]) == int(row["cpp_conflicts"])
+        for row in rows
+    )
+    notes = (
+        "After aligning unreachable-goal safety and unplanned-task reservation cleanup, the compact C++ replay matches the Python junction environment on the configured 24/32/48/64 task windows for planned/unplanned counts, decision counts, mean travel time, and post-shield conflicts."
+        if aggregate_parity
+        else "The first 8/16 task windows have strict EdgeScore parity in the separate Phase8 parity report. Larger windows remain conflict-free but diverge in planned counts and decision counts once fallback-heavy local states occur. This gives the next C++ event-scheduler work a concrete target instead of hiding the mismatch."
+    )
     lines = [
         "# Phase8 Native C++ Scaling Diagnostic",
         "",
@@ -38,7 +51,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         "## Scope",
         "",
-        "This diagnostic extends the compact native C++ / Python comparison to larger same-map task windows. It is intentionally a diagnostic rather than a parity gate: the compact C++ replay and Python environment still diverge after fallback-heavy states appear.",
+        "This diagnostic extends the compact native C++ / Python comparison to larger same-map task windows. It is a compact-replay parity gate for these configured windows, not a substitute for the final high-throughput C++ event scheduler, repair-event validation, or heldout-map evaluation.",
         "",
         "## Metrics",
         "",
@@ -60,16 +73,17 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "",
             "- larger-window safety: PASS" if no_conflicts and no_crashes else "- larger-window safety: FAIL",
             "- larger-window divergence observed: YES" if any_divergence else "- larger-window divergence observed: NO",
-            "- strict larger-window parity: not claimed",
+            "- configured-window aggregate parity: PASS" if aggregate_parity else "- configured-window aggregate parity: FAIL",
+            "- full high-throughput event-scheduler parity: not covered",
             "",
             "## Notes",
             "",
-            "The first 8/16 task windows have strict EdgeScore parity in the separate Phase8 parity report. Larger windows remain conflict-free but diverge in planned counts and decision counts once fallback-heavy local states occur. This gives the next C++ event-scheduler work a concrete target instead of hiding the mismatch.",
+            notes,
             "",
             "## Remaining Work",
             "",
-            "- align fallback execution semantics and task cleanup between compact C++ replay and Python env",
-            "- use the separate Phase8 native trace diagnostic to localize the first mismatching task/decision",
+            "- expand trace parity beyond the current 24-task trace window and into repair/randomized schedules",
+            "- validate heldout maps, randomized density, and repair-event cases",
             "- replace compact replay with the full C++ event scheduler and rerun this diagnostic",
         ]
     )

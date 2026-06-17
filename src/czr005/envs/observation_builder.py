@@ -20,6 +20,7 @@ def build_junction_observation(
     edge_headway_seconds: float = 0.0,
     fault_edges: set[tuple[int, int]] | None = None,
     hold_seconds: float = 1.0,
+    require_reachable_goal: bool = True,
 ) -> dict[str, object]:
     candidates = build_action_candidates(
         graph=graph,
@@ -32,6 +33,7 @@ def build_junction_observation(
         edge_headway_seconds=edge_headway_seconds,
         fault_edges=fault_edges,
         hold_seconds=hold_seconds,
+        require_reachable_goal=require_reachable_goal,
     )
     current_node = graph.node(current)
     return {

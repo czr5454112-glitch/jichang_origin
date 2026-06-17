@@ -66,6 +66,22 @@ class EdgeReservationTable {
               });
   }
 
+  void remove_task(int task_id) {
+    for (auto iter = by_edge_.begin(); iter != by_edge_.end();) {
+      auto& intervals = iter->second;
+      intervals.erase(std::remove_if(intervals.begin(), intervals.end(),
+                                     [task_id](const EdgeReservation& item) {
+                                       return item.task_id == task_id;
+                                     }),
+                      intervals.end());
+      if (intervals.empty()) {
+        iter = by_edge_.erase(iter);
+      } else {
+        ++iter;
+      }
+    }
+  }
+
   [[nodiscard]] bool has_capacity_conflict(int start_node,
                                            int end_node,
                                            double start,

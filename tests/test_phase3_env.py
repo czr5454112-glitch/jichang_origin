@@ -55,6 +55,31 @@ def _branch_graph() -> IcsGraph:
     )
 
 
+def _dead_end_branch_graph() -> IcsGraph:
+    return IcsGraph(
+        nodes={
+            0: SimNode(location=0, node_type=1, service_time=0.0, x=0, y=0, outgoing=(1, 2)),
+            1: SimNode(location=1, node_type=4, service_time=0.0, x=1, y=1, outgoing=()),
+            2: SimNode(location=2, node_type=4, service_time=0.0, x=1, y=0, outgoing=(3,)),
+            3: SimNode(location=3, node_type=2, service_time=0.0, x=2, y=0, outgoing=()),
+        },
+        edges={
+            (0, 1): SimEdge(start=0, end=1, length=5.0, speed=2.5),
+            (0, 2): SimEdge(start=0, end=2, length=5.0, speed=2.5),
+            (2, 3): SimEdge(start=2, end=3, length=5.0, speed=2.5),
+        },
+        heuristic_time=(
+            (0.0, 2.0, 2.0, 4.0),
+            (4.0, 0.0, 4.0, 4.0),
+            (4.0, 4.0, 0.0, 2.0),
+            (4.0, 4.0, 2.0, 0.0),
+        ),
+        agv_length=1.0,
+        safe_length=1.0,
+        fault_threshold=1.0,
+    )
+
+
 def _task(segment_id: str, task_id: int, pass_time: float, std: float, goal: int = 2) -> TaskLeg:
     return TaskLeg(
         segment_id=segment_id,
@@ -104,6 +129,37 @@ def test_action_mask_blocks_fault_and_edge_capacity() -> None:
     )
     assert fault_candidates[0].safe is False
     assert "fault_edge" in fault_candidates[0].blocked_reasons
+
+
+def test_action_mask_blocks_unreachable_goal_candidates() -> None:
+    graph = _dead_end_branch_graph()
+    task = _task("dead-end", 1, pass_time=0.0, std=20.0, goal=3)
+
+    candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=ReservationTable(),
+        edge_reservations=EdgeReservationTable(),
+    )
+
+    assert candidates[0].next_node == 1
+    assert candidates[0].safe is False
+    assert "unreachable_goal" in candidates[0].blocked_reasons
+    assert candidates[1].next_node == 2
+    assert candidates[1].safe is True
+
+    compatibility_candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=ReservationTable(),
+        edge_reservations=EdgeReservationTable(),
+        require_reachable_goal=False,
+    )
+    assert compatibility_candidates[0].safe is True
 
 
 def test_junction_env_shortest_policy_runs_without_post_shield_conflicts() -> None:

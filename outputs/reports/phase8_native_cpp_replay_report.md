@@ -12,14 +12,14 @@ The replay is intentionally compact and sequential. It is a native-runtime gate,
 
 | Case | Policy | Fault edges | Tasks | Planned | Unplanned | Decisions | Conflicts | Mean travel | Decisions/s |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| native_first8 | edge_score_runtime | none | 8 | 8 | 0 | 78 | 0 | 49.750000 | 3733.72 |
-| native_first8 | shortest_safe_fallback | none | 8 | 8 | 0 | 73 | 0 | 55.225000 | 5148.75 |
-| native_first16 | edge_score_runtime | none | 16 | 16 | 0 | 173 | 0 | 57.012500 | 4780.21 |
-| native_first16 | shortest_safe_fallback | none | 16 | 16 | 0 | 198 | 0 | 58.800000 | 4205.09 |
-| native_fault_alt_route_first8 | edge_score_runtime | 16->17 | 8 | 8 | 0 | 74 | 0 | 51.850000 | 4896.84 |
-| native_fault_alt_route_first8 | shortest_safe_fallback | 16->17 | 8 | 8 | 0 | 73 | 0 | 55.225000 | 5318.92 |
-| native_fault_goal_exit_first8 | edge_score_runtime | 28->47 | 8 | 8 | 0 | 186 | 0 | 146.750000 | 4079.03 |
-| native_fault_goal_exit_first8 | shortest_safe_fallback | 28->47 | 8 | 8 | 0 | 155 | 0 | 132.575000 | 4614.59 |
+| native_first8 | edge_score_runtime | none | 8 | 8 | 0 | 78 | 0 | 49.750000 | 4049.44 |
+| native_first8 | shortest_safe_fallback | none | 8 | 8 | 0 | 73 | 0 | 55.225000 | 5266.73 |
+| native_first16 | edge_score_runtime | none | 16 | 16 | 0 | 173 | 0 | 57.012500 | 4446.42 |
+| native_first16 | shortest_safe_fallback | none | 16 | 16 | 0 | 198 | 0 | 58.800000 | 5720.58 |
+| native_fault_alt_route_first8 | edge_score_runtime | 16->17 | 8 | 8 | 0 | 74 | 0 | 51.850000 | 5440.30 |
+| native_fault_alt_route_first8 | shortest_safe_fallback | 16->17 | 8 | 8 | 0 | 73 | 0 | 55.225000 | 5702.63 |
+| native_fault_goal_exit_first8 | edge_score_runtime | 28->47 | 8 | 8 | 0 | 186 | 0 | 146.750000 | 4255.70 |
+| native_fault_goal_exit_first8 | shortest_safe_fallback | 28->47 | 8 | 8 | 0 | 155 | 0 | 132.575000 | 4922.73 |
 
 CSV: `outputs/tables/phase8_native_cpp_replay.csv`
 
