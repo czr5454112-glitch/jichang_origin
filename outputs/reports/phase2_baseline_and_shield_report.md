@@ -37,6 +37,6 @@ Route-discarding periodic active-bag replanning parity is tracked in
 ## Remaining Work
 
 - merge-group and buffer-capacity constraints
-- repair-window periodic replanning
 - recursive PIBT/CS-PIBT-style replay integration
+- real heldout airport-map fixtures
 - larger multi-seed task-density/fault sweeps

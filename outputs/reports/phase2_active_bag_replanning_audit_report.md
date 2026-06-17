@@ -16,14 +16,14 @@ Route-discarding periodic SIPP replanning is tracked separately in `outputs/repo
 
 | Case | Policy | Tasks | Py/C++ planned | Peak active Py/C++ | Active ticks Py/C++ | Decision ticks Py/C++ | C++ decisions/s | Tick parity | Pass |
 |---|---|---:|---:|---:|---:|---:|---:|---|---|
-| synthetic_seed7_medium_repair | edge_score_event | 18 | 18/18 | 4/4 | 14/14 | 13/13 | 8090.853 | True | True |
-| synthetic_seed7_medium_repair | fallback_event | 18 | 18/18 | 4/4 | 14/14 | 13/13 | 9578.377 | True | True |
-| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | 16/16 | 9/9 | 11/11 | 10/10 | 11163.607 | True | True |
-| synthetic_seed11_dense_multi_repair | fallback_event | 24 | 16/16 | 9/9 | 11/11 | 10/10 | 13137.522 | True | True |
-| synthetic_seed17_static_plus_repair | edge_score_event | 20 | 12/12 | 6/6 | 13/13 | 12/12 | 11085.841 | True | True |
-| synthetic_seed17_static_plus_repair | fallback_event | 20 | 12/12 | 6/6 | 13/13 | 12/12 | 13323.261 | True | True |
-| synthetic_seed23_repeated_repair | edge_score_event | 22 | 20/20 | 8/8 | 11/11 | 10/10 | 9759.570 | True | True |
-| synthetic_seed23_repeated_repair | fallback_event | 22 | 19/19 | 8/8 | 11/11 | 10/10 | 13687.340 | True | True |
+| synthetic_seed7_medium_repair | edge_score_event | 18 | 18/18 | 4/4 | 14/14 | 13/13 | 7676.418 | True | True |
+| synthetic_seed7_medium_repair | fallback_event | 18 | 18/18 | 4/4 | 14/14 | 13/13 | 9093.464 | True | True |
+| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | 16/16 | 9/9 | 11/11 | 10/10 | 9352.896 | True | True |
+| synthetic_seed11_dense_multi_repair | fallback_event | 24 | 16/16 | 9/9 | 11/11 | 10/10 | 12848.457 | True | True |
+| synthetic_seed17_static_plus_repair | edge_score_event | 20 | 12/12 | 6/6 | 13/13 | 12/12 | 10546.917 | True | True |
+| synthetic_seed17_static_plus_repair | fallback_event | 20 | 12/12 | 6/6 | 13/13 | 12/12 | 13219.942 | True | True |
+| synthetic_seed23_repeated_repair | edge_score_event | 22 | 20/20 | 8/8 | 11/11 | 10/10 | 10235.784 | True | True |
+| synthetic_seed23_repeated_repair | fallback_event | 22 | 19/19 | 8/8 | 11/11 | 10/10 | 13345.196 | True | True |
 
 CSV: `outputs/tables/phase2_active_bag_replanning_audit.csv`
 
@@ -37,6 +37,5 @@ CSV: `outputs/tables/phase2_active_bag_replanning_audit.csv`
 
 ## Remaining Work
 
-- extend periodic SIPP replanning to repair-window schedules if needed
 - add real heldout airport-map fixtures when available
 - carry active-bag cost metrics into Phase9 comparisons

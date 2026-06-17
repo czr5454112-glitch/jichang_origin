@@ -266,7 +266,6 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
             "",
             "## Remaining Work",
             "",
-            "- extend periodic SIPP replanning to repair-window schedules if needed",
             "- add real heldout airport-map fixtures when available",
             "- carry active-bag cost metrics into Phase9 comparisons",
         ]

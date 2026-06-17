@@ -238,6 +238,24 @@ int main() {
   test.check(periodic_result.post_shield_conflicts == 0,
              "periodic replanning SIPP should stay conflict-free");
 
+  TaskStream periodic_repair_tasks;
+  periodic_repair_tasks.add(TaskLeg{"repair-wait", 403, 403, 0.0, 30.0, 0, 2, 0, 2, 0.0, "direct", false, 3});
+  periodic_repair_tasks.sort_by_pass_time();
+  PeriodicReplanningConfig periodic_repair_config = periodic_config;
+  periodic_repair_config.max_tasks = 1;
+  const auto periodic_repair_result = run_periodic_replanning_sipp(
+      graph,
+      periodic_repair_tasks,
+      periodic_repair_config,
+      {},
+      {czr005::ics::PeriodicFaultWindow{0, 1, 0.0, 10.0}});
+  test.check(periodic_repair_result.planned_count == 1,
+             "periodic replanning repair window should plan the sample task after repair");
+  test.check(periodic_repair_result.unplanned_count == 0,
+             "periodic replanning repair window should not leave the sample task unplanned");
+  test.check(periodic_repair_result.post_shield_conflicts == 0,
+             "periodic replanning repair window should stay conflict-free");
+
   const Graph pibt_merge_graph = make_merge_graph();
   const PIBTStyleOneStepResolver pibt_merge_resolver(pibt_merge_graph);
   const auto pibt_merge_actions = pibt_merge_resolver.resolve({

@@ -25,6 +25,13 @@ struct PeriodicReplanningConfig {
   double edge_headway_seconds = 0.0;
 };
 
+struct PeriodicFaultWindow {
+  int start = -1;
+  int end = -1;
+  double fault_start = 0.0;
+  double repair_time = 0.0;
+};
+
 struct PeriodicReplanningEvent {
   std::string event;
   std::string segment_id;
@@ -81,6 +88,27 @@ inline std::vector<int> route_locations(const std::vector<PathNode>& route) {
     path.push_back(node.location);
   }
   return path;
+}
+
+inline void validate_fault_windows(const std::vector<PeriodicFaultWindow>& fault_windows) {
+  for (const auto& window : fault_windows) {
+    if (window.repair_time <= window.fault_start) {
+      throw std::invalid_argument("repair_time must be greater than fault_start");
+    }
+  }
+}
+
+inline std::set<std::pair<int, int>> active_fault_edges(
+    const std::set<std::pair<int, int>>& fault_edges,
+    const std::vector<PeriodicFaultWindow>& fault_windows,
+    double ready_time) {
+  std::set<std::pair<int, int>> active = fault_edges;
+  for (const auto& window : fault_windows) {
+    if (window.fault_start <= ready_time && ready_time < window.repair_time) {
+      active.insert({window.start, window.end});
+    }
+  }
+  return active;
 }
 
 inline double earliest_safe_node_start(const ReservationTable& reservations,
@@ -181,7 +209,11 @@ inline void hold_bag(const PeriodicReplanningConfig& config,
                      double tick_time,
                      int priority_rank,
                      std::vector<PeriodicReplanningEvent>& events) {
-  const double hold_start = std::max(tick_time, bag.ready_time);
+  const double hold_start = earliest_safe_node_start(reservations,
+                                                     bag.task.task_id,
+                                                     bag.current,
+                                                     std::max(tick_time, bag.ready_time),
+                                                     config.interval_seconds);
   const double hold_end = hold_start + config.interval_seconds;
   auto& current_node = bag.route.back();
   current_node.t2 = hold_end;
@@ -189,7 +221,7 @@ inline void hold_bag(const PeriodicReplanningConfig& config,
   current_node.fcost = hold_end + current_node.hcost;
   bag.waiting_time += hold_end - hold_start;
   bag.ready_time = hold_end;
-  reservations.reserve(bag.task.task_id, bag.current, current_node.t1, current_node.t2);
+  reservations.reserve(bag.task.task_id, bag.current, hold_start, hold_end);
   events.push_back(PeriodicReplanningEvent{"replan_hold",
                                            bag.task.segment_id,
                                            bag.task.task_id,
@@ -215,7 +247,8 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
     const Graph& graph,
     const TaskStream& tasks,
     const PeriodicReplanningConfig& config = {},
-    const std::set<std::pair<int, int>>& fault_edges = {}) {
+    const std::set<std::pair<int, int>>& fault_edges = {},
+    const std::vector<PeriodicFaultWindow>& fault_windows = {}) {
   if (config.interval_seconds <= 0.0) {
     throw std::invalid_argument("interval_seconds must be positive");
   }
@@ -228,6 +261,7 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
   if (config.edge_capacity <= 0) {
     throw std::invalid_argument("edge_capacity must be positive");
   }
+  periodic_detail::validate_fault_windows(fault_windows);
 
   std::vector<TaskLeg> selected;
   const std::size_t limit = std::min(config.max_tasks, tasks.size());
@@ -319,6 +353,8 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
       ++result.replan_count;
       ++bag.replan_count;
       const double start_time = std::max(tick_time, bag.ready_time);
+      const auto active_faults =
+          periodic_detail::active_fault_edges(fault_edges, fault_windows, start_time);
       const auto planned = planner.plan(bag.current,
                                         bag.task.goal,
                                         start_time,
@@ -326,7 +362,7 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
                                         &edge_reservations,
                                         config.edge_capacity,
                                         config.edge_headway_seconds,
-                                        fault_edges,
+                                        active_faults,
                                         bag.task.task_id);
       if (planned.size() >= 2) {
         const auto& next_node = planned[1];

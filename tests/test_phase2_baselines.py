@@ -263,6 +263,32 @@ def test_periodic_replanning_uses_fault_safe_alternative() -> None:
     assert move_events[0]["next_node"] == 2
 
 
+def test_periodic_replanning_respects_repair_windows() -> None:
+    active_window_result = PeriodicReplanningBaseline(
+        _branch_graph(),
+        interval_seconds=2.0,
+        max_ticks=16,
+    ).run_episode(
+        (_task("during-window", 9, pass_time=0.0, std=20.0, goal=3),),
+        fault_windows=((0, 1, 0.0, 5.0),),
+    )
+    repaired_result = PeriodicReplanningBaseline(
+        _branch_graph(),
+        interval_seconds=2.0,
+        max_ticks=16,
+    ).run_episode(
+        (_task("after-window", 10, pass_time=6.0, std=26.0, goal=3),),
+        fault_windows=((0, 1, 0.0, 5.0),),
+    )
+
+    active_move_events = [event for event in active_window_result.events if event["event"] == "replan_move"]
+    repaired_move_events = [event for event in repaired_result.events if event["event"] == "replan_move"]
+    assert active_window_result.metrics.planned_count == 1
+    assert repaired_result.metrics.planned_count == 1
+    assert active_move_events[0]["next_node"] == 2
+    assert repaired_move_events[0]["next_node"] == 1
+
+
 def test_pibt_style_resolver_prioritizes_merge_conflict() -> None:
     actions = PIBTStyleOneStepResolver(_merge_graph()).resolve(
         (

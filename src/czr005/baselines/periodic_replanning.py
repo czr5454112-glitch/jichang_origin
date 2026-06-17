@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from czr005.baselines.sipp import SIPPNode, SIPPPlanner
+from czr005.envs.action_mask import EdgeFaultWindow, active_fault_edges
 from czr005.sim_py.event_sim import EpisodeResult
 from czr005.sim_py.graph import IcsGraph
 from czr005.sim_py.metrics import compute_episode_metrics
@@ -78,6 +79,7 @@ class PeriodicReplanningBaseline:
         tasks: TaskStream | Iterable[TaskLeg],
         max_tasks: int | None = None,
         fault_edges: set[tuple[int, int]] | None = None,
+        fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
     ) -> EpisodeResult:
         selected = self._select_tasks(tuple(tasks), max_tasks=max_tasks)
         routes: dict[str, list[SIPPNode]] = {}
@@ -89,7 +91,8 @@ class PeriodicReplanningBaseline:
         tick_count = 0
         replan_count = 0
         peak_active_bags = 0
-        faults = fault_edges or set()
+        static_faults = fault_edges or set()
+        repair_windows = tuple(fault_windows or ())
 
         tick_time = selected[0].pass_time if selected else 0.0
         while (next_task_index < len(selected) or any(not bag.closed for bag in active)) and tick_count < self.max_ticks:
@@ -121,7 +124,16 @@ class PeriodicReplanningBaseline:
                     continue
                 replan_count += 1
                 bag.replan_count += 1
-                self._replan_one_step(bag, tick_time, priority_rank, faults, routes, unplanned, events)
+                self._replan_one_step(
+                    bag,
+                    tick_time,
+                    priority_rank,
+                    static_faults,
+                    repair_windows,
+                    routes,
+                    unplanned,
+                    events,
+                )
 
             tick_count += 1
             tick_time += self.interval_seconds
@@ -212,11 +224,13 @@ class PeriodicReplanningBaseline:
         tick_time: float,
         priority_rank: int,
         fault_edges: set[tuple[int, int]],
+        fault_windows: tuple[EdgeFaultWindow, ...],
         routes: dict[str, list[SIPPNode]],
         unplanned: list[TaskLeg],
         events: list[dict[str, object]],
     ) -> None:
         start_time = max(tick_time, bag.ready_time)
+        active_faults = active_fault_edges(fault_edges, fault_windows, start_time)
         planned = self.planner.plan(
             start=bag.current,
             goal=bag.task.goal,
@@ -225,7 +239,7 @@ class PeriodicReplanningBaseline:
             edge_reservations=self.edge_reservations,
             edge_capacity=self.edge_capacity,
             edge_headway_seconds=self.edge_headway_seconds,
-            fault_edges=fault_edges,
+            fault_edges=active_faults,
             task_id=bag.task.task_id,
         )
         if len(planned) >= 2:
@@ -294,14 +308,19 @@ class PeriodicReplanningBaseline:
         priority_rank: int,
         events: list[dict[str, object]],
     ) -> None:
-        hold_start = max(tick_time, bag.ready_time)
+        hold_start = self._earliest_safe_node_start(
+            task_id=bag.task.task_id,
+            node=bag.current,
+            earliest_start=max(tick_time, bag.ready_time),
+            duration=self.interval_seconds,
+        )
         hold_end = hold_start + self.interval_seconds
         bag.route[-1].t2 = hold_end
         bag.route[-1].gcost = hold_end
         bag.route[-1].fcost = hold_end + bag.route[-1].hcost
         bag.waiting_time += hold_end - hold_start
         bag.ready_time = hold_end
-        self.reservations.reserve(bag.task.task_id, bag.current, bag.route[-1].t1, bag.route[-1].t2)
+        self.reservations.reserve(bag.task.task_id, bag.current, hold_start, hold_end)
         events.append(
             {
                 "event": "replan_hold",

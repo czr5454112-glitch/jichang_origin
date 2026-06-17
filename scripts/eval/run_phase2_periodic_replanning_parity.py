@@ -16,6 +16,7 @@ FLOAT_TOLERANCE = 1.0e-9
 NodeRecord = tuple[int, int, float, int, int, list[int]]
 EdgeRecord = tuple[int, int, float, float]
 TaskRecord = tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
+FaultWindow = tuple[int, int, float, float]
 
 SUMMARY_FIELDS = (
     "planned_count",
@@ -68,6 +69,7 @@ class PeriodicParityCase:
     edge_capacity: int = 1
     edge_headway_seconds: float = 0.0
     fault_edges: tuple[tuple[int, int], ...] = ()
+    fault_windows: tuple[FaultWindow, ...] = ()
 
 
 def _prepare_imports() -> None:
@@ -228,6 +230,7 @@ def _python_payload(case: PeriodicParityCase) -> dict[str, Any]:
         case.tasks,
         max_tasks=case.max_tasks,
         fault_edges=set(case.fault_edges),
+        fault_windows=case.fault_windows,
     )
     return {
         "summary": {
@@ -256,6 +259,7 @@ def _cpp_payload(case: PeriodicParityCase) -> dict[str, Any]:
         edge_capacity=case.edge_capacity,
         edge_headway_seconds=case.edge_headway_seconds,
         fault_edges=list(case.fault_edges),
+        fault_windows=list(case.fault_windows),
     )
     return {
         "summary": dict(payload["summary"]),
@@ -358,6 +362,8 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
         _task("second", 4, 0.1, 20.0, 0, 1),
     )
     branch_tasks = (_task("fault-alt", 5, 0.0, 20.0, 0, 3),)
+    branch_repair_tasks = (_task("repair-alt", 6, 0.0, 20.0, 0, 3),)
+    branch_repaired_tasks = (_task("after-repair", 7, 6.0, 26.0, 0, 3),)
     cases: list[PeriodicParityCase] = [
         PeriodicParityCase(
             "line_two_active_bags",
@@ -397,6 +403,32 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
             max_ticks=32,
             fault_edges=((0, 1),),
         ),
+        PeriodicParityCase(
+            "branch_repair_window_alternative",
+            branch_graph,
+            branch_nodes,
+            branch_edges,
+            branch_heuristic,
+            branch_repair_tasks,
+            tuple(_task_record(task) for task in branch_repair_tasks),
+            max_tasks=1,
+            interval_seconds=2.0,
+            max_ticks=32,
+            fault_windows=((0, 1, 0.0, 5.0),),
+        ),
+        PeriodicParityCase(
+            "branch_repaired_preferred_edge",
+            branch_graph,
+            branch_nodes,
+            branch_edges,
+            branch_heuristic,
+            branch_repaired_tasks,
+            tuple(_task_record(task) for task in branch_repaired_tasks),
+            max_tasks=1,
+            interval_seconds=2.0,
+            max_ticks=32,
+            fault_windows=((0, 1, 0.0, 5.0),),
+        ),
     ]
     for manifest_case in load_manifest_cases()[:2]:
         tasks = tasks_from_case(manifest_case)
@@ -413,6 +445,7 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
                 interval_seconds=5.0,
                 max_ticks=256,
                 fault_edges=manifest_case.spec.fault_edges,
+                fault_windows=manifest_case.spec.fault_windows,
             )
         )
     return tuple(cases)
@@ -445,8 +478,9 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "It covers two active bags, edge-capacity pressure, static-fault alternate routing, "
-            "and two persisted synthetic manifest slices. Repair windows, recursive PIBT, and "
-            "real heldout airport maps are not covered."
+            "repair-window alternate/repaired routing, "
+            "and two persisted synthetic manifest slices. Recursive PIBT and real heldout "
+            "airport maps are not covered."
         ),
         "",
         "## Metrics",
@@ -480,7 +514,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "- post-shield safety: PASS" if safety_pass else "- post-shield safety: FAIL",
             "- route-discarding one-step replanning: covered",
             "- static-fault alternate routing: covered",
-            "- repair-window periodic replanning: not covered",
+            "- repair-window periodic replanning: covered",
             "- recursive PIBT: not covered",
         ]
     )

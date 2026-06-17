@@ -494,3 +494,14 @@
 - Tests / validation: CTest passed 2/2; target Phase2 pytest passed `12 passed`; Phase2 periodic replanning parity reported `5` strict PASS rows with zero post-shield conflicts.
 - Safety / parity notes: This closes route-discarding one-step periodic SIPP replanning parity for static-fault schedules. Repair-window periodic replanning, recursive PIBT priority inheritance/backtracking, merge-group/buffer semantics, real heldout-map validation, and final Phase9 large-scale comparisons remain pending.
 - Follow-up: extend periodic replanning to repair-window schedules if needed, then continue with recursive PIBT or heldout-map/runtime validation.
+
+## 2026-06-17 18:20 - Phase2 periodic replanning repair-window parity
+
+- Request: Close the repair-window gap in the route-discarding periodic SIPP replanning baseline and keep Python/C++ parity intact.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: extended Python and C++ periodic replanning to union static faults with time-bounded repair windows at each decision time, exposed `fault_windows` through the pybind periodic replanning entry point, fixed hold reservations to reserve only the actual safe hold interval, expanded Python/C++/pybind smoke tests, refreshed the periodic parity diagnostic and status docs.
+- Commands run: target Phase2 pytest, CMake build through the VS developer environment with CTest, full Python pytest, Phase2 periodic replanning parity, Phase2 C++ SIPP parity, Phase2 C++ rolling-horizon parity, Phase2 C++ PIBT parity, Phase8 native C++ event parity, and Phase8 event trace diagnostic.
+- Key observations: Python and C++ now both treat repair-window faults as active when `fault_start <= decision_time < repair_time`, combined with static fault edges. The periodic parity gate covers active-window alternate routing, repaired preferred-edge routing, and persisted synthetic repair slices with exact event-stream parity and zero post-shield conflicts.
+- Tests / validation: target Phase2 pytest passed `13 passed`; CTest passed 2/2; full Python pytest passed `39 passed`; Phase2 periodic replanning parity reported `7` strict PASS rows; SIPP, rolling-horizon, PIBT, Phase8 event parity, and Phase8 trace diagnostics all passed.
+- Safety / parity notes: Repair-window periodic replanning parity is now covered. Recursive PIBT priority inheritance/backtracking, merge-group/buffer semantics, real heldout-map validation, and final Phase9 large-scale runtime comparisons remain pending.
+- Follow-up: continue with recursive PIBT or heldout-map/runtime validation.

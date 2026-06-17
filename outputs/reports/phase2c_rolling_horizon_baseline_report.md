@@ -51,7 +51,7 @@ Target CTest:
 
 This is a first rolling-horizon skeleton. Remaining work includes:
 
-- repair-window periodic replanning
 - merge-aware priority
+- real heldout airport-map fixtures
 - larger task-stream replay sweeps
 - comparison against SIPP-only and A* reference baselines

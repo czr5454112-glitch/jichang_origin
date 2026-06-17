@@ -218,6 +218,19 @@ def main() -> None:
     assert periodic_replanning["summary"]["replan_count"] >= 2
     assert periodic_replanning["summary"]["peak_active_bags"] >= 1
     assert periodic_replanning["summary"]["post_shield_conflicts"] == 0
+    periodic_repair = czr005_cpp.periodic_replanning_sipp_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        [rolling_task_records[1]],
+        max_tasks=1,
+        interval_seconds=2.0,
+        max_ticks=16,
+        fault_windows=[(0, 1, 0.0, 10.0)],
+    )
+    assert periodic_repair["summary"]["planned_count"] == 1
+    assert periodic_repair["summary"]["unplanned_count"] == 0
+    assert periodic_repair["summary"]["post_shield_conflicts"] == 0
 
     pibt_merge_node_records = [
         (0, 1, 0.0, 0, 0, [2]),
