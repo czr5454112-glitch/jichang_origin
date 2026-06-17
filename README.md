@@ -15,7 +15,7 @@ legacy Java reference
 Current scope:
 
 - Phase0/Phase1 legacy source fixation, map/task parsing, Python reference simulator, and C++ core smoke parity.
-- Phase2 non-learning baselines: A*, reservation/SIPP, rolling-horizon SIPP, PIBT-style one-step shield, and active-bag/replan-cost diagnostics.
+- Phase2 non-learning baselines: A*, reservation/SIPP, rolling-horizon SIPP, route-discarding periodic SIPP replanning, PIBT-style one-step shield, and active-bag/replan-cost diagnostics.
 - Phase8 native C++ event replay with Python/C++ parity over persisted synthetic schedules.
 - Learning experiments are still smoke/prototype scope, not final paper-grade RL results.
 - Legacy Java files are read-only reference material.

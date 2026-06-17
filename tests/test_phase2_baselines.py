@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from czr005.baselines import AgentState, PIBTStyleOneStepResolver, RollingHorizonBaseline, SIPPPlanner
+from czr005.baselines import (
+    AgentState,
+    PeriodicReplanningBaseline,
+    PIBTStyleOneStepResolver,
+    RollingHorizonBaseline,
+    SIPPPlanner,
+)
 from czr005.sim_py import AStarPlanner, EdgeReservationTable, IcsGraph, ReservationTable, SimEdge, SimNode
 from czr005.sim_py.task_stream import TaskLeg
 
@@ -223,6 +229,38 @@ def test_rolling_horizon_reserves_edge_headway() -> None:
     assert result.metrics.planned_count == 2
     assert result.routes["urgent"][1].t1 == 2.0
     assert result.routes["loose"][1].t1 >= 4.0
+
+
+def test_periodic_replanning_commits_one_step_per_tick() -> None:
+    result = PeriodicReplanningBaseline(
+        _line_graph(),
+        interval_seconds=2.0,
+        max_ticks=16,
+    ).run_episode((_task("active", 7, pass_time=0.0, std=20.0),))
+
+    move_events = [event for event in result.events if event["event"] == "replan_move"]
+    assert result.metrics.planned_count == 1
+    assert result.metrics.unplanned_count == 0
+    assert result.metrics.reservation_conflicts == 0
+    assert [event["planned_path"] for event in move_events] == [[0, 1, 2], [1, 2]]
+    assert result.events[-1]["event"] == "planned"
+    assert result.events[-1]["path"] == [0, 1, 2]
+
+
+def test_periodic_replanning_uses_fault_safe_alternative() -> None:
+    result = PeriodicReplanningBaseline(
+        _branch_graph(),
+        interval_seconds=2.0,
+        max_ticks=16,
+    ).run_episode(
+        (_task("fault-alt", 8, pass_time=0.0, std=20.0, goal=3),),
+        fault_edges={(0, 1)},
+    )
+
+    move_events = [event for event in result.events if event["event"] == "replan_move"]
+    assert result.metrics.planned_count == 1
+    assert move_events[0]["current"] == 0
+    assert move_events[0]["next_node"] == 2
 
 
 def test_pibt_style_resolver_prioritizes_merge_conflict() -> None:

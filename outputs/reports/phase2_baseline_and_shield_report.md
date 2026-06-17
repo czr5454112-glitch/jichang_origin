@@ -25,6 +25,9 @@ CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 Active-bag/replan-cost evidence is tracked separately in
 `outputs/reports/phase2_active_bag_replanning_audit_report.md`.
 
+Route-discarding periodic active-bag replanning parity is tracked in
+`outputs/reports/phase2_periodic_replanning_parity_report.md`.
+
 ## Gate Status
 
 - post-shield/reservation conflicts: PASS
@@ -34,6 +37,6 @@ Active-bag/replan-cost evidence is tracked separately in
 ## Remaining Work
 
 - merge-group and buffer-capacity constraints
-- true route-discarding active-bag replanning rather than sequential task-leg replay
+- repair-window periodic replanning
 - recursive PIBT/CS-PIBT-style replay integration
 - larger multi-seed task-density/fault sweeps

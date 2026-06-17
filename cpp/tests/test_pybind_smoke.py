@@ -204,6 +204,21 @@ def main() -> None:
     assert rolling_horizon["summary"]["post_shield_conflicts"] == 0
     assert [event["segment_id"] for event in rolling_horizon["events"]] == ["urgent", "loose"]
 
+    periodic_replanning = czr005_cpp.periodic_replanning_sipp_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        rolling_task_records,
+        max_tasks=2,
+        interval_seconds=2.0,
+        max_ticks=16,
+    )
+    assert periodic_replanning["summary"]["planned_count"] == 2
+    assert periodic_replanning["summary"]["unplanned_count"] == 0
+    assert periodic_replanning["summary"]["replan_count"] >= 2
+    assert periodic_replanning["summary"]["peak_active_bags"] >= 1
+    assert periodic_replanning["summary"]["post_shield_conflicts"] == 0
+
     pibt_merge_node_records = [
         (0, 1, 0.0, 0, 0, [2]),
         (1, 1, 0.0, 0, 1, [2]),

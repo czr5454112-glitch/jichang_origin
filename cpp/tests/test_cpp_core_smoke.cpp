@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "ics_core/baselines/pibt.hpp"
+#include "ics_core/baselines/periodic_replanning.hpp"
 #include "ics_core/baselines/rolling_horizon.hpp"
 #include "ics_core/graph/graph.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
@@ -30,6 +31,7 @@ using czr005::ics::JunctionShieldConfig;
 using czr005::ics::Node;
 using czr005::ics::PIBTAgentState;
 using czr005::ics::PIBTStyleOneStepResolver;
+using czr005::ics::PeriodicReplanningConfig;
 using czr005::ics::ReservationTable;
 using czr005::ics::RollingHorizonConfig;
 using czr005::ics::SafetyStatus;
@@ -42,6 +44,7 @@ using czr005::ics::run_edge_score_event_fallback_replay;
 using czr005::ics::run_edge_score_event_replay;
 using czr005::ics::run_edge_score_replay;
 using czr005::ics::run_rolling_horizon_sipp;
+using czr005::ics::run_periodic_replanning_sipp;
 using czr005::ics::TaskLeg;
 using czr005::ics::TaskStream;
 
@@ -218,6 +221,22 @@ int main() {
     test.check(rolling_result.events[1].segment_id == "loose",
                "rolling-horizon SIPP should plan the looser task second");
   }
+
+  PeriodicReplanningConfig periodic_config;
+  periodic_config.max_tasks = 2;
+  periodic_config.interval_seconds = 2.0;
+  periodic_config.max_ticks = 16;
+  const auto periodic_result = run_periodic_replanning_sipp(graph, rolling_tasks, periodic_config);
+  test.check(periodic_result.planned_count == 2,
+             "periodic replanning SIPP should plan two sample tasks");
+  test.check(periodic_result.unplanned_count == 0,
+             "periodic replanning SIPP should not leave sample tasks unplanned");
+  test.check(periodic_result.replan_count >= 2,
+             "periodic replanning SIPP should record active-bag replans");
+  test.check(periodic_result.peak_active_bags >= 1,
+             "periodic replanning SIPP should report active-bag pressure");
+  test.check(periodic_result.post_shield_conflicts == 0,
+             "periodic replanning SIPP should stay conflict-free");
 
   const Graph pibt_merge_graph = make_merge_graph();
   const PIBTStyleOneStepResolver pibt_merge_resolver(pibt_merge_graph);

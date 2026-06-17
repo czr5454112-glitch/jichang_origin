@@ -10,6 +10,9 @@ Added a first Python rolling-horizon prioritized baseline:
 - updated `src/czr005/baselines/__init__.py`
 - expanded `tests/test_phase2_baselines.py`
 
+Route-discarding periodic active-bag replanning and Python/C++ parity are
+tracked separately in `outputs/reports/phase2_periodic_replanning_parity_report.md`.
+
 ## Behavior
 
 The baseline batches task legs by a fixed pass-time horizon, sorts each batch by deadline slack, and plans each task with SIPP against a shared reservation table.
@@ -48,8 +51,7 @@ Target CTest:
 
 This is a first rolling-horizon skeleton. Remaining work includes:
 
-- true active-bag replanning
-- C++ parity/runtime version
-- edge capacity/headway and merge-aware priority
+- repair-window periodic replanning
+- merge-aware priority
 - larger task-stream replay sweeps
 - comparison against SIPP-only and A* reference baselines

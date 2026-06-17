@@ -230,6 +230,11 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
             "periodic global replanner and not recursive PIBT."
         ),
         "",
+        (
+            "Route-discarding periodic SIPP replanning is tracked separately in "
+            "`outputs/reports/phase2_periodic_replanning_parity_report.md`."
+        ),
+        "",
         "## Metrics",
         "",
         (
@@ -261,7 +266,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
             "",
             "## Remaining Work",
             "",
-            "- implement a true route-discarding periodic SIPP replanner if needed for a separate baseline",
+            "- extend periodic SIPP replanning to repair-window schedules if needed",
             "- add real heldout airport-map fixtures when available",
             "- carry active-bag cost metrics into Phase9 comparisons",
         ]

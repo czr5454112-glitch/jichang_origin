@@ -483,3 +483,14 @@
 - Tests / validation: Python pytest passed `36 passed`; CTest passed 2/2; Phase8 event scheduler parity reported `8` strict PASS rows; event trace diagnostic reported `8` invariant PASS rows; Phase2 active-bag audit reported `8` PASS rows.
 - Safety / parity notes: This supplies a reproducible replan-cost/active-bag audit over the event scheduler. It is not a true route-discarding periodic SIPP replanner, not recursive PIBT, and not real heldout-map validation.
 - Follow-up: implement a true route-discarding periodic replanning baseline if needed, add real heldout-map fixtures when available, and carry active-bag cost metrics into Phase9 comparisons.
+
+## 2026-06-17 17:45 - Phase2 route-discarding periodic SIPP replanning parity
+
+- Request: Continue closing Phase2C by implementing the true route-discarding periodic active-bag replanner that the previous audit explicitly left pending.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added Python `PeriodicReplanningBaseline`, added C++ `periodic_replanning.hpp`, exposed `periodic_replanning_sipp_from_records` through pybind, expanded C++/pybind/Python smoke tests, added `scripts/eval/run_phase2_periodic_replanning_parity.py`, generated `outputs/tables/phase2_periodic_replanning_parity.csv` plus `outputs/reports/phase2_periodic_replanning_parity_report.md`, and refreshed Phase2 status docs.
+- Commands run: CMake build through the VS developer environment with CTest, target Phase2 pytest, and Phase2 periodic replanning parity.
+- Key observations: The new baseline admits active bags on fixed ticks, replans SIPP from each bag's current node, commits only the next hop, discards the remaining planned route, and replans again at the next tick. Python and C++ matched exactly on summary metrics and event streams for active-bag, edge-capacity, static-fault alternate, and persisted synthetic slices.
+- Tests / validation: CTest passed 2/2; target Phase2 pytest passed `12 passed`; Phase2 periodic replanning parity reported `5` strict PASS rows with zero post-shield conflicts.
+- Safety / parity notes: This closes route-discarding one-step periodic SIPP replanning parity for static-fault schedules. Repair-window periodic replanning, recursive PIBT priority inheritance/backtracking, merge-group/buffer semantics, real heldout-map validation, and final Phase9 large-scale comparisons remain pending.
+- Follow-up: extend periodic replanning to repair-window schedules if needed, then continue with recursive PIBT or heldout-map/runtime validation.
