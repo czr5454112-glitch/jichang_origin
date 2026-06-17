@@ -81,6 +81,7 @@ def main() -> None:
         assert loaded.feature_dim == 3
         assert loaded.hidden_dim == 2
         assert loaded.predict(features, [False, True]) == 1
+        assert loaded.predict_many([features, features], [[False, True], [True, False]]) == [1, 0]
         assert czr005_cpp.edge_score_load_summary(str(runtime_model_path))["hidden_dim"] == 2
     finally:
         runtime_model_path.unlink(missing_ok=True)

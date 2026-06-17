@@ -285,3 +285,14 @@
 - Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `29 passed`; Phase8 runtime-loader parity script passed.
 - Safety / parity notes: This closes the model-export/load prerequisite for C++ policy runtime, but it is still not C++ closed-loop replay, runtime latency measurement, or heldout-map validation.
 - Follow-up: bind the loaded scorer into a C++ shielded replay loop, measure latency on larger replay batches, and validate exported checkpoints across heldout maps and fault schedules.
+
+## 2026-06-17 08:25 - Phase8 C++ runtime policy and latency smoke
+
+- Request: Continue Phase8 by measuring runtime inference latency and using the C++ loaded scorer inside a closed-loop shielded policy smoke.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `EdgeScoreRuntimeModel.predict_many`, added Python runtime-text loading and `runtime_edge_score_policy_factory`, expanded Python/pybind tests, added `scripts/eval/run_phase8_cpp_runtime_policy_smoke.py`, and generated `outputs/tables/phase8_cpp_runtime_latency.csv`, `outputs/tables/phase8_cpp_runtime_closed_loop.csv`, and `outputs/reports/phase8_cpp_runtime_report.md`.
+- Commands run: CMake build, target CTest, target Python pytest, and Phase8 C++ runtime policy smoke.
+- Key observations: The C++ runtime model matches Python masked predictions on 208 fault-curriculum slices with zero mismatches. On this pybind batch smoke, `cpp_predict_many` measured about `18106.09` decisions/s. The C++ runtime policy matched the Python-loaded artifact planned counts on four density/fault closed-loop cases, with zero post-shield conflicts and no truncation.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `31 passed`; Phase8 runtime policy smoke passed.
+- Safety / parity notes: This measures and uses C++ inference inside the existing Python event environment. Native C++ event replay, larger latency sweeps, and heldout-map/fault-schedule validation remain pending.
+- Follow-up: move the event replay loop itself into C++, compare runtime against rolling-horizon/SIPP on identical larger windows, then validate exported checkpoints on heldout maps and randomized schedules.

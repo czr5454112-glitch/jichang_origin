@@ -55,6 +55,21 @@ class EdgeScoreModel {
     return best_index;
   }
 
+  std::vector<int> predict_many(
+      const std::vector<std::vector<std::vector<double>>>& feature_batches,
+      const std::vector<std::vector<bool>>& action_masks = {}) const {
+    if (!action_masks.empty() && action_masks.size() != feature_batches.size()) {
+      throw std::invalid_argument("action_masks size must match feature batch count");
+    }
+    std::vector<int> predictions;
+    predictions.reserve(feature_batches.size());
+    for (std::size_t index = 0; index < feature_batches.size(); ++index) {
+      const auto& mask = action_masks.empty() ? empty_mask_ : action_masks[index];
+      predictions.push_back(predict(feature_batches[index], mask));
+    }
+    return predictions;
+  }
+
   std::size_t feature_dim() const { return w1_.size(); }
   std::size_t hidden_dim() const { return b1_.size(); }
 
@@ -63,6 +78,7 @@ class EdgeScoreModel {
   std::vector<double> b1_;
   std::vector<double> w2_;
   double b2_ = 0.0;
+  inline static const std::vector<bool> empty_mask_{};
 
   void validate() const {
     if (w1_.empty()) {

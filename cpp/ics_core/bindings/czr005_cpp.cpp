@@ -149,6 +149,10 @@ PYBIND11_MODULE(czr005_cpp, module) {
            &czr005::ics::EdgeScoreModel::predict,
            py::arg("features"),
            py::arg("action_mask") = std::vector<bool>{})
+      .def("predict_many",
+           &czr005::ics::EdgeScoreModel::predict_many,
+           py::arg("feature_batches"),
+           py::arg("action_masks") = std::vector<std::vector<bool>>{})
       .def_property_readonly("feature_dim", &czr005::ics::EdgeScoreModel::feature_dim)
       .def_property_readonly("hidden_dim", &czr005::ics::EdgeScoreModel::hidden_dim);
 

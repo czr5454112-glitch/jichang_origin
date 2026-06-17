@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from czr005.datasets import collect_labeled_policy_slices, collect_teacher_slices
 from czr005.envs import IcsJunctionEnv, astar_guided_policy_factory
-from czr005.eval import edge_score_policy_factory, run_shadow_replay
+from czr005.eval import edge_score_policy_factory, run_shadow_replay, runtime_edge_score_policy_factory
 from czr005.models import fit_edge_score_model
 from czr005.sim_py import IcsGraph, SimEdge, SimNode
 from czr005.sim_py.task_stream import TaskLeg
@@ -62,6 +62,41 @@ def test_shadow_replay_and_closed_loop_policy_are_safe() -> None:
     assert run_info.truncated is False
     assert result.metrics.planned_count == 2
     assert closed_env.episode_summary()["post_shield_conflicts"] == 0
+
+
+def test_runtime_edge_score_policy_factory_uses_runtime_predict() -> None:
+    graph = _line_graph()
+    tasks = (_task(1, 0.0), _task(2, 0.5))
+    teacher = collect_teacher_slices(
+        IcsJunctionEnv(graph, tasks),
+        astar_guided_policy_factory(graph),
+        seed=5,
+    )
+    model, _ = fit_edge_score_model(list(teacher.slices), hidden_dim=8, epochs=80, learning_rate=0.08, seed=9)
+
+    class RuntimeModel:
+        def predict(self, features: list[list[float]], action_mask: list[bool]) -> int:
+            scores = model.scores(features)
+            masked = [score if allowed else -1.0e9 for score, allowed in zip(scores, action_mask)]
+            return max(range(len(masked)), key=lambda index: masked[index])
+
+    env = IcsJunctionEnv(graph, tasks)
+    result, run_info = env.run_policy(runtime_edge_score_policy_factory(RuntimeModel()), seed=7)
+
+    assert run_info.truncated is False
+    assert result.metrics.planned_count == 2
+    assert env.episode_summary()["post_shield_conflicts"] == 0
+
+
+def test_runtime_edge_score_policy_falls_back_when_model_missing() -> None:
+    graph = _line_graph()
+    tasks = (_task(1, 0.0),)
+    env = IcsJunctionEnv(graph, tasks)
+    result, run_info = env.run_policy(runtime_edge_score_policy_factory(None), seed=7)
+
+    assert run_info.truncated is False
+    assert result.metrics.planned_count == 1
+    assert env.episode_summary()["post_shield_conflicts"] == 0
 
 
 def test_labeled_policy_slices_keep_behavior_and_expert_actions() -> None:

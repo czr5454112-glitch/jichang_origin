@@ -9,6 +9,7 @@ from czr005.models import (
     evaluate_top1,
     fit_edge_score_model,
     load_edge_score_model,
+    load_edge_score_runtime_text,
     load_teacher_manifest,
     save_edge_score_model,
     save_edge_score_runtime_text,
@@ -88,6 +89,7 @@ def test_edge_score_runtime_text_export() -> None:
     model_path = ROOT / ".pytest_cache" / "edge_score_runtime.txt"
     try:
         save_edge_score_runtime_text(model_path, model)
+        loaded = load_edge_score_runtime_text(model_path)
         lines = model_path.read_text(encoding="utf-8").splitlines()
 
         assert lines[:5] == [
@@ -108,5 +110,6 @@ def test_edge_score_runtime_text_export() -> None:
             "w2",
             "0.69999999999999996 -0.59999999999999998",
         ]
+        assert loaded == model
     finally:
         model_path.unlink(missing_ok=True)

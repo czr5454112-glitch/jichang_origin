@@ -6,9 +6,10 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from czr005.envs import IcsJunctionEnv
+from czr005.envs import IcsJunctionEnv, shortest_safe_policy
 from czr005.envs.ics_junction_env import PolicyFn
 from czr005.models import EdgeScoreModel
+from czr005.models.edge_score import featurize_slice
 
 
 @dataclass(frozen=True)
@@ -50,6 +51,24 @@ def edge_score_policy_factory(model: EdgeScoreModel, safe_only: bool = True) -> 
         if not obs:
             return 0
         return model.predict_action(_model_item_from_obs(obs), safe_only=safe_only)
+
+    return policy
+
+
+def runtime_edge_score_policy_factory(
+    runtime_model: Any | None,
+    safe_only: bool = True,
+    fallback_policy: PolicyFn | None = None,
+) -> PolicyFn:
+    def policy(obs: dict[str, Any], info: dict[str, Any]) -> int:
+        if not obs:
+            return 0
+        if runtime_model is None:
+            fallback = fallback_policy or shortest_safe_policy
+            return fallback(obs, info)
+        features, candidate_indices, action_mask = featurize_slice(_model_item_from_obs(obs))
+        selected_position = int(runtime_model.predict(features, action_mask if safe_only else []))
+        return candidate_indices[selected_position]
 
     return policy
 

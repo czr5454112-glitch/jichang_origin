@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass
 import json
 import math
@@ -101,6 +102,35 @@ def save_edge_score_runtime_text(path: str | Path, model: EdgeScoreModel) -> Non
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def load_edge_score_runtime_text(path: str | Path) -> EdgeScoreModel:
+    tokens = iter(Path(path).read_text(encoding="utf-8").split())
+    _expect_runtime_token(tokens, "czr005_edge_score_v1")
+    _expect_runtime_token(tokens, "feature_dim")
+    feature_dim = int(_next_runtime_token(tokens, "feature_dim value"))
+    _expect_runtime_token(tokens, "hidden_dim")
+    hidden_dim = int(_next_runtime_token(tokens, "hidden_dim value"))
+    _expect_runtime_token(tokens, "b2")
+    b2 = float(_next_runtime_token(tokens, "b2 value"))
+    if feature_dim <= 0 or hidden_dim <= 0:
+        raise ValueError("feature_dim and hidden_dim must be positive")
+
+    _expect_runtime_token(tokens, "w1")
+    w1 = [
+        [float(_next_runtime_token(tokens, "w1 value")) for _ in range(hidden_dim)]
+        for _ in range(feature_dim)
+    ]
+    _expect_runtime_token(tokens, "b1")
+    b1 = [float(_next_runtime_token(tokens, "b1 value")) for _ in range(hidden_dim)]
+    _expect_runtime_token(tokens, "w2")
+    w2 = [float(_next_runtime_token(tokens, "w2 value")) for _ in range(hidden_dim)]
+
+    try:
+        extra = next(tokens)
+    except StopIteration:
+        return EdgeScoreModel(w1=w1, b1=b1, w2=w2, b2=b2)
+    raise ValueError(f"unexpected trailing token in runtime model: {extra}")
+
+
 def load_edge_score_model(path: str | Path) -> EdgeScoreModel:
     return EdgeScoreModel.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
@@ -195,6 +225,19 @@ def _clip_scale(value: object, scale: float, limit: float) -> float:
 
 def _format_float(value: float) -> str:
     return format(float(value), ".17g")
+
+
+def _expect_runtime_token(tokens: Iterator[str], expected: str) -> None:
+    actual = _next_runtime_token(tokens, expected)
+    if actual != expected:
+        raise ValueError(f"expected token {expected!r}, got {actual!r}")
+
+
+def _next_runtime_token(tokens: Iterator[str], label: str) -> str:
+    try:
+        return next(tokens)
+    except StopIteration as exc:
+        raise ValueError(f"missing runtime model token: {label}") from exc
 
 
 def _target_position(candidate_indices: list[int], expert_action: int) -> int:
