@@ -11,7 +11,7 @@ Implemented so far:
 - header-only MLP edge-score inference and text runtime loader
 - compact native C++ EdgeScore replay smoke
 - model-unavailable shortest-safe fallback for compact native replay
-- first native C++ event-queue replay smoke over persisted synthetic schedules
+- first native C++ event-queue replay and trace audit over persisted synthetic schedules
 - pybind smoke boundary
 
 Paper-grade high-throughput scheduler validation, event-level Python parity, C++ SIPP baseline, C++ rolling-horizon baseline, recursive PIBT-style resolver, and broad runtime replay validation are still pending.

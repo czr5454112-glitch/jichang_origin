@@ -14,14 +14,14 @@ This is a high-throughput scheduler integration smoke, not a final Python parity
 
 | Case | Policy | Tasks | Planned | Unplanned | Decisions | Conflicts | Mean travel | Decisions/s | Compact planned | Compact decisions | Accounted | Safety |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
-| synthetic_seed7_medium_repair | edge_score_event | 18 | 18 | 0 | 55 | 0 | 9.152747331724 | 8332.58 | 18 | 55 | True | True |
-| synthetic_seed7_medium_repair | fallback_event | 18 | 18 | 0 | 55 | 0 | 9.152747331724 | 9971.54 | 18 | 55 | True | True |
-| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | 16 | 8 | 112 | 0 | 14.121867493002 | 11222.00 | 18 | 140 | True | True |
-| synthetic_seed11_dense_multi_repair | fallback_event | 24 | 16 | 8 | 112 | 0 | 14.121867493002 | 11427.87 | 18 | 140 | True | True |
-| synthetic_seed17_static_plus_repair | edge_score_event | 20 | 12 | 8 | 97 | 0 | 16.972989032025 | 11325.03 | 14 | 247 | True | True |
-| synthetic_seed17_static_plus_repair | fallback_event | 20 | 12 | 8 | 97 | 0 | 16.972989032025 | 11964.67 | 14 | 247 | True | True |
-| synthetic_seed23_repeated_repair | edge_score_event | 22 | 20 | 2 | 85 | 0 | 12.984904736897 | 10688.87 | 20 | 128 | True | True |
-| synthetic_seed23_repeated_repair | fallback_event | 22 | 19 | 3 | 93 | 0 | 13.729371734283 | 10333.10 | 20 | 128 | True | True |
+| synthetic_seed7_medium_repair | edge_score_event | 18 | 18 | 0 | 55 | 0 | 9.152747331724 | 9053.05 | 18 | 55 | True | True |
+| synthetic_seed7_medium_repair | fallback_event | 18 | 18 | 0 | 55 | 0 | 9.152747331724 | 9159.49 | 18 | 55 | True | True |
+| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | 16 | 8 | 112 | 0 | 14.121867493002 | 6449.16 | 18 | 140 | True | True |
+| synthetic_seed11_dense_multi_repair | fallback_event | 24 | 16 | 8 | 112 | 0 | 14.121867493002 | 7635.41 | 18 | 140 | True | True |
+| synthetic_seed17_static_plus_repair | edge_score_event | 20 | 12 | 8 | 97 | 0 | 16.972989032025 | 6175.20 | 14 | 247 | True | True |
+| synthetic_seed17_static_plus_repair | fallback_event | 20 | 12 | 8 | 97 | 0 | 16.972989032025 | 8564.14 | 14 | 247 | True | True |
+| synthetic_seed23_repeated_repair | edge_score_event | 22 | 20 | 2 | 85 | 0 | 12.984904736897 | 7513.61 | 20 | 128 | True | True |
+| synthetic_seed23_repeated_repair | fallback_event | 22 | 19 | 3 | 93 | 0 | 13.729371734283 | 8496.10 | 20 | 128 | True | True |
 
 CSV: `outputs/tables/phase8_native_cpp_event_scheduler.csv`
 

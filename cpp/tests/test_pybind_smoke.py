@@ -191,6 +191,19 @@ def main() -> None:
     assert records_event_replay["decision_count"] > 0
     assert records_event_replay["post_shield_conflicts"] == 0
 
+    records_event_trace = czr005_cpp.edge_score_native_event_replay_trace_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        task_records,
+        str(RUNTIME / "phase8_edge_score_runtime_model.txt"),
+        max_tasks=2,
+        max_decisions_per_task=8,
+    )
+    assert records_event_trace["summary"]["decision_count"] == len(records_event_trace["trace"])
+    assert records_event_trace["trace"][0]["decision_ordinal"] == 1
+    assert records_event_trace["trace"][0]["candidate_count"] >= records_event_trace["trace"][0]["safe_candidate_count"]
+
     records_trace = czr005_cpp.edge_score_native_replay_trace_from_records(
         node_records,
         edge_records,
@@ -229,6 +242,18 @@ def main() -> None:
     assert records_event_fallback_repair["planned_count"] == 1
     assert records_event_fallback_repair["unplanned_count"] == 1
     assert records_event_fallback_repair["post_shield_conflicts"] == 0
+
+    records_event_fallback_trace = czr005_cpp.edge_score_native_event_fallback_replay_trace_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        task_records,
+        max_tasks=2,
+        max_decisions_per_task=4,
+        fault_windows=[(0, 1, 0.0, 10.0)],
+    )
+    assert records_event_fallback_trace["summary"]["decision_count"] == len(records_event_fallback_trace["trace"])
+    assert records_event_fallback_trace["summary"]["post_shield_conflicts"] == 0
 
 
 if __name__ == "__main__":
