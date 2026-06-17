@@ -17,6 +17,7 @@
 namespace czr005::ics {
 
 struct EdgeScoreReplayConfig {
+  std::size_t task_offset = 0;
   std::size_t max_tasks = 8;
   int max_decisions_per_task = 128;
   double hold_seconds = 1.0;
@@ -281,8 +282,10 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
   const JunctionShield shield(graph, shield_config);
 
   EdgeScoreReplayResult result;
-  const std::size_t limit = std::min(config.max_tasks, tasks.size());
-  for (std::size_t task_index = 0; task_index < limit; ++task_index) {
+  const std::size_t start_index = std::min(config.task_offset, tasks.size());
+  const std::size_t limit = std::min(config.max_tasks, tasks.size() - start_index);
+  for (std::size_t local_task_index = 0; local_task_index < limit; ++local_task_index) {
+    const std::size_t task_index = start_index + local_task_index;
     const auto& task = tasks.tasks()[task_index];
     const double start_duration = graph.service_time(task.start);
     const double start_time = detail::earliest_safe_node_start(node_reservations,
@@ -355,7 +358,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
                                                       decision + 1,
                                                       "unplanned",
                                                       chosen_position < 0 ? "no_safe_action" : "invalid_action",
-                                                      static_cast<int>(task_index),
+                                                      static_cast<int>(local_task_index),
                                                       task.segment_id,
                                                       task.task_id,
                                                       current,
@@ -393,7 +396,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
                                                         decision + 1,
                                                         "unplanned",
                                                         "unsafe_no_safe_fallback",
-                                                        static_cast<int>(task_index),
+                                                        static_cast<int>(local_task_index),
                                                         task.segment_id,
                                                         task.task_id,
                                                         current,
@@ -428,7 +431,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
                                                     decision + 1,
                                                     "step",
                                                     "",
-                                                    static_cast<int>(task_index),
+                                                    static_cast<int>(local_task_index),
                                                     task.segment_id,
                                                     task.task_id,
                                                     current,

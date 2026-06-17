@@ -117,6 +117,16 @@ def main() -> None:
     assert native_trace["trace"][0]["executed_kind"] in {"move", "hold"}
     assert native_trace["trace"][0]["candidate_count"] >= native_trace["trace"][0]["safe_candidate_count"]
 
+    offset_replay = czr005_cpp.edge_score_native_replay_summary(
+        str(LEGACY / "map2.txt"),
+        str(LEGACY / "inputdata.txt"),
+        str(RUNTIME / "phase8_edge_score_runtime_model.txt"),
+        max_tasks=2,
+        task_offset=4,
+    )
+    assert offset_replay["planned_count"] + offset_replay["unplanned_count"] == 2
+    assert offset_replay["post_shield_conflicts"] == 0
+
     fallback_replay = czr005_cpp.edge_score_native_fallback_replay_summary(
         str(LEGACY / "map2.txt"),
         str(LEGACY / "inputdata.txt"),

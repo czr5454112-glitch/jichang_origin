@@ -362,3 +362,14 @@
 - Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `33 passed`; Phase8 trace diagnostic reports 24-task decision trace parity PASS; Phase8 scaling diagnostic reports `divergences=0`; Phase8 parity diagnostic reports EdgeScore and fallback strict replay parity PASS; Phase8 native replay smoke passed with zero conflicts.
 - Safety / parity notes: This closes the compact-replay same-map parity gap for the configured windows, but it is still not the final high-throughput C++ event scheduler and does not cover repair-event schedules, randomized density, or heldout maps.
 - Follow-up: expand trace/scaling parity to repair and randomized schedules, then implement the full C++ event scheduler required for final runtime claims.
+
+## 2026-06-17 12:05 - Phase8 offset/fault compact replay parity
+
+- Request: Broaden compact native replay parity beyond first-window same-map cases before moving to full event-scheduler claims.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `task_offset` support to `EdgeScoreReplayConfig` and pybind replay/trace/fallback entry points, expanded the pybind smoke test, added `scripts/eval/run_phase8_native_cpp_offset_fault_parity.py`, and generated `outputs/tables/phase8_native_cpp_offset_fault_parity.csv` plus `outputs/reports/phase8_native_cpp_offset_fault_parity_report.md`.
+- Commands run: CMake build, target CTest, target Python pytest, Phase8 offset/fault parity diagnostic, Phase8 native scaling diagnostic, Phase8 native trace diagnostic, Phase8 native C++ / Python parity diagnostic, and Phase8 native replay smoke.
+- Key observations: Compact C++ replay now runs arbitrary windows from the legacy task stream. Eight 24-task windows, mixing deterministic offsets and fixed-seed randomized offsets with static fault edges, matched the Python junction environment exactly on planned/unplanned counts, decision counts, mean travel time, and post-shield conflicts.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `33 passed`; Phase8 offset/fault parity reports `8/8` strict PASS rows; existing Phase8 scaling remains `divergences=0`; trace parity remains PASS.
+- Safety / parity notes: This strengthens same-map static-fault compact replay evidence. It still does not cover repair-event schedules, heldout maps, randomized synthetic maps, or the final high-throughput C++ event scheduler.
+- Follow-up: add repair-event semantics and heldout/randomized-map parity gates, then replace compact replay with the full C++ event scheduler.

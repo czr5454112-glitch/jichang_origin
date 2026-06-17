@@ -195,18 +195,23 @@ py::dict edge_score_native_replay_summary(const std::string& map_path,
                                           const std::string& model_path,
                                           int max_tasks,
                                           const std::vector<std::pair<int, int>>& fault_edges,
-                                          int max_decisions_per_task) {
+                                          int max_decisions_per_task,
+                                          int task_offset) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
   if (max_decisions_per_task <= 0) {
     throw std::invalid_argument("max_decisions_per_task must be positive");
   }
+  if (task_offset < 0) {
+    throw std::invalid_argument("task_offset must be non-negative");
+  }
   const auto legacy_map = czr005::ics::read_legacy_map2(map_path);
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   czr005::ics::EdgeScoreReplayConfig config;
+  config.task_offset = static_cast<std::size_t>(task_offset);
   config.max_tasks = static_cast<std::size_t>(max_tasks);
   config.max_decisions_per_task = max_decisions_per_task;
 
@@ -228,18 +233,23 @@ py::dict edge_score_native_replay_trace(const std::string& map_path,
                                         const std::string& model_path,
                                         int max_tasks,
                                         const std::vector<std::pair<int, int>>& fault_edges,
-                                        int max_decisions_per_task) {
+                                        int max_decisions_per_task,
+                                        int task_offset) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
   if (max_decisions_per_task <= 0) {
     throw std::invalid_argument("max_decisions_per_task must be positive");
   }
+  if (task_offset < 0) {
+    throw std::invalid_argument("task_offset must be non-negative");
+  }
   const auto legacy_map = czr005::ics::read_legacy_map2(map_path);
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   czr005::ics::EdgeScoreReplayConfig config;
+  config.task_offset = static_cast<std::size_t>(task_offset);
   config.max_tasks = static_cast<std::size_t>(max_tasks);
   config.max_decisions_per_task = max_decisions_per_task;
 
@@ -263,17 +273,22 @@ py::dict edge_score_native_fallback_replay_summary(const std::string& map_path,
                                                    const std::string& task_path,
                                                    int max_tasks,
                                                    const std::vector<std::pair<int, int>>& fault_edges,
-                                                   int max_decisions_per_task) {
+                                                   int max_decisions_per_task,
+                                                   int task_offset) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
   if (max_decisions_per_task <= 0) {
     throw std::invalid_argument("max_decisions_per_task must be positive");
   }
+  if (task_offset < 0) {
+    throw std::invalid_argument("task_offset must be non-negative");
+  }
   const auto legacy_map = czr005::ics::read_legacy_map2(map_path);
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   czr005::ics::EdgeScoreReplayConfig config;
+  config.task_offset = static_cast<std::size_t>(task_offset);
   config.max_tasks = static_cast<std::size_t>(max_tasks);
   config.max_decisions_per_task = max_decisions_per_task;
 
@@ -350,7 +365,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("model_path"),
              py::arg("max_tasks") = 8,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
-             py::arg("max_decisions_per_task") = 128);
+             py::arg("max_decisions_per_task") = 128,
+             py::arg("task_offset") = 0);
   module.def("edge_score_native_replay_trace",
              &edge_score_native_replay_trace,
              py::arg("map_path"),
@@ -358,12 +374,14 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("model_path"),
              py::arg("max_tasks") = 8,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
-             py::arg("max_decisions_per_task") = 128);
+             py::arg("max_decisions_per_task") = 128,
+             py::arg("task_offset") = 0);
   module.def("edge_score_native_fallback_replay_summary",
              &edge_score_native_fallback_replay_summary,
              py::arg("map_path"),
              py::arg("task_path"),
              py::arg("max_tasks") = 8,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
-             py::arg("max_decisions_per_task") = 128);
+             py::arg("max_decisions_per_task") = 128,
+             py::arg("task_offset") = 0);
 }
