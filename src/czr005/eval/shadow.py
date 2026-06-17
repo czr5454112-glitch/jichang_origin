@@ -67,7 +67,11 @@ def runtime_edge_score_policy_factory(
             fallback = fallback_policy or shortest_safe_policy
             return fallback(obs, info)
         features, candidate_indices, action_mask = featurize_slice(_model_item_from_obs(obs))
-        selected_position = int(runtime_model.predict(features, action_mask if safe_only else []))
+        try:
+            selected_position = int(runtime_model.predict(features, action_mask if safe_only else []))
+        except (RuntimeError, ValueError):
+            fallback = fallback_policy or shortest_safe_policy
+            return fallback(obs, info)
         return candidate_indices[selected_position]
 
     return policy

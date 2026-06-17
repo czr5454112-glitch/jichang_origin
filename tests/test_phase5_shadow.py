@@ -99,6 +99,22 @@ def test_runtime_edge_score_policy_falls_back_when_model_missing() -> None:
     assert env.episode_summary()["post_shield_conflicts"] == 0
 
 
+def test_runtime_edge_score_policy_falls_back_when_runtime_predict_fails() -> None:
+    graph = _line_graph()
+    tasks = (_task(1, 0.0),)
+
+    class FailingRuntimeModel:
+        def predict(self, features: list[list[float]], action_mask: list[bool]) -> int:
+            raise ValueError("at least one action must be available")
+
+    env = IcsJunctionEnv(graph, tasks)
+    result, run_info = env.run_policy(runtime_edge_score_policy_factory(FailingRuntimeModel()), seed=7)
+
+    assert run_info.truncated is False
+    assert result.metrics.planned_count == 1
+    assert env.episode_summary()["post_shield_conflicts"] == 0
+
+
 def test_labeled_policy_slices_keep_behavior_and_expert_actions() -> None:
     graph = _line_graph()
     tasks = (_task(1, 0.0),)

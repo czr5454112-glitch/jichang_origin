@@ -155,6 +155,7 @@ struct JunctionShieldConfig {
   int edge_capacity = 1;
   double edge_headway_seconds = 0.0;
   bool require_reachable_goal = true;
+  bool allow_goal_node_overlap = true;
 };
 
 class JunctionShield {
@@ -207,7 +208,8 @@ class JunctionShield {
                             node_start,
                             node_end};
     }
-    if (next != goal && node_reservations.has_conflict(next, node_start, node_end, task_id)) {
+    if ((!config_.allow_goal_node_overlap || next != goal) &&
+        node_reservations.has_conflict(next, node_start, node_end, task_id)) {
       return ShieldDecision{SafetyStatus::kNodeReservationConflict,
                             edge_start,
                             edge_end,

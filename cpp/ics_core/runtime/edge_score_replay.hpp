@@ -22,6 +22,7 @@ struct EdgeScoreReplayConfig {
   double hold_seconds = 1.0;
   int edge_capacity = 1;
   double edge_headway_seconds = 0.0;
+  bool allow_goal_node_overlap = false;
 };
 
 struct EdgeScoreReplayResult {
@@ -250,6 +251,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
   JunctionShieldConfig shield_config;
   shield_config.edge_capacity = config.edge_capacity;
   shield_config.edge_headway_seconds = config.edge_headway_seconds;
+  shield_config.allow_goal_node_overlap = config.allow_goal_node_overlap;
   const JunctionShield shield(graph, shield_config);
 
   EdgeScoreReplayResult result;

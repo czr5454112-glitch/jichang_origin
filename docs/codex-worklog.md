@@ -329,3 +329,14 @@
 - Tests / validation: Phase8 native C++ / Python parity script passed with `4/4` EdgeScore strict parity rows and fallback safety diagnostic PASS.
 - Safety / parity notes: This strengthens Phase8 compact replay evidence, but it is not full high-throughput C++ event-simulator parity and does not cover repair schedules or heldout maps.
 - Follow-up: align fallback semantics if fallback metric parity becomes a claim, expand to larger/randomized windows, then replace the compact replay with the full C++ event scheduler.
+
+## 2026-06-17 10:20 - Phase8 native C++ scaling diagnostic
+
+- Request: Continue hardening Phase8 after a Python/C++ runtime exception surfaced during larger-window replay probes.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added runtime-predict exception fallback in `src/czr005/eval/shadow.py`, added a regression test in `tests/test_phase5_shadow.py`, exposed Python-compatible goal-node overlap configuration for compact C++ replay, added `scripts/eval/run_phase8_native_cpp_scaling_diagnostic.py`, regenerated the Phase8 native replay smoke outputs, and generated `outputs/tables/phase8_native_cpp_scaling_diagnostic.csv` plus `outputs/reports/phase8_native_cpp_scaling_diagnostic_report.md`.
+- Commands run: CMake build, target CTest, target Python pytest, Phase8 native C++ replay smoke, Phase8 native C++ / Python parity diagnostic, and Phase8 native C++ scaling diagnostic.
+- Key observations: The runtime EdgeScore Python policy now falls back to the shortest-safe policy if the C++ runtime model raises during prediction, preventing the observed interpreter crash path. EdgeScore small-window parity remains strict PASS. Larger 24/32/48/64 task windows remain no-crash and zero-conflict, but compact C++ replay diverges from Python in planned counts and decision counts once fallback-heavy states appear.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `32 passed`; Phase8 native replay smoke passed with `80/80` accounted tasks and zero conflicts; Phase8 parity diagnostic passed with `edge_strict_pass=True`; Phase8 scaling diagnostic passed safety gates and recorded `4/4` expected divergence rows.
+- Safety / parity notes: The larger-window report is explicitly diagnostic, not a strict parity claim. The divergence should be closed by aligning fallback execution/task cleanup semantics or by replacing the compact replay with the full C++ event scheduler.
+- Follow-up: add trace-level localization for the first larger-window mismatch, then implement the full C++ event scheduler and rerun this diagnostic on repair and heldout schedules.
