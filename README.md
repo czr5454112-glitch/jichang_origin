@@ -14,9 +14,10 @@ legacy Java reference
 
 Current scope:
 
-- Phase0 project hygiene and legacy source fixation.
-- Phase1A legacy `map2.txt` and `inputdata.txt` parsing.
-- No reinforcement learning code in this round.
+- Phase0/Phase1 legacy source fixation, map/task parsing, Python reference simulator, and C++ core smoke parity.
+- Phase2 non-learning baselines: A*, reservation/SIPP, rolling-horizon SIPP, and PIBT-style one-step shield diagnostics.
+- Phase8 native C++ event replay with Python/C++ parity over persisted synthetic schedules.
+- Learning experiments are still smoke/prototype scope, not final paper-grade RL results.
 - Legacy Java files are read-only reference material.
 
 ## Quick Start
@@ -38,4 +39,3 @@ legacy/jichang_origin_readonly
 ```
 
 It is copied from `jichang_origin` and should not be modified in this repository.
-

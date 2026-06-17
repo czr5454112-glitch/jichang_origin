@@ -204,6 +204,67 @@ def main() -> None:
     assert rolling_horizon["summary"]["post_shield_conflicts"] == 0
     assert [event["segment_id"] for event in rolling_horizon["events"]] == ["urgent", "loose"]
 
+    pibt_merge_node_records = [
+        (0, 1, 0.0, 0, 0, [2]),
+        (1, 1, 0.0, 0, 1, [2]),
+        (2, 4, 1.0, 1, 0, [3]),
+        (3, 2, 0.0, 2, 0, []),
+    ]
+    pibt_merge_edge_records = [
+        (0, 2, 5.0, 2.5),
+        (1, 2, 5.0, 2.5),
+        (2, 3, 5.0, 2.5),
+    ]
+    pibt_merge_heuristic_time = [
+        [0.0, 4.0, 2.0, 4.0],
+        [4.0, 0.0, 2.0, 4.0],
+        [4.0, 4.0, 0.0, 2.0],
+        [4.0, 4.0, 2.0, 0.0],
+    ]
+    pibt_merge = czr005_cpp.pibt_resolve_from_records(
+        pibt_merge_node_records,
+        pibt_merge_edge_records,
+        pibt_merge_heuristic_time,
+        [
+            (1, 0, 3, 0.0, 100.0, 0.0),
+            (2, 1, 3, 0.0, 20.0, 0.0),
+        ],
+    )
+    assert [action["task_id"] for action in pibt_merge] == [2, 1]
+    assert pibt_merge[0]["action"] == "move"
+    assert pibt_merge[0]["next_node"] == 2
+    assert pibt_merge[1]["action"] == "hold"
+    assert pibt_merge[1]["reason"] == "no_safe_edge"
+
+    pibt_branch_node_records = [
+        (0, 1, 0.0, 0, 0, [1, 2]),
+        (1, 4, 0.0, 1, 0, [3]),
+        (2, 4, 0.0, 1, 1, [3]),
+        (3, 2, 0.0, 2, 0, []),
+    ]
+    pibt_branch_edge_records = [
+        (0, 1, 5.0, 2.5),
+        (0, 2, 5.0, 2.5),
+        (1, 3, 5.0, 2.5),
+        (2, 3, 7.5, 2.5),
+    ]
+    pibt_branch_heuristic_time = [
+        [0.0, 2.0, 3.0, 4.0],
+        [4.0, 0.0, 4.0, 2.0],
+        [4.0, 4.0, 0.0, 3.0],
+        [4.0, 2.0, 3.0, 0.0],
+    ]
+    pibt_branch = czr005_cpp.pibt_resolve_from_records(
+        pibt_branch_node_records,
+        pibt_branch_edge_records,
+        pibt_branch_heuristic_time,
+        [(3, 0, 3, 0.0, 20.0, 0.0)],
+        fault_edges=[(0, 1)],
+    )
+    assert len(pibt_branch) == 1
+    assert pibt_branch[0]["action"] == "move"
+    assert pibt_branch[0]["next_node"] == 2
+
     records_replay = czr005_cpp.edge_score_native_replay_summary_from_records(
         node_records,
         edge_records,

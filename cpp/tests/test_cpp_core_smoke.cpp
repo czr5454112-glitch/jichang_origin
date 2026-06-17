@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "ics_core/baselines/pibt.hpp"
 #include "ics_core/baselines/rolling_horizon.hpp"
 #include "ics_core/graph/graph.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
@@ -27,6 +28,8 @@ using czr005::ics::Graph;
 using czr005::ics::JunctionShield;
 using czr005::ics::JunctionShieldConfig;
 using czr005::ics::Node;
+using czr005::ics::PIBTAgentState;
+using czr005::ics::PIBTStyleOneStepResolver;
 using czr005::ics::ReservationTable;
 using czr005::ics::RollingHorizonConfig;
 using czr005::ics::SafetyStatus;
@@ -52,6 +55,39 @@ Graph make_graph() {
   graph.set_heuristic({{0.0, 2.0, 4.0}, {4.0, 0.0, 2.0}, {4.0, 2.0, 0.0}});
   graph.add_edge(Edge{0, 1, 5.0, 2.5});
   graph.add_edge(Edge{1, 2, 5.0, 2.5});
+  return graph;
+}
+
+Graph make_merge_graph() {
+  Graph graph;
+  graph.add_node(Node{0, 1, 0.0, 0, 0, {2}});
+  graph.add_node(Node{1, 1, 0.0, 0, 1, {2}});
+  graph.add_node(Node{2, 4, 1.0, 1, 0, {3}});
+  graph.add_node(Node{3, 2, 0.0, 2, 0, {}});
+  graph.set_heuristic({{0.0, 4.0, 2.0, 4.0},
+                       {4.0, 0.0, 2.0, 4.0},
+                       {4.0, 4.0, 0.0, 2.0},
+                       {4.0, 4.0, 2.0, 0.0}});
+  graph.add_edge(Edge{0, 2, 5.0, 2.5});
+  graph.add_edge(Edge{1, 2, 5.0, 2.5});
+  graph.add_edge(Edge{2, 3, 5.0, 2.5});
+  return graph;
+}
+
+Graph make_branch_graph() {
+  Graph graph;
+  graph.add_node(Node{0, 1, 0.0, 0, 0, {1, 2}});
+  graph.add_node(Node{1, 4, 0.0, 1, 0, {3}});
+  graph.add_node(Node{2, 4, 0.0, 1, 1, {3}});
+  graph.add_node(Node{3, 2, 0.0, 2, 0, {}});
+  graph.set_heuristic({{0.0, 2.0, 3.0, 4.0},
+                       {4.0, 0.0, 4.0, 2.0},
+                       {4.0, 4.0, 0.0, 3.0},
+                       {4.0, 2.0, 3.0, 0.0}});
+  graph.add_edge(Edge{0, 1, 5.0, 2.5});
+  graph.add_edge(Edge{0, 2, 5.0, 2.5});
+  graph.add_edge(Edge{1, 3, 5.0, 2.5});
+  graph.add_edge(Edge{2, 3, 7.5, 2.5});
   return graph;
 }
 
@@ -181,6 +217,37 @@ int main() {
                "rolling-horizon SIPP should prioritize tighter deadline slack");
     test.check(rolling_result.events[1].segment_id == "loose",
                "rolling-horizon SIPP should plan the looser task second");
+  }
+
+  const Graph pibt_merge_graph = make_merge_graph();
+  const PIBTStyleOneStepResolver pibt_merge_resolver(pibt_merge_graph);
+  const auto pibt_merge_actions = pibt_merge_resolver.resolve({
+      PIBTAgentState{1, 0, 3, 0.0, 100.0, 0.0},
+      PIBTAgentState{2, 1, 3, 0.0, 20.0, 0.0},
+  });
+  test.check(pibt_merge_actions.size() == 2, "PIBT resolver should produce two merge actions");
+  if (pibt_merge_actions.size() == 2) {
+    test.check(pibt_merge_actions[0].task_id == 2, "PIBT resolver should prioritize tighter slack");
+    test.check(pibt_merge_actions[0].action == "move", "PIBT resolver first merge action should move");
+    test.check(pibt_merge_actions[0].next_node == 2, "PIBT resolver first merge action should target node 2");
+    test.check(pibt_merge_actions[1].task_id == 1, "PIBT resolver should process loose task second");
+    test.check(pibt_merge_actions[1].action == "hold", "PIBT resolver loose merge action should hold");
+    test.check(pibt_merge_actions[1].reason == "no_safe_edge",
+               "PIBT resolver loose merge action should explain blocked edge");
+  }
+
+  const Graph pibt_branch_graph = make_branch_graph();
+  const PIBTStyleOneStepResolver pibt_branch_resolver(pibt_branch_graph);
+  const auto pibt_branch_actions = pibt_branch_resolver.resolve(
+      {PIBTAgentState{3, 0, 3, 0.0, 20.0, 0.0}},
+      nullptr,
+      {{0, 1}});
+  test.check(pibt_branch_actions.size() == 1, "PIBT resolver should produce one branch action");
+  if (pibt_branch_actions.size() == 1) {
+    test.check(pibt_branch_actions[0].action == "move",
+               "PIBT resolver should move on the safe branch edge");
+    test.check(pibt_branch_actions[0].next_node == 2,
+               "PIBT resolver should choose the non-faulted branch");
   }
 
   const auto later = planner.plan(0, 2, 6.0, &reservations, {}, 3);

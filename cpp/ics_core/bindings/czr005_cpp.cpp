@@ -10,6 +10,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "ics_core/baselines/pibt.hpp"
 #include "ics_core/baselines/rolling_horizon.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
@@ -28,6 +29,7 @@ using EdgeRecordTuple = std::tuple<int, int, double, double>;
 using EdgeReservationTuple = std::tuple<int, int, int, double, double>;
 using NodeRecordTuple = std::tuple<int, int, double, int, int, std::vector<int>>;
 using NodeReservationTuple = std::tuple<int, int, double, double>;
+using PIBTAgentStateTuple = std::tuple<int, int, int, double, double, double>;
 using TaskRecordTuple = std::tuple<std::string,
                                    int,
                                    int,
@@ -303,6 +305,36 @@ czr005::ics::EdgeReservationTable edge_reservations_from_tuples(
   return table;
 }
 
+std::vector<czr005::ics::PIBTAgentState> pibt_agents_from_tuples(
+    const std::vector<PIBTAgentStateTuple>& agent_records) {
+  std::vector<czr005::ics::PIBTAgentState> agents;
+  agents.reserve(agent_records.size());
+  for (const auto& [task_id, current, goal, ready_time, deadline, waiting_time] : agent_records) {
+    agents.push_back(czr005::ics::PIBTAgentState{
+        task_id, current, goal, ready_time, deadline, waiting_time});
+  }
+  return agents;
+}
+
+py::list pibt_action_rows(const std::vector<czr005::ics::PIBTResolvedAction>& actions) {
+  py::list rows;
+  for (const auto& action : actions) {
+    py::dict row;
+    row["task_id"] = action.task_id;
+    row["action"] = action.action;
+    row["current"] = action.current;
+    row["next_node"] = action.next_node;
+    row["edge_start"] = action.edge_start;
+    row["edge_end"] = action.edge_end;
+    row["node_start"] = action.node_start;
+    row["node_end"] = action.node_end;
+    row["reason"] = action.reason;
+    row["priority_rank"] = action.priority_rank;
+    rows.append(row);
+  }
+  return rows;
+}
+
 czr005::ics::EdgeScoreReplayConfig make_replay_config(
     int max_tasks,
     int max_decisions_per_task,
@@ -437,6 +469,22 @@ py::list sipp_plan_from_records(
                                      edge_headway_seconds,
                                      faults,
                                      task_id));
+}
+
+py::list pibt_resolve_from_records(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    const std::vector<PIBTAgentStateTuple>& agent_records,
+    const std::vector<NodeReservationTuple>& node_reservations,
+    const std::vector<std::pair<int, int>>& fault_edges,
+    double hold_seconds) {
+  const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
+  const auto agents = pibt_agents_from_tuples(agent_records);
+  const auto node_table = node_reservations_from_tuples(node_reservations);
+  std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  const czr005::ics::PIBTStyleOneStepResolver resolver(graph, hold_seconds);
+  return pibt_action_rows(resolver.resolve(agents, &node_table, faults));
 }
 
 py::dict rolling_horizon_summary(const czr005::ics::RollingHorizonResult& result,
@@ -823,6 +871,15 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("task_id") = -1,
              py::arg("max_time") = 86400.0);
+  module.def("pibt_resolve_from_records",
+             &pibt_resolve_from_records,
+             py::arg("node_records"),
+             py::arg("edge_records"),
+             py::arg("heuristic_time"),
+             py::arg("agent_records"),
+             py::arg("node_reservations") = std::vector<NodeReservationTuple>{},
+             py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
+             py::arg("hold_seconds") = 1.0);
   module.def("rolling_horizon_sipp_from_records",
              &rolling_horizon_sipp_from_records,
              py::arg("node_records"),
