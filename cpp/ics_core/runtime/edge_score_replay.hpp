@@ -25,6 +25,31 @@ struct EdgeScoreReplayConfig {
   bool allow_goal_node_overlap = false;
 };
 
+struct EdgeScoreDecisionTrace {
+  int decision_ordinal = 0;
+  int task_decision_ordinal = 0;
+  std::string event = "step";
+  std::string terminal_reason;
+  int task_index = 0;
+  std::string segment_id;
+  int task_id = 0;
+  int current = -1;
+  int goal = -1;
+  double ready_time = 0.0;
+  double waiting_time = 0.0;
+  int proposed_position = -1;
+  int executed_index = -1;
+  int executed_next = -1;
+  std::string executed_kind;
+  bool executed_safe = false;
+  bool unsafe_proposal = false;
+  bool fallback_used = false;
+  bool reached_goal = false;
+  int candidate_count = 0;
+  int safe_candidate_count = 0;
+  int route_size_after = 0;
+};
+
 struct EdgeScoreReplayResult {
   int planned_count = 0;
   int unplanned_count = 0;
@@ -35,6 +60,7 @@ struct EdgeScoreReplayResult {
   double mean_travel_time = 0.0;
   double makespan = 0.0;
   std::vector<std::vector<PathNode>> routes;
+  std::vector<EdgeScoreDecisionTrace> trace;
 };
 
 namespace detail {
@@ -304,27 +330,85 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
         mask.push_back(candidate.safe);
       }
 
+      const int safe_candidate_count = static_cast<int>(
+          std::count_if(candidates.begin(),
+                        candidates.end(),
+                        [](const detail::RuntimeCandidate& candidate) { return candidate.safe; }));
       int chosen_position = -1;
+      int proposed_position = -1;
+      bool fallback_used = false;
       if (model == nullptr) {
         chosen_position = detail::fallback_candidate_index(candidates, task.goal);
+        fallback_used = true;
       } else {
         try {
           chosen_position = model->predict(features, mask);
+          proposed_position = chosen_position;
         } catch (const std::invalid_argument&) {
           chosen_position = detail::fallback_candidate_index(candidates, task.goal);
+          fallback_used = true;
         }
       }
       if (chosen_position < 0 || static_cast<std::size_t>(chosen_position) >= candidates.size()) {
+        ++result.decision_count;
+        result.trace.push_back(EdgeScoreDecisionTrace{result.decision_count,
+                                                      decision + 1,
+                                                      "unplanned",
+                                                      chosen_position < 0 ? "no_safe_action" : "invalid_action",
+                                                      static_cast<int>(task_index),
+                                                      task.segment_id,
+                                                      task.task_id,
+                                                      current,
+                                                      task.goal,
+                                                      ready_time,
+                                                      waiting_time,
+                                                      proposed_position,
+                                                      -1,
+                                                      current,
+                                                      "none",
+                                                      false,
+                                                      false,
+                                                      fallback_used,
+                                                      false,
+                                                      static_cast<int>(candidates.size()),
+                                                      safe_candidate_count,
+                                                      static_cast<int>(route.size())});
         ++result.unplanned_count;
         counted_unplanned = true;
         break;
       }
 
       const auto& chosen = candidates[static_cast<std::size_t>(chosen_position)];
+      bool unsafe_proposal = false;
       if (!chosen.safe) {
         ++result.unsafe_proposals;
+        unsafe_proposal = true;
         chosen_position = detail::fallback_candidate_index(candidates, task.goal);
+        fallback_used = true;
         if (chosen_position < 0) {
+          ++result.decision_count;
+          result.trace.push_back(EdgeScoreDecisionTrace{result.decision_count,
+                                                        decision + 1,
+                                                        "unplanned",
+                                                        "unsafe_no_safe_fallback",
+                                                        static_cast<int>(task_index),
+                                                        task.segment_id,
+                                                        task.task_id,
+                                                        current,
+                                                        task.goal,
+                                                        ready_time,
+                                                        waiting_time,
+                                                        proposed_position,
+                                                        -1,
+                                                        current,
+                                                        "none",
+                                                        false,
+                                                        unsafe_proposal,
+                                                        fallback_used,
+                                                        false,
+                                                        static_cast<int>(candidates.size()),
+                                                        safe_candidate_count,
+                                                        static_cast<int>(route.size())});
           ++result.unplanned_count;
           counted_unplanned = true;
           break;
@@ -336,6 +420,29 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
         ++result.shield_blocks;
       }
       ++result.decision_count;
+      result.trace.push_back(EdgeScoreDecisionTrace{result.decision_count,
+                                                    decision + 1,
+                                                    "step",
+                                                    "",
+                                                    static_cast<int>(task_index),
+                                                    task.segment_id,
+                                                    task.task_id,
+                                                    current,
+                                                    task.goal,
+                                                    ready_time,
+                                                    waiting_time,
+                                                    proposed_position,
+                                                    executed.index,
+                                                    executed.next,
+                                                    executed.is_hold ? "hold" : "move",
+                                                    executed.safe,
+                                                    unsafe_proposal,
+                                                    fallback_used,
+                                                    !executed.is_hold && executed.next == task.goal,
+                                                    static_cast<int>(candidates.size()),
+                                                    safe_candidate_count,
+                                                    static_cast<int>(route.size()) +
+                                                        (executed.is_hold ? 0 : 1)});
 
       if (executed.is_hold) {
         waiting_time += executed.node_end - ready_time;

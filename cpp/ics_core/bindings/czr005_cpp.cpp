@@ -155,6 +155,41 @@ py::dict edge_score_replay_result_summary(const czr005::ics::EdgeScoreReplayResu
   return summary;
 }
 
+py::dict edge_score_decision_trace_row(const czr005::ics::EdgeScoreDecisionTrace& trace) {
+  py::dict row;
+  row["decision_ordinal"] = trace.decision_ordinal;
+  row["task_decision_ordinal"] = trace.task_decision_ordinal;
+  row["event"] = trace.event;
+  row["terminal_reason"] = trace.terminal_reason;
+  row["task_index"] = trace.task_index;
+  row["segment_id"] = trace.segment_id;
+  row["task_id"] = trace.task_id;
+  row["current"] = trace.current;
+  row["goal"] = trace.goal;
+  row["ready_time"] = trace.ready_time;
+  row["waiting_time"] = trace.waiting_time;
+  row["proposed_position"] = trace.proposed_position;
+  row["executed_index"] = trace.executed_index;
+  row["executed_next"] = trace.executed_next;
+  row["executed_kind"] = trace.executed_kind;
+  row["executed_safe"] = trace.executed_safe;
+  row["unsafe_proposal"] = trace.unsafe_proposal;
+  row["fallback_used"] = trace.fallback_used;
+  row["reached_goal"] = trace.reached_goal;
+  row["candidate_count"] = trace.candidate_count;
+  row["safe_candidate_count"] = trace.safe_candidate_count;
+  row["route_size_after"] = trace.route_size_after;
+  return row;
+}
+
+py::list edge_score_decision_trace_rows(const czr005::ics::EdgeScoreReplayResult& result) {
+  py::list rows;
+  for (const auto& trace : result.trace) {
+    rows.append(edge_score_decision_trace_row(trace));
+  }
+  return rows;
+}
+
 py::dict edge_score_native_replay_summary(const std::string& map_path,
                                           const std::string& task_path,
                                           const std::string& model_path,
@@ -186,6 +221,42 @@ py::dict edge_score_native_replay_summary(const std::string& map_path,
   const std::chrono::duration<double> elapsed = end_time - start_time;
 
   return edge_score_replay_result_summary(result, max_tasks, elapsed.count());
+}
+
+py::dict edge_score_native_replay_trace(const std::string& map_path,
+                                        const std::string& task_path,
+                                        const std::string& model_path,
+                                        int max_tasks,
+                                        const std::vector<std::pair<int, int>>& fault_edges,
+                                        int max_decisions_per_task) {
+  if (max_tasks <= 0) {
+    throw std::invalid_argument("max_tasks must be positive");
+  }
+  if (max_decisions_per_task <= 0) {
+    throw std::invalid_argument("max_decisions_per_task must be positive");
+  }
+  const auto legacy_map = czr005::ics::read_legacy_map2(map_path);
+  const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
+  const auto model = czr005::ics::load_edge_score_model_text(model_path);
+  std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  czr005::ics::EdgeScoreReplayConfig config;
+  config.max_tasks = static_cast<std::size_t>(max_tasks);
+  config.max_decisions_per_task = max_decisions_per_task;
+
+  const auto start_time = std::chrono::steady_clock::now();
+  const auto result = czr005::ics::run_edge_score_replay(
+      legacy_map.graph,
+      legacy_tasks.stream,
+      model,
+      config,
+      faults);
+  const auto end_time = std::chrono::steady_clock::now();
+  const std::chrono::duration<double> elapsed = end_time - start_time;
+
+  py::dict payload;
+  payload["summary"] = edge_score_replay_result_summary(result, max_tasks, elapsed.count());
+  payload["trace"] = edge_score_decision_trace_rows(result);
+  return payload;
 }
 
 py::dict edge_score_native_fallback_replay_summary(const std::string& map_path,
@@ -274,6 +345,14 @@ PYBIND11_MODULE(czr005_cpp, module) {
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,
+             py::arg("map_path"),
+             py::arg("task_path"),
+             py::arg("model_path"),
+             py::arg("max_tasks") = 8,
+             py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
+             py::arg("max_decisions_per_task") = 128);
+  module.def("edge_score_native_replay_trace",
+             &edge_score_native_replay_trace,
              py::arg("map_path"),
              py::arg("task_path"),
              py::arg("model_path"),

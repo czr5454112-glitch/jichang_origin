@@ -104,6 +104,19 @@ def main() -> None:
     assert native_replay["decision_count"] > 0
     assert native_replay["post_shield_conflicts"] == 0
 
+    native_trace = czr005_cpp.edge_score_native_replay_trace(
+        str(LEGACY / "map2.txt"),
+        str(LEGACY / "inputdata.txt"),
+        str(RUNTIME / "phase8_edge_score_runtime_model.txt"),
+        max_tasks=2,
+    )
+    assert native_trace["summary"]["decision_count"] == len(native_trace["trace"])
+    assert native_trace["trace"][0]["decision_ordinal"] == 1
+    assert native_trace["trace"][0]["task_decision_ordinal"] == 1
+    assert native_trace["trace"][0]["event"] == "step"
+    assert native_trace["trace"][0]["executed_kind"] in {"move", "hold"}
+    assert native_trace["trace"][0]["candidate_count"] >= native_trace["trace"][0]["safe_candidate_count"]
+
     fallback_replay = czr005_cpp.edge_score_native_fallback_replay_summary(
         str(LEGACY / "map2.txt"),
         str(LEGACY / "inputdata.txt"),

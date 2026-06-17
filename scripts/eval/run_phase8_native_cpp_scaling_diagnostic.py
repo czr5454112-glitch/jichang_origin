@@ -69,7 +69,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "## Remaining Work",
             "",
             "- align fallback execution semantics and task cleanup between compact C++ replay and Python env",
-            "- add trace-level divergence localization for the first mismatching task/decision",
+            "- use the separate Phase8 native trace diagnostic to localize the first mismatching task/decision",
             "- replace compact replay with the full C++ event scheduler and rerun this diagnostic",
         ]
     )
