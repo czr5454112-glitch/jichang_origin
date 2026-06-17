@@ -7,6 +7,7 @@ import czr005_cpp
 
 ROOT = Path(__file__).resolve().parents[2]
 LEGACY = ROOT / "legacy" / "jichang_origin_readonly"
+RUNTIME = ROOT / "artifacts" / "runtime"
 
 
 def main() -> None:
@@ -54,6 +55,35 @@ def main() -> None:
     scores = czr005_cpp.edge_score_scores(w1, b1, w2, b2, features)
     assert len(scores) == 2
     assert czr005_cpp.edge_score_predict(w1, b1, w2, b2, features, [False, True]) == 1
+    runtime_model_path = RUNTIME / "pybind_edge_score_test.txt"
+    try:
+        runtime_model_path.write_text(
+            "\n".join(
+                [
+                    "czr005_edge_score_v1",
+                    "feature_dim 3",
+                    "hidden_dim 2",
+                    "b2 0.05",
+                    "w1",
+                    "0.1 -0.2",
+                    "0.3 0.4",
+                    "-0.5 0.25",
+                    "b1",
+                    "0.01 -0.02",
+                    "w2",
+                    "0.7 -0.6",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        loaded = czr005_cpp.EdgeScoreRuntimeModel.from_text(str(runtime_model_path))
+        assert loaded.feature_dim == 3
+        assert loaded.hidden_dim == 2
+        assert loaded.predict(features, [False, True]) == 1
+        assert czr005_cpp.edge_score_load_summary(str(runtime_model_path))["hidden_dim"] == 2
+    finally:
+        runtime_model_path.unlink(missing_ok=True)
 
     task_summary = czr005_cpp.read_legacy_task_summary(str(LEGACY / "inputdata.txt"))
     assert task_summary["raw_task_count"] == 28506

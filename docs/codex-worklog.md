@@ -274,3 +274,14 @@
 - Tests / validation: target Python pytest passed `28 passed`; target CTest passed 2/2; Phase8 parity smoke passed.
 - Safety / parity notes: This is scorer parity only. Production model loading, C++ closed-loop replay, runtime latency, and C++ shielded policy execution remain pending.
 - Follow-up: export trained model artifacts into a stable C++ format, then add C++ closed-loop replay and latency measurement.
+
+## 2026-06-17 07:45 - Phase8 EdgeScore runtime model text loader
+
+- Request: Turn the C++ scorer parity smoke into a loadable runtime artifact path for the trained pure-Python MLP-EdgeScore model.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `cpp/ics_core/models/edge_score_io.hpp`, exposed `EdgeScoreRuntimeModel.from_text` and `edge_score_load_summary` through pybind, added `save_edge_score_runtime_text`, expanded pybind/Python tests, added `scripts/eval/run_phase8_edge_score_runtime_loader.py`, and generated `artifacts/runtime/phase8_edge_score_runtime_model.txt`, `outputs/tables/phase8_edge_score_runtime_loader_parity.csv`, and `outputs/reports/phase8_edge_score_runtime_loader_report.md`.
+- Commands run: CMake build, target CTest, target Python pytest, and Phase8 runtime-loader parity script.
+- Key observations: The fault-curriculum MLP-EdgeScore checkpoint exports to a simple text format with magic/version, feature dimension, hidden dimension, and dense weights. C++ loads the artifact as a runtime model and matches Python scores/predictions on 64 real fault-curriculum teacher slices with max absolute score difference `0.000000000000` and zero masked-prediction mismatches.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `29 passed`; Phase8 runtime-loader parity script passed.
+- Safety / parity notes: This closes the model-export/load prerequisite for C++ policy runtime, but it is still not C++ closed-loop replay, runtime latency measurement, or heldout-map validation.
+- Follow-up: bind the loaded scorer into a C++ shielded replay loop, measure latency on larger replay batches, and validate exported checkpoints across heldout maps and fault schedules.

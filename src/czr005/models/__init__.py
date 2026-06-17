@@ -8,6 +8,7 @@ from .edge_score import (
     load_edge_score_model,
     load_teacher_manifest,
     save_edge_score_model,
+    save_edge_score_runtime_text,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "load_edge_score_model",
     "load_teacher_manifest",
     "save_edge_score_model",
+    "save_edge_score_runtime_text",
 ]

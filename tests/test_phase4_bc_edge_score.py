@@ -5,11 +5,13 @@ from pathlib import Path
 from czr005.datasets import collect_teacher_slices, write_teacher_manifest
 from czr005.envs import IcsJunctionEnv, astar_guided_policy_factory
 from czr005.models import (
+    EdgeScoreModel,
     evaluate_top1,
     fit_edge_score_model,
     load_edge_score_model,
     load_teacher_manifest,
     save_edge_score_model,
+    save_edge_score_runtime_text,
 )
 from czr005.sim_py import IcsGraph, SimEdge, SimNode
 from czr005.sim_py.task_stream import TaskLeg
@@ -73,4 +75,38 @@ def test_edge_score_bc_fits_tiny_teacher_manifest() -> None:
         assert evaluate_top1(loaded, rows) == top1
     finally:
         manifest.unlink(missing_ok=True)
+        model_path.unlink(missing_ok=True)
+
+
+def test_edge_score_runtime_text_export() -> None:
+    model = EdgeScoreModel(
+        w1=[[0.1, -0.2], [0.3, 0.4], [-0.5, 0.25]],
+        b1=[0.01, -0.02],
+        w2=[0.7, -0.6],
+        b2=0.05,
+    )
+    model_path = ROOT / ".pytest_cache" / "edge_score_runtime.txt"
+    try:
+        save_edge_score_runtime_text(model_path, model)
+        lines = model_path.read_text(encoding="utf-8").splitlines()
+
+        assert lines[:5] == [
+            "czr005_edge_score_v1",
+            "feature_dim 3",
+            "hidden_dim 2",
+            "b2 0.050000000000000003",
+            "w1",
+        ]
+        assert lines[5:8] == [
+            "0.10000000000000001 -0.20000000000000001",
+            "0.29999999999999999 0.40000000000000002",
+            "-0.5 0.25",
+        ]
+        assert lines[8:] == [
+            "b1",
+            "0.01 -0.02",
+            "w2",
+            "0.69999999999999996 -0.59999999999999998",
+        ]
+    finally:
         model_path.unlink(missing_ok=True)

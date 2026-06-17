@@ -83,6 +83,24 @@ def save_edge_score_model(path: str | Path, model: EdgeScoreModel) -> None:
     output_path.write_text(json.dumps(model.to_dict(), ensure_ascii=True, indent=2), encoding="utf-8")
 
 
+def save_edge_score_runtime_text(path: str | Path, model: EdgeScoreModel) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "czr005_edge_score_v1",
+        f"feature_dim {len(model.w1)}",
+        f"hidden_dim {len(model.b1)}",
+        f"b2 {_format_float(model.b2)}",
+        "w1",
+    ]
+    lines.extend(" ".join(_format_float(value) for value in row) for row in model.w1)
+    lines.append("b1")
+    lines.append(" ".join(_format_float(value) for value in model.b1))
+    lines.append("w2")
+    lines.append(" ".join(_format_float(value) for value in model.w2))
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def load_edge_score_model(path: str | Path) -> EdgeScoreModel:
     return EdgeScoreModel.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
@@ -173,6 +191,10 @@ def _candidate_features(task: dict[str, Any], candidate: dict[str, Any], goal: i
 def _clip_scale(value: object, scale: float, limit: float) -> float:
     scaled = float(value) / scale
     return max(-limit, min(limit, scaled))
+
+
+def _format_float(value: float) -> str:
+    return format(float(value), ".17g")
 
 
 def _target_position(candidate_indices: list[int], expert_action: int) -> int:

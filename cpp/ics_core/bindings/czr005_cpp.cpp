@@ -10,6 +10,7 @@
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
 #include "ics_core/models/edge_score.hpp"
+#include "ics_core/models/edge_score_io.hpp"
 #include "ics_core/routing/astar.hpp"
 
 namespace py = pybind11;
@@ -124,10 +125,33 @@ int edge_score_predict(const std::vector<std::vector<double>>& w1,
   return model.predict(features, action_mask);
 }
 
+py::dict edge_score_load_summary(const std::string& path) {
+  const auto model = czr005::ics::load_edge_score_model_text(path);
+  py::dict summary;
+  summary["feature_dim"] = model.feature_dim();
+  summary["hidden_dim"] = model.hidden_dim();
+  return summary;
+}
+
 }  // namespace
 
 PYBIND11_MODULE(czr005_cpp, module) {
   module.doc() = "Minimal czr005 C++ core bindings for Phase1D parity checks.";
+  py::class_<czr005::ics::EdgeScoreModel>(module, "EdgeScoreRuntimeModel")
+      .def(py::init<std::vector<std::vector<double>>, std::vector<double>, std::vector<double>, double>(),
+           py::arg("w1"),
+           py::arg("b1"),
+           py::arg("w2"),
+           py::arg("b2"))
+      .def_static("from_text", &czr005::ics::load_edge_score_model_text, py::arg("path"))
+      .def("scores", &czr005::ics::EdgeScoreModel::scores, py::arg("features"))
+      .def("predict",
+           &czr005::ics::EdgeScoreModel::predict,
+           py::arg("features"),
+           py::arg("action_mask") = std::vector<bool>{})
+      .def_property_readonly("feature_dim", &czr005::ics::EdgeScoreModel::feature_dim)
+      .def_property_readonly("hidden_dim", &czr005::ics::EdgeScoreModel::hidden_dim);
+
   module.def("read_legacy_map_summary", &read_legacy_map_summary, py::arg("path"));
   module.def("read_legacy_task_summary", &read_legacy_task_summary, py::arg("path"));
   module.def("plan_legacy_map_path",
@@ -159,4 +183,5 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("b2"),
              py::arg("features"),
              py::arg("action_mask"));
+  module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
 }
