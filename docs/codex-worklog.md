@@ -197,3 +197,14 @@
 - Tests / validation: target Python pytest passed `22 passed`; Phase4 smoke wrote the manifest with `8/8` planned task legs and zero reservation conflicts; target CTest passed 2/2.
 - Safety / parity notes: This is a small manifest schema smoke, not a training set or learned policy. Larger teacher sweeps, split metadata, SIPP/rolling-horizon/PIBT teacher sources, and the first BC baseline remain pending.
 - Follow-up: add the first MLP-EdgeScore behavior cloning baseline or expand teacher dataset generation across density/fault settings.
+
+## 2026-06-17 03:35 - Phase4C pure-Python MLP-EdgeScore BC smoke
+
+- Request: Continue Phase4 by proving the teacher manifest can feed a first behavior-cloning baseline.
+- Branch: `main`.
+- Files changed: added `src/czr005/models/edge_score.py` and exports, added `tests/test_phase4_bc_edge_score.py`, added `scripts/train/train_phase4_bc_smoke.py`, generated `outputs/tables/phase4_bc_smoke_history.csv` and `outputs/reports/phase4_bc_smoke_report.md`. The local model artifact is written to ignored `artifacts/models/phase4_mlp_edge_score_smoke.json`.
+- Commands run: target Python pytest, target Phase4 BC smoke, and target CTest.
+- Key observations: A small pure-Python MLP-EdgeScore model trains on the 78-slice teacher manifest and reaches safe-masked top1 `0.974359` on the same smoke set. The implementation intentionally avoids numpy matrix operations after a Windows native `0xc06d007f` crash occurred during an initial numpy version of the smoke.
+- Tests / validation: target Python pytest passed `23 passed`; Phase4 BC smoke passed with final loss `0.081198`; target CTest passed 2/2.
+- Safety / parity notes: This is not a validated learning result. It has no train/validation split, no shadow replay, no closed-loop BC+shield run, and no comparison against Phase2 baselines yet.
+- Follow-up: add Phase5 shadow replay for the BC scorer or expand teacher data and add split metadata first.
