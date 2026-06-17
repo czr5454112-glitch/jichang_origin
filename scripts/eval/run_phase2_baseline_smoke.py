@@ -25,7 +25,11 @@ def main() -> None:
     _prepare_imports()
 
     from czr005.baselines import RollingHorizonBaseline  # pylint: disable=import-outside-toplevel
-    from czr005.sim_py import IcsGraph, ReferenceSimulator, TaskStream  # pylint: disable=import-outside-toplevel
+    from czr005.sim_py import (  # pylint: disable=import-outside-toplevel
+        IcsGraph,
+        ReferenceSimulator,
+        TaskStream,
+    )
 
     graph = IcsGraph.from_json(ROOT / "data" / "processed" / "maps" / "map2.json")
     stream = TaskStream.from_jsonl(ROOT / "data" / "processed" / "tasks" / "inputdata.jsonl")
@@ -39,6 +43,15 @@ def main() -> None:
         result = runner.run_episode(stream, max_tasks=args.max_tasks)
         elapsed = perf_counter() - start
         metrics = result.metrics.to_dict()
+        edge_reservations = getattr(runner, "edge_reservations", None)
+        edge_conflicts = (
+            edge_reservations.conflict_count(
+                capacity=getattr(runner, "edge_capacity", 1),
+                headway_seconds=getattr(runner, "edge_headway_seconds", 0.0),
+            )
+            if edge_reservations is not None
+            else 0
+        )
         runs.append(
             {
                 "baseline": name,
@@ -53,6 +66,8 @@ def main() -> None:
                 "max_lateness": f"{metrics['max_lateness']:.6f}",
                 "makespan": f"{metrics['makespan']:.6f}",
                 "reservation_conflicts": metrics["reservation_conflicts"],
+                "edge_reservation_conflicts": edge_conflicts,
+                "post_shield_conflicts": metrics["reservation_conflicts"] + edge_conflicts,
             }
         )
 
@@ -63,26 +78,29 @@ def main() -> None:
         writer.writerows(runs)
 
     rows = "\n".join(
-        "| {baseline} | {planned_count} | {unplanned_count} | {reservation_conflicts} | "
+        "| {baseline} | {planned_count} | {unplanned_count} | {post_shield_conflicts} | "
         "{mean_travel_time} | {p95_travel_time} | {elapsed_seconds} |".format(**run)
         for run in runs
     )
+    conflict_gate = "PASS" if all(int(run["post_shield_conflicts"]) == 0 for run in runs) else "FAIL"
     report = f"""# Phase2 Baseline and Shield Smoke Report
 
 Date: 2026-06-17
 
 ## Scope
 
-This smoke runs two non-learning baselines on the same first `{args.max_tasks}` expanded task legs from `inputdata.jsonl`:
+This smoke runs two non-learning baselines on the same first `{args.max_tasks}` expanded task legs
+from `inputdata.jsonl`:
 
 - `reference_astar`: Phase1 Python A* reference replay
 - `rolling_horizon_sipp`: Phase2 rolling-window SIPP baseline with horizon `{args.horizon_seconds}` seconds
 
-This is still a smoke replay, not a full benchmark. It exercises node reservation safety and baseline logging on real task-stream inputs.
+This is still a smoke replay, not a full benchmark. It exercises node and edge reservation safety
+plus baseline logging on real task-stream inputs.
 
 ## Metrics
 
-| Baseline | Planned | Unplanned | Reservation conflicts | Mean travel | P95 travel | Runtime seconds |
+| Baseline | Planned | Unplanned | Post-shield conflicts | Mean travel | P95 travel | Runtime seconds |
 |---|---:|---:|---:|---:|---:|---:|
 {rows}
 
@@ -90,15 +108,15 @@ CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 
 ## Gate Status
 
-- post-shield/reservation conflicts: {"PASS" if all(int(run["reservation_conflicts"]) == 0 for run in runs) else "FAIL"}
+- post-shield/reservation conflicts: {conflict_gate}
 - reproducible baseline entry point: PASS
 - full Phase2 baseline stack: incomplete
 
 ## Remaining Work
 
-- SIPP with edge capacity/headway and merge constraints
+- merge-group and buffer-capacity constraints
 - rolling-horizon active-bag replanning rather than sequential task-leg replay
-- PIBT/CS-PIBT-style one-step resolver
+- recursive PIBT/CS-PIBT-style replay integration
 - larger multi-seed task-density/fault sweeps
 """
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -108,9 +126,9 @@ CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
     for run in runs:
         print(
             f"{run['baseline']}: planned={run['planned_count']} "
-            f"unplanned={run['unplanned_count']} conflicts={run['reservation_conflicts']}"
+            f"unplanned={run['unplanned_count']} conflicts={run['post_shield_conflicts']}"
         )
-    if not all(int(run["reservation_conflicts"]) == 0 for run in runs):
+    if not all(int(run["post_shield_conflicts"]) == 0 for run in runs):
         raise SystemExit(1)
 
 

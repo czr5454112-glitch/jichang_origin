@@ -157,10 +157,12 @@ class RollingHorizonBaseline:
         for left, right in zip(route, route[1:]):
             if left.location == right.location:
                 continue
+            edge = self.graph.edge(left.location, right.location)
+            edge_start = right.t1 - edge.travel_time
             self.edge_reservations.reserve(
                 task_id=task_id,
                 start_node=left.location,
                 end_node=right.location,
-                start=left.t2,
+                start=edge_start,
                 end=right.t1,
             )

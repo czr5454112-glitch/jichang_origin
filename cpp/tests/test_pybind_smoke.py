@@ -165,6 +165,10 @@ def main() -> None:
         ("records-active", 301, 301, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", False, 1),
         ("records-after", 302, 302, 12.0, 32.0, 0, 2, 0, 2, 12.0, "direct", False, 2),
     ]
+    rolling_task_records = [
+        ("loose", 401, 401, 0.1, 100.0, 0, 2, 0, 2, 0.1, "direct", False, 1),
+        ("urgent", 402, 402, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", False, 2),
+    ]
     sipp_route = czr005_cpp.sipp_plan_from_records(
         node_records,
         edge_records,
@@ -186,6 +190,19 @@ def main() -> None:
         task_id=301,
     )
     assert sipp_fault_blocked == []
+
+    rolling_horizon = czr005_cpp.rolling_horizon_sipp_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        rolling_task_records,
+        max_tasks=2,
+        horizon_seconds=60.0,
+    )
+    assert rolling_horizon["summary"]["planned_count"] == 2
+    assert rolling_horizon["summary"]["unplanned_count"] == 0
+    assert rolling_horizon["summary"]["post_shield_conflicts"] == 0
+    assert [event["segment_id"] for event in rolling_horizon["events"]] == ["urgent", "loose"]
 
     records_replay = czr005_cpp.edge_score_native_replay_summary_from_records(
         node_records,

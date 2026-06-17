@@ -29,7 +29,8 @@ class EdgeReservation:
     end: float
 
     def overlaps(self, start: float, end: float) -> bool:
-        return not (start >= self.end or end <= self.start)
+        epsilon = 1.0e-9
+        return not (start >= self.end - epsilon or end <= self.start + epsilon)
 
     def to_dict(self) -> dict[str, float | int]:
         return asdict(self)

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "ics_core/baselines/rolling_horizon.hpp"
 #include "ics_core/graph/graph.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
@@ -27,6 +28,7 @@ using czr005::ics::JunctionShield;
 using czr005::ics::JunctionShieldConfig;
 using czr005::ics::Node;
 using czr005::ics::ReservationTable;
+using czr005::ics::RollingHorizonConfig;
 using czr005::ics::SafetyStatus;
 using czr005::ics::SIPPPlanner;
 using czr005::ics::compute_episode_metrics;
@@ -36,6 +38,7 @@ using czr005::ics::run_edge_score_fallback_replay;
 using czr005::ics::run_edge_score_event_fallback_replay;
 using czr005::ics::run_edge_score_event_replay;
 using czr005::ics::run_edge_score_replay;
+using czr005::ics::run_rolling_horizon_sipp;
 using czr005::ics::TaskLeg;
 using czr005::ics::TaskStream;
 
@@ -159,6 +162,26 @@ int main() {
 
   const auto sipp_fault_blocked = sipp_planner.plan(0, 2, 0.0, nullptr, nullptr, 1, 0.0, {{1, 2}}, 4);
   test.check(sipp_fault_blocked.empty(), "SIPP should reject a faulted only edge");
+
+  TaskStream rolling_tasks;
+  rolling_tasks.add(TaskLeg{"loose", 401, 401, 0.1, 100.0, 0, 2, 0, 2, 0.1, "direct", false, 1});
+  rolling_tasks.add(TaskLeg{"urgent", 402, 402, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", false, 2});
+  rolling_tasks.sort_by_pass_time();
+  RollingHorizonConfig rolling_config;
+  rolling_config.max_tasks = 2;
+  rolling_config.horizon_seconds = 60.0;
+  const auto rolling_result = run_rolling_horizon_sipp(graph, rolling_tasks, rolling_config);
+  test.check(rolling_result.planned_count == 2, "rolling-horizon SIPP should plan two sample tasks");
+  test.check(rolling_result.unplanned_count == 0, "rolling-horizon SIPP should not leave sample tasks unplanned");
+  test.check(rolling_result.reservation_conflicts == 0, "rolling-horizon SIPP should avoid node conflicts");
+  test.check(rolling_result.edge_reservation_conflicts == 0, "rolling-horizon SIPP should avoid edge conflicts");
+  test.check(rolling_result.events.size() == 2, "rolling-horizon SIPP should record two events");
+  if (rolling_result.events.size() == 2) {
+    test.check(rolling_result.events[0].segment_id == "urgent",
+               "rolling-horizon SIPP should prioritize tighter deadline slack");
+    test.check(rolling_result.events[1].segment_id == "loose",
+               "rolling-horizon SIPP should plan the looser task second");
+  }
 
   const auto later = planner.plan(0, 2, 6.0, &reservations, {}, 3);
   test.check(later.size() == 3, "sample later route should have 3 nodes");

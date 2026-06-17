@@ -10,6 +10,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "ics_core/baselines/rolling_horizon.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
 #include "ics_core/models/edge_score.hpp"
@@ -438,6 +439,71 @@ py::list sipp_plan_from_records(
                                      task_id));
 }
 
+py::dict rolling_horizon_summary(const czr005::ics::RollingHorizonResult& result,
+                                 int max_tasks) {
+  py::dict summary;
+  summary["max_tasks"] = max_tasks;
+  summary["planned_count"] = result.planned_count;
+  summary["unplanned_count"] = result.unplanned_count;
+  summary["decision_count"] = static_cast<int>(result.events.size());
+  summary["reservation_conflicts"] = result.reservation_conflicts;
+  summary["edge_reservation_conflicts"] = result.edge_reservation_conflicts;
+  summary["post_shield_conflicts"] = result.reservation_conflicts + result.edge_reservation_conflicts;
+  summary["mean_travel_time"] = result.mean_travel_time;
+  summary["makespan"] = result.makespan;
+  return summary;
+}
+
+py::list rolling_horizon_event_rows(const czr005::ics::RollingHorizonResult& result) {
+  py::list rows;
+  for (const auto& event : result.events) {
+    py::dict row;
+    row["event"] = event.event;
+    row["baseline"] = "rolling_horizon_sipp";
+    row["segment_id"] = event.segment_id;
+    row["task_id"] = event.task_id;
+    row["start"] = event.start;
+    row["goal"] = event.goal;
+    row["entry_time"] = event.entry_time;
+    row["finish_time"] = event.finish_time;
+    row["horizon_start"] = event.horizon_start;
+    row["horizon_end"] = event.horizon_end;
+    row["priority_rank"] = event.priority_rank;
+    row["path"] = event.path;
+    rows.append(row);
+  }
+  return rows;
+}
+
+py::dict rolling_horizon_sipp_from_records(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    const std::vector<TaskRecordTuple>& task_records,
+    int max_tasks,
+    double horizon_seconds,
+    int edge_capacity,
+    double edge_headway_seconds,
+    const std::vector<std::pair<int, int>>& fault_edges) {
+  if (max_tasks <= 0) {
+    throw std::invalid_argument("max_tasks must be positive");
+  }
+  const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
+  const auto tasks = task_stream_from_records(task_records);
+  std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  czr005::ics::RollingHorizonConfig config;
+  config.max_tasks = static_cast<std::size_t>(max_tasks);
+  config.horizon_seconds = horizon_seconds;
+  config.edge_capacity = edge_capacity;
+  config.edge_headway_seconds = edge_headway_seconds;
+  const auto result = czr005::ics::run_rolling_horizon_sipp(graph, tasks, config, faults);
+
+  py::dict payload;
+  payload["summary"] = rolling_horizon_summary(result, max_tasks);
+  payload["events"] = rolling_horizon_event_rows(result);
+  return payload;
+}
+
 py::dict edge_score_native_replay_summary_from_records(
     const std::vector<NodeRecordTuple>& node_records,
     const std::vector<EdgeRecordTuple>& edge_records,
@@ -757,6 +823,17 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("task_id") = -1,
              py::arg("max_time") = 86400.0);
+  module.def("rolling_horizon_sipp_from_records",
+             &rolling_horizon_sipp_from_records,
+             py::arg("node_records"),
+             py::arg("edge_records"),
+             py::arg("heuristic_time"),
+             py::arg("task_records"),
+             py::arg("max_tasks") = 8,
+             py::arg("horizon_seconds") = 300.0,
+             py::arg("edge_capacity") = 1,
+             py::arg("edge_headway_seconds") = 0.0,
+             py::arg("fault_edges") = std::vector<std::pair<int, int>>{});
   module.def("edge_score_native_replay_summary_from_records",
              &edge_score_native_replay_summary_from_records,
              py::arg("node_records"),

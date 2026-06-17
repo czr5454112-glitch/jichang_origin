@@ -4,19 +4,21 @@ Date: 2026-06-17
 
 ## Scope
 
-This smoke runs two non-learning baselines on the same first `128` expanded task legs from `inputdata.jsonl`:
+This smoke runs two non-learning baselines on the same first `128` expanded task legs
+from `inputdata.jsonl`:
 
 - `reference_astar`: Phase1 Python A* reference replay
 - `rolling_horizon_sipp`: Phase2 rolling-window SIPP baseline with horizon `300.0` seconds
 
-This is still a smoke replay, not a full benchmark. It exercises node and edge reservation safety plus baseline logging on real task-stream inputs.
+This is still a smoke replay, not a full benchmark. It exercises node and edge reservation safety
+plus baseline logging on real task-stream inputs.
 
 ## Metrics
 
-| Baseline | Planned | Unplanned | Reservation conflicts | Mean travel | P95 travel | Runtime seconds |
+| Baseline | Planned | Unplanned | Post-shield conflicts | Mean travel | P95 travel | Runtime seconds |
 |---|---:|---:|---:|---:|---:|---:|
-| reference_astar | 113 | 15 | 0 | 51.529204 | 76.800000 | 0.041820 |
-| rolling_horizon_sipp | 128 | 0 | 0 | 89.060688 | 161.469291 | 0.119374 |
+| reference_astar | 113 | 15 | 0 | 51.529204 | 76.800000 | 0.032216 |
+| rolling_horizon_sipp | 128 | 0 | 0 | 87.705494 | 161.469291 | 0.092915 |
 
 CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 

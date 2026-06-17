@@ -40,7 +40,8 @@ struct EdgeReservation {
   double end = 0.0;
 
   [[nodiscard]] bool overlaps(double candidate_start, double candidate_end) const {
-    return !(candidate_start >= end || candidate_end <= start);
+    constexpr double epsilon = 1.0e-9;
+    return !(candidate_start >= end - epsilon || candidate_end <= start + epsilon);
   }
 };
 
@@ -186,23 +187,21 @@ class EdgeReservationTable {
     for (const auto& entry : by_edge_) {
       const auto& intervals = entry.second;
       for (std::size_t i = 0; i < intervals.size(); ++i) {
-        int overlapping = 0;
-        for (std::size_t j = 0; j < intervals.size(); ++j) {
-          if (i == j) {
-            continue;
+        for (std::size_t j = i + 1; j < intervals.size(); ++j) {
+          if (intervals[j].start >= intervals[i].end &&
+              intervals[j].start - intervals[i].start >= headway_seconds) {
+            break;
           }
-          if (intervals[i].overlaps(intervals[j].start, intervals[j].end)) {
-            ++overlapping;
-          }
-          const double gap = intervals[i].start > intervals[j].start
-                                 ? intervals[i].start - intervals[j].start
-                                 : intervals[j].start - intervals[i].start;
-          if (headway_seconds > 0.0 && gap < headway_seconds) {
+          if (intervals[i].overlaps(intervals[j].start, intervals[j].end) && capacity <= 1) {
             ++conflicts;
+          } else {
+            const double gap = intervals[i].start > intervals[j].start
+                                   ? intervals[i].start - intervals[j].start
+                                   : intervals[j].start - intervals[i].start;
+            if (headway_seconds > 0.0 && gap < headway_seconds) {
+              ++conflicts;
+            }
           }
-        }
-        if (overlapping >= capacity) {
-          ++conflicts;
         }
       }
     }
