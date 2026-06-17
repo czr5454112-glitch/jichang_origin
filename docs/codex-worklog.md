@@ -241,3 +241,14 @@
 - Tests / validation: target Python pytest passed `26 passed`; Phase5 validation sweep passed all task-window gates; target CTest passed 2/2.
 - Safety / parity notes: This is a same-map task-window heldout smoke, not a heldout-map, density, or fault validation. It reduces but does not eliminate overfit risk before Phase6.
 - Follow-up: add heldout-map/synthetic-map validation, fault/density sweeps, and Phase2 baseline comparisons on larger windows before strong learning claims.
+
+## 2026-06-17 05:55 - Phase5 robustness sweep for Phase6 fault curriculum
+
+- Request: Continue preparing for Phase6 by adding density/fault diagnostics instead of starting RL before the failure modes are visible.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase5_robustness_sweep.py`, generated `outputs/tables/phase5_robustness_sweep_metrics.csv`, and generated `outputs/reports/phase5_robustness_sweep_report.md`.
+- Commands run: target Python pytest, target Phase5 robustness sweep, and target CTest.
+- Key observations: A*-guided and DAgger BC+shield match on no-fault density windows with zero conflicts, but selected fault windows expose a BC robustness gap. With fault `16->17`, DAgger BC plans only `4/8` while rolling-horizon SIPP plans `8/8`; with fault `28->47`, both junction policies plan `0/8` while rolling-horizon SIPP plans `8/8`. All methods still report zero post-shield conflicts.
+- Tests / validation: target Python pytest passed `26 passed`; Phase5 robustness sweep produced the density/fault diagnostics; target CTest passed 2/2.
+- Safety / parity notes: This is a diagnostic sweep, not a learning improvement. It defines concrete Phase6 fault-curriculum targets and shows rolling-horizon SIPP remains the stronger recovery baseline under these faults.
+- Follow-up: add fault-aware teacher slices and DAgger relabeling before RL fine-tuning, then compare against rolling-horizon SIPP and PIBT-style baselines on larger windows.
