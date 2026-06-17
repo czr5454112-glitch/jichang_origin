@@ -175,3 +175,14 @@
 - Tests / validation: target Python pytest passed `16 passed`; target Phase2 baseline smoke passed with rolling-horizon SIPP planning `128/128` task legs and zero reservation conflicts; target CTest passed 2/2.
 - Safety / parity notes: This is still a deterministic Python replay baseline. Merge groups, buffer-capacity constraints, full active-bag replanning, recursive PIBT replay integration, C++ SIPP parity, and multi-seed density/fault sweeps remain pending.
 - Follow-up: move to merge/buffer constraints, C++ SIPP parity, or Phase3 learning-environment scaffolding.
+
+## 2026-06-17 02:35 - Phase3 Python junction learning environment smoke
+
+- Request: Continue from Phase2 into the Phase3 learning-environment definition in the master plan.
+- Branch: `main`.
+- Files changed: added `src/czr005/envs/` with action masks, observations, reward shaping, a Gym-style `IcsJunctionEnv`, a lightweight vectorized wrapper, and scripted safe policies; expanded `EdgeReservationTable` cleanup helpers; added `tests/test_phase3_env.py`; added `scripts/eval/run_phase3_learning_env_smoke.py`; generated `outputs/tables/phase3_learning_env_smoke_metrics.csv` and `outputs/reports/phase3_learning_env_report.md`.
+- Commands run: target Python pytest, target Phase3 learning-env smoke, and target CTest.
+- Key observations: The environment exposes `reset`/`step`, candidate-edge observations, hard shield fallback, node/edge reservation checks, and structured episode summaries. On real `map2`/`inputdata`, the A*-guided safe policy planned `8/8` smoke task legs with zero post-shield conflicts; random-safe actions ran on `16` task legs with zero post-shield conflicts but many unplanned tasks, as expected for an unguided random policy.
+- Tests / validation: target Python pytest passed `21 passed`; Phase3 smoke passed; target CTest passed 2/2.
+- Safety / parity notes: This is an environment contract and smoke gate, not a strong learned-policy result. Multi-agent PettingZoo compatibility, richer occupancy/merge/buffer observations, queue-aware scripted policy, and teacher-slice export remain pending.
+- Follow-up: start Phase4 teacher junction-slice generation or strengthen Phase3 with richer local features and a queue-aware policy baseline.

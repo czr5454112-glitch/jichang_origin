@@ -122,6 +122,12 @@ class EdgeReservationTable:
     def intervals(self, start_node: int, end_node: int) -> tuple[EdgeReservation, ...]:
         return tuple(self._by_edge.get((start_node, end_node), ()))
 
+    def all_intervals(self) -> tuple[EdgeReservation, ...]:
+        values: list[EdgeReservation] = []
+        for intervals in self._by_edge.values():
+            values.extend(intervals)
+        return tuple(values)
+
     def reserve(
         self,
         task_id: int,
@@ -142,6 +148,14 @@ class EdgeReservationTable:
         existing.append(reservation)
         existing.sort(key=lambda interval: (interval.start, interval.end, interval.task_id))
         return reservation
+
+    def remove_task(self, task_id: int) -> None:
+        for edge in list(self._by_edge):
+            self._by_edge[edge] = [
+                interval for interval in self._by_edge[edge] if interval.task_id != task_id
+            ]
+            if not self._by_edge[edge]:
+                del self._by_edge[edge]
 
     def has_capacity_conflict(
         self,
