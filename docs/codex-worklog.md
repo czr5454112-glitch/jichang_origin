@@ -252,3 +252,14 @@
 - Tests / validation: target Python pytest passed `26 passed`; Phase5 robustness sweep produced the density/fault diagnostics; target CTest passed 2/2.
 - Safety / parity notes: This is a diagnostic sweep, not a learning improvement. It defines concrete Phase6 fault-curriculum targets and shows rolling-horizon SIPP remains the stronger recovery baseline under these faults.
 - Follow-up: add fault-aware teacher slices and DAgger relabeling before RL fine-tuning, then compare against rolling-horizon SIPP and PIBT-style baselines on larger windows.
+
+## 2026-06-17 06:35 - Phase5 fault-aware teacher curriculum smoke
+
+- Request: Address the fault robustness gap found by the Phase5 robustness diagnostics before attempting Phase6 RL fine-tuning.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `fault_aware_astar_policy_factory` to `src/czr005/envs/ics_junction_env.py` and exports, added `tests/test_phase5_fault_curriculum.py`, added `scripts/eval/run_phase5_fault_curriculum_smoke.py`, generated `artifacts/teacher/junction_slices_fault_curriculum_smoke.jsonl`, `outputs/tables/phase5_fault_curriculum_metrics.csv`, and `outputs/reports/phase5_fault_curriculum_report.md`.
+- Commands run: target Python pytest, target Phase5 fault curriculum smoke, and target CTest.
+- Key observations: The fault-aware teacher produced 208 recovery slices for selected faults. Retraining MLP-EdgeScore with base + DAgger + fault-curriculum slices recovers both selected fault windows with zero conflicts: fault `16->17` improves from base DAgger BC `4/8` to `8/8`, and fault `28->47` improves from `0/8` to `8/8`. Rolling-horizon SIPP still has better fault-case travel time and remains the stronger recovery baseline.
+- Tests / validation: target Python pytest passed `28 passed`; Phase5 fault curriculum smoke passed with zero post-shield conflicts; target CTest passed 2/2.
+- Safety / parity notes: This is still same-map BC curriculum evidence, not RL and not heldout-map validation. It is a stronger starting checkpoint candidate for Phase6 but does not satisfy Phase6 gates by itself.
+- Follow-up: add model-visited fault DAgger relabeling, larger fault/repair sweeps, and then a conservative Phase6 fine-tuning smoke.

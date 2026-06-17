@@ -506,6 +506,45 @@ def astar_guided_policy_factory(graph: IcsGraph) -> PolicyFn:
     return policy
 
 
+def fault_aware_astar_policy_factory(
+    graph: IcsGraph,
+    fault_edges: set[tuple[int, int]] | None = None,
+) -> PolicyFn:
+    planner = AStarPlanner(graph)
+    blocked = fault_edges or set()
+
+    def policy(obs: dict[str, Any], info: dict[str, Any]) -> int:
+        if not obs:
+            return 0
+        task = obs["task"]
+        route = planner.plan(
+            start=int(task["current"]),
+            goal=int(task["goal"]),
+            start_time=float(task["ready_time"]),
+            fault_edges=blocked,
+        )
+        if len(route) > 1:
+            action = _action_for_next_node(obs["candidates"], route[1].location)
+            if action is not None:
+                return action
+        return shortest_safe_policy(obs, info)
+
+    return policy
+
+
+def _action_for_next_node(candidates: object, next_node: int) -> int | None:
+    planned = [
+        candidate
+        for candidate in candidates
+        if candidate["kind"] == "move" and int(candidate["next_node"]) == next_node
+    ]
+    if planned and planned[0]["safe"]:
+        return int(planned[0]["index"])
+    if planned and _only_transient_blocks(planned[0]["blocked_reasons"]):
+        return _safe_hold_action(candidates)
+    return None
+
+
 def _only_transient_blocks(reasons: object) -> bool:
     transient = {"edge_capacity", "edge_headway", "node_reservation"}
     return bool(reasons) and all(str(reason) in transient for reason in reasons)
