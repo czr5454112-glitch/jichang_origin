@@ -186,3 +186,14 @@
 - Tests / validation: target Python pytest passed `21 passed`; Phase3 smoke passed; target CTest passed 2/2.
 - Safety / parity notes: This is an environment contract and smoke gate, not a strong learned-policy result. Multi-agent PettingZoo compatibility, richer occupancy/merge/buffer observations, queue-aware scripted policy, and teacher-slice export remain pending.
 - Follow-up: start Phase4 teacher junction-slice generation or strengthen Phase3 with richer local features and a queue-aware policy baseline.
+
+## 2026-06-17 03:05 - Phase4A teacher junction-slice manifest smoke
+
+- Request: Continue from Phase3 into the master-plan teacher data stage, without starting BC training yet.
+- Branch: `main`.
+- Files changed: added `src/czr005/datasets/teacher_slices.py` and exports, added `tests/test_phase4_teacher_slices.py`, added `scripts/eval/run_phase4_teacher_dataset_smoke.py`, generated `artifacts/teacher/junction_slices_manifest.jsonl`, `outputs/tables/phase4_teacher_dataset_summary.csv`, and `outputs/reports/phase4_teacher_dataset_report.md`.
+- Commands run: target Python pytest, target Phase4 teacher dataset smoke, and target CTest.
+- Key observations: The first teacher manifest records 78 shielded junction decision slices from 8 real task legs using the A*-guided safe scripted policy. Each slice includes task observation features, candidate edges, action mask, proposed action, executed expert action, expert rank, cost-to-goal proxy, future-delay proxy, shield result, unsafe-proposal flag, reward, and goal flag.
+- Tests / validation: target Python pytest passed `22 passed`; Phase4 smoke wrote the manifest with `8/8` planned task legs and zero reservation conflicts; target CTest passed 2/2.
+- Safety / parity notes: This is a small manifest schema smoke, not a training set or learned policy. Larger teacher sweeps, split metadata, SIPP/rolling-horizon/PIBT teacher sources, and the first BC baseline remain pending.
+- Follow-up: add the first MLP-EdgeScore behavior cloning baseline or expand teacher dataset generation across density/fault settings.
