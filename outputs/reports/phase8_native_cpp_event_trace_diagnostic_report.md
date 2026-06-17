@@ -30,11 +30,10 @@ CSV: `outputs/tables/phase8_native_cpp_event_trace_diagnostic.csv`
 - event trace invariants: PASS
 - EdgeScore and fallback event traces covered: PASS
 - persisted synthetic manifest covered: PASS
-- Python event-scheduler trace parity: not covered
+- Python event-scheduler trace parity: covered by `phase8_native_cpp_event_parity_report.md`
 - final paper-grade scheduler throughput: not covered
 
 ## Remaining Work
 
-- add a Python event-scheduler reference or equivalent route-update oracle
 - scale this diagnostic over larger persisted manifests
 - carry the event trace audit into Phase9 baseline and policy comparisons
