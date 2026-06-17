@@ -22,6 +22,9 @@ plus baseline logging on real task-stream inputs.
 
 CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 
+Active-bag/replan-cost evidence is tracked separately in
+`outputs/reports/phase2_active_bag_replanning_audit_report.md`.
+
 ## Gate Status
 
 - post-shield/reservation conflicts: PASS
@@ -31,6 +34,6 @@ CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 ## Remaining Work
 
 - merge-group and buffer-capacity constraints
-- rolling-horizon active-bag replanning rather than sequential task-leg replay
+- true route-discarding active-bag replanning rather than sequential task-leg replay
 - recursive PIBT/CS-PIBT-style replay integration
 - larger multi-seed task-density/fault sweeps

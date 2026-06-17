@@ -472,3 +472,14 @@
 - Tests / validation: CTest passed 2/2; Python pytest passed `36 passed`; Phase2 C++ PIBT parity reported `6` strict PASS rows; Phase2 C++ SIPP parity reported `9` strict PASS rows; Phase2 C++ rolling-horizon parity reported `8` strict PASS rows; Phase8 event scheduler parity reported `8` strict PASS rows; event trace audit reported `8` invariant PASS rows; scaling reported `divergences=0`.
 - Safety / parity notes: This closes the C++ parity gate for the deterministic one-step PIBT-style shield only. Recursive priority inheritance/backtracking, active-bag replanning integration, merge-group/buffer semantics, real heldout-map event parity, and final paper-grade runtime validation remain pending.
 - Follow-up: integrate active-bag/periodic replanning semantics or recursive PIBT-style replay, then carry the C++ baseline stack into larger Phase9 comparisons.
+
+## 2026-06-17 17:05 - Phase2 active-bag replan-cost audit
+
+- Request: Continue closing Python/C++ port and prerequisite baseline gaps from the master plan, especially Phase2C active-bag/replan-cost evidence.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase2_active_bag_replanning_audit.py`, generated `outputs/tables/phase2_active_bag_replanning_audit.csv` plus `outputs/reports/phase2_active_bag_replanning_audit_report.md`, updated README status, and linked the new audit from the Phase2 baseline smoke report.
+- Commands run: target Python pytest, target CTest through the VS developer environment, Phase8 event scheduler Python/C++ parity, Phase8 event trace diagnostic, and the new Phase2 active-bag replanning audit.
+- Key observations: The new audit samples Python and C++ event-queue traces into fixed `5.0s` ticks and reports active-bag pressure, decision ticks, elapsed replay time, decisions per second, task accounting, and post-shield safety. All eight policy/case rows on the persisted synthetic manifest have matching Python/C++ binned active-bag metrics and zero post-shield conflicts.
+- Tests / validation: Python pytest passed `36 passed`; CTest passed 2/2; Phase8 event scheduler parity reported `8` strict PASS rows; event trace diagnostic reported `8` invariant PASS rows; Phase2 active-bag audit reported `8` PASS rows.
+- Safety / parity notes: This supplies a reproducible replan-cost/active-bag audit over the event scheduler. It is not a true route-discarding periodic SIPP replanner, not recursive PIBT, and not real heldout-map validation.
+- Follow-up: implement a true route-discarding periodic replanning baseline if needed, add real heldout-map fixtures when available, and carry active-bag cost metrics into Phase9 comparisons.
