@@ -8,7 +8,13 @@ import random
 from typing import Any
 
 from czr005.baselines.sipp import SIPPNode
-from czr005.envs.action_mask import ActionCandidate, build_action_candidates, shortest_safe_action
+from czr005.envs.action_mask import (
+    ActionCandidate,
+    EdgeFaultWindow,
+    active_fault_edges,
+    build_action_candidates,
+    shortest_safe_action,
+)
 from czr005.envs.observation_builder import build_junction_observation
 from czr005.envs.reward import DecisionRewardConfig, decision_reward
 from czr005.sim_py.astar import AStarPlanner
@@ -51,6 +57,7 @@ class IcsJunctionEnv:
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
         fault_edges: set[tuple[int, int]] | None = None,
+        fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
         require_reachable_goal: bool = True,
         max_decisions_per_task: int = 256,
         reward_config: DecisionRewardConfig | None = None,
@@ -69,6 +76,7 @@ class IcsJunctionEnv:
         self.edge_capacity = edge_capacity
         self.edge_headway_seconds = edge_headway_seconds
         self.fault_edges = fault_edges or set()
+        self.fault_windows = tuple(fault_windows or ())
         self.require_reachable_goal = require_reachable_goal
         self.max_decisions_per_task = max_decisions_per_task
         self.reward_config = reward_config or DecisionRewardConfig()
@@ -369,6 +377,7 @@ class IcsJunctionEnv:
             edge_capacity=self.edge_capacity,
             edge_headway_seconds=self.edge_headway_seconds,
             fault_edges=self.fault_edges,
+            fault_windows=self.fault_windows,
             hold_seconds=self.hold_seconds,
             require_reachable_goal=self.require_reachable_goal,
         )
@@ -387,6 +396,7 @@ class IcsJunctionEnv:
             edge_capacity=self.edge_capacity,
             edge_headway_seconds=self.edge_headway_seconds,
             fault_edges=self.fault_edges,
+            fault_windows=self.fault_windows,
             hold_seconds=self.hold_seconds,
             require_reachable_goal=self.require_reachable_goal,
         )
@@ -514,19 +524,22 @@ def astar_guided_policy_factory(graph: IcsGraph) -> PolicyFn:
 def fault_aware_astar_policy_factory(
     graph: IcsGraph,
     fault_edges: set[tuple[int, int]] | None = None,
+    fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
 ) -> PolicyFn:
     planner = AStarPlanner(graph)
     blocked = fault_edges or set()
+    windows = tuple(fault_windows or ())
 
     def policy(obs: dict[str, Any], info: dict[str, Any]) -> int:
         if not obs:
             return 0
         task = obs["task"]
+        ready_time = float(task["ready_time"])
         route = planner.plan(
             start=int(task["current"]),
             goal=int(task["goal"]),
-            start_time=float(task["ready_time"]),
-            fault_edges=blocked,
+            start_time=ready_time,
+            fault_edges=active_fault_edges(blocked, windows, ready_time),
         )
         if len(route) > 1:
             action = _action_for_next_node(obs["candidates"], route[1].location)

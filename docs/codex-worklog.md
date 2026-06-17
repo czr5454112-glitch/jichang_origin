@@ -373,3 +373,14 @@
 - Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `33 passed`; Phase8 offset/fault parity reports `8/8` strict PASS rows; existing Phase8 scaling remains `divergences=0`; trace parity remains PASS.
 - Safety / parity notes: This strengthens same-map static-fault compact replay evidence. It still does not cover repair-event schedules, heldout maps, randomized synthetic maps, or the final high-throughput C++ event scheduler.
 - Follow-up: add repair-event semantics and heldout/randomized-map parity gates, then replace compact replay with the full C++ event scheduler.
+
+## 2026-06-17 12:35 - Phase8 repair-window compact replay parity
+
+- Request: Add repair-event schedule semantics to the Python/C++ compact replay parity path before moving to broader heldout and event-scheduler work.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added time-bounded `fault_windows` support to Python action-mask/observation/env layers, added C++ `EdgeFaultWindow` support and active-fault evaluation in native replay, exposed repair windows through pybind replay/trace/fallback entry points, expanded Python/C++/pybind tests, added `scripts/eval/run_phase8_native_cpp_repair_parity.py`, and generated `outputs/tables/phase8_native_cpp_repair_parity.csv` plus `outputs/reports/phase8_native_cpp_repair_parity_report.md`.
+- Commands run: CMake build, target CTest, target Python pytest, Phase8 repair-window parity diagnostic, Phase8 offset/fault parity diagnostic, Phase8 native C++ / Python parity diagnostic, Phase8 native trace diagnostic, and Phase8 native scaling diagnostic.
+- Key observations: Both Python and C++ now treat a repair window as active when `fault_start <= ready_time < repair_time`, unioned with any static fault edges for that decision. Four 24-task same-map repair-window rows matched exactly on planned/unplanned counts, decision counts, mean travel time, and post-shield conflicts.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `34 passed`; Phase8 repair parity reports `4/4` strict PASS rows; existing offset/fault parity still reports `8/8` strict PASS rows; existing trace/scaling diagnostics still pass.
+- Safety / parity notes: This validates compact replay repair-window semantics, not the full Java route-update behavior or final high-throughput C++ event scheduler. Heldout-map and randomized-map repair validation remain open.
+- Follow-up: add heldout/randomized repair schedule gates, then implement the full C++ event scheduler required for final runtime claims.

@@ -3,6 +3,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -19,6 +20,8 @@
 namespace py = pybind11;
 
 namespace {
+
+using EdgeFaultWindowTuple = std::tuple<int, int, double, double>;
 
 std::vector<int> route_locations(const std::vector<czr005::ics::PathNode>& route) {
   std::vector<int> locations;
@@ -190,13 +193,24 @@ py::list edge_score_decision_trace_rows(const czr005::ics::EdgeScoreReplayResult
   return rows;
 }
 
+std::vector<czr005::ics::EdgeFaultWindow> edge_fault_windows_from_tuples(
+    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+  std::vector<czr005::ics::EdgeFaultWindow> windows;
+  windows.reserve(fault_windows.size());
+  for (const auto& [start, end, fault_start, repair_time] : fault_windows) {
+    windows.push_back(czr005::ics::EdgeFaultWindow{start, end, fault_start, repair_time});
+  }
+  return windows;
+}
+
 py::dict edge_score_native_replay_summary(const std::string& map_path,
                                           const std::string& task_path,
                                           const std::string& model_path,
                                           int max_tasks,
                                           const std::vector<std::pair<int, int>>& fault_edges,
                                           int max_decisions_per_task,
-                                          int task_offset) {
+                                          int task_offset,
+                                          const std::vector<EdgeFaultWindowTuple>& fault_windows) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
@@ -210,6 +224,7 @@ py::dict edge_score_native_replay_summary(const std::string& map_path,
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  const auto windows = edge_fault_windows_from_tuples(fault_windows);
   czr005::ics::EdgeScoreReplayConfig config;
   config.task_offset = static_cast<std::size_t>(task_offset);
   config.max_tasks = static_cast<std::size_t>(max_tasks);
@@ -221,7 +236,8 @@ py::dict edge_score_native_replay_summary(const std::string& map_path,
       legacy_tasks.stream,
       model,
       config,
-      faults);
+      faults,
+      windows);
   const auto end_time = std::chrono::steady_clock::now();
   const std::chrono::duration<double> elapsed = end_time - start_time;
 
@@ -234,7 +250,8 @@ py::dict edge_score_native_replay_trace(const std::string& map_path,
                                         int max_tasks,
                                         const std::vector<std::pair<int, int>>& fault_edges,
                                         int max_decisions_per_task,
-                                        int task_offset) {
+                                        int task_offset,
+                                        const std::vector<EdgeFaultWindowTuple>& fault_windows) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
@@ -248,6 +265,7 @@ py::dict edge_score_native_replay_trace(const std::string& map_path,
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  const auto windows = edge_fault_windows_from_tuples(fault_windows);
   czr005::ics::EdgeScoreReplayConfig config;
   config.task_offset = static_cast<std::size_t>(task_offset);
   config.max_tasks = static_cast<std::size_t>(max_tasks);
@@ -259,7 +277,8 @@ py::dict edge_score_native_replay_trace(const std::string& map_path,
       legacy_tasks.stream,
       model,
       config,
-      faults);
+      faults,
+      windows);
   const auto end_time = std::chrono::steady_clock::now();
   const std::chrono::duration<double> elapsed = end_time - start_time;
 
@@ -274,7 +293,8 @@ py::dict edge_score_native_fallback_replay_summary(const std::string& map_path,
                                                    int max_tasks,
                                                    const std::vector<std::pair<int, int>>& fault_edges,
                                                    int max_decisions_per_task,
-                                                   int task_offset) {
+                                                   int task_offset,
+                                                   const std::vector<EdgeFaultWindowTuple>& fault_windows) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
@@ -287,6 +307,7 @@ py::dict edge_score_native_fallback_replay_summary(const std::string& map_path,
   const auto legacy_map = czr005::ics::read_legacy_map2(map_path);
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  const auto windows = edge_fault_windows_from_tuples(fault_windows);
   czr005::ics::EdgeScoreReplayConfig config;
   config.task_offset = static_cast<std::size_t>(task_offset);
   config.max_tasks = static_cast<std::size_t>(max_tasks);
@@ -297,7 +318,8 @@ py::dict edge_score_native_fallback_replay_summary(const std::string& map_path,
       legacy_map.graph,
       legacy_tasks.stream,
       config,
-      faults);
+      faults,
+      windows);
   const auto end_time = std::chrono::steady_clock::now();
   const std::chrono::duration<double> elapsed = end_time - start_time;
   return edge_score_replay_result_summary(result, max_tasks, elapsed.count());
@@ -366,7 +388,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("max_tasks") = 8,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
-             py::arg("task_offset") = 0);
+             py::arg("task_offset") = 0,
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
   module.def("edge_score_native_replay_trace",
              &edge_score_native_replay_trace,
              py::arg("map_path"),
@@ -375,7 +398,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("max_tasks") = 8,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
-             py::arg("task_offset") = 0);
+             py::arg("task_offset") = 0,
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
   module.def("edge_score_native_fallback_replay_summary",
              &edge_score_native_fallback_replay_summary,
              py::arg("map_path"),
@@ -383,5 +407,6 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("max_tasks") = 8,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
-             py::arg("task_offset") = 0);
+             py::arg("task_offset") = 0,
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
 }

@@ -131,6 +131,39 @@ def test_action_mask_blocks_fault_and_edge_capacity() -> None:
     assert "fault_edge" in fault_candidates[0].blocked_reasons
 
 
+def test_action_mask_applies_repair_windows_by_ready_time() -> None:
+    graph = _branch_graph()
+    task = _task("repair-window", 1, pass_time=0.0, std=20.0, goal=3)
+    fault_windows = ((0, 1, 0.0, 5.0),)
+
+    active_candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=4.0,
+        reservations=ReservationTable(),
+        edge_reservations=EdgeReservationTable(),
+        fault_windows=fault_windows,
+    )
+    assert active_candidates[0].next_node == 1
+    assert active_candidates[0].safe is False
+    assert "fault_edge" in active_candidates[0].blocked_reasons
+    assert active_candidates[1].next_node == 2
+    assert active_candidates[1].safe is True
+
+    repaired_candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=5.0,
+        reservations=ReservationTable(),
+        edge_reservations=EdgeReservationTable(),
+        fault_windows=fault_windows,
+    )
+    assert repaired_candidates[0].next_node == 1
+    assert repaired_candidates[0].safe is True
+
+
 def test_action_mask_blocks_unreachable_goal_candidates() -> None:
     graph = _dead_end_branch_graph()
     task = _task("dead-end", 1, pass_time=0.0, std=20.0, goal=3)

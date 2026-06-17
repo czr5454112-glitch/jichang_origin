@@ -9,6 +9,8 @@ from czr005.sim_py.graph import IcsGraph
 from czr005.sim_py.reservation import EdgeReservationTable, ReservationTable
 from czr005.sim_py.task_stream import TaskLeg
 
+EdgeFaultWindow = tuple[int, int, float, float]
+
 
 @dataclass(frozen=True)
 class ActionCandidate:
@@ -48,6 +50,20 @@ class ActionCandidate:
         }
 
 
+def active_fault_edges(
+    fault_edges: set[tuple[int, int]] | None = None,
+    fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
+    ready_time: float = 0.0,
+) -> set[tuple[int, int]]:
+    active = set(fault_edges or set())
+    for start, end, fault_start, repair_time in fault_windows or ():
+        if repair_time <= fault_start:
+            raise ValueError("repair_time must be greater than fault_start")
+        if fault_start <= ready_time < repair_time:
+            active.add((start, end))
+    return active
+
+
 def build_action_candidates(
     graph: IcsGraph,
     task: TaskLeg,
@@ -58,6 +74,7 @@ def build_action_candidates(
     edge_capacity: int = 1,
     edge_headway_seconds: float = 0.0,
     fault_edges: set[tuple[int, int]] | None = None,
+    fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
     hold_seconds: float = 1.0,
     require_reachable_goal: bool = True,
 ) -> tuple[ActionCandidate, ...]:
@@ -66,7 +83,7 @@ def build_action_candidates(
     if hold_seconds <= 0.0:
         raise ValueError("hold_seconds must be positive")
 
-    fault_edges = fault_edges or set()
+    active_faults = active_fault_edges(fault_edges, fault_windows, ready_time)
     planner = AStarPlanner(graph) if require_reachable_goal else None
     candidates: list[ActionCandidate] = []
 
@@ -79,7 +96,7 @@ def build_action_candidates(
         node_end = node_start + service_time
         reasons: list[str] = []
 
-        if (current, next_node) in fault_edges:
+        if (current, next_node) in active_faults:
             reasons.append("fault_edge")
         if edge_reservations.has_capacity_conflict(
             current,
@@ -103,7 +120,7 @@ def build_action_candidates(
         if (
             planner is not None
             and next_node != task.goal
-            and not planner.plan(next_node, task.goal, fault_edges=fault_edges)
+            and not planner.plan(next_node, task.goal, fault_edges=active_faults)
         ):
             reasons.append("unreachable_goal")
 

@@ -17,6 +17,7 @@
 
 using czr005::ics::AStarPlanner;
 using czr005::ics::Edge;
+using czr005::ics::EdgeFaultWindow;
 using czr005::ics::EdgeScoreModel;
 using czr005::ics::EdgeScoreReplayConfig;
 using czr005::ics::EdgeReservationTable;
@@ -273,6 +274,27 @@ int main() {
              "native fallback replay should plan both sample tasks without a model");
   test.check(fallback_replay_result.post_shield_conflicts == 0,
              "native fallback replay should stay conflict-free without a model");
+
+  TaskStream repair_tasks;
+  repair_tasks.add(TaskLeg{"cpp-repair-active", 201, 201, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", false, 1});
+  repair_tasks.add(TaskLeg{"cpp-repair-after", 202, 202, 12.0, 32.0, 0, 2, 0, 2, 12.0, "direct", false, 2});
+  EdgeScoreReplayConfig repair_config;
+  repair_config.max_tasks = 2;
+  repair_config.max_decisions_per_task = 4;
+  const std::set<std::pair<int, int>> no_static_faults;
+  const std::vector<EdgeFaultWindow> repair_windows{{0, 1, 0.0, 10.0}};
+  const auto repair_replay_result = run_edge_score_fallback_replay(
+      graph,
+      repair_tasks,
+      repair_config,
+      no_static_faults,
+      repair_windows);
+  test.check(repair_replay_result.planned_count == 1,
+             "repair-window fallback replay should plan the post-repair task");
+  test.check(repair_replay_result.unplanned_count == 1,
+             "repair-window fallback replay should fail the task trapped during active fault");
+  test.check(repair_replay_result.post_shield_conflicts == 0,
+             "repair-window fallback replay should stay conflict-free");
 
   const auto legacy = read_legacy_map2(std::string(CZR005_SOURCE_DIR) +
                                        "/legacy/jichang_origin_readonly/map2.txt");

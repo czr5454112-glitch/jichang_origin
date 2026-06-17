@@ -16,6 +16,13 @@
 
 namespace czr005::ics {
 
+struct EdgeFaultWindow {
+  int start = -1;
+  int end = -1;
+  double fault_start = 0.0;
+  double repair_time = 0.0;
+};
+
 struct EdgeScoreReplayConfig {
   std::size_t task_offset = 0;
   std::size_t max_tasks = 8;
@@ -81,6 +88,27 @@ struct RuntimeCandidate {
   double heuristic_to_goal = 0.0;
   int blocked_reason_count = 0;
 };
+
+inline void validate_fault_windows(const std::vector<EdgeFaultWindow>& fault_windows) {
+  for (const auto& window : fault_windows) {
+    if (window.repair_time <= window.fault_start) {
+      throw std::invalid_argument("repair_time must be greater than fault_start");
+    }
+  }
+}
+
+inline std::set<std::pair<int, int>> active_fault_edges(
+    const std::set<std::pair<int, int>>& fault_edges,
+    const std::vector<EdgeFaultWindow>& fault_windows,
+    double ready_time) {
+  std::set<std::pair<int, int>> active = fault_edges;
+  for (const auto& window : fault_windows) {
+    if (window.fault_start <= ready_time && ready_time < window.repair_time) {
+      active.insert({window.start, window.end});
+    }
+  }
+  return active;
+}
 
 inline double clip_scale(double value, double scale, double limit) {
   const double scaled = value / scale;
@@ -262,7 +290,8 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
     const TaskStream& tasks,
     const EdgeScoreModel* model,
     const EdgeScoreReplayConfig& config = {},
-    const std::set<std::pair<int, int>>& fault_edges = {}) {
+    const std::set<std::pair<int, int>>& fault_edges = {},
+    const std::vector<EdgeFaultWindow>& fault_windows = {}) {
   if (config.hold_seconds <= 0.0) {
     throw std::invalid_argument("hold_seconds must be positive");
   }
@@ -272,6 +301,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
   if (config.max_decisions_per_task <= 0) {
     throw std::invalid_argument("max_decisions_per_task must be positive");
   }
+  detail::validate_fault_windows(fault_windows);
 
   ReservationTable node_reservations;
   EdgeReservationTable edge_reservations;
@@ -310,6 +340,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
     bool counted_unplanned = false;
 
     for (int decision = 0; decision < config.max_decisions_per_task && !planned; ++decision) {
+      const auto active_faults = detail::active_fault_edges(fault_edges, fault_windows, ready_time);
       const auto candidates = detail::build_candidates(graph,
                                                        shield,
                                                        task,
@@ -317,7 +348,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
                                                        ready_time,
                                                        node_reservations,
                                                        edge_reservations,
-                                                       fault_edges,
+                                                       active_faults,
                                                        config.hold_seconds);
       std::vector<std::vector<double>> features;
       std::vector<bool> mask;
@@ -507,16 +538,20 @@ inline EdgeScoreReplayResult run_edge_score_replay(
     const TaskStream& tasks,
     const EdgeScoreModel& model,
     const EdgeScoreReplayConfig& config = {},
-    const std::set<std::pair<int, int>>& fault_edges = {}) {
-  return run_edge_score_replay_with_optional_model(graph, tasks, &model, config, fault_edges);
+    const std::set<std::pair<int, int>>& fault_edges = {},
+    const std::vector<EdgeFaultWindow>& fault_windows = {}) {
+  return run_edge_score_replay_with_optional_model(
+      graph, tasks, &model, config, fault_edges, fault_windows);
 }
 
 inline EdgeScoreReplayResult run_edge_score_fallback_replay(
     const Graph& graph,
     const TaskStream& tasks,
     const EdgeScoreReplayConfig& config = {},
-    const std::set<std::pair<int, int>>& fault_edges = {}) {
-  return run_edge_score_replay_with_optional_model(graph, tasks, nullptr, config, fault_edges);
+    const std::set<std::pair<int, int>>& fault_edges = {},
+    const std::vector<EdgeFaultWindow>& fault_windows = {}) {
+  return run_edge_score_replay_with_optional_model(
+      graph, tasks, nullptr, config, fault_edges, fault_windows);
 }
 
 }  // namespace czr005::ics

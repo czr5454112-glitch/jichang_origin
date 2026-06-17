@@ -137,6 +137,16 @@ def main() -> None:
     assert fallback_replay["decision_count"] > 0
     assert fallback_replay["post_shield_conflicts"] == 0
 
+    repair_window_replay = czr005_cpp.edge_score_native_fallback_replay_summary(
+        str(LEGACY / "map2.txt"),
+        str(LEGACY / "inputdata.txt"),
+        max_tasks=2,
+        fault_windows=[(16, 17, 0.0, 9000.0)],
+    )
+    assert repair_window_replay["planned_count"] + repair_window_replay["unplanned_count"] == 2
+    assert repair_window_replay["decision_count"] > 0
+    assert repair_window_replay["post_shield_conflicts"] == 0
+
 
 if __name__ == "__main__":
     main()
