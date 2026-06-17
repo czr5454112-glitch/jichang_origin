@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from czr005.baselines import SIPPPlanner
+from czr005.baselines import RollingHorizonBaseline, SIPPPlanner
 from czr005.sim_py import AStarPlanner, IcsGraph, ReservationTable, SimEdge, SimNode
+from czr005.sim_py.task_stream import TaskLeg
 
 
 def _line_graph() -> IcsGraph:
@@ -41,3 +42,49 @@ def test_sipp_waits_for_next_safe_node_interval() -> None:
 def test_sipp_respects_fault_edges() -> None:
     route = SIPPPlanner(_line_graph()).plan(0, 2, fault_edges={(1, 2)})
     assert route == []
+
+
+def _task(segment_id: str, task_id: int, pass_time: float, std: float) -> TaskLeg:
+    return TaskLeg(
+        segment_id=segment_id,
+        task_id=task_id,
+        pallet_id=task_id,
+        pass_time=pass_time,
+        std=std,
+        start=0,
+        goal=2,
+        original_start=0,
+        original_goal=2,
+        original_entry_time=pass_time,
+        leg="direct",
+        early_bag_split=False,
+        source_line=task_id + 1,
+    )
+
+
+def test_rolling_horizon_prioritizes_deadline_slack_and_reserves_routes() -> None:
+    tasks = (
+        _task("loose", 1, pass_time=0.1, std=100.0),
+        _task("urgent", 2, pass_time=0.0, std=20.0),
+    )
+
+    result = RollingHorizonBaseline(_line_graph(), horizon_seconds=60.0).run_episode(tasks)
+
+    assert result.metrics.planned_count == 2
+    assert result.metrics.unplanned_count == 0
+    assert result.metrics.reservation_conflicts == 0
+    assert [event["segment_id"] for event in result.events] == ["urgent", "loose"]
+    assert result.routes["urgent"][1].t1 == 2.0
+    assert result.routes["loose"][1].t1 > result.routes["urgent"][1].t2
+
+
+def test_rolling_horizon_reports_fault_unplanned() -> None:
+    result = RollingHorizonBaseline(_line_graph()).run_episode(
+        (_task("faulted", 3, pass_time=0.0, std=20.0),),
+        fault_edges={(1, 2)},
+    )
+
+    assert result.metrics.planned_count == 0
+    assert result.metrics.unplanned_count == 1
+    assert result.events[0]["event"] == "unplanned"
+    assert result.events[0]["baseline"] == "rolling_horizon_sipp"

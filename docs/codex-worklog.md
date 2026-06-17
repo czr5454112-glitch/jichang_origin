@@ -120,3 +120,14 @@
 - Tests / validation: scaffold Python pytest passed `8 passed`; target Python pytest passed `8 passed`; target CTest passed 2/2.
 - Safety / parity notes: This is Python-only and node-reservation focused. Edge capacity/headway, buffers, merge groups, C++ parity, and event replay remain pending.
 - Follow-up: continue Phase2 baseline expansion.
+
+## 2026-06-17 00:20 - Phase2C rolling-horizon SIPP baseline
+
+- Request: Continue Phase2 baseline expansion toward rolling-horizon prioritized planning.
+- Branch: `main`.
+- Files changed: added `src/czr005/baselines/rolling_horizon.py`, exported it from `czr005.baselines`, expanded `tests/test_phase2_baselines.py`, and added `outputs/reports/phase2c_rolling_horizon_baseline_report.md`.
+- Commands run: Python pytest in scaffold.
+- Key observations: The baseline batches tasks by pass-time horizon, prioritizes tighter deadline slack, plans with SIPP against shared reservations, and reports unplanned tasks when fault edges block the only route.
+- Tests / validation: scaffold Python pytest passed `10 passed`; target Python pytest passed `10 passed`; target CTest passed 2/2.
+- Safety / parity notes: This is a Python skeleton, not full active-bag replanning or C++ runtime parity. Edge capacity/headway and merge-aware priority remain pending.
+- Follow-up: add broader baseline replay diagnostics.
