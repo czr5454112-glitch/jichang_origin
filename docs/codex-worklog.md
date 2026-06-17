@@ -318,3 +318,14 @@
 - Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `31 passed`; Phase8 native C++ replay smoke passed.
 - Safety / parity notes: This covers model-unavailable fallback for the compact native replay only. The full high-throughput event simulator, larger parity checks, and heldout-map validation remain pending.
 - Follow-up: compare compact C++ replay against Python environment metrics one-for-one on larger windows, then move the event scheduler itself into C++.
+
+## 2026-06-17 09:45 - Phase8 native C++ / Python replay parity diagnostic
+
+- Request: Verify that the compact native C++ EdgeScore replay is not only internally safe, but also aligned with the existing Python junction environment on identical windows.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase8_native_cpp_python_parity.py` and generated `outputs/tables/phase8_native_cpp_python_parity.csv` plus `outputs/reports/phase8_native_cpp_python_parity_report.md`.
+- Commands run: Phase8 native C++ / Python parity diagnostic.
+- Key observations: The loaded EdgeScore runtime policy matches Python environment metrics exactly on four real map/task windows: planned/unplanned counts, decision counts, mean travel time, and post-shield conflicts all match within tolerance. The shortest-safe fallback remains conflict-free on both sides but does not have strict metric parity because compact C++ fallback and Python fallback differ in tie-breaking and goal-node reservation handling.
+- Tests / validation: Phase8 native C++ / Python parity script passed with `4/4` EdgeScore strict parity rows and fallback safety diagnostic PASS.
+- Safety / parity notes: This strengthens Phase8 compact replay evidence, but it is not full high-throughput C++ event-simulator parity and does not cover repair schedules or heldout maps.
+- Follow-up: align fallback semantics if fallback metric parity becomes a claim, expand to larger/randomized windows, then replace the compact replay with the full C++ event scheduler.
