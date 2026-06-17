@@ -230,3 +230,14 @@
 - Tests / validation: target Python pytest passed `25 passed`; Phase5 smoke passed with shadow unsafe rate `0.000000`, DAgger closed-loop planned `8/8`, and DAgger closed-loop conflicts `0`; target CTest passed 2/2.
 - Safety / parity notes: This is still a small same-map smoke, not a heldout or paper-grade evaluation. It is enough to unblock larger Phase5 comparisons and then cautious Phase6 RL fine-tuning.
 - Follow-up: add heldout split metadata and larger shadow/closed-loop sweeps before claiming learning-policy advantage.
+
+## 2026-06-17 05:25 - Phase5 task-window validation sweep
+
+- Request: Continue hardening Phase5 before Phase6 by adding heldout task-window evidence for the DAgger BC+shield smoke policy.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase5_validation_sweep.py`, added `tests/test_phase5_validation.py`, and generated `outputs/tables/phase5_validation_sweep_metrics.csv` plus `outputs/reports/phase5_validation_sweep_report.md`.
+- Commands run: target Python pytest, target Phase5 validation sweep, and target CTest.
+- Key observations: Training used the base teacher manifest plus the DAgger smoke manifest. On `train_first8`, `heldout_next8`, and `combined_first16`, DAgger BC+shield matched the A*-guided baseline planned counts (`8/8`, `7/8`, `15/16`) with zero post-shield conflicts.
+- Tests / validation: target Python pytest passed `26 passed`; Phase5 validation sweep passed all task-window gates; target CTest passed 2/2.
+- Safety / parity notes: This is a same-map task-window heldout smoke, not a heldout-map, density, or fault validation. It reduces but does not eliminate overfit risk before Phase6.
+- Follow-up: add heldout-map/synthetic-map validation, fault/density sweeps, and Phase2 baseline comparisons on larger windows before strong learning claims.
