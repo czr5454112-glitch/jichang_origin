@@ -29,6 +29,7 @@ using czr005::ics::SafetyStatus;
 using czr005::ics::compute_episode_metrics;
 using czr005::ics::read_legacy_inputdata;
 using czr005::ics::read_legacy_map2;
+using czr005::ics::run_edge_score_fallback_replay;
 using czr005::ics::run_edge_score_replay;
 using czr005::ics::TaskLeg;
 using czr005::ics::TaskStream;
@@ -258,6 +259,11 @@ int main() {
   test.check(replay_result.unplanned_count == 0, "native edge-score replay should not leave sample tasks unplanned");
   test.check(replay_result.decision_count >= 4, "native edge-score replay should execute sample decisions");
   test.check(replay_result.post_shield_conflicts == 0, "native edge-score replay should stay conflict-free");
+  const auto fallback_replay_result = run_edge_score_fallback_replay(graph, replay_tasks, replay_config);
+  test.check(fallback_replay_result.planned_count == 2,
+             "native fallback replay should plan both sample tasks without a model");
+  test.check(fallback_replay_result.post_shield_conflicts == 0,
+             "native fallback replay should stay conflict-free without a model");
 
   const auto legacy = read_legacy_map2(std::string(CZR005_SOURCE_DIR) +
                                        "/legacy/jichang_origin_readonly/map2.txt");

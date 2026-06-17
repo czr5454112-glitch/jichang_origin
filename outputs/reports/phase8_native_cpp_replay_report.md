@@ -10,12 +10,16 @@ The replay is intentionally compact and sequential. It is a native-runtime gate,
 
 ## Metrics
 
-| Case | Fault edges | Tasks | Planned | Unplanned | Decisions | Conflicts | Mean travel | Decisions/s |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| native_first8 | none | 8 | 8 | 0 | 78 | 0 | 49.750000 | 4658.25 |
-| native_first16 | none | 16 | 16 | 0 | 173 | 0 | 57.012500 | 4729.71 |
-| native_fault_alt_route_first8 | 16->17 | 8 | 8 | 0 | 74 | 0 | 51.850000 | 3000.20 |
-| native_fault_goal_exit_first8 | 28->47 | 8 | 8 | 0 | 186 | 0 | 146.750000 | 2974.05 |
+| Case | Policy | Fault edges | Tasks | Planned | Unplanned | Decisions | Conflicts | Mean travel | Decisions/s |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| native_first8 | edge_score_runtime | none | 8 | 8 | 0 | 78 | 0 | 49.750000 | 4081.40 |
+| native_first8 | shortest_safe_fallback | none | 8 | 8 | 0 | 73 | 0 | 55.225000 | 4216.75 |
+| native_first16 | edge_score_runtime | none | 16 | 16 | 0 | 173 | 0 | 57.012500 | 3698.24 |
+| native_first16 | shortest_safe_fallback | none | 16 | 16 | 0 | 198 | 0 | 58.800000 | 4029.31 |
+| native_fault_alt_route_first8 | edge_score_runtime | 16->17 | 8 | 8 | 0 | 74 | 0 | 51.850000 | 3243.37 |
+| native_fault_alt_route_first8 | shortest_safe_fallback | 16->17 | 8 | 8 | 0 | 73 | 0 | 55.225000 | 3226.03 |
+| native_fault_goal_exit_first8 | edge_score_runtime | 28->47 | 8 | 8 | 0 | 186 | 0 | 146.750000 | 2786.10 |
+| native_fault_goal_exit_first8 | shortest_safe_fallback | 28->47 | 8 | 8 | 0 | 155 | 0 | 132.575000 | 2994.12 |
 
 CSV: `outputs/tables/phase8_native_cpp_replay.csv`
 
@@ -25,6 +29,7 @@ CSV: `outputs/tables/phase8_native_cpp_replay.csv`
 - all configured task windows accounted for: PASS
 - zero post-shield conflicts: PASS
 - at least one task planned by native replay: PASS
+- model-unavailable fallback replay: PASS
 - full high-throughput event simulator: not covered
 
 ## Remaining Work

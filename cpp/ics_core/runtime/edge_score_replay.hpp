@@ -229,10 +229,10 @@ inline double earliest_safe_node_start(const ReservationTable& reservations,
 
 }  // namespace detail
 
-inline EdgeScoreReplayResult run_edge_score_replay(
+inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
     const Graph& graph,
     const TaskStream& tasks,
-    const EdgeScoreModel& model,
+    const EdgeScoreModel* model,
     const EdgeScoreReplayConfig& config = {},
     const std::set<std::pair<int, int>>& fault_edges = {}) {
   if (config.hold_seconds <= 0.0) {
@@ -303,10 +303,14 @@ inline EdgeScoreReplayResult run_edge_score_replay(
       }
 
       int chosen_position = -1;
-      try {
-        chosen_position = model.predict(features, mask);
-      } catch (const std::invalid_argument&) {
+      if (model == nullptr) {
         chosen_position = detail::fallback_candidate_index(candidates, task.goal);
+      } else {
+        try {
+          chosen_position = model->predict(features, mask);
+        } catch (const std::invalid_argument&) {
+          chosen_position = detail::fallback_candidate_index(candidates, task.goal);
+        }
       }
       if (chosen_position < 0 || static_cast<std::size_t>(chosen_position) >= candidates.size()) {
         ++result.unplanned_count;
@@ -378,6 +382,23 @@ inline EdgeScoreReplayResult run_edge_score_replay(
       node_reservations.conflict_count() +
       edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds);
   return result;
+}
+
+inline EdgeScoreReplayResult run_edge_score_replay(
+    const Graph& graph,
+    const TaskStream& tasks,
+    const EdgeScoreModel& model,
+    const EdgeScoreReplayConfig& config = {},
+    const std::set<std::pair<int, int>>& fault_edges = {}) {
+  return run_edge_score_replay_with_optional_model(graph, tasks, &model, config, fault_edges);
+}
+
+inline EdgeScoreReplayResult run_edge_score_fallback_replay(
+    const Graph& graph,
+    const TaskStream& tasks,
+    const EdgeScoreReplayConfig& config = {},
+    const std::set<std::pair<int, int>>& fault_edges = {}) {
+  return run_edge_score_replay_with_optional_model(graph, tasks, nullptr, config, fault_edges);
 }
 
 }  // namespace czr005::ics

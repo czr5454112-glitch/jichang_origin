@@ -39,6 +39,8 @@ def write_report(rows: list[dict[str, float | int | str]]) -> None:
         for row in rows
     )
     any_planned = any(int(row["planned_count"]) > 0 for row in rows)
+    fallback_rows = [row for row in rows if row["policy"] == "shortest_safe_fallback"]
+    fallback_ok = bool(fallback_rows) and all(int(row["post_shield_conflicts"]) == 0 for row in fallback_rows)
     lines = [
         "# Phase8 Native C++ EdgeScore Replay Smoke",
         "",
@@ -52,12 +54,12 @@ def write_report(rows: list[dict[str, float | int | str]]) -> None:
         "",
         "## Metrics",
         "",
-        "| Case | Fault edges | Tasks | Planned | Unplanned | Decisions | Conflicts | Mean travel | Decisions/s |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+        "| Case | Policy | Fault edges | Tasks | Planned | Unplanned | Decisions | Conflicts | Mean travel | Decisions/s |",
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in rows:
         lines.append(
-            "| {case} | {fault_edges} | {max_tasks} | {planned_count} | {unplanned_count} | "
+            "| {case} | {policy} | {fault_edges} | {max_tasks} | {planned_count} | {unplanned_count} | "
             "{decision_count} | {post_shield_conflicts} | {mean_travel_time:.6f} | "
             "{decisions_per_second:.2f} |".format(**row)
         )
@@ -72,6 +74,7 @@ def write_report(rows: list[dict[str, float | int | str]]) -> None:
             "- all configured task windows accounted for: PASS" if no_missing_tasks else "- all configured task windows accounted for: FAIL",
             "- zero post-shield conflicts: PASS" if no_conflicts else "- zero post-shield conflicts: FAIL",
             "- at least one task planned by native replay: PASS" if any_planned else "- at least one task planned by native replay: FAIL",
+            "- model-unavailable fallback replay: PASS" if fallback_ok else "- model-unavailable fallback replay: FAIL",
             "- full high-throughput event simulator: not covered",
             "",
             "## Remaining Work",
@@ -97,31 +100,48 @@ def main() -> None:
     )
     rows: list[dict[str, float | int | str]] = []
     for case_name, max_tasks, fault_edges in cases:
-        summary = czr005_cpp.edge_score_native_replay_summary(
-            str(LEGACY / "map2.txt"),
-            str(LEGACY / "inputdata.txt"),
-            str(MODEL_PATH),
-            max_tasks=max_tasks,
-            fault_edges=fault_edges,
-            max_decisions_per_task=128,
+        policies = (
+            (
+                "edge_score_runtime",
+                czr005_cpp.edge_score_native_replay_summary(
+                    str(LEGACY / "map2.txt"),
+                    str(LEGACY / "inputdata.txt"),
+                    str(MODEL_PATH),
+                    max_tasks=max_tasks,
+                    fault_edges=fault_edges,
+                    max_decisions_per_task=128,
+                ),
+            ),
+            (
+                "shortest_safe_fallback",
+                czr005_cpp.edge_score_native_fallback_replay_summary(
+                    str(LEGACY / "map2.txt"),
+                    str(LEGACY / "inputdata.txt"),
+                    max_tasks=max_tasks,
+                    fault_edges=fault_edges,
+                    max_decisions_per_task=128,
+                ),
+            ),
         )
-        rows.append(
-            {
-                "case": case_name,
-                "fault_edges": _format_faults(fault_edges),
-                "max_tasks": max_tasks,
-                "planned_count": int(summary["planned_count"]),
-                "unplanned_count": int(summary["unplanned_count"]),
-                "decision_count": int(summary["decision_count"]),
-                "shield_blocks": int(summary["shield_blocks"]),
-                "unsafe_proposals": int(summary["unsafe_proposals"]),
-                "post_shield_conflicts": int(summary["post_shield_conflicts"]),
-                "mean_travel_time": float(summary["mean_travel_time"]),
-                "makespan": float(summary["makespan"]),
-                "elapsed_seconds": float(summary["elapsed_seconds"]),
-                "decisions_per_second": float(summary["decisions_per_second"]),
-            }
-        )
+        for policy_name, summary in policies:
+            rows.append(
+                {
+                    "case": case_name,
+                    "policy": policy_name,
+                    "fault_edges": _format_faults(fault_edges),
+                    "max_tasks": max_tasks,
+                    "planned_count": int(summary["planned_count"]),
+                    "unplanned_count": int(summary["unplanned_count"]),
+                    "decision_count": int(summary["decision_count"]),
+                    "shield_blocks": int(summary["shield_blocks"]),
+                    "unsafe_proposals": int(summary["unsafe_proposals"]),
+                    "post_shield_conflicts": int(summary["post_shield_conflicts"]),
+                    "mean_travel_time": float(summary["mean_travel_time"]),
+                    "makespan": float(summary["makespan"]),
+                    "elapsed_seconds": float(summary["elapsed_seconds"]),
+                    "decisions_per_second": float(summary["decisions_per_second"]),
+                }
+            )
 
     write_table(rows)
     write_report(rows)
@@ -134,7 +154,7 @@ def main() -> None:
 
     print(
         "phase8_native_cpp_replay cases={} planned_total={} conflicts={}".format(
-            len(rows),
+            len(cases),
             sum(int(row["planned_count"]) for row in rows),
             sum(int(row["post_shield_conflicts"]) for row in rows),
         )

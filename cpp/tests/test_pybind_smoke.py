@@ -104,6 +104,16 @@ def main() -> None:
     assert native_replay["decision_count"] > 0
     assert native_replay["post_shield_conflicts"] == 0
 
+    fallback_replay = czr005_cpp.edge_score_native_fallback_replay_summary(
+        str(LEGACY / "map2.txt"),
+        str(LEGACY / "inputdata.txt"),
+        max_tasks=2,
+    )
+    assert fallback_replay["planned_count"] + fallback_replay["unplanned_count"] == 2
+    assert fallback_replay["planned_count"] >= 1
+    assert fallback_replay["decision_count"] > 0
+    assert fallback_replay["post_shield_conflicts"] == 0
+
 
 if __name__ == "__main__":
     main()

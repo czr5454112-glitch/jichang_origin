@@ -307,3 +307,14 @@
 - Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `31 passed`; Phase8 native C++ replay smoke passed.
 - Safety / parity notes: This is the first native C++ replay loop, but it is still compact/sequential and not the final high-throughput event simulator. Feature/metric parity with the Python environment needs larger one-for-one checks.
 - Follow-up: replace the compact replay with a full C++ event simulator, align replay features/metrics against Python on larger windows, and add repair-event plus heldout-map validation.
+
+## 2026-06-17 09:25 - Phase8 native C++ replay fallback gate
+
+- Request: Cover the Phase8 runtime requirement that execution must fall back safely when the learned model is unavailable.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: extended `cpp/ics_core/runtime/edge_score_replay.hpp` with an optional-model replay path and `run_edge_score_fallback_replay`, exposed `edge_score_native_fallback_replay_summary` through pybind, expanded C++/pybind smoke tests, updated `cpp/ics_core/README.md`, and regenerated the Phase8 native replay CSV/report with both `edge_score_runtime` and `shortest_safe_fallback` rows.
+- Commands run: CMake build, target CTest, target Python pytest, and Phase8 native C++ replay smoke.
+- Key observations: The native fallback replay uses the same C++ candidate construction, shield, and reservations without loading a model. Across the four small real map/task windows, EdgeScore runtime plus fallback rows accounted for `80/80` configured tasks and reported zero post-shield conflicts.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `31 passed`; Phase8 native C++ replay smoke passed.
+- Safety / parity notes: This covers model-unavailable fallback for the compact native replay only. The full high-throughput event simulator, larger parity checks, and heldout-map validation remain pending.
+- Follow-up: compare compact C++ replay against Python environment metrics one-for-one on larger windows, then move the event scheduler itself into C++.

@@ -10,6 +10,7 @@ Implemented so far:
 - initial junction shield checks
 - header-only MLP edge-score inference and text runtime loader
 - compact native C++ EdgeScore replay smoke
+- model-unavailable shortest-safe fallback for compact native replay
 - pybind smoke boundary
 
 The full high-throughput C++ event simulator, C++ SIPP baseline, C++ rolling-horizon baseline, recursive PIBT-style resolver, and broad runtime replay validation are still pending.
