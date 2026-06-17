@@ -15,7 +15,7 @@ This smoke trains the first minimal MLP-EdgeScore behavior-cloning baseline on t
 
 ## Metrics
 
-- Final training loss: `0.081198`
+- Final training loss: `0.078525`
 - Final training top1: `0.974359`
 - Safe masked eval top1: `0.974359`
 

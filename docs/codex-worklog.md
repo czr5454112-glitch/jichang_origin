@@ -205,6 +205,17 @@
 - Files changed: added `src/czr005/models/edge_score.py` and exports, added `tests/test_phase4_bc_edge_score.py`, added `scripts/train/train_phase4_bc_smoke.py`, generated `outputs/tables/phase4_bc_smoke_history.csv` and `outputs/reports/phase4_bc_smoke_report.md`. The local model artifact is written to ignored `artifacts/models/phase4_mlp_edge_score_smoke.json`.
 - Commands run: target Python pytest, target Phase4 BC smoke, and target CTest.
 - Key observations: A small pure-Python MLP-EdgeScore model trains on the 78-slice teacher manifest and reaches safe-masked top1 `0.974359` on the same smoke set. The implementation intentionally avoids numpy matrix operations after a Windows native `0xc06d007f` crash occurred during an initial numpy version of the smoke.
-- Tests / validation: target Python pytest passed `23 passed`; Phase4 BC smoke passed with final loss `0.081198`; target CTest passed 2/2.
+- Tests / validation: target Python pytest passed `23 passed`; Phase4 BC smoke passed with final loss `0.078525`; target CTest passed 2/2.
 - Safety / parity notes: This is not a validated learning result. It has no train/validation split, no shadow replay, no closed-loop BC+shield run, and no comparison against Phase2 baselines yet.
 - Follow-up: add Phase5 shadow replay for the BC scorer or expand teacher data and add split metadata first.
+
+## 2026-06-17 04:05 - Phase5 BC shadow and closed-loop smoke
+
+- Request: Continue from Phase4 BC into Phase5 shadow mode and a first shielded closed-loop smoke.
+- Branch: `main`.
+- Files changed: added `src/czr005/eval/shadow.py` and exports, added `tests/test_phase5_shadow.py`, added `scripts/eval/run_phase5_shadow_smoke.py`, generated `outputs/tables/phase5_shadow_smoke_metrics.csv` and `outputs/reports/phase5_shadow_and_closed_loop_smoke.md`, and updated the Phase4 BC history/report after changing BC training to penalize unsafe candidates in the raw softmax.
+- Commands run: target Python pytest, target Phase4 BC smoke, target Phase5 shadow smoke, and target CTest.
+- Key observations: Shadow replay over the 8-task smoke produced 78 decisions, 2 disagreements with the A*-guided baseline, unsafe proposal rate `0.000000`, and zero post-shield conflicts. The safe-masked BC+shield closed-loop replay stayed conflict-free but planned only `6/8` task legs, so it is not yet competitive with the baseline.
+- Tests / validation: target Python pytest passed `24 passed`; Phase4 BC smoke passed with final loss `0.078525` and safe-masked top1 `0.974359`; Phase5 smoke passed with closed-loop conflicts `0`; target CTest passed 2/2.
+- Safety / parity notes: This is a shadow/closed-loop plumbing smoke. It does not yet include heldout data, deadline-critical mistake analysis, larger task sets, faults, density sweeps, or Phase2 baseline comparisons.
+- Follow-up: expand teacher data with splits and run larger Phase5 shadow/closed-loop comparisons before any RL fine-tuning.

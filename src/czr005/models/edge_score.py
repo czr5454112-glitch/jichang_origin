@@ -193,14 +193,12 @@ def _loss_and_grads(
         sum(hidden_value * weight for hidden_value, weight in zip(hidden, model.w2)) + model.b2
         for hidden in hidden_rows
     ]
-    scores = [score if allowed else -1.0e9 for score, allowed in zip(raw_scores, mask)]
-    probs = _softmax(scores)
+    probs = _softmax(raw_scores)
     loss = -math.log(max(probs[target_position], 1.0e-12))
     prediction = max(range(len(probs)), key=lambda index: probs[index])
 
     grad_scores = list(probs)
     grad_scores[target_position] -= 1.0
-    grad_scores = [grad if allowed else 0.0 for grad, allowed in zip(grad_scores, mask)]
 
     hidden_dim = len(model.w2)
     feature_dim = len(features[0])
