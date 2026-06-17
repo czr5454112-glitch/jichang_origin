@@ -131,3 +131,14 @@
 - Tests / validation: scaffold Python pytest passed `10 passed`; target Python pytest passed `10 passed`; target CTest passed 2/2.
 - Safety / parity notes: This is a Python skeleton, not full active-bag replanning or C++ runtime parity. Edge capacity/headway and merge-aware priority remain pending.
 - Follow-up: add broader baseline replay diagnostics.
+
+## 2026-06-17 00:40 - Phase2 baseline smoke replay
+
+- Request: Add a reproducible Phase2 baseline/shield smoke after the rolling-horizon skeleton.
+- Branch: `main`.
+- Files changed: added `scripts/eval/run_phase2_baseline_smoke.py`, generated `outputs/tables/phase2_baseline_smoke_metrics.csv`, and generated `outputs/reports/phase2_baseline_and_shield_report.md`.
+- Commands run: Phase2 baseline smoke in scaffold.
+- Key observations: On the first 128 expanded task legs, reference A* planned 113 and left 15 unplanned; rolling-horizon SIPP planned 128/128. Both runs reported zero reservation conflicts.
+- Tests / validation: scaffold script passed; target script passed; target Python pytest passed `10 passed`; target CTest passed 2/2.
+- Safety / parity notes: This is still a smoke replay, not full multi-seed/fault/density evaluation. It covers node reservation safety but not edge capacity/headway or merge groups.
+- Follow-up: continue Phase2 baseline expansion with edge/headway-aware SIPP or PIBT-style one-step resolver.
