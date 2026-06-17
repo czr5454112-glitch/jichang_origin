@@ -9,7 +9,7 @@ from czr005.baselines.sipp import SIPPPlanner, SIPPNode
 from czr005.sim_py.event_sim import EpisodeResult
 from czr005.sim_py.graph import IcsGraph
 from czr005.sim_py.metrics import compute_episode_metrics
-from czr005.sim_py.reservation import ReservationTable
+from czr005.sim_py.reservation import EdgeReservationTable, ReservationTable
 from czr005.sim_py.task_stream import TaskLeg, TaskStream
 
 
@@ -33,12 +33,20 @@ class RollingHorizonBaseline:
         graph: IcsGraph,
         horizon_seconds: float = 300.0,
         reservations: ReservationTable | None = None,
+        edge_reservations: EdgeReservationTable | None = None,
+        edge_capacity: int = 1,
+        edge_headway_seconds: float = 0.0,
     ) -> None:
         if horizon_seconds <= 0.0:
             raise ValueError("horizon_seconds must be positive")
+        if edge_capacity <= 0:
+            raise ValueError("edge_capacity must be positive")
         self.graph = graph
         self.horizon_seconds = horizon_seconds
         self.reservations = reservations or ReservationTable()
+        self.edge_reservations = edge_reservations or EdgeReservationTable()
+        self.edge_capacity = edge_capacity
+        self.edge_headway_seconds = edge_headway_seconds
         self.planner = SIPPPlanner(graph)
 
     def run_episode(
@@ -65,11 +73,15 @@ class RollingHorizonBaseline:
                     goal=task.goal,
                     start_time=task.pass_time,
                     reservations=self.reservations,
+                    edge_reservations=self.edge_reservations,
+                    edge_capacity=self.edge_capacity,
+                    edge_headway_seconds=self.edge_headway_seconds,
                     fault_edges=fault_edges,
                     task_id=task.task_id,
                 )
                 if route:
                     self.reservations.add_route(task.task_id, route)
+                    self._reserve_route_edges(task.task_id, route)
                     routes[task.segment_id] = route
                     events.append(
                         {
@@ -140,3 +152,15 @@ class RollingHorizonBaseline:
         if current:
             batches.append(HorizonBatch(current_start, current_end, tuple(current)))
         return tuple(batches)
+
+    def _reserve_route_edges(self, task_id: int, route: list[SIPPNode]) -> None:
+        for left, right in zip(route, route[1:]):
+            if left.location == right.location:
+                continue
+            self.edge_reservations.reserve(
+                task_id=task_id,
+                start_node=left.location,
+                end_node=right.location,
+                start=left.t2,
+                end=right.t1,
+            )

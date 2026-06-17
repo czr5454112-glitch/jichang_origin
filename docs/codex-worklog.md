@@ -164,3 +164,14 @@
 - Tests / validation: target Python pytest passed `14 passed`; target CTest passed 2/2.
 - Safety / parity notes: Rolling-horizon replay does not yet emit edge reservations, merge groups and buffers are still pending, and C++ SIPP parity remains pending.
 - Follow-up: integrate edge reservations into rolling-horizon replay or add C++ SIPP parity.
+
+## 2026-06-17 01:55 - Phase2C rolling-horizon edge reservation integration
+
+- Request: Continue Phase2 by making the rolling-horizon SIPP replay use the edge capacity/headway machinery.
+- Branch: `main`.
+- Files changed: extended `src/czr005/baselines/rolling_horizon.py` with shared edge reservations and edge capacity/headway parameters, expanded `tests/test_phase2_baselines.py`, regenerated `outputs/tables/phase2_baseline_smoke_metrics.csv` and `outputs/reports/phase2_baseline_and_shield_report.md`, and added `outputs/reports/phase2c_edge_reservation_replay_report.md`.
+- Commands run: target Python pytest, target Phase2 baseline smoke, and target CTest.
+- Key observations: Rolling-horizon SIPP now reserves every traversed edge after a route is accepted, so later task legs wait for edge capacity or entry-headway availability before crossing.
+- Tests / validation: target Python pytest passed `16 passed`; target Phase2 baseline smoke passed with rolling-horizon SIPP planning `128/128` task legs and zero reservation conflicts; target CTest passed 2/2.
+- Safety / parity notes: This is still a deterministic Python replay baseline. Merge groups, buffer-capacity constraints, full active-bag replanning, recursive PIBT replay integration, C++ SIPP parity, and multi-seed density/fault sweeps remain pending.
+- Follow-up: move to merge/buffer constraints, C++ SIPP parity, or Phase3 learning-environment scaffolding.

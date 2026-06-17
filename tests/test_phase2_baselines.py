@@ -74,6 +74,20 @@ def _branch_graph() -> IcsGraph:
     )
 
 
+def _single_edge_goal_graph() -> IcsGraph:
+    return IcsGraph(
+        nodes={
+            0: SimNode(location=0, node_type=1, service_time=0.0, x=0, y=0, outgoing=(1,)),
+            1: SimNode(location=1, node_type=2, service_time=0.0, x=1, y=0, outgoing=()),
+        },
+        edges={(0, 1): SimEdge(start=0, end=1, length=5.0, speed=2.5)},
+        heuristic_time=((0.0, 2.0), (2.0, 0.0)),
+        agv_length=1.0,
+        safe_length=1.0,
+        fault_threshold=1.0,
+    )
+
+
 def test_sipp_waits_for_next_safe_node_interval() -> None:
     graph = _line_graph()
     reservations = ReservationTable()
@@ -130,7 +144,7 @@ def test_sipp_waits_for_edge_headway() -> None:
     assert not edge_reservations.has_headway_conflict(0, 1, route[1].t1 - 2.0, 2.0, task_id=1)
 
 
-def _task(segment_id: str, task_id: int, pass_time: float, std: float) -> TaskLeg:
+def _task(segment_id: str, task_id: int, pass_time: float, std: float, goal: int = 2) -> TaskLeg:
     return TaskLeg(
         segment_id=segment_id,
         task_id=task_id,
@@ -138,9 +152,9 @@ def _task(segment_id: str, task_id: int, pass_time: float, std: float) -> TaskLe
         pass_time=pass_time,
         std=std,
         start=0,
-        goal=2,
+        goal=goal,
         original_start=0,
-        original_goal=2,
+        original_goal=goal,
         original_entry_time=pass_time,
         leg="direct",
         early_bag_split=False,
@@ -174,6 +188,41 @@ def test_rolling_horizon_reports_fault_unplanned() -> None:
     assert result.metrics.unplanned_count == 1
     assert result.events[0]["event"] == "unplanned"
     assert result.events[0]["baseline"] == "rolling_horizon_sipp"
+
+
+def test_rolling_horizon_reserves_edge_capacity() -> None:
+    tasks = (
+        _task("urgent", 1, pass_time=0.0, std=10.0, goal=1),
+        _task("loose", 2, pass_time=0.1, std=20.0, goal=1),
+    )
+
+    result = RollingHorizonBaseline(
+        _single_edge_goal_graph(),
+        horizon_seconds=60.0,
+        edge_capacity=1,
+    ).run_episode(tasks)
+
+    assert result.metrics.planned_count == 2
+    assert result.routes["urgent"][1].t1 == 2.0
+    assert result.routes["loose"][1].t1 >= 4.0
+
+
+def test_rolling_horizon_reserves_edge_headway() -> None:
+    tasks = (
+        _task("urgent", 1, pass_time=0.0, std=10.0, goal=1),
+        _task("loose", 2, pass_time=0.1, std=20.0, goal=1),
+    )
+
+    result = RollingHorizonBaseline(
+        _single_edge_goal_graph(),
+        horizon_seconds=60.0,
+        edge_capacity=2,
+        edge_headway_seconds=2.0,
+    ).run_episode(tasks)
+
+    assert result.metrics.planned_count == 2
+    assert result.routes["urgent"][1].t1 == 2.0
+    assert result.routes["loose"][1].t1 >= 4.0
 
 
 def test_pibt_style_resolver_prioritizes_merge_conflict() -> None:
