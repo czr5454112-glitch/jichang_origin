@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from czr005.baselines import RollingHorizonBaseline, SIPPPlanner
+from czr005.baselines import AgentState, PIBTStyleOneStepResolver, RollingHorizonBaseline, SIPPPlanner
 from czr005.sim_py import AStarPlanner, IcsGraph, ReservationTable, SimEdge, SimNode
 from czr005.sim_py.task_stream import TaskLeg
 
@@ -17,6 +17,57 @@ def _line_graph() -> IcsGraph:
             (1, 2): SimEdge(start=1, end=2, length=5.0, speed=2.5),
         },
         heuristic_time=((0.0, 2.0, 4.0), (4.0, 0.0, 2.0), (4.0, 2.0, 0.0)),
+        agv_length=1.0,
+        safe_length=1.0,
+        fault_threshold=1.0,
+    )
+
+
+def _merge_graph() -> IcsGraph:
+    return IcsGraph(
+        nodes={
+            0: SimNode(location=0, node_type=1, service_time=0.0, x=0, y=0, outgoing=(2,)),
+            1: SimNode(location=1, node_type=1, service_time=0.0, x=0, y=1, outgoing=(2,)),
+            2: SimNode(location=2, node_type=4, service_time=1.0, x=1, y=0, outgoing=(3,)),
+            3: SimNode(location=3, node_type=2, service_time=0.0, x=2, y=0, outgoing=()),
+        },
+        edges={
+            (0, 2): SimEdge(start=0, end=2, length=5.0, speed=2.5),
+            (1, 2): SimEdge(start=1, end=2, length=5.0, speed=2.5),
+            (2, 3): SimEdge(start=2, end=3, length=5.0, speed=2.5),
+        },
+        heuristic_time=(
+            (0.0, 4.0, 2.0, 4.0),
+            (4.0, 0.0, 2.0, 4.0),
+            (4.0, 4.0, 0.0, 2.0),
+            (4.0, 4.0, 2.0, 0.0),
+        ),
+        agv_length=1.0,
+        safe_length=1.0,
+        fault_threshold=1.0,
+    )
+
+
+def _branch_graph() -> IcsGraph:
+    return IcsGraph(
+        nodes={
+            0: SimNode(location=0, node_type=1, service_time=0.0, x=0, y=0, outgoing=(1, 2)),
+            1: SimNode(location=1, node_type=4, service_time=0.0, x=1, y=0, outgoing=(3,)),
+            2: SimNode(location=2, node_type=4, service_time=0.0, x=1, y=1, outgoing=(3,)),
+            3: SimNode(location=3, node_type=2, service_time=0.0, x=2, y=0, outgoing=()),
+        },
+        edges={
+            (0, 1): SimEdge(start=0, end=1, length=5.0, speed=2.5),
+            (0, 2): SimEdge(start=0, end=2, length=5.0, speed=2.5),
+            (1, 3): SimEdge(start=1, end=3, length=5.0, speed=2.5),
+            (2, 3): SimEdge(start=2, end=3, length=7.5, speed=2.5),
+        },
+        heuristic_time=(
+            (0.0, 2.0, 3.0, 4.0),
+            (4.0, 0.0, 4.0, 2.0),
+            (4.0, 4.0, 0.0, 3.0),
+            (4.0, 2.0, 3.0, 0.0),
+        ),
         agv_length=1.0,
         safe_length=1.0,
         fault_threshold=1.0,
@@ -88,3 +139,30 @@ def test_rolling_horizon_reports_fault_unplanned() -> None:
     assert result.metrics.unplanned_count == 1
     assert result.events[0]["event"] == "unplanned"
     assert result.events[0]["baseline"] == "rolling_horizon_sipp"
+
+
+def test_pibt_style_resolver_prioritizes_merge_conflict() -> None:
+    actions = PIBTStyleOneStepResolver(_merge_graph()).resolve(
+        (
+            AgentState(task_id=1, current=0, goal=3, ready_time=0.0, deadline=100.0),
+            AgentState(task_id=2, current=1, goal=3, ready_time=0.0, deadline=20.0),
+        )
+    )
+
+    by_task = {action.task_id: action for action in actions}
+    assert [action.task_id for action in actions] == [2, 1]
+    assert by_task[2].action == "move"
+    assert by_task[2].next_node == 2
+    assert by_task[1].action == "hold"
+    assert by_task[1].reason == "no_safe_edge"
+
+
+def test_pibt_style_resolver_uses_fault_safe_alternative() -> None:
+    actions = PIBTStyleOneStepResolver(_branch_graph()).resolve(
+        (AgentState(task_id=3, current=0, goal=3, ready_time=0.0, deadline=20.0),),
+        fault_edges={(0, 1)},
+    )
+
+    assert len(actions) == 1
+    assert actions[0].action == "move"
+    assert actions[0].next_node == 2

@@ -142,3 +142,14 @@
 - Tests / validation: scaffold script passed; target script passed; target Python pytest passed `10 passed`; target CTest passed 2/2.
 - Safety / parity notes: This is still a smoke replay, not full multi-seed/fault/density evaluation. It covers node reservation safety but not edge capacity/headway or merge groups.
 - Follow-up: continue Phase2 baseline expansion with edge/headway-aware SIPP or PIBT-style one-step resolver.
+
+## 2026-06-17 01:05 - Phase2D PIBT-style one-step resolver
+
+- Request: Continue Phase2 baseline expansion with the PIBT/CS-PIBT-style one-step resolver from the master plan.
+- Branch: `main`.
+- Files changed: added `src/czr005/baselines/pibt.py`, exported it from `czr005.baselines`, expanded `tests/test_phase2_baselines.py`, updated `docs/safety-spec.md`, and added `outputs/reports/phase2d_pibt_style_resolver_report.md`.
+- Commands run: target Python pytest and target CTest.
+- Key observations: The resolver orders agents by deadline slack/waiting priority, avoids same-slice merge conflicts, falls back to hold when no safe edge is available, and selects a safe alternative when the preferred edge is faulted.
+- Tests / validation: target Python pytest passed `12 passed`; target CTest passed 2/2.
+- Safety / parity notes: This is a deterministic one-step baseline, not full recursive PIBT. Edge headway/capacity, merge groups, full replay integration, and C++ parity remain pending.
+- Follow-up: integrate one-step resolver into replay diagnostics or add edge/headway-aware SIPP.

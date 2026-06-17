@@ -30,5 +30,5 @@ CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 
 - SIPP with edge capacity/headway and merge constraints
 - rolling-horizon active-bag replanning rather than sequential task-leg replay
-- PIBT/CS-PIBT-style one-step resolver
+- PIBT/CS-PIBT-style resolver integration and recursive priority inheritance
 - larger multi-seed task-density/fault sweeps
