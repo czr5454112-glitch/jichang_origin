@@ -219,3 +219,14 @@
 - Tests / validation: target Python pytest passed `24 passed`; Phase4 BC smoke passed with final loss `0.078525` and safe-masked top1 `0.974359`; Phase5 smoke passed with closed-loop conflicts `0`; target CTest passed 2/2.
 - Safety / parity notes: This is a shadow/closed-loop plumbing smoke. It does not yet include heldout data, deadline-critical mistake analysis, larger task sets, faults, density sweeps, or Phase2 baseline comparisons.
 - Follow-up: expand teacher data with splits and run larger Phase5 shadow/closed-loop comparisons before any RL fine-tuning.
+
+## 2026-06-17 04:45 - Phase5 DAgger-style BC closed-loop recovery smoke
+
+- Request: Strengthen the Phase5 gate before any RL work because the initial BC+shield closed-loop smoke was safe but only planned `6/8` task legs.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: extended `src/czr005/datasets/teacher_slices.py` with behavior-policy state collection and expert relabeling, exported it, expanded `tests/test_phase5_shadow.py`, updated `scripts/eval/run_phase5_shadow_smoke.py`, regenerated `outputs/tables/phase5_shadow_smoke_metrics.csv` and `outputs/reports/phase5_shadow_and_closed_loop_smoke.md`, and added `artifacts/teacher/junction_slices_dagger_smoke.jsonl`.
+- Commands run: target Python pytest, target Phase5 shadow smoke, and target CTest.
+- Key observations: The script now records 461 DAgger-style slices from model-visited states, retrains the pure-Python MLP-EdgeScore smoke model, and improves the 8-task closed-loop result from base BC `6/8` to DAgger BC `8/8`, with zero post-shield conflicts.
+- Tests / validation: target Python pytest passed `25 passed`; Phase5 smoke passed with shadow unsafe rate `0.000000`, DAgger closed-loop planned `8/8`, and DAgger closed-loop conflicts `0`; target CTest passed 2/2.
+- Safety / parity notes: This is still a small same-map smoke, not a heldout or paper-grade evaluation. It is enough to unblock larger Phase5 comparisons and then cautious Phase6 RL fine-tuning.
+- Follow-up: add heldout split metadata and larger shadow/closed-loop sweeps before claiming learning-policy advantage.

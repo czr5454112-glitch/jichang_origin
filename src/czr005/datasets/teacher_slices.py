@@ -82,6 +82,64 @@ def collect_teacher_slices(
     )
 
 
+def collect_labeled_policy_slices(
+    env: IcsJunctionEnv,
+    behavior_policy: PolicyFn,
+    expert_policy: PolicyFn,
+    seed: int | None = None,
+    max_steps: int = 100_000,
+    expert_source: str = "astar_guided_safe",
+    behavior_source: str = "behavior_policy",
+) -> TeacherSliceRun:
+    """Collect teacher labels on states visited by a behavior policy.
+
+    This is a compact DAgger-style primitive for Phase5/Phase6 preparation:
+    the behavior policy drives the environment, while the stored expert action
+    is computed from the same observation before the behavior action executes.
+    """
+
+    obs, info = env.reset(seed=seed)
+    slices: list[dict[str, Any]] = []
+    total_reward = 0.0
+    steps = 0
+    terminated = False
+    truncated = False
+
+    while not terminated:
+        if steps >= max_steps:
+            truncated = True
+            break
+        behavior_action = behavior_policy(obs, info)
+        expert_action = expert_policy(obs, info)
+        slice_obs = obs
+        next_obs, reward, terminated, truncated_step, step_info = env.step(behavior_action)
+        total_reward += reward
+        if truncated_step:
+            truncated = True
+        if step_info.get("executed_action") is not None:
+            item = _build_slice(
+                slice_id=len(slices),
+                obs=slice_obs,
+                proposed_action=behavior_action,
+                step_info=step_info,
+                reward=reward,
+                expert_source=expert_source,
+                expert_action=expert_action,
+            )
+            item["behavior_source"] = behavior_source
+            slices.append(item)
+        obs, info = next_obs, step_info
+        steps += 1
+        if truncated:
+            break
+
+    return TeacherSliceRun(
+        slices=tuple(slices),
+        result=env.episode_result(),
+        run_info=EnvRunInfo(total_reward=total_reward, steps=steps, truncated=truncated),
+    )
+
+
 def write_teacher_manifest(path: str | Path, slices: tuple[dict[str, Any], ...]) -> None:
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -97,8 +155,9 @@ def _build_slice(
     step_info: dict[str, Any],
     reward: float,
     expert_source: str,
+    expert_action: int | None = None,
 ) -> dict[str, Any]:
-    expert_action = int(step_info["executed_action"])
+    expert_action = int(step_info["executed_action"] if expert_action is None else expert_action)
     candidates = list(obs["candidates"])
     chosen = _candidate_by_index(candidates, expert_action)
     task_obs = dict(obs["task"])

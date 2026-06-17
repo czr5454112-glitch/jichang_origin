@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from czr005.datasets import collect_teacher_slices
+from czr005.datasets import collect_labeled_policy_slices, collect_teacher_slices
 from czr005.envs import IcsJunctionEnv, astar_guided_policy_factory
 from czr005.eval import edge_score_policy_factory, run_shadow_replay
 from czr005.models import fit_edge_score_model
@@ -62,3 +62,28 @@ def test_shadow_replay_and_closed_loop_policy_are_safe() -> None:
     assert run_info.truncated is False
     assert result.metrics.planned_count == 2
     assert closed_env.episode_summary()["post_shield_conflicts"] == 0
+
+
+def test_labeled_policy_slices_keep_behavior_and_expert_actions() -> None:
+    graph = _line_graph()
+    tasks = (_task(1, 0.0),)
+
+    def hold_first_policy(obs, info) -> int:
+        for candidate in obs["candidates"]:
+            if candidate["kind"] == "hold":
+                return int(candidate["index"])
+        return 0
+
+    env = IcsJunctionEnv(graph, tasks, max_decisions_per_task=4)
+    run = collect_labeled_policy_slices(
+        env,
+        behavior_policy=hold_first_policy,
+        expert_policy=astar_guided_policy_factory(graph),
+        seed=13,
+        max_steps=4,
+        behavior_source="hold_first",
+    )
+
+    assert run.slices[0]["behavior_source"] == "hold_first"
+    assert run.slices[0]["proposed_action"] != run.slices[0]["expert_action"]
+    assert run.slices[0]["shield_result"] == "accepted"
