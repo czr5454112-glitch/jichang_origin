@@ -406,3 +406,14 @@
 - Tests / validation: target Python pytest passed `35 passed`; target CTest passed 2/2; manifest-backed randomized parity passed with `strict_pass=True`.
 - Safety / parity notes: This is a persisted synthetic heldout-like fixture set, not a real airport heldout map. It improves reproducibility and gives the future full C++ event scheduler a concrete shared input manifest.
 - Follow-up: reuse this manifest in the full scheduler gate, then add real heldout-map fixtures if/when available.
+
+## 2026-06-17 13:45 - Phase8 native C++ event-queue replay smoke
+
+- Request: Start replacing compact sequential replay with an event-queue C++ scheduler path required by the runtime phase.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added event-arrival and decision-event scheduling to `cpp/ics_core/runtime/edge_score_replay.hpp`, exposed EdgeScore and fallback event replay summaries through pybind record APIs, expanded C++ and pybind smoke coverage, updated `cpp/ics_core/README.md`, added `scripts/eval/run_phase8_native_cpp_event_scheduler_smoke.py`, and generated `outputs/tables/phase8_native_cpp_event_scheduler.csv` plus `outputs/reports/phase8_native_cpp_event_scheduler_report.md`.
+- Commands run: CMake build, target CTest, target Python pytest, Phase8 event scheduler smoke, manifest-backed randomized parity, repair-window parity, offset/fault parity, scaling diagnostic, and trace diagnostic.
+- Key observations: The first native C++ event scheduler processes task arrivals by `pass_time`, interleaves active bag decisions by ready time, applies the C++ `JunctionShield`, updates node/edge reservations, and honors repair-window fault schedules. On the four persisted synthetic schedules, both EdgeScore-event and fallback-event rows accounted for all configured tasks with zero post-shield conflicts.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `35 passed`; event scheduler smoke reported `8` safety-pass rows; existing randomized, repair, offset/fault, scaling, and trace gates still pass.
+- Safety / parity notes: This is the first event-queue runtime path, but it is not yet a final paper-grade high-throughput scheduler claim. Compact-vs-event aggregate parity is not expected on dense cases because the event scheduler interleaves active bags chronologically.
+- Follow-up: add event-level trace diagnostics and a Python event-scheduler reference or equivalent audit, then scale this scheduler over larger persisted manifests and Phase9 baselines.

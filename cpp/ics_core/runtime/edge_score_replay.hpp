@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <queue>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -87,6 +88,34 @@ struct RuntimeCandidate {
   double service_time = 0.0;
   double heuristic_to_goal = 0.0;
   int blocked_reason_count = 0;
+};
+
+struct EventTaskState {
+  std::size_t task_index = 0;
+  const TaskLeg* task = nullptr;
+  std::vector<PathNode> route;
+  int current = -1;
+  double ready_time = 0.0;
+  double waiting_time = 0.0;
+  int decision_count = 0;
+  bool closed = false;
+};
+
+struct RuntimeEvent {
+  double time = 0.0;
+  long long sequence = 0;
+  int kind = 0;
+  std::size_t local_task_index = 0;
+  std::size_t state_index = 0;
+};
+
+struct RuntimeEventCompare {
+  bool operator()(const RuntimeEvent& left, const RuntimeEvent& right) const {
+    if (left.time != right.time) {
+      return left.time > right.time;
+    }
+    return left.sequence > right.sequence;
+  }
 };
 
 inline void validate_fault_windows(const std::vector<EdgeFaultWindow>& fault_windows) {
@@ -285,6 +314,24 @@ inline double earliest_safe_node_start(const ReservationTable& reservations,
     candidate = interval.end + 1e-9;
   }
   return candidate;
+}
+
+inline void add_planned_result(EdgeScoreReplayResult& result,
+                               const TaskLeg& task,
+                               const std::vector<PathNode>& route) {
+  ++result.planned_count;
+  result.routes.push_back(route);
+  result.makespan = std::max(result.makespan, route.back().t2);
+  result.mean_travel_time += route.back().t2 - task.pass_time;
+}
+
+inline void mark_task_unplanned(EdgeScoreReplayResult& result,
+                                ReservationTable& node_reservations,
+                                EdgeReservationTable& edge_reservations,
+                                int task_id) {
+  node_reservations.remove_task(task_id);
+  edge_reservations.remove_task(task_id);
+  ++result.unplanned_count;
 }
 
 }  // namespace detail
@@ -517,15 +564,296 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
     }
 
     if (planned) {
-      ++result.planned_count;
-      result.routes.push_back(route);
-      result.makespan = std::max(result.makespan, route.back().t2);
-      result.mean_travel_time += route.back().t2 - task.pass_time;
+      detail::add_planned_result(result, task, route);
     } else if (!counted_unplanned) {
-      node_reservations.remove_task(task.task_id);
-      edge_reservations.remove_task(task.task_id);
-      ++result.unplanned_count;
+      detail::mark_task_unplanned(result, node_reservations, edge_reservations, task.task_id);
     }
+  }
+
+  if (result.planned_count > 0) {
+    result.mean_travel_time /= static_cast<double>(result.planned_count);
+  }
+  result.post_shield_conflicts =
+      node_reservations.conflict_count() +
+      edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds);
+  return result;
+}
+
+inline EdgeScoreReplayResult run_edge_score_event_replay_with_optional_model(
+    const Graph& graph,
+    const TaskStream& tasks,
+    const EdgeScoreModel* model,
+    const EdgeScoreReplayConfig& config = {},
+    const std::set<std::pair<int, int>>& fault_edges = {},
+    const std::vector<EdgeFaultWindow>& fault_windows = {}) {
+  if (config.hold_seconds <= 0.0) {
+    throw std::invalid_argument("hold_seconds must be positive");
+  }
+  if (config.edge_capacity <= 0) {
+    throw std::invalid_argument("edge_capacity must be positive");
+  }
+  if (config.max_decisions_per_task <= 0) {
+    throw std::invalid_argument("max_decisions_per_task must be positive");
+  }
+  detail::validate_fault_windows(fault_windows);
+
+  ReservationTable node_reservations;
+  EdgeReservationTable edge_reservations;
+  JunctionShieldConfig shield_config;
+  shield_config.edge_capacity = config.edge_capacity;
+  shield_config.edge_headway_seconds = config.edge_headway_seconds;
+  shield_config.allow_goal_node_overlap = config.allow_goal_node_overlap;
+  const JunctionShield shield(graph, shield_config);
+
+  EdgeScoreReplayResult result;
+  const std::size_t start_index = std::min(config.task_offset, tasks.size());
+  const std::size_t limit = std::min(config.max_tasks, tasks.size() - start_index);
+  std::priority_queue<detail::RuntimeEvent,
+                      std::vector<detail::RuntimeEvent>,
+                      detail::RuntimeEventCompare>
+      events;
+  long long sequence = 0;
+  for (std::size_t local_task_index = 0; local_task_index < limit; ++local_task_index) {
+    const auto& task = tasks.tasks()[start_index + local_task_index];
+    events.push(detail::RuntimeEvent{task.pass_time, sequence++, 0, local_task_index, 0});
+  }
+
+  std::vector<detail::EventTaskState> states;
+  states.reserve(limit);
+
+  while (!events.empty()) {
+    const auto event = events.top();
+    events.pop();
+
+    if (event.kind == 0) {
+      const std::size_t task_index = start_index + event.local_task_index;
+      const auto& task = tasks.tasks()[task_index];
+      const double start_duration = graph.service_time(task.start);
+      const double start_time = detail::earliest_safe_node_start(node_reservations,
+                                                                task.task_id,
+                                                                task.start,
+                                                                task.pass_time,
+                                                                start_duration,
+                                                                config.hold_seconds);
+      detail::EventTaskState state;
+      state.task_index = event.local_task_index;
+      state.task = &task;
+      state.current = task.start;
+      state.ready_time = start_time + start_duration;
+      state.waiting_time = std::max(0.0, start_time - task.pass_time);
+      state.route.push_back(PathNode{task.start,
+                                     start_time,
+                                     start_time + start_duration,
+                                     start_time,
+                                     graph.heuristic(task.start, task.goal),
+                                     start_time + graph.heuristic(task.start, task.goal)});
+      node_reservations.reserve(task.task_id, task.start, state.route.back().t1, state.route.back().t2);
+
+      const std::size_t state_index = states.size();
+      states.push_back(std::move(state));
+      if (task.start == task.goal) {
+        states[state_index].closed = true;
+        detail::add_planned_result(result, task, states[state_index].route);
+      } else {
+        events.push(detail::RuntimeEvent{states[state_index].ready_time,
+                                         sequence++,
+                                         1,
+                                         event.local_task_index,
+                                         state_index});
+      }
+      continue;
+    }
+
+    auto& state = states[event.state_index];
+    if (state.closed || state.task == nullptr) {
+      continue;
+    }
+    const auto& task = *state.task;
+    const int current = state.current;
+    const double ready_time = state.ready_time;
+    const auto active_faults = detail::active_fault_edges(fault_edges, fault_windows, ready_time);
+    const auto candidates = detail::build_candidates(graph,
+                                                     shield,
+                                                     task,
+                                                     current,
+                                                     ready_time,
+                                                     node_reservations,
+                                                     edge_reservations,
+                                                     active_faults,
+                                                     config.hold_seconds);
+    std::vector<std::vector<double>> features;
+    std::vector<bool> mask;
+    features.reserve(candidates.size());
+    mask.reserve(candidates.size());
+    for (const auto& candidate : candidates) {
+      features.push_back(detail::candidate_features(task,
+                                                    candidate,
+                                                    task.goal,
+                                                    ready_time,
+                                                    state.waiting_time,
+                                                    static_cast<int>(graph.outgoing(current).size())));
+      mask.push_back(candidate.safe);
+    }
+
+    const int safe_candidate_count = static_cast<int>(
+        std::count_if(candidates.begin(),
+                      candidates.end(),
+                      [](const detail::RuntimeCandidate& candidate) { return candidate.safe; }));
+    int chosen_position = -1;
+    int proposed_position = -1;
+    bool fallback_used = false;
+    if (model == nullptr) {
+      chosen_position = detail::fallback_candidate_index(candidates, task.goal);
+      fallback_used = true;
+    } else {
+      try {
+        chosen_position = model->predict(features, mask);
+        proposed_position = chosen_position;
+      } catch (const std::invalid_argument&) {
+        chosen_position = detail::fallback_candidate_index(candidates, task.goal);
+        fallback_used = true;
+      }
+    }
+
+    ++state.decision_count;
+    if (chosen_position < 0 || static_cast<std::size_t>(chosen_position) >= candidates.size()) {
+      ++result.decision_count;
+      result.trace.push_back(EdgeScoreDecisionTrace{result.decision_count,
+                                                    state.decision_count,
+                                                    "unplanned",
+                                                    chosen_position < 0 ? "no_safe_action" : "invalid_action",
+                                                    static_cast<int>(state.task_index),
+                                                    task.segment_id,
+                                                    task.task_id,
+                                                    current,
+                                                    task.goal,
+                                                    ready_time,
+                                                    state.waiting_time,
+                                                    proposed_position,
+                                                    -1,
+                                                    current,
+                                                    "none",
+                                                    false,
+                                                    false,
+                                                    fallback_used,
+                                                    false,
+                                                    static_cast<int>(candidates.size()),
+                                                    safe_candidate_count,
+                                                    static_cast<int>(state.route.size())});
+      detail::mark_task_unplanned(result, node_reservations, edge_reservations, task.task_id);
+      state.closed = true;
+      continue;
+    }
+
+    const auto& chosen = candidates[static_cast<std::size_t>(chosen_position)];
+    bool unsafe_proposal = false;
+    if (!chosen.safe) {
+      ++result.unsafe_proposals;
+      unsafe_proposal = true;
+      chosen_position = detail::fallback_candidate_index(candidates, task.goal);
+      fallback_used = true;
+      if (chosen_position < 0) {
+        ++result.decision_count;
+        result.trace.push_back(EdgeScoreDecisionTrace{result.decision_count,
+                                                      state.decision_count,
+                                                      "unplanned",
+                                                      "unsafe_no_safe_fallback",
+                                                      static_cast<int>(state.task_index),
+                                                      task.segment_id,
+                                                      task.task_id,
+                                                      current,
+                                                      task.goal,
+                                                      ready_time,
+                                                      state.waiting_time,
+                                                      proposed_position,
+                                                      -1,
+                                                      current,
+                                                      "none",
+                                                      false,
+                                                      unsafe_proposal,
+                                                      fallback_used,
+                                                      false,
+                                                      static_cast<int>(candidates.size()),
+                                                      safe_candidate_count,
+                                                      static_cast<int>(state.route.size())});
+        detail::mark_task_unplanned(result, node_reservations, edge_reservations, task.task_id);
+        state.closed = true;
+        continue;
+      }
+    }
+
+    const auto& executed = candidates[static_cast<std::size_t>(chosen_position)];
+    if (chosen_position != executed.index) {
+      ++result.shield_blocks;
+    }
+    ++result.decision_count;
+    const bool reached_goal = !executed.is_hold && executed.next == task.goal;
+    result.trace.push_back(EdgeScoreDecisionTrace{result.decision_count,
+                                                  state.decision_count,
+                                                  "step",
+                                                  "",
+                                                  static_cast<int>(state.task_index),
+                                                  task.segment_id,
+                                                  task.task_id,
+                                                  current,
+                                                  task.goal,
+                                                  ready_time,
+                                                  state.waiting_time,
+                                                  proposed_position,
+                                                  executed.index,
+                                                  executed.next,
+                                                  executed.is_hold ? "hold" : "move",
+                                                  executed.safe,
+                                                  unsafe_proposal,
+                                                  fallback_used,
+                                                  reached_goal,
+                                                  static_cast<int>(candidates.size()),
+                                                  safe_candidate_count,
+                                                  static_cast<int>(state.route.size()) +
+                                                      (executed.is_hold ? 0 : 1)});
+
+    if (executed.is_hold) {
+      state.waiting_time += executed.node_end - ready_time;
+      state.route.back().t2 = executed.node_end;
+      state.route.back().gcost = executed.node_end;
+      state.route.back().fcost = state.route.back().gcost + state.route.back().hcost;
+      node_reservations.reserve(task.task_id, current, state.route.back().t1, state.route.back().t2);
+      state.ready_time = executed.node_end;
+    } else {
+      edge_reservations.reserve(task.task_id,
+                                current,
+                                executed.next,
+                                executed.edge_start,
+                                executed.edge_end);
+      node_reservations.reserve(task.task_id,
+                                executed.next,
+                                executed.node_start,
+                                executed.node_end);
+      state.route.push_back(PathNode{executed.next,
+                                     executed.node_start,
+                                     executed.node_end,
+                                     executed.node_start,
+                                     executed.heuristic_to_goal,
+                                     executed.node_start + executed.heuristic_to_goal});
+      state.current = executed.next;
+      state.ready_time = executed.node_end;
+    }
+
+    if (reached_goal) {
+      detail::add_planned_result(result, task, state.route);
+      state.closed = true;
+      continue;
+    }
+    if (state.decision_count >= config.max_decisions_per_task) {
+      detail::mark_task_unplanned(result, node_reservations, edge_reservations, task.task_id);
+      state.closed = true;
+      continue;
+    }
+    events.push(detail::RuntimeEvent{state.ready_time,
+                                     sequence++,
+                                     1,
+                                     state.task_index,
+                                     event.state_index});
   }
 
   if (result.planned_count > 0) {
@@ -555,6 +883,27 @@ inline EdgeScoreReplayResult run_edge_score_fallback_replay(
     const std::set<std::pair<int, int>>& fault_edges = {},
     const std::vector<EdgeFaultWindow>& fault_windows = {}) {
   return run_edge_score_replay_with_optional_model(
+      graph, tasks, nullptr, config, fault_edges, fault_windows);
+}
+
+inline EdgeScoreReplayResult run_edge_score_event_replay(
+    const Graph& graph,
+    const TaskStream& tasks,
+    const EdgeScoreModel& model,
+    const EdgeScoreReplayConfig& config = {},
+    const std::set<std::pair<int, int>>& fault_edges = {},
+    const std::vector<EdgeFaultWindow>& fault_windows = {}) {
+  return run_edge_score_event_replay_with_optional_model(
+      graph, tasks, &model, config, fault_edges, fault_windows);
+}
+
+inline EdgeScoreReplayResult run_edge_score_event_fallback_replay(
+    const Graph& graph,
+    const TaskStream& tasks,
+    const EdgeScoreReplayConfig& config = {},
+    const std::set<std::pair<int, int>>& fault_edges = {},
+    const std::vector<EdgeFaultWindow>& fault_windows = {}) {
+  return run_edge_score_event_replay_with_optional_model(
       graph, tasks, nullptr, config, fault_edges, fault_windows);
 }
 

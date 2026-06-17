@@ -31,6 +31,8 @@ using czr005::ics::compute_episode_metrics;
 using czr005::ics::read_legacy_inputdata;
 using czr005::ics::read_legacy_map2;
 using czr005::ics::run_edge_score_fallback_replay;
+using czr005::ics::run_edge_score_event_fallback_replay;
+using czr005::ics::run_edge_score_event_replay;
 using czr005::ics::run_edge_score_replay;
 using czr005::ics::TaskLeg;
 using czr005::ics::TaskStream;
@@ -274,6 +276,18 @@ int main() {
              "native fallback replay should plan both sample tasks without a model");
   test.check(fallback_replay_result.post_shield_conflicts == 0,
              "native fallback replay should stay conflict-free without a model");
+  const auto event_replay_result = run_edge_score_event_replay(graph, replay_tasks, replay_model, replay_config);
+  test.check(event_replay_result.planned_count == 2,
+             "native event replay should plan both sample tasks");
+  test.check(event_replay_result.unplanned_count == 0,
+             "native event replay should not leave sample tasks unplanned");
+  test.check(event_replay_result.post_shield_conflicts == 0,
+             "native event replay should stay conflict-free");
+  const auto event_fallback_replay_result = run_edge_score_event_fallback_replay(graph, replay_tasks, replay_config);
+  test.check(event_fallback_replay_result.planned_count == 2,
+             "native event fallback replay should plan both sample tasks without a model");
+  test.check(event_fallback_replay_result.post_shield_conflicts == 0,
+             "native event fallback replay should stay conflict-free without a model");
 
   TaskStream repair_tasks;
   repair_tasks.add(TaskLeg{"cpp-repair-active", 201, 201, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", false, 1});
