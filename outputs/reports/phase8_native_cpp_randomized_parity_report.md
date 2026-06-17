@@ -6,7 +6,9 @@ Date: 2026-06-17
 
 This diagnostic checks compact native C++ replay parity against the Python junction environment on fixed-seed synthetic directed ICS-like maps. The rows vary map edge lengths, optional branch edges, task density, static fault edges, and repair-window schedules.
 
-The graph and task stream are passed through the pybind in-memory record API, so this is no longer limited to legacy `map2.txt` files. This is randomized synthetic-map coverage, not a real heldout airport map or the final high-throughput C++ event scheduler.
+Manifest: `data/processed/phase8/phase8_synthetic_replay_cases.json`
+
+The graph, task stream, and fault schedule are loaded from a persisted manifest and passed through the pybind in-memory record API. This is randomized synthetic-map coverage, not a real heldout airport map or the final high-throughput C++ event scheduler.
 
 ## Metrics
 
@@ -23,11 +25,12 @@ CSV: `outputs/tables/phase8_native_cpp_randomized_parity.csv`
 
 - randomized synthetic compact replay parity: PASS
 - randomized synthetic safety: PASS
+- persisted synthetic replay manifest: PASS
 - real heldout-map parity: not covered
 - full high-throughput event-scheduler parity: not covered
 
 ## Remaining Work
 
-- add real heldout-map fixtures or map generators with persisted manifests
-- carry the same randomized schedules into the final C++ event scheduler
+- add real heldout-map fixtures when available
+- carry the persisted synthetic schedules into the final C++ event scheduler
 - expand randomized density/fault seeds before paper-grade claims

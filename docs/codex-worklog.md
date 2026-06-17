@@ -395,3 +395,14 @@
 - Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `34 passed`; randomized synthetic parity reports `4/4` strict PASS rows; repair-window parity reports `4/4` strict PASS rows; offset/fault parity reports `8/8` strict PASS rows; trace and scaling diagnostics still pass.
 - Safety / parity notes: This is randomized synthetic-map compact replay evidence, not a real heldout airport map and not the final high-throughput C++ event scheduler. It adds a stronger regression gate for future scheduler work because synthetic graphs are passed directly through the in-memory pybind API.
 - Follow-up: add persisted heldout-map fixtures or generated-map manifests, then carry these randomized schedules into the full C++ event scheduler.
+
+## 2026-06-17 13:20 - Phase8 persisted synthetic replay manifest
+
+- Request: Turn the randomized synthetic parity cases into reusable heldout-like fixtures so future Python/C++ and scheduler gates can share exactly the same maps, tasks, and fault schedules.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/phase8_synthetic_replay_cases.py`, added `scripts/eval/generate_phase8_synthetic_replay_manifest.py`, generated `data/processed/phase8/phase8_synthetic_replay_cases.json`, rewrote `scripts/eval/run_phase8_native_cpp_randomized_parity.py` to read the persisted manifest, updated `outputs/reports/phase8_native_cpp_randomized_parity_report.md`, and added `tests/test_phase8_synthetic_manifest.py`.
+- Commands run: generated the Phase8 synthetic replay manifest, ran the manifest-backed randomized parity diagnostic, target Python pytest, and target CTest.
+- Key observations: The persisted manifest contains four fixed-seed directed ICS-like synthetic maps and `84` total tasks with static and repair-window fault schedules. The randomized parity gate still reports `4/4` strict PASS rows after loading from the manifest rather than regenerating in the diagnostic script.
+- Tests / validation: target Python pytest passed `35 passed`; target CTest passed 2/2; manifest-backed randomized parity passed with `strict_pass=True`.
+- Safety / parity notes: This is a persisted synthetic heldout-like fixture set, not a real airport heldout map. It improves reproducibility and gives the future full C++ event scheduler a concrete shared input manifest.
+- Follow-up: reuse this manifest in the full scheduler gate, then add real heldout-map fixtures if/when available.
