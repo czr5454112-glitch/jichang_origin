@@ -20,6 +20,21 @@ class NodeReservation:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class EdgeReservation:
+    task_id: int
+    start_node: int
+    end_node: int
+    start: float
+    end: float
+
+    def overlaps(self, start: float, end: float) -> bool:
+        return not (start >= self.end or end <= self.start)
+
+    def to_dict(self) -> dict[str, float | int]:
+        return asdict(self)
+
+
 class ReservationTable:
     """Java-compatible node interval table.
 
@@ -97,3 +112,116 @@ class ReservationTable:
             for node, intervals in self._by_node.items()
         }
 
+
+class EdgeReservationTable:
+    """Edge interval reservations with capacity and entry-headway checks."""
+
+    def __init__(self) -> None:
+        self._by_edge: dict[tuple[int, int], list[EdgeReservation]] = {}
+
+    def intervals(self, start_node: int, end_node: int) -> tuple[EdgeReservation, ...]:
+        return tuple(self._by_edge.get((start_node, end_node), ()))
+
+    def reserve(
+        self,
+        task_id: int,
+        start_node: int,
+        end_node: int,
+        start: float,
+        end: float,
+    ) -> EdgeReservation:
+        existing = self._by_edge.setdefault((start_node, end_node), [])
+        existing[:] = [interval for interval in existing if interval.task_id != task_id]
+        reservation = EdgeReservation(
+            task_id=task_id,
+            start_node=start_node,
+            end_node=end_node,
+            start=start,
+            end=end,
+        )
+        existing.append(reservation)
+        existing.sort(key=lambda interval: (interval.start, interval.end, interval.task_id))
+        return reservation
+
+    def has_capacity_conflict(
+        self,
+        start_node: int,
+        end_node: int,
+        start: float,
+        end: float,
+        capacity: int,
+        task_id: int | None = None,
+    ) -> bool:
+        if capacity <= 0:
+            return True
+        overlapping = 0
+        for interval in self._by_edge.get((start_node, end_node), ()):
+            if task_id is not None and interval.task_id == task_id:
+                continue
+            if interval.overlaps(start, end):
+                overlapping += 1
+        return overlapping >= capacity
+
+    def has_headway_conflict(
+        self,
+        start_node: int,
+        end_node: int,
+        start: float,
+        headway_seconds: float,
+        task_id: int | None = None,
+    ) -> bool:
+        if headway_seconds <= 0.0:
+            return False
+        for interval in self._by_edge.get((start_node, end_node), ()):
+            if task_id is not None and interval.task_id == task_id:
+                continue
+            if abs(start - interval.start) < headway_seconds:
+                return True
+        return False
+
+    def earliest_start(
+        self,
+        start_node: int,
+        end_node: int,
+        earliest: float,
+        duration: float,
+        capacity: int,
+        headway_seconds: float = 0.0,
+        task_id: int | None = None,
+    ) -> float:
+        candidate = earliest
+        intervals = self._by_edge.get((start_node, end_node), ())
+        for _ in range(len(intervals) * 2 + 2):
+            moved = False
+            for interval in intervals:
+                if task_id is not None and interval.task_id == task_id:
+                    continue
+                candidate_end = candidate + duration
+                if capacity <= 0 or interval.overlaps(candidate, candidate_end):
+                    if self.has_capacity_conflict(
+                        start_node, end_node, candidate, candidate_end, capacity, task_id
+                    ):
+                        candidate = max(candidate, interval.end)
+                        moved = True
+                        break
+                if headway_seconds > 0.0 and abs(candidate - interval.start) < headway_seconds:
+                    candidate = interval.start + headway_seconds
+                    moved = True
+                    break
+            if not moved:
+                return candidate
+        return candidate
+
+    def conflict_count(self, capacity: int = 1, headway_seconds: float = 0.0) -> int:
+        conflicts = 0
+        for intervals in self._by_edge.values():
+            ordered = sorted(intervals, key=lambda interval: (interval.start, interval.end))
+            for index, left in enumerate(ordered):
+                for right in ordered[index + 1 :]:
+                    if right.start >= left.end and right.start - left.start >= headway_seconds:
+                        break
+                    if left.overlaps(right.start, right.end) and capacity <= 1:
+                        conflicts += 1
+                    elif headway_seconds > 0.0 and abs(left.start - right.start) < headway_seconds:
+                        conflicts += 1
+        return conflicts

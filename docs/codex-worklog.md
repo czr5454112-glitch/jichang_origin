@@ -153,3 +153,14 @@
 - Tests / validation: target Python pytest passed `12 passed`; target CTest passed 2/2.
 - Safety / parity notes: This is a deterministic one-step baseline, not full recursive PIBT. Edge headway/capacity, merge groups, full replay integration, and C++ parity remain pending.
 - Follow-up: integrate one-step resolver into replay diagnostics or add edge/headway-aware SIPP.
+
+## 2026-06-17 01:30 - Phase2B edge/headway-aware SIPP extension
+
+- Request: Strengthen Phase2 safety constraints by adding edge capacity/headway awareness to the Python SIPP baseline.
+- Branch: `main`.
+- Files changed: added `EdgeReservation` and `EdgeReservationTable` to `src/czr005/sim_py/reservation.py`, exported them from `czr005.sim_py`, extended SIPP with edge reservation/capacity/headway parameters, expanded Phase2 baseline tests, updated safety docs, and added `outputs/reports/phase2b_edge_headway_sipp_report.md`.
+- Commands run: target Python pytest and target CTest.
+- Key observations: SIPP now waits for an occupied edge-capacity slot and for edge entry headway before traversing, then still aligns arrival with target-node safe intervals.
+- Tests / validation: target Python pytest passed `14 passed`; target CTest passed 2/2.
+- Safety / parity notes: Rolling-horizon replay does not yet emit edge reservations, merge groups and buffers are still pending, and C++ SIPP parity remains pending.
+- Follow-up: integrate edge reservations into rolling-horizon replay or add C++ SIPP parity.

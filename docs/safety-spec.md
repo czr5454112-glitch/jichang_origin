@@ -40,6 +40,7 @@ Currently covered by C++ smoke tests:
 Currently covered by Python baseline tests:
 
 - SIPP waits for safe node intervals
+- SIPP waits for edge capacity/headway slots
 - rolling-horizon SIPP priority and reservation reuse
 - PIBT-style one-step merge conflict resolution
 - PIBT-style fault-edge fallback
@@ -49,5 +50,5 @@ Still pending:
 - explicit buffer capacity
 - merge conflict groups
 - event-simulation safety counters
-- C++ / full-constraint SIPP integration
+- C++ SIPP integration
 - full recursive PIBT-style baseline integration

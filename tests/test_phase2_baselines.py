@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from czr005.baselines import AgentState, PIBTStyleOneStepResolver, RollingHorizonBaseline, SIPPPlanner
-from czr005.sim_py import AStarPlanner, IcsGraph, ReservationTable, SimEdge, SimNode
+from czr005.sim_py import AStarPlanner, EdgeReservationTable, IcsGraph, ReservationTable, SimEdge, SimNode
 from czr005.sim_py.task_stream import TaskLeg
 
 
@@ -93,6 +93,41 @@ def test_sipp_waits_for_next_safe_node_interval() -> None:
 def test_sipp_respects_fault_edges() -> None:
     route = SIPPPlanner(_line_graph()).plan(0, 2, fault_edges={(1, 2)})
     assert route == []
+
+
+def test_sipp_waits_for_edge_capacity() -> None:
+    edge_reservations = EdgeReservationTable()
+    edge_reservations.reserve(task_id=99, start_node=0, end_node=1, start=0.0, end=2.0)
+
+    route = SIPPPlanner(_line_graph()).plan(
+        0,
+        2,
+        edge_reservations=edge_reservations,
+        edge_capacity=1,
+        task_id=1,
+    )
+
+    assert [node.location for node in route] == [0, 1, 2]
+    assert route[1].t1 >= 4.0
+    assert not edge_reservations.has_capacity_conflict(0, 1, route[1].t1 - 2.0, route[1].t1, 1, task_id=1)
+
+
+def test_sipp_waits_for_edge_headway() -> None:
+    edge_reservations = EdgeReservationTable()
+    edge_reservations.reserve(task_id=99, start_node=0, end_node=1, start=0.0, end=0.5)
+
+    route = SIPPPlanner(_line_graph()).plan(
+        0,
+        2,
+        edge_reservations=edge_reservations,
+        edge_capacity=2,
+        edge_headway_seconds=2.0,
+        task_id=1,
+    )
+
+    assert [node.location for node in route] == [0, 1, 2]
+    assert route[1].t1 >= 4.0
+    assert not edge_reservations.has_headway_conflict(0, 1, route[1].t1 - 2.0, 2.0, task_id=1)
 
 
 def _task(segment_id: str, task_id: int, pass_time: float, std: float) -> TaskLeg:

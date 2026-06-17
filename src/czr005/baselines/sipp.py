@@ -7,7 +7,7 @@ import heapq
 from itertools import count
 
 from czr005.sim_py.graph import IcsGraph
-from czr005.sim_py.reservation import NodeReservation, ReservationTable
+from czr005.sim_py.reservation import EdgeReservationTable, NodeReservation, ReservationTable
 
 
 EPSILON = 1e-9
@@ -54,10 +54,14 @@ class SIPPPlanner:
         goal: int,
         start_time: float = 0.0,
         reservations: ReservationTable | None = None,
+        edge_reservations: EdgeReservationTable | None = None,
+        edge_capacity: int = 1,
+        edge_headway_seconds: float = 0.0,
         fault_edges: set[tuple[int, int]] | None = None,
         task_id: int | None = None,
     ) -> list[SIPPNode]:
         reservations = reservations or ReservationTable()
+        edge_reservations = edge_reservations or EdgeReservationTable()
         fault_edges = fault_edges or set()
         sequence = count()
         open_heap: list[tuple[float, int, SIPPNode]] = []
@@ -83,19 +87,22 @@ class SIPPPlanner:
                 if (current.location, next_location) in fault_edges:
                     continue
                 edge = self.graph.edge(current.location, next_location)
-                earliest_node_start = current.t2 + edge.travel_time
                 service_time = self.graph.service_time(next_location)
-                if next_location == goal:
-                    node_start = earliest_node_start
-                else:
-                    node_start = self._earliest_safe_node_start(
-                        reservations.intervals(next_location),
-                        earliest_node_start,
-                        service_time,
-                        task_id,
-                    )
-                if node_start is None or node_start > self.max_time:
+                transition = self._earliest_safe_transition(
+                    current=current,
+                    next_location=next_location,
+                    goal=goal,
+                    travel_time=edge.travel_time,
+                    service_time=service_time,
+                    reservations=reservations,
+                    edge_reservations=edge_reservations,
+                    edge_capacity=edge_capacity,
+                    edge_headway_seconds=edge_headway_seconds,
+                    task_id=task_id,
+                )
+                if transition is None:
                     continue
+                edge_start, node_start = transition
 
                 node_end = node_start + service_time
                 if node_end >= best_t2.get(next_location, float("inf")) - EPSILON:
@@ -114,6 +121,49 @@ class SIPPPlanner:
                 heapq.heappush(open_heap, (child.fcost, next(sequence), child))
 
         return []
+
+    def _earliest_safe_transition(
+        self,
+        current: SIPPNode,
+        next_location: int,
+        goal: int,
+        travel_time: float,
+        service_time: float,
+        reservations: ReservationTable,
+        edge_reservations: EdgeReservationTable,
+        edge_capacity: int,
+        edge_headway_seconds: float,
+        task_id: int | None,
+    ) -> tuple[float, float] | None:
+        edge_start = current.t2
+        for _ in range(len(edge_reservations.intervals(current.location, next_location)) * 2 + 4):
+            edge_start = edge_reservations.earliest_start(
+                current.location,
+                next_location,
+                edge_start,
+                travel_time,
+                edge_capacity,
+                edge_headway_seconds,
+                task_id,
+            )
+            node_start = edge_start + travel_time
+            if next_location != goal:
+                safe_node_start = self._earliest_safe_node_start(
+                    reservations.intervals(next_location),
+                    node_start,
+                    service_time,
+                    task_id,
+                )
+                if safe_node_start is None:
+                    return None
+                if safe_node_start > node_start + EPSILON:
+                    edge_start = safe_node_start - travel_time
+                    continue
+                node_start = safe_node_start
+            if node_start <= self.max_time:
+                return edge_start, node_start
+            return None
+        return None
 
     def _earliest_safe_node_start(
         self,
