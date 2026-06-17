@@ -439,3 +439,14 @@
 - Tests / validation: Python pytest passed `36 passed`; CTest passed 2/2; event scheduler parity reported `8` strict PASS rows; event trace audit reported `8` invariant PASS rows; event scheduler smoke reported `8` safety PASS rows; randomized synthetic parity reported `4/4` strict PASS rows; repair parity reported `4/4` strict PASS rows; offset/fault parity reported `8/8` strict PASS rows; existing trace diagnostic still matched and scaling reported `divergences=0`.
 - Safety / parity notes: This establishes event-level Python/C++ parity on persisted synthetic heldout-like schedules, but it is still not real-airport heldout parity and not final paper-grade high-throughput validation.
 - Follow-up: add real heldout-map event parity if fixtures become available, scale event replay over larger manifests, and carry the event scheduler into Phase9 baseline comparisons.
+
+## 2026-06-17 15:20 - Phase2 C++ SIPP parity
+
+- Request: Continue closing Python/C++ port and prerequisite baseline gaps by bringing the Python SIPP baseline into the C++ core.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `cpp/ics_core/routing/sipp.hpp`, extended C++ `EdgeReservationTable` with interval and earliest-start helpers, exposed `sipp_plan_from_records` through pybind, expanded C++ and pybind smoke tests, added `scripts/eval/run_phase2_cpp_sipp_parity.py`, generated `outputs/tables/phase2_cpp_sipp_parity.csv` plus `outputs/reports/phase2_cpp_sipp_parity_report.md`, and updated `cpp/ics_core/README.md`.
+- Commands run: CMake build, target CTest, target Python pytest, Phase2 C++ SIPP parity diagnostic, Phase8 event scheduler parity, Phase8 event trace diagnostic, randomized synthetic compact parity, repair-window compact parity, and native scaling diagnostic.
+- Key observations: The C++ SIPP planner now matches the Python SIPP baseline on timed route rows for clear routing, node-reservation waiting, edge-capacity waiting, edge-headway waiting, fault-edge blocking, and first-task routes from all four persisted synthetic schedules.
+- Tests / validation: CTest passed 2/2; Python pytest passed `36 passed`; Phase2 C++ SIPP parity reported `9` strict PASS rows; Phase8 event scheduler parity still reported `8` strict PASS rows; event trace audit still reported `8` invariant PASS rows; randomized synthetic parity reported `4/4` strict PASS rows; repair parity reported `4/4` strict PASS rows; scaling reported `divergences=0`.
+- Safety / parity notes: This closes the first C++ SIPP planner parity gate, but it is not yet a full C++ rolling-horizon replay or merge/buffer-aware baseline.
+- Follow-up: wrap C++ SIPP into rolling-horizon/batch replay, then compare Phase5/Phase8 policies against the C++ baseline under larger density and fault schedules.

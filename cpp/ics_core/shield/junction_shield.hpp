@@ -131,6 +131,56 @@ class EdgeReservationTable {
     return false;
   }
 
+  [[nodiscard]] const std::vector<EdgeReservation>& intervals(int start_node,
+                                                              int end_node) const {
+    static const std::vector<EdgeReservation> empty;
+    const auto found = by_edge_.find(edge_key(start_node, end_node));
+    return found == by_edge_.end() ? empty : found->second;
+  }
+
+  [[nodiscard]] double earliest_start(int start_node,
+                                      int end_node,
+                                      double earliest,
+                                      double duration,
+                                      int capacity,
+                                      double headway_seconds = 0.0,
+                                      int task_id = -1) const {
+    double candidate = earliest;
+    const auto& edge_intervals = intervals(start_node, end_node);
+    for (std::size_t attempt = 0; attempt < edge_intervals.size() * 2 + 2; ++attempt) {
+      bool moved = false;
+      for (const auto& interval : edge_intervals) {
+        if (task_id >= 0 && interval.task_id == task_id) {
+          continue;
+        }
+        const double candidate_end = candidate + duration;
+        if (capacity <= 0 || interval.overlaps(candidate, candidate_end)) {
+          if (has_capacity_conflict(start_node,
+                                    end_node,
+                                    candidate,
+                                    candidate_end,
+                                    capacity,
+                                    task_id)) {
+            candidate = std::max(candidate, interval.end);
+            moved = true;
+            break;
+          }
+        }
+        const double gap = interval.start > candidate ? interval.start - candidate
+                                                      : candidate - interval.start;
+        if (headway_seconds > 0.0 && gap < headway_seconds) {
+          candidate = interval.start + headway_seconds;
+          moved = true;
+          break;
+        }
+      }
+      if (!moved) {
+        return candidate;
+      }
+    }
+    return candidate;
+  }
+
   [[nodiscard]] int conflict_count(int capacity, double headway_seconds) const {
     int conflicts = 0;
     for (const auto& entry : by_edge_) {

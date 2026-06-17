@@ -15,6 +15,7 @@
 #include "ics_core/models/edge_score.hpp"
 #include "ics_core/models/edge_score_io.hpp"
 #include "ics_core/routing/astar.hpp"
+#include "ics_core/routing/sipp.hpp"
 #include "ics_core/runtime/edge_score_replay.hpp"
 
 namespace py = pybind11;
@@ -23,7 +24,9 @@ namespace {
 
 using EdgeFaultWindowTuple = std::tuple<int, int, double, double>;
 using EdgeRecordTuple = std::tuple<int, int, double, double>;
+using EdgeReservationTuple = std::tuple<int, int, int, double, double>;
 using NodeRecordTuple = std::tuple<int, int, double, int, int, std::vector<int>>;
+using NodeReservationTuple = std::tuple<int, int, double, double>;
 using TaskRecordTuple = std::tuple<std::string,
                                    int,
                                    int,
@@ -45,6 +48,21 @@ std::vector<int> route_locations(const std::vector<czr005::ics::PathNode>& route
     locations.push_back(node.location);
   }
   return locations;
+}
+
+py::list path_node_rows(const std::vector<czr005::ics::PathNode>& route) {
+  py::list rows;
+  for (const auto& node : route) {
+    py::dict row;
+    row["location"] = node.location;
+    row["t1"] = node.t1;
+    row["t2"] = node.t2;
+    row["gcost"] = node.gcost;
+    row["hcost"] = node.hcost;
+    row["fcost"] = node.fcost;
+    rows.append(row);
+  }
+  return rows;
 }
 
 py::dict read_legacy_map_summary(const std::string& path) {
@@ -266,6 +284,24 @@ czr005::ics::TaskStream task_stream_from_records(const std::vector<TaskRecordTup
   return stream;
 }
 
+czr005::ics::ReservationTable node_reservations_from_tuples(
+    const std::vector<NodeReservationTuple>& reservations) {
+  czr005::ics::ReservationTable table;
+  for (const auto& [task_id, node, start, end] : reservations) {
+    table.reserve(task_id, node, start, end);
+  }
+  return table;
+}
+
+czr005::ics::EdgeReservationTable edge_reservations_from_tuples(
+    const std::vector<EdgeReservationTuple>& reservations) {
+  czr005::ics::EdgeReservationTable table;
+  for (const auto& [task_id, start_node, end_node, start, end] : reservations) {
+    table.reserve(task_id, start_node, end_node, start, end);
+  }
+  return table;
+}
+
 czr005::ics::EdgeScoreReplayConfig make_replay_config(
     int max_tasks,
     int max_decisions_per_task,
@@ -370,6 +406,36 @@ py::dict edge_score_native_fallback_replay_summary(const std::string& map_path,
   const auto end_time = std::chrono::steady_clock::now();
   const std::chrono::duration<double> elapsed = end_time - start_time;
   return edge_score_replay_result_summary(result, max_tasks, elapsed.count());
+}
+
+py::list sipp_plan_from_records(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    int start,
+    int goal,
+    double start_time,
+    const std::vector<NodeReservationTuple>& node_reservations,
+    const std::vector<EdgeReservationTuple>& edge_reservations,
+    int edge_capacity,
+    double edge_headway_seconds,
+    const std::vector<std::pair<int, int>>& fault_edges,
+    int task_id,
+    double max_time) {
+  const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
+  const auto node_table = node_reservations_from_tuples(node_reservations);
+  const auto edge_table = edge_reservations_from_tuples(edge_reservations);
+  std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  const czr005::ics::SIPPPlanner planner(graph, max_time);
+  return path_node_rows(planner.plan(start,
+                                     goal,
+                                     start_time,
+                                     &node_table,
+                                     &edge_table,
+                                     edge_capacity,
+                                     edge_headway_seconds,
+                                     faults,
+                                     task_id));
 }
 
 py::dict edge_score_native_replay_summary_from_records(
@@ -676,6 +742,21 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
              py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+  module.def("sipp_plan_from_records",
+             &sipp_plan_from_records,
+             py::arg("node_records"),
+             py::arg("edge_records"),
+             py::arg("heuristic_time"),
+             py::arg("start"),
+             py::arg("goal"),
+             py::arg("start_time") = 0.0,
+             py::arg("node_reservations") = std::vector<NodeReservationTuple>{},
+             py::arg("edge_reservations") = std::vector<EdgeReservationTuple>{},
+             py::arg("edge_capacity") = 1,
+             py::arg("edge_headway_seconds") = 0.0,
+             py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
+             py::arg("task_id") = -1,
+             py::arg("max_time") = 86400.0);
   module.def("edge_score_native_replay_summary_from_records",
              &edge_score_native_replay_summary_from_records,
              py::arg("node_records"),

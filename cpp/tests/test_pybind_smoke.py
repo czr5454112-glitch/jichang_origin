@@ -165,6 +165,28 @@ def main() -> None:
         ("records-active", 301, 301, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", False, 1),
         ("records-after", 302, 302, 12.0, 32.0, 0, 2, 0, 2, 12.0, "direct", False, 2),
     ]
+    sipp_route = czr005_cpp.sipp_plan_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        start=0,
+        goal=2,
+        node_reservations=[(99, 1, 2.0, 3.0)],
+        task_id=301,
+    )
+    assert [row["location"] for row in sipp_route] == [0, 1, 2]
+    assert abs(sipp_route[1]["t1"] - 3.000000001) < 1.0e-9
+    sipp_fault_blocked = czr005_cpp.sipp_plan_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        start=0,
+        goal=2,
+        fault_edges=[(1, 2)],
+        task_id=301,
+    )
+    assert sipp_fault_blocked == []
+
     records_replay = czr005_cpp.edge_score_native_replay_summary_from_records(
         node_records,
         edge_records,

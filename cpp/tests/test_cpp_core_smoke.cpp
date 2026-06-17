@@ -12,6 +12,7 @@
 #include "ics_core/models/edge_score.hpp"
 #include "ics_core/reservation/reservation.hpp"
 #include "ics_core/routing/astar.hpp"
+#include "ics_core/routing/sipp.hpp"
 #include "ics_core/runtime/edge_score_replay.hpp"
 #include "ics_core/shield/junction_shield.hpp"
 
@@ -27,6 +28,7 @@ using czr005::ics::JunctionShieldConfig;
 using czr005::ics::Node;
 using czr005::ics::ReservationTable;
 using czr005::ics::SafetyStatus;
+using czr005::ics::SIPPPlanner;
 using czr005::ics::compute_episode_metrics;
 using czr005::ics::read_legacy_inputdata;
 using czr005::ics::read_legacy_map2;
@@ -127,6 +129,36 @@ int main() {
 
   const auto blocked = planner.plan(0, 2, 0.0, &reservations, {}, 2);
   test.check(blocked.empty(), "sample conflicting route should be blocked");
+
+  ReservationTable sipp_node_reservations;
+  sipp_node_reservations.reserve(99, 1, 2.0, 3.0);
+  const SIPPPlanner sipp_planner(graph);
+  const auto sipp_wait = sipp_planner.plan(0, 2, 0.0, &sipp_node_reservations, nullptr, 1, 0.0, {}, 2);
+  test.check(sipp_wait.size() == 3, "SIPP should wait around a node reservation");
+  if (sipp_wait.size() == 3) {
+    test.check(near(sipp_wait[1].t1, 3.000000001), "SIPP node wait should start after reserved node interval");
+    test.check(near(sipp_wait[2].t1, 6.000000001), "SIPP node wait should preserve downstream timing");
+  }
+
+  EdgeReservationTable sipp_edge_reservations;
+  sipp_edge_reservations.reserve(99, 0, 1, 0.0, 2.0);
+  const auto sipp_edge_wait = sipp_planner.plan(
+      0,
+      2,
+      0.0,
+      nullptr,
+      &sipp_edge_reservations,
+      1,
+      0.0,
+      {},
+      3);
+  test.check(sipp_edge_wait.size() == 3, "SIPP should wait around an edge capacity reservation");
+  if (sipp_edge_wait.size() == 3) {
+    test.check(near(sipp_edge_wait[1].t1, 4.0), "SIPP edge wait should delay target node arrival");
+  }
+
+  const auto sipp_fault_blocked = sipp_planner.plan(0, 2, 0.0, nullptr, nullptr, 1, 0.0, {{1, 2}}, 4);
+  test.check(sipp_fault_blocked.empty(), "SIPP should reject a faulted only edge");
 
   const auto later = planner.plan(0, 2, 6.0, &reservations, {}, 3);
   test.check(later.size() == 3, "sample later route should have 3 nodes");
