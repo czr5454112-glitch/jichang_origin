@@ -34,6 +34,7 @@ Currently covered by C++ smoke tests:
 - faulted edge rejection
 - edge capacity conflict
 - edge headway conflict
+- merge-group conflict
 - node reservation conflict
 - explicit node/buffer capacity below/full-capacity behavior
 - next-hop reachability to goal
@@ -46,10 +47,11 @@ Currently covered by Python baseline tests:
 - PIBT-style one-step merge conflict resolution
 - PIBT-style fault-edge fallback
 - action masks respect explicit node/buffer capacity
+- action masks reject configured merge-group conflicts
 
 Still pending:
 
-- merge conflict groups
 - event-simulation safety counters
 - full buffer-capacity replay integration across every baseline
+- full merge-group replay integration across every baseline
 - full active-bag PIBT-style replay integration

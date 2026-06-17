@@ -331,7 +331,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "- node and edge reservation waiting cases: covered",
             "- persisted synthetic manifest first-task cases: covered",
             "- rolling-horizon C++ replay: not covered",
-            "- merge-group/full buffer-capacity replay constraints: not covered",
+            "- full merge-group/buffer-capacity replay integration: not covered",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

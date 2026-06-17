@@ -7,7 +7,7 @@ Implemented so far:
 - legacy map/task readers
 - A* planner and route smoke parity
 - node and edge reservation primitives
-- initial junction shield checks, including explicit node/buffer capacity
+- initial junction shield checks, including explicit node/buffer capacity and merge groups
 - C++ SIPP planner parity over node/edge reservations and synthetic routes
 - C++ rolling-horizon SIPP parity over priority, fault, capacity, headway, and synthetic schedules
 - C++ route-discarding periodic SIPP replanning parity over active-bag, capacity, static-fault, repair-window, and synthetic slices
@@ -19,4 +19,4 @@ Implemented so far:
 - first native C++ event-queue replay, trace audit, and Python/C++ parity over persisted synthetic schedules
 - pybind smoke boundary
 
-Paper-grade high-throughput scheduler validation, real heldout-map event parity, full active-bag PIBT-style replay integration, merge-group semantics, full buffer-capacity replay integration, and broad runtime replay validation are still pending.
+Paper-grade high-throughput scheduler validation, real heldout-map event parity, full active-bag PIBT-style replay integration, full merge-group/buffer-capacity replay integration, and broad runtime replay validation are still pending.

@@ -527,3 +527,14 @@
 - Tests / validation: Phase3 env pytest passed `8 passed`; Phase2 baseline pytest passed `15 passed`; CTest passed 2/2; Phase2 baseline smoke reported zero post-shield conflicts; Phase3 learning-env smoke reported zero post-shield conflicts; full Python pytest passed `42 passed`; SIPP, PIBT, periodic replanning, rolling-horizon, Phase8 event parity, and Phase8 trace diagnostics all passed.
 - Safety / parity notes: Explicit node/buffer capacity checks are covered at the action-mask/shield layer. Full buffer-capacity replay integration across every baseline, merge-group semantics, real heldout-map validation, and Phase9 runtime comparisons remain pending.
 - Follow-up: carry node-capacity configuration into broader replay/parity scripts or implement merge-group conflict semantics.
+
+## 2026-06-17 19:55 - Phase2 merge-group shield checks
+
+- Request: Continue closing Phase2 safety prerequisites by implementing configurable merge-group conflict checks in both Python and C++.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added merge-group conflict checks to Python action masks and the junction environment, added C++ `JunctionShield` merge-group status/configuration over edge reservations, expanded Python/C++ smoke coverage, and refreshed safety/status reports.
+- Commands run: target Phase3 env pytest, target Phase2 baseline pytest, CMake build through the VS developer environment with CTest, Phase2 baseline smoke, Phase3 learning-env smoke, Phase2 C++ SIPP parity, Phase2 C++ rolling-horizon parity, full Python pytest, Phase2 C++ PIBT parity, Phase2 periodic replanning parity, Phase8 native C++ event parity, and Phase8 event trace diagnostic.
+- Key observations: Configured directed edges can now share a merge group. A candidate edge is blocked when another edge in the same group already occupies the merge interval or violates the configured merge entry headway; edges outside the candidate group remain unaffected.
+- Tests / validation: Phase3 env pytest passed `9 passed`; Phase2 baseline pytest passed `15 passed`; CTest passed 2/2; Phase2 baseline and Phase3 learning-env smokes reported zero post-shield conflicts; SIPP, rolling-horizon, PIBT, periodic replanning, and Phase8 event parity remained strict PASS; full Python pytest passed `43 passed`; Phase8 trace diagnostic passed.
+- Safety / parity notes: Merge-group checks are covered at the action-mask/shield layer. Full merge-group/buffer-capacity replay integration across every baseline, real heldout-map validation, and Phase9 runtime comparisons remain pending.
+- Follow-up: thread merge/buffer configuration through full replay/parity manifests or move to heldout/runtime evaluation scaffolding.

@@ -74,6 +74,9 @@ def build_action_candidates(
     edge_capacity: int = 1,
     edge_headway_seconds: float = 0.0,
     node_capacities: dict[int, int] | None = None,
+    merge_groups: dict[tuple[int, int], int] | None = None,
+    merge_capacity: int = 1,
+    merge_headway_seconds: float = 0.0,
     fault_edges: set[tuple[int, int]] | None = None,
     fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
     hold_seconds: float = 1.0,
@@ -81,10 +84,13 @@ def build_action_candidates(
 ) -> tuple[ActionCandidate, ...]:
     if edge_capacity <= 0:
         raise ValueError("edge_capacity must be positive")
+    if merge_capacity <= 0:
+        raise ValueError("merge_capacity must be positive")
     if hold_seconds <= 0.0:
         raise ValueError("hold_seconds must be positive")
 
     node_capacities = node_capacities or {}
+    merge_groups = merge_groups or {}
     active_faults = active_fault_edges(fault_edges, fault_windows, ready_time)
     planner = AStarPlanner(graph) if require_reachable_goal else None
     candidates: list[ActionCandidate] = []
@@ -117,6 +123,18 @@ def build_action_candidates(
             task_id=task.task_id,
         ):
             reasons.append("edge_headway")
+        if _has_merge_group_conflict(
+            edge_reservations=edge_reservations,
+            start_node=current,
+            end_node=next_node,
+            start=edge_start,
+            end=edge_end,
+            merge_groups=merge_groups,
+            merge_capacity=merge_capacity,
+            merge_headway_seconds=merge_headway_seconds,
+            task_id=task.task_id,
+        ):
+            reasons.append("merge_group")
         node_capacity = node_capacities.get(next_node, 1)
         if reservations.has_capacity_conflict(
             next_node,
@@ -183,6 +201,33 @@ def build_action_candidates(
     )
 
     return tuple(candidates)
+
+
+def _has_merge_group_conflict(
+    edge_reservations: EdgeReservationTable,
+    start_node: int,
+    end_node: int,
+    start: float,
+    end: float,
+    merge_groups: dict[tuple[int, int], int],
+    merge_capacity: int,
+    merge_headway_seconds: float,
+    task_id: int,
+) -> bool:
+    group = merge_groups.get((start_node, end_node))
+    if group is None:
+        return False
+    overlapping = 0
+    for interval in edge_reservations.all_intervals():
+        if interval.task_id == task_id:
+            continue
+        if merge_groups.get((interval.start_node, interval.end_node)) != group:
+            continue
+        if interval.overlaps(start, end):
+            overlapping += 1
+        if merge_headway_seconds > 0.0 and abs(start - interval.start) < merge_headway_seconds:
+            return True
+    return overlapping >= merge_capacity
 
 
 def action_mask(candidates: tuple[ActionCandidate, ...]) -> tuple[bool, ...]:

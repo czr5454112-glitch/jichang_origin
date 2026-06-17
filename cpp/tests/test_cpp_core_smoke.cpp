@@ -456,6 +456,34 @@ int main() {
   test.check(decision.status == SafetyStatus::kEdgeHeadwayConflict,
              "shield should reject edge headway conflicts");
 
+  EdgeReservationTable merge_group_conflicts;
+  merge_group_conflicts.reserve(99, 1, 2, 0.0, 2.0);
+  JunctionShieldConfig merge_shield_config = shield_config;
+  merge_shield_config.merge_groups.push_back(czr005::ics::MergeGroupEdge{0, 1, 7});
+  merge_shield_config.merge_groups.push_back(czr005::ics::MergeGroupEdge{1, 2, 7});
+  const JunctionShield merge_shield(graph, merge_shield_config);
+  decision = merge_shield.validate_edge_action(10,
+                                               0,
+                                               1,
+                                               2,
+                                               0.0,
+                                               empty_node_reservations,
+                                               merge_group_conflicts);
+  test.check(decision.status == SafetyStatus::kMergeGroupConflict,
+             "shield should reject shared merge-group conflicts across different edges");
+  JunctionShieldConfig independent_merge_config = shield_config;
+  independent_merge_config.merge_groups.push_back(czr005::ics::MergeGroupEdge{0, 1, 7});
+  const JunctionShield independent_merge_shield(graph, independent_merge_config);
+  decision = independent_merge_shield.validate_edge_action(10,
+                                                           0,
+                                                           1,
+                                                           2,
+                                                           0.0,
+                                                           empty_node_reservations,
+                                                           merge_group_conflicts);
+  test.check(decision.allowed(),
+             "shield should ignore reservations outside the candidate merge group");
+
   decision = shield.validate_edge_action(10,
                                          0,
                                          1,

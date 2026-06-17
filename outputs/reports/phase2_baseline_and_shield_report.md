@@ -17,8 +17,8 @@ plus baseline logging on real task-stream inputs.
 
 | Baseline | Planned | Unplanned | Post-shield conflicts | Mean travel | P95 travel | Runtime seconds |
 |---|---:|---:|---:|---:|---:|---:|
-| reference_astar | 113 | 15 | 0 | 51.529204 | 76.800000 | 0.037938 |
-| rolling_horizon_sipp | 128 | 0 | 0 | 87.705494 | 161.469291 | 0.098733 |
+| reference_astar | 113 | 15 | 0 | 51.529204 | 76.800000 | 0.032668 |
+| rolling_horizon_sipp | 128 | 0 | 0 | 87.705494 | 161.469291 | 0.097627 |
 
 CSV: `outputs/tables/phase2_baseline_smoke_metrics.csv`
 
@@ -39,7 +39,7 @@ PIBT-style recursive current-node handoff parity is tracked in
 
 ## Remaining Work
 
-- merge-group constraints
+- full merge-group replay integration across every baseline
 - full buffer-capacity replay integration across every baseline
 - rolling-horizon active-bag replanning rather than sequential task-leg replay
 - full PIBT/CS-PIBT-style active-bag replay integration

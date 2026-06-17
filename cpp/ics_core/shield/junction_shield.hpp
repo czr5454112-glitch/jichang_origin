@@ -19,6 +19,7 @@ enum class SafetyStatus {
   kNodeReservationConflict,
   kEdgeCapacityConflict,
   kEdgeHeadwayConflict,
+  kMergeGroupConflict,
   kUnreachableGoal,
 };
 
@@ -139,6 +140,14 @@ class EdgeReservationTable {
     return found == by_edge_.end() ? empty : found->second;
   }
 
+  [[nodiscard]] std::vector<EdgeReservation> all_intervals() const {
+    std::vector<EdgeReservation> values;
+    for (const auto& entry : by_edge_) {
+      values.insert(values.end(), entry.second.begin(), entry.second.end());
+    }
+    return values;
+  }
+
   [[nodiscard]] double earliest_start(int start_node,
                                       int end_node,
                                       double earliest,
@@ -216,10 +225,19 @@ class EdgeReservationTable {
   std::unordered_map<long long, std::vector<EdgeReservation>> by_edge_;
 };
 
+struct MergeGroupEdge {
+  int start_node = -1;
+  int end_node = -1;
+  int group = -1;
+};
+
 struct JunctionShieldConfig {
   int edge_capacity = 1;
   double edge_headway_seconds = 0.0;
   std::unordered_map<int, int> node_capacities;
+  std::vector<MergeGroupEdge> merge_groups;
+  int merge_capacity = 1;
+  double merge_headway_seconds = 0.0;
   bool require_reachable_goal = true;
   bool allow_goal_node_overlap = true;
 };
@@ -274,6 +292,13 @@ class JunctionShield {
                             node_start,
                             node_end};
     }
+    if (has_merge_group_conflict(current, next, edge_start, edge_end, task_id, edge_reservations)) {
+      return ShieldDecision{SafetyStatus::kMergeGroupConflict,
+                            edge_start,
+                            edge_end,
+                            node_start,
+                            node_end};
+    }
     if ((!config_.allow_goal_node_overlap || next != goal) &&
         node_reservations.has_capacity_conflict(next,
                                                 node_start,
@@ -307,6 +332,48 @@ class JunctionShield {
   [[nodiscard]] int node_capacity(int node) const {
     const auto found = config_.node_capacities.find(node);
     return found == config_.node_capacities.end() ? 1 : found->second;
+  }
+
+  [[nodiscard]] int merge_group(int start_node, int end_node) const {
+    for (const auto& edge : config_.merge_groups) {
+      if (edge.start_node == start_node && edge.end_node == end_node) {
+        return edge.group;
+      }
+    }
+    return -1;
+  }
+
+  [[nodiscard]] bool has_merge_group_conflict(
+      int start_node,
+      int end_node,
+      double start,
+      double end,
+      int task_id,
+      const EdgeReservationTable& edge_reservations) const {
+    if (config_.merge_capacity <= 0) {
+      return true;
+    }
+    const int group = merge_group(start_node, end_node);
+    if (group < 0) {
+      return false;
+    }
+    int overlapping = 0;
+    for (const auto& interval : edge_reservations.all_intervals()) {
+      if (interval.task_id == task_id) {
+        continue;
+      }
+      if (merge_group(interval.start_node, interval.end_node) != group) {
+        continue;
+      }
+      if (interval.overlaps(start, end)) {
+        ++overlapping;
+      }
+      const double gap = interval.start > start ? interval.start - start : start - interval.start;
+      if (config_.merge_headway_seconds > 0.0 && gap < config_.merge_headway_seconds) {
+        return true;
+      }
+    }
+    return overlapping >= config_.merge_capacity;
   }
 
   const Graph& graph_;

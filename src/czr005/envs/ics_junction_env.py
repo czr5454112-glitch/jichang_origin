@@ -57,6 +57,9 @@ class IcsJunctionEnv:
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
         node_capacities: dict[int, int] | None = None,
+        merge_groups: dict[tuple[int, int], int] | None = None,
+        merge_capacity: int = 1,
+        merge_headway_seconds: float = 0.0,
         fault_edges: set[tuple[int, int]] | None = None,
         fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
         require_reachable_goal: bool = True,
@@ -67,6 +70,8 @@ class IcsJunctionEnv:
             raise ValueError("hold_seconds must be positive")
         if edge_capacity <= 0:
             raise ValueError("edge_capacity must be positive")
+        if merge_capacity <= 0:
+            raise ValueError("merge_capacity must be positive")
         if max_decisions_per_task <= 0:
             raise ValueError("max_decisions_per_task must be positive")
 
@@ -77,6 +82,9 @@ class IcsJunctionEnv:
         self.edge_capacity = edge_capacity
         self.edge_headway_seconds = edge_headway_seconds
         self.node_capacities = dict(node_capacities or {})
+        self.merge_groups = dict(merge_groups or {})
+        self.merge_capacity = merge_capacity
+        self.merge_headway_seconds = merge_headway_seconds
         self.fault_edges = fault_edges or set()
         self.fault_windows = tuple(fault_windows or ())
         self.require_reachable_goal = require_reachable_goal
@@ -379,6 +387,9 @@ class IcsJunctionEnv:
             edge_capacity=self.edge_capacity,
             edge_headway_seconds=self.edge_headway_seconds,
             node_capacities=self.node_capacities,
+            merge_groups=self.merge_groups,
+            merge_capacity=self.merge_capacity,
+            merge_headway_seconds=self.merge_headway_seconds,
             fault_edges=self.fault_edges,
             fault_windows=self.fault_windows,
             hold_seconds=self.hold_seconds,
@@ -399,6 +410,9 @@ class IcsJunctionEnv:
             edge_capacity=self.edge_capacity,
             edge_headway_seconds=self.edge_headway_seconds,
             node_capacities=self.node_capacities,
+            merge_groups=self.merge_groups,
+            merge_capacity=self.merge_capacity,
+            merge_headway_seconds=self.merge_headway_seconds,
             fault_edges=self.fault_edges,
             fault_windows=self.fault_windows,
             hold_seconds=self.hold_seconds,

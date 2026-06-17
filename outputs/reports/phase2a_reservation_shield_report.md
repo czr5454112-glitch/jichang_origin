@@ -17,10 +17,11 @@ The initial shield validates a proposed edge action before execution:
 - edge must not be faulted
 - edge capacity must have room
 - edge entry headway must be respected
+- configured merge group must have room
 - non-goal target node must have available explicit node/buffer capacity
 - taking the edge must not make the goal unreachable
 
-The C++ smoke test covers allowed action, missing edge, faulted edge, node reservation conflict, explicit buffer capacity below/full-capacity behavior, edge capacity conflict, edge headway conflict, and unreachable-goal rejection.
+The C++ smoke test covers allowed action, missing edge, faulted edge, node reservation conflict, explicit buffer capacity below/full-capacity behavior, edge capacity conflict, edge headway conflict, configured merge-group conflict, and unreachable-goal rejection.
 
 ## Validation
 
@@ -48,7 +49,7 @@ Target Phase3 env pytest:
 
 This is a first shield skeleton, not the full Phase2 baseline stack. Remaining Phase2 work includes:
 
-- merge conflict groups
+- full merge-group replay integration across every baseline
 - full buffer-capacity replay integration across every baseline
 - full active-bag PIBT/CS-PIBT-style replay integration
 - full event-simulation safety counters

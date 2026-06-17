@@ -123,7 +123,7 @@ PIBT-style recursive current-node handoff parity is tracked in
 
 ## Remaining Work
 
-- merge-group constraints
+- full merge-group replay integration across every baseline
 - full buffer-capacity replay integration across every baseline
 - rolling-horizon active-bag replanning rather than sequential task-leg replay
 - full PIBT/CS-PIBT-style active-bag replay integration

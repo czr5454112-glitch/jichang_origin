@@ -173,6 +173,37 @@ def test_action_mask_respects_buffer_node_capacity() -> None:
     assert "node_reservation" in full_buffer_candidates[0].blocked_reasons
 
 
+def test_action_mask_blocks_merge_group_conflicts() -> None:
+    graph = _branch_graph()
+    task = _task("merge-group", 1, pass_time=0.0, std=20.0, goal=3)
+    edge_reservations = EdgeReservationTable()
+    edge_reservations.reserve(task_id=99, start_node=0, end_node=2, start=0.0, end=3.0)
+
+    candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=ReservationTable(),
+        edge_reservations=edge_reservations,
+        merge_groups={(0, 1): 7, (0, 2): 7},
+    )
+    assert candidates[0].next_node == 1
+    assert candidates[0].safe is False
+    assert "merge_group" in candidates[0].blocked_reasons
+
+    independent_candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=ReservationTable(),
+        edge_reservations=edge_reservations,
+        merge_groups={(0, 1): 7},
+    )
+    assert independent_candidates[0].safe is True
+
+
 def test_action_mask_applies_repair_windows_by_ready_time() -> None:
     graph = _branch_graph()
     task = _task("repair-window", 1, pass_time=0.0, std=20.0, goal=3)
