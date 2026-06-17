@@ -66,6 +66,12 @@ class ReservationTable {
     }
   }
 
+  [[nodiscard]] const std::vector<NodeReservation>& intervals(int node) const {
+    static const std::vector<NodeReservation> empty;
+    const auto found = by_node_.find(node);
+    return found == by_node_.end() ? empty : found->second;
+  }
+
   void remove_task(int task_id) {
     for (auto iter = by_node_.begin(); iter != by_node_.end();) {
       auto& intervals = iter->second;
@@ -105,4 +111,3 @@ class ReservationTable {
 };
 
 }  // namespace czr005::ics
-

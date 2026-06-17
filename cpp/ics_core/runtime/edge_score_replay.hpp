@@ -273,14 +273,18 @@ inline double earliest_safe_node_start(const ReservationTable& reservations,
                                        double earliest_start,
                                        double duration,
                                        double step_seconds) {
+  (void)step_seconds;
   double candidate = earliest_start;
-  for (int attempt = 0; attempt < 10000; ++attempt) {
-    if (!reservations.has_conflict(node, candidate, candidate + duration, task_id)) {
-      return candidate;
+  for (const auto& interval : reservations.intervals(node)) {
+    if (interval.task_id == task_id) {
+      continue;
     }
-    candidate += step_seconds;
+    if (!interval.overlaps(candidate, candidate + duration)) {
+      continue;
+    }
+    candidate = interval.end + 1e-9;
   }
-  throw std::runtime_error("failed to find safe node start");
+  return candidate;
 }
 
 }  // namespace detail
@@ -516,7 +520,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
       ++result.planned_count;
       result.routes.push_back(route);
       result.makespan = std::max(result.makespan, route.back().t2);
-      result.mean_travel_time += route.back().t2 - route.front().t1;
+      result.mean_travel_time += route.back().t2 - task.pass_time;
     } else if (!counted_unplanned) {
       node_reservations.remove_task(task.task_id);
       edge_reservations.remove_task(task.task_id);
