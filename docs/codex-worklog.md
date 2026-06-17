@@ -296,3 +296,14 @@
 - Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `31 passed`; Phase8 runtime policy smoke passed.
 - Safety / parity notes: This measures and uses C++ inference inside the existing Python event environment. Native C++ event replay, larger latency sweeps, and heldout-map/fault-schedule validation remain pending.
 - Follow-up: move the event replay loop itself into C++, compare runtime against rolling-horizon/SIPP on identical larger windows, then validate exported checkpoints on heldout maps and randomized schedules.
+
+## 2026-06-17 09:00 - Phase8 compact native C++ EdgeScore replay
+
+- Request: Push Phase8 beyond pybind inference by adding a first native C++ replay path that constructs candidates, applies the shield, and executes the loaded EdgeScore policy inside C++.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `cpp/ics_core/runtime/edge_score_replay.hpp`, exposed `edge_score_native_replay_summary` through pybind, expanded C++/pybind smoke tests, updated `cpp/ics_core/README.md`, added `scripts/eval/run_phase8_native_cpp_replay_smoke.py`, and generated `outputs/tables/phase8_native_cpp_replay.csv` plus `outputs/reports/phase8_native_cpp_replay_report.md`.
+- Commands run: CMake build, target CTest, target Python pytest, and Phase8 native C++ replay smoke.
+- Key observations: The compact C++ replay uses the runtime text model, C++ candidate feature construction, C++ `JunctionShield`, node/edge reservations, and hold fallback. On four small real map/task windows, it planned all `40/40` configured tasks with zero post-shield conflicts.
+- Tests / validation: CMake build succeeded; target CTest passed 2/2; target Python pytest passed `31 passed`; Phase8 native C++ replay smoke passed.
+- Safety / parity notes: This is the first native C++ replay loop, but it is still compact/sequential and not the final high-throughput event simulator. Feature/metric parity with the Python environment needs larger one-for-one checks.
+- Follow-up: replace the compact replay with a full C++ event simulator, align replay features/metrics against Python on larger windows, and add repair-event plus heldout-map validation.

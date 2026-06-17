@@ -93,6 +93,17 @@ def main() -> None:
     assert task_summary["expanded_task_count"] == 43603
     assert task_summary["expanded_by_start"][52] == 15097
 
+    native_replay = czr005_cpp.edge_score_native_replay_summary(
+        str(LEGACY / "map2.txt"),
+        str(LEGACY / "inputdata.txt"),
+        str(RUNTIME / "phase8_edge_score_runtime_model.txt"),
+        max_tasks=2,
+    )
+    assert native_replay["planned_count"] + native_replay["unplanned_count"] == 2
+    assert native_replay["planned_count"] >= 1
+    assert native_replay["decision_count"] > 0
+    assert native_replay["post_shield_conflicts"] == 0
+
 
 if __name__ == "__main__":
     main()

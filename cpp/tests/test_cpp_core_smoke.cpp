@@ -12,11 +12,13 @@
 #include "ics_core/models/edge_score.hpp"
 #include "ics_core/reservation/reservation.hpp"
 #include "ics_core/routing/astar.hpp"
+#include "ics_core/runtime/edge_score_replay.hpp"
 #include "ics_core/shield/junction_shield.hpp"
 
 using czr005::ics::AStarPlanner;
 using czr005::ics::Edge;
 using czr005::ics::EdgeScoreModel;
+using czr005::ics::EdgeScoreReplayConfig;
 using czr005::ics::EdgeReservationTable;
 using czr005::ics::Graph;
 using czr005::ics::JunctionShield;
@@ -27,6 +29,9 @@ using czr005::ics::SafetyStatus;
 using czr005::ics::compute_episode_metrics;
 using czr005::ics::read_legacy_inputdata;
 using czr005::ics::read_legacy_map2;
+using czr005::ics::run_edge_score_replay;
+using czr005::ics::TaskLeg;
+using czr005::ics::TaskStream;
 
 namespace {
 
@@ -233,6 +238,26 @@ int main() {
              "edge score first row should match manual tanh MLP");
   test.check(edge_score_model.predict(edge_features, {false, true}) == 1,
              "edge score masked prediction should choose the only safe action");
+
+  std::vector<std::vector<double>> replay_w1(13, std::vector<double>{0.0});
+  replay_w1[0][0] = 2.0;
+  replay_w1[1][0] = -2.0;
+  replay_w1[5][0] = -0.5;
+  replay_w1[6][0] = 1.0;
+  const EdgeScoreModel replay_model(replay_w1, {0.0}, {1.0}, 0.0);
+  TaskStream replay_tasks;
+  replay_tasks.add(TaskLeg{"cpp-replay-1", 101, 101, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", false, 1});
+  replay_tasks.add(TaskLeg{"cpp-replay-2", 102, 102, 0.5, 20.5, 0, 2, 0, 2, 0.5, "direct", false, 2});
+  EdgeScoreReplayConfig replay_config;
+  replay_config.max_tasks = 2;
+  replay_config.max_decisions_per_task = 16;
+  replay_config.edge_capacity = 1;
+  replay_config.edge_headway_seconds = 0.0;
+  const auto replay_result = run_edge_score_replay(graph, replay_tasks, replay_model, replay_config);
+  test.check(replay_result.planned_count == 2, "native edge-score replay should plan both sample tasks");
+  test.check(replay_result.unplanned_count == 0, "native edge-score replay should not leave sample tasks unplanned");
+  test.check(replay_result.decision_count >= 4, "native edge-score replay should execute sample decisions");
+  test.check(replay_result.post_shield_conflicts == 0, "native edge-score replay should stay conflict-free");
 
   const auto legacy = read_legacy_map2(std::string(CZR005_SOURCE_DIR) +
                                        "/legacy/jichang_origin_readonly/map2.txt");

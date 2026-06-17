@@ -115,6 +115,34 @@ class EdgeReservationTable {
     return false;
   }
 
+  [[nodiscard]] int conflict_count(int capacity, double headway_seconds) const {
+    int conflicts = 0;
+    for (const auto& entry : by_edge_) {
+      const auto& intervals = entry.second;
+      for (std::size_t i = 0; i < intervals.size(); ++i) {
+        int overlapping = 0;
+        for (std::size_t j = 0; j < intervals.size(); ++j) {
+          if (i == j) {
+            continue;
+          }
+          if (intervals[i].overlaps(intervals[j].start, intervals[j].end)) {
+            ++overlapping;
+          }
+          const double gap = intervals[i].start > intervals[j].start
+                                 ? intervals[i].start - intervals[j].start
+                                 : intervals[j].start - intervals[i].start;
+          if (headway_seconds > 0.0 && gap < headway_seconds) {
+            ++conflicts;
+          }
+        }
+        if (overlapping >= capacity) {
+          ++conflicts;
+        }
+      }
+    }
+    return conflicts;
+  }
+
  private:
   static long long edge_key(int start_node, int end_node) {
     return (static_cast<long long>(start_node) << 32) ^ static_cast<unsigned int>(end_node);

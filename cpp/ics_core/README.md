@@ -8,7 +8,8 @@ Implemented so far:
 - A* planner and route smoke parity
 - node and edge reservation primitives
 - initial junction shield checks
-- header-only MLP edge-score inference smoke
+- header-only MLP edge-score inference and text runtime loader
+- compact native C++ EdgeScore replay smoke
 - pybind smoke boundary
 
-The full C++ event simulator, C++ SIPP baseline, C++ rolling-horizon baseline, recursive PIBT-style resolver, and production model loader are still pending.
+The full high-throughput C++ event simulator, C++ SIPP baseline, C++ rolling-horizon baseline, recursive PIBT-style resolver, and broad runtime replay validation are still pending.
