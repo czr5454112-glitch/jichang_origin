@@ -36,6 +36,7 @@ using czr005::ics::PIBTStyleOneStepResolver;
 using czr005::ics::PeriodicReplanningConfig;
 using czr005::ics::ReservationTable;
 using czr005::ics::RollingHorizonConfig;
+using czr005::ics::RollingHorizonFaultWindow;
 using czr005::ics::SafetyStatus;
 using czr005::ics::SIPPPlanner;
 using czr005::ics::compute_episode_metrics;
@@ -190,6 +191,14 @@ int main() {
   reservations.add_route(1, route);
   test.check(reservations.conflict_count() == 0, "sample reservation should have no conflicts");
 
+  ReservationTable zero_duration_reservations;
+  zero_duration_reservations.reserve(1, 47, 10.0, 10.0);
+  zero_duration_reservations.reserve(2, 47, 10.0, 10.0);
+  test.check(zero_duration_reservations.conflict_count() == 0,
+             "zero-duration node reservations should not count as occupancy conflicts");
+  test.check(!zero_duration_reservations.has_conflict(47, 10.0, 10.0, 3),
+             "zero-duration node reservations should not block another zero-duration visit");
+
   const auto blocked = planner.plan(0, 2, 0.0, &reservations, {}, 2);
   test.check(blocked.empty(), "sample conflicting route should be blocked");
 
@@ -242,6 +251,39 @@ int main() {
     test.check(rolling_result.events[1].segment_id == "loose",
                "rolling-horizon SIPP should plan the looser task second");
   }
+
+  TaskStream rolling_repair_active_tasks;
+  rolling_repair_active_tasks.add(
+      TaskLeg{"repair-active", 403, 403, 5.0, 40.0, 0, 2, 0, 2, 5.0, "direct", false, 3});
+  rolling_repair_active_tasks.sort_by_pass_time();
+  RollingHorizonConfig rolling_repair_config;
+  rolling_repair_config.max_tasks = 1;
+  rolling_repair_config.horizon_seconds = 60.0;
+  const auto rolling_repair_active_result = run_rolling_horizon_sipp(
+      graph,
+      rolling_repair_active_tasks,
+      rolling_repair_config,
+      {},
+      {RollingHorizonFaultWindow{1, 2, 0.0, 10.0}});
+  test.check(rolling_repair_active_result.planned_count == 0,
+             "rolling-horizon active repair window should block planning-time faulted edge");
+  test.check(rolling_repair_active_result.unplanned_count == 1,
+             "rolling-horizon active repair window should mark the sample task unplanned");
+
+  TaskStream rolling_repaired_tasks;
+  rolling_repaired_tasks.add(
+      TaskLeg{"repair-after", 404, 404, 12.0, 40.0, 0, 2, 0, 2, 12.0, "direct", false, 4});
+  rolling_repaired_tasks.sort_by_pass_time();
+  const auto rolling_repaired_result = run_rolling_horizon_sipp(
+      graph,
+      rolling_repaired_tasks,
+      rolling_repair_config,
+      {},
+      {RollingHorizonFaultWindow{1, 2, 0.0, 10.0}});
+  test.check(rolling_repaired_result.planned_count == 1,
+             "rolling-horizon repaired window should allow planning after repair");
+  test.check(rolling_repaired_result.unplanned_count == 0,
+             "rolling-horizon repaired window should not leave the sample task unplanned");
 
   PeriodicReplanningConfig periodic_config;
   periodic_config.max_tasks = 2;

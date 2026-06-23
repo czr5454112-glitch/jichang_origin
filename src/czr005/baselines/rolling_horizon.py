@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from czr005.baselines.sipp import SIPPPlanner, SIPPNode
+from czr005.envs.action_mask import EdgeFaultWindow, active_fault_edges
 from czr005.sim_py.event_sim import EpisodeResult
 from czr005.sim_py.graph import IcsGraph
 from czr005.sim_py.metrics import compute_episode_metrics
@@ -55,12 +56,15 @@ class RollingHorizonBaseline:
         max_tasks: int | None = None,
         end_time: float | None = None,
         fault_edges: set[tuple[int, int]] | None = None,
+        fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
     ) -> EpisodeResult:
         selected = self._select_tasks(tuple(tasks), max_tasks=max_tasks, end_time=end_time)
         routes: dict[str, list[SIPPNode]] = {}
         unplanned: list[TaskLeg] = []
         events: list[dict[str, object]] = []
         task_by_segment: dict[str, TaskLeg] = {task.segment_id: task for task in selected}
+        static_faults = set(fault_edges or set())
+        repair_windows = tuple(fault_windows or ())
 
         for batch in self._batches(selected):
             prioritized = sorted(
@@ -68,6 +72,7 @@ class RollingHorizonBaseline:
                 key=lambda task: (task.std - task.pass_time, task.pass_time, task.task_id, task.leg),
             )
             for priority_rank, task in enumerate(prioritized):
+                planning_faults = active_fault_edges(static_faults, repair_windows, task.pass_time)
                 route = self.planner.plan(
                     start=task.start,
                     goal=task.goal,
@@ -76,7 +81,7 @@ class RollingHorizonBaseline:
                     edge_reservations=self.edge_reservations,
                     edge_capacity=self.edge_capacity,
                     edge_headway_seconds=self.edge_headway_seconds,
-                    fault_edges=fault_edges,
+                    fault_edges=planning_faults,
                     task_id=task.task_id,
                 )
                 if route:

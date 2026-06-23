@@ -273,6 +273,16 @@ std::vector<czr005::ics::PeriodicFaultWindow> periodic_fault_windows_from_tuples
   return windows;
 }
 
+std::vector<czr005::ics::RollingHorizonFaultWindow> rolling_horizon_fault_windows_from_tuples(
+    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+  std::vector<czr005::ics::RollingHorizonFaultWindow> windows;
+  windows.reserve(fault_windows.size());
+  for (const auto& [start, end, fault_start, repair_time] : fault_windows) {
+    windows.push_back(czr005::ics::RollingHorizonFaultWindow{start, end, fault_start, repair_time});
+  }
+  return windows;
+}
+
 czr005::ics::Graph graph_from_records(
     const std::vector<NodeRecordTuple>& node_records,
     const std::vector<EdgeRecordTuple>& edge_records,
@@ -614,19 +624,21 @@ py::dict rolling_horizon_sipp_from_records(
     double horizon_seconds,
     int edge_capacity,
     double edge_headway_seconds,
-    const std::vector<std::pair<int, int>>& fault_edges) {
+    const std::vector<std::pair<int, int>>& fault_edges,
+    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto tasks = task_stream_from_records(task_records);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  const auto windows = rolling_horizon_fault_windows_from_tuples(fault_windows);
   czr005::ics::RollingHorizonConfig config;
   config.max_tasks = static_cast<std::size_t>(max_tasks);
   config.horizon_seconds = horizon_seconds;
   config.edge_capacity = edge_capacity;
   config.edge_headway_seconds = edge_headway_seconds;
-  const auto result = czr005::ics::run_rolling_horizon_sipp(graph, tasks, config, faults);
+  const auto result = czr005::ics::run_rolling_horizon_sipp(graph, tasks, config, faults, windows);
 
   py::dict payload;
   payload["summary"] = rolling_horizon_summary(result, max_tasks);
@@ -1218,7 +1230,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("horizon_seconds") = 300.0,
              py::arg("edge_capacity") = 1,
              py::arg("edge_headway_seconds") = 0.0,
-             py::arg("fault_edges") = std::vector<std::pair<int, int>>{});
+             py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
   module.def("periodic_replanning_sipp_from_records",
              &periodic_replanning_sipp_from_records,
              py::arg("node_records"),

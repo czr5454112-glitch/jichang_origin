@@ -368,6 +368,12 @@ def _median(values: list[float]) -> float:
     return 0.5 * (ordered[mid - 1] + ordered[mid])
 
 
+def _fault_label(row: dict[str, str]) -> str:
+    if row["fault_edges"] != "none":
+        return row["fault_edges"]
+    return row["fault_windows"]
+
+
 def write_report(rows: list[dict[str, str]]) -> None:
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     summary = _summarize(rows)
@@ -391,7 +397,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
         "",
         (
             "The table is intentionally an evidence index, not a final paper benchmark. Rows come from different "
-            "scopes, and the first matched Phase9 rows are still limited to small no-fault/static-fault windows, "
+            "scopes, and the first matched Phase9 rows are still limited to small no-fault/static-fault/repair-window windows, "
             "so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and "
             "hardware-normalized timing."
         ),
@@ -420,8 +426,10 @@ def write_report(rows: list[dict[str, str]]) -> None:
     )
     for row in matched_rows:
         lines.append(
-            "| {case} | {policy_or_baseline} | {max_tasks} | {fault_edges} | {planned_count} | "
-            "{decision_count} | {post_shield_conflicts} | {cpp_decision_speedup} | {strict_parity_pass} |".format(**row)
+            "| {case} | {policy_or_baseline} | {max_tasks} | {fault_label} | {planned_count} | "
+            "{decision_count} | {post_shield_conflicts} | {cpp_decision_speedup} | {strict_parity_pass} |".format(
+                **{**row, "fault_label": _fault_label(row)}
+            )
         )
 
     lines.extend(
@@ -493,7 +501,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "",
             "## Remaining Work",
             "",
-            "- extend matched Phase9 rows to repair-window, merge-group, and buffer-capacity scenarios",
+            "- extend matched Phase9 rows to merge-group and buffer-capacity scenarios",
             "- add a separate real heldout airport map when fixture data is available",
             "- add hardware-normalized repeated timing and confidence intervals for every compared baseline family",
         ]

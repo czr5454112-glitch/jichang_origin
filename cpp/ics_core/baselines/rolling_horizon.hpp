@@ -38,6 +38,13 @@ struct RollingHorizonEvent {
   std::vector<int> path;
 };
 
+struct RollingHorizonFaultWindow {
+  int start = -1;
+  int end = -1;
+  double fault_start = 0.0;
+  double repair_time = 0.0;
+};
+
 struct RollingHorizonResult {
   int planned_count = 0;
   int unplanned_count = 0;
@@ -92,6 +99,27 @@ inline std::vector<int> route_locations(const std::vector<PathNode>& route) {
   return path;
 }
 
+inline void validate_fault_windows(const std::vector<RollingHorizonFaultWindow>& fault_windows) {
+  for (const auto& window : fault_windows) {
+    if (window.repair_time < window.fault_start) {
+      throw std::invalid_argument("repair_time must be >= fault_start");
+    }
+  }
+}
+
+inline std::set<std::pair<int, int>> active_fault_edges(
+    const std::set<std::pair<int, int>>& fault_edges,
+    const std::vector<RollingHorizonFaultWindow>& fault_windows,
+    double decision_time) {
+  std::set<std::pair<int, int>> active = fault_edges;
+  for (const auto& window : fault_windows) {
+    if (window.fault_start <= decision_time && decision_time < window.repair_time) {
+      active.insert({window.start, window.end});
+    }
+  }
+  return active;
+}
+
 inline void reserve_route_edges(const Graph& graph,
                                 EdgeReservationTable& edge_reservations,
                                 int task_id,
@@ -113,7 +141,8 @@ inline RollingHorizonResult run_rolling_horizon_sipp(
     const Graph& graph,
     const TaskStream& tasks,
     const RollingHorizonConfig& config = {},
-    const std::set<std::pair<int, int>>& fault_edges = {}) {
+    const std::set<std::pair<int, int>>& fault_edges = {},
+    const std::vector<RollingHorizonFaultWindow>& fault_windows = {}) {
   if (config.horizon_seconds <= 0.0) {
     throw std::invalid_argument("horizon_seconds must be positive");
   }
@@ -123,6 +152,7 @@ inline RollingHorizonResult run_rolling_horizon_sipp(
   if (config.edge_capacity <= 0) {
     throw std::invalid_argument("edge_capacity must be positive");
   }
+  detail::validate_fault_windows(fault_windows);
 
   const std::size_t limit = std::min(config.max_tasks, tasks.size());
   std::vector<TaskLeg> selected;
@@ -156,6 +186,8 @@ inline RollingHorizonResult run_rolling_horizon_sipp(
 
     for (std::size_t priority_rank = 0; priority_rank < batch.tasks.size(); ++priority_rank) {
       const auto& task = batch.tasks[priority_rank];
+      const auto planning_faults =
+          detail::active_fault_edges(fault_edges, fault_windows, task.pass_time);
       const auto route = planner.plan(task.start,
                                       task.goal,
                                       task.pass_time,
@@ -163,7 +195,7 @@ inline RollingHorizonResult run_rolling_horizon_sipp(
                                       &edge_reservations,
                                       config.edge_capacity,
                                       config.edge_headway_seconds,
-                                      fault_edges,
+                                      planning_faults,
                                       task.task_id);
       if (route.empty()) {
         ++result.unplanned_count;

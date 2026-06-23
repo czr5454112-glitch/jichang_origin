@@ -211,6 +211,7 @@ def _case_plan() -> tuple[MatchedScenario, ...]:
         MatchedScenario("legacy_first16", 0, 16),
         MatchedScenario("legacy_first32", 0, 32),
         MatchedScenario("legacy_offset32_static16", 32, 16, fault_edges=((16, 17),)),
+        MatchedScenario("legacy_offset64_repair32", 64, 32, fault_windows=((28, 47, 0.0, 12000.0),)),
     )
 
 
@@ -232,6 +233,7 @@ def _python_rolling(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[st
         _selected_tasks(inputs, scenario),
         max_tasks=scenario.max_tasks,
         fault_edges=set(scenario.fault_edges),
+        fault_windows=scenario.fault_windows,
     )
     edge_conflicts = baseline.edge_reservations.conflict_count()
     return {
@@ -256,6 +258,7 @@ def _cpp_rolling(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, 
         edge_capacity=1,
         edge_headway_seconds=0.0,
         fault_edges=list(scenario.fault_edges),
+        fault_windows=list(scenario.fault_windows),
     )
     return dict(payload["summary"])
 
@@ -513,6 +516,14 @@ def _row(
     }
 
 
+def _fault_label(row: dict[str, float | int | str | bool]) -> str:
+    fault_edges = str(row["fault_edges"])
+    fault_windows = str(row["fault_windows"])
+    if fault_edges != "none":
+        return fault_edges
+    return fault_windows
+
+
 def build_rows(inputs: RuntimeInputs) -> list[dict[str, float | int | str | bool]]:
     rows: list[dict[str, float | int | str | bool]] = []
     for scenario in _case_plan():
@@ -563,7 +574,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This diagnostic reruns Python and C++ implementations of the main event/baseline families "
-            "on the same real legacy `map2/inputdata` task windows. It covers no-fault and static-fault "
+            "on the same real legacy `map2/inputdata` task windows. It covers no-fault, static-fault, and repair-window "
             "scenarios that are supported by every included family."
         ),
         "",
@@ -573,7 +584,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This is a matched diagnostic gate, not a final paper benchmark: timings are single local "
-            "passes and repair-window/merge-buffer variants are handled by the dedicated parity gates."
+            "passes and merge-buffer variants are handled by the dedicated parity gates."
         ),
         "",
         "## Matched Rows",
@@ -588,9 +599,11 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         decisions = f"{row['python_decisions']}/{row['cpp_decisions']}"
         conflicts = f"{row['python_conflicts']}/{row['cpp_conflicts']}"
         lines.append(
-            "| {scenario} | {family} | {max_tasks} | {fault_edges} | {python_planned} | {cpp_planned} | "
+            "| {scenario} | {family} | {max_tasks} | {fault_label} | {python_planned} | {cpp_planned} | "
             f"{decisions} | {conflicts} | "
-            "{mean_travel_abs_diff:.6f} | {cpp_speedup:.3f} | {parity_pass} |".format(**row)
+            "{mean_travel_abs_diff:.6f} | {cpp_speedup:.3f} | {parity_pass} |".format(
+                **{**row, "fault_label": _fault_label(row)}
+            )
         )
     lines.extend(
         [
@@ -615,12 +628,11 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "- Python/C++ summary parity: PASS" if parity_pass else "- Python/C++ summary parity: FAIL",
             "- post-shield safety: PASS" if safety_pass else "- post-shield safety: FAIL",
             f"- median C++ local-call speedup: `{_median(speedups):.3f}x`",
-            "- repair-window common-family comparison: not covered",
+            "- repair-window common-family comparison: covered",
             "- merge/buffer common-family comparison: not covered",
             "",
             "## Remaining Work",
             "",
-            "- add repair-window rows for families that support them or extend rolling-horizon semantics",
             "- add merge/buffer matched rows once every included family accepts the shared config",
             "- replace single local timing with repeated hardware-normalized timing across the matched table",
         ]

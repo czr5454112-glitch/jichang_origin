@@ -14,6 +14,8 @@ class NodeReservation:
     end: float
 
     def overlaps(self, start: float, end: float) -> bool:
+        if self.end <= self.start or end <= start:
+            return False
         return not (start > self.end or end < self.start)
 
     def to_dict(self) -> dict[str, float | int]:

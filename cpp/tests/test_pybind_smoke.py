@@ -204,6 +204,29 @@ def main() -> None:
     assert rolling_horizon["summary"]["post_shield_conflicts"] == 0
     assert [event["segment_id"] for event in rolling_horizon["events"]] == ["urgent", "loose"]
 
+    rolling_repair_active = czr005_cpp.rolling_horizon_sipp_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        [("repair-active", 403, 403, 5.0, 40.0, 0, 2, 0, 2, 5.0, "direct", False, 3)],
+        max_tasks=1,
+        horizon_seconds=60.0,
+        fault_windows=[(1, 2, 0.0, 10.0)],
+    )
+    rolling_repaired = czr005_cpp.rolling_horizon_sipp_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        [("repair-after", 404, 404, 12.0, 40.0, 0, 2, 0, 2, 12.0, "direct", False, 4)],
+        max_tasks=1,
+        horizon_seconds=60.0,
+        fault_windows=[(1, 2, 0.0, 10.0)],
+    )
+    assert rolling_repair_active["summary"]["planned_count"] == 0
+    assert rolling_repair_active["summary"]["unplanned_count"] == 1
+    assert rolling_repaired["summary"]["planned_count"] == 1
+    assert rolling_repaired["summary"]["unplanned_count"] == 0
+
     periodic_replanning = czr005_cpp.periodic_replanning_sipp_from_records(
         node_records,
         edge_records,

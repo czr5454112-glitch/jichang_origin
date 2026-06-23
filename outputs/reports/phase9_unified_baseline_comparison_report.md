@@ -6,7 +6,7 @@ Date: 2026-06-23
 
 This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, repeated native event runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
 
-The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/static-fault windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and hardware-normalized timing.
+The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/static-fault/repair-window windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and hardware-normalized timing.
 
 CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
@@ -36,21 +36,26 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 | Scenario | Family | Tasks | Faults | C++ planned | C++ active steps | Conflicts | Speedup | Parity |
 |---|---|---:|---|---:|---:|---:|---:|---|
-| legacy_first16 | rolling_horizon_sipp | 16 | none | 16 | 16 | 0 | 5.297741 | True |
-| legacy_first16 | periodic_replanning_sipp | 16 | none | 16 | 120 | 0 | 0.736662 | True |
-| legacy_first16 | pibt_active_bag_replay | 16 | none | 0 | 18599 | 0 | 0.886578 | True |
-| legacy_first16 | edge_score_event | 16 | none | 16 | 173 | 0 | 2.319130 | True |
-| legacy_first16 | fallback_event | 16 | none | 15 | 168 | 0 | 1.041515 | True |
-| legacy_first32 | rolling_horizon_sipp | 32 | none | 32 | 32 | 0 | 0.969175 | True |
-| legacy_first32 | periodic_replanning_sipp | 32 | none | 32 | 248 | 0 | 0.940319 | True |
-| legacy_first32 | pibt_active_bag_replay | 32 | none | 0 | 41032 | 0 | 0.907718 | True |
-| legacy_first32 | edge_score_event | 32 | none | 24 | 330 | 0 | 2.394749 | True |
-| legacy_first32 | fallback_event | 32 | none | 25 | 346 | 0 | 1.183677 | True |
-| legacy_offset32_static16 | rolling_horizon_sipp | 16 | 16->17 | 16 | 16 | 0 | 0.874914 | True |
-| legacy_offset32_static16 | periodic_replanning_sipp | 16 | 16->17 | 16 | 129 | 0 | 0.854657 | True |
-| legacy_offset32_static16 | pibt_active_bag_replay | 16 | 16->17 | 0 | 22378 | 0 | 0.873019 | True |
-| legacy_offset32_static16 | edge_score_event | 16 | 16->17 | 12 | 205 | 0 | 2.563742 | True |
-| legacy_offset32_static16 | fallback_event | 16 | 16->17 | 12 | 193 | 0 | 1.146298 | True |
+| legacy_first16 | rolling_horizon_sipp | 16 | none | 16 | 16 | 0 | 4.994907 | True |
+| legacy_first16 | periodic_replanning_sipp | 16 | none | 16 | 120 | 0 | 0.792844 | True |
+| legacy_first16 | pibt_active_bag_replay | 16 | none | 0 | 18599 | 0 | 0.739430 | True |
+| legacy_first16 | edge_score_event | 16 | none | 16 | 173 | 0 | 1.878323 | True |
+| legacy_first16 | fallback_event | 16 | none | 15 | 168 | 0 | 1.000818 | True |
+| legacy_first32 | rolling_horizon_sipp | 32 | none | 32 | 32 | 0 | 0.656311 | True |
+| legacy_first32 | periodic_replanning_sipp | 32 | none | 32 | 248 | 0 | 0.687069 | True |
+| legacy_first32 | pibt_active_bag_replay | 32 | none | 0 | 41032 | 0 | 0.887482 | True |
+| legacy_first32 | edge_score_event | 32 | none | 24 | 330 | 0 | 1.724383 | True |
+| legacy_first32 | fallback_event | 32 | none | 25 | 346 | 0 | 1.233064 | True |
+| legacy_offset32_static16 | rolling_horizon_sipp | 16 | 16->17 | 16 | 16 | 0 | 0.810236 | True |
+| legacy_offset32_static16 | periodic_replanning_sipp | 16 | 16->17 | 16 | 129 | 0 | 1.020729 | True |
+| legacy_offset32_static16 | pibt_active_bag_replay | 16 | 16->17 | 0 | 22378 | 0 | 0.833197 | True |
+| legacy_offset32_static16 | edge_score_event | 16 | 16->17 | 12 | 205 | 0 | 2.534776 | True |
+| legacy_offset32_static16 | fallback_event | 16 | 16->17 | 12 | 193 | 0 | 1.022244 | True |
+| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | 28->47@[0.000,12000.000) | 32 | 32 | 0 | 0.997723 | True |
+| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | 28->47@[0.000,12000.000) | 32 | 265 | 0 | 0.748766 | True |
+| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | 28->47@[0.000,12000.000) | 0 | 50808 | 0 | 0.863118 | True |
+| legacy_offset64_repair32 | edge_score_event | 32 | 28->47@[0.000,12000.000) | 15 | 323 | 0 | 2.844537 | True |
+| legacy_offset64_repair32 | fallback_event | 32 | 28->47@[0.000,12000.000) | 13 | 321 | 0 | 1.258603 | True |
 
 ## Legacy Event Parity Evidence
 
@@ -81,19 +86,19 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | Family | Source rows | Passing rows | Safety | Source |
 |---|---:|---:|---|---|
 | sipp_planner | 9 | 9 | True | `outputs/tables/phase2_cpp_sipp_parity.csv` |
-| rolling_horizon_sipp | 8 | 8 | True | `outputs/tables/phase2_cpp_rolling_horizon_parity.csv` |
+| rolling_horizon_sipp | 11 | 11 | True | `outputs/tables/phase2_cpp_rolling_horizon_parity.csv` |
 | periodic_replanning_sipp | 7 | 7 | True | `outputs/tables/phase2_periodic_replanning_parity.csv` |
 | pibt_active_bag_replay | 6 | 6 | True | `outputs/tables/phase2_pibt_active_bag_replay_parity.csv` |
 | phase8_synthetic_event_scheduler | 10 | 10 | True | `outputs/tables/phase8_native_cpp_event_parity.csv` |
 | phase8_randomized_synthetic | 5 | 5 | True | `outputs/tables/phase8_native_cpp_randomized_parity.csv` |
 | phase8_legacy_event_scheduler | 6 | 6 | True | `outputs/tables/phase8_legacy_event_parity.csv` |
-| phase9_matched_baseline_comparison | 15 | 15 | True | `outputs/tables/phase9_matched_baseline_comparison.csv` |
+| phase9_matched_baseline_comparison | 20 | 20 | True | `outputs/tables/phase9_matched_baseline_comparison.csv` |
 | phase9_runtime_scaling | 8 | 8 | True | `outputs/tables/phase9_event_runtime_scaling.csv` |
 
 ## Gate Status
 
 - unified outcome rows: `17`
-- matched baseline rows: `15`
+- matched baseline rows: `20`
 - native event parity/runtime rows: `14`
 - baseline-family parity summaries: `9`
 - policies/baselines surfaced: `astar_guided, dagger_bc, edge_score_event, fallback_event, periodic_replanning_sipp, pibt_active_bag_replay, reference_astar, rolling_horizon_sipp`
@@ -106,6 +111,6 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 ## Remaining Work
 
-- extend matched Phase9 rows to repair-window, merge-group, and buffer-capacity scenarios
+- extend matched Phase9 rows to merge-group and buffer-capacity scenarios
 - add a separate real heldout airport map when fixture data is available
 - add hardware-normalized repeated timing and confidence intervals for every compared baseline family

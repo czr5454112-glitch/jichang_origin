@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
+from datetime import date
+import os
 from pathlib import Path
 import sys
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-BUILD_PYTHON_PATH = ROOT / "build_nmake" / "python"
+BUILD_PYTHON_PATH = Path(os.environ.get("CZR005_CPP_PYTHON_PATH", ROOT / "build_nmake" / "python"))
 TABLE_PATH = ROOT / "outputs" / "tables" / "phase2_cpp_rolling_horizon_parity.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "phase2_cpp_rolling_horizon_parity_report.md"
 FLOAT_TOLERANCE = 1.0e-9
@@ -16,6 +18,7 @@ FLOAT_TOLERANCE = 1.0e-9
 NodeRecord = tuple[int, int, float, int, int, list[int]]
 EdgeRecord = tuple[int, int, float, float]
 TaskRecord = tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
+FaultWindow = tuple[int, int, float, float]
 
 SUMMARY_FIELDS = (
     "planned_count",
@@ -56,12 +59,21 @@ class RollingParityCase:
     edge_capacity: int = 1
     edge_headway_seconds: float = 0.0
     fault_edges: tuple[tuple[int, int], ...] = ()
+    fault_windows: tuple[FaultWindow, ...] = ()
 
 
 def _prepare_imports() -> None:
     sys.path.insert(0, str(ROOT / "src"))
-    sys.path.insert(0, str(BUILD_PYTHON_PATH))
     sys.path.insert(0, str(Path(__file__).resolve().parent))
+    build_candidates = (
+        BUILD_PYTHON_PATH,
+        ROOT / "build_vs" / "python" / "Debug",
+        ROOT / "build_vs" / "python" / "Release",
+        ROOT / "build_nmake" / "python",
+    )
+    for candidate in reversed(build_candidates):
+        if candidate.exists():
+            sys.path.insert(0, str(candidate))
 
 
 def _task(segment_id: str, task_id: int, pass_time: float, std: float, goal: int) -> Any:
@@ -191,6 +203,7 @@ def _python_payload(case: RollingParityCase) -> dict[str, Any]:
         case.tasks,
         max_tasks=case.max_tasks,
         fault_edges=set(case.fault_edges),
+        fault_windows=case.fault_windows,
     )
     edge_conflicts = baseline.edge_reservations.conflict_count(
         capacity=case.edge_capacity,
@@ -220,6 +233,7 @@ def _cpp_payload(case: RollingParityCase) -> dict[str, Any]:
         edge_capacity=case.edge_capacity,
         edge_headway_seconds=case.edge_headway_seconds,
         fault_edges=list(case.fault_edges),
+        fault_windows=list(case.fault_windows),
     )
     return {
         "summary": dict(payload["summary"]),
@@ -334,6 +348,28 @@ def _cases() -> tuple[RollingParityCase, ...]:
             fault_edges=((1, 2),),
         ),
         RollingParityCase(
+            "line_repair_window_recovered",
+            line_graph,
+            line_nodes,
+            line_edges,
+            line_heuristic,
+            (_task("repair-after", 4, 12.0, 40.0, 2),),
+            (_task_record(_task("repair-after", 4, 12.0, 40.0, 2)),),
+            max_tasks=1,
+            fault_windows=((1, 2, 0.0, 10.0),),
+        ),
+        RollingParityCase(
+            "line_repair_window_active_unplanned",
+            line_graph,
+            line_nodes,
+            line_edges,
+            line_heuristic,
+            (_task("repair-active", 5, 5.0, 40.0, 2),),
+            (_task_record(_task("repair-active", 5, 5.0, 40.0, 2)),),
+            max_tasks=1,
+            fault_windows=((1, 2, 0.0, 10.0),),
+        ),
+        RollingParityCase(
             "single_edge_capacity",
             single_graph,
             single_nodes,
@@ -373,6 +409,7 @@ def _cases() -> tuple[RollingParityCase, ...]:
                 max_tasks=manifest_case.spec.task_count,
                 horizon_seconds=6.0,
                 fault_edges=manifest_case.spec.fault_edges,
+                fault_windows=manifest_case.spec.fault_windows,
             )
         )
     return tuple(cases)
@@ -393,15 +430,15 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
     lines = [
         "# Phase2 C++ Rolling-Horizon SIPP Parity Report",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
         (
             "This diagnostic compares the Python rolling-horizon SIPP baseline against the C++ "
             "rolling-horizon SIPP replay through pybind. It checks aggregate summaries and "
-            "planned/unplanned event rows across priority, fault, edge-capacity, edge-headway, "
-            "and persisted synthetic-map schedules."
+            "planned/unplanned event rows across priority, static fault, repair-window fault, "
+            "edge-capacity, edge-headway, and persisted synthetic-map schedules."
         ),
         "",
         "## Metrics",
@@ -437,6 +474,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
                 else "- rolling-horizon post-shield safety: FAIL"
             ),
             "- persisted synthetic manifest schedules: covered",
+            "- repair-window rolling-horizon planning-time semantics: covered",
             "- full active-bag PIBT replay and full merge-group/buffer-capacity replay integration: not covered",
         ]
     )

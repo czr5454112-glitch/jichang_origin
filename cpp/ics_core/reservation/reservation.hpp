@@ -15,6 +15,9 @@ struct NodeReservation {
   double end = 0.0;
 
   [[nodiscard]] bool overlaps(double candidate_start, double candidate_end) const {
+    if (end <= start || candidate_end <= candidate_start) {
+      return false;
+    }
     return !(candidate_start > end || candidate_end < start);
   }
 };

@@ -212,6 +212,15 @@ def test_rolling_horizon_prioritizes_deadline_slack_and_reserves_routes() -> Non
     assert result.routes["loose"][1].t1 > result.routes["urgent"][1].t2
 
 
+def test_zero_duration_node_reservations_do_not_conflict() -> None:
+    reservations = ReservationTable()
+    reservations.reserve(1, 47, 10.0, 10.0)
+    reservations.reserve(2, 47, 10.0, 10.0)
+
+    assert reservations.conflict_count() == 0
+    assert not reservations.has_conflict(47, 10.0, 10.0, task_id=3)
+
+
 def test_rolling_horizon_reports_fault_unplanned() -> None:
     result = RollingHorizonBaseline(_line_graph()).run_episode(
         (_task("faulted", 3, pass_time=0.0, std=20.0),),
@@ -222,6 +231,23 @@ def test_rolling_horizon_reports_fault_unplanned() -> None:
     assert result.metrics.unplanned_count == 1
     assert result.events[0]["event"] == "unplanned"
     assert result.events[0]["baseline"] == "rolling_horizon_sipp"
+
+
+def test_rolling_horizon_uses_repair_window_at_planning_time() -> None:
+    graph = _line_graph()
+    active_result = RollingHorizonBaseline(graph).run_episode(
+        (_task("repair-active", 4, pass_time=5.0, std=40.0),),
+        fault_windows=((1, 2, 0.0, 10.0),),
+    )
+    repaired_result = RollingHorizonBaseline(graph).run_episode(
+        (_task("repair-after", 5, pass_time=12.0, std=40.0),),
+        fault_windows=((1, 2, 0.0, 10.0),),
+    )
+
+    assert active_result.metrics.planned_count == 0
+    assert active_result.metrics.unplanned_count == 1
+    assert repaired_result.metrics.planned_count == 1
+    assert repaired_result.metrics.unplanned_count == 0
 
 
 def test_rolling_horizon_reserves_edge_capacity() -> None:
