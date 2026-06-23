@@ -7,7 +7,7 @@ import heapq
 from itertools import count
 
 from czr005.sim_py.graph import IcsGraph
-from czr005.sim_py.reservation import EdgeReservationTable, NodeReservation, ReservationTable
+from czr005.sim_py.reservation import EdgeReservationTable, ReservationTable
 
 
 EPSILON = 1e-9
@@ -57,11 +57,13 @@ class SIPPPlanner:
         edge_reservations: EdgeReservationTable | None = None,
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
+        node_capacities: dict[int, int] | None = None,
         fault_edges: set[tuple[int, int]] | None = None,
         task_id: int | None = None,
     ) -> list[SIPPNode]:
         reservations = reservations or ReservationTable()
         edge_reservations = edge_reservations or EdgeReservationTable()
+        node_capacities = node_capacities or {}
         fault_edges = fault_edges or set()
         sequence = count()
         open_heap: list[tuple[float, int, SIPPNode]] = []
@@ -98,6 +100,7 @@ class SIPPPlanner:
                     edge_reservations=edge_reservations,
                     edge_capacity=edge_capacity,
                     edge_headway_seconds=edge_headway_seconds,
+                    node_capacities=node_capacities,
                     task_id=task_id,
                 )
                 if transition is None:
@@ -133,6 +136,7 @@ class SIPPPlanner:
         edge_reservations: EdgeReservationTable,
         edge_capacity: int,
         edge_headway_seconds: float,
+        node_capacities: dict[int, int],
         task_id: int | None,
     ) -> tuple[float, float] | None:
         edge_start = current.t2
@@ -149,9 +153,11 @@ class SIPPPlanner:
             node_start = edge_start + travel_time
             if next_location != goal:
                 safe_node_start = self._earliest_safe_node_start(
-                    reservations.intervals(next_location),
+                    reservations,
+                    next_location,
                     node_start,
                     service_time,
+                    node_capacities.get(next_location, 1),
                     task_id,
                 )
                 if safe_node_start is None:
@@ -167,22 +173,34 @@ class SIPPPlanner:
 
     def _earliest_safe_node_start(
         self,
-        intervals: tuple[NodeReservation, ...],
+        reservations: ReservationTable,
+        node: int,
         earliest_start: float,
         duration: float,
+        capacity: int,
         task_id: int | None,
     ) -> float | None:
+        if capacity <= 0:
+            return None
         candidate = earliest_start
-        for interval in sorted(intervals, key=lambda item: (item.start, item.end, item.task_id)):
-            if task_id is not None and interval.task_id == task_id:
-                continue
+        intervals = tuple(sorted(reservations.intervals(node), key=lambda item: (item.start, item.end, item.task_id)))
+        for _ in range(len(intervals) * 2 + 2):
             candidate_end = candidate + duration
-            if candidate_end < interval.start:
-                return candidate
-            if candidate > interval.end:
-                continue
-            candidate = interval.end + EPSILON
-        return candidate if candidate <= self.max_time else None
+            if not reservations.has_capacity_conflict(node, candidate, candidate_end, capacity, task_id):
+                return candidate if candidate <= self.max_time else None
+
+            overlapping = [
+                interval
+                for interval in intervals
+                if (task_id is None or interval.task_id != task_id) and interval.overlaps(candidate, candidate_end)
+            ]
+            if not overlapping:
+                return None
+            candidate = min(interval.end for interval in overlapping) + EPSILON
+            if candidate > self.max_time:
+                return None
+
+        return None
 
     @staticmethod
     def _reconstruct(goal_node: SIPPNode) -> list[SIPPNode]:

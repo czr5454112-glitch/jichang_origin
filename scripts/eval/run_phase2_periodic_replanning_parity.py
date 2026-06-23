@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
+from datetime import date
+import os
 from pathlib import Path
 import sys
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-BUILD_PYTHON_PATH = ROOT / "build_nmake" / "python"
+BUILD_PYTHON_PATH = Path(os.environ.get("CZR005_CPP_PYTHON_PATH", ROOT / "build_nmake" / "python"))
 TABLE_PATH = ROOT / "outputs" / "tables" / "phase2_periodic_replanning_parity.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "phase2_periodic_replanning_parity_report.md"
 FLOAT_TOLERANCE = 1.0e-9
@@ -17,6 +19,7 @@ NodeRecord = tuple[int, int, float, int, int, list[int]]
 EdgeRecord = tuple[int, int, float, float]
 TaskRecord = tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
 FaultWindow = tuple[int, int, float, float]
+NodeCapacity = tuple[int, int]
 
 SUMMARY_FIELDS = (
     "planned_count",
@@ -70,12 +73,24 @@ class PeriodicParityCase:
     edge_headway_seconds: float = 0.0
     fault_edges: tuple[tuple[int, int], ...] = ()
     fault_windows: tuple[FaultWindow, ...] = ()
+    node_capacities: tuple[NodeCapacity, ...] = ()
 
 
 def _prepare_imports() -> None:
     sys.path.insert(0, str(ROOT / "src"))
-    sys.path.insert(0, str(BUILD_PYTHON_PATH))
     sys.path.insert(0, str(Path(__file__).resolve().parent))
+    build_candidates = (
+        Path(os.environ["CZR005_CPP_PYTHON_PATH"])
+        if os.environ.get("CZR005_CPP_PYTHON_PATH")
+        else None,
+        ROOT / "build_vs" / "python" / "Debug",
+        ROOT / "build_vs" / "python" / "Release",
+        ROOT / "build_nmake" / "python",
+        BUILD_PYTHON_PATH,
+    )
+    for candidate in reversed([path for path in build_candidates if path is not None]):
+        if candidate.exists() or str(candidate) == os.environ.get("CZR005_CPP_PYTHON_PATH"):
+            sys.path.insert(0, str(candidate))
 
 
 def _graph_from_records(
@@ -225,6 +240,7 @@ def _python_payload(case: PeriodicParityCase) -> dict[str, Any]:
         max_ticks=case.max_ticks,
         edge_capacity=case.edge_capacity,
         edge_headway_seconds=case.edge_headway_seconds,
+        node_capacities=dict(case.node_capacities),
     )
     result = baseline.run_episode(
         case.tasks,
@@ -260,6 +276,7 @@ def _cpp_payload(case: PeriodicParityCase) -> dict[str, Any]:
         edge_headway_seconds=case.edge_headway_seconds,
         fault_edges=list(case.fault_edges),
         fault_windows=list(case.fault_windows),
+        node_capacities=list(case.node_capacities),
     )
     return {
         "summary": dict(payload["summary"]),
@@ -364,6 +381,10 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
     branch_tasks = (_task("fault-alt", 5, 0.0, 20.0, 0, 3),)
     branch_repair_tasks = (_task("repair-alt", 6, 0.0, 20.0, 0, 3),)
     branch_repaired_tasks = (_task("after-repair", 7, 6.0, 26.0, 0, 3),)
+    buffer_tasks = (
+        _task("buffer-first", 8, 0.0, 20.0, 0, 2),
+        _task("buffer-second", 9, 0.0, 20.0, 0, 2),
+    )
     cases: list[PeriodicParityCase] = [
         PeriodicParityCase(
             "line_two_active_bags",
@@ -429,6 +450,20 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
             max_ticks=32,
             fault_windows=((0, 1, 0.0, 5.0),),
         ),
+        PeriodicParityCase(
+            "line_buffer_capacity",
+            line_graph,
+            line_nodes,
+            line_edges,
+            line_heuristic,
+            buffer_tasks,
+            tuple(_task_record(task) for task in buffer_tasks),
+            max_tasks=2,
+            interval_seconds=1.0,
+            max_ticks=32,
+            edge_capacity=2,
+            node_capacities=((1, 2),),
+        ),
     ]
     for manifest_case in load_manifest_cases()[:2]:
         tasks = tasks_from_case(manifest_case)
@@ -446,6 +481,7 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
                 max_ticks=256,
                 fault_edges=manifest_case.spec.fault_edges,
                 fault_windows=manifest_case.spec.fault_windows,
+                node_capacities=manifest_case.spec.node_capacities,
             )
         )
     return tuple(cases)
@@ -466,7 +502,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
     lines = [
         "# Phase2 Periodic Replanning Parity Report",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
@@ -478,7 +514,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "It covers two active bags, edge-capacity pressure, static-fault alternate routing, "
-            "repair-window alternate/repaired routing, "
+            "repair-window alternate/repaired routing, node buffer-capacity overlap, "
             "and two persisted synthetic manifest slices. Recursive PIBT and real heldout "
             "airport maps are not covered."
         ),

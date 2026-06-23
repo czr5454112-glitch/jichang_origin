@@ -6,7 +6,7 @@ Date: 2026-06-23
 
 This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, repeated native event runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
 
-The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/static-fault/repair-window windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and hardware-normalized timing.
+The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and hardware-normalized timing.
 
 CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
@@ -34,28 +34,33 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 ## Matched Baseline Evidence
 
-| Scenario | Family | Tasks | Faults | C++ planned | C++ active steps | Conflicts | Speedup | Parity |
-|---|---|---:|---|---:|---:|---:|---:|---|
-| legacy_first16 | rolling_horizon_sipp | 16 | none | 16 | 16 | 0 | 4.994907 | True |
-| legacy_first16 | periodic_replanning_sipp | 16 | none | 16 | 120 | 0 | 0.792844 | True |
-| legacy_first16 | pibt_active_bag_replay | 16 | none | 0 | 18599 | 0 | 0.739430 | True |
-| legacy_first16 | edge_score_event | 16 | none | 16 | 173 | 0 | 1.878323 | True |
-| legacy_first16 | fallback_event | 16 | none | 15 | 168 | 0 | 1.000818 | True |
-| legacy_first32 | rolling_horizon_sipp | 32 | none | 32 | 32 | 0 | 0.656311 | True |
-| legacy_first32 | periodic_replanning_sipp | 32 | none | 32 | 248 | 0 | 0.687069 | True |
-| legacy_first32 | pibt_active_bag_replay | 32 | none | 0 | 41032 | 0 | 0.887482 | True |
-| legacy_first32 | edge_score_event | 32 | none | 24 | 330 | 0 | 1.724383 | True |
-| legacy_first32 | fallback_event | 32 | none | 25 | 346 | 0 | 1.233064 | True |
-| legacy_offset32_static16 | rolling_horizon_sipp | 16 | 16->17 | 16 | 16 | 0 | 0.810236 | True |
-| legacy_offset32_static16 | periodic_replanning_sipp | 16 | 16->17 | 16 | 129 | 0 | 1.020729 | True |
-| legacy_offset32_static16 | pibt_active_bag_replay | 16 | 16->17 | 0 | 22378 | 0 | 0.833197 | True |
-| legacy_offset32_static16 | edge_score_event | 16 | 16->17 | 12 | 205 | 0 | 2.534776 | True |
-| legacy_offset32_static16 | fallback_event | 16 | 16->17 | 12 | 193 | 0 | 1.022244 | True |
-| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | 28->47@[0.000,12000.000) | 32 | 32 | 0 | 0.997723 | True |
-| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | 28->47@[0.000,12000.000) | 32 | 265 | 0 | 0.748766 | True |
-| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | 28->47@[0.000,12000.000) | 0 | 50808 | 0 | 0.863118 | True |
-| legacy_offset64_repair32 | edge_score_event | 32 | 28->47@[0.000,12000.000) | 15 | 323 | 0 | 2.844537 | True |
-| legacy_offset64_repair32 | fallback_event | 32 | 28->47@[0.000,12000.000) | 13 | 321 | 0 | 1.258603 | True |
+| Scenario | Family | Tasks | Faults | Buffer | C++ planned | C++ active steps | Conflicts | Speedup | Parity |
+|---|---|---:|---|---|---:|---:|---:|---:|---|
+| legacy_first16 | rolling_horizon_sipp | 16 | none | none | 16 | 16 | 0 | 5.338645 | True |
+| legacy_first16 | periodic_replanning_sipp | 16 | none | none | 16 | 120 | 0 | 0.847620 | True |
+| legacy_first16 | pibt_active_bag_replay | 16 | none | none | 0 | 18599 | 0 | 0.808346 | True |
+| legacy_first16 | edge_score_event | 16 | none | none | 16 | 173 | 0 | 2.086075 | True |
+| legacy_first16 | fallback_event | 16 | none | none | 15 | 168 | 0 | 1.002151 | True |
+| legacy_first16_buffer2 | rolling_horizon_sipp | 16 | none | 28:2;47:2 | 16 | 16 | 0 | 0.608293 | True |
+| legacy_first16_buffer2 | periodic_replanning_sipp | 16 | none | 28:2;47:2 | 16 | 120 | 0 | 0.852381 | True |
+| legacy_first16_buffer2 | pibt_active_bag_replay | 16 | none | 28:2;47:2 | 0 | 18599 | 0 | 0.820508 | True |
+| legacy_first16_buffer2 | edge_score_event | 16 | none | 28:2;47:2 | 16 | 173 | 0 | 2.126276 | True |
+| legacy_first16_buffer2 | fallback_event | 16 | none | 28:2;47:2 | 15 | 168 | 0 | 1.065881 | True |
+| legacy_first32 | rolling_horizon_sipp | 32 | none | none | 32 | 32 | 0 | 0.829810 | True |
+| legacy_first32 | periodic_replanning_sipp | 32 | none | none | 32 | 248 | 0 | 0.733281 | True |
+| legacy_first32 | pibt_active_bag_replay | 32 | none | none | 0 | 41032 | 0 | 0.890613 | True |
+| legacy_first32 | edge_score_event | 32 | none | none | 24 | 330 | 0 | 2.353723 | True |
+| legacy_first32 | fallback_event | 32 | none | none | 25 | 346 | 0 | 1.029406 | True |
+| legacy_offset32_static16 | rolling_horizon_sipp | 16 | 16->17 | none | 16 | 16 | 0 | 0.948935 | True |
+| legacy_offset32_static16 | periodic_replanning_sipp | 16 | 16->17 | none | 16 | 129 | 0 | 0.637186 | True |
+| legacy_offset32_static16 | pibt_active_bag_replay | 16 | 16->17 | none | 0 | 22378 | 0 | 0.819749 | True |
+| legacy_offset32_static16 | edge_score_event | 16 | 16->17 | none | 12 | 205 | 0 | 2.663386 | True |
+| legacy_offset32_static16 | fallback_event | 16 | 16->17 | none | 12 | 193 | 0 | 0.928187 | True |
+| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 32 | 0 | 1.020745 | True |
+| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 265 | 0 | 0.709194 | True |
+| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | 28->47@[0.000,12000.000) | none | 0 | 50808 | 0 | 0.920311 | True |
+| legacy_offset64_repair32 | edge_score_event | 32 | 28->47@[0.000,12000.000) | none | 15 | 323 | 0 | 2.184377 | True |
+| legacy_offset64_repair32 | fallback_event | 32 | 28->47@[0.000,12000.000) | none | 13 | 321 | 0 | 1.216787 | True |
 
 ## Legacy Event Parity Evidence
 
@@ -86,19 +91,19 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | Family | Source rows | Passing rows | Safety | Source |
 |---|---:|---:|---|---|
 | sipp_planner | 9 | 9 | True | `outputs/tables/phase2_cpp_sipp_parity.csv` |
-| rolling_horizon_sipp | 11 | 11 | True | `outputs/tables/phase2_cpp_rolling_horizon_parity.csv` |
-| periodic_replanning_sipp | 7 | 7 | True | `outputs/tables/phase2_periodic_replanning_parity.csv` |
+| rolling_horizon_sipp | 12 | 12 | True | `outputs/tables/phase2_cpp_rolling_horizon_parity.csv` |
+| periodic_replanning_sipp | 8 | 8 | True | `outputs/tables/phase2_periodic_replanning_parity.csv` |
 | pibt_active_bag_replay | 6 | 6 | True | `outputs/tables/phase2_pibt_active_bag_replay_parity.csv` |
 | phase8_synthetic_event_scheduler | 10 | 10 | True | `outputs/tables/phase8_native_cpp_event_parity.csv` |
 | phase8_randomized_synthetic | 5 | 5 | True | `outputs/tables/phase8_native_cpp_randomized_parity.csv` |
 | phase8_legacy_event_scheduler | 6 | 6 | True | `outputs/tables/phase8_legacy_event_parity.csv` |
-| phase9_matched_baseline_comparison | 20 | 20 | True | `outputs/tables/phase9_matched_baseline_comparison.csv` |
+| phase9_matched_baseline_comparison | 25 | 25 | True | `outputs/tables/phase9_matched_baseline_comparison.csv` |
 | phase9_runtime_scaling | 8 | 8 | True | `outputs/tables/phase9_event_runtime_scaling.csv` |
 
 ## Gate Status
 
 - unified outcome rows: `17`
-- matched baseline rows: `20`
+- matched baseline rows: `25`
 - native event parity/runtime rows: `14`
 - baseline-family parity summaries: `9`
 - policies/baselines surfaced: `astar_guided, dagger_bc, edge_score_event, fallback_event, periodic_replanning_sipp, pibt_active_bag_replay, reference_astar, rolling_horizon_sipp`
@@ -111,6 +116,6 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 ## Remaining Work
 
-- extend matched Phase9 rows to merge-group and buffer-capacity scenarios
+- extend matched Phase9 rows to merge-group scenarios once every included family accepts shared merge config
 - add a separate real heldout airport map when fixture data is available
 - add hardware-normalized repeated timing and confidence intervals for every compared baseline family

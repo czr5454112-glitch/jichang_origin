@@ -122,10 +122,11 @@ class ReservationTable:
             capacity = node_capacities.get(node, 1)
             ordered = sorted(intervals, key=lambda interval: (interval.start, interval.end))
             if capacity > 1:
-                points = sorted({point for interval in ordered for point in (interval.start, interval.end)})
+                active_intervals = [interval for interval in ordered if interval.end > interval.start]
+                points = sorted({point for interval in active_intervals for point in (interval.start, interval.end)})
                 for point in points:
                     active = sum(
-                        1 for interval in ordered if interval.start <= point <= interval.end
+                        1 for interval in active_intervals if interval.start <= point <= interval.end
                     )
                     if active > capacity:
                         conflicts += active - capacity

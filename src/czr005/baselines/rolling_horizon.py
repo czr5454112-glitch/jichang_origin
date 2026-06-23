@@ -37,6 +37,7 @@ class RollingHorizonBaseline:
         edge_reservations: EdgeReservationTable | None = None,
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
+        node_capacities: dict[int, int] | None = None,
     ) -> None:
         if horizon_seconds <= 0.0:
             raise ValueError("horizon_seconds must be positive")
@@ -48,6 +49,7 @@ class RollingHorizonBaseline:
         self.edge_reservations = edge_reservations or EdgeReservationTable()
         self.edge_capacity = edge_capacity
         self.edge_headway_seconds = edge_headway_seconds
+        self.node_capacities = dict(node_capacities or {})
         self.planner = SIPPPlanner(graph)
 
     def run_episode(
@@ -81,6 +83,7 @@ class RollingHorizonBaseline:
                     edge_reservations=self.edge_reservations,
                     edge_capacity=self.edge_capacity,
                     edge_headway_seconds=self.edge_headway_seconds,
+                    node_capacities=self.node_capacities,
                     fault_edges=planning_faults,
                     task_id=task.task_id,
                 )
@@ -121,7 +124,7 @@ class RollingHorizonBaseline:
                         }
                     )
 
-        metrics = compute_episode_metrics(routes, task_by_segment, unplanned, self.reservations)
+        metrics = compute_episode_metrics(routes, task_by_segment, unplanned, self.reservations, self.node_capacities)
         return EpisodeResult(routes=routes, unplanned=unplanned, events=events, metrics=metrics)
 
     @staticmethod

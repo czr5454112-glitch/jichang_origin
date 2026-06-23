@@ -25,6 +25,7 @@ NodeRecord = tuple[int, int, float, int, int, list[int]]
 EdgeRecord = tuple[int, int, float, float]
 TaskRecord = tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
 FaultWindow = tuple[int, int, float, float]
+NodeCapacity = tuple[int, int]
 
 ROW_FIELDS = [
     "scenario",
@@ -33,6 +34,7 @@ ROW_FIELDS = [
     "max_tasks",
     "fault_edges",
     "fault_windows",
+    "node_capacities",
     "python_planned",
     "cpp_planned",
     "python_unplanned",
@@ -121,6 +123,7 @@ class MatchedScenario:
     max_tasks: int
     fault_edges: tuple[tuple[int, int], ...] = ()
     fault_windows: tuple[FaultWindow, ...] = ()
+    node_capacities: tuple[NodeCapacity, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -206,9 +209,16 @@ def _format_fault_windows(fault_windows: tuple[FaultWindow, ...]) -> str:
     )
 
 
+def _format_node_capacities(node_capacities: tuple[NodeCapacity, ...]) -> str:
+    if not node_capacities:
+        return "none"
+    return ";".join(f"{node}:{capacity}" for node, capacity in sorted(node_capacities))
+
+
 def _case_plan() -> tuple[MatchedScenario, ...]:
     return (
         MatchedScenario("legacy_first16", 0, 16),
+        MatchedScenario("legacy_first16_buffer2", 0, 16, node_capacities=((28, 2), (47, 2))),
         MatchedScenario("legacy_first32", 0, 32),
         MatchedScenario("legacy_offset32_static16", 32, 16, fault_edges=((16, 17),)),
         MatchedScenario("legacy_offset64_repair32", 64, 32, fault_windows=((28, 47, 0.0, 12000.0),)),
@@ -228,7 +238,11 @@ def _timed(call: Callable[[], dict[str, Any]]) -> tuple[dict[str, Any], float]:
 def _python_rolling(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, Any]:
     from czr005.baselines import RollingHorizonBaseline  # pylint: disable=import-outside-toplevel
 
-    baseline = RollingHorizonBaseline(inputs.graph, horizon_seconds=300.0)
+    baseline = RollingHorizonBaseline(
+        inputs.graph,
+        horizon_seconds=300.0,
+        node_capacities=dict(scenario.node_capacities),
+    )
     result = baseline.run_episode(
         _selected_tasks(inputs, scenario),
         max_tasks=scenario.max_tasks,
@@ -259,6 +273,7 @@ def _cpp_rolling(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, 
         edge_headway_seconds=0.0,
         fault_edges=list(scenario.fault_edges),
         fault_windows=list(scenario.fault_windows),
+        node_capacities=list(scenario.node_capacities),
     )
     return dict(payload["summary"])
 
@@ -266,7 +281,12 @@ def _cpp_rolling(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, 
 def _python_periodic(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, Any]:
     from czr005.baselines import PeriodicReplanningBaseline  # pylint: disable=import-outside-toplevel
 
-    baseline = PeriodicReplanningBaseline(inputs.graph, interval_seconds=5.0, max_ticks=2048)
+    baseline = PeriodicReplanningBaseline(
+        inputs.graph,
+        interval_seconds=5.0,
+        max_ticks=2048,
+        node_capacities=dict(scenario.node_capacities),
+    )
     result = baseline.run_episode(
         _selected_tasks(inputs, scenario),
         max_tasks=scenario.max_tasks,
@@ -299,6 +319,7 @@ def _cpp_periodic(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str,
         edge_headway_seconds=0.0,
         fault_edges=list(scenario.fault_edges),
         fault_windows=list(scenario.fault_windows),
+        node_capacities=list(scenario.node_capacities),
     )
     return dict(payload["summary"])
 
@@ -311,6 +332,7 @@ def _python_pibt(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, 
         interval_seconds=5.0,
         max_ticks=2048,
         hold_seconds=5.0,
+        node_capacities=dict(scenario.node_capacities),
     )
     result = baseline.run_episode(
         _selected_tasks(inputs, scenario),
@@ -347,7 +369,7 @@ def _cpp_pibt(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, Any
         edge_headway_seconds=0.0,
         fault_edges=list(scenario.fault_edges),
         fault_windows=list(scenario.fault_windows),
-        node_capacities=[],
+        node_capacities=list(scenario.node_capacities),
     )
     return dict(payload["summary"])
 
@@ -362,6 +384,7 @@ def _python_event(inputs: RuntimeInputs, scenario: MatchedScenario, runtime_mode
         max_tasks=scenario.max_tasks,
         fault_edges=set(scenario.fault_edges),
         fault_windows=scenario.fault_windows,
+        node_capacities=dict(scenario.node_capacities),
         max_decisions_per_task=MAX_DECISIONS_PER_TASK,
     )
     return dict(run.summary)
@@ -375,6 +398,7 @@ def _cpp_event(inputs: RuntimeInputs, scenario: MatchedScenario, model_path: Pat
         "max_tasks": scenario.max_tasks,
         "fault_edges": list(scenario.fault_edges),
         "fault_windows": list(scenario.fault_windows),
+        "node_capacities": list(scenario.node_capacities),
         "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
     }
     if model_path is None:
@@ -481,6 +505,7 @@ def _row(
         "max_tasks": scenario.max_tasks,
         "fault_edges": _format_faults(scenario.fault_edges),
         "fault_windows": _format_fault_windows(scenario.fault_windows),
+        "node_capacities": _format_node_capacities(scenario.node_capacities),
         "python_planned": _summary_int(python_summary, "planned_count"),
         "cpp_planned": _summary_int(cpp_summary, "planned_count"),
         "python_unplanned": _summary_int(python_summary, "unplanned_count"),
@@ -522,6 +547,11 @@ def _fault_label(row: dict[str, float | int | str | bool]) -> str:
     if fault_edges != "none":
         return fault_edges
     return fault_windows
+
+
+def _config_label(row: dict[str, float | int | str | bool]) -> str:
+    node_capacities = str(row["node_capacities"])
+    return node_capacities
 
 
 def build_rows(inputs: RuntimeInputs) -> list[dict[str, float | int | str | bool]]:
@@ -574,7 +604,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This diagnostic reruns Python and C++ implementations of the main event/baseline families "
-            "on the same real legacy `map2/inputdata` task windows. It covers no-fault, static-fault, and repair-window "
+            "on the same real legacy `map2/inputdata` task windows. It covers no-fault, buffer-capacity, static-fault, and repair-window "
             "scenarios that are supported by every included family."
         ),
         "",
@@ -584,25 +614,26 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This is a matched diagnostic gate, not a final paper benchmark: timings are single local "
-            "passes and merge-buffer variants are handled by the dedicated parity gates."
+            "passes and merge-group variants are handled by the dedicated parity gates."
         ),
         "",
         "## Matched Rows",
         "",
         (
             "| Scenario | Family | Tasks | Faults | Py planned | C++ planned | "
-            "Py/C++ active steps | Py/C++ conflicts | Mean diff | C++ speedup | Parity |"
+            "Config | Py/C++ active steps | Py/C++ conflicts | Mean diff | C++ speedup | Parity |"
         ),
-        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|",
+        "|---|---|---:|---|---:|---:|---|---:|---:|---:|---:|---|",
     ]
     for row in rows:
         decisions = f"{row['python_decisions']}/{row['cpp_decisions']}"
         conflicts = f"{row['python_conflicts']}/{row['cpp_conflicts']}"
         lines.append(
             "| {scenario} | {family} | {max_tasks} | {fault_label} | {python_planned} | {cpp_planned} | "
+            "{config_label} | "
             f"{decisions} | {conflicts} | "
             "{mean_travel_abs_diff:.6f} | {cpp_speedup:.3f} | {parity_pass} |".format(
-                **{**row, "fault_label": _fault_label(row)}
+                **{**row, "fault_label": _fault_label(row), "config_label": _config_label(row)}
             )
         )
     lines.extend(
@@ -629,11 +660,12 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "- post-shield safety: PASS" if safety_pass else "- post-shield safety: FAIL",
             f"- median C++ local-call speedup: `{_median(speedups):.3f}x`",
             "- repair-window common-family comparison: covered",
-            "- merge/buffer common-family comparison: not covered",
+            "- buffer-capacity common-family comparison: covered",
+            "- merge-group common-family comparison: not covered",
             "",
             "## Remaining Work",
             "",
-            "- add merge/buffer matched rows once every included family accepts the shared config",
+            "- add merge-group matched rows once every included family accepts the shared config",
             "- replace single local timing with repeated hardware-normalized timing across the matched table",
         ]
     )

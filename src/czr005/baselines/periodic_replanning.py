@@ -57,6 +57,7 @@ class PeriodicReplanningBaseline:
         edge_reservations: EdgeReservationTable | None = None,
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
+        node_capacities: dict[int, int] | None = None,
     ) -> None:
         if interval_seconds <= 0.0:
             raise ValueError("interval_seconds must be positive")
@@ -71,6 +72,7 @@ class PeriodicReplanningBaseline:
         self.edge_reservations = edge_reservations or EdgeReservationTable()
         self.edge_capacity = edge_capacity
         self.edge_headway_seconds = edge_headway_seconds
+        self.node_capacities = dict(node_capacities or {})
         self.planner = SIPPPlanner(graph)
         self.summary = PeriodicReplanningSummary(0, 0, 0, 0, 0, 0, 0)
 
@@ -158,7 +160,13 @@ class PeriodicReplanningBaseline:
                     }
                 )
 
-        metrics = compute_episode_metrics(routes, task_by_segment, unplanned, self.reservations)
+        metrics = compute_episode_metrics(
+            routes,
+            task_by_segment,
+            unplanned,
+            self.reservations,
+            self.node_capacities,
+        )
         edge_conflicts = self.edge_reservations.conflict_count(
             capacity=self.edge_capacity,
             headway_seconds=self.edge_headway_seconds,
@@ -187,6 +195,7 @@ class PeriodicReplanningBaseline:
             node=task.start,
             earliest_start=max(task.pass_time, tick_time),
             duration=self.graph.service_time(task.start),
+            capacity=self.node_capacities.get(task.start, 1),
         )
         start_node = SIPPNode(
             location=task.start,
@@ -239,6 +248,7 @@ class PeriodicReplanningBaseline:
             edge_reservations=self.edge_reservations,
             edge_capacity=self.edge_capacity,
             edge_headway_seconds=self.edge_headway_seconds,
+            node_capacities=self.node_capacities,
             fault_edges=active_faults,
             task_id=bag.task.task_id,
         )
@@ -313,6 +323,7 @@ class PeriodicReplanningBaseline:
             node=bag.current,
             earliest_start=max(tick_time, bag.ready_time),
             duration=self.interval_seconds,
+            capacity=self.node_capacities.get(bag.current, 1),
         )
         hold_end = hold_start + self.interval_seconds
         bag.route[-1].t2 = hold_end
@@ -379,12 +390,22 @@ class PeriodicReplanningBaseline:
         node: int,
         earliest_start: float,
         duration: float,
+        capacity: int,
     ) -> float:
+        if capacity <= 0:
+            raise ValueError("node capacity must be positive")
         candidate = earliest_start
-        for interval in self.reservations.intervals(node):
-            if interval.task_id == task_id:
-                continue
-            if not interval.overlaps(candidate, candidate + duration):
-                continue
-            candidate = interval.end + EPSILON
+        intervals = self.reservations.intervals(node)
+        for _ in range(len(intervals) * 2 + 2):
+            candidate_end = candidate + duration
+            if not self.reservations.has_capacity_conflict(node, candidate, candidate_end, capacity, task_id):
+                return candidate
+            overlapping = [
+                interval
+                for interval in intervals
+                if interval.task_id != task_id and interval.overlaps(candidate, candidate_end)
+            ]
+            if not overlapping:
+                return candidate
+            candidate = min(interval.end for interval in overlapping) + EPSILON
         return candidate

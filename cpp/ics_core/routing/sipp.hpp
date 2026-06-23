@@ -30,7 +30,8 @@ class SIPPPlanner {
       int edge_capacity = 1,
       double edge_headway_seconds = 0.0,
       const std::set<std::pair<int, int>>& fault_edges = {},
-      int task_id = -1) const {
+      int task_id = -1,
+      const std::unordered_map<int, int>& node_capacities = {}) const {
     const ReservationTable empty_reservations;
     const EdgeReservationTable empty_edge_reservations;
     const auto& node_table = reservations == nullptr ? empty_reservations : *reservations;
@@ -81,7 +82,8 @@ class SIPPPlanner {
                                                          edge_table,
                                                          edge_capacity,
                                                          edge_headway_seconds,
-                                                         task_id);
+                                                         task_id,
+                                                         node_capacities);
         if (!transition.valid) {
           continue;
         }
@@ -149,7 +151,8 @@ class SIPPPlanner {
       const EdgeReservationTable& edge_reservations,
       int edge_capacity,
       double edge_headway_seconds,
-      int task_id) const {
+      int task_id,
+      const std::unordered_map<int, int>& node_capacities) const {
     double edge_start = current.t2;
     const auto& intervals = edge_reservations.intervals(current.location, next_location);
     for (std::size_t attempt = 0; attempt < intervals.size() * 2 + 4; ++attempt) {
@@ -163,9 +166,11 @@ class SIPPPlanner {
       double node_start = edge_start + travel_time;
       if (next_location != goal) {
         const auto safe_node_start = earliest_safe_node_start(
-            reservations.intervals(next_location),
+            reservations,
+            next_location,
             node_start,
             service_time,
+            node_capacity(node_capacities, next_location),
             task_id);
         if (!safe_node_start.valid) {
           return Transition{};
@@ -190,25 +195,47 @@ class SIPPPlanner {
   };
 
   [[nodiscard]] SafeNodeStart earliest_safe_node_start(
-      const std::vector<NodeReservation>& intervals,
+      const ReservationTable& reservations,
+      int node,
       double earliest_start,
       double duration,
+      int capacity,
       int task_id) const {
+    if (capacity <= 0) {
+      return SafeNodeStart{};
+    }
     double candidate = earliest_start;
-    for (const auto& interval : intervals) {
-      if (task_id >= 0 && interval.task_id == task_id) {
-        continue;
-      }
+    const auto& intervals = reservations.intervals(node);
+    for (std::size_t attempt = 0; attempt < intervals.size() * 2 + 2; ++attempt) {
       const double candidate_end = candidate + duration;
-      if (candidate_end < interval.start) {
+      if (!reservations.has_capacity_conflict(node, candidate, candidate_end, capacity, task_id)) {
         return SafeNodeStart{true, candidate};
       }
-      if (candidate > interval.end) {
-        continue;
+
+      bool has_overlap = false;
+      double next_candidate = std::numeric_limits<double>::infinity();
+      for (const auto& interval : intervals) {
+        if (task_id >= 0 && interval.task_id == task_id) {
+          continue;
+        }
+        if (interval.overlaps(candidate, candidate_end)) {
+          has_overlap = true;
+          next_candidate = std::min(next_candidate, interval.end + kEpsilon);
+        }
       }
-      candidate = interval.end + kEpsilon;
+      if (!has_overlap || next_candidate > max_time_) {
+        return SafeNodeStart{};
+      }
+      candidate = next_candidate;
     }
-    return candidate <= max_time_ ? SafeNodeStart{true, candidate} : SafeNodeStart{};
+    return SafeNodeStart{};
+  }
+
+  [[nodiscard]] static int node_capacity(
+      const std::unordered_map<int, int>& node_capacities,
+      int node) {
+    const auto found = node_capacities.find(node);
+    return found == node_capacities.end() ? 1 : found->second;
   }
 
   static std::vector<PathNode> reconstruct(const std::vector<Record>& records, int index) {

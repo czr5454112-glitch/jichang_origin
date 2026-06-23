@@ -138,6 +138,25 @@ def test_sipp_waits_for_next_safe_node_interval() -> None:
     assert not reservations.has_conflict(1, route[1].t1, route[1].t2, task_id=1)
 
 
+def test_sipp_allows_node_buffer_capacity_overlap() -> None:
+    graph = _line_graph()
+    reservations = ReservationTable()
+    reservations.reserve(task_id=99, node=1, start=2.0, end=3.0)
+
+    route = SIPPPlanner(graph).plan(
+        0,
+        2,
+        reservations=reservations,
+        node_capacities={1: 2},
+        task_id=1,
+    )
+
+    assert [node.location for node in route] == [0, 1, 2]
+    assert route[1].t1 == 2.0
+    reservations.add_route(1, route)
+    assert reservations.conflict_count({1: 2}) == 0
+
+
 def test_sipp_respects_fault_edges() -> None:
     route = SIPPPlanner(_line_graph()).plan(0, 2, fault_edges={(1, 2)})
     assert route == []
@@ -218,6 +237,7 @@ def test_zero_duration_node_reservations_do_not_conflict() -> None:
     reservations.reserve(2, 47, 10.0, 10.0)
 
     assert reservations.conflict_count() == 0
+    assert reservations.conflict_count({47: 2}) == 0
     assert not reservations.has_conflict(47, 10.0, 10.0, task_id=3)
 
 
@@ -285,6 +305,25 @@ def test_rolling_horizon_reserves_edge_headway() -> None:
     assert result.routes["loose"][1].t1 >= 4.0
 
 
+def test_rolling_horizon_allows_node_buffer_capacity_overlap() -> None:
+    tasks = (
+        _task("first", 1, pass_time=0.0, std=10.0),
+        _task("second", 2, pass_time=0.1, std=20.0),
+    )
+
+    result = RollingHorizonBaseline(
+        _line_graph(),
+        horizon_seconds=60.0,
+        edge_capacity=2,
+        node_capacities={1: 2},
+    ).run_episode(tasks)
+
+    assert result.metrics.planned_count == 2
+    assert result.routes["first"][1].t1 == 2.0
+    assert result.routes["second"][1].t1 == 2.1
+    assert result.metrics.reservation_conflicts == 0
+
+
 def test_periodic_replanning_commits_one_step_per_tick() -> None:
     result = PeriodicReplanningBaseline(
         _line_graph(),
@@ -299,6 +338,29 @@ def test_periodic_replanning_commits_one_step_per_tick() -> None:
     assert [event["planned_path"] for event in move_events] == [[0, 1, 2], [1, 2]]
     assert result.events[-1]["event"] == "planned"
     assert result.events[-1]["path"] == [0, 1, 2]
+
+
+def test_periodic_replanning_allows_node_buffer_capacity_overlap() -> None:
+    tasks = (
+        _task("first", 1, pass_time=0.0, std=20.0),
+        _task("second", 2, pass_time=0.0, std=20.0),
+    )
+
+    baseline = PeriodicReplanningBaseline(
+        _line_graph(),
+        interval_seconds=1.0,
+        max_ticks=16,
+        edge_capacity=2,
+        node_capacities={1: 2},
+    )
+    result = baseline.run_episode(tasks)
+
+    first_moves = [
+        event for event in result.events if event["event"] == "replan_move" and event["next_node"] == 1
+    ]
+    assert result.metrics.planned_count == 2
+    assert len(first_moves) == 2
+    assert baseline.summary.post_shield_conflicts == 0
 
 
 def test_periodic_replanning_uses_fault_safe_alternative() -> None:

@@ -5,6 +5,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -23,6 +24,7 @@ struct PeriodicReplanningConfig {
   int max_ticks = 2048;
   int edge_capacity = 1;
   double edge_headway_seconds = 0.0;
+  std::unordered_map<int, int> node_capacities;
 };
 
 struct PeriodicFaultWindow {
@@ -115,22 +117,47 @@ inline double earliest_safe_node_start(const ReservationTable& reservations,
                                        int task_id,
                                        int node,
                                        double earliest_start,
-                                       double duration) {
+                                       double duration,
+                                       int capacity) {
+  if (capacity <= 0) {
+    throw std::invalid_argument("node capacity must be positive");
+  }
   double candidate = earliest_start;
-  for (const auto& interval : reservations.intervals(node)) {
-    if (interval.task_id == task_id) {
-      continue;
+  const auto& intervals = reservations.intervals(node);
+  for (std::size_t attempt = 0; attempt < intervals.size() * 2 + 2; ++attempt) {
+    const double candidate_end = candidate + duration;
+    if (!reservations.has_capacity_conflict(node, candidate, candidate_end, capacity, task_id)) {
+      return candidate;
     }
-    if (!interval.overlaps(candidate, candidate + duration)) {
-      continue;
+    bool has_overlap = false;
+    double next_candidate = candidate;
+    for (const auto& interval : intervals) {
+      if (interval.task_id == task_id) {
+        continue;
+      }
+      if (interval.overlaps(candidate, candidate_end)) {
+        has_overlap = true;
+        if (next_candidate == candidate || interval.end + kEpsilon < next_candidate) {
+          next_candidate = interval.end + kEpsilon;
+        }
+      }
     }
-    candidate = interval.end + kEpsilon;
+    if (!has_overlap || next_candidate <= candidate) {
+      return candidate;
+    }
+    candidate = next_candidate;
   }
   return candidate;
 }
 
+inline int node_capacity(const PeriodicReplanningConfig& config, int node) {
+  const auto found = config.node_capacities.find(node);
+  return found == config.node_capacities.end() ? 1 : found->second;
+}
+
 inline ActiveBag admit_bag(const Graph& graph,
                            ReservationTable& reservations,
+                           const PeriodicReplanningConfig& config,
                            const TaskLeg& task,
                            double tick_time,
                            std::vector<PeriodicReplanningEvent>& events) {
@@ -138,7 +165,8 @@ inline ActiveBag admit_bag(const Graph& graph,
                                                      task.task_id,
                                                      task.start,
                                                      std::max(task.pass_time, tick_time),
-                                                     graph.service_time(task.start));
+                                                     graph.service_time(task.start),
+                                                     node_capacity(config, task.start));
   PathNode start_node{task.start,
                       start_time,
                       start_time + graph.service_time(task.start),
@@ -213,7 +241,8 @@ inline void hold_bag(const PeriodicReplanningConfig& config,
                                                      bag.task.task_id,
                                                      bag.current,
                                                      std::max(tick_time, bag.ready_time),
-                                                     config.interval_seconds);
+                                                     config.interval_seconds,
+                                                     node_capacity(config, bag.current));
   const double hold_end = hold_start + config.interval_seconds;
   auto& current_node = bag.route.back();
   current_node.t2 = hold_end;
@@ -301,6 +330,7 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
            selected[next_task_index].pass_time <= tick_time + periodic_detail::kEpsilon) {
       active.push_back(periodic_detail::admit_bag(graph,
                                                   node_reservations,
+                                                  config,
                                                   selected[next_task_index],
                                                   tick_time,
                                                   result.events));
@@ -363,7 +393,8 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
                                         config.edge_capacity,
                                         config.edge_headway_seconds,
                                         active_faults,
-                                        bag.task.task_id);
+                                        bag.task.task_id,
+                                        config.node_capacities);
       if (planned.size() >= 2) {
         const auto& next_node = planned[1];
         const auto& edge = graph.edge(bag.current, next_node.location);
@@ -457,7 +488,7 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
   if (result.planned_count > 0) {
     result.mean_travel_time /= static_cast<double>(result.planned_count);
   }
-  result.reservation_conflicts = node_reservations.conflict_count();
+  result.reservation_conflicts = node_reservations.conflict_count(config.node_capacities);
   result.edge_reservation_conflicts =
       edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds);
   result.post_shield_conflicts = result.reservation_conflicts + result.edge_reservation_conflicts;

@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "ics_core/baselines/pibt.hpp"
@@ -196,6 +197,8 @@ int main() {
   zero_duration_reservations.reserve(2, 47, 10.0, 10.0);
   test.check(zero_duration_reservations.conflict_count() == 0,
              "zero-duration node reservations should not count as occupancy conflicts");
+  test.check(zero_duration_reservations.conflict_count({{47, 2}}) == 0,
+             "zero-duration node reservations should not count against explicit node capacity");
   test.check(!zero_duration_reservations.has_conflict(47, 10.0, 10.0, 3),
              "zero-duration node reservations should not block another zero-duration visit");
 
@@ -210,6 +213,26 @@ int main() {
   if (sipp_wait.size() == 3) {
     test.check(near(sipp_wait[1].t1, 3.000000001), "SIPP node wait should start after reserved node interval");
     test.check(near(sipp_wait[2].t1, 6.000000001), "SIPP node wait should preserve downstream timing");
+  }
+
+  ReservationTable sipp_buffer_reservations;
+  sipp_buffer_reservations.reserve(99, 1, 2.0, 3.0);
+  const auto sipp_buffer_overlap = sipp_planner.plan(
+      0,
+      2,
+      0.0,
+      &sipp_buffer_reservations,
+      nullptr,
+      1,
+      0.0,
+      {},
+      5,
+      std::unordered_map<int, int>{{1, 2}});
+  test.check(sipp_buffer_overlap.size() == 3,
+             "SIPP should plan through a node overlap below explicit buffer capacity");
+  if (sipp_buffer_overlap.size() == 3) {
+    test.check(near(sipp_buffer_overlap[1].t1, 2.0),
+               "SIPP buffer-capacity route should not wait at the buffer node");
   }
 
   EdgeReservationTable sipp_edge_reservations;
@@ -250,6 +273,28 @@ int main() {
                "rolling-horizon SIPP should prioritize tighter deadline slack");
     test.check(rolling_result.events[1].segment_id == "loose",
                "rolling-horizon SIPP should plan the looser task second");
+  }
+
+  TaskStream rolling_buffer_tasks;
+  rolling_buffer_tasks.add(TaskLeg{"buffer-first", 405, 405, 0.0, 10.0, 0, 2, 0, 2, 0.0, "direct", false, 5});
+  rolling_buffer_tasks.add(TaskLeg{"buffer-second", 406, 406, 0.1, 20.0, 0, 2, 0, 2, 0.1, "direct", false, 6});
+  rolling_buffer_tasks.sort_by_pass_time();
+  RollingHorizonConfig rolling_buffer_config;
+  rolling_buffer_config.max_tasks = 2;
+  rolling_buffer_config.horizon_seconds = 60.0;
+  rolling_buffer_config.edge_capacity = 2;
+  rolling_buffer_config.node_capacities[1] = 2;
+  const auto rolling_buffer_result =
+      run_rolling_horizon_sipp(graph, rolling_buffer_tasks, rolling_buffer_config);
+  test.check(rolling_buffer_result.planned_count == 2,
+             "rolling-horizon SIPP should plan overlapping buffer-capacity tasks");
+  test.check(rolling_buffer_result.reservation_conflicts == 0,
+             "rolling-horizon SIPP should count explicit buffer capacity in node conflicts");
+  if (rolling_buffer_result.routes.size() == 2) {
+    test.check(near(rolling_buffer_result.routes[0][1].t1, 2.0),
+               "rolling-horizon first buffer route should use the earliest node interval");
+    test.check(near(rolling_buffer_result.routes[1][1].t1, 2.1),
+               "rolling-horizon second buffer route should overlap within capacity");
   }
 
   TaskStream rolling_repair_active_tasks;
@@ -300,6 +345,23 @@ int main() {
              "periodic replanning SIPP should report active-bag pressure");
   test.check(periodic_result.post_shield_conflicts == 0,
              "periodic replanning SIPP should stay conflict-free");
+
+  TaskStream periodic_buffer_tasks;
+  periodic_buffer_tasks.add(TaskLeg{"buffer-first", 407, 407, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", false, 7});
+  periodic_buffer_tasks.add(TaskLeg{"buffer-second", 408, 408, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", false, 8});
+  periodic_buffer_tasks.sort_by_pass_time();
+  PeriodicReplanningConfig periodic_buffer_config;
+  periodic_buffer_config.max_tasks = 2;
+  periodic_buffer_config.interval_seconds = 1.0;
+  periodic_buffer_config.max_ticks = 16;
+  periodic_buffer_config.edge_capacity = 2;
+  periodic_buffer_config.node_capacities[1] = 2;
+  const auto periodic_buffer_result =
+      run_periodic_replanning_sipp(graph, periodic_buffer_tasks, periodic_buffer_config);
+  test.check(periodic_buffer_result.planned_count == 2,
+             "periodic replanning SIPP should plan overlapping buffer-capacity tasks");
+  test.check(periodic_buffer_result.post_shield_conflicts == 0,
+             "periodic replanning SIPP should count explicit buffer capacity in post-shield conflicts");
 
   TaskStream periodic_repair_tasks;
   periodic_repair_tasks.add(TaskLeg{"repair-wait", 403, 403, 0.0, 30.0, 0, 2, 0, 2, 0.0, "direct", false, 3});

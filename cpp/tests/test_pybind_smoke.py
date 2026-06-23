@@ -180,6 +180,18 @@ def main() -> None:
     )
     assert [row["location"] for row in sipp_route] == [0, 1, 2]
     assert abs(sipp_route[1]["t1"] - 3.000000001) < 1.0e-9
+    sipp_buffer_route = czr005_cpp.sipp_plan_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        start=0,
+        goal=2,
+        node_reservations=[(99, 1, 2.0, 3.0)],
+        node_capacities=[(1, 2)],
+        task_id=302,
+    )
+    assert [row["location"] for row in sipp_buffer_route] == [0, 1, 2]
+    assert abs(sipp_buffer_route[1]["t1"] - 2.0) < 1.0e-9
     sipp_fault_blocked = czr005_cpp.sipp_plan_from_records(
         node_records,
         edge_records,
@@ -203,6 +215,22 @@ def main() -> None:
     assert rolling_horizon["summary"]["unplanned_count"] == 0
     assert rolling_horizon["summary"]["post_shield_conflicts"] == 0
     assert [event["segment_id"] for event in rolling_horizon["events"]] == ["urgent", "loose"]
+
+    rolling_buffer = czr005_cpp.rolling_horizon_sipp_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        [
+            ("buffer-first", 405, 405, 0.0, 10.0, 0, 2, 0, 2, 0.0, "direct", False, 5),
+            ("buffer-second", 406, 406, 0.1, 20.0, 0, 2, 0, 2, 0.1, "direct", False, 6),
+        ],
+        max_tasks=2,
+        horizon_seconds=60.0,
+        edge_capacity=2,
+        node_capacities=[(1, 2)],
+    )
+    assert rolling_buffer["summary"]["planned_count"] == 2
+    assert rolling_buffer["summary"]["post_shield_conflicts"] == 0
 
     rolling_repair_active = czr005_cpp.rolling_horizon_sipp_from_records(
         node_records,
@@ -241,6 +269,22 @@ def main() -> None:
     assert periodic_replanning["summary"]["replan_count"] >= 2
     assert periodic_replanning["summary"]["peak_active_bags"] >= 1
     assert periodic_replanning["summary"]["post_shield_conflicts"] == 0
+    periodic_buffer = czr005_cpp.periodic_replanning_sipp_from_records(
+        node_records,
+        edge_records,
+        heuristic_time,
+        [
+            ("buffer-first", 407, 407, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", False, 7),
+            ("buffer-second", 408, 408, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", False, 8),
+        ],
+        max_tasks=2,
+        interval_seconds=1.0,
+        max_ticks=16,
+        edge_capacity=2,
+        node_capacities=[(1, 2)],
+    )
+    assert periodic_buffer["summary"]["planned_count"] == 2
+    assert periodic_buffer["summary"]["post_shield_conflicts"] == 0
     periodic_repair = czr005_cpp.periodic_replanning_sipp_from_records(
         node_records,
         edge_records,

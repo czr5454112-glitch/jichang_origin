@@ -123,9 +123,16 @@ class ReservationTable {
       const int capacity = capacity_found == node_capacities.end() ? 1 : capacity_found->second;
       const auto& intervals = entry.second;
       if (capacity > 1) {
-        std::vector<double> points;
-        points.reserve(intervals.size() * 2);
+        std::vector<NodeReservation> active_intervals;
+        active_intervals.reserve(intervals.size());
         for (const auto& interval : intervals) {
+          if (interval.end > interval.start) {
+            active_intervals.push_back(interval);
+          }
+        }
+        std::vector<double> points;
+        points.reserve(active_intervals.size() * 2);
+        for (const auto& interval : active_intervals) {
           points.push_back(interval.start);
           points.push_back(interval.end);
         }
@@ -133,7 +140,7 @@ class ReservationTable {
         points.erase(std::unique(points.begin(), points.end()), points.end());
         for (const double point : points) {
           int active = 0;
-          for (const auto& interval : intervals) {
+          for (const auto& interval : active_intervals) {
             if (interval.start <= point && point <= interval.end) {
               ++active;
             }

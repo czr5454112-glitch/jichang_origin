@@ -40,6 +40,7 @@ FIELDNAMES = [
     "max_tasks",
     "fault_edges",
     "fault_windows",
+    "node_capacities",
     "planned_count",
     "unplanned_count",
     "post_shield_conflicts",
@@ -114,6 +115,7 @@ def _outcome_rows() -> list[dict[str, str]]:
                 max_tasks=_int_text(source["max_tasks"]),
                 fault_edges="none",
                 fault_windows="none",
+                node_capacities="none",
                 planned_count=_int_text(source["planned_count"]),
                 unplanned_count=_int_text(source["unplanned_count"]),
                 post_shield_conflicts=_int_text(source["post_shield_conflicts"]),
@@ -138,6 +140,7 @@ def _outcome_rows() -> list[dict[str, str]]:
                 max_tasks=_int_text(source["max_tasks"]),
                 fault_edges=source.get("fault_edges", "none"),
                 fault_windows="none",
+                node_capacities="none",
                 planned_count=_int_text(source["planned_count"]),
                 unplanned_count=_int_text(source["unplanned_count"]),
                 post_shield_conflicts=_int_text(source["post_shield_conflicts"]),
@@ -166,6 +169,7 @@ def _legacy_event_parity_rows() -> list[dict[str, str]]:
                 max_tasks=_int_text(source["max_tasks"]),
                 fault_edges=source.get("fault_edges", "none"),
                 fault_windows=source.get("fault_windows", "none"),
+                node_capacities=source.get("node_capacities", "none"),
                 planned_count=_int_text(source["cpp_planned"]),
                 unplanned_count=_int_text(source["cpp_unplanned"]),
                 post_shield_conflicts=_int_text(source["cpp_conflicts"]),
@@ -201,6 +205,7 @@ def _matched_rows() -> list[dict[str, str]]:
                 max_tasks=_int_text(source["max_tasks"]),
                 fault_edges=source.get("fault_edges", "none"),
                 fault_windows=source.get("fault_windows", "none"),
+                node_capacities=source.get("node_capacities", "none"),
                 planned_count=_int_text(source["cpp_planned"]),
                 unplanned_count=_int_text(source["cpp_unplanned"]),
                 post_shield_conflicts=_int_text(source["cpp_conflicts"]),
@@ -238,6 +243,7 @@ def _runtime_rows() -> list[dict[str, str]]:
                 max_tasks=_int_text(source["max_tasks"]),
                 fault_edges=source.get("fault_edges", "none"),
                 fault_windows=source.get("fault_windows", "none"),
+                node_capacities=source.get("node_capacities", "none"),
                 planned_count=_int_text(source["cpp_planned"]),
                 unplanned_count=_int_text(source["cpp_unplanned"]),
                 post_shield_conflicts=_int_text(source["cpp_conflicts"]),
@@ -397,7 +403,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
         "",
         (
             "The table is intentionally an evidence index, not a final paper benchmark. Rows come from different "
-            "scopes, and the first matched Phase9 rows are still limited to small no-fault/static-fault/repair-window windows, "
+            "scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window windows, "
             "so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and "
             "hardware-normalized timing."
         ),
@@ -420,13 +426,13 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "",
             "## Matched Baseline Evidence",
             "",
-            "| Scenario | Family | Tasks | Faults | C++ planned | C++ active steps | Conflicts | Speedup | Parity |",
-            "|---|---|---:|---|---:|---:|---:|---:|---|",
+            "| Scenario | Family | Tasks | Faults | Buffer | C++ planned | C++ active steps | Conflicts | Speedup | Parity |",
+            "|---|---|---:|---|---|---:|---:|---:|---:|---|",
         ]
     )
     for row in matched_rows:
         lines.append(
-            "| {case} | {policy_or_baseline} | {max_tasks} | {fault_label} | {planned_count} | "
+            "| {case} | {policy_or_baseline} | {max_tasks} | {fault_label} | {node_capacities} | {planned_count} | "
             "{decision_count} | {post_shield_conflicts} | {cpp_decision_speedup} | {strict_parity_pass} |".format(
                 **{**row, "fault_label": _fault_label(row)}
             )
@@ -501,7 +507,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "",
             "## Remaining Work",
             "",
-            "- extend matched Phase9 rows to merge-group and buffer-capacity scenarios",
+            "- extend matched Phase9 rows to merge-group scenarios once every included family accepts shared merge config",
             "- add a separate real heldout airport map when fixture data is available",
             "- add hardware-normalized repeated timing and confidence intervals for every compared baseline family",
         ]
