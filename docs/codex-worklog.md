@@ -604,3 +604,14 @@
 - Tests / validation: Phase9 unified baseline comparison reported `rows=39 outcome_rows=17 event_rows=14 parity_families=8`; all reported post-shield conflicts were zero; native event Python/C++ parity rows passed; baseline-family parity summaries passed.
 - Safety / parity notes: This is a unified evidence index, not a matched paper-grade bakeoff. It still needs common Phase9 scenario windows, hardware-normalized repeated timing for every compared family, and a separate real heldout airport map if fixture data becomes available.
 - Follow-up: rerun all compared families on common Phase9 scenario sets and extend the table with matched timing/confidence intervals.
+
+## 2026-06-23 19:35 - Phase9 matched baseline comparison diagnostic
+
+- Request: Continue the Python/C++ port objective by running the main baseline/event families on common real legacy task windows instead of only indexing previously generated evidence.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase9_matched_baseline_comparison.py`, generated `outputs/tables/phase9_matched_baseline_comparison.csv` plus `outputs/reports/phase9_matched_baseline_comparison_report.md`, extended `scripts/eval/run_phase9_unified_baseline_comparison.py` to ingest the matched table, regenerated the unified Phase9 CSV/report, and refreshed README/C++ status docs.
+- Commands run: Python py_compile for the matched/unified diagnostics, `scripts/eval/run_phase9_matched_baseline_comparison.py` with `CZR005_CPP_PYTHON_PATH=build_vs/python/Debug`, and `scripts/eval/run_phase9_unified_baseline_comparison.py`.
+- Key observations: The matched gate reruns rolling-horizon SIPP, periodic replanning SIPP, PIBT active-bag replay, EdgeScore-event, and fallback-event on three shared `map2/inputdata` windows: first 16, first 32, and offset-32 static fault. All `15` rows matched Python/C++ summaries exactly with zero post-shield conflicts. Rolling-horizon and periodic SIPP planned `64/64` matched tasks, EdgeScore-event and fallback-event each planned `52/64`, and PIBT active-bag replay planned `0/64` under the current real-window settings while remaining parity/safety clean.
+- Tests / validation: Phase9 matched baseline comparison reported `rows=15 scenarios=3 families=5`; regenerated unified comparison reported `rows=55 outcome_rows=17 event_rows=14 parity_families=9`.
+- Safety / parity notes: This is a matched diagnostic over common no-fault/static-fault windows, not a final paper benchmark. Repair-window rows, merge/buffer matched rows, repeated hardware-normalized timing, and separate heldout airport maps remain pending.
+- Follow-up: extend matched comparison to repair-window and merge/buffer scenarios, and investigate whether PIBT active-bag replay should be tuned or scoped differently for real legacy windows.
