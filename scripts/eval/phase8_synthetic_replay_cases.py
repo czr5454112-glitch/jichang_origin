@@ -98,6 +98,40 @@ def format_fault_windows(fault_windows: tuple[FaultWindow, ...]) -> str:
     )
 
 
+def python_replay_kwargs(
+    spec: SyntheticCaseSpec,
+    max_decisions_per_task: int,
+) -> dict[str, object]:
+    return {
+        "max_tasks": spec.task_count,
+        "fault_edges": set(spec.fault_edges),
+        "max_decisions_per_task": max_decisions_per_task,
+        "fault_windows": tuple(spec.fault_windows),
+        "node_capacities": dict(spec.node_capacities),
+        "merge_groups": {
+            (start_node, end_node): group for start_node, end_node, group in spec.merge_groups
+        },
+        "merge_capacity": spec.merge_capacity,
+        "merge_headway_seconds": spec.merge_headway_seconds,
+    }
+
+
+def cpp_replay_kwargs(
+    spec: SyntheticCaseSpec,
+    max_decisions_per_task: int,
+) -> dict[str, object]:
+    return {
+        "max_tasks": spec.task_count,
+        "fault_edges": list(spec.fault_edges),
+        "max_decisions_per_task": max_decisions_per_task,
+        "fault_windows": list(spec.fault_windows),
+        "node_capacities": list(spec.node_capacities),
+        "merge_groups": list(spec.merge_groups),
+        "merge_capacity": spec.merge_capacity,
+        "merge_headway_seconds": spec.merge_headway_seconds,
+    }
+
+
 def make_replay_case(spec: SyntheticCaseSpec) -> SyntheticReplayCase:
     rng = random.Random(spec.seed)
     node_count = 12

@@ -1,6 +1,6 @@
 # Phase2 Active-Bag Replanning Audit
 
-Date: 2026-06-17
+Date: 2026-06-23
 
 ## Scope
 
@@ -16,14 +16,16 @@ Route-discarding periodic SIPP replanning is tracked separately in `outputs/repo
 
 | Case | Policy | Tasks | Py/C++ planned | Peak active Py/C++ | Active ticks Py/C++ | Decision ticks Py/C++ | C++ decisions/s | Tick parity | Pass |
 |---|---|---:|---:|---:|---:|---:|---:|---|---|
-| synthetic_seed7_medium_repair | edge_score_event | 18 | 18/18 | 4/4 | 14/14 | 13/13 | 7676.418 | True | True |
-| synthetic_seed7_medium_repair | fallback_event | 18 | 18/18 | 4/4 | 14/14 | 13/13 | 9093.464 | True | True |
-| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | 16/16 | 9/9 | 11/11 | 10/10 | 9352.896 | True | True |
-| synthetic_seed11_dense_multi_repair | fallback_event | 24 | 16/16 | 9/9 | 11/11 | 10/10 | 12848.457 | True | True |
-| synthetic_seed17_static_plus_repair | edge_score_event | 20 | 12/12 | 6/6 | 13/13 | 12/12 | 10546.917 | True | True |
-| synthetic_seed17_static_plus_repair | fallback_event | 20 | 12/12 | 6/6 | 13/13 | 12/12 | 13219.942 | True | True |
-| synthetic_seed23_repeated_repair | edge_score_event | 22 | 20/20 | 8/8 | 11/11 | 10/10 | 10235.784 | True | True |
-| synthetic_seed23_repeated_repair | fallback_event | 22 | 19/19 | 8/8 | 11/11 | 10/10 | 13345.196 | True | True |
+| synthetic_seed7_medium_repair | edge_score_event | 18 | 18/18 | 4/4 | 14/14 | 13/13 | 8723.927 | True | True |
+| synthetic_seed7_medium_repair | fallback_event | 18 | 18/18 | 4/4 | 14/14 | 13/13 | 7850.638 | True | True |
+| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | 16/16 | 9/9 | 11/11 | 10/10 | 10705.615 | True | True |
+| synthetic_seed11_dense_multi_repair | fallback_event | 24 | 16/16 | 9/9 | 11/11 | 10/10 | 12399.119 | True | True |
+| synthetic_seed17_static_plus_repair | edge_score_event | 20 | 12/12 | 6/6 | 13/13 | 12/12 | 9385.401 | True | True |
+| synthetic_seed17_static_plus_repair | fallback_event | 20 | 12/12 | 6/6 | 13/13 | 12/12 | 12796.834 | True | True |
+| synthetic_seed23_repeated_repair | edge_score_event | 22 | 20/20 | 8/8 | 11/11 | 10/10 | 10751.600 | True | True |
+| synthetic_seed23_repeated_repair | fallback_event | 22 | 19/19 | 8/8 | 11/11 | 10/10 | 13417.203 | True | True |
+| synthetic_seed31_merge_buffer | edge_score_event | 26 | 22/22 | 12/12 | 8/8 | 8/8 | 9094.168 | True | True |
+| synthetic_seed31_merge_buffer | fallback_event | 26 | 22/22 | 12/12 | 8/8 | 8/8 | 11161.553 | True | True |
 
 CSV: `outputs/tables/phase2_active_bag_replanning_audit.csv`
 
@@ -32,7 +34,7 @@ CSV: `outputs/tables/phase2_active_bag_replanning_audit.csv`
 - active-bag task-stream audit: PASS
 - Python/C++ binned active-bag parity: PASS
 - post-shield safety under active bags: PASS
-- fault/repair schedule rows included: `8`
+- fault/repair schedule rows included: `10`
 - replan cost reported: PASS
 
 ## Remaining Work

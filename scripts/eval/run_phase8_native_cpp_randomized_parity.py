@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import csv
+from datetime import date
+import os
 from pathlib import Path
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[2]
-BUILD_PYTHON_PATH = ROOT / "build_nmake" / "python"
+BUILD_PYTHON_PATH = Path(os.environ.get("CZR005_CPP_PYTHON_PATH", ROOT / "build_nmake" / "python"))
 MODEL_PATH = ROOT / "artifacts" / "runtime" / "phase8_edge_score_runtime_model.txt"
 TABLE_PATH = ROOT / "outputs" / "tables" / "phase8_native_cpp_randomized_parity.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "phase8_native_cpp_randomized_parity_report.md"
@@ -40,7 +42,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
     lines = [
         "# Phase8 Native C++ Randomized Synthetic Parity Report",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
@@ -73,13 +75,12 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
             "- randomized synthetic compact replay parity: PASS" if strict_pass else "- randomized synthetic compact replay parity: FAIL",
             "- randomized synthetic safety: PASS" if safety_pass else "- randomized synthetic safety: FAIL",
             "- persisted synthetic replay manifest: PASS",
+            "- event-scheduler parity: covered by `phase8_native_cpp_event_parity_report.md`",
             "- real heldout-map parity: not covered",
-            "- full high-throughput event-scheduler parity: not covered",
             "",
             "## Remaining Work",
             "",
             "- add real heldout-map fixtures when available",
-            "- carry the persisted synthetic schedules into the final C++ event scheduler",
             "- expand randomized density/fault seeds before paper-grade claims",
         ]
     )
@@ -94,6 +95,7 @@ def main() -> None:
     from czr005.eval import runtime_edge_score_policy_factory  # pylint: disable=import-outside-toplevel
     from phase8_synthetic_replay_cases import (  # pylint: disable=import-outside-toplevel
         MANIFEST_PATH,
+        cpp_replay_kwargs,
         format_faults,
         format_fault_windows,
         graph_from_case,
@@ -115,6 +117,12 @@ def main() -> None:
             tasks,
             fault_edges=fault_edges,
             fault_windows=fault_windows,
+            node_capacities=dict(case.spec.node_capacities),
+            merge_groups={
+                (start_node, end_node): group for start_node, end_node, group in case.spec.merge_groups
+            },
+            merge_capacity=case.spec.merge_capacity,
+            merge_headway_seconds=case.spec.merge_headway_seconds,
             max_decisions_per_task=MAX_DECISIONS_PER_TASK,
         )
         python_result, python_run = env.run_policy(
@@ -129,10 +137,7 @@ def main() -> None:
             [list(row) for row in case.heuristic_time],
             list(case.task_records),
             str(MODEL_PATH),
-            max_tasks=case.spec.task_count,
-            fault_edges=list(case.spec.fault_edges),
-            max_decisions_per_task=MAX_DECISIONS_PER_TASK,
-            fault_windows=list(fault_windows),
+            **cpp_replay_kwargs(case.spec, MAX_DECISIONS_PER_TASK),
         )
         mean_diff = abs(python_result.metrics.mean_travel_time - float(cpp_summary["mean_travel_time"]))
         planned_match = python_result.metrics.planned_count == int(cpp_summary["planned_count"])

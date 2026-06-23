@@ -549,3 +549,14 @@
 - Tests / validation: targeted pytest passed `26 passed`; CTest passed 2/2; full Python pytest passed `44 passed`; Phase8 native C++ event parity reported `rows=10 strict_pass=True` with zero post-shield conflicts.
 - Safety / parity notes: Phase8 event replay now covers merge/buffer configuration end to end. Merge/buffer parity across every baseline family, real heldout-map event parity, full active-bag PIBT/CS-PIBT replay integration, and Phase9 large-scale runtime comparisons remain pending.
 - Follow-up: extend merge/buffer config through remaining baseline parity scripts where needed, then move toward heldout-map/runtime evaluation scaffolding.
+
+## 2026-06-23 16:20 - Manifest-wide merge/buffer replay diagnostics
+
+- Request: Continue widening the merge/buffer replay integration beyond the primary Phase8 event parity gate.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added shared Python/C++ replay kwarg helpers to the synthetic manifest module, threaded those helpers through the Phase8 event parity, event trace diagnostic, event scheduler smoke, active-bag audit, and compact randomized parity scripts, added `CZR005_CPP_PYTHON_PATH` support for scripts that import native pybind modules, made diagnostic report dates dynamic, and fixed `IcsJunctionEnv` episode summaries to count node conflicts with explicit buffer capacities.
+- Commands run: py_compile over updated diagnostics, Phase8 event trace diagnostic, Phase8 event scheduler smoke, Phase2 active-bag replanning audit, Phase8 randomized compact parity, Phase8 event parity, full Python pytest, and CTest through `build_vs`.
+- Key observations: The wider compact randomized parity gate exposed that Python compact env metrics still counted capacity-2 buffer overlaps as conflicts even though execution matched C++; passing `node_capacities` into `compute_episode_metrics` fixed the summary mismatch. All manifest-reading replay diagnostics now include the `synthetic_seed31_merge_buffer` case with consistent merge/buffer configuration.
+- Tests / validation: Phase8 event trace diagnostic reported `rows=10 invariant_pass=True`; event scheduler smoke reported `rows=10 safety_pass=True`; Phase2 active-bag audit reported `rows=10 audit_pass=True`; compact randomized parity reported `rows=5 strict_pass=True`; Phase8 event parity reported `rows=10 strict_pass=True`; full Python pytest passed `44 passed`; CTest passed 2/2.
+- Safety / parity notes: Manifest-wide synthetic replay diagnostics now carry repair windows, explicit buffer capacity, and merge groups consistently. Real heldout-map validation, Phase9 large-scale evaluation, and full active-bag PIBT/CS-PIBT replay integration remain pending.
+- Follow-up: move next toward real heldout-map/runtime scaffolding or active-bag PIBT/CS-PIBT replay integration.

@@ -199,6 +199,7 @@ class IcsJunctionEnv:
             self.task_by_segment,
             self.unplanned,
             self.reservations,
+            node_capacities=self.node_capacities,
         )
         return EpisodeResult(
             routes=self.routes,

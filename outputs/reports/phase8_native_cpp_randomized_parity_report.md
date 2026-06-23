@@ -1,6 +1,6 @@
 # Phase8 Native C++ Randomized Synthetic Parity Report
 
-Date: 2026-06-17
+Date: 2026-06-23
 
 ## Scope
 
@@ -18,6 +18,7 @@ The graph, task stream, and fault schedule are loaded from a persisted manifest 
 | synthetic_seed11_dense_multi_repair | 11 | 24 | 18 | 1.400 | none | 7->9@[5.000,16.000);8->9@[10.000,22.000) | 18 | 18 | 140 | 140 | 0.000000000000 | True |
 | synthetic_seed17_static_plus_repair | 17 | 20 | 17 | 2.200 | 4->7 | 5->8@[0.000,14.000) | 14 | 14 | 247 | 247 | 0.000000000000 | True |
 | synthetic_seed23_repeated_repair | 23 | 22 | 17 | 1.800 | none | 4->8@[3.000,8.000);4->8@[14.000,21.000);8->9@[9.000,15.000) | 20 | 20 | 128 | 128 | 0.000000000000 | True |
+| synthetic_seed31_merge_buffer | 31 | 26 | 20 | 0.900 | none | 4->8@[2.000,13.000) | 25 | 25 | 185 | 185 | 0.000000000000 | True |
 
 CSV: `outputs/tables/phase8_native_cpp_randomized_parity.csv`
 
@@ -26,11 +27,10 @@ CSV: `outputs/tables/phase8_native_cpp_randomized_parity.csv`
 - randomized synthetic compact replay parity: PASS
 - randomized synthetic safety: PASS
 - persisted synthetic replay manifest: PASS
+- event-scheduler parity: covered by `phase8_native_cpp_event_parity_report.md`
 - real heldout-map parity: not covered
-- full high-throughput event-scheduler parity: not covered
 
 ## Remaining Work
 
 - add real heldout-map fixtures when available
-- carry the persisted synthetic schedules into the final C++ event scheduler
 - expand randomized density/fault seeds before paper-grade claims

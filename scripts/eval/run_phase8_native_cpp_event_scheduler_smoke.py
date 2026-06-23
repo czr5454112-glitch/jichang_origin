@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import csv
+from datetime import date
+import os
 from pathlib import Path
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[2]
-BUILD_PYTHON_PATH = ROOT / "build_nmake" / "python"
+BUILD_PYTHON_PATH = Path(os.environ.get("CZR005_CPP_PYTHON_PATH", ROOT / "build_nmake" / "python"))
 MODEL_PATH = ROOT / "artifacts" / "runtime" / "phase8_edge_score_runtime_model.txt"
 TABLE_PATH = ROOT / "outputs" / "tables" / "phase8_native_cpp_event_scheduler.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "phase8_native_cpp_event_scheduler_report.md"
@@ -36,7 +38,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
     lines = [
         "# Phase8 Native C++ Event Scheduler Smoke",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
@@ -70,11 +72,11 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
             f"- EdgeScore event rows: `{len(edge_rows)}`",
             f"- fallback event rows: `{len(fallback_rows)}`",
             "- compact-vs-event strict metric parity: not expected",
-            "- final paper-grade scheduler parity/throughput: not covered",
+            "- Python/C++ event trace parity: covered by `phase8_native_cpp_event_parity_report.md`",
+            "- final paper-grade scheduler throughput: not covered",
             "",
             "## Remaining Work",
             "",
-            "- add event-level trace diagnostics against a Python event scheduler once that reference exists",
             "- add larger manifest sweeps and runtime scaling measurements",
             "- carry this scheduler path into Phase9 baseline and policy comparisons",
         ]
@@ -88,6 +90,7 @@ def main() -> None:
     import czr005_cpp  # pylint: disable=import-outside-toplevel
     from phase8_synthetic_replay_cases import (  # pylint: disable=import-outside-toplevel
         MANIFEST_PATH,
+        cpp_replay_kwargs,
         load_manifest_cases,
     )
 
@@ -98,12 +101,7 @@ def main() -> None:
         edge_records = list(case.edge_records)
         heuristic_time = [list(row) for row in case.heuristic_time]
         task_records = list(case.task_records)
-        common = {
-            "max_tasks": case.spec.task_count,
-            "fault_edges": list(case.spec.fault_edges),
-            "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
-            "fault_windows": list(case.spec.fault_windows),
-        }
+        common = cpp_replay_kwargs(case.spec, MAX_DECISIONS_PER_TASK)
         compact = czr005_cpp.edge_score_native_replay_summary_from_records(
             node_records,
             edge_records,

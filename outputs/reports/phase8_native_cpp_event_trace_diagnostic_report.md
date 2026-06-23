@@ -1,6 +1,6 @@
 # Phase8 Native C++ Event Trace Diagnostic
 
-Date: 2026-06-17
+Date: 2026-06-23
 
 ## Scope
 
@@ -22,6 +22,8 @@ This is an event-trace audit, not a strict compact replay parity claim. Compact 
 | synthetic_seed17_static_plus_repair | fallback_event | 20 | 12 | 8 | 97 | 97 | 0 | 56.525476928365 | 8 | True | none |
 | synthetic_seed23_repeated_repair | edge_score_event | 22 | 20 | 2 | 85 | 85 | 0 | 49.045341958722 | 6 | True | none |
 | synthetic_seed23_repeated_repair | fallback_event | 22 | 19 | 3 | 93 | 93 | 0 | 49.045341958722 | 7 | True | none |
+| synthetic_seed31_merge_buffer | edge_score_event | 26 | 22 | 4 | 104 | 104 | 0 | 36.138469032029 | 9 | True | none |
+| synthetic_seed31_merge_buffer | fallback_event | 26 | 22 | 4 | 104 | 104 | 0 | 36.138469032029 | 9 | True | none |
 
 CSV: `outputs/tables/phase8_native_cpp_event_trace_diagnostic.csv`
 

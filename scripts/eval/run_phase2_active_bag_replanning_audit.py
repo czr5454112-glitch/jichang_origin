@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
+from datetime import date
+import os
 from pathlib import Path
 import sys
 from time import perf_counter
@@ -9,7 +11,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-BUILD_PYTHON_PATH = ROOT / "build_nmake" / "python"
+BUILD_PYTHON_PATH = Path(os.environ.get("CZR005_CPP_PYTHON_PATH", ROOT / "build_nmake" / "python"))
 MODEL_PATH = ROOT / "artifacts" / "runtime" / "phase8_edge_score_runtime_model.txt"
 TABLE_PATH = ROOT / "outputs" / "tables" / "phase2_active_bag_replanning_audit.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "phase2_active_bag_replanning_audit_report.md"
@@ -143,6 +145,7 @@ def _row(
     case_name: str,
     policy: str,
     task_count: int,
+    has_fault_schedule: bool,
     python_summary: dict[str, Any],
     python_metrics: TickMetrics,
     python_elapsed: float,
@@ -160,6 +163,7 @@ def _row(
         "case": case_name,
         "policy": policy,
         "task_count": task_count,
+        "has_fault_schedule": has_fault_schedule,
         "replan_interval_seconds": REPLAN_INTERVAL_SECONDS,
         "python_planned": int(python_summary["planned_count"]),
         "cpp_planned": int(cpp_summary["planned_count"]),
@@ -207,11 +211,11 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
     audit_pass = all(bool(row["audit_pass"]) for row in rows)
     tick_parity_pass = all(bool(row["tick_parity_pass"]) for row in rows)
     conflict_pass = all(bool(row["conflict_pass"]) for row in rows)
-    fault_case_count = sum(1 for row in rows if "repair" in str(row["case"]) or "static" in str(row["case"]))
+    fault_case_count = sum(1 for row in rows if bool(row["has_fault_schedule"]))
     lines = [
         "# Phase2 Active-Bag Replanning Audit",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
@@ -280,8 +284,10 @@ def main() -> None:
     from czr005.eval import run_event_replay  # pylint: disable=import-outside-toplevel
     from phase8_synthetic_replay_cases import (  # pylint: disable=import-outside-toplevel
         MANIFEST_PATH,
+        cpp_replay_kwargs,
         graph_from_case,
         load_manifest_cases,
+        python_replay_kwargs,
         tasks_from_case,
     )
 
@@ -290,18 +296,8 @@ def main() -> None:
     for case in load_manifest_cases(MANIFEST_PATH):
         graph = graph_from_case(case)
         tasks = tasks_from_case(case)
-        common = {
-            "max_tasks": case.spec.task_count,
-            "fault_edges": set(case.spec.fault_edges),
-            "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
-            "fault_windows": tuple(case.spec.fault_windows),
-        }
-        record_common = {
-            "max_tasks": case.spec.task_count,
-            "fault_edges": list(case.spec.fault_edges),
-            "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
-            "fault_windows": list(case.spec.fault_windows),
-        }
+        common = python_replay_kwargs(case.spec, MAX_DECISIONS_PER_TASK)
+        record_common = cpp_replay_kwargs(case.spec, MAX_DECISIONS_PER_TASK)
         node_records = list(case.node_records)
         edge_records = list(case.edge_records)
         heuristic_time = [list(row) for row in case.heuristic_time]
@@ -341,6 +337,7 @@ def main() -> None:
                     case.spec.name,
                     policy,
                     case.spec.task_count,
+                    bool(case.spec.fault_edges or case.spec.fault_windows),
                     _summary(python_payload),
                     _tick_metrics(graph, tasks, python_trace, REPLAN_INTERVAL_SECONDS),
                     python_elapsed,

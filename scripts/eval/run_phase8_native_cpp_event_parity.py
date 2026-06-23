@@ -239,8 +239,10 @@ def main() -> None:
     from czr005.eval import run_event_replay  # pylint: disable=import-outside-toplevel
     from phase8_synthetic_replay_cases import (  # pylint: disable=import-outside-toplevel
         MANIFEST_PATH,
+        cpp_replay_kwargs,
         graph_from_case,
         load_manifest_cases,
+        python_replay_kwargs,
         tasks_from_case,
     )
 
@@ -249,30 +251,8 @@ def main() -> None:
     for case in load_manifest_cases(MANIFEST_PATH):
         graph = graph_from_case(case)
         tasks = tasks_from_case(case)
-        python_node_capacities = dict(case.spec.node_capacities)
-        python_merge_groups = {
-            (start_node, end_node): group for start_node, end_node, group in case.spec.merge_groups
-        }
-        common = {
-            "max_tasks": case.spec.task_count,
-            "fault_edges": set(case.spec.fault_edges),
-            "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
-            "fault_windows": tuple(case.spec.fault_windows),
-            "node_capacities": python_node_capacities,
-            "merge_groups": python_merge_groups,
-            "merge_capacity": case.spec.merge_capacity,
-            "merge_headway_seconds": case.spec.merge_headway_seconds,
-        }
-        record_common = {
-            "max_tasks": case.spec.task_count,
-            "fault_edges": list(case.spec.fault_edges),
-            "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
-            "fault_windows": list(case.spec.fault_windows),
-            "node_capacities": list(case.spec.node_capacities),
-            "merge_groups": list(case.spec.merge_groups),
-            "merge_capacity": case.spec.merge_capacity,
-            "merge_headway_seconds": case.spec.merge_headway_seconds,
-        }
+        common = python_replay_kwargs(case.spec, MAX_DECISIONS_PER_TASK)
+        record_common = cpp_replay_kwargs(case.spec, MAX_DECISIONS_PER_TASK)
         node_records = list(case.node_records)
         edge_records = list(case.edge_records)
         heuristic_time = [list(row) for row in case.heuristic_time]
