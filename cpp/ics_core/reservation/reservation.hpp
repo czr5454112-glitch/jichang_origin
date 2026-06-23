@@ -112,10 +112,35 @@ class ReservationTable {
     }
   }
 
-  [[nodiscard]] int conflict_count() const {
+  [[nodiscard]] int conflict_count(
+      const std::unordered_map<int, int>& node_capacities = {}) const {
     int conflicts = 0;
     for (const auto& entry : by_node_) {
+      const auto capacity_found = node_capacities.find(entry.first);
+      const int capacity = capacity_found == node_capacities.end() ? 1 : capacity_found->second;
       const auto& intervals = entry.second;
+      if (capacity > 1) {
+        std::vector<double> points;
+        points.reserve(intervals.size() * 2);
+        for (const auto& interval : intervals) {
+          points.push_back(interval.start);
+          points.push_back(interval.end);
+        }
+        std::sort(points.begin(), points.end());
+        points.erase(std::unique(points.begin(), points.end()), points.end());
+        for (const double point : points) {
+          int active = 0;
+          for (const auto& interval : intervals) {
+            if (interval.start <= point && point <= interval.end) {
+              ++active;
+            }
+          }
+          if (active > capacity) {
+            conflicts += active - capacity;
+          }
+        }
+        continue;
+      }
       for (std::size_t i = 0; i < intervals.size(); ++i) {
         for (std::size_t j = i + 1; j < intervals.size(); ++j) {
           if (intervals[j].start > intervals[i].end) {

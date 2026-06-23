@@ -538,3 +538,14 @@
 - Tests / validation: Phase3 env pytest passed `9 passed`; Phase2 baseline pytest passed `15 passed`; CTest passed 2/2; Phase2 baseline and Phase3 learning-env smokes reported zero post-shield conflicts; SIPP, rolling-horizon, PIBT, periodic replanning, and Phase8 event parity remained strict PASS; full Python pytest passed `43 passed`; Phase8 trace diagnostic passed.
 - Safety / parity notes: Merge-group checks are covered at the action-mask/shield layer. Full merge-group/buffer-capacity replay integration across every baseline, real heldout-map validation, and Phase9 runtime comparisons remain pending.
 - Follow-up: thread merge/buffer configuration through full replay/parity manifests or move to heldout/runtime evaluation scaffolding.
+
+## 2026-06-23 15:40 - Phase8 event replay merge/buffer parity
+
+- Request: Continue the Python/C++ port objective by carrying explicit buffer capacity and merge-group safety semantics through the event replay runtime, not just the action-mask/shield layer.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: threaded `node_capacities`, `merge_groups`, `merge_capacity`, and `merge_headway_seconds` through Python `run_event_replay`, C++ `EdgeScoreReplayConfig`, native compact/event replay shield setup, pybind replay APIs, and the Phase8 event parity script; made node conflict summaries capacity-aware; added a persisted synthetic merge/buffer case; expanded Python event replay and pybind smoke coverage; fixed CTest pybind smoke to use the actual generated `.pyd` target directory for multi-config VS builds; refreshed Phase8 event parity CSV/report and status docs.
+- Commands run: VS CMake configure/build in `build_vs`, `ctest --test-dir build_vs -C Debug --output-on-failure`, targeted Phase2/Phase3/Phase8 pytest, full `python -m pytest`, and `scripts/eval/run_phase8_native_cpp_event_parity.py` with `CZR005_CPP_PYTHON_PATH=build_vs/python/Debug`.
+- Key observations: Python and C++ event replay now agree exactly when explicit buffer capacity allows target-node overlap and merge groups force same-group entry serialization. The persisted synthetic manifest now contains five cases and 110 tasks, including `synthetic_seed31_merge_buffer`. Phase8 event parity reports 10 strict PASS rows across EdgeScore-event and fallback-event policies.
+- Tests / validation: targeted pytest passed `26 passed`; CTest passed 2/2; full Python pytest passed `44 passed`; Phase8 native C++ event parity reported `rows=10 strict_pass=True` with zero post-shield conflicts.
+- Safety / parity notes: Phase8 event replay now covers merge/buffer configuration end to end. Merge/buffer parity across every baseline family, real heldout-map event parity, full active-bag PIBT/CS-PIBT replay integration, and Phase9 large-scale runtime comparisons remain pending.
+- Follow-up: extend merge/buffer config through remaining baseline parity scripts where needed, then move toward heldout-map/runtime evaluation scaffolding.

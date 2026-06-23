@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -28,7 +29,9 @@ namespace {
 using EdgeFaultWindowTuple = std::tuple<int, int, double, double>;
 using EdgeRecordTuple = std::tuple<int, int, double, double>;
 using EdgeReservationTuple = std::tuple<int, int, int, double, double>;
+using MergeGroupTuple = std::tuple<int, int, int>;
 using NodeRecordTuple = std::tuple<int, int, double, int, int, std::vector<int>>;
+using NodeCapacityTuple = std::tuple<int, int>;
 using NodeReservationTuple = std::tuple<int, int, double, double>;
 using PIBTAgentStateTuple = std::tuple<int, int, int, double, double, double>;
 using TaskRecordTuple = std::tuple<std::string,
@@ -240,6 +243,25 @@ std::vector<czr005::ics::EdgeFaultWindow> edge_fault_windows_from_tuples(
   return windows;
 }
 
+std::unordered_map<int, int> node_capacities_from_tuples(
+    const std::vector<NodeCapacityTuple>& node_capacities) {
+  std::unordered_map<int, int> capacities;
+  for (const auto& [node, capacity] : node_capacities) {
+    capacities[node] = capacity;
+  }
+  return capacities;
+}
+
+std::vector<czr005::ics::MergeGroupEdge> merge_groups_from_tuples(
+    const std::vector<MergeGroupTuple>& merge_groups) {
+  std::vector<czr005::ics::MergeGroupEdge> groups;
+  groups.reserve(merge_groups.size());
+  for (const auto& [start_node, end_node, group] : merge_groups) {
+    groups.push_back(czr005::ics::MergeGroupEdge{start_node, end_node, group});
+  }
+  return groups;
+}
+
 std::vector<czr005::ics::PeriodicFaultWindow> periodic_fault_windows_from_tuples(
     const std::vector<EdgeFaultWindowTuple>& fault_windows) {
   std::vector<czr005::ics::PeriodicFaultWindow> windows;
@@ -349,7 +371,11 @@ py::list pibt_action_rows(const std::vector<czr005::ics::PIBTResolvedAction>& ac
 czr005::ics::EdgeScoreReplayConfig make_replay_config(
     int max_tasks,
     int max_decisions_per_task,
-    int task_offset) {
+    int task_offset,
+    const std::vector<NodeCapacityTuple>& node_capacities = {},
+    const std::vector<MergeGroupTuple>& merge_groups = {},
+    int merge_capacity = 1,
+    double merge_headway_seconds = 0.0) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
@@ -359,10 +385,17 @@ czr005::ics::EdgeScoreReplayConfig make_replay_config(
   if (task_offset < 0) {
     throw std::invalid_argument("task_offset must be non-negative");
   }
+  if (merge_capacity <= 0) {
+    throw std::invalid_argument("merge_capacity must be positive");
+  }
   czr005::ics::EdgeScoreReplayConfig config;
   config.task_offset = static_cast<std::size_t>(task_offset);
   config.max_tasks = static_cast<std::size_t>(max_tasks);
   config.max_decisions_per_task = max_decisions_per_task;
+  config.node_capacities = node_capacities_from_tuples(node_capacities);
+  config.merge_groups = merge_groups_from_tuples(merge_groups);
+  config.merge_capacity = merge_capacity;
+  config.merge_headway_seconds = merge_headway_seconds;
   return config;
 }
 
@@ -373,13 +406,23 @@ py::dict edge_score_native_replay_summary(const std::string& map_path,
                                           const std::vector<std::pair<int, int>>& fault_edges,
                                           int max_decisions_per_task,
                                           int task_offset,
-                                          const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+                                          const std::vector<EdgeFaultWindowTuple>& fault_windows,
+                                          const std::vector<NodeCapacityTuple>& node_capacities,
+                                          const std::vector<MergeGroupTuple>& merge_groups,
+                                          int merge_capacity,
+                                          double merge_headway_seconds) {
   const auto legacy_map = czr005::ics::read_legacy_map2(map_path);
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_replay(
@@ -402,13 +445,23 @@ py::dict edge_score_native_replay_trace(const std::string& map_path,
                                         const std::vector<std::pair<int, int>>& fault_edges,
                                         int max_decisions_per_task,
                                         int task_offset,
-                                        const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+                                        const std::vector<EdgeFaultWindowTuple>& fault_windows,
+                                        const std::vector<NodeCapacityTuple>& node_capacities,
+                                        const std::vector<MergeGroupTuple>& merge_groups,
+                                        int merge_capacity,
+                                        double merge_headway_seconds) {
   const auto legacy_map = czr005::ics::read_legacy_map2(map_path);
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_replay(
@@ -433,12 +486,22 @@ py::dict edge_score_native_fallback_replay_summary(const std::string& map_path,
                                                    const std::vector<std::pair<int, int>>& fault_edges,
                                                    int max_decisions_per_task,
                                                    int task_offset,
-                                                   const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+                                                   const std::vector<EdgeFaultWindowTuple>& fault_windows,
+                                                   const std::vector<NodeCapacityTuple>& node_capacities,
+                                                   const std::vector<MergeGroupTuple>& merge_groups,
+                                                   int merge_capacity,
+                                                   double merge_headway_seconds) {
   const auto legacy_map = czr005::ics::read_legacy_map2(map_path);
   const auto legacy_tasks = czr005::ics::read_legacy_inputdata(task_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_fallback_replay(
@@ -650,13 +713,23 @@ py::dict edge_score_native_replay_summary_from_records(
     const std::vector<std::pair<int, int>>& fault_edges,
     int max_decisions_per_task,
     int task_offset,
-    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto tasks = task_stream_from_records(task_records);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_replay(
@@ -681,13 +754,23 @@ py::dict edge_score_native_event_replay_summary_from_records(
     const std::vector<std::pair<int, int>>& fault_edges,
     int max_decisions_per_task,
     int task_offset,
-    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto tasks = task_stream_from_records(task_records);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_event_replay(
@@ -712,13 +795,23 @@ py::dict edge_score_native_event_replay_trace_from_records(
     const std::vector<std::pair<int, int>>& fault_edges,
     int max_decisions_per_task,
     int task_offset,
-    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto tasks = task_stream_from_records(task_records);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_event_replay(
@@ -747,13 +840,23 @@ py::dict edge_score_native_replay_trace_from_records(
     const std::vector<std::pair<int, int>>& fault_edges,
     int max_decisions_per_task,
     int task_offset,
-    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto tasks = task_stream_from_records(task_records);
   const auto model = czr005::ics::load_edge_score_model_text(model_path);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_replay(
@@ -781,12 +884,22 @@ py::dict edge_score_native_fallback_replay_summary_from_records(
     const std::vector<std::pair<int, int>>& fault_edges,
     int max_decisions_per_task,
     int task_offset,
-    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto tasks = task_stream_from_records(task_records);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_fallback_replay(
@@ -809,12 +922,22 @@ py::dict edge_score_native_event_fallback_replay_summary_from_records(
     const std::vector<std::pair<int, int>>& fault_edges,
     int max_decisions_per_task,
     int task_offset,
-    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto tasks = task_stream_from_records(task_records);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_event_fallback_replay(
@@ -837,12 +960,22 @@ py::dict edge_score_native_event_fallback_replay_trace_from_records(
     const std::vector<std::pair<int, int>>& fault_edges,
     int max_decisions_per_task,
     int task_offset,
-    const std::vector<EdgeFaultWindowTuple>& fault_windows) {
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto tasks = task_stream_from_records(task_records);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const auto windows = edge_fault_windows_from_tuples(fault_windows);
-  const auto config = make_replay_config(max_tasks, max_decisions_per_task, task_offset);
+  const auto config = make_replay_config(max_tasks,
+                                         max_decisions_per_task,
+                                         task_offset,
+                                         node_capacities,
+                                         merge_groups,
+                                         merge_capacity,
+                                         merge_headway_seconds);
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto result = czr005::ics::run_edge_score_event_fallback_replay(
@@ -924,7 +1057,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_replay_trace",
              &edge_score_native_replay_trace,
              py::arg("map_path"),
@@ -934,7 +1071,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_fallback_replay_summary",
              &edge_score_native_fallback_replay_summary,
              py::arg("map_path"),
@@ -943,7 +1084,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("sipp_plan_from_records",
              &sipp_plan_from_records,
              py::arg("node_records"),
@@ -1003,7 +1148,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_event_replay_summary_from_records",
              &edge_score_native_event_replay_summary_from_records,
              py::arg("node_records"),
@@ -1015,7 +1164,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_event_replay_trace_from_records",
              &edge_score_native_event_replay_trace_from_records,
              py::arg("node_records"),
@@ -1027,7 +1180,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_replay_trace_from_records",
              &edge_score_native_replay_trace_from_records,
              py::arg("node_records"),
@@ -1039,7 +1196,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_fallback_replay_summary_from_records",
              &edge_score_native_fallback_replay_summary_from_records,
              py::arg("node_records"),
@@ -1050,7 +1211,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_event_fallback_replay_summary_from_records",
              &edge_score_native_event_fallback_replay_summary_from_records,
              py::arg("node_records"),
@@ -1061,7 +1226,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_event_fallback_replay_trace_from_records",
              &edge_score_native_event_fallback_replay_trace_from_records,
              py::arg("node_records"),
@@ -1072,5 +1241,9 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("max_decisions_per_task") = 128,
              py::arg("task_offset") = 0,
-             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
 }

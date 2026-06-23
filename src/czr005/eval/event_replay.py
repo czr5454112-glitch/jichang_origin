@@ -49,6 +49,10 @@ def run_event_replay(
     hold_seconds: float = 1.0,
     edge_capacity: int = 1,
     edge_headway_seconds: float = 0.0,
+    node_capacities: dict[int, int] | None = None,
+    merge_groups: dict[tuple[int, int], int] | None = None,
+    merge_capacity: int = 1,
+    merge_headway_seconds: float = 0.0,
     fault_edges: set[tuple[int, int]] | None = None,
     fault_windows: tuple[EdgeFaultWindow, ...] | None = None,
     require_reachable_goal: bool = True,
@@ -65,6 +69,8 @@ def run_event_replay(
         raise ValueError("hold_seconds must be positive")
     if edge_capacity <= 0:
         raise ValueError("edge_capacity must be positive")
+    if merge_capacity <= 0:
+        raise ValueError("merge_capacity must be positive")
     if task_offset < 0:
         raise ValueError("task_offset must be non-negative")
     if max_decisions_per_task <= 0:
@@ -73,6 +79,8 @@ def run_event_replay(
     selected = tuple(tasks) if isinstance(tasks, TaskStream) else tuple(TaskStream(tasks))
     start_index = min(task_offset, len(selected))
     limit = min(max_tasks if max_tasks is not None else len(selected), len(selected) - start_index)
+    node_capacities = dict(node_capacities or {})
+    merge_groups = dict(merge_groups or {})
     static_fault_edges = set(fault_edges or set())
     repair_windows = tuple(fault_windows or ())
 
@@ -108,6 +116,7 @@ def run_event_replay(
                 task.pass_time,
                 start_duration,
                 task.task_id,
+                node_capacities.get(task.start, 1),
             )
             route = [
                 SIPPNode(
@@ -162,6 +171,10 @@ def run_event_replay(
             edge_reservations=edge_reservations,
             edge_capacity=edge_capacity,
             edge_headway_seconds=edge_headway_seconds,
+            node_capacities=node_capacities,
+            merge_groups=merge_groups,
+            merge_capacity=merge_capacity,
+            merge_headway_seconds=merge_headway_seconds,
             fault_edges=static_fault_edges,
             fault_windows=repair_windows,
             hold_seconds=hold_seconds,
@@ -177,6 +190,10 @@ def run_event_replay(
             edge_reservations=edge_reservations,
             edge_capacity=edge_capacity,
             edge_headway_seconds=edge_headway_seconds,
+            node_capacities=node_capacities,
+            merge_groups=merge_groups,
+            merge_capacity=merge_capacity,
+            merge_headway_seconds=merge_headway_seconds,
             fault_edges=static_fault_edges,
             fault_windows=repair_windows,
             hold_seconds=hold_seconds,
@@ -327,7 +344,13 @@ def run_event_replay(
         routes=routes,
         unplanned=unplanned,
         events=events,
-        metrics=compute_episode_metrics(routes, task_by_segment, unplanned, reservations),
+        metrics=compute_episode_metrics(
+            routes,
+            task_by_segment,
+            unplanned,
+            reservations,
+            node_capacities=node_capacities,
+        ),
     )
     edge_conflicts = edge_reservations.conflict_count(
         capacity=edge_capacity,
@@ -356,6 +379,10 @@ def _choose_candidate(
     edge_reservations: EdgeReservationTable,
     edge_capacity: int,
     edge_headway_seconds: float,
+    node_capacities: dict[int, int],
+    merge_groups: dict[tuple[int, int], int],
+    merge_capacity: int,
+    merge_headway_seconds: float,
     fault_edges: set[tuple[int, int]],
     fault_windows: tuple[EdgeFaultWindow, ...],
     hold_seconds: float,
@@ -373,6 +400,10 @@ def _choose_candidate(
         edge_reservations=edge_reservations,
         edge_capacity=edge_capacity,
         edge_headway_seconds=edge_headway_seconds,
+        node_capacities=node_capacities,
+        merge_groups=merge_groups,
+        merge_capacity=merge_capacity,
+        merge_headway_seconds=merge_headway_seconds,
         fault_edges=fault_edges,
         fault_windows=fault_windows,
         hold_seconds=hold_seconds,
@@ -528,17 +559,32 @@ def _earliest_safe_node_start(
     earliest_start: float,
     duration: float,
     task_id: int,
+    capacity: int = 1,
 ) -> float:
     candidate = earliest_start
-    for interval in sorted(
+    intervals = sorted(
         reservations.intervals(node),
         key=lambda item: (item.start, item.end, item.task_id),
-    ):
-        if interval.task_id == task_id:
-            continue
-        if _node_interval_safe(interval, candidate, candidate + duration):
-            continue
-        candidate = interval.end + 1e-9
+    )
+    for _ in range(len(intervals) * 2 + 2):
+        moved = False
+        for interval in intervals:
+            if interval.task_id == task_id:
+                continue
+            if _node_interval_safe(interval, candidate, candidate + duration):
+                continue
+            if reservations.has_capacity_conflict(
+                node,
+                candidate,
+                candidate + duration,
+                capacity=capacity,
+                task_id=task_id,
+            ):
+                candidate = interval.end + 1e-9
+                moved = True
+                break
+        if not moved:
+            return candidate
     return candidate
 
 

@@ -13,6 +13,8 @@ SPEED = 2.5
 
 FaultEdge = tuple[int, int]
 FaultWindow = tuple[int, int, float, float]
+MergeGroup = tuple[int, int, int]
+NodeCapacity = tuple[int, int]
 NodeRecord = tuple[int, int, float, int, int, list[int]]
 EdgeRecord = tuple[int, int, float, float]
 TaskRecord = tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
@@ -26,6 +28,10 @@ class SyntheticCaseSpec:
     spacing: float
     fault_edges: tuple[FaultEdge, ...]
     fault_windows: tuple[FaultWindow, ...]
+    node_capacities: tuple[NodeCapacity, ...] = ()
+    merge_groups: tuple[MergeGroup, ...] = ()
+    merge_capacity: int = 1
+    merge_headway_seconds: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -63,6 +69,16 @@ def case_plan() -> tuple[SyntheticCaseSpec, ...]:
             1.8,
             (),
             ((4, 8, 3.0, 8.0), (4, 8, 14.0, 21.0), (8, 9, 9.0, 15.0)),
+        ),
+        SyntheticCaseSpec(
+            "synthetic_seed31_merge_buffer",
+            31,
+            26,
+            0.9,
+            (),
+            ((4, 8, 2.0, 13.0),),
+            ((8, 2), (9, 2)),
+            ((4, 7, 7), (4, 8, 7), (5, 8, 8), (6, 8, 8)),
         ),
     )
 
@@ -296,6 +312,10 @@ def _case_to_dict(case: SyntheticReplayCase) -> dict[str, Any]:
         "spacing": case.spec.spacing,
         "fault_edges": [list(item) for item in case.spec.fault_edges],
         "fault_windows": [list(item) for item in case.spec.fault_windows],
+        "node_capacities": [list(item) for item in case.spec.node_capacities],
+        "merge_groups": [list(item) for item in case.spec.merge_groups],
+        "merge_capacity": case.spec.merge_capacity,
+        "merge_headway_seconds": case.spec.merge_headway_seconds,
         "node_records": [
             [location, node_type, service_time, x, y, outgoing]
             for location, node_type, service_time, x, y, outgoing in case.node_records
@@ -317,6 +337,15 @@ def _case_from_dict(data: dict[str, Any]) -> SyntheticReplayCase:
             (int(start), int(end), float(fault_start), float(repair_time))
             for start, end, fault_start, repair_time in data["fault_windows"]
         ),
+        node_capacities=tuple(
+            (int(node), int(capacity)) for node, capacity in data.get("node_capacities", [])
+        ),
+        merge_groups=tuple(
+            (int(start), int(end), int(group))
+            for start, end, group in data.get("merge_groups", [])
+        ),
+        merge_capacity=int(data.get("merge_capacity", 1)),
+        merge_headway_seconds=float(data.get("merge_headway_seconds", 0.0)),
     )
     return SyntheticReplayCase(
         spec=spec,

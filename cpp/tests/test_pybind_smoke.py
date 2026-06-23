@@ -417,6 +417,54 @@ def main() -> None:
     assert records_event_fallback_trace["summary"]["decision_count"] == len(records_event_fallback_trace["trace"])
     assert records_event_fallback_trace["summary"]["post_shield_conflicts"] == 0
 
+    merge_buffer_node_records = [
+        (0, 1, 0.0, 0, 0, [1]),
+        (1, 4, 1.0, 1, 0, [2]),
+        (2, 2, 0.0, 2, 0, []),
+        (3, 1, 0.0, 0, 1, [1]),
+    ]
+    merge_buffer_edge_records = [
+        (0, 1, 5.0, 2.5),
+        (3, 1, 5.0, 2.5),
+        (1, 2, 5.0, 2.5),
+    ]
+    merge_buffer_heuristic_time = [
+        [0.0, 2.0, 4.0, 999.0],
+        [999.0, 0.0, 2.0, 999.0],
+        [999.0, 999.0, 0.0, 999.0],
+        [999.0, 2.0, 4.0, 0.0],
+    ]
+    merge_buffer_tasks = [
+        ("left-buffer", 501, 501, 0.0, 30.0, 0, 2, 0, 2, 0.0, "direct", False, 1),
+        ("right-buffer", 502, 502, 0.1, 30.0, 3, 2, 3, 2, 0.1, "direct", False, 2),
+    ]
+    buffer_trace = czr005_cpp.edge_score_native_event_fallback_replay_trace_from_records(
+        merge_buffer_node_records,
+        merge_buffer_edge_records,
+        merge_buffer_heuristic_time,
+        merge_buffer_tasks,
+        max_tasks=2,
+        max_decisions_per_task=8,
+        node_capacities=[(1, 2)],
+    )
+    assert buffer_trace["summary"]["planned_count"] == 2
+    assert buffer_trace["summary"]["post_shield_conflicts"] == 0
+    assert next(row for row in buffer_trace["trace"] if row["task_id"] == 502)["executed_kind"] == "move"
+
+    merge_trace = czr005_cpp.edge_score_native_event_fallback_replay_trace_from_records(
+        merge_buffer_node_records,
+        merge_buffer_edge_records,
+        merge_buffer_heuristic_time,
+        merge_buffer_tasks,
+        max_tasks=2,
+        max_decisions_per_task=8,
+        node_capacities=[(1, 2)],
+        merge_groups=[(0, 1, 7), (3, 1, 7)],
+    )
+    assert merge_trace["summary"]["planned_count"] == 2
+    assert merge_trace["summary"]["post_shield_conflicts"] == 0
+    assert next(row for row in merge_trace["trace"] if row["task_id"] == 502)["executed_kind"] == "hold"
+
 
 if __name__ == "__main__":
     main()

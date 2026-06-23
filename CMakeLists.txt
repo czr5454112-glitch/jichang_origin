@@ -32,10 +32,9 @@ if(CZR005_BUILD_PYBIND)
 
   add_test(
     NAME pybind_smoke
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cpp/tests/test_pybind_smoke.py)
-  set_tests_properties(
-    pybind_smoke
-    PROPERTIES
-      ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/python"
-      DEPENDS czr005_cpp)
+    COMMAND
+      ${CMAKE_COMMAND} -E env
+      "PYTHONPATH=$<TARGET_FILE_DIR:czr005_cpp>"
+      ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cpp/tests/test_pybind_smoke.py)
+  set_tests_properties(pybind_smoke PROPERTIES DEPENDS czr005_cpp)
 endif()

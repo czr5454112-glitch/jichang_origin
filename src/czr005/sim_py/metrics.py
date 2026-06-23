@@ -61,6 +61,7 @@ def compute_episode_metrics(
     task_by_segment: dict[str, TaskLeg],
     unplanned: list[TaskLeg],
     reservations: ReservationTable,
+    node_capacities: dict[int, int] | None = None,
 ) -> EpisodeMetrics:
     route_metrics = [
         route_metric(task_by_segment[segment_id], route)
@@ -78,7 +79,7 @@ def compute_episode_metrics(
         late_count=sum(1 for value in lateness if value > 0.0),
         max_lateness=max(lateness) if lateness else 0.0,
         makespan=max((route[-1].t2 for route in planned.values() if route), default=0.0),
-        reservation_conflicts=reservations.conflict_count(),
+        reservation_conflicts=reservations.conflict_count(node_capacities),
     )
 
 
@@ -93,4 +94,3 @@ def _percentile(values: list[float], percentile: float) -> float:
     upper = min(lower + 1, len(ordered) - 1)
     fraction = rank - lower
     return ordered[lower] * (1.0 - fraction) + ordered[upper] * fraction
-

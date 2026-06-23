@@ -1,6 +1,6 @@
 # Phase8 Native C++ Event Scheduler Parity
 
-Date: 2026-06-17
+Date: 2026-06-23
 
 ## Scope
 
@@ -22,6 +22,8 @@ This validates event-scheduler Python/C++ semantics on synthetic heldout-like fi
 | synthetic_seed17_static_plus_repair | fallback_event | 12 | 12 | 97 | 97 | 0.000000000000 | 97/97 | True | match:none@ |
 | synthetic_seed23_repeated_repair | edge_score_event | 20 | 20 | 85 | 85 | 0.000000000000 | 85/85 | True | match:none@ |
 | synthetic_seed23_repeated_repair | fallback_event | 19 | 19 | 93 | 93 | 0.000000000000 | 93/93 | True | match:none@ |
+| synthetic_seed31_merge_buffer | edge_score_event | 22 | 22 | 104 | 104 | 0.000000000000 | 104/104 | True | match:none@ |
+| synthetic_seed31_merge_buffer | fallback_event | 22 | 22 | 104 | 104 | 0.000000000000 | 104/104 | True | match:none@ |
 
 CSV: `outputs/tables/phase8_native_cpp_event_parity.csv`
 
@@ -29,7 +31,7 @@ CSV: `outputs/tables/phase8_native_cpp_event_parity.csv`
 
 - event scheduler Python/C++ trace parity: PASS
 - event scheduler post-shield safety: PASS
-- EdgeScore event parity rows: `4`
-- fallback event parity rows: `4`
+- EdgeScore event parity rows: `5`
+- fallback event parity rows: `5`
 - real heldout airport map: not covered
 - final throughput scaling: not covered

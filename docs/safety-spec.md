@@ -49,6 +49,12 @@ Currently covered by Python baseline tests:
 - action masks respect explicit node/buffer capacity
 - action masks reject configured merge-group conflicts
 
+Currently covered by Phase8 event replay parity:
+
+- Python and C++ event replay both carry explicit node/buffer capacities.
+- Python and C++ event replay both carry configured merge groups.
+- Persisted synthetic schedules include a merge/buffer case with zero post-shield conflicts.
+
 Still pending:
 
 - event-simulation safety counters

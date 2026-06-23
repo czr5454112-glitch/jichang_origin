@@ -22,7 +22,10 @@ def test_phase8_synthetic_replay_manifest_matches_generator() -> None:
     regenerated = tuple(make_replay_case(spec) for spec in case_plan())
 
     assert tuple(case.spec.name for case in cases) == tuple(case.spec.name for case in regenerated)
-    assert sum(case.spec.task_count for case in cases) == 84
+    assert sum(case.spec.task_count for case in cases) == 110
+    merge_buffer_case = next(case for case in cases if case.spec.name == "synthetic_seed31_merge_buffer")
+    assert merge_buffer_case.spec.node_capacities == ((8, 2), (9, 2))
+    assert merge_buffer_case.spec.merge_groups == ((4, 7, 7), (4, 8, 7), (5, 8, 8), (6, 8, 8))
     for loaded, expected in zip(cases, regenerated, strict=True):
         assert loaded.spec == expected.spec
         assert loaded.node_records == expected.node_records

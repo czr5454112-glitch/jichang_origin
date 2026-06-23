@@ -113,10 +113,21 @@ class ReservationTable:
             if not self._by_node[node]:
                 del self._by_node[node]
 
-    def conflict_count(self) -> int:
+    def conflict_count(self, node_capacities: dict[int, int] | None = None) -> int:
+        node_capacities = node_capacities or {}
         conflicts = 0
-        for intervals in self._by_node.values():
+        for node, intervals in self._by_node.items():
+            capacity = node_capacities.get(node, 1)
             ordered = sorted(intervals, key=lambda interval: (interval.start, interval.end))
+            if capacity > 1:
+                points = sorted({point for interval in ordered for point in (interval.start, interval.end)})
+                for point in points:
+                    active = sum(
+                        1 for interval in ordered if interval.start <= point <= interval.end
+                    )
+                    if active > capacity:
+                        conflicts += active - capacity
+                continue
             for index, left in enumerate(ordered):
                 for right in ordered[index + 1 :]:
                     if right.start > left.end:

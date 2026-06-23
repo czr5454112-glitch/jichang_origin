@@ -5,6 +5,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -31,6 +32,10 @@ struct EdgeScoreReplayConfig {
   double hold_seconds = 1.0;
   int edge_capacity = 1;
   double edge_headway_seconds = 0.0;
+  std::unordered_map<int, int> node_capacities;
+  std::vector<MergeGroupEdge> merge_groups;
+  int merge_capacity = 1;
+  double merge_headway_seconds = 0.0;
   bool allow_goal_node_overlap = false;
 };
 
@@ -126,6 +131,31 @@ inline void validate_fault_windows(const std::vector<EdgeFaultWindow>& fault_win
   }
 }
 
+inline void validate_replay_config(const EdgeScoreReplayConfig& config) {
+  if (config.hold_seconds <= 0.0) {
+    throw std::invalid_argument("hold_seconds must be positive");
+  }
+  if (config.edge_capacity <= 0) {
+    throw std::invalid_argument("edge_capacity must be positive");
+  }
+  if (config.merge_capacity <= 0) {
+    throw std::invalid_argument("merge_capacity must be positive");
+  }
+  if (config.max_decisions_per_task <= 0) {
+    throw std::invalid_argument("max_decisions_per_task must be positive");
+  }
+  for (const auto& entry : config.node_capacities) {
+    if (entry.second <= 0) {
+      throw std::invalid_argument("node capacities must be positive");
+    }
+  }
+}
+
+inline int node_capacity(const EdgeScoreReplayConfig& config, int node) {
+  const auto found = config.node_capacities.find(node);
+  return found == config.node_capacities.end() ? 1 : found->second;
+}
+
 inline std::set<std::pair<int, int>> active_fault_edges(
     const std::set<std::pair<int, int>>& fault_edges,
     const std::vector<EdgeFaultWindow>& fault_windows,
@@ -212,11 +242,13 @@ inline RuntimeCandidate make_hold_candidate(const Graph& graph,
                                             int current,
                                             double ready_time,
                                             double hold_seconds,
-                                            const ReservationTable& node_reservations) {
-  const bool safe = !node_reservations.has_conflict(current,
-                                                    ready_time,
-                                                    ready_time + hold_seconds,
-                                                    task.task_id);
+                                            const ReservationTable& node_reservations,
+                                            int node_capacity) {
+  const bool safe = !node_reservations.has_capacity_conflict(current,
+                                                            ready_time,
+                                                            ready_time + hold_seconds,
+                                                            node_capacity,
+                                                            task.task_id);
   return RuntimeCandidate{index,
                           true,
                           safe,
@@ -241,7 +273,8 @@ inline std::vector<RuntimeCandidate> build_candidates(
     const ReservationTable& node_reservations,
     const EdgeReservationTable& edge_reservations,
     const std::set<std::pair<int, int>>& fault_edges,
-    double hold_seconds) {
+    double hold_seconds,
+    int current_node_capacity) {
   std::vector<RuntimeCandidate> candidates;
   int index = 0;
   for (const int next : graph.outgoing(current)) {
@@ -263,7 +296,8 @@ inline std::vector<RuntimeCandidate> build_candidates(
                                            current,
                                            ready_time,
                                            hold_seconds,
-                                           node_reservations));
+                                           node_reservations,
+                                           current_node_capacity));
   return candidates;
 }
 
@@ -301,17 +335,31 @@ inline double earliest_safe_node_start(const ReservationTable& reservations,
                                        int node,
                                        double earliest_start,
                                        double duration,
-                                       double step_seconds) {
-  (void)step_seconds;
+                                       int capacity) {
   double candidate = earliest_start;
-  for (const auto& interval : reservations.intervals(node)) {
-    if (interval.task_id == task_id) {
-      continue;
+  const auto& intervals = reservations.intervals(node);
+  for (std::size_t attempt = 0; attempt < intervals.size() * 2 + 2; ++attempt) {
+    bool moved = false;
+    for (const auto& interval : intervals) {
+      if (interval.task_id == task_id) {
+        continue;
+      }
+      if (!interval.overlaps(candidate, candidate + duration)) {
+        continue;
+      }
+      if (reservations.has_capacity_conflict(node,
+                                             candidate,
+                                             candidate + duration,
+                                             capacity,
+                                             task_id)) {
+        candidate = interval.end + 1e-9;
+        moved = true;
+        break;
+      }
     }
-    if (!interval.overlaps(candidate, candidate + duration)) {
-      continue;
+    if (!moved) {
+      return candidate;
     }
-    candidate = interval.end + 1e-9;
   }
   return candidate;
 }
@@ -343,15 +391,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
     const EdgeScoreReplayConfig& config = {},
     const std::set<std::pair<int, int>>& fault_edges = {},
     const std::vector<EdgeFaultWindow>& fault_windows = {}) {
-  if (config.hold_seconds <= 0.0) {
-    throw std::invalid_argument("hold_seconds must be positive");
-  }
-  if (config.edge_capacity <= 0) {
-    throw std::invalid_argument("edge_capacity must be positive");
-  }
-  if (config.max_decisions_per_task <= 0) {
-    throw std::invalid_argument("max_decisions_per_task must be positive");
-  }
+  detail::validate_replay_config(config);
   detail::validate_fault_windows(fault_windows);
 
   ReservationTable node_reservations;
@@ -359,6 +399,10 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
   JunctionShieldConfig shield_config;
   shield_config.edge_capacity = config.edge_capacity;
   shield_config.edge_headway_seconds = config.edge_headway_seconds;
+  shield_config.node_capacities = config.node_capacities;
+  shield_config.merge_groups = config.merge_groups;
+  shield_config.merge_capacity = config.merge_capacity;
+  shield_config.merge_headway_seconds = config.merge_headway_seconds;
   shield_config.allow_goal_node_overlap = config.allow_goal_node_overlap;
   const JunctionShield shield(graph, shield_config);
 
@@ -374,7 +418,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
                                                               task.start,
                                                               task.pass_time,
                                                               start_duration,
-                                                              config.hold_seconds);
+                                                              detail::node_capacity(config, task.start));
     std::vector<PathNode> route;
     route.push_back(PathNode{task.start,
                              start_time,
@@ -400,7 +444,8 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
                                                        node_reservations,
                                                        edge_reservations,
                                                        active_faults,
-                                                       config.hold_seconds);
+                                                       config.hold_seconds,
+                                                       detail::node_capacity(config, current));
       std::vector<std::vector<double>> features;
       std::vector<bool> mask;
       features.reserve(candidates.size());
@@ -574,7 +619,7 @@ inline EdgeScoreReplayResult run_edge_score_replay_with_optional_model(
     result.mean_travel_time /= static_cast<double>(result.planned_count);
   }
   result.post_shield_conflicts =
-      node_reservations.conflict_count() +
+      node_reservations.conflict_count(config.node_capacities) +
       edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds);
   return result;
 }
@@ -586,15 +631,7 @@ inline EdgeScoreReplayResult run_edge_score_event_replay_with_optional_model(
     const EdgeScoreReplayConfig& config = {},
     const std::set<std::pair<int, int>>& fault_edges = {},
     const std::vector<EdgeFaultWindow>& fault_windows = {}) {
-  if (config.hold_seconds <= 0.0) {
-    throw std::invalid_argument("hold_seconds must be positive");
-  }
-  if (config.edge_capacity <= 0) {
-    throw std::invalid_argument("edge_capacity must be positive");
-  }
-  if (config.max_decisions_per_task <= 0) {
-    throw std::invalid_argument("max_decisions_per_task must be positive");
-  }
+  detail::validate_replay_config(config);
   detail::validate_fault_windows(fault_windows);
 
   ReservationTable node_reservations;
@@ -602,6 +639,10 @@ inline EdgeScoreReplayResult run_edge_score_event_replay_with_optional_model(
   JunctionShieldConfig shield_config;
   shield_config.edge_capacity = config.edge_capacity;
   shield_config.edge_headway_seconds = config.edge_headway_seconds;
+  shield_config.node_capacities = config.node_capacities;
+  shield_config.merge_groups = config.merge_groups;
+  shield_config.merge_capacity = config.merge_capacity;
+  shield_config.merge_headway_seconds = config.merge_headway_seconds;
   shield_config.allow_goal_node_overlap = config.allow_goal_node_overlap;
   const JunctionShield shield(graph, shield_config);
 
@@ -634,7 +675,7 @@ inline EdgeScoreReplayResult run_edge_score_event_replay_with_optional_model(
                                                                 task.start,
                                                                 task.pass_time,
                                                                 start_duration,
-                                                                config.hold_seconds);
+                                                                detail::node_capacity(config, task.start));
       detail::EventTaskState state;
       state.task_index = event.local_task_index;
       state.task = &task;
@@ -680,7 +721,8 @@ inline EdgeScoreReplayResult run_edge_score_event_replay_with_optional_model(
                                                      node_reservations,
                                                      edge_reservations,
                                                      active_faults,
-                                                     config.hold_seconds);
+                                                     config.hold_seconds,
+                                                     detail::node_capacity(config, current));
     std::vector<std::vector<double>> features;
     std::vector<bool> mask;
     features.reserve(candidates.size());
@@ -860,7 +902,7 @@ inline EdgeScoreReplayResult run_edge_score_event_replay_with_optional_model(
     result.mean_travel_time /= static_cast<double>(result.planned_count);
   }
   result.post_shield_conflicts =
-      node_reservations.conflict_count() +
+      node_reservations.conflict_count(config.node_capacities) +
       edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds);
   return result;
 }

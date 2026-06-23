@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import csv
+from datetime import date
+import os
 from pathlib import Path
 import sys
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-BUILD_PYTHON_PATH = ROOT / "build_nmake" / "python"
+BUILD_PYTHON_PATH = Path(os.environ.get("CZR005_CPP_PYTHON_PATH", ROOT / "build_nmake" / "python"))
 MODEL_PATH = ROOT / "artifacts" / "runtime" / "phase8_edge_score_runtime_model.txt"
 TABLE_PATH = ROOT / "outputs" / "tables" / "phase8_native_cpp_event_parity.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "phase8_native_cpp_event_parity_report.md"
@@ -172,7 +174,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
     lines = [
         "# Phase8 Native C++ Event Scheduler Parity",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
@@ -247,17 +249,29 @@ def main() -> None:
     for case in load_manifest_cases(MANIFEST_PATH):
         graph = graph_from_case(case)
         tasks = tasks_from_case(case)
+        python_node_capacities = dict(case.spec.node_capacities)
+        python_merge_groups = {
+            (start_node, end_node): group for start_node, end_node, group in case.spec.merge_groups
+        }
         common = {
             "max_tasks": case.spec.task_count,
             "fault_edges": set(case.spec.fault_edges),
             "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
             "fault_windows": tuple(case.spec.fault_windows),
+            "node_capacities": python_node_capacities,
+            "merge_groups": python_merge_groups,
+            "merge_capacity": case.spec.merge_capacity,
+            "merge_headway_seconds": case.spec.merge_headway_seconds,
         }
         record_common = {
             "max_tasks": case.spec.task_count,
             "fault_edges": list(case.spec.fault_edges),
             "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
             "fault_windows": list(case.spec.fault_windows),
+            "node_capacities": list(case.spec.node_capacities),
+            "merge_groups": list(case.spec.merge_groups),
+            "merge_capacity": case.spec.merge_capacity,
+            "merge_headway_seconds": case.spec.merge_headway_seconds,
         }
         node_records = list(case.node_records)
         edge_records = list(case.edge_records)
