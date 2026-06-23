@@ -571,3 +571,14 @@
 - Tests / validation: target Phase2 pytest passed `17 passed`; CTest passed 2/2; Phase2 active-bag PIBT replay parity reported `rows=6 strict_pass=True`; full Python pytest passed `46 passed`.
 - Safety / parity notes: Full active-bag PIBT/CS-PIBT replay integration is now covered for the Phase2 parity fixture set. Real heldout-map validation, Phase9 large-scale evaluation, and merge/buffer parity across every baseline family remain pending.
 - Follow-up: move next toward real heldout-map/runtime scaffolding or broaden merge/buffer semantics through the remaining baseline families.
+
+## 2026-06-23 17:45 - Phase8 legacy map event replay parity
+
+- Request: Continue closing Python/C++ port prerequisites by moving event replay parity beyond synthetic fixtures onto the real legacy airport map/task stream.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase8_legacy_event_parity.py`, generated `outputs/tables/phase8_legacy_event_parity.csv` plus `outputs/reports/phase8_legacy_event_parity_report.md`, and refreshed README/C++/safety status docs.
+- Commands run: Python py_compile for the new diagnostic and `scripts/eval/run_phase8_legacy_event_parity.py` with `CZR005_CPP_PYTHON_PATH=build_vs/python/Debug`.
+- Key observations: The diagnostic compares Python `run_event_replay` against native C++ event replay on processed `map2.json` and `inputdata.jsonl`, using the same real legacy task records passed through pybind. It covers the first 16 tasks, an offset-32 static-fault window, and an offset-64 repair-window case under both EdgeScore-runtime and fallback policies.
+- Tests / validation: Phase8 legacy event parity reported `rows=6 strict_pass=True`; all rows had zero post-shield conflicts and exact summary/decision-trace parity.
+- Safety / parity notes: Real legacy `map2/inputdata` event replay parity is now covered for deterministic task windows. A separate heldout airport map, Phase9 large-scale evaluation, and final throughput claims remain pending.
+- Follow-up: add a separate heldout map fixture if available, then scale the event parity gate into Phase9 baseline/policy comparisons.

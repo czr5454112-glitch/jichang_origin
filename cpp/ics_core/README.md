@@ -18,7 +18,8 @@ Implemented so far:
 - compact native C++ EdgeScore replay smoke
 - model-unavailable shortest-safe fallback for compact native replay
 - first native C++ event-queue replay, trace audit, and Python/C++ parity over persisted synthetic schedules
+- real legacy map2/inputdata event replay trace parity on deterministic task windows
 - Phase8 event replay carries repair windows plus explicit node/buffer capacity and merge-group configuration through Python/C++ parity
 - pybind smoke boundary
 
-Paper-grade high-throughput scheduler validation, real heldout-map event parity, merge-group/buffer-capacity parity across every baseline family, and broad runtime replay validation are still pending.
+Paper-grade high-throughput scheduler validation, separate heldout-map event parity, merge-group/buffer-capacity parity across every baseline family, and broad runtime replay validation are still pending.

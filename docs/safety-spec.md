@@ -55,6 +55,7 @@ Currently covered by Phase8 event replay parity:
 - Python and C++ event replay both carry explicit node/buffer capacities.
 - Python and C++ event replay both carry configured merge groups.
 - Persisted synthetic schedules include a merge/buffer case with zero post-shield conflicts.
+- Real legacy `map2/inputdata` task windows match on Python/C++ event replay summaries and decision traces with zero post-shield conflicts.
 
 Currently covered by Phase2 active-bag PIBT replay parity:
 
