@@ -3,9 +3,12 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass
 from datetime import date
+import math
 import os
+import platform
 from pathlib import Path
-from time import perf_counter
+from statistics import mean, stdev
+from time import get_clock_info, perf_counter
 import sys
 from typing import Any
 
@@ -19,6 +22,7 @@ TABLE_PATH = ROOT / "outputs" / "tables" / "phase9_event_runtime_scaling.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "phase9_event_runtime_scaling_report.md"
 MAX_DECISIONS_PER_TASK = 128
 FLOAT_TOLERANCE = 1.0e-9
+REPEATS = int(os.environ.get("CZR005_RUNTIME_REPEATS", "5"))
 
 NodeRecord = tuple[int, int, float, int, int, list[int]]
 EdgeRecord = tuple[int, int, float, float]
@@ -133,6 +137,53 @@ def _first_summary_mismatch(python_summary: dict[str, Any], cpp_summary: dict[st
     return {"status": "match", "field": "none", "python_value": "", "cpp_value": ""}
 
 
+def _runtime_metadata() -> dict[str, float | int | str]:
+    clock = get_clock_info("perf_counter")
+    return {
+        "repeat_count": REPEATS,
+        "python_version": platform.python_version(),
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "processor": platform.processor(),
+        "cpu_count": os.cpu_count() or 0,
+        "timer": "perf_counter",
+        "timer_resolution_seconds": clock.resolution,
+    }
+
+
+def _sample_stats(values: list[float]) -> dict[str, float]:
+    if not values:
+        return {"mean": 0.0, "std": 0.0, "ci95": 0.0, "min": 0.0, "max": 0.0}
+    average = mean(values)
+    if len(values) == 1:
+        spread = 0.0
+        ci95 = 0.0
+    else:
+        spread = stdev(values)
+        ci95 = 1.96 * spread / math.sqrt(len(values))
+    return {
+        "mean": average,
+        "std": spread,
+        "ci95": ci95,
+        "min": min(values),
+        "max": max(values),
+    }
+
+
+def _stable_summary(summaries: list[dict[str, Any]], label: str) -> dict[str, Any]:
+    if not summaries:
+        raise ValueError(f"missing summaries for {label}")
+    first = summaries[0]
+    for index, summary in enumerate(summaries[1:], start=2):
+        mismatch = _first_summary_mismatch(first, summary)
+        if mismatch["status"] != "match":
+            raise AssertionError(
+                f"{label} summary changed on repeat {index}: "
+                f"{mismatch['field']} {mismatch['python_value']} != {mismatch['cpp_value']}"
+            )
+    return first
+
+
 def _run_python_event(
     graph: Any,
     tasks: tuple[Any, ...],
@@ -158,17 +209,21 @@ def _row(
     case: RuntimeScalingCase,
     policy: str,
     python_summary: dict[str, Any],
-    python_elapsed: float,
+    python_elapsed_values: list[float],
     cpp_summary: dict[str, Any],
+    cpp_elapsed_values: list[float],
 ) -> dict[str, float | int | str | bool]:
     mismatch = _first_summary_mismatch(python_summary, cpp_summary)
     python_decisions = int(python_summary["decision_count"])
     cpp_decisions = int(cpp_summary["decision_count"])
-    cpp_elapsed = float(cpp_summary["elapsed_seconds"])
-    python_dps = python_decisions / python_elapsed if python_elapsed > 0.0 else 0.0
-    cpp_dps = cpp_decisions / cpp_elapsed if cpp_elapsed > 0.0 else 0.0
-    python_tps = case.max_tasks / python_elapsed if python_elapsed > 0.0 else 0.0
-    cpp_tps = case.max_tasks / cpp_elapsed if cpp_elapsed > 0.0 else 0.0
+    python_elapsed = _sample_stats(python_elapsed_values)
+    cpp_elapsed = _sample_stats(cpp_elapsed_values)
+    python_elapsed_mean = python_elapsed["mean"]
+    cpp_elapsed_mean = cpp_elapsed["mean"]
+    python_dps = python_decisions / python_elapsed_mean if python_elapsed_mean > 0.0 else 0.0
+    cpp_dps = cpp_decisions / cpp_elapsed_mean if cpp_elapsed_mean > 0.0 else 0.0
+    python_tps = case.max_tasks / python_elapsed_mean if python_elapsed_mean > 0.0 else 0.0
+    cpp_tps = case.max_tasks / cpp_elapsed_mean if cpp_elapsed_mean > 0.0 else 0.0
     return {
         "case": case.name,
         "policy": policy,
@@ -184,8 +239,16 @@ def _row(
         "cpp_decisions": cpp_decisions,
         "python_conflicts": int(python_summary["post_shield_conflicts"]),
         "cpp_conflicts": int(cpp_summary["post_shield_conflicts"]),
-        "python_elapsed_seconds": python_elapsed,
-        "cpp_elapsed_seconds": cpp_elapsed,
+        "python_elapsed_mean_seconds": python_elapsed_mean,
+        "python_elapsed_std_seconds": python_elapsed["std"],
+        "python_elapsed_ci95_seconds": python_elapsed["ci95"],
+        "python_elapsed_min_seconds": python_elapsed["min"],
+        "python_elapsed_max_seconds": python_elapsed["max"],
+        "cpp_elapsed_mean_seconds": cpp_elapsed_mean,
+        "cpp_elapsed_std_seconds": cpp_elapsed["std"],
+        "cpp_elapsed_ci95_seconds": cpp_elapsed["ci95"],
+        "cpp_elapsed_min_seconds": cpp_elapsed["min"],
+        "cpp_elapsed_max_seconds": cpp_elapsed["max"],
         "python_decisions_per_second": python_dps,
         "cpp_decisions_per_second": cpp_dps,
         "python_tasks_per_second": python_tps,
@@ -210,7 +273,7 @@ def write_table(rows: list[dict[str, float | int | str | bool]]) -> None:
         writer.writerows(rows)
 
 
-def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
+def write_report(rows: list[dict[str, float | int | str | bool]], metadata: dict[str, float | int | str]) -> None:
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     parity_pass = all(bool(row["summary_parity_pass"]) for row in rows)
     safety_pass = all(int(row["python_conflicts"]) == 0 and int(row["cpp_conflicts"]) == 0 for row in rows)
@@ -235,21 +298,32 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This is an early Phase9 runtime-scaling gate. It is not a final paper benchmark: "
-            "results are single-run timings on the local workstation and should be expanded before making claims."
+            "results are repeated local timings on one workstation and should be expanded before making claims."
         ),
+        "",
+        "## Environment",
+        "",
+        f"- repeats per row: `{metadata['repeat_count']}`",
+        f"- platform: `{metadata['platform']}`",
+        f"- machine: `{metadata['machine']}`",
+        f"- processor: `{metadata['processor']}`",
+        f"- CPU count: `{metadata['cpu_count']}`",
+        f"- Python: `{metadata['python_version']}`",
+        f"- timer: `{metadata['timer']}` resolution `{float(metadata['timer_resolution_seconds']):.12g}` seconds",
         "",
         "## Metrics",
         "",
         (
-            "| Case | Policy | Tasks | Py decisions | C++ decisions | Py seconds | C++ seconds | "
-            "Py decisions/s | C++ decisions/s | C++ speedup | Parity | First mismatch |"
+            "| Case | Policy | Tasks | Py decisions | C++ decisions | Py seconds mean+/-95% CI | "
+            "C++ seconds mean+/-95% CI | Py decisions/s | C++ decisions/s | C++ speedup | Parity | First mismatch |"
         ),
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for row in rows:
         lines.append(
             "| {case} | {policy} | {max_tasks} | {python_decisions} | {cpp_decisions} | "
-            "{python_elapsed_seconds:.6f} | {cpp_elapsed_seconds:.6f} | "
+            "{python_elapsed_mean_seconds:.6f}+/-{python_elapsed_ci95_seconds:.6f} | "
+            "{cpp_elapsed_mean_seconds:.6f}+/-{cpp_elapsed_ci95_seconds:.6f} | "
             "{python_decisions_per_second:.2f} | {cpp_decisions_per_second:.2f} | "
             "{cpp_decision_speedup:.3f} | {summary_parity_pass} | "
             "{first_mismatch_status}:{first_mismatch_field} |".format(**row)
@@ -266,12 +340,12 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             f"- EdgeScore runtime rows: `{len(edge_rows)}`",
             f"- fallback runtime rows: `{len(fallback_rows)}`",
             f"- median C++ decision-throughput speedup: `{median_speedup:.3f}x`",
-            "- single-run local timing only: YES",
+            "- repeated local timing with environment metadata: YES",
             "- final paper-grade throughput claim: not covered",
             "",
             "## Remaining Work",
             "",
-            "- add repeated-run timing with hardware metadata and confidence intervals",
+            "- add more task windows and hardware-normalized runs",
             "- scale to larger persisted manifests and separate heldout maps",
             "- compare against Phase2 baseline families in a unified Phase9 table",
         ]
@@ -303,6 +377,9 @@ def main() -> None:
     heuristic_time = [list(row) for row in graph.heuristic_time]
     runtime_model = czr005_cpp.EdgeScoreRuntimeModel.from_text(str(MODEL_PATH))
 
+    if REPEATS <= 0:
+        raise ValueError("CZR005_RUNTIME_REPEATS must be positive")
+    metadata = _runtime_metadata()
     rows: list[dict[str, float | int | str | bool]] = []
     for case in _case_plan():
         selected_tasks = tasks[case.task_offset : case.task_offset + case.max_tasks]
@@ -313,45 +390,83 @@ def main() -> None:
             "fault_windows": list(case.fault_windows),
             "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
         }
-        python_edge_summary, python_edge_elapsed = _run_python_event(
-            graph,
-            selected_tasks,
-            runtime_model,
-            RuntimeScalingCase(case.name, 0, case.max_tasks, case.fault_edges, case.fault_windows),
-            run_event_replay,
-        )
-        cpp_edge_summary = dict(
-            czr005_cpp.edge_score_native_event_replay_summary_from_records(
-                node_records,
-                edge_records,
-                heuristic_time,
-                task_records,
-                str(MODEL_PATH),
-                **common,
+        python_edge_summaries: list[dict[str, Any]] = []
+        python_edge_elapsed: list[float] = []
+        cpp_edge_summaries: list[dict[str, Any]] = []
+        cpp_edge_elapsed: list[float] = []
+        for _ in range(REPEATS):
+            summary, elapsed = _run_python_event(
+                graph,
+                selected_tasks,
+                runtime_model,
+                RuntimeScalingCase(case.name, 0, case.max_tasks, case.fault_edges, case.fault_windows),
+                run_event_replay,
+            )
+            python_edge_summaries.append(summary)
+            python_edge_elapsed.append(elapsed)
+            cpp_summary = dict(
+                czr005_cpp.edge_score_native_event_replay_summary_from_records(
+                    node_records,
+                    edge_records,
+                    heuristic_time,
+                    task_records,
+                    str(MODEL_PATH),
+                    **common,
+                )
+            )
+            cpp_edge_summaries.append(cpp_summary)
+            cpp_edge_elapsed.append(float(cpp_summary["elapsed_seconds"]))
+        rows.append(
+            _row(
+                case,
+                "edge_score_event",
+                _stable_summary(python_edge_summaries, f"{case.name}/edge_score/python"),
+                python_edge_elapsed,
+                _stable_summary(cpp_edge_summaries, f"{case.name}/edge_score/cpp"),
+                cpp_edge_elapsed,
             )
         )
-        rows.append(_row(case, "edge_score_event", python_edge_summary, python_edge_elapsed, cpp_edge_summary))
 
-        python_fallback_summary, python_fallback_elapsed = _run_python_event(
-            graph,
-            selected_tasks,
-            None,
-            RuntimeScalingCase(case.name, 0, case.max_tasks, case.fault_edges, case.fault_windows),
-            run_event_replay,
-        )
-        cpp_fallback_summary = dict(
-            czr005_cpp.edge_score_native_event_fallback_replay_summary_from_records(
-                node_records,
-                edge_records,
-                heuristic_time,
-                task_records,
-                **common,
+        python_fallback_summaries: list[dict[str, Any]] = []
+        python_fallback_elapsed: list[float] = []
+        cpp_fallback_summaries: list[dict[str, Any]] = []
+        cpp_fallback_elapsed: list[float] = []
+        for _ in range(REPEATS):
+            summary, elapsed = _run_python_event(
+                graph,
+                selected_tasks,
+                None,
+                RuntimeScalingCase(case.name, 0, case.max_tasks, case.fault_edges, case.fault_windows),
+                run_event_replay,
+            )
+            python_fallback_summaries.append(summary)
+            python_fallback_elapsed.append(elapsed)
+            cpp_summary = dict(
+                czr005_cpp.edge_score_native_event_fallback_replay_summary_from_records(
+                    node_records,
+                    edge_records,
+                    heuristic_time,
+                    task_records,
+                    **common,
+                )
+            )
+            cpp_fallback_summaries.append(cpp_summary)
+            cpp_fallback_elapsed.append(float(cpp_summary["elapsed_seconds"]))
+        rows.append(
+            _row(
+                case,
+                "fallback_event",
+                _stable_summary(python_fallback_summaries, f"{case.name}/fallback/python"),
+                python_fallback_elapsed,
+                _stable_summary(cpp_fallback_summaries, f"{case.name}/fallback/cpp"),
+                cpp_fallback_elapsed,
             )
         )
-        rows.append(_row(case, "fallback_event", python_fallback_summary, python_fallback_elapsed, cpp_fallback_summary))
 
+    for row in rows:
+        row.update(metadata)
     write_table(rows)
-    write_report(rows)
+    write_report(rows, metadata)
     if not all(bool(row["summary_parity_pass"]) for row in rows):
         raise AssertionError("Phase9 event runtime scaling parity failed")
     if any(int(row["python_conflicts"]) != 0 or int(row["cpp_conflicts"]) != 0 for row in rows):
