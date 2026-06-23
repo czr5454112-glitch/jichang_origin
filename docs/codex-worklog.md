@@ -582,3 +582,14 @@
 - Tests / validation: Phase8 legacy event parity reported `rows=6 strict_pass=True`; all rows had zero post-shield conflicts and exact summary/decision-trace parity.
 - Safety / parity notes: Real legacy `map2/inputdata` event replay parity is now covered for deterministic task windows. A separate heldout airport map, Phase9 large-scale evaluation, and final throughput claims remain pending.
 - Follow-up: add a separate heldout map fixture if available, then scale the event parity gate into Phase9 baseline/policy comparisons.
+
+## 2026-06-23 18:15 - Phase9 event runtime scaling diagnostic
+
+- Request: Continue the Python/C++ port objective by adding runtime-scaling evidence for the native C++ event replay path before broader Phase9 comparisons.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase9_event_runtime_scaling.py`, generated `outputs/tables/phase9_event_runtime_scaling.csv` plus `outputs/reports/phase9_event_runtime_scaling_report.md`, and refreshed README/C++ status docs.
+- Commands run: Python py_compile for the new diagnostic, `scripts/eval/run_phase9_event_runtime_scaling.py` with `CZR005_CPP_PYTHON_PATH=build_vs/python/Debug`, full Python pytest, and CTest through `build_vs`.
+- Key observations: The diagnostic measures Python and native C++ event replay on real legacy `map2/inputdata` task windows of 16, 32, and 64 bags plus a repair-window offset case. EdgeScore-event and fallback-event rows all matched Python/C++ summaries exactly with zero post-shield conflicts. On this local single-run timing, median C++ decision-throughput speedup was `1.764x`.
+- Tests / validation: Phase9 event runtime scaling reported `rows=8 summary_parity=True`; event runtime post-shield safety passed for all rows; full Python pytest passed `46 passed`; CTest passed 2/2.
+- Safety / parity notes: This is early Phase9 runtime evidence, not a final paper-grade throughput claim. It still needs repeated-run timing, hardware metadata, separate heldout maps, and unified Phase2/Phase8 baseline comparison tables.
+- Follow-up: add repeated-run timing with confidence intervals or fold this diagnostic into a broader Phase9 baseline/policy comparison report.
