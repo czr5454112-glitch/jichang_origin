@@ -12,6 +12,7 @@
 #include <pybind11/stl.h>
 
 #include "ics_core/baselines/pibt.hpp"
+#include "ics_core/baselines/pibt_replay.hpp"
 #include "ics_core/baselines/periodic_replanning.hpp"
 #include "ics_core/baselines/rolling_horizon.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
@@ -552,13 +553,20 @@ py::list pibt_resolve_from_records(
     const std::vector<PIBTAgentStateTuple>& agent_records,
     const std::vector<NodeReservationTuple>& node_reservations,
     const std::vector<std::pair<int, int>>& fault_edges,
-    double hold_seconds) {
+    double hold_seconds,
+    const std::vector<EdgeReservationTuple>& edge_reservations,
+    int edge_capacity,
+    double edge_headway_seconds,
+    const std::vector<NodeCapacityTuple>& node_capacities) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto agents = pibt_agents_from_tuples(agent_records);
   const auto node_table = node_reservations_from_tuples(node_reservations);
+  const auto edge_table = edge_reservations_from_tuples(edge_reservations);
+  const auto capacities = node_capacities_from_tuples(node_capacities);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const czr005::ics::PIBTStyleOneStepResolver resolver(graph, hold_seconds);
-  return pibt_action_rows(resolver.resolve(agents, &node_table, faults));
+  return pibt_action_rows(resolver.resolve(
+      agents, &node_table, faults, &edge_table, edge_capacity, edge_headway_seconds, capacities));
 }
 
 py::dict rolling_horizon_summary(const czr005::ics::RollingHorizonResult& result,
@@ -700,6 +708,89 @@ py::dict periodic_replanning_sipp_from_records(
   py::dict payload;
   payload["summary"] = periodic_replanning_summary(result, max_tasks);
   payload["events"] = periodic_replanning_event_rows(result);
+  return payload;
+}
+
+py::dict pibt_active_bag_replay_summary(const czr005::ics::PIBTActiveBagReplayResult& result,
+                                        int max_tasks) {
+  py::dict summary;
+  summary["max_tasks"] = max_tasks;
+  summary["planned_count"] = result.planned_count;
+  summary["unplanned_count"] = result.unplanned_count;
+  summary["decision_count"] = result.decision_count;
+  summary["tick_count"] = result.tick_count;
+  summary["peak_active_bags"] = result.peak_active_bags;
+  summary["move_count"] = result.move_count;
+  summary["hold_count"] = result.hold_count;
+  summary["reservation_conflicts"] = result.reservation_conflicts;
+  summary["edge_reservation_conflicts"] = result.edge_reservation_conflicts;
+  summary["post_shield_conflicts"] = result.post_shield_conflicts;
+  summary["mean_travel_time"] = result.mean_travel_time;
+  summary["makespan"] = result.makespan;
+  return summary;
+}
+
+py::list pibt_active_bag_replay_event_rows(
+    const czr005::ics::PIBTActiveBagReplayResult& result) {
+  py::list rows;
+  for (const auto& event : result.events) {
+    py::dict row;
+    row["event"] = event.event;
+    row["baseline"] = "pibt_active_bag_replay";
+    row["segment_id"] = event.segment_id;
+    row["task_id"] = event.task_id;
+    row["current"] = event.current;
+    row["next_node"] = event.next_node;
+    row["start"] = event.start;
+    row["goal"] = event.goal;
+    row["entry_time"] = event.entry_time;
+    row["finish_time"] = event.finish_time;
+    row["tick_time"] = event.tick_time;
+    row["ready_time"] = event.ready_time;
+    row["priority_rank"] = event.priority_rank;
+    row["decision_count"] = event.decision_count;
+    row["reached_goal"] = event.reached_goal;
+    row["reason"] = event.reason;
+    row["path"] = event.path;
+    rows.append(row);
+  }
+  return rows;
+}
+
+py::dict pibt_active_bag_replay_from_records(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    const std::vector<TaskRecordTuple>& task_records,
+    int max_tasks,
+    double interval_seconds,
+    int max_ticks,
+    double hold_seconds,
+    int edge_capacity,
+    double edge_headway_seconds,
+    const std::vector<std::pair<int, int>>& fault_edges,
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    const std::vector<NodeCapacityTuple>& node_capacities) {
+  if (max_tasks <= 0) {
+    throw std::invalid_argument("max_tasks must be positive");
+  }
+  const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
+  const auto tasks = task_stream_from_records(task_records);
+  std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  const auto windows = periodic_fault_windows_from_tuples(fault_windows);
+  czr005::ics::PIBTActiveBagReplayConfig config;
+  config.max_tasks = static_cast<std::size_t>(max_tasks);
+  config.interval_seconds = interval_seconds;
+  config.max_ticks = max_ticks;
+  config.hold_seconds = hold_seconds;
+  config.edge_capacity = edge_capacity;
+  config.edge_headway_seconds = edge_headway_seconds;
+  config.node_capacities = node_capacities_from_tuples(node_capacities);
+  const auto result = czr005::ics::run_pibt_active_bag_replay(graph, tasks, config, faults, windows);
+
+  py::dict payload;
+  payload["summary"] = pibt_active_bag_replay_summary(result, max_tasks);
+  payload["events"] = pibt_active_bag_replay_event_rows(result);
   return payload;
 }
 
@@ -1112,7 +1203,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("agent_records"),
              py::arg("node_reservations") = std::vector<NodeReservationTuple>{},
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
-             py::arg("hold_seconds") = 1.0);
+             py::arg("hold_seconds") = 1.0,
+             py::arg("edge_reservations") = std::vector<EdgeReservationTuple>{},
+             py::arg("edge_capacity") = 1,
+             py::arg("edge_headway_seconds") = 0.0,
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{});
   module.def("rolling_horizon_sipp_from_records",
              &rolling_horizon_sipp_from_records,
              py::arg("node_records"),
@@ -1137,6 +1232,21 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("edge_headway_seconds") = 0.0,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{});
+  module.def("pibt_active_bag_replay_from_records",
+             &pibt_active_bag_replay_from_records,
+             py::arg("node_records"),
+             py::arg("edge_records"),
+             py::arg("heuristic_time"),
+             py::arg("task_records"),
+             py::arg("max_tasks") = 8,
+             py::arg("interval_seconds") = 5.0,
+             py::arg("max_ticks") = 2048,
+             py::arg("hold_seconds") = 5.0,
+             py::arg("edge_capacity") = 1,
+             py::arg("edge_headway_seconds") = 0.0,
+             py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{});
   module.def("edge_score_native_replay_summary_from_records",
              &edge_score_native_replay_summary_from_records,
              py::arg("node_records"),

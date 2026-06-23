@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "ics_core/baselines/pibt.hpp"
+#include "ics_core/baselines/pibt_replay.hpp"
 #include "ics_core/baselines/periodic_replanning.hpp"
 #include "ics_core/baselines/rolling_horizon.hpp"
 #include "ics_core/graph/graph.hpp"
@@ -30,6 +31,7 @@ using czr005::ics::JunctionShield;
 using czr005::ics::JunctionShieldConfig;
 using czr005::ics::Node;
 using czr005::ics::PIBTAgentState;
+using czr005::ics::PIBTActiveBagReplayConfig;
 using czr005::ics::PIBTStyleOneStepResolver;
 using czr005::ics::PeriodicReplanningConfig;
 using czr005::ics::ReservationTable;
@@ -43,6 +45,7 @@ using czr005::ics::run_edge_score_fallback_replay;
 using czr005::ics::run_edge_score_event_fallback_replay;
 using czr005::ics::run_edge_score_event_replay;
 using czr005::ics::run_edge_score_replay;
+using czr005::ics::run_pibt_active_bag_replay;
 using czr005::ics::run_rolling_horizon_sipp;
 using czr005::ics::run_periodic_replanning_sipp;
 using czr005::ics::TaskLeg;
@@ -342,6 +345,26 @@ int main() {
     test.check(pibt_handoff_blocked_actions[1].next_node == 0,
                "PIBT blocked handoff should let the blocker move after the high-priority task reroutes");
   }
+
+  TaskStream pibt_replay_tasks;
+  pibt_replay_tasks.add(TaskLeg{"handoff-high", 501, 501, 0.0, 20.0, 0, 3, 0, 3, 0.0, "direct", false, 1});
+  pibt_replay_tasks.add(TaskLeg{"handoff-blocker", 502, 502, 0.0, 100.0, 1, 3, 1, 3, 0.0, "direct", false, 2});
+  pibt_replay_tasks.sort_by_pass_time();
+  PIBTActiveBagReplayConfig pibt_replay_config;
+  pibt_replay_config.max_tasks = 2;
+  pibt_replay_config.interval_seconds = 2.0;
+  pibt_replay_config.hold_seconds = 2.0;
+  pibt_replay_config.max_ticks = 16;
+  const auto pibt_replay_result =
+      run_pibt_active_bag_replay(pibt_handoff_graph, pibt_replay_tasks, pibt_replay_config);
+  test.check(pibt_replay_result.planned_count == 2,
+             "PIBT active-bag replay should plan both handoff tasks");
+  test.check(pibt_replay_result.post_shield_conflicts == 0,
+             "PIBT active-bag replay should stay conflict-free");
+  test.check(pibt_replay_result.decision_count >= 2,
+             "PIBT active-bag replay should record active decisions");
+  test.check(pibt_replay_result.events.size() >= 4,
+             "PIBT active-bag replay should emit replay events");
 
   const auto later = planner.plan(0, 2, 6.0, &reservations, {}, 3);
   test.check(later.size() == 3, "sample later route should have 3 nodes");

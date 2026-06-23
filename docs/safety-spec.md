@@ -46,6 +46,7 @@ Currently covered by Python baseline tests:
 - rolling-horizon SIPP priority and reservation reuse
 - PIBT-style one-step merge conflict resolution
 - PIBT-style fault-edge fallback
+- PIBT-style active-bag replay with recursive handoff
 - action masks respect explicit node/buffer capacity
 - action masks reject configured merge-group conflicts
 
@@ -55,9 +56,13 @@ Currently covered by Phase8 event replay parity:
 - Python and C++ event replay both carry configured merge groups.
 - Persisted synthetic schedules include a merge/buffer case with zero post-shield conflicts.
 
+Currently covered by Phase2 active-bag PIBT replay parity:
+
+- Python and C++ active-bag PIBT replay match on summary metrics and event streams.
+- Static-fault, repair-window, recursive handoff, and persisted synthetic slices stay at zero post-shield conflicts.
+
 Still pending:
 
 - event-simulation safety counters
 - full buffer-capacity replay integration across every baseline
 - full merge-group replay integration across every baseline
-- full active-bag PIBT-style replay integration

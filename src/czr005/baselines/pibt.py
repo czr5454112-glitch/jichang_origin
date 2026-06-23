@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from czr005.sim_py.astar import AStarPlanner
 from czr005.sim_py.graph import IcsGraph
-from czr005.sim_py.reservation import ReservationTable
+from czr005.sim_py.reservation import EdgeReservationTable, ReservationTable
 
 
 @dataclass(frozen=True)
@@ -63,9 +63,17 @@ class PIBTStyleOneStepResolver:
         self,
         agents: list[AgentState] | tuple[AgentState, ...],
         reservations: ReservationTable | None = None,
+        edge_reservations: EdgeReservationTable | None = None,
+        edge_capacity: int = 1,
+        edge_headway_seconds: float = 0.0,
+        node_capacities: dict[int, int] | None = None,
         fault_edges: set[tuple[int, int]] | None = None,
     ) -> list[ResolvedAction]:
+        if edge_capacity <= 0:
+            raise ValueError("edge_capacity must be positive")
         reservations = reservations or ReservationTable()
+        edge_reservations = edge_reservations or EdgeReservationTable()
+        node_capacities = node_capacities or {}
         fault_edges = fault_edges or set()
         ordered = sorted(
             agents,
@@ -87,6 +95,10 @@ class PIBTStyleOneStepResolver:
                 agent=agent,
                 priority_rank=priority_ranks[agent.task_id],
                 reservations=reservations,
+                edge_reservations=edge_reservations,
+                edge_capacity=edge_capacity,
+                edge_headway_seconds=edge_headway_seconds,
+                node_capacities=node_capacities,
                 fault_edges=fault_edges,
                 agents_by_task=agents_by_task,
                 current_owner=current_owner,
@@ -106,6 +118,10 @@ class PIBTStyleOneStepResolver:
         agent: AgentState,
         priority_rank: int,
         reservations: ReservationTable,
+        edge_reservations: EdgeReservationTable,
+        edge_capacity: int,
+        edge_headway_seconds: float,
+        node_capacities: dict[int, int],
         fault_edges: set[tuple[int, int]],
         agents_by_task: dict[int, AgentState],
         current_owner: dict[int, int],
@@ -139,8 +155,30 @@ class PIBTStyleOneStepResolver:
             node_start = edge_end
             node_end = node_start + self.graph.service_time(next_node)
 
-            if next_node != agent.goal and reservations.has_conflict(
-                next_node, node_start, node_end, task_id=agent.task_id
+            if edge_reservations.has_capacity_conflict(
+                agent.current,
+                next_node,
+                edge_start,
+                edge_end,
+                edge_capacity,
+                task_id=agent.task_id,
+            ):
+                continue
+            if edge_reservations.has_headway_conflict(
+                agent.current,
+                next_node,
+                edge_start,
+                edge_headway_seconds,
+                task_id=agent.task_id,
+            ):
+                continue
+
+            if next_node != agent.goal and reservations.has_capacity_conflict(
+                next_node,
+                node_start,
+                node_end,
+                capacity=node_capacities.get(next_node, 1),
+                task_id=agent.task_id,
             ):
                 continue
             if self._local_node_conflict(next_node, node_start, node_end, agent.task_id, local_node_windows):
@@ -156,6 +194,10 @@ class PIBTStyleOneStepResolver:
                         agent=blocker,
                         priority_rank=priority_ranks[blocker.task_id],
                         reservations=reservations,
+                        edge_reservations=edge_reservations,
+                        edge_capacity=edge_capacity,
+                        edge_headway_seconds=edge_headway_seconds,
+                        node_capacities=node_capacities,
                         fault_edges=fault_edges,
                         agents_by_task=agents_by_task,
                         current_owner=current_owner,

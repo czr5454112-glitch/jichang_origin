@@ -115,6 +115,9 @@ Route-discarding periodic active-bag replanning parity is tracked in
 PIBT-style recursive current-node handoff parity is tracked in
 `outputs/reports/phase2_cpp_pibt_parity_report.md`.
 
+Active-bag PIBT replay parity is tracked in
+`outputs/reports/phase2_pibt_active_bag_replay_parity_report.md`.
+
 ## Gate Status
 
 - post-shield/reservation conflicts: {conflict_gate}
@@ -126,7 +129,6 @@ PIBT-style recursive current-node handoff parity is tracked in
 - full merge-group replay integration across every baseline
 - full buffer-capacity replay integration across every baseline
 - rolling-horizon active-bag replanning rather than sequential task-leg replay
-- full PIBT/CS-PIBT-style active-bag replay integration
 - real heldout airport-map fixtures
 - larger multi-seed task-density/fault sweeps
 """

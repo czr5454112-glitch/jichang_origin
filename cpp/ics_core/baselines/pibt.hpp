@@ -12,6 +12,7 @@
 #include "ics_core/graph/graph.hpp"
 #include "ics_core/reservation/reservation.hpp"
 #include "ics_core/routing/astar.hpp"
+#include "ics_core/shield/junction_shield.hpp"
 
 namespace czr005::ics {
 
@@ -53,10 +54,20 @@ class PIBTStyleOneStepResolver {
   [[nodiscard]] std::vector<PIBTResolvedAction> resolve(
       std::vector<PIBTAgentState> agents,
       const ReservationTable* reservations = nullptr,
-      const std::set<std::pair<int, int>>& fault_edges = {}) const {
+      const std::set<std::pair<int, int>>& fault_edges = {},
+      const EdgeReservationTable* edge_reservations = nullptr,
+      int edge_capacity = 1,
+      double edge_headway_seconds = 0.0,
+      const std::unordered_map<int, int>& node_capacities = {}) const {
+    if (edge_capacity <= 0) {
+      throw std::invalid_argument("edge_capacity must be positive");
+    }
     const ReservationTable empty_reservations;
     const ReservationTable& node_reservations =
         reservations == nullptr ? empty_reservations : *reservations;
+    const EdgeReservationTable empty_edge_reservations;
+    const EdgeReservationTable& edge_table =
+        edge_reservations == nullptr ? empty_edge_reservations : *edge_reservations;
 
     std::sort(agents.begin(), agents.end(), [](const PIBTAgentState& left,
                                                const PIBTAgentState& right) {
@@ -95,6 +106,10 @@ class PIBTStyleOneStepResolver {
       const bool assigned = assign_recursive(agent,
                                              priority_ranks.at(agent.task_id),
                                              node_reservations,
+                                             edge_table,
+                                             edge_capacity,
+                                             edge_headway_seconds,
+                                             node_capacities,
                                              fault_edges,
                                              agents_by_task,
                                              current_owner,
@@ -130,6 +145,10 @@ class PIBTStyleOneStepResolver {
       const PIBTAgentState& agent,
       int priority_rank,
       const ReservationTable& reservations,
+      const EdgeReservationTable& edge_reservations,
+      int edge_capacity,
+      double edge_headway_seconds,
+      const std::unordered_map<int, int>& node_capacities,
       const std::set<std::pair<int, int>>& fault_edges,
       const std::unordered_map<int, PIBTAgentState>& agents_by_task,
       const std::unordered_map<int, int>& current_owner,
@@ -169,8 +188,28 @@ class PIBTStyleOneStepResolver {
       const double node_start = edge_end;
       const double node_end = node_start + graph_.service_time(next_node);
 
+      if (edge_reservations.has_capacity_conflict(agent.current,
+                                                  next_node,
+                                                  edge_start,
+                                                  edge_end,
+                                                  edge_capacity,
+                                                  agent.task_id)) {
+        continue;
+      }
+      if (edge_reservations.has_headway_conflict(agent.current,
+                                                 next_node,
+                                                 edge_start,
+                                                 edge_headway_seconds,
+                                                 agent.task_id)) {
+        continue;
+      }
+
       if (next_node != agent.goal &&
-          reservations.has_conflict(next_node, node_start, node_end, agent.task_id)) {
+          reservations.has_capacity_conflict(next_node,
+                                             node_start,
+                                             node_end,
+                                             node_capacity(node_capacities, next_node),
+                                             agent.task_id)) {
         continue;
       }
       if (local_node_conflict(next_node,
@@ -192,6 +231,10 @@ class PIBTStyleOneStepResolver {
           if (!assign_recursive(blocker,
                                 priority_ranks.at(blocker.task_id),
                                 reservations,
+                                edge_reservations,
+                                edge_capacity,
+                                edge_headway_seconds,
+                                node_capacities,
                                 fault_edges,
                                 agents_by_task,
                                 current_owner,
@@ -288,6 +331,13 @@ class PIBTStyleOneStepResolver {
       return true;
     }
     return !astar_.plan(next_node, goal, 0.0, nullptr, fault_edges).empty();
+  }
+
+  [[nodiscard]] static int node_capacity(
+      const std::unordered_map<int, int>& node_capacities,
+      int node) {
+    const auto found = node_capacities.find(node);
+    return found == node_capacities.end() ? 1 : found->second;
   }
 
   [[nodiscard]] static bool local_node_conflict(

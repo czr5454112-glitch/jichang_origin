@@ -327,6 +327,29 @@ def main() -> None:
     assert pibt_handoff[1]["next_node"] == 3
     assert pibt_handoff[1]["reason"] == "inherited_move"
 
+    pibt_replay = czr005_cpp.pibt_active_bag_replay_from_records(
+        pibt_handoff_node_records,
+        pibt_handoff_edge_records,
+        pibt_handoff_heuristic_time,
+        [
+            ("handoff-high", 1, 1, 0.0, 20.0, 0, 3, 0, 3, 0.0, "direct", False, 1),
+            ("handoff-blocker", 2, 2, 0.0, 100.0, 1, 3, 1, 3, 0.0, "direct", False, 2),
+        ],
+        max_tasks=2,
+        interval_seconds=2.0,
+        max_ticks=16,
+        hold_seconds=2.0,
+    )
+    assert pibt_replay["summary"]["planned_count"] == 2
+    assert pibt_replay["summary"]["post_shield_conflicts"] == 0
+    pibt_first_moves = [
+        event for event in pibt_replay["events"] if event["event"] == "pibt_move" and event["tick_time"] == 0.0
+    ]
+    assert [(event["task_id"], event["next_node"], event["reason"]) for event in pibt_first_moves] == [
+        (1, 1, "priority_inheritance"),
+        (2, 3, "inherited_move"),
+    ]
+
     records_replay = czr005_cpp.edge_score_native_replay_summary_from_records(
         node_records,
         edge_records,

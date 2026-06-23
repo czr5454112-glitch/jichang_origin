@@ -12,6 +12,7 @@ Implemented so far:
 - C++ rolling-horizon SIPP parity over priority, fault, capacity, headway, and synthetic schedules
 - C++ route-discarding periodic SIPP replanning parity over active-bag, capacity, static-fault, repair-window, and synthetic slices
 - C++ PIBT-style resolver parity over priority, merge, fault, reservation, hold-duration, bounded recursive handoff, and synthetic slices
+- C++ active-bag PIBT replay parity over static-fault, repair-window, recursive handoff, and synthetic slices
 - active-bag/replan-cost audit over Python/C++ event traces on persisted synthetic schedules
 - header-only MLP edge-score inference and text runtime loader
 - compact native C++ EdgeScore replay smoke
@@ -20,4 +21,4 @@ Implemented so far:
 - Phase8 event replay carries repair windows plus explicit node/buffer capacity and merge-group configuration through Python/C++ parity
 - pybind smoke boundary
 
-Paper-grade high-throughput scheduler validation, real heldout-map event parity, full active-bag PIBT-style replay integration, merge-group/buffer-capacity parity across every baseline family, and broad runtime replay validation are still pending.
+Paper-grade high-throughput scheduler validation, real heldout-map event parity, merge-group/buffer-capacity parity across every baseline family, and broad runtime replay validation are still pending.

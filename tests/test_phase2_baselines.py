@@ -3,6 +3,7 @@ from __future__ import annotations
 from czr005.baselines import (
     AgentState,
     PeriodicReplanningBaseline,
+    PIBTActiveBagReplayBaseline,
     PIBTStyleOneStepResolver,
     RollingHorizonBaseline,
     SIPPPlanner,
@@ -343,6 +344,21 @@ def test_pibt_style_resolver_uses_fault_safe_alternative() -> None:
     assert actions[0].next_node == 2
 
 
+def test_pibt_style_resolver_respects_edge_capacity_reservation() -> None:
+    edge_reservations = EdgeReservationTable()
+    edge_reservations.reserve(task_id=99, start_node=0, end_node=1, start=0.0, end=2.0)
+
+    actions = PIBTStyleOneStepResolver(_single_edge_goal_graph()).resolve(
+        (AgentState(task_id=3, current=0, goal=1, ready_time=0.0, deadline=20.0),),
+        edge_reservations=edge_reservations,
+        edge_capacity=1,
+    )
+
+    assert len(actions) == 1
+    assert actions[0].action == "hold"
+    assert actions[0].reason == "no_safe_edge"
+
+
 def test_pibt_style_resolver_uses_recursive_handoff() -> None:
     actions = PIBTStyleOneStepResolver(_handoff_graph()).resolve(
         (
@@ -375,3 +391,28 @@ def test_pibt_style_resolver_uses_alternative_when_blocker_cannot_handoff() -> N
     assert by_task[1].reason == "best_safe_edge"
     assert by_task[2].action == "move"
     assert by_task[2].next_node == 0
+
+
+def test_pibt_active_bag_replay_runs_recursive_handoff_slice() -> None:
+    tasks = (
+        TaskLeg("handoff-high", 1, 1, 0.0, 20.0, 0, 3, 0, 3, 0.0, "direct", False, 1),
+        TaskLeg("handoff-blocker", 2, 2, 0.0, 100.0, 1, 3, 1, 3, 0.0, "direct", False, 2),
+    )
+
+    baseline = PIBTActiveBagReplayBaseline(
+        _handoff_graph(),
+        interval_seconds=2.0,
+        hold_seconds=2.0,
+        max_ticks=16,
+    )
+    result = baseline.run_episode(tasks)
+
+    first_slice_moves = [
+        event for event in result.events if event["event"] == "pibt_move" and event["tick_time"] == 0.0
+    ]
+    assert result.metrics.planned_count == 2
+    assert baseline.summary.post_shield_conflicts == 0
+    assert [(event["task_id"], event["next_node"], event["reason"]) for event in first_slice_moves] == [
+        (1, 1, "priority_inheritance"),
+        (2, 3, "inherited_move"),
+    ]

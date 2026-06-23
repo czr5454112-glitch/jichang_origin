@@ -560,3 +560,14 @@
 - Tests / validation: Phase8 event trace diagnostic reported `rows=10 invariant_pass=True`; event scheduler smoke reported `rows=10 safety_pass=True`; Phase2 active-bag audit reported `rows=10 audit_pass=True`; compact randomized parity reported `rows=5 strict_pass=True`; Phase8 event parity reported `rows=10 strict_pass=True`; full Python pytest passed `44 passed`; CTest passed 2/2.
 - Safety / parity notes: Manifest-wide synthetic replay diagnostics now carry repair windows, explicit buffer capacity, and merge groups consistently. Real heldout-map validation, Phase9 large-scale evaluation, and full active-bag PIBT/CS-PIBT replay integration remain pending.
 - Follow-up: move next toward real heldout-map/runtime scaffolding or active-bag PIBT/CS-PIBT replay integration.
+
+## 2026-06-23 17:10 - Phase2 active-bag PIBT replay parity
+
+- Request: Continue closing Python/C++ port prerequisites from the master plan by integrating the PIBT/CS-PIBT-style resolver into a full active-bag replay path.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added Python `PIBTActiveBagReplayBaseline`, added C++ `pibt_replay.hpp`, extended the Python/C++ PIBT one-step resolver with edge reservation and node-capacity checks, exposed `pibt_active_bag_replay_from_records` through pybind, expanded Python/C++/pybind smoke coverage, added `scripts/eval/run_phase2_pibt_active_bag_replay_parity.py`, generated `outputs/tables/phase2_pibt_active_bag_replay_parity.csv` plus `outputs/reports/phase2_pibt_active_bag_replay_parity_report.md`, and refreshed Phase2/C++ safety status docs.
+- Commands run: Python py_compile over updated Phase2 files, target Phase2 pytest, CMake build through `build_vs`, CTest, Phase2 active-bag PIBT replay parity, and full Python pytest.
+- Key observations: Python and C++ now both admit arrived bags on periodic ticks, resolve all ready active bags through the bounded recursive PIBT one-step resolver, commit moves/holds into node and edge reservations, and continue until each active bag is planned or reaches the tick limit. The parity gate covers two active bags, static-fault alternate routing, repair-window behavior, recursive handoff inside an active-bag slice, and two persisted synthetic manifest slices.
+- Tests / validation: target Phase2 pytest passed `17 passed`; CTest passed 2/2; Phase2 active-bag PIBT replay parity reported `rows=6 strict_pass=True`; full Python pytest passed `46 passed`.
+- Safety / parity notes: Full active-bag PIBT/CS-PIBT replay integration is now covered for the Phase2 parity fixture set. Real heldout-map validation, Phase9 large-scale evaluation, and merge/buffer parity across every baseline family remain pending.
+- Follow-up: move next toward real heldout-map/runtime scaffolding or broaden merge/buffer semantics through the remaining baseline families.
