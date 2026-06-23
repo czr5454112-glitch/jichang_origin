@@ -25,14 +25,14 @@ This is an early Phase9 runtime-scaling gate. It is not a final paper benchmark:
 
 | Case | Policy | Tasks | Py decisions | C++ decisions | Py seconds mean+/-95% CI | C++ seconds mean+/-95% CI | Py decisions/s | C++ decisions/s | C++ speedup | Parity | First mismatch |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
-| legacy_first16 | edge_score_event | 16 | 173 | 173 | 0.117239+/-0.019628 | 0.053470+/-0.010734 | 1475.61 | 3235.44 | 2.193 | True | match:none |
-| legacy_first16 | fallback_event | 16 | 168 | 168 | 0.036353+/-0.003649 | 0.033083+/-0.002604 | 4621.42 | 5078.19 | 1.099 | True | match:none |
-| legacy_first32 | edge_score_event | 32 | 330 | 330 | 0.171708+/-0.001232 | 0.069652+/-0.004564 | 1921.86 | 4737.87 | 2.465 | True | match:none |
-| legacy_first32 | fallback_event | 32 | 346 | 346 | 0.072240+/-0.002306 | 0.062534+/-0.003178 | 4789.57 | 5532.95 | 1.155 | True | match:none |
-| legacy_first64 | edge_score_event | 64 | 695 | 695 | 0.362827+/-0.005364 | 0.131052+/-0.001225 | 1915.51 | 5303.25 | 2.769 | True | match:none |
-| legacy_first64 | fallback_event | 64 | 721 | 721 | 0.153201+/-0.004330 | 0.123116+/-0.003912 | 4706.23 | 5856.27 | 1.244 | True | match:none |
-| legacy_offset64_repair32 | edge_score_event | 32 | 323 | 323 | 0.167784+/-0.001062 | 0.059014+/-0.002195 | 1925.09 | 5473.24 | 2.843 | True | match:none |
-| legacy_offset64_repair32 | fallback_event | 32 | 321 | 321 | 0.067141+/-0.001616 | 0.053008+/-0.001761 | 4780.99 | 6055.67 | 1.267 | True | match:none |
+| legacy_first16 | edge_score_event | 16 | 173 | 173 | 0.092733+/-0.004473 | 0.039193+/-0.001463 | 1865.58 | 4414.06 | 2.366 | True | match:none |
+| legacy_first16 | fallback_event | 16 | 168 | 168 | 0.041548+/-0.003065 | 0.035081+/-0.001924 | 4043.47 | 4788.91 | 1.184 | True | match:none |
+| legacy_first32 | edge_score_event | 32 | 330 | 330 | 0.184321+/-0.005907 | 0.073843+/-0.001747 | 1790.36 | 4468.93 | 2.496 | True | match:none |
+| legacy_first32 | fallback_event | 32 | 346 | 346 | 0.073674+/-0.002229 | 0.065392+/-0.002655 | 4696.39 | 5291.13 | 1.127 | True | match:none |
+| legacy_first64 | edge_score_event | 64 | 695 | 695 | 0.391772+/-0.011774 | 0.146148+/-0.005271 | 1773.99 | 4755.45 | 2.681 | True | match:none |
+| legacy_first64 | fallback_event | 64 | 721 | 721 | 0.164165+/-0.007623 | 0.128189+/-0.006450 | 4391.93 | 5624.49 | 1.281 | True | match:none |
+| legacy_offset64_repair32 | edge_score_event | 32 | 323 | 323 | 0.172698+/-0.005626 | 0.060607+/-0.001695 | 1870.32 | 5329.46 | 2.849 | True | match:none |
+| legacy_offset64_repair32 | fallback_event | 32 | 321 | 321 | 0.067367+/-0.001629 | 0.055447+/-0.002069 | 4764.91 | 5789.31 | 1.215 | True | match:none |
 
 CSV: `outputs/tables/phase9_event_runtime_scaling.csv`
 
@@ -42,7 +42,7 @@ CSV: `outputs/tables/phase9_event_runtime_scaling.csv`
 - event runtime post-shield safety: PASS
 - EdgeScore runtime rows: `4`
 - fallback runtime rows: `4`
-- median C++ decision-throughput speedup: `1.730x`
+- median C++ decision-throughput speedup: `1.823x`
 - repeated local timing with environment metadata: YES
 - final paper-grade throughput claim: not covered
 
@@ -50,4 +50,4 @@ CSV: `outputs/tables/phase9_event_runtime_scaling.csv`
 
 - add more task windows and hardware-normalized runs
 - scale to larger persisted manifests and separate heldout maps
-- compare against Phase2 baseline families in a unified Phase9 table
+- extend the unified Phase9 comparison with matched baseline-family runtime rows

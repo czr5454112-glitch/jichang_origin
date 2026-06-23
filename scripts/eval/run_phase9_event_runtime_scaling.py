@@ -347,7 +347,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]], metadata: dict
             "",
             "- add more task windows and hardware-normalized runs",
             "- scale to larger persisted manifests and separate heldout maps",
-            "- compare against Phase2 baseline families in a unified Phase9 table",
+            "- extend the unified Phase9 comparison with matched baseline-family runtime rows",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

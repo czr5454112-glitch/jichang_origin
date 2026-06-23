@@ -21,6 +21,7 @@ Implemented so far:
 - real legacy map2/inputdata event replay trace parity on deterministic task windows
 - Phase8 event replay carries repair windows plus explicit node/buffer capacity and merge-group configuration through Python/C++ parity
 - early Phase9 event runtime scaling diagnostic over real legacy task windows
+- Phase9 unified baseline-comparison evidence table across existing Phase2/Phase5/Phase8/Phase9 outputs
 - pybind smoke boundary
 
-Paper-grade repeated-run high-throughput validation, separate heldout-map event parity, merge-group/buffer-capacity parity across every baseline family, and broad runtime replay validation are still pending.
+Matched paper-grade repeated-run high-throughput validation across every baseline family, separate heldout-map event parity, merge-group/buffer-capacity parity across every baseline family, and broad runtime replay validation are still pending.

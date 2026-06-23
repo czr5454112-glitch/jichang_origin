@@ -589,7 +589,18 @@
 - Branch: `codex/czr005-rewrite`.
 - Files changed: added `scripts/eval/run_phase9_event_runtime_scaling.py`, generated `outputs/tables/phase9_event_runtime_scaling.csv` plus `outputs/reports/phase9_event_runtime_scaling_report.md`, and refreshed README/C++ status docs.
 - Commands run: Python py_compile for the new diagnostic, `scripts/eval/run_phase9_event_runtime_scaling.py` with `CZR005_CPP_PYTHON_PATH=build_vs/python/Debug`, full Python pytest, and CTest through `build_vs`.
-- Key observations: The diagnostic measures Python and native C++ event replay on real legacy `map2/inputdata` task windows of 16, 32, and 64 bags plus a repair-window offset case. EdgeScore-event and fallback-event rows all matched Python/C++ summaries exactly with zero post-shield conflicts. With 5 local repeats per row, the report records mean/std/95% CI timing, environment metadata, and median C++ decision-throughput speedup of `1.730x`.
+- Key observations: The diagnostic measures Python and native C++ event replay on real legacy `map2/inputdata` task windows of 16, 32, and 64 bags plus a repair-window offset case. EdgeScore-event and fallback-event rows all matched Python/C++ summaries exactly with zero post-shield conflicts. With 5 local repeats per row, the report records mean/std/95% CI timing, environment metadata, and median C++ decision-throughput speedup of `1.823x`.
 - Tests / validation: Phase9 event runtime scaling reported `rows=8 summary_parity=True`; event runtime post-shield safety passed for all rows; full Python pytest passed `46 passed`; CTest passed 2/2.
 - Safety / parity notes: This is early repeated-run Phase9 runtime evidence, not a final paper-grade throughput claim. It still needs more task windows, hardware-normalized runs, separate heldout maps, and unified Phase2/Phase8 baseline comparison tables.
 - Follow-up: fold this diagnostic into a broader Phase9 baseline/policy comparison report with more windows and hardware-normalized timing.
+
+## 2026-06-23 18:45 - Phase9 unified baseline comparison diagnostic
+
+- Request: Continue the Python/C++ port objective by turning the existing Phase2/Phase5/Phase8/Phase9 outputs into a single Phase9 evidence table before broader matched experiments.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase9_unified_baseline_comparison.py`, generated `outputs/tables/phase9_unified_baseline_comparison.csv` plus `outputs/reports/phase9_unified_baseline_comparison_report.md`, and refreshed README/C++ status docs.
+- Commands run: Python py_compile for the new diagnostic and `scripts/eval/run_phase9_unified_baseline_comparison.py`.
+- Key observations: The diagnostic aggregates `39` evidence rows: `17` same-map outcome rows, `14` real legacy event parity/runtime rows, and `8` baseline-family parity summaries. It surfaces A*-guided, DAgger BC, rolling-horizon SIPP, EdgeScore-event, fallback-event, SIPP, periodic replanning, and PIBT active-bag evidence in one table while preserving each source scope.
+- Tests / validation: Phase9 unified baseline comparison reported `rows=39 outcome_rows=17 event_rows=14 parity_families=8`; all reported post-shield conflicts were zero; native event Python/C++ parity rows passed; baseline-family parity summaries passed.
+- Safety / parity notes: This is a unified evidence index, not a matched paper-grade bakeoff. It still needs common Phase9 scenario windows, hardware-normalized repeated timing for every compared family, and a separate real heldout airport map if fixture data becomes available.
+- Follow-up: rerun all compared families on common Phase9 scenario sets and extend the table with matched timing/confidence intervals.

@@ -1,0 +1,463 @@
+from __future__ import annotations
+
+import csv
+from datetime import date
+from pathlib import Path
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[2]
+TABLE_PATH = ROOT / "outputs" / "tables" / "phase9_unified_baseline_comparison.csv"
+REPORT_PATH = ROOT / "outputs" / "reports" / "phase9_unified_baseline_comparison_report.md"
+
+SOURCE_TABLES = {
+    "phase2_baseline_smoke": ROOT / "outputs" / "tables" / "phase2_baseline_smoke_metrics.csv",
+    "phase5_robustness_sweep": ROOT / "outputs" / "tables" / "phase5_robustness_sweep_metrics.csv",
+    "phase8_legacy_event_parity": ROOT / "outputs" / "tables" / "phase8_legacy_event_parity.csv",
+    "phase9_event_runtime_scaling": ROOT / "outputs" / "tables" / "phase9_event_runtime_scaling.csv",
+}
+
+PARITY_TABLES = {
+    "sipp_planner": ROOT / "outputs" / "tables" / "phase2_cpp_sipp_parity.csv",
+    "rolling_horizon_sipp": ROOT / "outputs" / "tables" / "phase2_cpp_rolling_horizon_parity.csv",
+    "periodic_replanning_sipp": ROOT / "outputs" / "tables" / "phase2_periodic_replanning_parity.csv",
+    "pibt_active_bag_replay": ROOT / "outputs" / "tables" / "phase2_pibt_active_bag_replay_parity.csv",
+    "phase8_synthetic_event_scheduler": ROOT / "outputs" / "tables" / "phase8_native_cpp_event_parity.csv",
+    "phase8_randomized_synthetic": ROOT / "outputs" / "tables" / "phase8_native_cpp_randomized_parity.csv",
+    "phase8_legacy_event_scheduler": ROOT / "outputs" / "tables" / "phase8_legacy_event_parity.csv",
+    "phase9_runtime_scaling": ROOT / "outputs" / "tables" / "phase9_event_runtime_scaling.csv",
+}
+
+FIELDNAMES = [
+    "evidence_group",
+    "source_table",
+    "source_scope",
+    "case",
+    "policy_or_baseline",
+    "engine",
+    "max_tasks",
+    "fault_edges",
+    "fault_windows",
+    "planned_count",
+    "unplanned_count",
+    "post_shield_conflicts",
+    "mean_travel_time",
+    "p95_travel_time",
+    "decision_count",
+    "elapsed_seconds",
+    "decisions_per_second",
+    "cpp_decision_speedup",
+    "python_planned",
+    "cpp_planned",
+    "python_decisions",
+    "cpp_decisions",
+    "python_conflicts",
+    "cpp_conflicts",
+    "summary_parity_pass",
+    "trace_parity_pass",
+    "strict_parity_pass",
+    "parity_rows",
+    "pass_rows",
+    "safety_pass",
+    "notes",
+]
+
+
+def _read_csv(path: Path) -> list[dict[str, str]]:
+    if not path.exists():
+        raise FileNotFoundError(path)
+    with path.open("r", encoding="utf-8", newline="") as fh:
+        return list(csv.DictReader(fh))
+
+
+def _bool(value: Any) -> bool:
+    return str(value).strip().lower() == "true"
+
+
+def _int_text(value: Any) -> str:
+    if value in (None, ""):
+        return ""
+    return str(int(float(str(value))))
+
+
+def _float_text(value: Any, places: int = 6) -> str:
+    if value in (None, ""):
+        return ""
+    return f"{float(str(value)):.{places}f}"
+
+
+def _blank_row(**values: Any) -> dict[str, str]:
+    row = {field: "" for field in FIELDNAMES}
+    for key, value in values.items():
+        row[key] = str(value)
+    return row
+
+
+def _source_name(path: Path) -> str:
+    return path.relative_to(ROOT).as_posix()
+
+
+def _outcome_rows() -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    phase2_path = SOURCE_TABLES["phase2_baseline_smoke"]
+    for source in _read_csv(phase2_path):
+        rows.append(
+            _blank_row(
+                evidence_group="baseline_or_policy_outcome",
+                source_table=_source_name(phase2_path),
+                source_scope="same-map Python baseline smoke on map2/inputdata",
+                case="phase2_baseline_smoke",
+                policy_or_baseline=source["baseline"],
+                engine="python",
+                max_tasks=_int_text(source["max_tasks"]),
+                fault_edges="none",
+                fault_windows="none",
+                planned_count=_int_text(source["planned_count"]),
+                unplanned_count=_int_text(source["unplanned_count"]),
+                post_shield_conflicts=_int_text(source["post_shield_conflicts"]),
+                mean_travel_time=_float_text(source["mean_travel_time"]),
+                p95_travel_time=_float_text(source["p95_travel_time"]),
+                elapsed_seconds=_float_text(source["elapsed_seconds"]),
+                safety_pass=str(int(float(source["post_shield_conflicts"])) == 0),
+                notes="Phase2 broad smoke; not a matched Phase9 policy bakeoff.",
+            )
+        )
+
+    phase5_path = SOURCE_TABLES["phase5_robustness_sweep"]
+    for source in _read_csv(phase5_path):
+        rows.append(
+            _blank_row(
+                evidence_group="baseline_or_policy_outcome",
+                source_table=_source_name(phase5_path),
+                source_scope="same-map learned-policy robustness sweep on map2 task windows",
+                case=source["case"],
+                policy_or_baseline=source["policy"],
+                engine="python",
+                max_tasks=_int_text(source["max_tasks"]),
+                fault_edges=source.get("fault_edges", "none"),
+                fault_windows="none",
+                planned_count=_int_text(source["planned_count"]),
+                unplanned_count=_int_text(source["unplanned_count"]),
+                post_shield_conflicts=_int_text(source["post_shield_conflicts"]),
+                mean_travel_time=_float_text(source["mean_travel_time"]),
+                p95_travel_time=_float_text(source["p95_travel_time"]),
+                elapsed_seconds=_float_text(source["elapsed_seconds"]),
+                safety_pass=str(int(float(source["post_shield_conflicts"])) == 0),
+                notes="Compares A*-guided, DAgger BC, and rolling-horizon SIPP in the existing Phase5 sweep.",
+            )
+        )
+    return rows
+
+
+def _legacy_event_parity_rows() -> list[dict[str, str]]:
+    path = SOURCE_TABLES["phase8_legacy_event_parity"]
+    rows: list[dict[str, str]] = []
+    for source in _read_csv(path):
+        rows.append(
+            _blank_row(
+                evidence_group="native_event_parity",
+                source_table=_source_name(path),
+                source_scope="real legacy map2/inputdata event-scheduler parity",
+                case=source["case"],
+                policy_or_baseline=source["policy"],
+                engine="python_cpp_event",
+                max_tasks=_int_text(source["max_tasks"]),
+                fault_edges=source.get("fault_edges", "none"),
+                fault_windows=source.get("fault_windows", "none"),
+                planned_count=_int_text(source["cpp_planned"]),
+                unplanned_count=_int_text(source["cpp_unplanned"]),
+                post_shield_conflicts=_int_text(source["cpp_conflicts"]),
+                decision_count=_int_text(source["cpp_decisions"]),
+                python_planned=_int_text(source["python_planned"]),
+                cpp_planned=_int_text(source["cpp_planned"]),
+                python_decisions=_int_text(source["python_decisions"]),
+                cpp_decisions=_int_text(source["cpp_decisions"]),
+                python_conflicts=_int_text(source["python_conflicts"]),
+                cpp_conflicts=_int_text(source["cpp_conflicts"]),
+                summary_parity_pass=source["summary_match"],
+                trace_parity_pass=source["trace_match"],
+                strict_parity_pass=source["strict_parity_pass"],
+                safety_pass=str(int(float(source["python_conflicts"])) == 0 and int(float(source["cpp_conflicts"])) == 0),
+                notes="Trace-level Python/C++ event replay parity on real legacy task windows.",
+            )
+        )
+    return rows
+
+
+def _runtime_rows() -> list[dict[str, str]]:
+    path = SOURCE_TABLES["phase9_event_runtime_scaling"]
+    rows: list[dict[str, str]] = []
+    for source in _read_csv(path):
+        rows.append(
+            _blank_row(
+                evidence_group="native_event_runtime",
+                source_table=_source_name(path),
+                source_scope="repeated local timing on real legacy map2/inputdata windows",
+                case=source["case"],
+                policy_or_baseline=source["policy"],
+                engine="python_cpp_event",
+                max_tasks=_int_text(source["max_tasks"]),
+                fault_edges=source.get("fault_edges", "none"),
+                fault_windows=source.get("fault_windows", "none"),
+                planned_count=_int_text(source["cpp_planned"]),
+                unplanned_count=_int_text(source["cpp_unplanned"]),
+                post_shield_conflicts=_int_text(source["cpp_conflicts"]),
+                decision_count=_int_text(source["cpp_decisions"]),
+                elapsed_seconds=_float_text(source["cpp_elapsed_mean_seconds"]),
+                decisions_per_second=_float_text(source["cpp_decisions_per_second"], places=2),
+                cpp_decision_speedup=_float_text(source["cpp_decision_speedup"], places=6),
+                python_planned=_int_text(source["python_planned"]),
+                cpp_planned=_int_text(source["cpp_planned"]),
+                python_decisions=_int_text(source["python_decisions"]),
+                cpp_decisions=_int_text(source["cpp_decisions"]),
+                python_conflicts=_int_text(source["python_conflicts"]),
+                cpp_conflicts=_int_text(source["cpp_conflicts"]),
+                summary_parity_pass=source["summary_parity_pass"],
+                strict_parity_pass=source["summary_parity_pass"],
+                safety_pass=str(int(float(source["python_conflicts"])) == 0 and int(float(source["cpp_conflicts"])) == 0),
+                notes=f"Repeated {source['repeat_count']}x timing row with local environment metadata.",
+            )
+        )
+    return rows
+
+
+def _pass_column(rows: list[dict[str, str]]) -> str:
+    candidates = ("strict_parity_pass", "parity_pass", "summary_parity_pass")
+    for candidate in candidates:
+        if rows and candidate in rows[0]:
+            return candidate
+    raise KeyError("no parity pass column found")
+
+
+def _conflict_pass(rows: list[dict[str, str]]) -> bool:
+    conflict_columns = [
+        ("python_conflicts", "cpp_conflicts"),
+        ("post_shield_conflicts",),
+    ]
+    for columns in conflict_columns:
+        if rows and all(column in rows[0] for column in columns):
+            return all(all(int(float(row[column])) == 0 for column in columns) for row in rows)
+    return True
+
+
+def _parity_summary_rows() -> list[dict[str, str]]:
+    summary_rows: list[dict[str, str]] = []
+    for family, path in PARITY_TABLES.items():
+        source_rows = _read_csv(path)
+        pass_column = _pass_column(source_rows)
+        pass_count = sum(1 for row in source_rows if _bool(row[pass_column]))
+        safety_pass = _conflict_pass(source_rows)
+        summary_rows.append(
+            _blank_row(
+                evidence_group="baseline_family_parity_summary",
+                source_table=_source_name(path),
+                source_scope="aggregated Python/C++ parity gate",
+                case="ALL",
+                policy_or_baseline=family,
+                engine="python_cpp",
+                strict_parity_pass=str(pass_count == len(source_rows)),
+                parity_rows=str(len(source_rows)),
+                pass_rows=str(pass_count),
+                safety_pass=str(safety_pass),
+                notes=f"Uses `{pass_column}` across all rows in the source table.",
+            )
+        )
+    return summary_rows
+
+
+def build_rows() -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    rows.extend(_outcome_rows())
+    rows.extend(_legacy_event_parity_rows())
+    rows.extend(_runtime_rows())
+    rows.extend(_parity_summary_rows())
+    return rows
+
+
+def write_table(rows: list[dict[str, str]]) -> None:
+    TABLE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with TABLE_PATH.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=FIELDNAMES)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
+    outcome_rows = [row for row in rows if row["evidence_group"] == "baseline_or_policy_outcome"]
+    event_rows = [row for row in rows if row["evidence_group"] in {"native_event_parity", "native_event_runtime"}]
+    parity_rows = [row for row in rows if row["evidence_group"] == "baseline_family_parity_summary"]
+    safety_pass = all(row["safety_pass"] == "True" for row in rows if row["safety_pass"])
+    event_parity_pass = all(row["strict_parity_pass"] == "True" for row in event_rows if row["strict_parity_pass"])
+    family_parity_pass = all(row["strict_parity_pass"] == "True" for row in parity_rows)
+    policies = sorted(
+        {
+            row["policy_or_baseline"]
+            for row in [*outcome_rows, *event_rows]
+            if row["policy_or_baseline"]
+        }
+    )
+    families = sorted({row["policy_or_baseline"] for row in parity_rows if row["policy_or_baseline"]})
+    speedups = [
+        float(row["cpp_decision_speedup"])
+        for row in rows
+        if row["evidence_group"] == "native_event_runtime" and row["cpp_decision_speedup"]
+    ]
+    return {
+        "outcome_row_count": len(outcome_rows),
+        "event_row_count": len(event_rows),
+        "family_row_count": len(parity_rows),
+        "safety_pass": safety_pass,
+        "event_parity_pass": event_parity_pass,
+        "family_parity_pass": family_parity_pass,
+        "policies": policies,
+        "families": families,
+        "median_speedup": _median(speedups),
+    }
+
+
+def _median(values: list[float]) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    mid = len(ordered) // 2
+    if len(ordered) % 2:
+        return ordered[mid]
+    return 0.5 * (ordered[mid - 1] + ordered[mid])
+
+
+def write_report(rows: list[dict[str, str]]) -> None:
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    summary = _summarize(rows)
+    outcome_rows = [row for row in rows if row["evidence_group"] == "baseline_or_policy_outcome"]
+    legacy_event_rows = [row for row in rows if row["evidence_group"] == "native_event_parity"]
+    runtime_rows = [row for row in rows if row["evidence_group"] == "native_event_runtime"]
+    parity_rows = [row for row in rows if row["evidence_group"] == "baseline_family_parity_summary"]
+    lines = [
+        "# Phase9 Unified Baseline Comparison Diagnostic",
+        "",
+        f"Date: {date.today().isoformat()}",
+        "",
+        "## Scope",
+        "",
+        (
+            "This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. "
+            "It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, "
+            "repeated native event runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families."
+        ),
+        "",
+        (
+            "The table is intentionally an evidence index, not a final paper benchmark. Rows come from different "
+            "scopes, so cross-policy ranking should wait for a matched Phase9 experiment with common maps, task "
+            "windows, fault schedules, and hardware-normalized timing."
+        ),
+        "",
+        f"CSV: `{TABLE_PATH.relative_to(ROOT).as_posix()}`",
+        "",
+        "## Outcome Evidence",
+        "",
+        "| Case | Policy/Baseline | Tasks | Faults | Planned | Unplanned | Conflicts | Mean travel | Seconds |",
+        "|---|---|---:|---|---:|---:|---:|---:|---:|",
+    ]
+    for row in outcome_rows:
+        lines.append(
+            "| {case} | {policy_or_baseline} | {max_tasks} | {fault_edges} | {planned_count} | "
+            "{unplanned_count} | {post_shield_conflicts} | {mean_travel_time} | {elapsed_seconds} |".format(**row)
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Legacy Event Parity Evidence",
+            "",
+            "| Case | Policy | Tasks | Py planned | C++ planned | C++ decisions | Conflicts | Strict parity |",
+            "|---|---|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    for row in legacy_event_rows:
+        lines.append(
+            "| {case} | {policy_or_baseline} | {max_tasks} | {python_planned} | {cpp_planned} | "
+            "{cpp_decisions} | {cpp_conflicts} | {strict_parity_pass} |".format(**row)
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Runtime Evidence",
+            "",
+            "| Case | Policy | Tasks | C++ planned | C++ decisions | C++ seconds | C++ decisions/s | Speedup | Parity |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    for row in runtime_rows:
+        lines.append(
+            "| {case} | {policy_or_baseline} | {max_tasks} | {planned_count} | {decision_count} | "
+            "{elapsed_seconds} | {decisions_per_second} | {cpp_decision_speedup} | {strict_parity_pass} |".format(**row)
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Parity Coverage",
+            "",
+            "| Family | Source rows | Passing rows | Safety | Source |",
+            "|---|---:|---:|---|---|",
+        ]
+    )
+    for row in parity_rows:
+        lines.append(
+            "| {policy_or_baseline} | {parity_rows} | {pass_rows} | {safety_pass} | `{source_table}` |".format(**row)
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Gate Status",
+            "",
+            f"- unified outcome rows: `{summary['outcome_row_count']}`",
+            f"- native event parity/runtime rows: `{summary['event_row_count']}`",
+            f"- baseline-family parity summaries: `{summary['family_row_count']}`",
+            f"- policies/baselines surfaced: `{', '.join(summary['policies'])}`",
+            f"- parity families surfaced: `{', '.join(summary['families'])}`",
+            "- all reported post-shield conflicts are zero: PASS"
+            if summary["safety_pass"]
+            else "- all reported post-shield conflicts are zero: FAIL",
+            "- native event Python/C++ parity rows pass: PASS"
+            if summary["event_parity_pass"]
+            else "- native event Python/C++ parity rows pass: FAIL",
+            "- baseline-family parity summaries pass: PASS"
+            if summary["family_parity_pass"]
+            else "- baseline-family parity summaries pass: FAIL",
+            f"- median C++ decision-throughput speedup in runtime rows: `{summary['median_speedup']:.3f}x`",
+            "- matched paper-grade Phase9 comparison: not covered",
+            "",
+            "## Remaining Work",
+            "",
+            "- rerun all families on a common matched Phase9 scenario set",
+            "- add a separate real heldout airport map when fixture data is available",
+            "- add hardware-normalized repeated timing and confidence intervals for every compared baseline family",
+        ]
+    )
+    REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def main() -> None:
+    rows = build_rows()
+    write_table(rows)
+    write_report(rows)
+    summary = _summarize(rows)
+    if not summary["safety_pass"]:
+        raise AssertionError("Phase9 unified comparison found post-shield conflicts")
+    if not summary["event_parity_pass"]:
+        raise AssertionError("Phase9 unified comparison found event parity failures")
+    if not summary["family_parity_pass"]:
+        raise AssertionError("Phase9 unified comparison found baseline-family parity failures")
+    print(
+        "phase9_unified_baseline_comparison "
+        f"rows={len(rows)} outcome_rows={summary['outcome_row_count']} "
+        f"event_rows={summary['event_row_count']} parity_families={summary['family_row_count']}"
+    )
+    print(f"report={REPORT_PATH}")
+
+
+if __name__ == "__main__":
+    main()
