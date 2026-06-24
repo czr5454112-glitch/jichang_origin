@@ -22,7 +22,8 @@ Implemented so far:
 - Phase8 event replay carries repair windows plus explicit node/buffer capacity and merge-group configuration through Python/C++ parity
 - early Phase9 event runtime scaling diagnostic over real legacy task windows
 - Phase9 matched baseline comparison over common real legacy no-fault/buffer-capacity/static-fault/repair-window task windows
+- Phase9 heldout-like synthetic matched comparison over persisted Phase8 ICS-like maps, including explicit dense-PIBT negative rows
 - Phase9 unified baseline-comparison evidence table across existing Phase2/Phase5/Phase8/Phase9 outputs
 - pybind smoke boundary
 
-Paper-grade repeated-run high-throughput validation across every baseline family, separate heldout-map event parity, merge-group matched comparison across every baseline family, and broad runtime replay validation are still pending.
+Paper-grade repeated-run high-throughput validation across every baseline family, separate heldout-map event parity, dense active-bag PIBT hardening, and broad runtime replay validation are still pending.

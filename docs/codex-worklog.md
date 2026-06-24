@@ -626,3 +626,14 @@
 - Tests / validation: target Phase2 baseline pytest passed `22 passed`; CTest passed 2/2; pybind smoke passed; Phase2 rolling-horizon parity reported `rows=12 strict_pass=True`; Phase2 periodic replanning parity reported `rows=8 strict_pass=True`; Phase9 matched baseline comparison reported `rows=25 scenarios=5 families=5`; regenerated unified comparison reported `rows=65 outcome_rows=17 event_rows=14 parity_families=9`; full pytest passed all `51` collected tests.
 - Safety / parity notes: Buffer-capacity matched rows are now covered for every included family. Merge-group matched rows, repeated hardware-normalized timing across every baseline family, and separate heldout airport maps remain pending.
 - Follow-up: extend shared merge-group config into the remaining baseline families, or move to heldout-map/runtime validation if fixture data is available.
+
+## 2026-06-24 21:30 - Phase9 synthetic matched baseline evidence
+
+- Request: Continue the Python/C++ port objective by extending Phase9 matched evidence beyond real legacy task windows into persisted synthetic ICS-like maps.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase9_synthetic_matched_baseline_comparison.py`, generated `outputs/tables/phase9_synthetic_matched_baseline_comparison.csv` plus `outputs/reports/phase9_synthetic_matched_baseline_comparison_report.md`, extended `scripts/eval/run_phase9_unified_baseline_comparison.py` to ingest synthetic matched rows, regenerated the unified Phase9 CSV/report, and refreshed README/C++ status docs.
+- Commands run: Phase9 synthetic matched comparison, Python py_compile over the new/updated Phase9 diagnostics, Phase9 unified baseline comparison, target Phase2 baseline pytest, and full Python pytest.
+- Key observations: The new diagnostic reruns rolling-horizon SIPP, periodic replanning SIPP, PIBT active-bag replay, EdgeScore-event, and fallback-event on five fixed-seed synthetic Phase8 manifest maps. All `25` rows preserve exact Python/C++ summary parity. Non-PIBT rows remain zero-conflict, while four dense active-bag PIBT rows reproduce Python/C++ conflicts exactly and are now recorded as negative stress cases rather than hidden behind a passing safety claim.
+- Tests / validation: Phase9 synthetic matched comparison reported `rows=25 scenarios=5 families=5`; regenerated unified comparison reported `rows=126 outcome_rows=17 event_rows=14 parity_families=10`; target Phase2 pytest passed `27 passed`; full Python pytest passed; py_compile passed for the updated diagnostics.
+- Safety / parity notes: Heldout-like synthetic matched parity is covered, and dense PIBT stress gaps are explicitly reported. This is still not a separate real heldout airport map or a paper-grade benchmark.
+- Follow-up: harden PIBT active-bag replay against dense synthetic hold/start-node overlap cases, expand randomized synthetic seeds, and add real heldout airport maps if fixture data becomes available.

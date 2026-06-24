@@ -67,6 +67,36 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | legacy_offset64_merge32 | edge_score_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 14 | 332 | 0 | 2.625963 | True |
 | legacy_offset64_merge32 | fallback_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 13 | 334 | 0 | 1.265459 | True |
 
+## Synthetic Matched Evidence
+
+| Scenario | Family | Tasks | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity | Notes |
+|---|---|---:|---|---:|---:|---:|---:|---|---|
+| synthetic_seed7_medium_repair | rolling_horizon_sipp | 18 | none | 18 | 18 | 0 | 6.771107 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | periodic_replanning_sipp | 18 | none | 18 | 54 | 0 | 0.341729 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | pibt_active_bag_replay | 18 | none | 18 | 56 | 0 | 0.455744 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | edge_score_event | 18 | none | 18 | 55 | 0 | 3.007438 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | fallback_event | 18 | none | 18 | 55 | 0 | 0.627552 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | rolling_horizon_sipp | 24 | none | 24 | 24 | 0 | 0.531801 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | periodic_replanning_sipp | 24 | none | 24 | 87 | 0 | 0.467897 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | pibt_active_bag_replay | 24 | none | 24 | 200 | 22 | 0.450027 | True | dense synthetic PIBT active-bag stress gap; parity is expected but this row is not a safety pass |
+| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | none | 15 | 125 | 0 | 1.794420 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | fallback_event | 24 | none | 15 | 125 | 0 | 0.792970 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | rolling_horizon_sipp | 20 | none | 20 | 20 | 0 | 0.623374 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | periodic_replanning_sipp | 20 | none | 20 | 76 | 0 | 0.496253 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | pibt_active_bag_replay | 20 | none | 20 | 231 | 50 | 0.677896 | True | dense synthetic PIBT active-bag stress gap; parity is expected but this row is not a safety pass |
+| synthetic_seed17_static_plus_repair | edge_score_event | 20 | none | 12 | 97 | 0 | 1.909647 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | fallback_event | 20 | none | 12 | 97 | 0 | 0.738930 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | rolling_horizon_sipp | 22 | none | 22 | 22 | 0 | 0.508673 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | periodic_replanning_sipp | 22 | none | 22 | 74 | 0 | 0.434836 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | pibt_active_bag_replay | 22 | none | 22 | 120 | 22 | 0.461331 | True | dense synthetic PIBT active-bag stress gap; parity is expected but this row is not a safety pass |
+| synthetic_seed23_repeated_repair | edge_score_event | 22 | none | 20 | 85 | 0 | 1.723586 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | fallback_event | 22 | none | 19 | 93 | 0 | 0.810262 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | rolling_horizon_sipp | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 26 | 0 | 0.629372 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | periodic_replanning_sipp | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 81 | 0 | 0.476209 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | pibt_active_bag_replay | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 155 | 24 | 0.529927 | True | dense synthetic PIBT active-bag stress gap; parity is expected but this row is not a safety pass |
+| synthetic_seed31_merge_buffer | edge_score_event | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 22 | 109 | 0 | 1.865069 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | fallback_event | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 22 | 109 | 0 | 0.729150 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+
 ## Legacy Event Parity Evidence
 
 | Case | Policy | Tasks | Py planned | C++ planned | C++ decisions | Conflicts | Strict parity |
@@ -145,20 +175,25 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 - unified outcome rows: `17`
 - matched baseline rows: `30`
+- synthetic matched baseline rows: `25`
 - matched baseline runtime rows: `30`
 - native event parity/runtime rows: `14`
 - baseline-family parity summaries: `10`
 - policies/baselines surfaced: `astar_guided, dagger_bc, edge_score_event, fallback_event, periodic_replanning_sipp, pibt_active_bag_replay, reference_astar, rolling_horizon_sipp`
 - parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
-- all reported post-shield conflicts are zero: PASS
+- gate-scoped post-shield conflicts are zero: PASS
+- all reported post-shield conflicts are zero: FAIL
+- dense synthetic PIBT negative rows reported: `4`
 - native event Python/C++ parity rows pass: PASS
 - baseline-family parity summaries pass: PASS
 - median C++ decision-throughput speedup in runtime rows: `0.914x`
 - matched paper-grade Phase9 comparison: not covered
 - matched merge-group scenario: covered
 - repeated matched-baseline runtime timing with 95% CI: covered
+- heldout-like synthetic matched comparison: covered
 
 ## Remaining Work
 
 - add a separate real heldout airport map when fixture data is available
+- harden PIBT active-bag replay on dense synthetic stress rows
 - expand timing to multi-machine hardware-normalized runs and confidence intervals before paper-grade speed claims
