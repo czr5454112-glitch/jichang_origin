@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from datetime import date
 from pathlib import Path
 import sys
 
@@ -55,7 +56,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
     lines = [
         "# Phase8 Native C++ / Python Replay Parity Report",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
@@ -85,13 +86,14 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "- fallback safety diagnostic: PASS" if fallback_safety_pass else "- fallback safety diagnostic: FAIL",
             "- fallback strict replay parity: PASS" if fallback_strict_pass else "- fallback strict replay parity: FAIL",
             f"- fallback strict parity rows: `{fallback_strict_matches}/{len(fallback_rows)}`",
-            "- full high-throughput C++ event simulator parity: not covered",
+            "- native event-scheduler parity: covered by `outputs/reports/phase8_native_cpp_event_parity_report.md`",
+            "- real legacy event-scheduler parity: covered by `outputs/reports/phase8_legacy_event_parity_report.md`",
             "",
             "## Remaining Work",
             "",
             fallback_follow_up,
             "- expand parity to larger windows, repair events, randomized density, and heldout maps",
-            "- replace the compact replay with the full C++ event scheduler before final runtime claims",
+            "- keep compact and event-scheduler parity aligned when adding new runtime policy formats",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

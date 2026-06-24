@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from datetime import date
 from pathlib import Path
 import sys
 
@@ -42,7 +43,7 @@ def write_report(rows: list[dict[str, float | int | bool]]) -> None:
     lines = [
         "# Phase8 EdgeScore C++ Runtime Parity Report",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
@@ -60,13 +61,12 @@ def write_report(rows: list[dict[str, float | int | bool]]) -> None:
         "- C++ scorer callable from pybind: PASS",
         "- score parity tolerance 1e-12: PASS" if max_diff <= 1.0e-12 else "- score parity tolerance 1e-12: FAIL",
         "- masked argmax parity: PASS" if all_match else "- masked argmax parity: FAIL",
-        "- production model loader: not started",
+        "- production text model loader: covered by `outputs/reports/phase8_edge_score_runtime_loader_report.md`",
+        "- latency and closed-loop runtime smoke: covered by `outputs/reports/phase8_cpp_runtime_report.md`",
         "",
         "## Remaining Work",
         "",
-        "- export trained model artifacts into a stable C++ runtime format",
-        "- add C++ closed-loop replay using the scorer and shield",
-        "- measure C++ policy inference latency on larger replay batches",
+        "- keep runtime parity covered when replacing the text MLP artifact with ONNX/LibTorch/GNN runtime formats",
     ]
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

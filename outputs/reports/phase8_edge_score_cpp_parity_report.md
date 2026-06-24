@@ -1,6 +1,6 @@
 # Phase8 EdgeScore C++ Runtime Parity Report
 
-Date: 2026-06-17
+Date: 2026-06-24
 
 ## Scope
 
@@ -18,10 +18,9 @@ This smoke verifies that the new C++ MLP-EdgeScore inference kernel and pybind w
 - C++ scorer callable from pybind: PASS
 - score parity tolerance 1e-12: PASS
 - masked argmax parity: PASS
-- production model loader: not started
+- production text model loader: covered by `outputs/reports/phase8_edge_score_runtime_loader_report.md`
+- latency and closed-loop runtime smoke: covered by `outputs/reports/phase8_cpp_runtime_report.md`
 
 ## Remaining Work
 
-- export trained model artifacts into a stable C++ runtime format
-- add C++ closed-loop replay using the scorer and shield
-- measure C++ policy inference latency on larger replay batches
+- keep runtime parity covered when replacing the text MLP artifact with ONNX/LibTorch/GNN runtime formats

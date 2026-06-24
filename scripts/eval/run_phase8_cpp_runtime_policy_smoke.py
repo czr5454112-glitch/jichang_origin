@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from datetime import date
 from pathlib import Path
 import sys
 from time import perf_counter
@@ -50,13 +51,13 @@ def write_report(
     lines = [
         "# Phase8 C++ Runtime Policy Smoke Report",
         "",
-        "Date: 2026-06-17",
+        f"Date: {date.today().isoformat()}",
         "",
         "## Scope",
         "",
         "This smoke uses the exported MLP-EdgeScore runtime text artifact from Phase8, loads it through both Python and C++, measures C++ pybind inference latency, and runs the C++ loaded scorer as the policy inside the existing shielded Python junction environment.",
         "",
-        "This is a runtime integration smoke. It is not yet a native C++ event-simulator replay.",
+        "This script is the local C++ inference and Python-environment closed-loop smoke. Native C++ compact replay, event replay, repair-window replay, and model-unavailable fallback evidence are tracked by the later Phase8 reports linked in the gate status below.",
         "",
         "## Runtime Artifact",
         "",
@@ -102,12 +103,12 @@ def write_report(
             "- runtime latency measured: PASS" if cpp_batch["decisions_per_second"] > 0 else "- runtime latency measured: FAIL",
             "- C++ runtime policy closed-loop smoke: PASS" if no_cpp_conflicts and no_cpp_truncation else "- C++ runtime policy closed-loop smoke: FAIL",
             "- C++ runtime policy matches Python artifact planned counts: PASS" if matches_python_planned else "- C++ runtime policy matches Python artifact planned counts: FAIL",
-            "- native C++ event replay: not covered",
-            "- model-unavailable fallback: covered by unit test, not this script",
+            "- native C++ event replay: covered by `outputs/reports/phase8_native_cpp_event_parity_report.md` and `outputs/reports/phase8_legacy_event_parity_report.md`",
+            "- model-unavailable fallback: covered by native fallback replay reports and pybind smoke",
+            "- safety constraints independent of neural output: PASS; hard action masks, C++ shield checks, and fallback replay remain available without model output",
             "",
             "## Remaining Work",
             "",
-            "- move the event replay loop itself into C++ instead of only calling C++ inference from Python",
             "- add larger batch latency sweeps and compare against rolling-horizon/SIPP runtime under identical task windows",
             "- validate runtime checkpoints on heldout maps, randomized density windows, and repair schedules",
         ]

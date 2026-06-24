@@ -1,6 +1,6 @@
 # Phase8 Native C++ / Python Replay Parity Report
 
-Date: 2026-06-17
+Date: 2026-06-24
 
 ## Scope
 
@@ -29,10 +29,11 @@ CSV: `outputs/tables/phase8_native_cpp_python_parity.csv`
 - fallback safety diagnostic: PASS
 - fallback strict replay parity: PASS
 - fallback strict parity rows: `4/4`
-- full high-throughput C++ event simulator parity: not covered
+- native event-scheduler parity: covered by `outputs/reports/phase8_native_cpp_event_parity_report.md`
+- real legacy event-scheduler parity: covered by `outputs/reports/phase8_legacy_event_parity_report.md`
 
 ## Remaining Work
 
 - keep fallback parity covered when expanding to repair events, randomized density, and heldout maps
 - expand parity to larger windows, repair events, randomized density, and heldout maps
-- replace the compact replay with the full C++ event scheduler before final runtime claims
+- keep compact and event-scheduler parity aligned when adding new runtime policy formats
