@@ -11,7 +11,7 @@ from typing import Any
 import run_java_cpp_legacy_window_performance as base
 
 
-DEFAULT_SCHEDULE = "8260:16:17:fault;9000:16:17:repair"
+DEFAULT_SCHEDULE = "8268:3:16:fault;8300:3:16:repair"
 JAVA_ROUTE_TABLE = base.ROOT / "outputs" / "tables" / "java_legacy_scheduled_fault_window_routes.csv"
 JAVA_SUMMARY_TABLE = base.ROOT / "outputs" / "tables" / "java_legacy_scheduled_fault_window_summary.csv"
 CPP_ROUTE_TABLE = base.ROOT / "outputs" / "tables" / "cpp_legacy_scheduled_fault_window_routes.csv"
@@ -209,7 +209,8 @@ def _write_report(
             "This benchmark compares the read-only legacy Java `ICS_PathFinding` scheduler against "
             "the native C++ port on a deterministic fault/repair window. The schedule is injected "
             "through an external Java harness by toggling in-memory edge fault states before the "
-            "legacy `Tasks.generate_tasks` call; no legacy source file is modified."
+            "legacy `Tasks.generate_tasks` call; no legacy source file is modified. The default "
+            "schedule faults the first active route after it has been planned, then repairs the edge."
         ),
         "",
         f"- map: `{base.MAP2_PATH.relative_to(base.ROOT).as_posix()}`",
@@ -259,8 +260,9 @@ def _write_report(
             "",
             (
                 "This covers deterministic fault activation and repair propagation through the "
-                "legacy task-generation/path-finding loop. It does not yet cover random fault "
-                "sampling or the Swing GUI repaint/sleep loop."
+                "legacy task-generation/path-finding loop, including the active-route first-edge "
+                "`Handling_faults` branch. It does not yet cover random fault sampling or the "
+                "Swing GUI repaint/sleep loop."
             ),
         ]
     )

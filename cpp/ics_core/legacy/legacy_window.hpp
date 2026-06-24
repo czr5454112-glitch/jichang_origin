@@ -239,6 +239,7 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
     result.last_epoch = epoch;
     result.epochs_run = epoch_index + 1;
 
+    std::set<std::pair<int, int>> epoch_fault_edges;
     for (const auto& event : fault_schedule) {
       if (event.epoch != epoch_int) {
         continue;
@@ -247,7 +248,9 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
         active_fault_edges.erase({event.start, event.end});
         ++result.repair_event_count;
       } else {
-        active_fault_edges.insert({event.start, event.end});
+        const auto edge = std::pair<int, int>{event.start, event.end};
+        active_fault_edges.insert(edge);
+        epoch_fault_edges.insert(edge);
         ++result.fault_event_count;
       }
     }
@@ -295,6 +298,22 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
       if (on_path_ids.find(entry.first) == on_path_ids.end()) {
         reservations.add_route(entry.first, entry.second);
       }
+    }
+
+    std::vector<int> faulted_route_ids;
+    for (const auto& entry : saved_routes) {
+      const auto& route = entry.second;
+      if (route.size() < 2) {
+        continue;
+      }
+      if (epoch_fault_edges.find({route[0].location, route[1].location}) !=
+          epoch_fault_edges.end()) {
+        faulted_route_ids.push_back(entry.first);
+      }
+    }
+    for (const int task_id : faulted_route_ids) {
+      saved_routes.erase(task_id);
+      reservations.remove_task(task_id);
     }
 
     std::vector<TaskLeg> new_tasks;
