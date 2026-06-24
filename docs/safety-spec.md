@@ -72,6 +72,11 @@ Currently covered by Phase9 randomized-topology PIBT stress:
 - Generated DAG-like synthetic ICS topologies with varied layer widths, branch/shortcut density, and task source/goal distributions match on Python/C++ summary metrics.
 - Static-fault, repair-window, buffer-capacity, and merge-group randomized-topology rows stay at zero post-shield conflicts.
 
+Currently covered by Phase9 randomized-topology matched baselines:
+
+- Rolling-horizon SIPP, periodic replanning SIPP, active-bag PIBT, EdgeScore-event, and fallback-event families match on Python/C++ summary metrics across the generated topology/task-source cases.
+- All randomized-topology matched baseline rows stay at zero post-shield conflicts.
+
 Still pending:
 
 - event-simulation safety counters

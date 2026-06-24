@@ -22,6 +22,9 @@ SOURCE_TABLES = {
     "phase9_random_topology_pibt_stress_sweep": (
         ROOT / "outputs" / "tables" / "phase9_random_topology_pibt_stress_sweep.csv"
     ),
+    "phase9_random_topology_matched_baseline_comparison": (
+        ROOT / "outputs" / "tables" / "phase9_random_topology_matched_baseline_comparison.csv"
+    ),
     "phase9_event_runtime_scaling": ROOT / "outputs" / "tables" / "phase9_event_runtime_scaling.csv",
     "phase9_matched_runtime_scaling": ROOT / "outputs" / "tables" / "phase9_matched_runtime_scaling.csv",
 }
@@ -40,6 +43,9 @@ PARITY_TABLES = {
     "phase9_dense_pibt_stress_sweep": ROOT / "outputs" / "tables" / "phase9_dense_pibt_stress_sweep.csv",
     "phase9_random_topology_pibt_stress_sweep": (
         ROOT / "outputs" / "tables" / "phase9_random_topology_pibt_stress_sweep.csv"
+    ),
+    "phase9_random_topology_matched_baseline_comparison": (
+        ROOT / "outputs" / "tables" / "phase9_random_topology_matched_baseline_comparison.csv"
     ),
 }
 
@@ -394,6 +400,54 @@ def _random_topology_pibt_stress_rows() -> list[dict[str, str]]:
     return rows
 
 
+def _random_topology_matched_rows() -> list[dict[str, str]]:
+    path = SOURCE_TABLES["phase9_random_topology_matched_baseline_comparison"]
+    rows: list[dict[str, str]] = []
+    for source in _read_csv(path):
+        python_conflicts = int(float(source["python_conflicts"]))
+        cpp_conflicts = int(float(source["cpp_conflicts"]))
+        notes = (
+            f"Random DAG-like matched family row; layers={source.get('layers', '')}; "
+            f"source_mode={source.get('source_mode', '')}; goal_mode={source.get('goal_mode', '')}; "
+            f"sources={source.get('source_histogram', '')}; goals={source.get('goal_histogram', '')}."
+        )
+        rows.append(
+            _blank_row(
+                evidence_group="random_topology_matched_baseline_comparison",
+                source_table=_source_name(path),
+                source_scope="random DAG-like synthetic topologies across all included baseline/event families",
+                case=source["scenario"],
+                policy_or_baseline=source["family"],
+                engine="python_cpp",
+                max_tasks=_int_text(source["task_count"]),
+                fault_edges=source.get("fault_edges", "none"),
+                fault_windows=source.get("fault_windows", "none"),
+                node_capacities=source.get("node_capacities", "none"),
+                merge_groups=source.get("merge_groups", "none"),
+                merge_capacity=source.get("merge_capacity", "1"),
+                merge_headway_seconds=source.get("merge_headway_seconds", "0.0"),
+                planned_count=_int_text(source["cpp_planned"]),
+                unplanned_count=_int_text(source["cpp_unplanned"]),
+                post_shield_conflicts=_int_text(source["cpp_conflicts"]),
+                mean_travel_time=_float_text(source["cpp_mean_travel_time"]),
+                decision_count=_int_text(source["cpp_active_steps"]),
+                elapsed_seconds=_float_text(source["cpp_elapsed_seconds"]),
+                cpp_decision_speedup=_float_text(source["cpp_speedup"], places=6),
+                python_planned=_int_text(source["python_planned"]),
+                cpp_planned=_int_text(source["cpp_planned"]),
+                python_decisions=_int_text(source["python_active_steps"]),
+                cpp_decisions=_int_text(source["cpp_active_steps"]),
+                python_conflicts=_int_text(source["python_conflicts"]),
+                cpp_conflicts=_int_text(source["cpp_conflicts"]),
+                summary_parity_pass=source["parity_pass"],
+                strict_parity_pass=source["parity_pass"],
+                safety_pass=str(python_conflicts == 0 and cpp_conflicts == 0),
+                notes=notes,
+            )
+        )
+    return rows
+
+
 def _runtime_rows() -> list[dict[str, str]]:
     path = SOURCE_TABLES["phase9_event_runtime_scaling"]
     rows: list[dict[str, str]] = []
@@ -535,6 +589,7 @@ def build_rows() -> list[dict[str, str]]:
     rows.extend(_synthetic_matched_rows())
     rows.extend(_dense_pibt_stress_rows())
     rows.extend(_random_topology_pibt_stress_rows())
+    rows.extend(_random_topology_matched_rows())
     rows.extend(_legacy_event_parity_rows())
     rows.extend(_runtime_rows())
     rows.extend(_matched_runtime_rows())
@@ -560,6 +615,9 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     random_topology_rows = [
         row for row in rows if row["evidence_group"] == "random_topology_pibt_stress_sweep"
     ]
+    random_topology_matched_rows = [
+        row for row in rows if row["evidence_group"] == "random_topology_matched_baseline_comparison"
+    ]
     matched_runtime_rows = [row for row in rows if row["evidence_group"] == "matched_baseline_runtime"]
     event_rows = [row for row in rows if row["evidence_group"] in {"native_event_parity", "native_event_runtime"}]
     parity_rows = [row for row in rows if row["evidence_group"] == "baseline_family_parity_summary"]
@@ -575,6 +633,7 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
             + synthetic_rows
             + dense_pibt_rows
             + random_topology_rows
+            + random_topology_matched_rows
             if row["policy_or_baseline"]
         }
     )
@@ -597,6 +656,13 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         ),
         "random_topology_pibt_stress_parity_pass": all(
             row["strict_parity_pass"] == "True" for row in random_topology_rows
+        ),
+        "random_topology_matched_row_count": len(random_topology_matched_rows),
+        "random_topology_matched_safety_pass": all(
+            row["safety_pass"] == "True" for row in random_topology_matched_rows
+        ),
+        "random_topology_matched_parity_pass": all(
+            row["strict_parity_pass"] == "True" for row in random_topology_matched_rows
         ),
         "matched_runtime_row_count": len(matched_runtime_rows),
         "event_row_count": len(event_rows),
@@ -650,6 +716,9 @@ def write_report(rows: list[dict[str, str]]) -> None:
     random_topology_rows = [
         row for row in rows if row["evidence_group"] == "random_topology_pibt_stress_sweep"
     ]
+    random_topology_matched_rows = [
+        row for row in rows if row["evidence_group"] == "random_topology_matched_baseline_comparison"
+    ]
     legacy_event_rows = [row for row in rows if row["evidence_group"] == "native_event_parity"]
     runtime_rows = [row for row in rows if row["evidence_group"] == "native_event_runtime"]
     matched_runtime_rows = [row for row in rows if row["evidence_group"] == "matched_baseline_runtime"]
@@ -665,8 +734,8 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. "
             "It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, "
             "heldout-like synthetic matched rows, dense active-bag PIBT stress rows, randomized-topology PIBT stress rows, "
-            "repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage "
-            "for the Phase2/Phase8 baseline families."
+            "randomized-topology matched baseline rows, repeated native event runtime rows, repeated matched-baseline runtime "
+            "rows, and aggregate parity coverage for the Phase2/Phase8 baseline families."
         ),
         "",
         (
@@ -761,6 +830,24 @@ def write_report(rows: list[dict[str, str]]) -> None:
     lines.extend(
         [
             "",
+            "## Random Topology Matched Evidence",
+            "",
+            "| Scenario | Family | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity | Notes |",
+            "|---|---|---:|---|---|---:|---:|---:|---:|---|---|",
+        ]
+    )
+    for row in random_topology_matched_rows:
+        lines.append(
+            "| {case} | {policy_or_baseline} | {max_tasks} | {fault_label} | {config_label} | "
+            "{planned_count} | {decision_count} | {post_shield_conflicts} | {cpp_decision_speedup} | "
+            "{strict_parity_pass} | {notes} |".format(
+                **{**row, "fault_label": _fault_label(row), "config_label": _config_label(row)}
+            )
+        )
+
+    lines.extend(
+        [
+            "",
             "## Legacy Event Parity Evidence",
             "",
             "| Case | Policy | Tasks | Py planned | C++ planned | C++ decisions | Conflicts | Strict parity |",
@@ -833,6 +920,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
             f"- synthetic matched baseline rows: `{summary['synthetic_row_count']}`",
             f"- dense PIBT stress rows: `{summary['dense_pibt_stress_row_count']}`",
             f"- random topology PIBT stress rows: `{summary['random_topology_pibt_stress_row_count']}`",
+            f"- random topology matched baseline rows: `{summary['random_topology_matched_row_count']}`",
             f"- matched baseline runtime rows: `{summary['matched_runtime_row_count']}`",
             f"- native event parity/runtime rows: `{summary['event_row_count']}`",
             f"- baseline-family parity summaries: `{summary['family_row_count']}`",
@@ -856,6 +944,12 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "- random topology PIBT stress rows are safety-clean: PASS"
             if summary["random_topology_pibt_stress_safety_pass"]
             else "- random topology PIBT stress rows are safety-clean: FAIL",
+            "- random topology matched baseline Python/C++ parity rows pass: PASS"
+            if summary["random_topology_matched_parity_pass"]
+            else "- random topology matched baseline Python/C++ parity rows pass: FAIL",
+            "- random topology matched baseline rows are safety-clean: PASS"
+            if summary["random_topology_matched_safety_pass"]
+            else "- random topology matched baseline rows are safety-clean: FAIL",
             "- native event Python/C++ parity rows pass: PASS"
             if summary["event_parity_pass"]
             else "- native event Python/C++ parity rows pass: FAIL",
@@ -869,6 +963,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "- heldout-like synthetic matched comparison: covered",
             "- dense active-bag PIBT stress sweep: covered",
             "- randomized topology/task-source PIBT stress sweep: covered",
+            "- randomized topology/task-source matched baseline comparison: covered",
             "",
             "## Remaining Work",
             "",

@@ -4,7 +4,7 @@ Date: 2026-06-24
 
 ## Scope
 
-This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, heldout-like synthetic matched rows, dense active-bag PIBT stress rows, randomized-topology PIBT stress rows, repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
+This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, heldout-like synthetic matched rows, dense active-bag PIBT stress rows, randomized-topology PIBT stress rows, randomized-topology matched baseline rows, repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
 
 The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window/merge-group windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and multi-machine hardware-normalized timing.
 
@@ -118,12 +118,47 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 | Scenario | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity | Notes |
 |---|---:|---|---|---:|---:|---:|---:|---|---|
-| random_topo_seed211_wide_uniform | 36 | none | none | 36 | 200 | 0 | 1.347613 | True | Random DAG-like topology layers=3-4-4-3-2; source_mode=uniform; goal_mode=uniform; branch=0.45; shortcut=0.12; sources=0:8;1:17;2:11; goals=14:14;15:22. |
-| random_topo_seed223_skewed_bottleneck | 40 | none | nodes=10:2;13:2;14:2; merge=0->6:106;1->6:106;2->6:106,cap=1,headway=0.25 | 40 | 166 | 0 | 0.680349 | True | Random DAG-like topology layers=4-3-5-3-2; source_mode=skewed; goal_mode=skewed; branch=0.5; shortcut=0.18; sources=0:30;1:5;2:2;3:3; goals=15:27;16:13. |
-| random_topo_seed227_burst_repair | 42 | 3->15@[4.000,18.000) | nodes=3:2;11:2;13:2; merge=5->11:111;9->11:111;10->11:111,cap=1,headway=0.0 | 42 | 168 | 0 | 0.630240 | True | Random DAG-like topology layers=3-5-3-5-2; source_mode=burst; goal_mode=alternating; branch=0.42; shortcut=0.1; sources=0:18;1:12;2:12; goals=16:21;17:21. |
-| random_topo_seed229_static_alt | 44 | 10->12 | merge=4->9:109;5->9:109;7->9:109;8->18:118;12->18:118;13->18:118;15->18:118,cap=1,headway=0.0 | 44 | 311 | 0 | 0.611945 | True | Random DAG-like topology layers=4-4-4-4-3; source_mode=alternating; goal_mode=uniform; branch=0.38; shortcut=0.16; sources=1:22;3:22; goals=16:18;17:17;18:9. |
-| random_topo_seed233_shortcut_dense | 48 | 6->10@[3.000,12.000);12->18@[8.000,20.000) | nodes=6:2;10:2;14:2; merge=5->18:118;6->10:110;7->10:110;8->10:110;9->10:110;10->18:118;11->18:118;12->18:118;13->18:118,cap=1,headway=0.25 | 48 | 191 | 0 | 0.718621 | True | Random DAG-like topology layers=5-5-4-5-3; source_mode=skewed; goal_mode=alternating; branch=0.6; shortcut=0.3; sources=0:37;1:5;2:2;3:1;4:3; goals=19:16;20:16;21:16. |
-| random_topo_seed239_sparse_repair | 34 | 3->8@[4.000,18.000) | none | 34 | 245 | 0 | 0.586761 | True | Random DAG-like topology layers=3-3-3-3-2; source_mode=burst; goal_mode=skewed; branch=0.22; shortcut=0.05; sources=0:12;1:12;2:10; goals=12:25;13:9. |
+| random_topo_seed211_wide_uniform | 36 | none | none | 36 | 200 | 0 | 1.384507 | True | Random DAG-like topology layers=3-4-4-3-2; source_mode=uniform; goal_mode=uniform; branch=0.45; shortcut=0.12; sources=0:8;1:17;2:11; goals=14:14;15:22. |
+| random_topo_seed223_skewed_bottleneck | 40 | none | nodes=10:2;13:2;14:2; merge=0->6:106;1->6:106;2->6:106,cap=1,headway=0.25 | 40 | 166 | 0 | 0.690095 | True | Random DAG-like topology layers=4-3-5-3-2; source_mode=skewed; goal_mode=skewed; branch=0.5; shortcut=0.18; sources=0:30;1:5;2:2;3:3; goals=15:27;16:13. |
+| random_topo_seed227_burst_repair | 42 | 3->15@[4.000,18.000) | nodes=3:2;11:2;13:2; merge=5->11:111;9->11:111;10->11:111,cap=1,headway=0.0 | 42 | 168 | 0 | 0.618070 | True | Random DAG-like topology layers=3-5-3-5-2; source_mode=burst; goal_mode=alternating; branch=0.42; shortcut=0.1; sources=0:18;1:12;2:12; goals=16:21;17:21. |
+| random_topo_seed229_static_alt | 44 | 10->12 | merge=4->9:109;5->9:109;7->9:109;8->18:118;12->18:118;13->18:118;15->18:118,cap=1,headway=0.0 | 44 | 311 | 0 | 0.601670 | True | Random DAG-like topology layers=4-4-4-4-3; source_mode=alternating; goal_mode=uniform; branch=0.38; shortcut=0.16; sources=1:22;3:22; goals=16:18;17:17;18:9. |
+| random_topo_seed233_shortcut_dense | 48 | 6->10@[3.000,12.000);12->18@[8.000,20.000) | nodes=6:2;10:2;14:2; merge=5->18:118;6->10:110;7->10:110;8->10:110;9->10:110;10->18:118;11->18:118;12->18:118;13->18:118,cap=1,headway=0.25 | 48 | 191 | 0 | 0.727140 | True | Random DAG-like topology layers=5-5-4-5-3; source_mode=skewed; goal_mode=alternating; branch=0.6; shortcut=0.3; sources=0:37;1:5;2:2;3:1;4:3; goals=19:16;20:16;21:16. |
+| random_topo_seed239_sparse_repair | 34 | 3->8@[4.000,18.000) | none | 34 | 245 | 0 | 0.579494 | True | Random DAG-like topology layers=3-3-3-3-2; source_mode=burst; goal_mode=skewed; branch=0.22; shortcut=0.05; sources=0:12;1:12;2:10; goals=12:25;13:9. |
+
+## Random Topology Matched Evidence
+
+| Scenario | Family | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity | Notes |
+|---|---|---:|---|---|---:|---:|---:|---:|---|---|
+| random_topo_seed211_wide_uniform | rolling_horizon_sipp | 36 | none | none | 36 | 36 | 0 | 1.842218 | True | Random DAG-like matched family row; layers=3-4-4-3-2; source_mode=uniform; goal_mode=uniform; sources=0:8;1:17;2:11; goals=14:14;15:22. |
+| random_topo_seed211_wide_uniform | periodic_replanning_sipp | 36 | none | none | 36 | 140 | 0 | 0.404959 | True | Random DAG-like matched family row; layers=3-4-4-3-2; source_mode=uniform; goal_mode=uniform; sources=0:8;1:17;2:11; goals=14:14;15:22. |
+| random_topo_seed211_wide_uniform | pibt_active_bag_replay | 36 | none | none | 36 | 200 | 0 | 0.659899 | True | Random DAG-like matched family row; layers=3-4-4-3-2; source_mode=uniform; goal_mode=uniform; sources=0:8;1:17;2:11; goals=14:14;15:22. |
+| random_topo_seed211_wide_uniform | edge_score_event | 36 | none | none | 27 | 163 | 0 | 3.045166 | True | Random DAG-like matched family row; layers=3-4-4-3-2; source_mode=uniform; goal_mode=uniform; sources=0:8;1:17;2:11; goals=14:14;15:22. |
+| random_topo_seed211_wide_uniform | fallback_event | 36 | none | none | 27 | 161 | 0 | 1.038763 | True | Random DAG-like matched family row; layers=3-4-4-3-2; source_mode=uniform; goal_mode=uniform; sources=0:8;1:17;2:11; goals=14:14;15:22. |
+| random_topo_seed223_skewed_bottleneck | rolling_horizon_sipp | 40 | none | nodes=10:2;13:2;14:2; merge=0->6:106;1->6:106;2->6:106,cap=1,headway=0.25 | 40 | 40 | 0 | 0.505405 | True | Random DAG-like matched family row; layers=4-3-5-3-2; source_mode=skewed; goal_mode=skewed; sources=0:30;1:5;2:2;3:3; goals=15:27;16:13. |
+| random_topo_seed223_skewed_bottleneck | periodic_replanning_sipp | 40 | none | nodes=10:2;13:2;14:2; merge=0->6:106;1->6:106;2->6:106,cap=1,headway=0.25 | 40 | 140 | 0 | 0.451948 | True | Random DAG-like matched family row; layers=4-3-5-3-2; source_mode=skewed; goal_mode=skewed; sources=0:30;1:5;2:2;3:3; goals=15:27;16:13. |
+| random_topo_seed223_skewed_bottleneck | pibt_active_bag_replay | 40 | none | nodes=10:2;13:2;14:2; merge=0->6:106;1->6:106;2->6:106,cap=1,headway=0.25 | 40 | 166 | 0 | 0.589652 | True | Random DAG-like matched family row; layers=4-3-5-3-2; source_mode=skewed; goal_mode=skewed; sources=0:30;1:5;2:2;3:3; goals=15:27;16:13. |
+| random_topo_seed223_skewed_bottleneck | edge_score_event | 40 | none | nodes=10:2;13:2;14:2; merge=0->6:106;1->6:106;2->6:106,cap=1,headway=0.25 | 26 | 178 | 0 | 2.675707 | True | Random DAG-like matched family row; layers=4-3-5-3-2; source_mode=skewed; goal_mode=skewed; sources=0:30;1:5;2:2;3:3; goals=15:27;16:13. |
+| random_topo_seed223_skewed_bottleneck | fallback_event | 40 | none | nodes=10:2;13:2;14:2; merge=0->6:106;1->6:106;2->6:106,cap=1,headway=0.25 | 24 | 170 | 0 | 1.098874 | True | Random DAG-like matched family row; layers=4-3-5-3-2; source_mode=skewed; goal_mode=skewed; sources=0:30;1:5;2:2;3:3; goals=15:27;16:13. |
+| random_topo_seed227_burst_repair | rolling_horizon_sipp | 42 | 3->15@[4.000,18.000) | nodes=3:2;11:2;13:2; merge=5->11:111;9->11:111;10->11:111,cap=1,headway=0.0 | 42 | 42 | 0 | 0.426495 | True | Random DAG-like matched family row; layers=3-5-3-5-2; source_mode=burst; goal_mode=alternating; sources=0:18;1:12;2:12; goals=16:21;17:21. |
+| random_topo_seed227_burst_repair | periodic_replanning_sipp | 42 | 3->15@[4.000,18.000) | nodes=3:2;11:2;13:2; merge=5->11:111;9->11:111;10->11:111,cap=1,headway=0.0 | 42 | 156 | 0 | 0.436187 | True | Random DAG-like matched family row; layers=3-5-3-5-2; source_mode=burst; goal_mode=alternating; sources=0:18;1:12;2:12; goals=16:21;17:21. |
+| random_topo_seed227_burst_repair | pibt_active_bag_replay | 42 | 3->15@[4.000,18.000) | nodes=3:2;11:2;13:2; merge=5->11:111;9->11:111;10->11:111,cap=1,headway=0.0 | 42 | 168 | 0 | 0.595260 | True | Random DAG-like matched family row; layers=3-5-3-5-2; source_mode=burst; goal_mode=alternating; sources=0:18;1:12;2:12; goals=16:21;17:21. |
+| random_topo_seed227_burst_repair | edge_score_event | 42 | 3->15@[4.000,18.000) | nodes=3:2;11:2;13:2; merge=5->11:111;9->11:111;10->11:111,cap=1,headway=0.0 | 15 | 136 | 0 | 2.849804 | True | Random DAG-like matched family row; layers=3-5-3-5-2; source_mode=burst; goal_mode=alternating; sources=0:18;1:12;2:12; goals=16:21;17:21. |
+| random_topo_seed227_burst_repair | fallback_event | 42 | 3->15@[4.000,18.000) | nodes=3:2;11:2;13:2; merge=5->11:111;9->11:111;10->11:111,cap=1,headway=0.0 | 15 | 135 | 0 | 1.215045 | True | Random DAG-like matched family row; layers=3-5-3-5-2; source_mode=burst; goal_mode=alternating; sources=0:18;1:12;2:12; goals=16:21;17:21. |
+| random_topo_seed229_static_alt | rolling_horizon_sipp | 44 | 10->12 | merge=4->9:109;5->9:109;7->9:109;8->18:118;12->18:118;13->18:118;15->18:118,cap=1,headway=0.0 | 44 | 44 | 0 | 0.534827 | True | Random DAG-like matched family row; layers=4-4-4-4-3; source_mode=alternating; goal_mode=uniform; sources=1:22;3:22; goals=16:18;17:17;18:9. |
+| random_topo_seed229_static_alt | periodic_replanning_sipp | 44 | 10->12 | merge=4->9:109;5->9:109;7->9:109;8->18:118;12->18:118;13->18:118;15->18:118,cap=1,headway=0.0 | 44 | 162 | 0 | 0.521209 | True | Random DAG-like matched family row; layers=4-4-4-4-3; source_mode=alternating; goal_mode=uniform; sources=1:22;3:22; goals=16:18;17:17;18:9. |
+| random_topo_seed229_static_alt | pibt_active_bag_replay | 44 | 10->12 | merge=4->9:109;5->9:109;7->9:109;8->18:118;12->18:118;13->18:118;15->18:118,cap=1,headway=0.0 | 44 | 311 | 0 | 0.682171 | True | Random DAG-like matched family row; layers=4-4-4-4-3; source_mode=alternating; goal_mode=uniform; sources=1:22;3:22; goals=16:18;17:17;18:9. |
+| random_topo_seed229_static_alt | edge_score_event | 44 | 10->12 | merge=4->9:109;5->9:109;7->9:109;8->18:118;12->18:118;13->18:118;15->18:118,cap=1,headway=0.0 | 23 | 190 | 0 | 2.544422 | True | Random DAG-like matched family row; layers=4-4-4-4-3; source_mode=alternating; goal_mode=uniform; sources=1:22;3:22; goals=16:18;17:17;18:9. |
+| random_topo_seed229_static_alt | fallback_event | 44 | 10->12 | merge=4->9:109;5->9:109;7->9:109;8->18:118;12->18:118;13->18:118;15->18:118,cap=1,headway=0.0 | 21 | 191 | 0 | 1.200068 | True | Random DAG-like matched family row; layers=4-4-4-4-3; source_mode=alternating; goal_mode=uniform; sources=1:22;3:22; goals=16:18;17:17;18:9. |
+| random_topo_seed233_shortcut_dense | rolling_horizon_sipp | 48 | 6->10@[3.000,12.000);12->18@[8.000,20.000) | nodes=6:2;10:2;14:2; merge=5->18:118;6->10:110;7->10:110;8->10:110;9->10:110;10->18:118;11->18:118;12->18:118;13->18:118,cap=1,headway=0.25 | 48 | 48 | 0 | 0.612399 | True | Random DAG-like matched family row; layers=5-5-4-5-3; source_mode=skewed; goal_mode=alternating; sources=0:37;1:5;2:2;3:1;4:3; goals=19:16;20:16;21:16. |
+| random_topo_seed233_shortcut_dense | periodic_replanning_sipp | 48 | 6->10@[3.000,12.000);12->18@[8.000,20.000) | nodes=6:2;10:2;14:2; merge=5->18:118;6->10:110;7->10:110;8->10:110;9->10:110;10->18:118;11->18:118;12->18:118;13->18:118,cap=1,headway=0.25 | 48 | 186 | 0 | 0.498692 | True | Random DAG-like matched family row; layers=5-5-4-5-3; source_mode=skewed; goal_mode=alternating; sources=0:37;1:5;2:2;3:1;4:3; goals=19:16;20:16;21:16. |
+| random_topo_seed233_shortcut_dense | pibt_active_bag_replay | 48 | 6->10@[3.000,12.000);12->18@[8.000,20.000) | nodes=6:2;10:2;14:2; merge=5->18:118;6->10:110;7->10:110;8->10:110;9->10:110;10->18:118;11->18:118;12->18:118;13->18:118,cap=1,headway=0.25 | 48 | 191 | 0 | 0.694545 | True | Random DAG-like matched family row; layers=5-5-4-5-3; source_mode=skewed; goal_mode=alternating; sources=0:37;1:5;2:2;3:1;4:3; goals=19:16;20:16;21:16. |
+| random_topo_seed233_shortcut_dense | edge_score_event | 48 | 6->10@[3.000,12.000);12->18@[8.000,20.000) | nodes=6:2;10:2;14:2; merge=5->18:118;6->10:110;7->10:110;8->10:110;9->10:110;10->18:118;11->18:118;12->18:118;13->18:118,cap=1,headway=0.25 | 25 | 149 | 0 | 2.429769 | True | Random DAG-like matched family row; layers=5-5-4-5-3; source_mode=skewed; goal_mode=alternating; sources=0:37;1:5;2:2;3:1;4:3; goals=19:16;20:16;21:16. |
+| random_topo_seed233_shortcut_dense | fallback_event | 48 | 6->10@[3.000,12.000);12->18@[8.000,20.000) | nodes=6:2;10:2;14:2; merge=5->18:118;6->10:110;7->10:110;8->10:110;9->10:110;10->18:118;11->18:118;12->18:118;13->18:118,cap=1,headway=0.25 | 26 | 145 | 0 | 1.137189 | True | Random DAG-like matched family row; layers=5-5-4-5-3; source_mode=skewed; goal_mode=alternating; sources=0:37;1:5;2:2;3:1;4:3; goals=19:16;20:16;21:16. |
+| random_topo_seed239_sparse_repair | rolling_horizon_sipp | 34 | 3->8@[4.000,18.000) | none | 34 | 34 | 0 | 0.599932 | True | Random DAG-like matched family row; layers=3-3-3-3-2; source_mode=burst; goal_mode=skewed; sources=0:12;1:12;2:10; goals=12:25;13:9. |
+| random_topo_seed239_sparse_repair | periodic_replanning_sipp | 34 | 3->8@[4.000,18.000) | none | 34 | 133 | 0 | 0.514740 | True | Random DAG-like matched family row; layers=3-3-3-3-2; source_mode=burst; goal_mode=skewed; sources=0:12;1:12;2:10; goals=12:25;13:9. |
+| random_topo_seed239_sparse_repair | pibt_active_bag_replay | 34 | 3->8@[4.000,18.000) | none | 34 | 245 | 0 | 0.604096 | True | Random DAG-like matched family row; layers=3-3-3-3-2; source_mode=burst; goal_mode=skewed; sources=0:12;1:12;2:10; goals=12:25;13:9. |
+| random_topo_seed239_sparse_repair | edge_score_event | 34 | 3->8@[4.000,18.000) | none | 8 | 99 | 0 | 2.146648 | True | Random DAG-like matched family row; layers=3-3-3-3-2; source_mode=burst; goal_mode=skewed; sources=0:12;1:12;2:10; goals=12:25;13:9. |
+| random_topo_seed239_sparse_repair | fallback_event | 34 | 3->8@[4.000,18.000) | none | 8 | 87 | 0 | 1.058976 | True | Random DAG-like matched family row; layers=3-3-3-3-2; source_mode=burst; goal_mode=skewed; sources=0:12;1:12;2:10; goals=12:25;13:9. |
 
 ## Legacy Event Parity Evidence
 
@@ -200,6 +235,7 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | phase9_matched_runtime_scaling | 30 | 30 | True | `outputs/tables/phase9_matched_runtime_scaling.csv` |
 | phase9_dense_pibt_stress_sweep | 12 | 12 | True | `outputs/tables/phase9_dense_pibt_stress_sweep.csv` |
 | phase9_random_topology_pibt_stress_sweep | 6 | 6 | True | `outputs/tables/phase9_random_topology_pibt_stress_sweep.csv` |
+| phase9_random_topology_matched_baseline_comparison | 30 | 30 | True | `outputs/tables/phase9_random_topology_matched_baseline_comparison.csv` |
 
 ## Gate Status
 
@@ -208,17 +244,20 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 - synthetic matched baseline rows: `25`
 - dense PIBT stress rows: `12`
 - random topology PIBT stress rows: `6`
+- random topology matched baseline rows: `30`
 - matched baseline runtime rows: `30`
 - native event parity/runtime rows: `14`
-- baseline-family parity summaries: `12`
+- baseline-family parity summaries: `13`
 - policies/baselines surfaced: `astar_guided, dagger_bc, edge_score_event, fallback_event, periodic_replanning_sipp, pibt_active_bag_replay, reference_astar, rolling_horizon_sipp`
-- parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_dense_pibt_stress_sweep, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_random_topology_pibt_stress_sweep, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
+- parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_dense_pibt_stress_sweep, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_random_topology_matched_baseline_comparison, phase9_random_topology_pibt_stress_sweep, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
 - gate-scoped post-shield conflicts are zero: PASS
 - all reported post-shield conflicts are zero: PASS
 - dense PIBT stress Python/C++ parity rows pass: PASS
 - dense PIBT stress rows are safety-clean: PASS
 - random topology PIBT stress Python/C++ parity rows pass: PASS
 - random topology PIBT stress rows are safety-clean: PASS
+- random topology matched baseline Python/C++ parity rows pass: PASS
+- random topology matched baseline rows are safety-clean: PASS
 - native event Python/C++ parity rows pass: PASS
 - baseline-family parity summaries pass: PASS
 - median C++ decision-throughput speedup in runtime rows: `1.065x`
@@ -228,6 +267,7 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 - heldout-like synthetic matched comparison: covered
 - dense active-bag PIBT stress sweep: covered
 - randomized topology/task-source PIBT stress sweep: covered
+- randomized topology/task-source matched baseline comparison: covered
 
 ## Remaining Work
 
