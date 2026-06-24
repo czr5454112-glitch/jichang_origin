@@ -710,3 +710,12 @@
 - Key observations: The master plan explicitly listed `cpp/ics_core/event_sim`, but the C++ core previously relied on later runtime replay implementations rather than a Phase1C reference simulator equivalent to Python `ReferenceSimulator`. The new C++ `ReferenceSimulator` performs deterministic sequential A* replay over `TaskStream`, writes node reservations, records planned/unplanned events, and returns summary metrics.
 - Tests / validation: Python py_compile passed for the updated backend/tests; CMake Debug build passed; CTest passed 2/2; standalone `tests/test_cpp_backend.py` passed `4 passed`; non-learning target pytest passed `38 passed`; direct pybind smoke passed.
 - Safety / parity notes: This is a non-learning simulator-port parity improvement. It does not add teacher data, BC, RL, or learned policy execution.
+
+## 2026-06-25 01:05 - Canonical Phase1 port acceptance artifacts
+
+- Request: Continue Python/C++ translation and prerequisite work only, without entering RL or learning.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added exact master-plan `tests/test_cpp_binding_smoke.py`, added `scripts/eval/run_phase1_port_acceptance.py`, generated `outputs/reports/phase1_python_cpp_port_report.md`, `outputs/tables/phase1_parity_cases.csv`, and `outputs/tables/phase1_speed_benchmark.csv`, and refreshed Phase1D/Phase1E docs.
+- Key observations: Existing Phase1 evidence was present but used narrower file names such as `phase1e_astar_py_cpp_parity.csv`. The new acceptance script emits the canonical Phase1 artifact names requested by the master plan and combines 40 `map2` start/end A* parity rows with 10 legacy `example1` ragged-heuristic rows.
+- Tests / validation: `tests/test_cpp_binding_smoke.py` passed `2 passed`; Phase1 port acceptance reported `phase1_parity_rows=50 strict_parity_pass=True speed_rows=2`; non-learning target pytest passed `40 passed`; CTest passed 2/2; direct pybind smoke passed.
+- Safety / parity notes: This is a non-learning acceptance/reporting improvement for the Python/C++ port. It does not add teacher data, BC, RL, or learned policy execution.

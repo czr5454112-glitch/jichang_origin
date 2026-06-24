@@ -63,11 +63,11 @@ Target result under `C:\PROGRAMING\czr005`:
 Target Python pytest:
 
 ```text
-pytest tests/test_cpp_backend.py tests/test_legacy_parsers.py tests/test_phase1b_sim_py.py tests/test_phase2_baselines.py
-38 passed
+pytest tests/test_cpp_binding_smoke.py tests/test_cpp_backend.py tests/test_legacy_parsers.py tests/test_phase1b_sim_py.py tests/test_phase2_baselines.py
+40 passed
 ```
 
-The pybind smoke imports `czr005_cpp`, checks map/task parser summaries, validates C++ A* paths for `0 -> 47` and `52 -> 49`, and covers the explicit `example1` ragged-heuristic compatibility mode. The Python backend tests import through `czr005.cpp_backend`, validate the same wrapper boundary, and compare C++ `reference_simulator_from_records` with the Python `ReferenceSimulator` on the same in-memory event-sim fixture.
+The pybind smoke imports `czr005_cpp`, checks map/task parser summaries, validates C++ A* paths for `0 -> 47` and `52 -> 49`, and covers the explicit `example1` ragged-heuristic compatibility mode. The Python backend and exact master-plan `tests/test_cpp_binding_smoke.py` tests import through `czr005.cpp_backend`, validate the same wrapper boundary, and compare C++ `reference_simulator_from_records` with the Python `ReferenceSimulator` on the same in-memory event-sim fixture.
 
 Standalone backend discovery also passed with only `src` on `PYTHONPATH`; `cpp_backend` found the local Debug build-tree extension without `CZR005_CPP_PYTHON_PATH`, and `tests/test_cpp_backend.py` passed `4 passed`.
 
