@@ -1,6 +1,6 @@
 # Phase1a A* Scalability Diagnosis
 
-Date: 2026-06-16
+Date: 2026-06-24
 
 ## Scope
 
@@ -20,9 +20,9 @@ Checksum parity across Python and C++ planner runs: PASS
 
 At the largest smoke size (8000 task-leg plans):
 
-- Python reference: 1.837983 seconds, 4352.60 plans/s
-- C++ pybind core: 1.516141 seconds, 5276.55 plans/s
-- C++ speedup vs Python: 1.212x
+- Python reference: 2.105450 seconds, 3799.66 plans/s
+- C++ pybind core: 1.979407 seconds, 4041.61 plans/s
+- C++ speedup vs Python: 1.064x
 
 ## Interpretation
 
@@ -31,5 +31,5 @@ The current map2 planner-only workload is small enough that both implementations
 ## Gate Status
 
 - A* bottleneck evidence: preliminary planner-only evidence produced.
-- Large-scale RL target: not yet defined from full event-simulation pressure.
+- Large-scale non-learning pressure target: defined by the Phase2 active-bag/replan-cost diagnostics, Phase8 event replay parity, and Phase9 matched/stress diagnostics; RL target remains intentionally out of scope for the current no-learning goal.
 - Baseline unfairness risk: documented; later comparisons must include reservation-heavy C++ replay and identical task/fault schedules.

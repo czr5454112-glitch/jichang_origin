@@ -10,6 +10,7 @@
 #include "ics_core/baselines/pibt.hpp"
 #include "ics_core/baselines/pibt_replay.hpp"
 #include "ics_core/baselines/periodic_replanning.hpp"
+#include "ics_core/baselines/queue_aware.hpp"
 #include "ics_core/baselines/rolling_horizon.hpp"
 #include "ics_core/event_sim/event_sim.hpp"
 #include "ics_core/graph/graph.hpp"
@@ -38,6 +39,7 @@ using czr005::ics::PIBTAgentState;
 using czr005::ics::PIBTActiveBagReplayConfig;
 using czr005::ics::PIBTStyleOneStepResolver;
 using czr005::ics::PeriodicReplanningConfig;
+using czr005::ics::QueueAwareShortestPath;
 using czr005::ics::ReferenceSimulator;
 using czr005::ics::ReservationTable;
 using czr005::ics::RollingHorizonConfig;
@@ -340,6 +342,25 @@ int main() {
 
   const auto sipp_fault_blocked = sipp_planner.plan(0, 2, 0.0, nullptr, nullptr, 1, 0.0, {{1, 2}}, 4);
   test.check(sipp_fault_blocked.empty(), "SIPP should reject a faulted only edge");
+
+  const Graph queue_graph = make_branch_graph();
+  ReservationTable queue_reservations;
+  queue_reservations.reserve(99, 1, 2.2, 8.0);
+  const SIPPPlanner queue_sipp(queue_graph);
+  const auto shortest_queue_route = queue_sipp.plan(0, 3, 0.0, &queue_reservations, nullptr, 1, 0.0, {}, 1);
+  check_route_locations(
+      test, shortest_queue_route, {0, 1, 3}, "plain SIPP should keep the shorter queued branch");
+  const QueueAwareShortestPath queue_planner(queue_graph, 3.0, 1.0, 10.0);
+  const auto queue_aware_route = queue_planner.plan(0, 3, 0.0, &queue_reservations, nullptr, 1, 0.0, {}, 1);
+  check_route_locations(
+      test, queue_aware_route, {0, 2, 3}, "queue-aware shortest path should avoid future node pressure");
+  const auto queue_ranked =
+      queue_planner.ranked_routes(0, 3, 0.0, &queue_reservations, nullptr, 1, 0.0, {}, 1);
+  test.check(queue_ranked.size() >= 2, "queue-aware planner should expose both first-hop routes");
+  if (queue_ranked.size() >= 2) {
+    test.check(queue_ranked[0].queue_penalty < queue_ranked[1].queue_penalty,
+               "queue-aware clean route should have lower queue penalty");
+  }
 
   TaskStream rolling_tasks;
   rolling_tasks.add(TaskLeg{"loose", 401, 401, 0.1, 100.0, 0, 2, 0, 2, 0.1, "direct", false, 1});

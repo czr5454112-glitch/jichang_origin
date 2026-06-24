@@ -10,6 +10,7 @@ Implemented so far:
 - node and edge reservation primitives
 - initial junction shield checks, including explicit node/buffer capacity and merge groups
 - C++ SIPP planner parity over node/edge reservations and synthetic routes
+- C++ QueueAwareShortestPath smoke over SIPP routes with future queue-pressure penalties
 - C++ rolling-horizon SIPP parity over priority, fault, edge capacity/headway, node buffer capacity, and synthetic schedules
 - C++ route-discarding periodic SIPP replanning parity over active-bag, edge capacity, node buffer capacity, static-fault, repair-window, and synthetic slices
 - C++ PIBT-style resolver parity over priority, merge, fault, reservation, hold-duration, bounded recursive handoff, and synthetic slices

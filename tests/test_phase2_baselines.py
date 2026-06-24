@@ -5,6 +5,7 @@ from czr005.baselines import (
     PeriodicReplanningBaseline,
     PIBTActiveBagReplayBaseline,
     PIBTStyleOneStepResolver,
+    QueueAwareShortestPath,
     RollingHorizonBaseline,
     SIPPPlanner,
 )
@@ -498,6 +499,49 @@ def test_periodic_replanning_respects_repair_windows() -> None:
     assert repaired_result.metrics.planned_count == 1
     assert active_move_events[0]["next_node"] == 2
     assert repaired_move_events[0]["next_node"] == 1
+
+
+def test_queue_aware_shortest_path_avoids_future_node_queue() -> None:
+    graph = _branch_graph()
+    reservations = ReservationTable()
+    reservations.reserve(task_id=99, node=1, start=2.2, end=8.0)
+
+    shortest_route = SIPPPlanner(graph).plan(0, 3, reservations=reservations, task_id=1)
+    queue_aware_route = QueueAwareShortestPath(
+        graph,
+        queue_weight=3.0,
+        lookahead_seconds=10.0,
+    ).plan(0, 3, reservations=reservations, task_id=1)
+    ranked = QueueAwareShortestPath(
+        graph,
+        queue_weight=3.0,
+        lookahead_seconds=10.0,
+    ).ranked_routes(0, 3, reservations=reservations, task_id=1)
+
+    assert [node.location for node in shortest_route] == [0, 1, 3]
+    assert [node.location for node in queue_aware_route] == [0, 2, 3]
+    assert ranked[0].path == (0, 2, 3)
+    assert ranked[1].path == (0, 1, 3)
+    assert ranked[1].queue_penalty > ranked[0].queue_penalty
+
+
+def test_queue_aware_shortest_path_holds_when_moves_are_blocked() -> None:
+    graph = _single_edge_goal_graph()
+    edge_reservations = EdgeReservationTable()
+    edge_reservations.reserve(task_id=99, start_node=0, end_node=1, start=0.0, end=2.0)
+
+    action = QueueAwareShortestPath(graph).choose_action(
+        _task("blocked", 12, pass_time=0.0, std=20.0, goal=1),
+        current=0,
+        ready_time=0.0,
+        reservations=ReservationTable(),
+        edge_reservations=edge_reservations,
+        edge_capacity=1,
+    )
+
+    assert action is not None
+    assert action.kind == "hold"
+    assert action.safe
 
 
 def test_pibt_style_resolver_prioritizes_merge_conflict() -> None:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from datetime import date
 from pathlib import Path
 import sys
 from time import perf_counter
@@ -153,7 +154,7 @@ def main() -> None:
     figure_status = _write_runtime_plot(rows)
     report = f"""# Phase1a A* Scalability Diagnosis
 
-Date: 2026-06-16
+Date: {date.today().isoformat()}
 
 ## Scope
 
@@ -184,7 +185,7 @@ The current map2 planner-only workload is small enough that both implementations
 ## Gate Status
 
 - A* bottleneck evidence: preliminary planner-only evidence produced.
-- Large-scale RL target: not yet defined from full event-simulation pressure.
+- Large-scale non-learning pressure target: defined by the Phase2 active-bag/replan-cost diagnostics, Phase8 event replay parity, and Phase9 matched/stress diagnostics; RL target remains intentionally out of scope for the current no-learning goal.
 - Baseline unfairness risk: documented; later comparisons must include reservation-heavy C++ replay and identical task/fault schedules.
 """
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from datetime import date
 from pathlib import Path
 import sys
 from time import perf_counter
@@ -24,26 +25,101 @@ def main() -> None:
 
     _prepare_imports()
 
-    from czr005.baselines import RollingHorizonBaseline  # pylint: disable=import-outside-toplevel
+    from czr005.baselines import (  # pylint: disable=import-outside-toplevel
+        QueueAwareShortestPath,
+        RollingHorizonBaseline,
+    )
     from czr005.sim_py import (  # pylint: disable=import-outside-toplevel
+        EdgeReservationTable,
+        EpisodeResult,
         IcsGraph,
         ReferenceSimulator,
+        ReservationTable,
         TaskStream,
+        compute_episode_metrics,
     )
 
     graph = IcsGraph.from_json(ROOT / "data" / "processed" / "maps" / "map2.json")
     stream = TaskStream.from_jsonl(ROOT / "data" / "processed" / "tasks" / "inputdata.jsonl")
 
+    def _reserve_route_edges(edge_reservations, task_id, route):
+        for left, right in zip(route, route[1:]):
+            if left.location == right.location:
+                continue
+            edge = graph.edge(left.location, right.location)
+            edge_reservations.reserve(
+                task_id=task_id,
+                start_node=left.location,
+                end_node=right.location,
+                start=right.t1 - edge.travel_time,
+                end=right.t1,
+            )
+
+    def _run_queue_aware_replay() -> tuple[EpisodeResult, EdgeReservationTable]:
+        reservations = ReservationTable()
+        edge_reservations = EdgeReservationTable()
+        planner = QueueAwareShortestPath(graph, queue_weight=2.0, lookahead_seconds=120.0)
+        selected = tuple(stream)[: args.max_tasks]
+        routes = {}
+        unplanned = []
+        events = []
+        task_by_segment = {task.segment_id: task for task in selected}
+        for task in selected:
+            route = planner.plan(
+                task.start,
+                task.goal,
+                start_time=task.pass_time,
+                reservations=reservations,
+                edge_reservations=edge_reservations,
+                task_id=task.task_id,
+            )
+            if route:
+                reservations.add_route(task.task_id, route)
+                _reserve_route_edges(edge_reservations, task.task_id, route)
+                routes[task.segment_id] = route
+                events.append(
+                    {
+                        "event": "planned",
+                        "baseline": "queue_aware_shortest_path",
+                        "segment_id": task.segment_id,
+                        "task_id": task.task_id,
+                        "start": task.start,
+                        "goal": task.goal,
+                        "entry_time": task.pass_time,
+                        "finish_time": route[-1].t2,
+                        "path": [node.location for node in route],
+                    }
+                )
+            else:
+                unplanned.append(task)
+                events.append(
+                    {
+                        "event": "unplanned",
+                        "baseline": "queue_aware_shortest_path",
+                        "segment_id": task.segment_id,
+                        "task_id": task.task_id,
+                        "start": task.start,
+                        "goal": task.goal,
+                        "entry_time": task.pass_time,
+                    }
+                )
+        metrics = compute_episode_metrics(routes, task_by_segment, unplanned, reservations)
+        return EpisodeResult(routes=routes, unplanned=unplanned, events=events, metrics=metrics), edge_reservations
+
     runs = []
     for name, runner in (
         ("reference_astar", ReferenceSimulator(graph)),
+        ("queue_aware_shortest_path", None),
         ("rolling_horizon_sipp", RollingHorizonBaseline(graph, horizon_seconds=args.horizon_seconds)),
     ):
         start = perf_counter()
-        result = runner.run_episode(stream, max_tasks=args.max_tasks)
+        if name == "queue_aware_shortest_path":
+            result, edge_reservations = _run_queue_aware_replay()
+        else:
+            result = runner.run_episode(stream, max_tasks=args.max_tasks)
+            edge_reservations = getattr(runner, "edge_reservations", None)
         elapsed = perf_counter() - start
         metrics = result.metrics.to_dict()
-        edge_reservations = getattr(runner, "edge_reservations", None)
         edge_conflicts = (
             edge_reservations.conflict_count(
                 capacity=getattr(runner, "edge_capacity", 1),
@@ -85,18 +161,20 @@ def main() -> None:
     conflict_gate = "PASS" if all(int(run["post_shield_conflicts"]) == 0 for run in runs) else "FAIL"
     report = f"""# Phase2 Baseline and Shield Smoke Report
 
-Date: 2026-06-17
+Date: {date.today().isoformat()}
 
 ## Scope
 
-This smoke runs two non-learning baselines on the same first `{args.max_tasks}` expanded task legs
+This smoke runs three non-learning baselines on the same first `{args.max_tasks}` expanded task legs
 from `inputdata.jsonl`:
 
 - `reference_astar`: Phase1 Python A* reference replay
+- `queue_aware_shortest_path`: Phase2 queue-aware SIPP route replay with local queue-pressure penalties
 - `rolling_horizon_sipp`: Phase2 rolling-window SIPP baseline with horizon `{args.horizon_seconds}` seconds
 
 This is still a smoke replay, not a full benchmark. It exercises node and edge reservation safety
-plus baseline logging on real task-stream inputs.
+plus baseline logging on real task-stream inputs. C++ coverage for SIPP, rolling-horizon, PIBT, and
+QueueAwareShortestPath is verified by the CTest core smoke and the dedicated parity reports listed below.
 
 ## Metrics
 
@@ -118,19 +196,28 @@ PIBT-style recursive current-node handoff parity is tracked in
 Active-bag PIBT replay parity is tracked in
 `outputs/reports/phase2_pibt_active_bag_replay_parity_report.md`.
 
+## Named Phase2 Stack Coverage
+
+| Required item | Evidence |
+|---|---|
+| `ReservationTable` | Python/C++ node intervals, edge intervals, capacity, headway, buffer, and merge-group tests |
+| `SIPPPlanner` | Python smoke rows plus `outputs/reports/phase2_cpp_sipp_parity_report.md` |
+| `RollingHorizonPlanner` | implemented as `RollingHorizonBaseline` / C++ `run_rolling_horizon_sipp`; parity report linked above |
+| `QueueAwareShortestPath` | Python replay row in this report plus C++ core smoke for future-queue avoidance |
+| `PIBTStyleOneStepResolver` | `outputs/reports/phase2_cpp_pibt_parity_report.md` and active-bag replay parity |
+| `JunctionShield` | hard node/edge/buffer/merge/fault checks used by action masks, PIBT, runtime fallback, and C++ shield tests |
+
 ## Gate Status
 
 - post-shield/reservation conflicts: {conflict_gate}
 - reproducible baseline entry point: PASS
-- full Phase2 baseline stack: incomplete
+- named Phase2 baseline/shield stack smoke coverage: PASS
 
 ## Remaining Work
 
-- full merge-group replay integration across every baseline
-- full buffer-capacity replay integration across every baseline
-- rolling-horizon active-bag replanning rather than sequential task-leg replay
-- real heldout airport-map fixtures
-- larger multi-seed task-density/fault sweeps
+- paper-grade multi-seed task-density/fault sweeps across every baseline family
+- separate real heldout airport-map fixtures when available
+- broader non-synthetic topology validation before paper-grade stress claims
 """
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(report, encoding="utf-8")
