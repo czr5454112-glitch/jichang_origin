@@ -701,3 +701,12 @@
 - Key observations: The master plan explicitly called for `src/czr005/cpp_backend.py`, while the existing scripts and pybind smoke imported `czr005_cpp` directly from manually configured build-tree paths. The new wrapper centralizes build-tree discovery through `CZR005_CPP_PYTHON_PATH`, `build_vs/python/Debug`, `build_vs/python/Release`, and `build_nmake/python`, then exposes thin non-learning wrappers for legacy map/task summaries, A* routes, batch routes, and route benchmarks.
 - Tests / validation: `py_compile src/czr005/cpp_backend.py` passed; non-learning target pytest passed `37 passed`; standalone default-discovery `tests/test_cpp_backend.py` passed `3 passed`; CTest passed 2/2; direct pybind smoke passed.
 - Safety / parity notes: This is a packaging/boundary improvement for the existing C++ extension. It does not add teacher data, BC, RL, or learning-policy execution.
+
+## 2026-06-25 00:40 - Phase1C C++ reference event simulator parity
+
+- Request: Continue Python/C++ translation and prerequisite work only, without entering RL or learning.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `cpp/ics_core/event_sim/event_sim.hpp`, exposed `reference_simulator_from_records` through pybind and `czr005.cpp_backend`, expanded C++ core smoke and backend parity tests, and refreshed Phase1C/Phase1D/README status docs.
+- Key observations: The master plan explicitly listed `cpp/ics_core/event_sim`, but the C++ core previously relied on later runtime replay implementations rather than a Phase1C reference simulator equivalent to Python `ReferenceSimulator`. The new C++ `ReferenceSimulator` performs deterministic sequential A* replay over `TaskStream`, writes node reservations, records planned/unplanned events, and returns summary metrics.
+- Tests / validation: Python py_compile passed for the updated backend/tests; CMake Debug build passed; CTest passed 2/2; standalone `tests/test_cpp_backend.py` passed `4 passed`; non-learning target pytest passed `38 passed`; direct pybind smoke passed.
+- Safety / parity notes: This is a non-learning simulator-port parity improvement. It does not add teacher data, BC, RL, or learned policy execution.

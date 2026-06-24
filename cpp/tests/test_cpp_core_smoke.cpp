@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -10,6 +11,7 @@
 #include "ics_core/baselines/pibt_replay.hpp"
 #include "ics_core/baselines/periodic_replanning.hpp"
 #include "ics_core/baselines/rolling_horizon.hpp"
+#include "ics_core/event_sim/event_sim.hpp"
 #include "ics_core/graph/graph.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
@@ -36,6 +38,7 @@ using czr005::ics::PIBTAgentState;
 using czr005::ics::PIBTActiveBagReplayConfig;
 using czr005::ics::PIBTStyleOneStepResolver;
 using czr005::ics::PeriodicReplanningConfig;
+using czr005::ics::ReferenceSimulator;
 using czr005::ics::ReservationTable;
 using czr005::ics::RollingHorizonConfig;
 using czr005::ics::RollingHorizonFaultWindow;
@@ -226,6 +229,43 @@ int main() {
 
   const auto blocked = planner.plan(0, 2, 0.0, &reservations, {}, 2);
   test.check(blocked.empty(), "sample conflicting route should be blocked");
+
+  TaskStream reference_tasks;
+  reference_tasks.add(TaskLeg{"reference-first", 201, 201, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", false, 1});
+  reference_tasks.add(TaskLeg{"reference-second", 202, 202, 6.0, 30.0, 0, 2, 0, 2, 6.0, "direct", false, 2});
+  reference_tasks.sort_by_pass_time();
+  ReferenceSimulator reference_simulator(graph);
+  const auto reference_result = reference_simulator.run_episode(reference_tasks, 2);
+  test.check(reference_result.metrics.planned_count == 2,
+             "reference simulator should plan two non-overlapping sample tasks");
+  test.check(reference_result.metrics.unplanned_count == 0,
+             "reference simulator should not leave non-overlapping sample tasks unplanned");
+  test.check(reference_result.metrics.reservation_conflicts == 0,
+             "reference simulator should keep node reservations conflict-free");
+  test.check(reference_result.events.size() == 2,
+             "reference simulator should emit one event per considered task");
+  if (reference_result.events.size() == 2) {
+    test.check(reference_result.events[0].event == "planned",
+               "reference simulator first event should be planned");
+    test.check(reference_result.events[0].path == std::vector<int>({0, 1, 2}),
+               "reference simulator first event path should match A*");
+    test.check(reference_result.events[1].segment_id == "reference-second",
+               "reference simulator should preserve second segment id");
+  }
+
+  ReferenceSimulator reference_fault_simulator(graph);
+  const auto reference_fault_result =
+      reference_fault_simulator.run_episode(reference_tasks, 1, std::nullopt, {{1, 2}});
+  test.check(reference_fault_result.metrics.planned_count == 0,
+             "reference simulator should not plan through a faulted only edge");
+  test.check(reference_fault_result.metrics.unplanned_count == 1,
+             "reference simulator should emit an unplanned result for a faulted only edge");
+  test.check(reference_fault_result.events.size() == 1,
+             "reference simulator should honor max_tasks for faulted sample task");
+  if (!reference_fault_result.events.empty()) {
+    test.check(reference_fault_result.events[0].event == "unplanned",
+               "reference simulator fault event should be unplanned");
+  }
 
   ReservationTable sipp_node_reservations;
   sipp_node_reservations.reserve(99, 1, 2.0, 3.0);

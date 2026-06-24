@@ -5,10 +5,30 @@ from pathlib import Path
 import pytest
 
 from czr005 import cpp_backend
+from czr005.sim_py import IcsGraph, ReferenceSimulator, SimEdge, SimNode, TaskLeg, TaskStream
 
 
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY = ROOT / "legacy" / "jichang_origin_readonly"
+
+NODE_RECORDS = [
+    (0, 1, 0.0, 0, 0, [1]),
+    (1, 4, 1.0, 1, 0, [2]),
+    (2, 2, 0.0, 2, 0, []),
+]
+EDGE_RECORDS = [
+    (0, 1, 5.0, 2.5),
+    (1, 2, 5.0, 2.5),
+]
+HEURISTIC_TIME = [
+    [0.0, 2.0, 4.0],
+    [4.0, 0.0, 2.0],
+    [4.0, 2.0, 0.0],
+]
+TASK_RECORDS = [
+    ("reference-first", 201, 201, 0.0, 20.0, 0, 2, 0, 2, 0.0, "direct", False, 1),
+    ("reference-second", 202, 202, 6.0, 30.0, 0, 2, 0, 2, 6.0, "direct", False, 2),
+]
 
 
 def _require_cpp_backend() -> None:
@@ -71,3 +91,54 @@ def test_cpp_backend_example1_ragged_heuristic_mode() -> None:
         9,
         allow_ragged_heuristic=True,
     ) == [10, 2, 4, 6, 7, 9]
+
+
+def test_cpp_backend_reference_simulator_matches_python_reference() -> None:
+    _require_cpp_backend()
+
+    graph = IcsGraph(
+        nodes={
+            location: SimNode(location, node_type, service_time, x, y, tuple(outgoing))
+            for location, node_type, service_time, x, y, outgoing in NODE_RECORDS
+        },
+        edges={(start, end): SimEdge(start, end, length, speed) for start, end, length, speed in EDGE_RECORDS},
+        heuristic_time=tuple(tuple(row) for row in HEURISTIC_TIME),
+        agv_length=1.0,
+        safe_length=1.0,
+        fault_threshold=4.0,
+    )
+    tasks = TaskStream(TaskLeg(*record) for record in TASK_RECORDS)
+    python_result = ReferenceSimulator(graph).run_episode(tasks, max_tasks=2)
+
+    cpp_result = cpp_backend.reference_simulator_from_records(
+        NODE_RECORDS,
+        EDGE_RECORDS,
+        HEURISTIC_TIME,
+        TASK_RECORDS,
+        max_tasks=2,
+    )
+
+    assert cpp_result["metrics"]["planned_count"] == python_result.metrics.planned_count
+    assert cpp_result["metrics"]["unplanned_count"] == python_result.metrics.unplanned_count
+    assert cpp_result["metrics"]["reservation_conflicts"] == python_result.metrics.reservation_conflicts
+    assert cpp_result["metrics"]["mean_travel_time"] == python_result.metrics.mean_travel_time
+    assert cpp_result["metrics"]["makespan"] == python_result.metrics.makespan
+    assert [event["event"] for event in cpp_result["events"]] == [
+        event["event"] for event in python_result.events
+    ]
+    assert [event["path"] for event in cpp_result["events"]] == [
+        event["path"] for event in python_result.events
+    ]
+
+    cpp_fault_result = cpp_backend.reference_simulator_from_records(
+        NODE_RECORDS,
+        EDGE_RECORDS,
+        HEURISTIC_TIME,
+        TASK_RECORDS,
+        max_tasks=1,
+        fault_edges=[(1, 2)],
+    )
+
+    assert cpp_fault_result["metrics"]["planned_count"] == 0
+    assert cpp_fault_result["metrics"]["unplanned_count"] == 1
+    assert cpp_fault_result["events"][0]["event"] == "unplanned"

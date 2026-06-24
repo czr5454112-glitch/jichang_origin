@@ -156,3 +156,67 @@ def benchmark_legacy_map_paths(
             allow_ragged_heuristic=allow_ragged_heuristic,
         )
     )
+
+
+def reference_simulator_from_records(
+    node_records: Sequence[tuple[int, int, float, int, int, Sequence[int]]],
+    edge_records: Sequence[tuple[int, int, float, float]],
+    heuristic_time: Sequence[Sequence[float]],
+    task_records: Sequence[
+        tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
+    ],
+    *,
+    max_tasks: int = -1,
+    end_time: float = -1.0,
+    fault_edges: Sequence[tuple[int, int]] = (),
+    search_path: PathLike | None = None,
+) -> dict[str, Any]:
+    module = load_cpp_module(search_path)
+    return dict(
+        module.reference_simulator_from_records(
+            [
+                (int(location), int(node_type), float(service_time), int(x), int(y), [int(value) for value in outgoing])
+                for location, node_type, service_time, x, y, outgoing in node_records
+            ],
+            [
+                (int(start), int(end), float(length), float(speed))
+                for start, end, length, speed in edge_records
+            ],
+            [[float(value) for value in row] for row in heuristic_time],
+            [
+                (
+                    str(segment_id),
+                    int(task_id),
+                    int(pallet_id),
+                    float(pass_time),
+                    float(std),
+                    int(start),
+                    int(goal),
+                    int(original_start),
+                    int(original_goal),
+                    float(original_entry_time),
+                    str(leg),
+                    bool(early_bag_split),
+                    int(source_line),
+                )
+                for (
+                    segment_id,
+                    task_id,
+                    pallet_id,
+                    pass_time,
+                    std,
+                    start,
+                    goal,
+                    original_start,
+                    original_goal,
+                    original_entry_time,
+                    leg,
+                    early_bag_split,
+                    source_line,
+                ) in task_records
+            ],
+            max_tasks=int(max_tasks),
+            end_time=float(end_time),
+            fault_edges=[(int(start), int(end)) for start, end in fault_edges],
+        )
+    )

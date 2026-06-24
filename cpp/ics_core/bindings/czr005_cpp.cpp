@@ -1,5 +1,6 @@
 #include <chrono>
 #include <map>
+#include <optional>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -15,6 +16,7 @@
 #include "ics_core/baselines/pibt_replay.hpp"
 #include "ics_core/baselines/periodic_replanning.hpp"
 #include "ics_core/baselines/rolling_horizon.hpp"
+#include "ics_core/event_sim/event_sim.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
 #include "ics_core/models/edge_score.hpp"
@@ -335,6 +337,83 @@ czr005::ics::TaskStream task_stream_from_records(const std::vector<TaskRecordTup
   }
   stream.sort_by_pass_time();
   return stream;
+}
+
+py::dict episode_metrics_row(const czr005::ics::EpisodeMetrics& metrics) {
+  py::dict row;
+  row["planned_count"] = metrics.planned_count;
+  row["unplanned_count"] = metrics.unplanned_count;
+  row["mean_travel_time"] = metrics.mean_travel_time;
+  row["makespan"] = metrics.makespan;
+  row["reservation_conflicts"] = metrics.reservation_conflicts;
+  return row;
+}
+
+py::dict reference_event_row(const czr005::ics::ReferenceSimEvent& event) {
+  py::dict row;
+  row["event"] = event.event;
+  row["segment_id"] = event.segment_id;
+  row["task_id"] = event.task_id;
+  row["start"] = event.start;
+  row["goal"] = event.goal;
+  row["entry_time"] = event.entry_time;
+  if (event.event == "planned") {
+    row["finish_time"] = event.finish_time;
+    row["path"] = event.path;
+  }
+  return row;
+}
+
+py::dict reference_episode_result_row(const czr005::ics::ReferenceEpisodeResult& result) {
+  py::dict row;
+  py::dict routes;
+  for (const auto& route_entry : result.routes) {
+    routes[py::str(route_entry.first)] = path_node_rows(route_entry.second);
+  }
+  py::list unplanned;
+  for (const auto& task : result.unplanned) {
+    py::dict task_row;
+    task_row["segment_id"] = task.segment_id;
+    task_row["task_id"] = task.task_id;
+    task_row["start"] = task.start;
+    task_row["goal"] = task.goal;
+    task_row["pass_time"] = task.pass_time;
+    task_row["std"] = task.std;
+    unplanned.append(task_row);
+  }
+  py::list events;
+  for (const auto& event : result.events) {
+    events.append(reference_event_row(event));
+  }
+  row["routes"] = routes;
+  row["unplanned"] = unplanned;
+  row["events"] = events;
+  row["metrics"] = episode_metrics_row(result.metrics);
+  return row;
+}
+
+py::dict reference_simulator_from_records(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    const std::vector<TaskRecordTuple>& task_records,
+    int max_tasks,
+    double end_time,
+    const std::vector<std::pair<int, int>>& fault_edges) {
+  const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
+  const auto stream = task_stream_from_records(task_records);
+  std::optional<int> max_tasks_opt;
+  if (max_tasks >= 0) {
+    max_tasks_opt = max_tasks;
+  }
+  std::optional<double> end_time_opt;
+  if (end_time >= 0.0) {
+    end_time_opt = end_time;
+  }
+  const std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
+  czr005::ics::ReferenceSimulator simulator(graph);
+  return reference_episode_result_row(
+      simulator.run_episode(stream, max_tasks_opt, end_time_opt, faults));
 }
 
 czr005::ics::ReservationTable node_reservations_from_tuples(
@@ -1248,6 +1327,15 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
              py::arg("merge_capacity") = 1,
              py::arg("merge_headway_seconds") = 0.0);
+  module.def("reference_simulator_from_records",
+             &reference_simulator_from_records,
+             py::arg("node_records"),
+             py::arg("edge_records"),
+             py::arg("heuristic_time"),
+             py::arg("task_records"),
+             py::arg("max_tasks") = -1,
+             py::arg("end_time") = -1.0,
+             py::arg("fault_edges") = std::vector<std::pair<int, int>>{});
   module.def("sipp_plan_from_records",
              &sipp_plan_from_records,
              py::arg("node_records"),

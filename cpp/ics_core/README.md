@@ -6,6 +6,7 @@ Implemented so far:
 
 - legacy map/task readers, including explicit Java-compatible ragged-heuristic mode for `example1/map.txt`
 - A* planner and route smoke parity, including `map2` and legacy `example1` pybind coverage
+- Phase1C reference event simulator using A* + node reservations, with Python/C++ records parity through `czr005.cpp_backend`
 - node and edge reservation primitives
 - initial junction shield checks, including explicit node/buffer capacity and merge groups
 - C++ SIPP planner parity over node/edge reservations and synthetic routes
