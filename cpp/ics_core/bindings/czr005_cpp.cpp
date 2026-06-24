@@ -73,8 +73,9 @@ py::list path_node_rows(const std::vector<czr005::ics::PathNode>& route) {
   return rows;
 }
 
-py::dict read_legacy_map_summary(const std::string& path) {
-  const auto legacy = czr005::ics::read_legacy_map2(path);
+py::dict read_legacy_map_summary(const std::string& path,
+                                 bool allow_ragged_heuristic = false) {
+  const auto legacy = czr005::ics::read_legacy_map2(path, 2.5, allow_ragged_heuristic);
   py::dict summary;
   summary["declared_node_count"] = legacy.declared_node_count;
   summary["node_count"] = legacy.graph.node_count();
@@ -106,16 +107,20 @@ py::dict read_legacy_task_summary(const std::string& path) {
   return summary;
 }
 
-std::vector<int> plan_legacy_map_path(const std::string& map_path, int start, int goal) {
-  const auto legacy = czr005::ics::read_legacy_map2(map_path);
+std::vector<int> plan_legacy_map_path(const std::string& map_path,
+                                      int start,
+                                      int goal,
+                                      bool allow_ragged_heuristic = false) {
+  const auto legacy = czr005::ics::read_legacy_map2(map_path, 2.5, allow_ragged_heuristic);
   const czr005::ics::AStarPlanner planner(legacy.graph);
   return route_locations(planner.plan(start, goal));
 }
 
 std::vector<std::vector<int>> plan_legacy_map_paths(
     const std::string& map_path,
-    const std::vector<std::pair<int, int>>& cases) {
-  const auto legacy = czr005::ics::read_legacy_map2(map_path);
+    const std::vector<std::pair<int, int>>& cases,
+    bool allow_ragged_heuristic = false) {
+  const auto legacy = czr005::ics::read_legacy_map2(map_path, 2.5, allow_ragged_heuristic);
   const czr005::ics::AStarPlanner planner(legacy.graph);
 
   std::vector<std::vector<int>> routes;
@@ -128,8 +133,9 @@ std::vector<std::vector<int>> plan_legacy_map_paths(
 
 py::dict benchmark_legacy_map_paths(const std::string& map_path,
                                     const std::vector<std::pair<int, int>>& cases,
-                                    int repeats) {
-  const auto legacy = czr005::ics::read_legacy_map2(map_path);
+                                    int repeats,
+                                    bool allow_ragged_heuristic = false) {
+  const auto legacy = czr005::ics::read_legacy_map2(map_path, 2.5, allow_ragged_heuristic);
   const czr005::ics::AStarPlanner planner(legacy.graph);
 
   int checksum = 0;
@@ -1163,22 +1169,28 @@ PYBIND11_MODULE(czr005_cpp, module) {
       .def_property_readonly("feature_dim", &czr005::ics::EdgeScoreModel::feature_dim)
       .def_property_readonly("hidden_dim", &czr005::ics::EdgeScoreModel::hidden_dim);
 
-  module.def("read_legacy_map_summary", &read_legacy_map_summary, py::arg("path"));
+  module.def("read_legacy_map_summary",
+             &read_legacy_map_summary,
+             py::arg("path"),
+             py::arg("allow_ragged_heuristic") = false);
   module.def("read_legacy_task_summary", &read_legacy_task_summary, py::arg("path"));
   module.def("plan_legacy_map_path",
              &plan_legacy_map_path,
              py::arg("map_path"),
              py::arg("start"),
-             py::arg("goal"));
+             py::arg("goal"),
+             py::arg("allow_ragged_heuristic") = false);
   module.def("plan_legacy_map_paths",
              &plan_legacy_map_paths,
              py::arg("map_path"),
-             py::arg("cases"));
+             py::arg("cases"),
+             py::arg("allow_ragged_heuristic") = false);
   module.def("benchmark_legacy_map_paths",
              &benchmark_legacy_map_paths,
              py::arg("map_path"),
              py::arg("cases"),
-             py::arg("repeats") = 100);
+             py::arg("repeats") = 100,
+             py::arg("allow_ragged_heuristic") = false);
   module.def("edge_score_scores",
              &edge_score_scores,
              py::arg("w1"),

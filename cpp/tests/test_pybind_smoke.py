@@ -47,6 +47,39 @@ def main() -> None:
     assert benchmark["total_plans"] == 4
     assert benchmark["checksum"] == 32
 
+    example_map = LEGACY / "example1" / "map.txt"
+    try:
+        czr005_cpp.read_legacy_map_summary(str(example_map))
+    except RuntimeError as exc:
+        assert "heuristic row" in str(exc)
+    else:
+        raise AssertionError("example1 ragged heuristic map should require compatibility mode")
+
+    example_summary = czr005_cpp.read_legacy_map_summary(
+        str(example_map),
+        allow_ragged_heuristic=True,
+    )
+    assert example_summary["declared_node_count"] == 11
+    assert example_summary["node_count"] == 11
+    assert example_summary["heuristic_rows"] == 11
+    assert example_summary["edge_count"] == 13
+    assert example_summary["type_1_count"] == 2
+    assert example_summary["type_2_count"] == 1
+    assert czr005_cpp.plan_legacy_map_path(
+        str(example_map),
+        0,
+        9,
+        allow_ragged_heuristic=True,
+    ) == [0, 1, 3, 5, 8, 9]
+    assert czr005_cpp.plan_legacy_map_paths(
+        str(example_map),
+        [(0, 9), (10, 9)],
+        allow_ragged_heuristic=True,
+    ) == [
+        [0, 1, 3, 5, 8, 9],
+        [10, 2, 4, 6, 7, 9],
+    ]
+
     w1 = [[0.1, -0.2], [0.3, 0.4], [-0.5, 0.25]]
     b1 = [0.01, -0.02]
     w2 = [0.7, -0.6]

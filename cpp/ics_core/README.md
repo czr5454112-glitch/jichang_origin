@@ -4,8 +4,8 @@ This directory contains the C++ core for graph loading, task streams, routing, r
 
 Implemented so far:
 
-- legacy map/task readers
-- A* planner and route smoke parity
+- legacy map/task readers, including explicit Java-compatible ragged-heuristic mode for `example1/map.txt`
+- A* planner and route smoke parity, including `map2` and legacy `example1` pybind coverage
 - node and edge reservation primitives
 - initial junction shield checks, including explicit node/buffer capacity and merge groups
 - C++ SIPP planner parity over node/edge reservations and synthetic routes

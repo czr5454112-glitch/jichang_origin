@@ -681,3 +681,14 @@
 - Tests / validation: Random-topology matched baseline comparison reported `rows=30 scenarios=6 families=5`; every row matched Python/C++ summary metrics and had `0/0` post-shield conflicts. Regenerated unified comparison reported `rows=177 outcome_rows=17 event_rows=14 parity_families=13`; all reported safety, random-topology matched parity, dense/random PIBT stress parity, event parity, and baseline-family parity gates passed.
 - Safety / parity notes: Randomized topology/task-source all-family parity is now covered at the synthetic DAG-like level. This still is not a separate real heldout airport map, non-synthetic topology corpus, or paper-grade benchmark.
 - Follow-up: add real heldout airport-map fixtures if available and expand timing to multi-machine hardware-normalized runs before paper-grade claims.
+
+## 2026-06-24 23:45 - Legacy example1 ragged-map A* parity
+
+- Request: Continue the Python/C++ port objective, but keep the scope limited to non-learning translation prerequisites and do not enter RL or learning work.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added explicit Java-compatible ragged-heuristic parsing mode to Python and C++ legacy map readers, exposed the compatibility flag through pybind map/A* helpers, expanded parser and pybind smoke coverage, added `scripts/eval/run_phase1_legacy_example1_astar_parity.py`, generated `outputs/tables/phase1_legacy_example1_astar_parity.csv` plus `outputs/reports/phase1_legacy_example1_astar_parity_report.md`, and refreshed README/C++ status docs.
+- Commands run: Python py_compile, `pytest tests/test_legacy_parsers.py -q`, CMake Debug build through the VS developer command prompt, CTest, direct pybind smoke script, and the new legacy `example1` A* parity diagnostic.
+- Key observations: `legacy/jichang_origin_readonly/example1/map.txt` has a final heuristic row with 10 values while the header declares 11 nodes. Java accepts that by leaving the missing `double[][]` cell at `0.0`; Python and C++ now preserve strict default parsing and require `allow_ragged_heuristic=True` to emulate that Java behavior.
+- Tests / validation: parser tests passed `4 passed`; CTest passed 2/2; direct pybind smoke passed; example1 A* parity reported `example1_cases=10 parity_pass=True anchor_pass=True`.
+- Safety / parity notes: This is a non-learning Phase1 parser/A* parity fixture over the bundled legacy example topology. It does not add RL, teacher data, BC training, or learning-policy evidence.
+- Follow-up: keep remaining work focused on Python/C++ translation gates and prerequisite non-learning baseline/runtime parity; do not start RL or learning unless the user explicitly changes scope.

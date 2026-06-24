@@ -21,7 +21,9 @@ struct LegacyMapReadResult {
   double fault_threshold = 0.0;
 };
 
-inline LegacyMapReadResult read_legacy_map2(const std::string& path, double edge_speed = 2.5) {
+inline LegacyMapReadResult read_legacy_map2(const std::string& path,
+                                            double edge_speed = 2.5,
+                                            bool allow_ragged_heuristic = false) {
   std::ifstream input(path);
   if (!input) {
     throw std::runtime_error("failed to open legacy map: " + path);
@@ -72,8 +74,15 @@ inline LegacyMapReadResult read_legacy_map2(const std::string& path, double edge
     while (stream >> value) {
       values.push_back(value / edge_speed);
     }
-    if (static_cast<int>(values.size()) != result.declared_node_count) {
+    if (static_cast<int>(values.size()) != result.declared_node_count &&
+        !allow_ragged_heuristic) {
       throw std::runtime_error("invalid heuristic row width");
+    }
+    if (static_cast<int>(values.size()) > result.declared_node_count) {
+      throw std::runtime_error("invalid heuristic row width");
+    }
+    while (static_cast<int>(values.size()) < result.declared_node_count) {
+      values.push_back(0.0);
     }
     heuristic.push_back(std::move(values));
     ++result.heuristic_rows;

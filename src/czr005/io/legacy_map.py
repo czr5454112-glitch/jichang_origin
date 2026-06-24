@@ -101,7 +101,11 @@ class LegacyMap:
         }
 
 
-def parse_legacy_map(path: str | Path, edge_speed: float = DEFAULT_EDGE_SPEED) -> LegacyMap:
+def parse_legacy_map(
+    path: str | Path,
+    edge_speed: float = DEFAULT_EDGE_SPEED,
+    allow_ragged_heuristic: bool = False,
+) -> LegacyMap:
     map_path = Path(path)
     lines = map_path.read_text(encoding="utf-8").splitlines()
     if not lines:
@@ -153,10 +157,16 @@ def parse_legacy_map(path: str | Path, edge_speed: float = DEFAULT_EDGE_SPEED) -
     for offset in range(header.node_count):
         line_no = heuristic_start + offset + 1
         values = tuple(float(value) for value in _parts(lines[heuristic_start + offset], line_no))
-        if len(values) != header.node_count:
+        if len(values) != header.node_count and not allow_ragged_heuristic:
             raise ValueError(
                 f"heuristic row {line_no} has {len(values)} values, expected {header.node_count}"
             )
+        if len(values) > header.node_count:
+            raise ValueError(
+                f"heuristic row {line_no} has {len(values)} values, expected at most {header.node_count}"
+            )
+        if len(values) < header.node_count:
+            values = values + (0.0,) * (header.node_count - len(values))
         heuristic_raw.append(values)
         heuristic_time.append(tuple(value / edge_speed for value in values))
 
