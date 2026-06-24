@@ -659,3 +659,14 @@
 - Tests / validation: Dense PIBT stress sweep reported `rows=12 tasks=422`; every row matched Python/C++ summary metrics and had `0/0` post-shield conflicts. Regenerated unified comparison reported `rows=139 outcome_rows=17 event_rows=14 parity_families=11`; all reported safety, event parity, dense PIBT stress parity, and baseline-family parity gates passed.
 - Safety / parity notes: Dense fixed-seed active-bag PIBT stress is now covered separately from the broader synthetic matched comparison. This is still synthetic evidence, not a separate real heldout airport map or a paper-grade stress benchmark.
 - Follow-up: expand randomized graph topologies and task-source distributions, then add real heldout airport-map evidence if fixture data becomes available.
+
+## 2026-06-24 23:00 - Phase9 randomized-topology PIBT stress sweep
+
+- Request: Continue the Python/C++ port objective by broadening PIBT stress beyond the fixed 12-node synthetic topology.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase9_random_topology_pibt_stress_sweep.py`, generated `outputs/tables/phase9_random_topology_pibt_stress_sweep.csv` plus `outputs/reports/phase9_random_topology_pibt_stress_sweep_report.md`, extended `scripts/eval/run_phase9_unified_baseline_comparison.py` to ingest the random-topology stress sweep as evidence rows and a parity-family summary, regenerated the unified Phase9 CSV/report, and refreshed README/C++/safety status docs.
+- Commands run: Python py_compile for the new/updated Phase9 diagnostics, `scripts/eval/run_phase9_random_topology_pibt_stress_sweep.py` with `CZR005_CPP_PYTHON_PATH=build_vs/python/Debug`, and `scripts/eval/run_phase9_unified_baseline_comparison.py`.
+- Key observations: The stress sweep generates `6` DAG-like ICS topologies with distinct layer layouts, branch/shortcut densities, source/goal distributions, repair/static fault settings, buffer capacities, and merge groups. It covers `244` total tasks and passes the same Python/C++ record boundary used by the pybind runtime.
+- Tests / validation: Random-topology PIBT stress reported `rows=6 tasks=244`; every row matched Python/C++ summary metrics and had `0/0` post-shield conflicts. Regenerated unified comparison reported `rows=146 outcome_rows=17 event_rows=14 parity_families=12`; all reported safety, dense/random PIBT stress parity, event parity, and baseline-family parity gates passed.
+- Safety / parity notes: Randomized topology/task-source PIBT stress is now covered at the synthetic DAG-like level. It is still not a separate real heldout airport map, non-synthetic topology corpus, or paper-grade stress benchmark.
+- Follow-up: add real heldout airport-map fixtures if available and expand timing to multi-machine hardware-normalized runs before paper-grade claims.

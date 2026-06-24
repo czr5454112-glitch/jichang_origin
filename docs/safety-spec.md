@@ -67,8 +67,13 @@ Currently covered by Phase9 dense active-bag PIBT stress:
 - Additional fixed random dense synthetic task streams match on Python/C++ summary metrics.
 - Static-fault, repair-window, repeated-repair, buffer-capacity, and merge-group stress rows stay at zero post-shield conflicts.
 
+Currently covered by Phase9 randomized-topology PIBT stress:
+
+- Generated DAG-like synthetic ICS topologies with varied layer widths, branch/shortcut density, and task source/goal distributions match on Python/C++ summary metrics.
+- Static-fault, repair-window, buffer-capacity, and merge-group randomized-topology rows stay at zero post-shield conflicts.
+
 Still pending:
 
 - event-simulation safety counters
 - separate real heldout airport-map safety evidence
-- broader randomized graph topologies and task-source distributions
+- non-synthetic topology/task-source validation

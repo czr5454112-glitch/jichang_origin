@@ -4,7 +4,7 @@ Date: 2026-06-24
 
 ## Scope
 
-This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, heldout-like synthetic matched rows, dense active-bag PIBT stress rows, repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
+This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, heldout-like synthetic matched rows, dense active-bag PIBT stress rows, randomized-topology PIBT stress rows, repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
 
 The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window/merge-group windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and multi-machine hardware-normalized timing.
 
@@ -101,18 +101,29 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 | Scenario | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity |
 |---|---:|---|---|---:|---:|---:|---:|---|
-| dense_pibt_seed101_low_spacing | 30 | none | none | 30 | 191 | 0 | 1.679895 | True |
-| dense_pibt_seed103_low_spacing | 32 | none | none | 32 | 173 | 0 | 0.622856 | True |
-| dense_pibt_seed107_static | 32 | 4->7 | none | 32 | 238 | 0 | 0.572558 | True |
-| dense_pibt_seed109_static | 34 | 5->8 | none | 34 | 359 | 0 | 0.550459 | True |
-| dense_pibt_seed113_repair | 34 | 4->8@[2.000,13.000) | none | 34 | 244 | 0 | 0.535565 | True |
-| dense_pibt_seed127_multi_repair | 36 | 4->8@[3.000,10.000);8->9@[9.000,20.000) | none | 36 | 403 | 0 | 0.563414 | True |
-| dense_pibt_seed131_merge_buffer | 36 | 4->8@[2.000,13.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 36 | 323 | 0 | 0.622344 | True |
-| dense_pibt_seed137_merge_buffer | 38 | 5->8@[3.000,16.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 38 | 433 | 0 | 0.567351 | True |
-| dense_pibt_seed139_static_repair | 34 | 4->7 | none | 34 | 364 | 0 | 0.522651 | True |
-| dense_pibt_seed149_repeated_repair | 36 | 4->8@[3.000,8.000);4->8@[14.000,21.000);8->9@[9.000,15.000) | none | 36 | 517 | 0 | 0.586604 | True |
-| dense_pibt_seed151_overload | 40 | none | none | 40 | 365 | 0 | 0.596818 | True |
-| dense_pibt_seed157_overload_merge | 40 | 4->8@[2.000,13.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 40 | 435 | 0 | 0.580988 | True |
+| dense_pibt_seed101_low_spacing | 30 | none | none | 30 | 191 | 0 | 1.687353 | True |
+| dense_pibt_seed103_low_spacing | 32 | none | none | 32 | 173 | 0 | 0.537604 | True |
+| dense_pibt_seed107_static | 32 | 4->7 | none | 32 | 238 | 0 | 0.539183 | True |
+| dense_pibt_seed109_static | 34 | 5->8 | none | 34 | 359 | 0 | 0.576582 | True |
+| dense_pibt_seed113_repair | 34 | 4->8@[2.000,13.000) | none | 34 | 244 | 0 | 0.559456 | True |
+| dense_pibt_seed127_multi_repair | 36 | 4->8@[3.000,10.000);8->9@[9.000,20.000) | none | 36 | 403 | 0 | 0.528108 | True |
+| dense_pibt_seed131_merge_buffer | 36 | 4->8@[2.000,13.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 36 | 323 | 0 | 0.575185 | True |
+| dense_pibt_seed137_merge_buffer | 38 | 5->8@[3.000,16.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 38 | 433 | 0 | 0.543209 | True |
+| dense_pibt_seed139_static_repair | 34 | 4->7 | none | 34 | 364 | 0 | 0.643072 | True |
+| dense_pibt_seed149_repeated_repair | 36 | 4->8@[3.000,8.000);4->8@[14.000,21.000);8->9@[9.000,15.000) | none | 36 | 517 | 0 | 0.636273 | True |
+| dense_pibt_seed151_overload | 40 | none | none | 40 | 365 | 0 | 0.551148 | True |
+| dense_pibt_seed157_overload_merge | 40 | 4->8@[2.000,13.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 40 | 435 | 0 | 0.609922 | True |
+
+## Random Topology PIBT Stress Evidence
+
+| Scenario | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity | Notes |
+|---|---:|---|---|---:|---:|---:|---:|---|---|
+| random_topo_seed211_wide_uniform | 36 | none | none | 36 | 200 | 0 | 1.347613 | True | Random DAG-like topology layers=3-4-4-3-2; source_mode=uniform; goal_mode=uniform; branch=0.45; shortcut=0.12; sources=0:8;1:17;2:11; goals=14:14;15:22. |
+| random_topo_seed223_skewed_bottleneck | 40 | none | nodes=10:2;13:2;14:2; merge=0->6:106;1->6:106;2->6:106,cap=1,headway=0.25 | 40 | 166 | 0 | 0.680349 | True | Random DAG-like topology layers=4-3-5-3-2; source_mode=skewed; goal_mode=skewed; branch=0.5; shortcut=0.18; sources=0:30;1:5;2:2;3:3; goals=15:27;16:13. |
+| random_topo_seed227_burst_repair | 42 | 3->15@[4.000,18.000) | nodes=3:2;11:2;13:2; merge=5->11:111;9->11:111;10->11:111,cap=1,headway=0.0 | 42 | 168 | 0 | 0.630240 | True | Random DAG-like topology layers=3-5-3-5-2; source_mode=burst; goal_mode=alternating; branch=0.42; shortcut=0.1; sources=0:18;1:12;2:12; goals=16:21;17:21. |
+| random_topo_seed229_static_alt | 44 | 10->12 | merge=4->9:109;5->9:109;7->9:109;8->18:118;12->18:118;13->18:118;15->18:118,cap=1,headway=0.0 | 44 | 311 | 0 | 0.611945 | True | Random DAG-like topology layers=4-4-4-4-3; source_mode=alternating; goal_mode=uniform; branch=0.38; shortcut=0.16; sources=1:22;3:22; goals=16:18;17:17;18:9. |
+| random_topo_seed233_shortcut_dense | 48 | 6->10@[3.000,12.000);12->18@[8.000,20.000) | nodes=6:2;10:2;14:2; merge=5->18:118;6->10:110;7->10:110;8->10:110;9->10:110;10->18:118;11->18:118;12->18:118;13->18:118,cap=1,headway=0.25 | 48 | 191 | 0 | 0.718621 | True | Random DAG-like topology layers=5-5-4-5-3; source_mode=skewed; goal_mode=alternating; branch=0.6; shortcut=0.3; sources=0:37;1:5;2:2;3:1;4:3; goals=19:16;20:16;21:16. |
+| random_topo_seed239_sparse_repair | 34 | 3->8@[4.000,18.000) | none | 34 | 245 | 0 | 0.586761 | True | Random DAG-like topology layers=3-3-3-3-2; source_mode=burst; goal_mode=skewed; branch=0.22; shortcut=0.05; sources=0:12;1:12;2:10; goals=12:25;13:9. |
 
 ## Legacy Event Parity Evidence
 
@@ -188,6 +199,7 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | phase9_runtime_scaling | 8 | 8 | True | `outputs/tables/phase9_event_runtime_scaling.csv` |
 | phase9_matched_runtime_scaling | 30 | 30 | True | `outputs/tables/phase9_matched_runtime_scaling.csv` |
 | phase9_dense_pibt_stress_sweep | 12 | 12 | True | `outputs/tables/phase9_dense_pibt_stress_sweep.csv` |
+| phase9_random_topology_pibt_stress_sweep | 6 | 6 | True | `outputs/tables/phase9_random_topology_pibt_stress_sweep.csv` |
 
 ## Gate Status
 
@@ -195,15 +207,18 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 - matched baseline rows: `30`
 - synthetic matched baseline rows: `25`
 - dense PIBT stress rows: `12`
+- random topology PIBT stress rows: `6`
 - matched baseline runtime rows: `30`
 - native event parity/runtime rows: `14`
-- baseline-family parity summaries: `11`
+- baseline-family parity summaries: `12`
 - policies/baselines surfaced: `astar_guided, dagger_bc, edge_score_event, fallback_event, periodic_replanning_sipp, pibt_active_bag_replay, reference_astar, rolling_horizon_sipp`
-- parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_dense_pibt_stress_sweep, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
+- parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_dense_pibt_stress_sweep, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_random_topology_pibt_stress_sweep, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
 - gate-scoped post-shield conflicts are zero: PASS
 - all reported post-shield conflicts are zero: PASS
 - dense PIBT stress Python/C++ parity rows pass: PASS
 - dense PIBT stress rows are safety-clean: PASS
+- random topology PIBT stress Python/C++ parity rows pass: PASS
+- random topology PIBT stress rows are safety-clean: PASS
 - native event Python/C++ parity rows pass: PASS
 - baseline-family parity summaries pass: PASS
 - median C++ decision-throughput speedup in runtime rows: `1.065x`
@@ -212,9 +227,10 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 - repeated matched-baseline runtime timing with 95% CI: covered
 - heldout-like synthetic matched comparison: covered
 - dense active-bag PIBT stress sweep: covered
+- randomized topology/task-source PIBT stress sweep: covered
 
 ## Remaining Work
 
 - add a separate real heldout airport map when fixture data is available
-- expand randomized graph topologies and task-source distributions before paper-grade stress claims
+- broaden beyond DAG-like synthetic topologies and fixture task-source models before paper-grade stress claims
 - expand timing to multi-machine hardware-normalized runs and confidence intervals before paper-grade speed claims
