@@ -633,15 +633,14 @@ def write_report(rows: list[dict[str, float | int | str | bool]], manifest_path:
             f"- PIBT active-bag dense stress conflict rows: `{len(pibt_stress_rows)}`",
             f"- median C++ local-call speedup: `{_median(speedups):.3f}x`",
             "- persisted synthetic manifest: PASS",
-            "- negative dense-PIBT cases honestly reported: PASS"
-            if pibt_stress_rows
-            else "- negative dense-PIBT cases honestly reported: not triggered",
+            "- dense-PIBT stress rows are safety-clean: PASS"
+            if not pibt_stress_rows
+            else "- dense-PIBT stress rows are safety-clean: FAIL",
             "- real heldout airport map: not covered",
             "",
             "## Remaining Work",
             "",
             "- add a separate real heldout airport map when fixture data is available",
-            "- harden PIBT active-bag replay against dense synthetic hold/start-node overlaps",
             "- expand randomized density/fault seeds before paper-grade claims",
         ]
     )

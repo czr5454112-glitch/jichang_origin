@@ -16,6 +16,8 @@
 
 namespace czr005::ics {
 
+inline constexpr double kPIBTOccupiedUntilRelease = 1.0e12;
+
 struct PIBTAgentState {
   int task_id = -1;
   int current = -1;
@@ -211,6 +213,13 @@ class PIBTStyleOneStepResolver {
       const double edge_end = edge_start + edge.travel_time();
       const double node_start = edge_end;
       const double node_end = node_start + graph_.service_time(next_node);
+      const double node_occupancy_end =
+          next_node == agent.goal ? node_end : kPIBTOccupiedUntilRelease;
+      const auto blocker_found = current_owner.find(next_node);
+      std::unordered_set<int> ignored_node_tasks{agent.task_id};
+      if (blocker_found != current_owner.end() && blocker_found->second != agent.task_id) {
+        ignored_node_tasks.insert(blocker_found->second);
+      }
 
       if (edge_reservations.has_capacity_conflict(agent.current,
                                                   next_node,
@@ -250,23 +259,23 @@ class PIBTStyleOneStepResolver {
       }
 
       if (next_node != agent.goal &&
-          reservations.has_capacity_conflict(next_node,
-                                             node_start,
-                                             node_end,
-                                             node_capacity(node_capacities, next_node),
-                                             agent.task_id)) {
+          node_capacity_conflict(reservations,
+                                 next_node,
+                                 node_start,
+                                 node_occupancy_end,
+                                 node_capacity(node_capacities, next_node),
+                                 ignored_node_tasks)) {
         continue;
       }
       if (local_node_conflict(next_node,
                               node_start,
-                              node_end,
+                              node_occupancy_end,
                               agent.task_id,
                               local_node_windows)) {
         continue;
       }
 
       bool inherited_move = false;
-      const auto blocker_found = current_owner.find(next_node);
       if (blocker_found != current_owner.end() && blocker_found->second != agent.task_id) {
         const int blocker_id = blocker_found->second;
         auto blocker_action = chosen_by_task.find(blocker_id);
@@ -321,7 +330,7 @@ class PIBTStyleOneStepResolver {
         }
         if (local_node_conflict(next_node,
                                 node_start,
-                                node_end,
+                                node_occupancy_end,
                                 agent.task_id,
                                 local_node_windows)) {
           continue;
@@ -340,7 +349,8 @@ class PIBTStyleOneStepResolver {
                                                          node_end,
                                                          reason,
                                                          priority_rank};
-      local_node_windows.push_back(LocalNodeWindow{next_node, node_start, node_end, agent.task_id});
+      local_node_windows.push_back(
+          LocalNodeWindow{next_node, node_start, node_occupancy_end, agent.task_id});
       local_edge_windows.push_back(LocalEdgeWindow{agent.current,
                                                    next_node,
                                                    edge_start,
@@ -420,6 +430,28 @@ class PIBTStyleOneStepResolver {
       }
     }
     return false;
+  }
+
+  [[nodiscard]] static bool node_capacity_conflict(
+      const ReservationTable& reservations,
+      int node,
+      double start,
+      double end,
+      int capacity,
+      const std::unordered_set<int>& ignored_task_ids) {
+    if (capacity <= 0) {
+      return true;
+    }
+    int overlapping = 0;
+    for (const auto& interval : reservations.intervals(node)) {
+      if (ignored_task_ids.find(interval.task_id) != ignored_task_ids.end()) {
+        continue;
+      }
+      if (interval.overlaps(start, end)) {
+        ++overlapping;
+      }
+    }
+    return overlapping >= capacity;
   }
 
   [[nodiscard]] static int merge_group(

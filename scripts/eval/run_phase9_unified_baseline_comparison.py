@@ -698,6 +698,9 @@ def write_report(rows: list[dict[str, str]]) -> None:
             if summary["all_reported_safety_pass"]
             else "- all reported post-shield conflicts are zero: FAIL",
             f"- dense synthetic PIBT negative rows reported: `{summary['synthetic_pibt_stress_row_count']}`",
+            "- dense synthetic PIBT rows are safety-clean: PASS"
+            if summary["synthetic_pibt_stress_row_count"] == 0
+            else "- dense synthetic PIBT rows are safety-clean: FAIL",
             "- native event Python/C++ parity rows pass: PASS"
             if summary["event_parity_pass"]
             else "- native event Python/C++ parity rows pass: FAIL",
@@ -713,7 +716,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "## Remaining Work",
             "",
             "- add a separate real heldout airport map when fixture data is available",
-            "- harden PIBT active-bag replay on dense synthetic stress rows",
+            "- expand dense active-bag PIBT stress coverage beyond the current fixed synthetic seeds",
             "- expand timing to multi-machine hardware-normalized runs and confidence intervals before paper-grade speed claims",
         ]
     )

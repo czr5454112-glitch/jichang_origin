@@ -9,6 +9,9 @@ from czr005.sim_py.graph import IcsGraph
 from czr005.sim_py.reservation import EdgeReservationTable, ReservationTable
 
 
+OCCUPIED_UNTIL_RELEASE = 1.0e12
+
+
 @dataclass(frozen=True)
 class AgentState:
     task_id: int
@@ -169,6 +172,8 @@ class PIBTStyleOneStepResolver:
             edge_end = edge_start + edge.travel_time
             node_start = edge_end
             node_end = node_start + self.graph.service_time(next_node)
+            node_occupancy_end = node_end if next_node == agent.goal else OCCUPIED_UNTIL_RELEASE
+            blocker_id = current_owner.get(next_node)
 
             if edge_reservations.has_capacity_conflict(
                 agent.current,
@@ -211,18 +216,21 @@ class PIBTStyleOneStepResolver:
             ):
                 continue
 
-            if next_node != agent.goal and reservations.has_capacity_conflict(
+            ignored_node_tasks = {agent.task_id}
+            if blocker_id is not None and blocker_id != agent.task_id:
+                ignored_node_tasks.add(blocker_id)
+            if next_node != agent.goal and self._node_capacity_conflict(
+                reservations,
                 next_node,
                 node_start,
-                node_end,
+                node_occupancy_end,
                 capacity=node_capacities.get(next_node, 1),
-                task_id=agent.task_id,
+                ignored_task_ids=ignored_node_tasks,
             ):
                 continue
-            if self._local_node_conflict(next_node, node_start, node_end, agent.task_id, local_node_windows):
+            if self._local_node_conflict(next_node, node_start, node_occupancy_end, agent.task_id, local_node_windows):
                 continue
 
-            blocker_id = current_owner.get(next_node)
             inherited_move = False
             if blocker_id is not None and blocker_id != agent.task_id:
                 blocker_action = chosen_by_task.get(blocker_id)
@@ -275,7 +283,13 @@ class PIBTStyleOneStepResolver:
                     merge_headway_seconds,
                 ):
                     continue
-                if self._local_node_conflict(next_node, node_start, node_end, agent.task_id, local_node_windows):
+                if self._local_node_conflict(
+                    next_node,
+                    node_start,
+                    node_occupancy_end,
+                    agent.task_id,
+                    local_node_windows,
+                ):
                     continue
 
             reason = (
@@ -297,7 +311,7 @@ class PIBTStyleOneStepResolver:
                 reason=reason,
                 priority_rank=priority_rank,
             )
-            local_node_windows.append((next_node, node_start, node_end, agent.task_id))
+            local_node_windows.append((next_node, node_start, node_occupancy_end, agent.task_id))
             local_edge_windows.append((agent.current, next_node, edge_start, edge_end, agent.task_id))
             local_edges.add((agent.current, next_node))
             visiting.remove(agent.task_id)
@@ -357,6 +371,25 @@ class PIBTStyleOneStepResolver:
             if not (start > other_end or end < other_start):
                 return True
         return False
+
+    @staticmethod
+    def _node_capacity_conflict(
+        reservations: ReservationTable,
+        node: int,
+        start: float,
+        end: float,
+        capacity: int,
+        ignored_task_ids: set[int],
+    ) -> bool:
+        if capacity <= 0:
+            return True
+        overlapping = 0
+        for interval in reservations.intervals(node):
+            if interval.task_id in ignored_task_ids:
+                continue
+            if interval.overlaps(start, end):
+                overlapping += 1
+        return overlapping >= capacity
 
     @staticmethod
     def _local_merge_group_conflict(

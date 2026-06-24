@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from typing import Iterable
 
 from czr005.baselines.pibt import AgentState, PIBTStyleOneStepResolver
@@ -16,6 +17,7 @@ from czr005.sim_py.task_stream import TaskLeg, TaskStream
 
 
 EPSILON = 1.0e-9
+OCCUPIED_UNTIL_RELEASE = 1.0e12
 
 
 @dataclass
@@ -108,13 +110,26 @@ class PIBTActiveBagReplayBaseline:
         repair_windows = tuple(fault_windows or ())
 
         tick_time = selected[0].pass_time if selected else 0.0
-        while (next_task_index < len(selected) or any(not bag.closed for bag in active)) and tick_count < self.max_ticks:
-            if not any(not bag.closed for bag in active) and next_task_index < len(selected):
-                tick_time = max(tick_time, selected[next_task_index].pass_time)
 
+        def has_open_active() -> bool:
+            return any(not bag.closed for bag in active)
+
+        def admit_due_tasks() -> None:
+            nonlocal next_task_index
             while next_task_index < len(selected) and selected[next_task_index].pass_time <= tick_time + EPSILON:
-                active.append(self._admit(selected[next_task_index], tick_time, events))
+                next_task = selected[next_task_index]
+                active_at_start = sum(
+                    1 for bag in active if not bag.closed and bag.current == next_task.start
+                )
+                if active_at_start >= self.node_capacities.get(next_task.start, 1):
+                    break
+                active.append(self._admit(next_task, tick_time, events))
                 next_task_index += 1
+
+        while (next_task_index < len(selected) or any(not bag.closed for bag in active)) and tick_count < self.max_ticks:
+            if not has_open_active() and next_task_index < len(selected):
+                tick_time = max(tick_time, selected[next_task_index].pass_time)
+                admit_due_tasks()
 
             open_active = [bag for bag in active if not bag.closed]
             peak_active_bags = max(peak_active_bags, len(open_active))
@@ -171,6 +186,7 @@ class PIBTActiveBagReplayBaseline:
                         unplanned.append(bag.task)
                         bag.closed = True
 
+            admit_due_tasks()
             tick_count += 1
             tick_time += self.interval_seconds
 
@@ -231,20 +247,25 @@ class PIBTActiveBagReplayBaseline:
         return tuple(selected[:max_tasks])
 
     def _admit(self, task: TaskLeg, tick_time: float, events: list[dict[str, object]]) -> _ActiveBag:
+        service_time = self.graph.service_time(task.start)
+        occupancy_duration = service_time if task.start == task.goal else max(service_time, self.hold_seconds)
         start_time = self._earliest_safe_node_start(
             task_id=task.task_id,
             node=task.start,
             earliest_start=max(task.pass_time, tick_time),
-            duration=self.graph.service_time(task.start),
+            duration=occupancy_duration,
             capacity=self.node_capacities.get(task.start, 1),
         )
+        service_end = start_time + service_time
+        ready_time = service_end if task.start == task.goal else self._next_decision_time(tick_time, service_end)
+        reservation_end = service_end if task.start == task.goal else OCCUPIED_UNTIL_RELEASE
         start_node = SIPPNode(
             location=task.start,
             t1=start_time,
-            t2=start_time + self.graph.service_time(task.start),
-            gcost=start_time,
+            t2=reservation_end,
+            gcost=reservation_end,
             hcost=self.graph.heuristic(task.start, task.goal),
-            fcost=start_time + self.graph.heuristic(task.start, task.goal),
+            fcost=reservation_end + self.graph.heuristic(task.start, task.goal),
         )
         self.reservations.reserve(task.task_id, task.start, start_node.t1, start_node.t2)
         events.append(
@@ -257,14 +278,14 @@ class PIBTActiveBagReplayBaseline:
                 "goal": task.goal,
                 "entry_time": task.pass_time,
                 "tick_time": tick_time,
-                "ready_time": start_node.t2,
+                "ready_time": ready_time,
             }
         )
         return _ActiveBag(
             task=task,
             route=[start_node],
             current=task.start,
-            ready_time=start_node.t2,
+            ready_time=ready_time,
             waiting_time=max(0.0, start_time - task.pass_time),
         )
 
@@ -276,34 +297,40 @@ class PIBTActiveBagReplayBaseline:
         events: list[dict[str, object]],
     ) -> None:
         previous = bag.current
-        bag.waiting_time += max(0.0, float(getattr(action, "edge_start")) - bag.ready_time)
+        edge_start = float(getattr(action, "edge_start"))
+        edge_end = float(getattr(action, "edge_end"))
+        next_node = int(getattr(action, "next_node"))
+        node_start = float(getattr(action, "node_start"))
+        node_service_end = float(getattr(action, "node_end"))
+        bag.waiting_time += max(0.0, edge_start - bag.ready_time)
+        current_node = bag.route[-1]
+        current_node.t2 = edge_start
+        current_node.gcost = edge_start
+        current_node.fcost = current_node.gcost + current_node.hcost
+        self.reservations.reserve(bag.task.task_id, previous, current_node.t1, current_node.t2)
         self.edge_reservations.reserve(
             task_id=bag.task.task_id,
             start_node=previous,
-            end_node=int(getattr(action, "next_node")),
-            start=float(getattr(action, "edge_start")),
-            end=float(getattr(action, "edge_end")),
+            end_node=next_node,
+            start=edge_start,
+            end=edge_end,
         )
-        self.reservations.reserve(
-            bag.task.task_id,
-            int(getattr(action, "next_node")),
-            float(getattr(action, "node_start")),
-            float(getattr(action, "node_end")),
-        )
-        next_node = int(getattr(action, "next_node"))
+        reached_goal = next_node == bag.task.goal
+        next_ready_time = node_service_end if reached_goal else self._next_decision_time(tick_time, node_service_end)
+        node_reservation_end = node_service_end if reached_goal else OCCUPIED_UNTIL_RELEASE
+        self.reservations.reserve(bag.task.task_id, next_node, node_start, node_reservation_end)
         bag.route.append(
             SIPPNode(
                 location=next_node,
-                t1=float(getattr(action, "node_start")),
-                t2=float(getattr(action, "node_end")),
-                gcost=float(getattr(action, "node_start")),
+                t1=node_start,
+                t2=node_reservation_end,
+                gcost=node_reservation_end,
                 hcost=self.graph.heuristic(next_node, bag.task.goal),
-                fcost=float(getattr(action, "node_start")) + self.graph.heuristic(next_node, bag.task.goal),
+                fcost=node_reservation_end + self.graph.heuristic(next_node, bag.task.goal),
             )
         )
         bag.current = next_node
-        bag.ready_time = float(getattr(action, "node_end"))
-        reached_goal = bag.current == bag.task.goal
+        bag.ready_time = next_ready_time
         events.append(
             {
                 "event": "pibt_move",
@@ -334,9 +361,10 @@ class PIBTActiveBagReplayBaseline:
     ) -> None:
         bag.waiting_time += max(0.0, hold_end - bag.ready_time)
         bag.ready_time = hold_end
+        reservation_end = OCCUPIED_UNTIL_RELEASE
         current_node = bag.route[-1]
-        current_node.t2 = hold_end
-        current_node.gcost = hold_end
+        current_node.t2 = reservation_end
+        current_node.gcost = reservation_end
         current_node.fcost = current_node.gcost + current_node.hcost
         self.reservations.reserve(bag.task.task_id, bag.current, current_node.t1, current_node.t2)
         events.append(
@@ -408,3 +436,9 @@ class PIBTActiveBagReplayBaseline:
             if self.reservations.has_capacity_conflict(node, candidate, candidate + duration, capacity, task_id):
                 candidate = interval.end + EPSILON
         return candidate
+
+    def _next_decision_time(self, tick_time: float, ready_time: float) -> float:
+        if ready_time <= tick_time + EPSILON:
+            return tick_time
+        steps = math.ceil(max(0.0, ready_time - tick_time - EPSILON) / self.interval_seconds)
+        return tick_time + steps * self.interval_seconds

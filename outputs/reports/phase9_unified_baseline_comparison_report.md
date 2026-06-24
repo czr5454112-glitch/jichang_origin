@@ -36,66 +36,66 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 | Scenario | Family | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity |
 |---|---|---:|---|---|---:|---:|---:|---:|---|
-| legacy_first16 | rolling_horizon_sipp | 16 | none | none | 16 | 16 | 0 | 1.877902 | True |
-| legacy_first16 | periodic_replanning_sipp | 16 | none | none | 16 | 120 | 0 | 0.297503 | True |
-| legacy_first16 | pibt_active_bag_replay | 16 | none | none | 0 | 18599 | 0 | 0.699152 | True |
-| legacy_first16 | edge_score_event | 16 | none | none | 16 | 173 | 0 | 1.979724 | True |
-| legacy_first16 | fallback_event | 16 | none | none | 15 | 168 | 0 | 1.042741 | True |
-| legacy_first16_buffer2 | rolling_horizon_sipp | 16 | none | nodes=28:2;47:2 | 16 | 16 | 0 | 0.209223 | True |
-| legacy_first16_buffer2 | periodic_replanning_sipp | 16 | none | nodes=28:2;47:2 | 16 | 120 | 0 | 0.265011 | True |
-| legacy_first16_buffer2 | pibt_active_bag_replay | 16 | none | nodes=28:2;47:2 | 0 | 18599 | 0 | 0.742965 | True |
-| legacy_first16_buffer2 | edge_score_event | 16 | none | nodes=28:2;47:2 | 16 | 173 | 0 | 1.872421 | True |
-| legacy_first16_buffer2 | fallback_event | 16 | none | nodes=28:2;47:2 | 15 | 168 | 0 | 0.922556 | True |
-| legacy_first32 | rolling_horizon_sipp | 32 | none | none | 32 | 32 | 0 | 0.291282 | True |
-| legacy_first32 | periodic_replanning_sipp | 32 | none | none | 32 | 248 | 0 | 0.351031 | True |
-| legacy_first32 | pibt_active_bag_replay | 32 | none | none | 0 | 41032 | 0 | 0.802410 | True |
-| legacy_first32 | edge_score_event | 32 | none | none | 24 | 330 | 0 | 2.970513 | True |
-| legacy_first32 | fallback_event | 32 | none | none | 25 | 346 | 0 | 0.986246 | True |
-| legacy_offset32_static16 | rolling_horizon_sipp | 16 | 16->17 | none | 16 | 16 | 0 | 0.306361 | True |
-| legacy_offset32_static16 | periodic_replanning_sipp | 16 | 16->17 | none | 16 | 129 | 0 | 0.255419 | True |
-| legacy_offset32_static16 | pibt_active_bag_replay | 16 | 16->17 | none | 0 | 22378 | 0 | 0.795140 | True |
-| legacy_offset32_static16 | edge_score_event | 16 | 16->17 | none | 12 | 205 | 0 | 2.379172 | True |
-| legacy_offset32_static16 | fallback_event | 16 | 16->17 | none | 12 | 193 | 0 | 1.173032 | True |
-| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 32 | 0 | 0.361366 | True |
-| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 265 | 0 | 0.337341 | True |
-| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | 28->47@[0.000,12000.000) | none | 0 | 50808 | 0 | 0.828779 | True |
-| legacy_offset64_repair32 | edge_score_event | 32 | 28->47@[0.000,12000.000) | none | 15 | 323 | 0 | 2.468076 | True |
-| legacy_offset64_repair32 | fallback_event | 32 | 28->47@[0.000,12000.000) | none | 13 | 321 | 0 | 1.183263 | True |
-| legacy_offset64_merge32 | rolling_horizon_sipp | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 32 | 32 | 0 | 0.272151 | True |
-| legacy_offset64_merge32 | periodic_replanning_sipp | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 32 | 260 | 0 | 0.341807 | True |
-| legacy_offset64_merge32 | pibt_active_bag_replay | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 0 | 51876 | 0 | 0.690858 | True |
-| legacy_offset64_merge32 | edge_score_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 14 | 332 | 0 | 2.625963 | True |
-| legacy_offset64_merge32 | fallback_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 13 | 334 | 0 | 1.265459 | True |
+| legacy_first16 | rolling_horizon_sipp | 16 | none | none | 16 | 16 | 0 | 1.961098 | True |
+| legacy_first16 | periodic_replanning_sipp | 16 | none | none | 16 | 120 | 0 | 0.364674 | True |
+| legacy_first16 | pibt_active_bag_replay | 16 | none | none | 0 | 19149 | 0 | 0.749275 | True |
+| legacy_first16 | edge_score_event | 16 | none | none | 16 | 173 | 0 | 2.288167 | True |
+| legacy_first16 | fallback_event | 16 | none | none | 15 | 168 | 0 | 1.000929 | True |
+| legacy_first16_buffer2 | rolling_horizon_sipp | 16 | none | nodes=28:2;47:2 | 16 | 16 | 0 | 0.373247 | True |
+| legacy_first16_buffer2 | periodic_replanning_sipp | 16 | none | nodes=28:2;47:2 | 16 | 120 | 0 | 0.322078 | True |
+| legacy_first16_buffer2 | pibt_active_bag_replay | 16 | none | nodes=28:2;47:2 | 0 | 19149 | 0 | 0.962385 | True |
+| legacy_first16_buffer2 | edge_score_event | 16 | none | nodes=28:2;47:2 | 16 | 173 | 0 | 2.918339 | True |
+| legacy_first16_buffer2 | fallback_event | 16 | none | nodes=28:2;47:2 | 15 | 168 | 0 | 1.328441 | True |
+| legacy_first32 | rolling_horizon_sipp | 32 | none | none | 32 | 32 | 0 | 0.253821 | True |
+| legacy_first32 | periodic_replanning_sipp | 32 | none | none | 32 | 248 | 0 | 0.444682 | True |
+| legacy_first32 | pibt_active_bag_replay | 32 | none | none | 10 | 29055 | 0 | 1.061465 | True |
+| legacy_first32 | edge_score_event | 32 | none | none | 24 | 330 | 0 | 2.953811 | True |
+| legacy_first32 | fallback_event | 32 | none | none | 25 | 346 | 0 | 1.193045 | True |
+| legacy_offset32_static16 | rolling_horizon_sipp | 16 | 16->17 | none | 16 | 16 | 0 | 0.324453 | True |
+| legacy_offset32_static16 | periodic_replanning_sipp | 16 | 16->17 | none | 16 | 129 | 0 | 0.328663 | True |
+| legacy_offset32_static16 | pibt_active_bag_replay | 16 | 16->17 | none | 1 | 20706 | 0 | 0.966601 | True |
+| legacy_offset32_static16 | edge_score_event | 16 | 16->17 | none | 12 | 205 | 0 | 2.542997 | True |
+| legacy_offset32_static16 | fallback_event | 16 | 16->17 | none | 12 | 193 | 0 | 1.551260 | True |
+| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 32 | 0 | 0.359808 | True |
+| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 265 | 0 | 0.304254 | True |
+| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | 28->47@[0.000,12000.000) | none | 14 | 27600 | 0 | 1.023950 | True |
+| legacy_offset64_repair32 | edge_score_event | 32 | 28->47@[0.000,12000.000) | none | 15 | 323 | 0 | 2.654798 | True |
+| legacy_offset64_repair32 | fallback_event | 32 | 28->47@[0.000,12000.000) | none | 13 | 321 | 0 | 1.195490 | True |
+| legacy_offset64_merge32 | rolling_horizon_sipp | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 32 | 32 | 0 | 0.374529 | True |
+| legacy_offset64_merge32 | periodic_replanning_sipp | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 32 | 260 | 0 | 0.403129 | True |
+| legacy_offset64_merge32 | pibt_active_bag_replay | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 14 | 27600 | 0 | 1.034889 | True |
+| legacy_offset64_merge32 | edge_score_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 14 | 332 | 0 | 2.623353 | True |
+| legacy_offset64_merge32 | fallback_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 13 | 334 | 0 | 1.570873 | True |
 
 ## Synthetic Matched Evidence
 
 | Scenario | Family | Tasks | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity | Notes |
 |---|---|---:|---|---:|---:|---:|---:|---|---|
-| synthetic_seed7_medium_repair | rolling_horizon_sipp | 18 | none | 18 | 18 | 0 | 6.771107 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed7_medium_repair | periodic_replanning_sipp | 18 | none | 18 | 54 | 0 | 0.341729 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed7_medium_repair | pibt_active_bag_replay | 18 | none | 18 | 56 | 0 | 0.455744 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed7_medium_repair | edge_score_event | 18 | none | 18 | 55 | 0 | 3.007438 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed7_medium_repair | fallback_event | 18 | none | 18 | 55 | 0 | 0.627552 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed11_dense_multi_repair | rolling_horizon_sipp | 24 | none | 24 | 24 | 0 | 0.531801 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed11_dense_multi_repair | periodic_replanning_sipp | 24 | none | 24 | 87 | 0 | 0.467897 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed11_dense_multi_repair | pibt_active_bag_replay | 24 | none | 24 | 200 | 22 | 0.450027 | True | dense synthetic PIBT active-bag stress gap; parity is expected but this row is not a safety pass |
-| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | none | 15 | 125 | 0 | 1.794420 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed11_dense_multi_repair | fallback_event | 24 | none | 15 | 125 | 0 | 0.792970 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed17_static_plus_repair | rolling_horizon_sipp | 20 | none | 20 | 20 | 0 | 0.623374 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed17_static_plus_repair | periodic_replanning_sipp | 20 | none | 20 | 76 | 0 | 0.496253 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed17_static_plus_repair | pibt_active_bag_replay | 20 | none | 20 | 231 | 50 | 0.677896 | True | dense synthetic PIBT active-bag stress gap; parity is expected but this row is not a safety pass |
-| synthetic_seed17_static_plus_repair | edge_score_event | 20 | none | 12 | 97 | 0 | 1.909647 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed17_static_plus_repair | fallback_event | 20 | none | 12 | 97 | 0 | 0.738930 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed23_repeated_repair | rolling_horizon_sipp | 22 | none | 22 | 22 | 0 | 0.508673 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed23_repeated_repair | periodic_replanning_sipp | 22 | none | 22 | 74 | 0 | 0.434836 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed23_repeated_repair | pibt_active_bag_replay | 22 | none | 22 | 120 | 22 | 0.461331 | True | dense synthetic PIBT active-bag stress gap; parity is expected but this row is not a safety pass |
-| synthetic_seed23_repeated_repair | edge_score_event | 22 | none | 20 | 85 | 0 | 1.723586 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed23_repeated_repair | fallback_event | 22 | none | 19 | 93 | 0 | 0.810262 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed31_merge_buffer | rolling_horizon_sipp | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 26 | 0 | 0.629372 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed31_merge_buffer | periodic_replanning_sipp | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 81 | 0 | 0.476209 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed31_merge_buffer | pibt_active_bag_replay | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 155 | 24 | 0.529927 | True | dense synthetic PIBT active-bag stress gap; parity is expected but this row is not a safety pass |
-| synthetic_seed31_merge_buffer | edge_score_event | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 22 | 109 | 0 | 1.865069 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
-| synthetic_seed31_merge_buffer | fallback_event | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 22 | 109 | 0 | 0.729150 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | rolling_horizon_sipp | 18 | none | 18 | 18 | 0 | 7.205706 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | periodic_replanning_sipp | 18 | none | 18 | 54 | 0 | 0.455007 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | pibt_active_bag_replay | 18 | none | 18 | 56 | 0 | 0.571760 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | edge_score_event | 18 | none | 18 | 55 | 0 | 2.834633 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed7_medium_repair | fallback_event | 18 | none | 18 | 55 | 0 | 0.604793 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | rolling_horizon_sipp | 24 | none | 24 | 24 | 0 | 0.638813 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | periodic_replanning_sipp | 24 | none | 24 | 87 | 0 | 0.564805 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | pibt_active_bag_replay | 24 | none | 24 | 292 | 0 | 0.543914 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | edge_score_event | 24 | none | 15 | 125 | 0 | 1.848325 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed11_dense_multi_repair | fallback_event | 24 | none | 15 | 125 | 0 | 0.803519 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | rolling_horizon_sipp | 20 | none | 20 | 20 | 0 | 0.685127 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | periodic_replanning_sipp | 20 | none | 20 | 76 | 0 | 0.453830 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | pibt_active_bag_replay | 20 | none | 20 | 324 | 0 | 0.549985 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | edge_score_event | 20 | none | 12 | 97 | 0 | 2.099960 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed17_static_plus_repair | fallback_event | 20 | none | 12 | 97 | 0 | 0.752581 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | rolling_horizon_sipp | 22 | none | 22 | 22 | 0 | 0.529154 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | periodic_replanning_sipp | 22 | none | 22 | 74 | 0 | 0.379923 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | pibt_active_bag_replay | 22 | none | 22 | 187 | 0 | 0.542495 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | edge_score_event | 22 | none | 20 | 85 | 0 | 1.696887 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed23_repeated_repair | fallback_event | 22 | none | 19 | 93 | 0 | 0.692667 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | rolling_horizon_sipp | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 26 | 0 | 0.472314 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | periodic_replanning_sipp | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 81 | 0 | 0.503433 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | pibt_active_bag_replay | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 26 | 123 | 0 | 0.586935 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | edge_score_event | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 22 | 109 | 0 | 1.826956 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
+| synthetic_seed31_merge_buffer | fallback_event | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 22 | 109 | 0 | 0.863828 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
 
 ## Legacy Event Parity Evidence
 
@@ -125,36 +125,36 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 | Scenario | Family | Tasks | Config | Repeats | C++ seconds mean+/-95% CI | C++ active steps/s | Speedup | Parity |
 |---|---|---:|---|---:|---:|---:|---:|---|
-| legacy_first16 | rolling_horizon_sipp | 16 | none | 3 | 0.021014+/-0.001456 | 761.41 | 0.815135 | True |
-| legacy_first16 | periodic_replanning_sipp | 16 | none | 3 | 0.123583+/-0.005025 | 971.01 | 0.323621 | True |
-| legacy_first16 | pibt_active_bag_replay | 16 | none | 3 | 5.118390+/-0.050057 | 3633.76 | 0.874707 | True |
-| legacy_first16 | edge_score_event | 16 | none | 3 | 0.042315+/-0.001144 | 4088.38 | 2.178417 | True |
-| legacy_first16 | fallback_event | 16 | none | 3 | 0.035067+/-0.000998 | 4790.81 | 0.981890 | True |
-| legacy_first16_buffer2 | rolling_horizon_sipp | 16 | nodes=28:2;47:2 | 3 | 0.021098+/-0.001314 | 758.38 | 0.363502 | True |
-| legacy_first16_buffer2 | periodic_replanning_sipp | 16 | nodes=28:2;47:2 | 3 | 0.123514+/-0.002730 | 971.55 | 0.339373 | True |
-| legacy_first16_buffer2 | pibt_active_bag_replay | 16 | nodes=28:2;47:2 | 3 | 5.014463+/-0.038680 | 3709.07 | 0.867402 | True |
-| legacy_first16_buffer2 | edge_score_event | 16 | nodes=28:2;47:2 | 3 | 0.042310+/-0.000886 | 4088.87 | 2.122391 | True |
-| legacy_first16_buffer2 | fallback_event | 16 | nodes=28:2;47:2 | 3 | 0.035400+/-0.002824 | 4745.79 | 0.956466 | True |
-| legacy_first32 | rolling_horizon_sipp | 32 | none | 3 | 0.054420+/-0.001007 | 588.02 | 0.341220 | True |
-| legacy_first32 | periodic_replanning_sipp | 32 | none | 3 | 0.301526+/-0.004548 | 822.48 | 0.345673 | True |
-| legacy_first32 | pibt_active_bag_replay | 32 | none | 3 | 9.189207+/-0.160361 | 4465.24 | 0.879926 | True |
-| legacy_first32 | edge_score_event | 32 | none | 3 | 0.105542+/-0.020364 | 3126.72 | 1.914238 | True |
-| legacy_first32 | fallback_event | 32 | none | 3 | 0.102091+/-0.021442 | 3389.14 | 0.819435 | True |
-| legacy_offset32_static16 | rolling_horizon_sipp | 16 | none | 3 | 0.041291+/-0.005453 | 387.50 | 0.277139 | True |
-| legacy_offset32_static16 | periodic_replanning_sipp | 16 | none | 3 | 0.201431+/-0.044404 | 640.42 | 0.266205 | True |
-| legacy_offset32_static16 | pibt_active_bag_replay | 16 | none | 3 | 7.232646+/-0.345710 | 3094.03 | 0.795843 | True |
-| legacy_offset32_static16 | edge_score_event | 16 | none | 3 | 0.059740+/-0.000361 | 3431.56 | 2.032006 | True |
-| legacy_offset32_static16 | fallback_event | 16 | none | 3 | 0.052085+/-0.005544 | 3705.51 | 1.019637 | True |
-| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | none | 3 | 0.070361+/-0.005991 | 454.80 | 0.323890 | True |
-| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | none | 3 | 0.512115+/-0.046332 | 517.46 | 0.270492 | True |
-| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | none | 3 | 13.932004+/-0.132094 | 3646.86 | 0.842491 | True |
-| legacy_offset64_repair32 | edge_score_event | 32 | none | 3 | 0.078834+/-0.019343 | 4097.22 | 2.370292 | True |
-| legacy_offset64_repair32 | fallback_event | 32 | none | 3 | 0.078506+/-0.010178 | 4088.85 | 0.947758 | True |
-| legacy_offset64_merge32 | rolling_horizon_sipp | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.094002+/-0.018388 | 340.42 | 0.321433 | True |
-| legacy_offset64_merge32 | periodic_replanning_sipp | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.524836+/-0.053653 | 495.39 | 0.296311 | True |
-| legacy_offset64_merge32 | pibt_active_bag_replay | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 13.424489+/-0.235170 | 3864.28 | 0.845053 | True |
-| legacy_offset64_merge32 | edge_score_event | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.083723+/-0.012908 | 3965.45 | 2.451947 | True |
-| legacy_offset64_merge32 | fallback_event | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.058397+/-0.001449 | 5719.50 | 1.301487 | True |
+| legacy_first16 | rolling_horizon_sipp | 16 | none | 3 | 0.020762+/-0.000635 | 770.65 | 0.958001 | True |
+| legacy_first16 | periodic_replanning_sipp | 16 | none | 3 | 0.123673+/-0.002347 | 970.30 | 0.381806 | True |
+| legacy_first16 | pibt_active_bag_replay | 16 | none | 3 | 5.473058+/-0.356821 | 3498.78 | 0.989300 | True |
+| legacy_first16 | edge_score_event | 16 | none | 3 | 0.046289+/-0.010349 | 3737.41 | 2.678646 | True |
+| legacy_first16 | fallback_event | 16 | none | 3 | 0.037728+/-0.008442 | 4452.89 | 1.216439 | True |
+| legacy_first16_buffer2 | rolling_horizon_sipp | 16 | nodes=28:2;47:2 | 3 | 0.023807+/-0.003231 | 672.08 | 0.463894 | True |
+| legacy_first16_buffer2 | periodic_replanning_sipp | 16 | nodes=28:2;47:2 | 3 | 0.153118+/-0.009644 | 783.71 | 0.396897 | True |
+| legacy_first16_buffer2 | pibt_active_bag_replay | 16 | nodes=28:2;47:2 | 3 | 5.481962+/-0.137094 | 3493.09 | 0.983451 | True |
+| legacy_first16_buffer2 | edge_score_event | 16 | nodes=28:2;47:2 | 3 | 0.046354+/-0.005939 | 3732.18 | 2.571506 | True |
+| legacy_first16_buffer2 | fallback_event | 16 | nodes=28:2;47:2 | 3 | 0.043014+/-0.006198 | 3905.68 | 1.039700 | True |
+| legacy_first32 | rolling_horizon_sipp | 32 | none | 3 | 0.057958+/-0.010656 | 552.12 | 0.400752 | True |
+| legacy_first32 | periodic_replanning_sipp | 32 | none | 3 | 0.373462+/-0.041650 | 664.06 | 0.370006 | True |
+| legacy_first32 | pibt_active_bag_replay | 32 | none | 3 | 9.304883+/-0.274150 | 3122.55 | 1.017782 | True |
+| legacy_first32 | edge_score_event | 32 | none | 3 | 0.090031+/-0.021339 | 3665.40 | 2.663006 | True |
+| legacy_first32 | fallback_event | 32 | none | 3 | 0.072585+/-0.016259 | 4766.84 | 1.370598 | True |
+| legacy_offset32_static16 | rolling_horizon_sipp | 16 | none | 3 | 0.034048+/-0.002611 | 469.93 | 0.279094 | True |
+| legacy_offset32_static16 | periodic_replanning_sipp | 16 | none | 3 | 0.204520+/-0.022839 | 630.74 | 0.292971 | True |
+| legacy_offset32_static16 | pibt_active_bag_replay | 16 | none | 3 | 6.584405+/-0.077422 | 3144.70 | 1.005857 | True |
+| legacy_offset32_static16 | edge_score_event | 16 | none | 3 | 0.043164+/-0.006948 | 4749.30 | 3.368758 | True |
+| legacy_offset32_static16 | fallback_event | 16 | none | 3 | 0.047887+/-0.012981 | 4030.32 | 1.089840 | True |
+| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | none | 3 | 0.074276+/-0.015058 | 430.83 | 0.366999 | True |
+| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | none | 3 | 0.467732+/-0.024789 | 566.56 | 0.307363 | True |
+| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | none | 3 | 8.864358+/-0.669878 | 3113.59 | 1.001900 | True |
+| legacy_offset64_repair32 | edge_score_event | 32 | none | 3 | 0.066690+/-0.008639 | 4843.27 | 3.195143 | True |
+| legacy_offset64_repair32 | fallback_event | 32 | none | 3 | 0.070375+/-0.022678 | 4561.27 | 1.286551 | True |
+| legacy_offset64_merge32 | rolling_horizon_sipp | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.097435+/-0.017881 | 328.43 | 0.344351 | True |
+| legacy_offset64_merge32 | periodic_replanning_sipp | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.533252+/-0.108590 | 487.57 | 0.348144 | True |
+| legacy_offset64_merge32 | pibt_active_bag_replay | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 8.687420+/-0.235647 | 3177.01 | 1.022966 | True |
+| legacy_offset64_merge32 | edge_score_event | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.068428+/-0.010076 | 4851.80 | 3.227028 | True |
+| legacy_offset64_merge32 | fallback_event | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.060767+/-0.004428 | 5496.40 | 1.606867 | True |
 
 ## Parity Coverage
 
@@ -182,11 +182,12 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 - policies/baselines surfaced: `astar_guided, dagger_bc, edge_score_event, fallback_event, periodic_replanning_sipp, pibt_active_bag_replay, reference_astar, rolling_horizon_sipp`
 - parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
 - gate-scoped post-shield conflicts are zero: PASS
-- all reported post-shield conflicts are zero: FAIL
-- dense synthetic PIBT negative rows reported: `4`
+- all reported post-shield conflicts are zero: PASS
+- dense synthetic PIBT negative rows reported: `0`
+- dense synthetic PIBT rows are safety-clean: PASS
 - native event Python/C++ parity rows pass: PASS
 - baseline-family parity summaries pass: PASS
-- median C++ decision-throughput speedup in runtime rows: `0.914x`
+- median C++ decision-throughput speedup in runtime rows: `1.065x`
 - matched paper-grade Phase9 comparison: not covered
 - matched merge-group scenario: covered
 - repeated matched-baseline runtime timing with 95% CI: covered
@@ -195,5 +196,5 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 ## Remaining Work
 
 - add a separate real heldout airport map when fixture data is available
-- harden PIBT active-bag replay on dense synthetic stress rows
+- expand dense active-bag PIBT stress coverage beyond the current fixed synthetic seeds
 - expand timing to multi-machine hardware-normalized runs and confidence intervals before paper-grade speed claims

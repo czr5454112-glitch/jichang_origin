@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <set>
 #include <stdexcept>
@@ -77,6 +78,15 @@ inline int node_capacity(const PIBTActiveBagReplayConfig& config, int node) {
   return found == config.node_capacities.end() ? 1 : found->second;
 }
 
+inline double next_decision_time(double tick_time, double ready_time, double interval_seconds) {
+  if (ready_time <= tick_time + kEpsilon) {
+    return tick_time;
+  }
+  const double steps = std::ceil(std::max(0.0, ready_time - tick_time - kEpsilon) /
+                                 interval_seconds);
+  return tick_time + steps * interval_seconds;
+}
+
 inline double earliest_safe_node_start(const ReservationTable& reservations,
                                        int task_id,
                                        int node,
@@ -113,18 +123,27 @@ inline periodic_detail::ActiveBag admit_bag(const Graph& graph,
                                             const TaskLeg& task,
                                             double tick_time,
                                             std::vector<PIBTActiveBagReplayEvent>& events) {
+  const double service_time = graph.service_time(task.start);
+  const double occupancy_duration =
+      task.start == task.goal ? service_time : std::max(service_time, config.hold_seconds);
   const double start_time = earliest_safe_node_start(reservations,
                                                      task.task_id,
                                                      task.start,
                                                      std::max(task.pass_time, tick_time),
-                                                     graph.service_time(task.start),
+                                                     occupancy_duration,
                                                      node_capacity(config, task.start));
+  const double service_end = start_time + service_time;
+  const double ready_time = task.start == task.goal
+                                ? service_end
+                                : next_decision_time(tick_time, service_end, config.interval_seconds);
+  const double reservation_end =
+      task.start == task.goal ? service_end : kPIBTOccupiedUntilRelease;
   PathNode start_node{task.start,
                       start_time,
-                      start_time + graph.service_time(task.start),
-                      start_time,
+                      reservation_end,
+                      reservation_end,
                       graph.heuristic(task.start, task.goal),
-                      start_time + graph.heuristic(task.start, task.goal)};
+                      reservation_end + graph.heuristic(task.start, task.goal)};
   reservations.reserve(task.task_id, task.start, start_node.t1, start_node.t2);
   events.push_back(PIBTActiveBagReplayEvent{"arrival",
                                             task.segment_id,
@@ -136,7 +155,7 @@ inline periodic_detail::ActiveBag admit_bag(const Graph& graph,
                                             task.pass_time,
                                             0.0,
                                             tick_time,
-                                            start_node.t2,
+                                            ready_time,
                                             -1,
                                             0,
                                             false,
@@ -146,7 +165,7 @@ inline periodic_detail::ActiveBag admit_bag(const Graph& graph,
   bag.task = task;
   bag.route.push_back(start_node);
   bag.current = task.start;
-  bag.ready_time = start_node.t2;
+  bag.ready_time = ready_time;
   bag.waiting_time = std::max(0.0, start_time - task.pass_time);
   return bag;
 }
@@ -189,8 +208,8 @@ inline void apply_hold(const PIBTResolvedAction& action,
   bag.waiting_time += std::max(0.0, action.node_end - bag.ready_time);
   bag.ready_time = action.node_end;
   auto& current_node = bag.route.back();
-  current_node.t2 = action.node_end;
-  current_node.gcost = action.node_end;
+  current_node.t2 = kPIBTOccupiedUntilRelease;
+  current_node.gcost = current_node.t2;
   current_node.fcost = current_node.gcost + current_node.hcost;
   node_reservations.reserve(bag.task.task_id, bag.current, current_node.t1, current_node.t2);
   events.push_back(PIBTActiveBagReplayEvent{"pibt_hold",
@@ -217,27 +236,36 @@ inline void apply_move(const Graph& graph,
                        EdgeReservationTable& edge_reservations,
                        periodic_detail::ActiveBag& bag,
                        double tick_time,
+                       double interval_seconds,
                        std::vector<PIBTActiveBagReplayEvent>& events) {
   const int previous = bag.current;
   bag.waiting_time += std::max(0.0, action.edge_start - bag.ready_time);
+  auto& current_node = bag.route.back();
+  current_node.t2 = action.edge_start;
+  current_node.gcost = action.edge_start;
+  current_node.fcost = current_node.gcost + current_node.hcost;
+  node_reservations.reserve(bag.task.task_id, previous, current_node.t1, current_node.t2);
   edge_reservations.reserve(bag.task.task_id,
                             previous,
                             action.next_node,
                             action.edge_start,
                             action.edge_end);
+  const bool reached_goal = action.next_node == bag.task.goal;
+  const double occupancy_end = reached_goal ? action.node_end : kPIBTOccupiedUntilRelease;
   node_reservations.reserve(bag.task.task_id,
                             action.next_node,
                             action.node_start,
-                            action.node_end);
+                            occupancy_end);
   bag.route.push_back(PathNode{action.next_node,
                                action.node_start,
-                               action.node_end,
-                               action.node_start,
+                               occupancy_end,
+                               occupancy_end,
                                graph.heuristic(action.next_node, bag.task.goal),
-                               action.node_start + graph.heuristic(action.next_node, bag.task.goal)});
+                               occupancy_end + graph.heuristic(action.next_node, bag.task.goal)});
   bag.current = action.next_node;
-  bag.ready_time = action.node_end;
-  const bool reached_goal = bag.current == bag.task.goal;
+  bag.ready_time = reached_goal
+                       ? action.node_end
+                       : next_decision_time(tick_time, action.node_end, interval_seconds);
   events.push_back(PIBTActiveBagReplayEvent{"pibt_move",
                                             bag.task.segment_id,
                                             bag.task.task_id,
@@ -311,22 +339,34 @@ inline PIBTActiveBagReplayResult run_pibt_active_bag_replay(
   auto has_open_active = [&active]() {
     return std::any_of(active.begin(), active.end(), [](const auto& bag) { return !bag.closed; });
   };
+  auto admit_due_tasks = [&]() {
+    while (next_task_index < selected.size() &&
+           selected[next_task_index].pass_time <= tick_time + pibt_replay_detail::kEpsilon) {
+      const auto& next_task = selected[next_task_index];
+      int active_at_start = 0;
+      for (const auto& bag : active) {
+        if (!bag.closed && bag.current == next_task.start) {
+          ++active_at_start;
+        }
+      }
+      if (active_at_start >= pibt_replay_detail::node_capacity(config, next_task.start)) {
+        break;
+      }
+      active.push_back(pibt_replay_detail::admit_bag(graph,
+                                                     config,
+                                                     node_reservations,
+                                                     next_task,
+                                                     tick_time,
+                                                     result.events));
+      ++next_task_index;
+    }
+  };
 
   while ((next_task_index < selected.size() || has_open_active()) &&
          result.tick_count < config.max_ticks) {
     if (!has_open_active() && next_task_index < selected.size()) {
       tick_time = std::max(tick_time, selected[next_task_index].pass_time);
-    }
-
-    while (next_task_index < selected.size() &&
-           selected[next_task_index].pass_time <= tick_time + pibt_replay_detail::kEpsilon) {
-      active.push_back(pibt_replay_detail::admit_bag(graph,
-                                                     config,
-                                                     node_reservations,
-                                                     selected[next_task_index],
-                                                     tick_time,
-                                                     result.events));
-      ++next_task_index;
+      admit_due_tasks();
     }
 
     int open_count = 0;
@@ -390,6 +430,7 @@ inline PIBTActiveBagReplayResult run_pibt_active_bag_replay(
                                          edge_reservations,
                                          bag,
                                          tick_time,
+                                         config.interval_seconds,
                                          result.events);
           if (bag.current == bag.task.goal) {
             pibt_replay_detail::close_planned(result, bag, tick_time, action.priority_rank);
@@ -404,6 +445,7 @@ inline PIBTActiveBagReplayResult run_pibt_active_bag_replay(
       }
     }
 
+    admit_due_tasks();
     ++result.tick_count;
     tick_time += config.interval_seconds;
   }

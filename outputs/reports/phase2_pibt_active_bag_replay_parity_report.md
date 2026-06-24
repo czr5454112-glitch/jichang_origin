@@ -12,13 +12,13 @@ It covers two active bags, static-fault alternate routing, repair-window behavio
 
 | Case | Tasks | Interval | Py/C++ planned | Py/C++ decisions | Py/C++ ticks | Peak active Py/C++ | Holds Py/C++ | Events Py/C++ | Parity | First mismatch |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
-| line_two_active_bags | 2 | 2.0 | 2/2 | 4/4 | 3/3 | 2/2 | 0/0 | 8/8 | True | match:none@ |
+| line_two_active_bags | 2 | 2.0 | 2/2 | 4/4 | 4/4 | 1/1 | 0/0 | 8/8 | True | match:none@ |
 | branch_static_fault_alternative | 1 | 2.0 | 1/1 | 2/2 | 2/2 | 1/1 | 0/0 | 4/4 | True | match:none@ |
 | branch_repaired_preferred_edge | 1 | 2.0 | 1/1 | 2/2 | 2/2 | 1/1 | 0/0 | 4/4 | True | match:none@ |
 | handoff_active_bag_slice | 2 | 2.0 | 2/2 | 3/3 | 2/2 | 2/2 | 0/0 | 7/7 | True | match:none@ |
 | parallel_merge_group_capacity | 2 | 2.0 | 2/2 | 5/5 | 3/3 | 2/2 | 1/1 | 9/9 | True | match:none@ |
-| synthetic_seed7_medium_repair_pibt_active | 6 | 5.0 | 6/6 | 18/18 | 7/7 | 4/4 | 0/0 | 30/30 | True | match:none@ |
-| synthetic_seed11_dense_multi_repair_pibt_active | 6 | 5.0 | 6/6 | 25/25 | 9/9 | 6/6 | 5/5 | 37/37 | True | match:none@ |
+| synthetic_seed7_medium_repair_pibt_active | 6 | 5.0 | 6/6 | 18/18 | 8/8 | 4/4 | 0/0 | 30/30 | True | match:none@ |
+| synthetic_seed11_dense_multi_repair_pibt_active | 6 | 5.0 | 6/6 | 21/21 | 10/10 | 4/4 | 1/1 | 33/33 | True | match:none@ |
 
 CSV: `outputs/tables/phase2_pibt_active_bag_replay_parity.csv`
 
