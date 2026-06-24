@@ -19,6 +19,7 @@
 #include "ics_core/event_sim/event_sim.hpp"
 #include "ics_core/io/legacy_map_reader.hpp"
 #include "ics_core/io/legacy_task_reader.hpp"
+#include "ics_core/legacy/legacy_window.hpp"
 #include "ics_core/models/edge_score.hpp"
 #include "ics_core/models/edge_score_io.hpp"
 #include "ics_core/routing/astar.hpp"
@@ -159,6 +160,68 @@ py::dict benchmark_legacy_map_paths(const std::string& map_path,
       elapsed.count() > 0.0 ? (static_cast<double>(cases.size()) * repeats) / elapsed.count() : 0.0;
   result["checksum"] = checksum;
   return result;
+}
+
+py::list legacy_window_planned_route_rows(
+    const std::vector<czr005::ics::LegacyWindowPlannedRoute>& routes) {
+  py::list rows;
+  for (const auto& route : routes) {
+    py::dict row;
+    row["ordinal"] = route.ordinal;
+    row["task_id"] = route.task_id;
+    row["start"] = route.start;
+    row["goal"] = route.goal;
+    row["epoch"] = route.epoch;
+    row["finish_time"] = route.finish_time;
+    row["path"] = route.path;
+    rows.append(row);
+  }
+  return rows;
+}
+
+py::dict legacy_no_fault_window_result_row(
+    const czr005::ics::LegacyNoFaultWindowResult& window,
+    double elapsed_seconds,
+    bool include_routes) {
+  py::dict result;
+  result["start_epoch"] = window.start_epoch;
+  result["max_epochs"] = window.max_epochs;
+  result["max_new_tasks"] = window.max_new_tasks;
+  result["epochs_run"] = window.epochs_run;
+  result["generated_count"] = window.generated_count;
+  result["planned_count"] = window.planned_count;
+  result["completed_count"] = window.completed_count;
+  result["unplanned_retry_count"] = window.unplanned_retry_count;
+  result["active_route_count"] = window.active_route_count;
+  result["unfinished_count"] = window.unfinished_count;
+  result["route_size_checksum"] = window.route_size_checksum;
+  result["route_location_checksum"] = window.route_location_checksum;
+  result["last_epoch"] = window.last_epoch;
+  result["elapsed_seconds"] = elapsed_seconds;
+  if (include_routes) {
+    result["planned_routes"] = legacy_window_planned_route_rows(window.planned_routes);
+  }
+  return result;
+}
+
+py::dict legacy_no_fault_window_summary(const std::string& map_path,
+                                        const std::string& task_path,
+                                        int start_epoch,
+                                        int max_epochs,
+                                        int max_new_tasks,
+                                        bool include_routes,
+                                        bool allow_ragged_heuristic = false) {
+  const auto start_time = std::chrono::steady_clock::now();
+  const auto legacy_map = czr005::ics::read_legacy_map2(map_path, 2.5, allow_ragged_heuristic);
+  const auto window = czr005::ics::run_legacy_no_fault_window_from_files(
+      legacy_map.graph,
+      task_path,
+      start_epoch,
+      max_epochs,
+      max_new_tasks);
+  const auto end_time = std::chrono::steady_clock::now();
+  const std::chrono::duration<double> elapsed = end_time - start_time;
+  return legacy_no_fault_window_result_row(window, elapsed.count(), include_routes);
 }
 
 std::vector<double> edge_score_scores(const std::vector<std::vector<double>>& w1,
@@ -1269,6 +1332,15 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("map_path"),
              py::arg("cases"),
              py::arg("repeats") = 100,
+             py::arg("allow_ragged_heuristic") = false);
+  module.def("legacy_no_fault_window_summary",
+             &legacy_no_fault_window_summary,
+             py::arg("map_path"),
+             py::arg("task_path"),
+             py::arg("start_epoch") = 8260,
+             py::arg("max_epochs") = 512,
+             py::arg("max_new_tasks") = 128,
+             py::arg("include_routes") = false,
              py::arg("allow_ragged_heuristic") = false);
   module.def("edge_score_scores",
              &edge_score_scores,

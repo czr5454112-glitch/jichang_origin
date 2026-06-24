@@ -56,8 +56,9 @@ def load_cpp_module(search_path: PathLike | None = None) -> ModuleType:
 
     search_paths = default_search_paths(search_path)
     for path in reversed(search_paths):
-        if str(path) not in sys.path:
-            sys.path.insert(0, str(path))
+        path_text = str(path)
+        sys.path[:] = [entry for entry in sys.path if entry != path_text]
+        sys.path.insert(0, path_text)
 
     try:
         return importlib.import_module(CPP_MODULE_NAME)
@@ -153,6 +154,31 @@ def benchmark_legacy_map_paths(
             str(map_path),
             normalized_cases,
             int(repeats),
+            allow_ragged_heuristic=allow_ragged_heuristic,
+        )
+    )
+
+
+def legacy_no_fault_window_summary(
+    map_path: PathLike,
+    task_path: PathLike,
+    *,
+    start_epoch: int = 8260,
+    max_epochs: int = 512,
+    max_new_tasks: int = 128,
+    include_routes: bool = False,
+    allow_ragged_heuristic: bool = False,
+    search_path: PathLike | None = None,
+) -> dict[str, Any]:
+    module = load_cpp_module(search_path)
+    return dict(
+        module.legacy_no_fault_window_summary(
+            str(map_path),
+            str(task_path),
+            int(start_epoch),
+            int(max_epochs),
+            int(max_new_tasks),
+            bool(include_routes),
             allow_ragged_heuristic=allow_ragged_heuristic,
         )
     )

@@ -44,6 +44,9 @@ def test_default_search_paths_include_cmake_build_trees() -> None:
     paths = cpp_backend.default_search_paths(custom)
 
     assert paths[0] == custom
+    assert paths.index(ROOT / "build_vs" / "python" / "Release") < paths.index(
+        ROOT / "build_vs" / "python" / "Debug"
+    )
     assert ROOT / "build_vs" / "python" / "Debug" in paths
     assert ROOT / "build_vs" / "python" / "Release" in paths
     assert ROOT / "build_nmake" / "python" in paths
@@ -72,6 +75,29 @@ def test_cpp_backend_legacy_map_astar_smoke() -> None:
         [0, 6, 12, 13, 23, 24, 27, 28, 47],
         [52, 29, 30, 31, 32, 37, 49],
     ]
+
+
+def test_cpp_backend_legacy_no_fault_window_smoke() -> None:
+    _require_cpp_backend()
+
+    result = cpp_backend.legacy_no_fault_window_summary(
+        LEGACY / "map2.txt",
+        LEGACY / "inputdata.txt",
+        start_epoch=8260,
+        max_epochs=512,
+        max_new_tasks=0,
+        include_routes=True,
+    )
+
+    assert result["epochs_run"] == 512
+    assert result["generated_count"] == 1
+    assert result["planned_count"] == 1
+    assert result["completed_count"] == 1
+    assert result["active_route_count"] == 0
+    assert result["unfinished_count"] == 0
+    assert result["route_size_checksum"] == 9
+    assert result["route_location_checksum"] == 1293
+    assert result["planned_routes"][0]["path"] == [3, 16, 17, 18, 22, 24, 27, 28, 47]
 
 
 def test_cpp_backend_example1_ragged_heuristic_mode() -> None:
