@@ -34,8 +34,8 @@ def default_search_paths(extra_path: PathLike | None = None) -> tuple[Path, ...]
 
     candidates.extend(
         [
-            ROOT / "build_vs" / "python" / "Debug",
             ROOT / "build_vs" / "python" / "Release",
+            ROOT / "build_vs" / "python" / "Debug",
             ROOT / "build_nmake" / "python",
         ]
     )
