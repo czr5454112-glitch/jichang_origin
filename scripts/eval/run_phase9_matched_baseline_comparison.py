@@ -671,7 +671,9 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This is a matched diagnostic gate, not a final paper benchmark: timings are single local "
-            "passes intended to verify common-scenario parity before repeated timing."
+            "passes intended to verify common-scenario parity. Repeated matched timing with hardware "
+            "metadata is tracked separately in "
+            "`outputs/reports/phase9_matched_runtime_scaling_report.md`."
         ),
         "",
         "## Matched Rows",
@@ -722,7 +724,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "",
             "## Remaining Work",
             "",
-            "- replace single local timing with repeated hardware-normalized timing across the matched table",
+            "- expand matched rows to separate real heldout airport maps when fixture data is available",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

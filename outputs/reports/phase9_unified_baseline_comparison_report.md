@@ -4,9 +4,9 @@ Date: 2026-06-24
 
 ## Scope
 
-This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, repeated native event runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
+This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
 
-The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window/merge-group windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and hardware-normalized timing.
+The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window/merge-group windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and multi-machine hardware-normalized timing.
 
 CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
@@ -36,36 +36,36 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 
 | Scenario | Family | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity |
 |---|---|---:|---|---|---:|---:|---:|---:|---|
-| legacy_first16 | rolling_horizon_sipp | 16 | none | none | 16 | 16 | 0 | 1.434634 | True |
-| legacy_first16 | periodic_replanning_sipp | 16 | none | none | 16 | 120 | 0 | 0.341482 | True |
-| legacy_first16 | pibt_active_bag_replay | 16 | none | none | 0 | 18599 | 0 | 0.891678 | True |
-| legacy_first16 | edge_score_event | 16 | none | none | 16 | 173 | 0 | 11.397290 | True |
-| legacy_first16 | fallback_event | 16 | none | none | 15 | 168 | 0 | 0.972643 | True |
-| legacy_first16_buffer2 | rolling_horizon_sipp | 16 | none | nodes=28:2;47:2 | 16 | 16 | 0 | 0.335887 | True |
-| legacy_first16_buffer2 | periodic_replanning_sipp | 16 | none | nodes=28:2;47:2 | 16 | 120 | 0 | 0.329664 | True |
-| legacy_first16_buffer2 | pibt_active_bag_replay | 16 | none | nodes=28:2;47:2 | 0 | 18599 | 0 | 0.869166 | True |
-| legacy_first16_buffer2 | edge_score_event | 16 | none | nodes=28:2;47:2 | 16 | 173 | 0 | 2.164963 | True |
-| legacy_first16_buffer2 | fallback_event | 16 | none | nodes=28:2;47:2 | 15 | 168 | 0 | 0.925841 | True |
-| legacy_first32 | rolling_horizon_sipp | 32 | none | none | 32 | 32 | 0 | 0.330390 | True |
-| legacy_first32 | periodic_replanning_sipp | 32 | none | none | 32 | 248 | 0 | 0.336659 | True |
-| legacy_first32 | pibt_active_bag_replay | 32 | none | none | 0 | 41032 | 0 | 0.886708 | True |
-| legacy_first32 | edge_score_event | 32 | none | none | 24 | 330 | 0 | 2.352595 | True |
-| legacy_first32 | fallback_event | 32 | none | none | 25 | 346 | 0 | 1.072410 | True |
-| legacy_offset32_static16 | rolling_horizon_sipp | 16 | 16->17 | none | 16 | 16 | 0 | 0.270774 | True |
-| legacy_offset32_static16 | periodic_replanning_sipp | 16 | 16->17 | none | 16 | 129 | 0 | 0.293092 | True |
-| legacy_offset32_static16 | pibt_active_bag_replay | 16 | 16->17 | none | 0 | 22378 | 0 | 0.842129 | True |
-| legacy_offset32_static16 | edge_score_event | 16 | 16->17 | none | 12 | 205 | 0 | 2.966993 | True |
-| legacy_offset32_static16 | fallback_event | 16 | 16->17 | none | 12 | 193 | 0 | 1.165776 | True |
-| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 32 | 0 | 0.320393 | True |
-| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 265 | 0 | 0.313979 | True |
-| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | 28->47@[0.000,12000.000) | none | 0 | 50808 | 0 | 0.887363 | True |
-| legacy_offset64_repair32 | edge_score_event | 32 | 28->47@[0.000,12000.000) | none | 15 | 323 | 0 | 2.527359 | True |
-| legacy_offset64_repair32 | fallback_event | 32 | 28->47@[0.000,12000.000) | none | 13 | 321 | 0 | 1.126838 | True |
-| legacy_offset64_merge32 | rolling_horizon_sipp | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 32 | 32 | 0 | 0.359605 | True |
-| legacy_offset64_merge32 | periodic_replanning_sipp | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 32 | 260 | 0 | 0.333797 | True |
-| legacy_offset64_merge32 | pibt_active_bag_replay | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 0 | 51876 | 0 | 0.879277 | True |
-| legacy_offset64_merge32 | edge_score_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 14 | 332 | 0 | 2.989109 | True |
-| legacy_offset64_merge32 | fallback_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 13 | 334 | 0 | 1.210739 | True |
+| legacy_first16 | rolling_horizon_sipp | 16 | none | none | 16 | 16 | 0 | 1.877902 | True |
+| legacy_first16 | periodic_replanning_sipp | 16 | none | none | 16 | 120 | 0 | 0.297503 | True |
+| legacy_first16 | pibt_active_bag_replay | 16 | none | none | 0 | 18599 | 0 | 0.699152 | True |
+| legacy_first16 | edge_score_event | 16 | none | none | 16 | 173 | 0 | 1.979724 | True |
+| legacy_first16 | fallback_event | 16 | none | none | 15 | 168 | 0 | 1.042741 | True |
+| legacy_first16_buffer2 | rolling_horizon_sipp | 16 | none | nodes=28:2;47:2 | 16 | 16 | 0 | 0.209223 | True |
+| legacy_first16_buffer2 | periodic_replanning_sipp | 16 | none | nodes=28:2;47:2 | 16 | 120 | 0 | 0.265011 | True |
+| legacy_first16_buffer2 | pibt_active_bag_replay | 16 | none | nodes=28:2;47:2 | 0 | 18599 | 0 | 0.742965 | True |
+| legacy_first16_buffer2 | edge_score_event | 16 | none | nodes=28:2;47:2 | 16 | 173 | 0 | 1.872421 | True |
+| legacy_first16_buffer2 | fallback_event | 16 | none | nodes=28:2;47:2 | 15 | 168 | 0 | 0.922556 | True |
+| legacy_first32 | rolling_horizon_sipp | 32 | none | none | 32 | 32 | 0 | 0.291282 | True |
+| legacy_first32 | periodic_replanning_sipp | 32 | none | none | 32 | 248 | 0 | 0.351031 | True |
+| legacy_first32 | pibt_active_bag_replay | 32 | none | none | 0 | 41032 | 0 | 0.802410 | True |
+| legacy_first32 | edge_score_event | 32 | none | none | 24 | 330 | 0 | 2.970513 | True |
+| legacy_first32 | fallback_event | 32 | none | none | 25 | 346 | 0 | 0.986246 | True |
+| legacy_offset32_static16 | rolling_horizon_sipp | 16 | 16->17 | none | 16 | 16 | 0 | 0.306361 | True |
+| legacy_offset32_static16 | periodic_replanning_sipp | 16 | 16->17 | none | 16 | 129 | 0 | 0.255419 | True |
+| legacy_offset32_static16 | pibt_active_bag_replay | 16 | 16->17 | none | 0 | 22378 | 0 | 0.795140 | True |
+| legacy_offset32_static16 | edge_score_event | 16 | 16->17 | none | 12 | 205 | 0 | 2.379172 | True |
+| legacy_offset32_static16 | fallback_event | 16 | 16->17 | none | 12 | 193 | 0 | 1.173032 | True |
+| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 32 | 0 | 0.361366 | True |
+| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | 28->47@[0.000,12000.000) | none | 32 | 265 | 0 | 0.337341 | True |
+| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | 28->47@[0.000,12000.000) | none | 0 | 50808 | 0 | 0.828779 | True |
+| legacy_offset64_repair32 | edge_score_event | 32 | 28->47@[0.000,12000.000) | none | 15 | 323 | 0 | 2.468076 | True |
+| legacy_offset64_repair32 | fallback_event | 32 | 28->47@[0.000,12000.000) | none | 13 | 321 | 0 | 1.183263 | True |
+| legacy_offset64_merge32 | rolling_horizon_sipp | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 32 | 32 | 0 | 0.272151 | True |
+| legacy_offset64_merge32 | periodic_replanning_sipp | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 32 | 260 | 0 | 0.341807 | True |
+| legacy_offset64_merge32 | pibt_active_bag_replay | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 0 | 51876 | 0 | 0.690858 | True |
+| legacy_offset64_merge32 | edge_score_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 14 | 332 | 0 | 2.625963 | True |
+| legacy_offset64_merge32 | fallback_event | 32 | none | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 13 | 334 | 0 | 1.265459 | True |
 
 ## Legacy Event Parity Evidence
 
@@ -91,6 +91,41 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | legacy_offset64_repair32 | edge_score_event | 32 | 15 | 323 | 0.060607 | 5329.46 | 2.849495 | True |
 | legacy_offset64_repair32 | fallback_event | 32 | 13 | 321 | 0.055447 | 5789.31 | 1.214987 | True |
 
+## Matched Runtime Evidence
+
+| Scenario | Family | Tasks | Config | Repeats | C++ seconds mean+/-95% CI | C++ active steps/s | Speedup | Parity |
+|---|---|---:|---|---:|---:|---:|---:|---|
+| legacy_first16 | rolling_horizon_sipp | 16 | none | 3 | 0.021014+/-0.001456 | 761.41 | 0.815135 | True |
+| legacy_first16 | periodic_replanning_sipp | 16 | none | 3 | 0.123583+/-0.005025 | 971.01 | 0.323621 | True |
+| legacy_first16 | pibt_active_bag_replay | 16 | none | 3 | 5.118390+/-0.050057 | 3633.76 | 0.874707 | True |
+| legacy_first16 | edge_score_event | 16 | none | 3 | 0.042315+/-0.001144 | 4088.38 | 2.178417 | True |
+| legacy_first16 | fallback_event | 16 | none | 3 | 0.035067+/-0.000998 | 4790.81 | 0.981890 | True |
+| legacy_first16_buffer2 | rolling_horizon_sipp | 16 | nodes=28:2;47:2 | 3 | 0.021098+/-0.001314 | 758.38 | 0.363502 | True |
+| legacy_first16_buffer2 | periodic_replanning_sipp | 16 | nodes=28:2;47:2 | 3 | 0.123514+/-0.002730 | 971.55 | 0.339373 | True |
+| legacy_first16_buffer2 | pibt_active_bag_replay | 16 | nodes=28:2;47:2 | 3 | 5.014463+/-0.038680 | 3709.07 | 0.867402 | True |
+| legacy_first16_buffer2 | edge_score_event | 16 | nodes=28:2;47:2 | 3 | 0.042310+/-0.000886 | 4088.87 | 2.122391 | True |
+| legacy_first16_buffer2 | fallback_event | 16 | nodes=28:2;47:2 | 3 | 0.035400+/-0.002824 | 4745.79 | 0.956466 | True |
+| legacy_first32 | rolling_horizon_sipp | 32 | none | 3 | 0.054420+/-0.001007 | 588.02 | 0.341220 | True |
+| legacy_first32 | periodic_replanning_sipp | 32 | none | 3 | 0.301526+/-0.004548 | 822.48 | 0.345673 | True |
+| legacy_first32 | pibt_active_bag_replay | 32 | none | 3 | 9.189207+/-0.160361 | 4465.24 | 0.879926 | True |
+| legacy_first32 | edge_score_event | 32 | none | 3 | 0.105542+/-0.020364 | 3126.72 | 1.914238 | True |
+| legacy_first32 | fallback_event | 32 | none | 3 | 0.102091+/-0.021442 | 3389.14 | 0.819435 | True |
+| legacy_offset32_static16 | rolling_horizon_sipp | 16 | none | 3 | 0.041291+/-0.005453 | 387.50 | 0.277139 | True |
+| legacy_offset32_static16 | periodic_replanning_sipp | 16 | none | 3 | 0.201431+/-0.044404 | 640.42 | 0.266205 | True |
+| legacy_offset32_static16 | pibt_active_bag_replay | 16 | none | 3 | 7.232646+/-0.345710 | 3094.03 | 0.795843 | True |
+| legacy_offset32_static16 | edge_score_event | 16 | none | 3 | 0.059740+/-0.000361 | 3431.56 | 2.032006 | True |
+| legacy_offset32_static16 | fallback_event | 16 | none | 3 | 0.052085+/-0.005544 | 3705.51 | 1.019637 | True |
+| legacy_offset64_repair32 | rolling_horizon_sipp | 32 | none | 3 | 0.070361+/-0.005991 | 454.80 | 0.323890 | True |
+| legacy_offset64_repair32 | periodic_replanning_sipp | 32 | none | 3 | 0.512115+/-0.046332 | 517.46 | 0.270492 | True |
+| legacy_offset64_repair32 | pibt_active_bag_replay | 32 | none | 3 | 13.932004+/-0.132094 | 3646.86 | 0.842491 | True |
+| legacy_offset64_repair32 | edge_score_event | 32 | none | 3 | 0.078834+/-0.019343 | 4097.22 | 2.370292 | True |
+| legacy_offset64_repair32 | fallback_event | 32 | none | 3 | 0.078506+/-0.010178 | 4088.85 | 0.947758 | True |
+| legacy_offset64_merge32 | rolling_horizon_sipp | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.094002+/-0.018388 | 340.42 | 0.321433 | True |
+| legacy_offset64_merge32 | periodic_replanning_sipp | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.524836+/-0.053653 | 495.39 | 0.296311 | True |
+| legacy_offset64_merge32 | pibt_active_bag_replay | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 13.424489+/-0.235170 | 3864.28 | 0.845053 | True |
+| legacy_offset64_merge32 | edge_score_event | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.083723+/-0.012908 | 3965.45 | 2.451947 | True |
+| legacy_offset64_merge32 | fallback_event | 32 | merge=13->23:9;18->22:9,cap=1,headway=0.0 | 3 | 0.058397+/-0.001449 | 5719.50 | 1.301487 | True |
+
 ## Parity Coverage
 
 | Family | Source rows | Passing rows | Safety | Source |
@@ -104,23 +139,26 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | phase8_legacy_event_scheduler | 6 | 6 | True | `outputs/tables/phase8_legacy_event_parity.csv` |
 | phase9_matched_baseline_comparison | 30 | 30 | True | `outputs/tables/phase9_matched_baseline_comparison.csv` |
 | phase9_runtime_scaling | 8 | 8 | True | `outputs/tables/phase9_event_runtime_scaling.csv` |
+| phase9_matched_runtime_scaling | 30 | 30 | True | `outputs/tables/phase9_matched_runtime_scaling.csv` |
 
 ## Gate Status
 
 - unified outcome rows: `17`
 - matched baseline rows: `30`
+- matched baseline runtime rows: `30`
 - native event parity/runtime rows: `14`
-- baseline-family parity summaries: `9`
+- baseline-family parity summaries: `10`
 - policies/baselines surfaced: `astar_guided, dagger_bc, edge_score_event, fallback_event, periodic_replanning_sipp, pibt_active_bag_replay, reference_astar, rolling_horizon_sipp`
-- parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_matched_baseline_comparison, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
+- parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
 - all reported post-shield conflicts are zero: PASS
 - native event Python/C++ parity rows pass: PASS
 - baseline-family parity summaries pass: PASS
-- median C++ decision-throughput speedup in runtime rows: `1.823x`
+- median C++ decision-throughput speedup in runtime rows: `0.914x`
 - matched paper-grade Phase9 comparison: not covered
 - matched merge-group scenario: covered
+- repeated matched-baseline runtime timing with 95% CI: covered
 
 ## Remaining Work
 
 - add a separate real heldout airport map when fixture data is available
-- add hardware-normalized repeated timing and confidence intervals for every compared baseline family
+- expand timing to multi-machine hardware-normalized runs and confidence intervals before paper-grade speed claims

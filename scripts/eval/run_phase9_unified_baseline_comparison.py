@@ -16,6 +16,7 @@ SOURCE_TABLES = {
     "phase8_legacy_event_parity": ROOT / "outputs" / "tables" / "phase8_legacy_event_parity.csv",
     "phase9_matched_baseline_comparison": ROOT / "outputs" / "tables" / "phase9_matched_baseline_comparison.csv",
     "phase9_event_runtime_scaling": ROOT / "outputs" / "tables" / "phase9_event_runtime_scaling.csv",
+    "phase9_matched_runtime_scaling": ROOT / "outputs" / "tables" / "phase9_matched_runtime_scaling.csv",
 }
 
 PARITY_TABLES = {
@@ -28,6 +29,7 @@ PARITY_TABLES = {
     "phase8_legacy_event_scheduler": ROOT / "outputs" / "tables" / "phase8_legacy_event_parity.csv",
     "phase9_matched_baseline_comparison": ROOT / "outputs" / "tables" / "phase9_matched_baseline_comparison.csv",
     "phase9_runtime_scaling": ROOT / "outputs" / "tables" / "phase9_event_runtime_scaling.csv",
+    "phase9_matched_runtime_scaling": ROOT / "outputs" / "tables" / "phase9_matched_runtime_scaling.csv",
 }
 
 FIELDNAMES = [
@@ -51,6 +53,9 @@ FIELDNAMES = [
     "p95_travel_time",
     "decision_count",
     "elapsed_seconds",
+    "elapsed_ci95_seconds",
+    "repeat_count",
+    "hardware",
     "decisions_per_second",
     "cpp_decision_speedup",
     "python_planned",
@@ -284,6 +289,55 @@ def _runtime_rows() -> list[dict[str, str]]:
     return rows
 
 
+def _matched_runtime_rows() -> list[dict[str, str]]:
+    path = SOURCE_TABLES["phase9_matched_runtime_scaling"]
+    rows: list[dict[str, str]] = []
+    for source in _read_csv(path):
+        hardware = (
+            f"{source.get('platform', '')}; machine={source.get('machine', '')}; "
+            f"cpu_count={source.get('cpu_count', '')}; processor={source.get('processor', '')}"
+        )
+        rows.append(
+            _blank_row(
+                evidence_group="matched_baseline_runtime",
+                source_table=_source_name(path),
+                source_scope="repeated local timing for every Phase9 matched baseline family row",
+                case=source["scenario"],
+                policy_or_baseline=source["family"],
+                engine="python_cpp",
+                max_tasks=_int_text(source["max_tasks"]),
+                fault_edges=source.get("fault_edges", "none"),
+                fault_windows=source.get("fault_windows", "none"),
+                node_capacities=source.get("node_capacities", "none"),
+                merge_groups=source.get("merge_groups", "none"),
+                merge_capacity=source.get("merge_capacity", "1"),
+                merge_headway_seconds=source.get("merge_headway_seconds", "0.0"),
+                planned_count=_int_text(source["cpp_planned"]),
+                unplanned_count=_int_text(source["cpp_unplanned"]),
+                post_shield_conflicts=_int_text(source["cpp_conflicts"]),
+                mean_travel_time=_float_text(source["cpp_mean_travel_time"]),
+                decision_count=_int_text(source["cpp_active_steps"]),
+                elapsed_seconds=_float_text(source["cpp_elapsed_mean_seconds"]),
+                elapsed_ci95_seconds=_float_text(source["cpp_elapsed_ci95_seconds"]),
+                repeat_count=_int_text(source["repeat_count"]),
+                hardware=hardware,
+                decisions_per_second=_float_text(source["cpp_active_steps_per_second"], places=2),
+                cpp_decision_speedup=_float_text(source["cpp_elapsed_speedup"], places=6),
+                python_planned=_int_text(source["python_planned"]),
+                cpp_planned=_int_text(source["cpp_planned"]),
+                python_decisions=_int_text(source["python_active_steps"]),
+                cpp_decisions=_int_text(source["cpp_active_steps"]),
+                python_conflicts=_int_text(source["python_conflicts"]),
+                cpp_conflicts=_int_text(source["cpp_conflicts"]),
+                summary_parity_pass=source["parity_pass"],
+                strict_parity_pass=source["parity_pass"],
+                safety_pass=str(int(float(source["python_conflicts"])) == 0 and int(float(source["cpp_conflicts"])) == 0),
+                notes=f"Repeated {source['repeat_count']}x matched timing row with local hardware metadata and 95% CI.",
+            )
+        )
+    return rows
+
+
 def _pass_column(rows: list[dict[str, str]]) -> str:
     candidates = ("strict_parity_pass", "parity_pass", "summary_parity_pass")
     for candidate in candidates:
@@ -334,6 +388,7 @@ def build_rows() -> list[dict[str, str]]:
     rows.extend(_matched_rows())
     rows.extend(_legacy_event_parity_rows())
     rows.extend(_runtime_rows())
+    rows.extend(_matched_runtime_rows())
     rows.extend(_parity_summary_rows())
     return rows
 
@@ -349,6 +404,7 @@ def write_table(rows: list[dict[str, str]]) -> None:
 def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     outcome_rows = [row for row in rows if row["evidence_group"] == "baseline_or_policy_outcome"]
     matched_rows = [row for row in rows if row["evidence_group"] == "matched_baseline_comparison"]
+    matched_runtime_rows = [row for row in rows if row["evidence_group"] == "matched_baseline_runtime"]
     event_rows = [row for row in rows if row["evidence_group"] in {"native_event_parity", "native_event_runtime"}]
     parity_rows = [row for row in rows if row["evidence_group"] == "baseline_family_parity_summary"]
     safety_pass = all(row["safety_pass"] == "True" for row in rows if row["safety_pass"])
@@ -366,11 +422,12 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     speedups = [
         float(row["cpp_decision_speedup"])
         for row in rows
-        if row["evidence_group"] == "native_event_runtime" and row["cpp_decision_speedup"]
+        if row["evidence_group"] in {"native_event_runtime", "matched_baseline_runtime"} and row["cpp_decision_speedup"]
     ]
     return {
         "outcome_row_count": len(outcome_rows),
         "matched_row_count": len(matched_rows),
+        "matched_runtime_row_count": len(matched_runtime_rows),
         "event_row_count": len(event_rows),
         "family_row_count": len(parity_rows),
         "safety_pass": safety_pass,
@@ -416,6 +473,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
     matched_rows = [row for row in rows if row["evidence_group"] == "matched_baseline_comparison"]
     legacy_event_rows = [row for row in rows if row["evidence_group"] == "native_event_parity"]
     runtime_rows = [row for row in rows if row["evidence_group"] == "native_event_runtime"]
+    matched_runtime_rows = [row for row in rows if row["evidence_group"] == "matched_baseline_runtime"]
     parity_rows = [row for row in rows if row["evidence_group"] == "baseline_family_parity_summary"]
     lines = [
         "# Phase9 Unified Baseline Comparison Diagnostic",
@@ -427,14 +485,15 @@ def write_report(rows: list[dict[str, str]]) -> None:
         (
             "This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. "
             "It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, "
-            "repeated native event runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families."
+            "repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage "
+            "for the Phase2/Phase8 baseline families."
         ),
         "",
         (
             "The table is intentionally an evidence index, not a final paper benchmark. Rows come from different "
             "scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window/merge-group windows, "
             "so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and "
-            "hardware-normalized timing."
+            "multi-machine hardware-normalized timing."
         ),
         "",
         f"CSV: `{TABLE_PATH.relative_to(ROOT).as_posix()}`",
@@ -500,6 +559,27 @@ def write_report(rows: list[dict[str, str]]) -> None:
     lines.extend(
         [
             "",
+            "## Matched Runtime Evidence",
+            "",
+            (
+                "| Scenario | Family | Tasks | Config | Repeats | C++ seconds mean+/-95% CI | "
+                "C++ active steps/s | Speedup | Parity |"
+            ),
+            "|---|---|---:|---|---:|---:|---:|---:|---|",
+        ]
+    )
+    for row in matched_runtime_rows:
+        lines.append(
+            "| {case} | {policy_or_baseline} | {max_tasks} | {config_label} | {repeat_count} | "
+            "{elapsed_seconds}+/-{elapsed_ci95_seconds} | {decisions_per_second} | "
+            "{cpp_decision_speedup} | {strict_parity_pass} |".format(
+                **{**row, "config_label": _config_label(row)}
+            )
+        )
+
+    lines.extend(
+        [
+            "",
             "## Parity Coverage",
             "",
             "| Family | Source rows | Passing rows | Safety | Source |",
@@ -518,6 +598,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "",
             f"- unified outcome rows: `{summary['outcome_row_count']}`",
             f"- matched baseline rows: `{summary['matched_row_count']}`",
+            f"- matched baseline runtime rows: `{summary['matched_runtime_row_count']}`",
             f"- native event parity/runtime rows: `{summary['event_row_count']}`",
             f"- baseline-family parity summaries: `{summary['family_row_count']}`",
             f"- policies/baselines surfaced: `{', '.join(summary['policies'])}`",
@@ -534,11 +615,12 @@ def write_report(rows: list[dict[str, str]]) -> None:
             f"- median C++ decision-throughput speedup in runtime rows: `{summary['median_speedup']:.3f}x`",
             "- matched paper-grade Phase9 comparison: not covered",
             "- matched merge-group scenario: covered",
+            "- repeated matched-baseline runtime timing with 95% CI: covered",
             "",
             "## Remaining Work",
             "",
             "- add a separate real heldout airport map when fixture data is available",
-            "- add hardware-normalized repeated timing and confidence intervals for every compared baseline family",
+            "- expand timing to multi-machine hardware-normalized runs and confidence intervals before paper-grade speed claims",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
