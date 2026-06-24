@@ -226,6 +226,90 @@ class EdgeReservationTable:
                 return True
         return False
 
+    def has_merge_group_conflict(
+        self,
+        start_node: int,
+        end_node: int,
+        start: float,
+        end: float,
+        merge_groups: dict[tuple[int, int], int] | None = None,
+        merge_capacity: int = 1,
+        merge_headway_seconds: float = 0.0,
+        task_id: int | None = None,
+    ) -> bool:
+        if merge_capacity <= 0:
+            return True
+        merge_groups = merge_groups or {}
+        group = merge_groups.get((start_node, end_node))
+        if group is None:
+            return False
+        overlapping = 0
+        for interval in self.all_intervals():
+            if task_id is not None and interval.task_id == task_id:
+                continue
+            if merge_groups.get((interval.start_node, interval.end_node)) != group:
+                continue
+            if interval.overlaps(start, end):
+                overlapping += 1
+            if merge_headway_seconds > 0.0 and abs(start - interval.start) < merge_headway_seconds:
+                return True
+        return overlapping >= merge_capacity
+
+    def earliest_merge_group_start(
+        self,
+        start_node: int,
+        end_node: int,
+        earliest: float,
+        duration: float,
+        merge_groups: dict[tuple[int, int], int] | None = None,
+        merge_capacity: int = 1,
+        merge_headway_seconds: float = 0.0,
+        task_id: int | None = None,
+    ) -> float:
+        if merge_capacity <= 0:
+            raise ValueError("merge_capacity must be positive")
+        merge_groups = merge_groups or {}
+        group = merge_groups.get((start_node, end_node))
+        if group is None:
+            return earliest
+        relevant = tuple(
+            interval
+            for interval in self.all_intervals()
+            if (task_id is None or interval.task_id != task_id)
+            and merge_groups.get((interval.start_node, interval.end_node)) == group
+        )
+        candidate = earliest
+        for _ in range(len(relevant) * 3 + 4):
+            candidate_end = candidate + duration
+            if not self.has_merge_group_conflict(
+                start_node,
+                end_node,
+                candidate,
+                candidate_end,
+                merge_groups,
+                merge_capacity,
+                merge_headway_seconds,
+                task_id,
+            ):
+                return candidate
+            next_candidate: float | None = None
+            for interval in relevant:
+                if interval.overlaps(candidate, candidate_end):
+                    next_candidate = interval.end if next_candidate is None else min(next_candidate, interval.end)
+                if merge_headway_seconds > 0.0 and abs(candidate - interval.start) < merge_headway_seconds:
+                    headway_candidate = interval.start + merge_headway_seconds
+                    next_candidate = (
+                        headway_candidate
+                        if next_candidate is None
+                        else min(next_candidate, headway_candidate)
+                    )
+            if next_candidate is None:
+                return candidate
+            if next_candidate <= candidate:
+                next_candidate = candidate + 1.0e-9
+            candidate = next_candidate
+        return candidate
+
     def earliest_start(
         self,
         start_node: int,
@@ -270,5 +354,40 @@ class EdgeReservationTable:
                     if left.overlaps(right.start, right.end) and capacity <= 1:
                         conflicts += 1
                     elif headway_seconds > 0.0 and abs(left.start - right.start) < headway_seconds:
+                        conflicts += 1
+        return conflicts
+
+    def merge_group_conflict_count(
+        self,
+        merge_groups: dict[tuple[int, int], int] | None = None,
+        merge_capacity: int = 1,
+        merge_headway_seconds: float = 0.0,
+    ) -> int:
+        merge_groups = merge_groups or {}
+        if not merge_groups:
+            return 0
+        conflicts = 0
+        grouped: dict[int, list[EdgeReservation]] = {}
+        for interval in self.all_intervals():
+            group = merge_groups.get((interval.start_node, interval.end_node))
+            if group is not None:
+                grouped.setdefault(group, []).append(interval)
+        for intervals in grouped.values():
+            ordered = sorted(intervals, key=lambda interval: (interval.start, interval.end, interval.task_id))
+            if merge_capacity > 1:
+                points = sorted({point for interval in ordered for point in (interval.start, interval.end)})
+                for point in points:
+                    active = sum(1 for interval in ordered if interval.start <= point <= interval.end)
+                    if active > merge_capacity:
+                        conflicts += active - merge_capacity
+            for index, left in enumerate(ordered):
+                for right in ordered[index + 1 :]:
+                    if left.task_id == right.task_id:
+                        continue
+                    if right.start >= left.end and right.start - left.start >= merge_headway_seconds:
+                        break
+                    if merge_capacity <= 1 and left.overlaps(right.start, right.end):
+                        conflicts += 1
+                    elif merge_headway_seconds > 0.0 and abs(left.start - right.start) < merge_headway_seconds:
                         conflicts += 1
         return conflicts

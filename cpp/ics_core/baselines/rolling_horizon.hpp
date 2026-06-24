@@ -24,6 +24,9 @@ struct RollingHorizonConfig {
   int edge_capacity = 1;
   double edge_headway_seconds = 0.0;
   std::unordered_map<int, int> node_capacities;
+  std::vector<MergeGroupEdge> merge_groups;
+  int merge_capacity = 1;
+  double merge_headway_seconds = 0.0;
 };
 
 struct RollingHorizonEvent {
@@ -154,6 +157,9 @@ inline RollingHorizonResult run_rolling_horizon_sipp(
   if (config.edge_capacity <= 0) {
     throw std::invalid_argument("edge_capacity must be positive");
   }
+  if (config.merge_capacity <= 0) {
+    throw std::invalid_argument("merge_capacity must be positive");
+  }
   detail::validate_fault_windows(fault_windows);
 
   const std::size_t limit = std::min(config.max_tasks, tasks.size());
@@ -199,7 +205,10 @@ inline RollingHorizonResult run_rolling_horizon_sipp(
                                       config.edge_headway_seconds,
                                       planning_faults,
                                       task.task_id,
-                                      config.node_capacities);
+                                      config.node_capacities,
+                                      config.merge_groups,
+                                      config.merge_capacity,
+                                      config.merge_headway_seconds);
       if (route.empty()) {
         ++result.unplanned_count;
         result.events.push_back(RollingHorizonEvent{"unplanned",
@@ -240,7 +249,10 @@ inline RollingHorizonResult run_rolling_horizon_sipp(
       result.planned_count == 0 ? 0.0 : travel_time_sum / static_cast<double>(result.planned_count);
   result.reservation_conflicts = node_reservations.conflict_count(config.node_capacities);
   result.edge_reservation_conflicts =
-      edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds);
+      edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds) +
+      edge_reservations.merge_group_conflict_count(config.merge_groups,
+                                                   config.merge_capacity,
+                                                   config.merge_headway_seconds);
   return result;
 }
 

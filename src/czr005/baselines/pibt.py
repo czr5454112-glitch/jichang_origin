@@ -67,13 +67,19 @@ class PIBTStyleOneStepResolver:
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
         node_capacities: dict[int, int] | None = None,
+        merge_groups: dict[tuple[int, int], int] | None = None,
+        merge_capacity: int = 1,
+        merge_headway_seconds: float = 0.0,
         fault_edges: set[tuple[int, int]] | None = None,
     ) -> list[ResolvedAction]:
         if edge_capacity <= 0:
             raise ValueError("edge_capacity must be positive")
+        if merge_capacity <= 0:
+            raise ValueError("merge_capacity must be positive")
         reservations = reservations or ReservationTable()
         edge_reservations = edge_reservations or EdgeReservationTable()
         node_capacities = node_capacities or {}
+        merge_groups = merge_groups or {}
         fault_edges = fault_edges or set()
         ordered = sorted(
             agents,
@@ -86,6 +92,7 @@ class PIBTStyleOneStepResolver:
             current_owner.setdefault(agent.current, agent.task_id)
         chosen_by_task: dict[int, ResolvedAction] = {}
         local_node_windows: list[tuple[int, float, float, int]] = []
+        local_edge_windows: list[tuple[int, int, float, float, int]] = []
         local_edges: set[tuple[int, int]] = set()
 
         for agent in ordered:
@@ -99,12 +106,16 @@ class PIBTStyleOneStepResolver:
                 edge_capacity=edge_capacity,
                 edge_headway_seconds=edge_headway_seconds,
                 node_capacities=node_capacities,
+                merge_groups=merge_groups,
+                merge_capacity=merge_capacity,
+                merge_headway_seconds=merge_headway_seconds,
                 fault_edges=fault_edges,
                 agents_by_task=agents_by_task,
                 current_owner=current_owner,
                 priority_ranks=priority_ranks,
                 chosen_by_task=chosen_by_task,
                 local_node_windows=local_node_windows,
+                local_edge_windows=local_edge_windows,
                 local_edges=local_edges,
                 blocked_targets=set(),
                 inherited=False,
@@ -122,12 +133,16 @@ class PIBTStyleOneStepResolver:
         edge_capacity: int,
         edge_headway_seconds: float,
         node_capacities: dict[int, int],
+        merge_groups: dict[tuple[int, int], int],
+        merge_capacity: int,
+        merge_headway_seconds: float,
         fault_edges: set[tuple[int, int]],
         agents_by_task: dict[int, AgentState],
         current_owner: dict[int, int],
         priority_ranks: dict[int, int],
         chosen_by_task: dict[int, ResolvedAction],
         local_node_windows: list[tuple[int, float, float, int]],
+        local_edge_windows: list[tuple[int, int, float, float, int]],
         local_edges: set[tuple[int, int]],
         blocked_targets: set[int],
         inherited: bool,
@@ -172,6 +187,29 @@ class PIBTStyleOneStepResolver:
                 task_id=agent.task_id,
             ):
                 continue
+            if edge_reservations.has_merge_group_conflict(
+                agent.current,
+                next_node,
+                edge_start,
+                edge_end,
+                merge_groups,
+                merge_capacity,
+                merge_headway_seconds,
+                task_id=agent.task_id,
+            ):
+                continue
+            if self._local_merge_group_conflict(
+                agent.current,
+                next_node,
+                edge_start,
+                edge_end,
+                agent.task_id,
+                local_edge_windows,
+                merge_groups,
+                merge_capacity,
+                merge_headway_seconds,
+            ):
+                continue
 
             if next_node != agent.goal and reservations.has_capacity_conflict(
                 next_node,
@@ -198,12 +236,16 @@ class PIBTStyleOneStepResolver:
                         edge_capacity=edge_capacity,
                         edge_headway_seconds=edge_headway_seconds,
                         node_capacities=node_capacities,
+                        merge_groups=merge_groups,
+                        merge_capacity=merge_capacity,
+                        merge_headway_seconds=merge_headway_seconds,
                         fault_edges=fault_edges,
                         agents_by_task=agents_by_task,
                         current_owner=current_owner,
                         priority_ranks=priority_ranks,
                         chosen_by_task=chosen_by_task,
                         local_node_windows=local_node_windows,
+                        local_edge_windows=local_edge_windows,
                         local_edges=local_edges,
                         blocked_targets={agent.current, next_node},
                         inherited=True,
@@ -220,6 +262,18 @@ class PIBTStyleOneStepResolver:
                 ):
                     continue
                 if (agent.current, next_node) in local_edges:
+                    continue
+                if self._local_merge_group_conflict(
+                    agent.current,
+                    next_node,
+                    edge_start,
+                    edge_end,
+                    agent.task_id,
+                    local_edge_windows,
+                    merge_groups,
+                    merge_capacity,
+                    merge_headway_seconds,
+                ):
                     continue
                 if self._local_node_conflict(next_node, node_start, node_end, agent.task_id, local_node_windows):
                     continue
@@ -244,6 +298,7 @@ class PIBTStyleOneStepResolver:
                 priority_rank=priority_rank,
             )
             local_node_windows.append((next_node, node_start, node_end, agent.task_id))
+            local_edge_windows.append((agent.current, next_node, edge_start, edge_end, agent.task_id))
             local_edges.add((agent.current, next_node))
             visiting.remove(agent.task_id)
             return True
@@ -302,3 +357,30 @@ class PIBTStyleOneStepResolver:
             if not (start > other_end or end < other_start):
                 return True
         return False
+
+    @staticmethod
+    def _local_merge_group_conflict(
+        start_node: int,
+        end_node: int,
+        start: float,
+        end: float,
+        task_id: int,
+        local_edges: list[tuple[int, int, float, float, int]],
+        merge_groups: dict[tuple[int, int], int],
+        merge_capacity: int,
+        merge_headway_seconds: float,
+    ) -> bool:
+        group = merge_groups.get((start_node, end_node))
+        if group is None:
+            return False
+        overlapping = 0
+        for other_start, other_end, other_t1, other_t2, other_task in local_edges:
+            if other_task == task_id:
+                continue
+            if merge_groups.get((other_start, other_end)) != group:
+                continue
+            if not (start >= other_t2 - 1.0e-9 or end <= other_t1 + 1.0e-9):
+                overlapping += 1
+            if merge_headway_seconds > 0.0 and abs(start - other_t1) < merge_headway_seconds:
+                return True
+        return overlapping >= merge_capacity

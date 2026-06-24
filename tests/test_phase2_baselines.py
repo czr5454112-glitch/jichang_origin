@@ -55,6 +55,36 @@ def _merge_graph() -> IcsGraph:
     )
 
 
+def _parallel_merge_group_graph() -> IcsGraph:
+    return IcsGraph(
+        nodes={
+            0: SimNode(location=0, node_type=1, service_time=0.0, x=0, y=0, outgoing=(2,)),
+            1: SimNode(location=1, node_type=1, service_time=0.0, x=0, y=1, outgoing=(3,)),
+            2: SimNode(location=2, node_type=4, service_time=0.0, x=1, y=0, outgoing=(4,)),
+            3: SimNode(location=3, node_type=4, service_time=0.0, x=1, y=1, outgoing=(5,)),
+            4: SimNode(location=4, node_type=2, service_time=0.0, x=2, y=0, outgoing=()),
+            5: SimNode(location=5, node_type=2, service_time=0.0, x=2, y=1, outgoing=()),
+        },
+        edges={
+            (0, 2): SimEdge(start=0, end=2, length=5.0, speed=2.5),
+            (1, 3): SimEdge(start=1, end=3, length=5.0, speed=2.5),
+            (2, 4): SimEdge(start=2, end=4, length=5.0, speed=2.5),
+            (3, 5): SimEdge(start=3, end=5, length=5.0, speed=2.5),
+        },
+        heuristic_time=(
+            (0.0, 999.0, 2.0, 999.0, 4.0, 999.0),
+            (999.0, 0.0, 999.0, 2.0, 999.0, 4.0),
+            (999.0, 999.0, 0.0, 999.0, 2.0, 999.0),
+            (999.0, 999.0, 999.0, 0.0, 999.0, 2.0),
+            (999.0, 999.0, 999.0, 999.0, 0.0, 999.0),
+            (999.0, 999.0, 999.0, 999.0, 999.0, 0.0),
+        ),
+        agv_length=1.0,
+        safe_length=1.0,
+        fault_threshold=1.0,
+    )
+
+
 def _branch_graph() -> IcsGraph:
     return IcsGraph(
         nodes={
@@ -197,6 +227,30 @@ def test_sipp_waits_for_edge_headway() -> None:
     assert not edge_reservations.has_headway_conflict(0, 1, route[1].t1 - 2.0, 2.0, task_id=1)
 
 
+def test_sipp_waits_for_merge_group_reservation() -> None:
+    edge_reservations = EdgeReservationTable()
+    edge_reservations.reserve(task_id=99, start_node=1, end_node=3, start=0.0, end=2.0)
+
+    route = SIPPPlanner(_parallel_merge_group_graph()).plan(
+        0,
+        4,
+        edge_reservations=edge_reservations,
+        merge_groups={(0, 2): 7, (1, 3): 7},
+        task_id=1,
+    )
+
+    assert [node.location for node in route] == [0, 2, 4]
+    assert route[1].t1 >= 4.0
+    assert not edge_reservations.has_merge_group_conflict(
+        0,
+        2,
+        route[1].t1 - 2.0,
+        route[1].t1,
+        {(0, 2): 7, (1, 3): 7},
+        task_id=1,
+    )
+
+
 def _task(segment_id: str, task_id: int, pass_time: float, std: float, goal: int = 2) -> TaskLeg:
     return TaskLeg(
         segment_id=segment_id,
@@ -305,6 +359,25 @@ def test_rolling_horizon_reserves_edge_headway() -> None:
     assert result.routes["loose"][1].t1 >= 4.0
 
 
+def test_rolling_horizon_respects_merge_group_capacity() -> None:
+    tasks = (
+        TaskLeg("left", 1, 1, 0.0, 10.0, 0, 4, 0, 4, 0.0, "direct", False, 1),
+        TaskLeg("right", 2, 2, 0.0, 20.0, 1, 5, 1, 5, 0.0, "direct", False, 2),
+    )
+
+    baseline = RollingHorizonBaseline(
+        _parallel_merge_group_graph(),
+        horizon_seconds=60.0,
+        merge_groups={(0, 2): 7, (1, 3): 7},
+    )
+    result = baseline.run_episode(tasks)
+
+    assert result.metrics.planned_count == 2
+    assert result.routes["left"][1].t1 == 2.0
+    assert result.routes["right"][1].t1 >= 4.0
+    assert baseline.edge_reservations.merge_group_conflict_count({(0, 2): 7, (1, 3): 7}) == 0
+
+
 def test_rolling_horizon_allows_node_buffer_capacity_overlap() -> None:
     tasks = (
         _task("first", 1, pass_time=0.0, std=10.0),
@@ -361,6 +434,28 @@ def test_periodic_replanning_allows_node_buffer_capacity_overlap() -> None:
     assert result.metrics.planned_count == 2
     assert len(first_moves) == 2
     assert baseline.summary.post_shield_conflicts == 0
+
+
+def test_periodic_replanning_respects_merge_group_capacity() -> None:
+    tasks = (
+        TaskLeg("left", 1, 1, 0.0, 20.0, 0, 4, 0, 4, 0.0, "direct", False, 1),
+        TaskLeg("right", 2, 2, 0.0, 20.0, 1, 5, 1, 5, 0.0, "direct", False, 2),
+    )
+
+    baseline = PeriodicReplanningBaseline(
+        _parallel_merge_group_graph(),
+        interval_seconds=1.0,
+        max_ticks=16,
+        merge_groups={(0, 2): 7, (1, 3): 7},
+    )
+    result = baseline.run_episode(tasks)
+
+    first_moves = [
+        event for event in result.events if event["event"] == "replan_move" and event["current"] in {0, 1}
+    ]
+    assert result.metrics.planned_count == 2
+    assert baseline.summary.post_shield_conflicts == 0
+    assert sorted(event["ready_time"] for event in first_moves) == [2.0, 4.0]
 
 
 def test_periodic_replanning_uses_fault_safe_alternative() -> None:
@@ -447,6 +542,23 @@ def test_pibt_style_resolver_respects_edge_capacity_reservation() -> None:
     assert actions[0].reason == "no_safe_edge"
 
 
+def test_pibt_style_resolver_blocks_local_merge_group_conflict() -> None:
+    actions = PIBTStyleOneStepResolver(_parallel_merge_group_graph()).resolve(
+        (
+            AgentState(task_id=1, current=0, goal=4, ready_time=0.0, deadline=10.0),
+            AgentState(task_id=2, current=1, goal=5, ready_time=0.0, deadline=20.0),
+        ),
+        merge_groups={(0, 2): 7, (1, 3): 7},
+    )
+
+    by_task = {action.task_id: action for action in actions}
+    assert [action.task_id for action in actions] == [1, 2]
+    assert by_task[1].action == "move"
+    assert by_task[1].next_node == 2
+    assert by_task[2].action == "hold"
+    assert by_task[2].reason == "no_safe_edge"
+
+
 def test_pibt_style_resolver_uses_recursive_handoff() -> None:
     actions = PIBTStyleOneStepResolver(_handoff_graph()).resolve(
         (
@@ -504,3 +616,24 @@ def test_pibt_active_bag_replay_runs_recursive_handoff_slice() -> None:
         (1, 1, "priority_inheritance"),
         (2, 3, "inherited_move"),
     ]
+
+
+def test_pibt_active_bag_replay_respects_merge_group_capacity() -> None:
+    tasks = (
+        TaskLeg("left", 1, 1, 0.0, 20.0, 0, 4, 0, 4, 0.0, "direct", False, 1),
+        TaskLeg("right", 2, 2, 0.0, 20.0, 1, 5, 1, 5, 0.0, "direct", False, 2),
+    )
+
+    baseline = PIBTActiveBagReplayBaseline(
+        _parallel_merge_group_graph(),
+        interval_seconds=2.0,
+        hold_seconds=2.0,
+        max_ticks=16,
+        merge_groups={(0, 2): 7, (1, 3): 7},
+    )
+    result = baseline.run_episode(tasks)
+
+    first_tick = [event for event in result.events if event["tick_time"] == 0.0]
+    assert result.metrics.planned_count == 2
+    assert baseline.summary.post_shield_conflicts == 0
+    assert any(event["event"] == "pibt_hold" and event["task_id"] == 2 for event in first_tick)

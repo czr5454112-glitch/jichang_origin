@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <set>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -44,6 +45,12 @@ struct EdgeReservation {
     constexpr double epsilon = 1.0e-9;
     return !(candidate_start >= end - epsilon || candidate_end <= start + epsilon);
   }
+};
+
+struct MergeGroupEdge {
+  int start_node = -1;
+  int end_node = -1;
+  int group = -1;
 };
 
 class EdgeReservationTable {
@@ -133,6 +140,41 @@ class EdgeReservationTable {
     return false;
   }
 
+  [[nodiscard]] bool has_merge_group_conflict(
+      int start_node,
+      int end_node,
+      double start,
+      double end,
+      const std::vector<MergeGroupEdge>& merge_groups,
+      int merge_capacity,
+      double merge_headway_seconds,
+      int task_id = -1) const {
+    if (merge_capacity <= 0) {
+      return true;
+    }
+    const int group = merge_group(start_node, end_node, merge_groups);
+    if (group < 0) {
+      return false;
+    }
+    int overlapping = 0;
+    for (const auto& interval : all_intervals()) {
+      if (task_id >= 0 && interval.task_id == task_id) {
+        continue;
+      }
+      if (merge_group(interval.start_node, interval.end_node, merge_groups) != group) {
+        continue;
+      }
+      if (interval.overlaps(start, end)) {
+        ++overlapping;
+      }
+      const double gap = interval.start > start ? interval.start - start : start - interval.start;
+      if (merge_headway_seconds > 0.0 && gap < merge_headway_seconds) {
+        return true;
+      }
+    }
+    return overlapping >= merge_capacity;
+  }
+
   [[nodiscard]] const std::vector<EdgeReservation>& intervals(int start_node,
                                                               int end_node) const {
     static const std::vector<EdgeReservation> empty;
@@ -191,6 +233,79 @@ class EdgeReservationTable {
     return candidate;
   }
 
+  [[nodiscard]] double earliest_merge_group_start(
+      int start_node,
+      int end_node,
+      double earliest,
+      double duration,
+      const std::vector<MergeGroupEdge>& merge_groups,
+      int merge_capacity,
+      double merge_headway_seconds = 0.0,
+      int task_id = -1) const {
+    if (merge_capacity <= 0) {
+      throw std::invalid_argument("merge_capacity must be positive");
+    }
+    const int group = merge_group(start_node, end_node, merge_groups);
+    if (group < 0) {
+      return earliest;
+    }
+    const auto intervals = all_intervals();
+    std::vector<EdgeReservation> relevant;
+    relevant.reserve(intervals.size());
+    for (const auto& interval : intervals) {
+      if (task_id >= 0 && interval.task_id == task_id) {
+        continue;
+      }
+      if (merge_group(interval.start_node, interval.end_node, merge_groups) == group) {
+        relevant.push_back(interval);
+      }
+    }
+
+    double candidate = earliest;
+    for (std::size_t attempt = 0; attempt < relevant.size() * 3 + 4; ++attempt) {
+      const double candidate_end = candidate + duration;
+      if (!has_merge_group_conflict(start_node,
+                                    end_node,
+                                    candidate,
+                                    candidate_end,
+                                    merge_groups,
+                                    merge_capacity,
+                                    merge_headway_seconds,
+                                    task_id)) {
+        return candidate;
+      }
+
+      bool moved = false;
+      double next_candidate = candidate;
+      for (const auto& interval : relevant) {
+        if (interval.overlaps(candidate, candidate_end)) {
+          const double interval_candidate = interval.end;
+          if (!moved || interval_candidate < next_candidate) {
+            next_candidate = interval_candidate;
+          }
+          moved = true;
+        }
+        const double gap = interval.start > candidate ? interval.start - candidate
+                                                      : candidate - interval.start;
+        if (merge_headway_seconds > 0.0 && gap < merge_headway_seconds) {
+          const double headway_candidate = interval.start + merge_headway_seconds;
+          if (!moved || headway_candidate < next_candidate) {
+            next_candidate = headway_candidate;
+          }
+          moved = true;
+        }
+      }
+      if (!moved) {
+        return candidate;
+      }
+      if (next_candidate <= candidate) {
+        next_candidate = candidate + 1.0e-9;
+      }
+      candidate = next_candidate;
+    }
+    return candidate;
+  }
+
   [[nodiscard]] int conflict_count(int capacity, double headway_seconds) const {
     int conflicts = 0;
     for (const auto& entry : by_edge_) {
@@ -217,18 +332,97 @@ class EdgeReservationTable {
     return conflicts;
   }
 
+  [[nodiscard]] int merge_group_conflict_count(
+      const std::vector<MergeGroupEdge>& merge_groups,
+      int merge_capacity,
+      double merge_headway_seconds) const {
+    if (merge_groups.empty()) {
+      return 0;
+    }
+    std::unordered_map<int, std::vector<EdgeReservation>> grouped;
+    for (const auto& interval : all_intervals()) {
+      const int group = merge_group(interval.start_node, interval.end_node, merge_groups);
+      if (group >= 0) {
+        grouped[group].push_back(interval);
+      }
+    }
+
+    int conflicts = 0;
+    for (auto& entry : grouped) {
+      auto& intervals = entry.second;
+      std::sort(intervals.begin(), intervals.end(),
+                [](const EdgeReservation& left, const EdgeReservation& right) {
+                  if (left.start != right.start) {
+                    return left.start < right.start;
+                  }
+                  if (left.end != right.end) {
+                    return left.end < right.end;
+                  }
+                  return left.task_id < right.task_id;
+                });
+      if (merge_capacity > 1) {
+        std::vector<double> points;
+        points.reserve(intervals.size() * 2);
+        for (const auto& interval : intervals) {
+          points.push_back(interval.start);
+          points.push_back(interval.end);
+        }
+        std::sort(points.begin(), points.end());
+        points.erase(std::unique(points.begin(), points.end()), points.end());
+        for (const double point : points) {
+          int active = 0;
+          for (const auto& interval : intervals) {
+            if (interval.start <= point && point <= interval.end) {
+              ++active;
+            }
+          }
+          if (active > merge_capacity) {
+            conflicts += active - merge_capacity;
+          }
+        }
+      }
+      for (std::size_t i = 0; i < intervals.size(); ++i) {
+        for (std::size_t j = i + 1; j < intervals.size(); ++j) {
+          if (intervals[i].task_id == intervals[j].task_id) {
+            continue;
+          }
+          if (intervals[j].start >= intervals[i].end &&
+              intervals[j].start - intervals[i].start >= merge_headway_seconds) {
+            break;
+          }
+          if (merge_capacity <= 1 && intervals[i].overlaps(intervals[j].start, intervals[j].end)) {
+            ++conflicts;
+          } else {
+            const double gap = intervals[i].start > intervals[j].start
+                                   ? intervals[i].start - intervals[j].start
+                                   : intervals[j].start - intervals[i].start;
+            if (merge_headway_seconds > 0.0 && gap < merge_headway_seconds) {
+              ++conflicts;
+            }
+          }
+        }
+      }
+    }
+    return conflicts;
+  }
+
  private:
+  [[nodiscard]] static int merge_group(int start_node,
+                                       int end_node,
+                                       const std::vector<MergeGroupEdge>& merge_groups) {
+    for (const auto& edge : merge_groups) {
+      if (edge.start_node == start_node && edge.end_node == end_node) {
+        return edge.group;
+      }
+    }
+    return -1;
+  }
+
   static long long edge_key(int start_node, int end_node) {
     return (static_cast<long long>(start_node) << 32) ^ static_cast<unsigned int>(end_node);
   }
 
   std::unordered_map<long long, std::vector<EdgeReservation>> by_edge_;
-};
-
-struct MergeGroupEdge {
-  int start_node = -1;
-  int end_node = -1;
-  int group = -1;
 };
 
 struct JunctionShieldConfig {

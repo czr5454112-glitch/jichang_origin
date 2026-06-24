@@ -25,6 +25,9 @@ struct PeriodicReplanningConfig {
   int edge_capacity = 1;
   double edge_headway_seconds = 0.0;
   std::unordered_map<int, int> node_capacities;
+  std::vector<MergeGroupEdge> merge_groups;
+  int merge_capacity = 1;
+  double merge_headway_seconds = 0.0;
 };
 
 struct PeriodicFaultWindow {
@@ -290,6 +293,9 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
   if (config.edge_capacity <= 0) {
     throw std::invalid_argument("edge_capacity must be positive");
   }
+  if (config.merge_capacity <= 0) {
+    throw std::invalid_argument("merge_capacity must be positive");
+  }
   periodic_detail::validate_fault_windows(fault_windows);
 
   std::vector<TaskLeg> selected;
@@ -394,7 +400,10 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
                                         config.edge_headway_seconds,
                                         active_faults,
                                         bag.task.task_id,
-                                        config.node_capacities);
+                                        config.node_capacities,
+                                        config.merge_groups,
+                                        config.merge_capacity,
+                                        config.merge_headway_seconds);
       if (planned.size() >= 2) {
         const auto& next_node = planned[1];
         const auto& edge = graph.edge(bag.current, next_node.location);
@@ -490,7 +499,10 @@ inline PeriodicReplanningResult run_periodic_replanning_sipp(
   }
   result.reservation_conflicts = node_reservations.conflict_count(config.node_capacities);
   result.edge_reservation_conflicts =
-      edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds);
+      edge_reservations.conflict_count(config.edge_capacity, config.edge_headway_seconds) +
+      edge_reservations.merge_group_conflict_count(config.merge_groups,
+                                                   config.merge_capacity,
+                                                   config.merge_headway_seconds);
   result.post_shield_conflicts = result.reservation_conflicts + result.edge_reservation_conflicts;
   return result;
 }

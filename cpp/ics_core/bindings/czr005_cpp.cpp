@@ -540,11 +540,15 @@ py::list sipp_plan_from_records(
     const std::vector<std::pair<int, int>>& fault_edges,
     int task_id,
     double max_time,
-    const std::vector<NodeCapacityTuple>& node_capacities) {
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto node_table = node_reservations_from_tuples(node_reservations);
   const auto edge_table = edge_reservations_from_tuples(edge_reservations);
   const auto capacities = node_capacities_from_tuples(node_capacities);
+  const auto groups = merge_groups_from_tuples(merge_groups);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const czr005::ics::SIPPPlanner planner(graph, max_time);
   return path_node_rows(planner.plan(start,
@@ -556,7 +560,10 @@ py::list sipp_plan_from_records(
                                      edge_headway_seconds,
                                      faults,
                                      task_id,
-                                     capacities));
+                                     capacities,
+                                     groups,
+                                     merge_capacity,
+                                     merge_headway_seconds));
 }
 
 py::list pibt_resolve_from_records(
@@ -570,16 +577,28 @@ py::list pibt_resolve_from_records(
     const std::vector<EdgeReservationTuple>& edge_reservations,
     int edge_capacity,
     double edge_headway_seconds,
-    const std::vector<NodeCapacityTuple>& node_capacities) {
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   const auto agents = pibt_agents_from_tuples(agent_records);
   const auto node_table = node_reservations_from_tuples(node_reservations);
   const auto edge_table = edge_reservations_from_tuples(edge_reservations);
   const auto capacities = node_capacities_from_tuples(node_capacities);
+  const auto groups = merge_groups_from_tuples(merge_groups);
   std::set<std::pair<int, int>> faults(fault_edges.begin(), fault_edges.end());
   const czr005::ics::PIBTStyleOneStepResolver resolver(graph, hold_seconds);
-  return pibt_action_rows(resolver.resolve(
-      agents, &node_table, faults, &edge_table, edge_capacity, edge_headway_seconds, capacities));
+  return pibt_action_rows(resolver.resolve(agents,
+                                           &node_table,
+                                           faults,
+                                           &edge_table,
+                                           edge_capacity,
+                                           edge_headway_seconds,
+                                           capacities,
+                                           groups,
+                                           merge_capacity,
+                                           merge_headway_seconds));
 }
 
 py::dict rolling_horizon_summary(const czr005::ics::RollingHorizonResult& result,
@@ -629,7 +648,10 @@ py::dict rolling_horizon_sipp_from_records(
     double edge_headway_seconds,
     const std::vector<std::pair<int, int>>& fault_edges,
     const std::vector<EdgeFaultWindowTuple>& fault_windows,
-    const std::vector<NodeCapacityTuple>& node_capacities) {
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
@@ -643,6 +665,9 @@ py::dict rolling_horizon_sipp_from_records(
   config.edge_capacity = edge_capacity;
   config.edge_headway_seconds = edge_headway_seconds;
   config.node_capacities = node_capacities_from_tuples(node_capacities);
+  config.merge_groups = merge_groups_from_tuples(merge_groups);
+  config.merge_capacity = merge_capacity;
+  config.merge_headway_seconds = merge_headway_seconds;
   const auto result = czr005::ics::run_rolling_horizon_sipp(graph, tasks, config, faults, windows);
 
   py::dict payload;
@@ -707,7 +732,10 @@ py::dict periodic_replanning_sipp_from_records(
     double edge_headway_seconds,
     const std::vector<std::pair<int, int>>& fault_edges,
     const std::vector<EdgeFaultWindowTuple>& fault_windows,
-    const std::vector<NodeCapacityTuple>& node_capacities) {
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
@@ -722,6 +750,9 @@ py::dict periodic_replanning_sipp_from_records(
   config.edge_capacity = edge_capacity;
   config.edge_headway_seconds = edge_headway_seconds;
   config.node_capacities = node_capacities_from_tuples(node_capacities);
+  config.merge_groups = merge_groups_from_tuples(merge_groups);
+  config.merge_capacity = merge_capacity;
+  config.merge_headway_seconds = merge_headway_seconds;
   const auto result = czr005::ics::run_periodic_replanning_sipp(graph, tasks, config, faults, windows);
 
   py::dict payload;
@@ -789,7 +820,10 @@ py::dict pibt_active_bag_replay_from_records(
     double edge_headway_seconds,
     const std::vector<std::pair<int, int>>& fault_edges,
     const std::vector<EdgeFaultWindowTuple>& fault_windows,
-    const std::vector<NodeCapacityTuple>& node_capacities) {
+    const std::vector<NodeCapacityTuple>& node_capacities,
+    const std::vector<MergeGroupTuple>& merge_groups,
+    int merge_capacity,
+    double merge_headway_seconds) {
   if (max_tasks <= 0) {
     throw std::invalid_argument("max_tasks must be positive");
   }
@@ -805,6 +839,9 @@ py::dict pibt_active_bag_replay_from_records(
   config.edge_capacity = edge_capacity;
   config.edge_headway_seconds = edge_headway_seconds;
   config.node_capacities = node_capacities_from_tuples(node_capacities);
+  config.merge_groups = merge_groups_from_tuples(merge_groups);
+  config.merge_capacity = merge_capacity;
+  config.merge_headway_seconds = merge_headway_seconds;
   const auto result = czr005::ics::run_pibt_active_bag_replay(graph, tasks, config, faults, windows);
 
   py::dict payload;
@@ -1214,7 +1251,10 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("task_id") = -1,
              py::arg("max_time") = 86400.0,
-             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{});
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("pibt_resolve_from_records",
              &pibt_resolve_from_records,
              py::arg("node_records"),
@@ -1227,7 +1267,10 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("edge_reservations") = std::vector<EdgeReservationTuple>{},
              py::arg("edge_capacity") = 1,
              py::arg("edge_headway_seconds") = 0.0,
-             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{});
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("rolling_horizon_sipp_from_records",
              &rolling_horizon_sipp_from_records,
              py::arg("node_records"),
@@ -1240,7 +1283,10 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("edge_headway_seconds") = 0.0,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
-             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{});
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("periodic_replanning_sipp_from_records",
              &periodic_replanning_sipp_from_records,
              py::arg("node_records"),
@@ -1254,7 +1300,10 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("edge_headway_seconds") = 0.0,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
-             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{});
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("pibt_active_bag_replay_from_records",
              &pibt_active_bag_replay_from_records,
              py::arg("node_records"),
@@ -1269,7 +1318,10 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("edge_headway_seconds") = 0.0,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
-             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{});
+             py::arg("node_capacities") = std::vector<NodeCapacityTuple>{},
+             py::arg("merge_groups") = std::vector<MergeGroupTuple>{},
+             py::arg("merge_capacity") = 1,
+             py::arg("merge_headway_seconds") = 0.0);
   module.def("edge_score_native_replay_summary_from_records",
              &edge_score_native_replay_summary_from_records,
              py::arg("node_records"),

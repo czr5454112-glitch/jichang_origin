@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
+import os
 from pathlib import Path
 import sys
 from typing import Any
@@ -17,6 +18,7 @@ NodeRecord = tuple[int, int, float, int, int, list[int]]
 EdgeRecord = tuple[int, int, float, float]
 AgentRecord = tuple[int, int, int, float, float, float]
 NodeReservationRecord = tuple[int, int, float, float]
+MergeGroup = tuple[int, int, int]
 ActionRow = dict[str, float | int | str]
 
 ACTION_FIELDS = (
@@ -46,12 +48,25 @@ class PIBTParityCase:
     node_reservations: tuple[NodeReservationRecord, ...] = ()
     fault_edges: tuple[tuple[int, int], ...] = ()
     hold_seconds: float = 1.0
+    merge_groups: tuple[MergeGroup, ...] = ()
+    merge_capacity: int = 1
+    merge_headway_seconds: float = 0.0
 
 
 def _prepare_imports() -> None:
     sys.path.insert(0, str(ROOT / "src"))
-    sys.path.insert(0, str(BUILD_PYTHON_PATH))
     sys.path.insert(0, str(Path(__file__).resolve().parent))
+    build_candidates = (
+        Path(os.environ["CZR005_CPP_PYTHON_PATH"])
+        if os.environ.get("CZR005_CPP_PYTHON_PATH")
+        else None,
+        ROOT / "build_vs" / "python" / "Debug",
+        ROOT / "build_vs" / "python" / "Release",
+        BUILD_PYTHON_PATH,
+    )
+    for candidate in reversed([path for path in build_candidates if path is not None]):
+        if candidate.exists() or str(candidate) == os.environ.get("CZR005_CPP_PYTHON_PATH"):
+            sys.path.insert(0, str(candidate))
 
 
 def _graph_from_records(
@@ -200,6 +215,9 @@ def _python_actions(case: PIBTParityCase) -> list[ActionRow]:
             agents,
             reservations=reservations,
             fault_edges=set(case.fault_edges),
+            merge_groups={(start, end): group for start, end, group in case.merge_groups},
+            merge_capacity=case.merge_capacity,
+            merge_headway_seconds=case.merge_headway_seconds,
         )
     ]
 
@@ -228,6 +246,9 @@ def _cpp_actions(case: PIBTParityCase) -> list[ActionRow]:
             node_reservations=list(case.node_reservations),
             fault_edges=list(case.fault_edges),
             hold_seconds=case.hold_seconds,
+            merge_groups=list(case.merge_groups),
+            merge_capacity=case.merge_capacity,
+            merge_headway_seconds=case.merge_headway_seconds,
         )
     ]
 
@@ -278,6 +299,7 @@ def _case_row(case: PIBTParityCase) -> dict[str, float | int | str | bool]:
         "case": case.name,
         "agent_count": len(case.agent_records),
         "node_reservation_count": len(case.node_reservations),
+        "merge_group_count": len(case.merge_groups),
         "fault_edge_count": len(case.fault_edges),
         "hold_seconds": case.hold_seconds,
         "python_actions": _action_summary(python),
@@ -337,9 +359,12 @@ def _synthetic_manifest_case() -> PIBTParityCase:
 
 
 def _cases() -> tuple[PIBTParityCase, ...]:
+    from run_phase2_cpp_sipp_parity import _parallel_merge_group_case_inputs  # pylint: disable=import-outside-toplevel
+
     merge_graph, merge_nodes, merge_edges, merge_heuristic = _merge_graph_inputs()
     branch_graph, branch_nodes, branch_edges, branch_heuristic = _branch_graph_inputs()
     handoff_graph, handoff_nodes, handoff_edges, handoff_heuristic = _handoff_graph_inputs()
+    parallel_graph, parallel_nodes, parallel_edges, parallel_heuristic = _parallel_merge_group_case_inputs()
     return (
         PIBTParityCase(
             "merge_priority_conflict",
@@ -374,6 +399,18 @@ def _cases() -> tuple[PIBTParityCase, ...]:
                 (2, 1, 3, 0.0, 20.0, 0.0),
             ),
             hold_seconds=2.5,
+        ),
+        PIBTParityCase(
+            "parallel_explicit_merge_group",
+            parallel_graph,
+            parallel_nodes,
+            parallel_edges,
+            parallel_heuristic,
+            (
+                (1, 0, 4, 0.0, 10.0, 0.0),
+                (2, 1, 5, 0.0, 20.0, 0.0),
+            ),
+            merge_groups=((0, 2, 7), (1, 3, 7)),
         ),
         PIBTParityCase(
             "branch_fault_alternative",
@@ -440,8 +477,8 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         (
             "This diagnostic compares the Python PIBTStyleOneStepResolver against the C++ "
             "resolver exposed through pybind. It covers deterministic priority ordering, "
-            "same-slice merge conflicts, fault-edge fallback, existing node reservations, "
-            "custom hold duration, bounded recursive current-node handoff, and one "
+            "same-slice node conflicts, explicit merge-group conflicts, fault-edge fallback, "
+            "existing node reservations, custom hold duration, bounded recursive current-node handoff, and one "
             "persisted synthetic manifest slice."
         ),
         "",
@@ -476,6 +513,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
                 else "- C++ PIBT-style Python/C++ parity: FAIL"
             ),
             "- merge/fault/reservation one-step shield cases: covered",
+            "- explicit merge-group one-step shield case: covered",
             "- bounded recursive current-node handoff: covered",
             "- persisted synthetic manifest one-step slice: covered",
             "- full active-bag replay integration: not covered",

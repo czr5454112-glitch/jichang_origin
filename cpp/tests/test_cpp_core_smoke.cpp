@@ -30,6 +30,7 @@ using czr005::ics::EdgeReservationTable;
 using czr005::ics::Graph;
 using czr005::ics::JunctionShield;
 using czr005::ics::JunctionShieldConfig;
+using czr005::ics::MergeGroupEdge;
 using czr005::ics::Node;
 using czr005::ics::PIBTAgentState;
 using czr005::ics::PIBTActiveBagReplayConfig;
@@ -79,6 +80,27 @@ Graph make_merge_graph() {
   graph.add_edge(Edge{0, 2, 5.0, 2.5});
   graph.add_edge(Edge{1, 2, 5.0, 2.5});
   graph.add_edge(Edge{2, 3, 5.0, 2.5});
+  return graph;
+}
+
+Graph make_parallel_merge_group_graph() {
+  Graph graph;
+  graph.add_node(Node{0, 1, 0.0, 0, 0, {2}});
+  graph.add_node(Node{1, 1, 0.0, 0, 1, {3}});
+  graph.add_node(Node{2, 4, 0.0, 1, 0, {4}});
+  graph.add_node(Node{3, 4, 0.0, 1, 1, {5}});
+  graph.add_node(Node{4, 2, 0.0, 2, 0, {}});
+  graph.add_node(Node{5, 2, 0.0, 2, 1, {}});
+  graph.set_heuristic({{0.0, 999.0, 2.0, 999.0, 4.0, 999.0},
+                       {999.0, 0.0, 999.0, 2.0, 999.0, 4.0},
+                       {999.0, 999.0, 0.0, 999.0, 2.0, 999.0},
+                       {999.0, 999.0, 999.0, 0.0, 999.0, 2.0},
+                       {999.0, 999.0, 999.0, 999.0, 0.0, 999.0},
+                       {999.0, 999.0, 999.0, 999.0, 999.0, 0.0}});
+  graph.add_edge(Edge{0, 2, 5.0, 2.5});
+  graph.add_edge(Edge{1, 3, 5.0, 2.5});
+  graph.add_edge(Edge{2, 4, 5.0, 2.5});
+  graph.add_edge(Edge{3, 5, 5.0, 2.5});
   return graph;
 }
 
@@ -252,6 +274,30 @@ int main() {
     test.check(near(sipp_edge_wait[1].t1, 4.0), "SIPP edge wait should delay target node arrival");
   }
 
+  const Graph parallel_merge_graph = make_parallel_merge_group_graph();
+  const SIPPPlanner parallel_sipp_planner(parallel_merge_graph);
+  EdgeReservationTable sipp_merge_reservations;
+  sipp_merge_reservations.reserve(99, 1, 3, 0.0, 2.0);
+  const std::vector<MergeGroupEdge> parallel_merge_groups{{0, 2, 7}, {1, 3, 7}};
+  const auto sipp_merge_wait = parallel_sipp_planner.plan(
+      0,
+      4,
+      0.0,
+      nullptr,
+      &sipp_merge_reservations,
+      1,
+      0.0,
+      {},
+      5,
+      {},
+      parallel_merge_groups);
+  test.check(sipp_merge_wait.size() == 3,
+             "SIPP should wait around a shared merge-group edge reservation");
+  if (sipp_merge_wait.size() == 3) {
+    test.check(near(sipp_merge_wait[1].t1, 4.0),
+               "SIPP merge-group wait should delay the first target node arrival");
+  }
+
   const auto sipp_fault_blocked = sipp_planner.plan(0, 2, 0.0, nullptr, nullptr, 1, 0.0, {{1, 2}}, 4);
   test.check(sipp_fault_blocked.empty(), "SIPP should reject a faulted only edge");
 
@@ -295,6 +341,27 @@ int main() {
                "rolling-horizon first buffer route should use the earliest node interval");
     test.check(near(rolling_buffer_result.routes[1][1].t1, 2.1),
                "rolling-horizon second buffer route should overlap within capacity");
+  }
+
+  TaskStream rolling_merge_tasks;
+  rolling_merge_tasks.add(TaskLeg{"merge-left", 409, 409, 0.0, 10.0, 0, 4, 0, 4, 0.0, "direct", false, 9});
+  rolling_merge_tasks.add(TaskLeg{"merge-right", 410, 410, 0.0, 20.0, 1, 5, 1, 5, 0.0, "direct", false, 10});
+  rolling_merge_tasks.sort_by_pass_time();
+  RollingHorizonConfig rolling_merge_config;
+  rolling_merge_config.max_tasks = 2;
+  rolling_merge_config.horizon_seconds = 60.0;
+  rolling_merge_config.merge_groups = parallel_merge_groups;
+  const auto rolling_merge_result =
+      run_rolling_horizon_sipp(parallel_merge_graph, rolling_merge_tasks, rolling_merge_config);
+  test.check(rolling_merge_result.planned_count == 2,
+             "rolling-horizon SIPP should plan both merge-group tasks");
+  test.check(rolling_merge_result.edge_reservation_conflicts == 0,
+             "rolling-horizon SIPP should keep merge-group edge conflicts at zero");
+  if (rolling_merge_result.routes.size() == 2) {
+    test.check(near(rolling_merge_result.routes[0][1].t1, 2.0),
+               "rolling-horizon first merge route should use the earliest edge interval");
+    test.check(near(rolling_merge_result.routes[1][1].t1, 4.0),
+               "rolling-horizon second merge route should wait for merge-group capacity");
   }
 
   TaskStream rolling_repair_active_tasks;
@@ -363,6 +430,22 @@ int main() {
   test.check(periodic_buffer_result.post_shield_conflicts == 0,
              "periodic replanning SIPP should count explicit buffer capacity in post-shield conflicts");
 
+  TaskStream periodic_merge_tasks;
+  periodic_merge_tasks.add(TaskLeg{"merge-left", 411, 411, 0.0, 20.0, 0, 4, 0, 4, 0.0, "direct", false, 11});
+  periodic_merge_tasks.add(TaskLeg{"merge-right", 412, 412, 0.0, 20.0, 1, 5, 1, 5, 0.0, "direct", false, 12});
+  periodic_merge_tasks.sort_by_pass_time();
+  PeriodicReplanningConfig periodic_merge_config;
+  periodic_merge_config.max_tasks = 2;
+  periodic_merge_config.interval_seconds = 1.0;
+  periodic_merge_config.max_ticks = 16;
+  periodic_merge_config.merge_groups = parallel_merge_groups;
+  const auto periodic_merge_result =
+      run_periodic_replanning_sipp(parallel_merge_graph, periodic_merge_tasks, periodic_merge_config);
+  test.check(periodic_merge_result.planned_count == 2,
+             "periodic replanning SIPP should plan both merge-group tasks");
+  test.check(periodic_merge_result.post_shield_conflicts == 0,
+             "periodic replanning SIPP should avoid merge-group conflicts");
+
   TaskStream periodic_repair_tasks;
   periodic_repair_tasks.add(TaskLeg{"repair-wait", 403, 403, 0.0, 30.0, 0, 2, 0, 2, 0.0, "direct", false, 3});
   periodic_repair_tasks.sort_by_pass_time();
@@ -396,6 +479,30 @@ int main() {
     test.check(pibt_merge_actions[1].action == "hold", "PIBT resolver loose merge action should hold");
     test.check(pibt_merge_actions[1].reason == "no_safe_edge",
                "PIBT resolver loose merge action should explain blocked edge");
+  }
+
+  const PIBTStyleOneStepResolver pibt_parallel_merge_resolver(parallel_merge_graph);
+  const auto pibt_parallel_merge_actions = pibt_parallel_merge_resolver.resolve(
+      {PIBTAgentState{1, 0, 4, 0.0, 10.0, 0.0},
+       PIBTAgentState{2, 1, 5, 0.0, 20.0, 0.0}},
+      nullptr,
+      {},
+      nullptr,
+      1,
+      0.0,
+      {},
+      parallel_merge_groups);
+  test.check(pibt_parallel_merge_actions.size() == 2,
+             "PIBT resolver should produce two parallel merge-group actions");
+  if (pibt_parallel_merge_actions.size() == 2) {
+    test.check(pibt_parallel_merge_actions[0].action == "move",
+               "PIBT resolver should move the first parallel merge-group task");
+    test.check(pibt_parallel_merge_actions[0].next_node == 2,
+               "PIBT resolver first parallel merge action should target node 2");
+    test.check(pibt_parallel_merge_actions[1].action == "hold",
+               "PIBT resolver should hold the second local merge-group conflict");
+    test.check(pibt_parallel_merge_actions[1].reason == "no_safe_edge",
+               "PIBT resolver should label the local merge-group block");
   }
 
   const Graph pibt_branch_graph = make_branch_graph();
@@ -469,6 +576,23 @@ int main() {
              "PIBT active-bag replay should record active decisions");
   test.check(pibt_replay_result.events.size() >= 4,
              "PIBT active-bag replay should emit replay events");
+
+  TaskStream pibt_merge_replay_tasks;
+  pibt_merge_replay_tasks.add(TaskLeg{"merge-left", 503, 503, 0.0, 20.0, 0, 4, 0, 4, 0.0, "direct", false, 3});
+  pibt_merge_replay_tasks.add(TaskLeg{"merge-right", 504, 504, 0.0, 20.0, 1, 5, 1, 5, 0.0, "direct", false, 4});
+  pibt_merge_replay_tasks.sort_by_pass_time();
+  PIBTActiveBagReplayConfig pibt_merge_replay_config;
+  pibt_merge_replay_config.max_tasks = 2;
+  pibt_merge_replay_config.interval_seconds = 2.0;
+  pibt_merge_replay_config.hold_seconds = 2.0;
+  pibt_merge_replay_config.max_ticks = 16;
+  pibt_merge_replay_config.merge_groups = parallel_merge_groups;
+  const auto pibt_merge_replay_result =
+      run_pibt_active_bag_replay(parallel_merge_graph, pibt_merge_replay_tasks, pibt_merge_replay_config);
+  test.check(pibt_merge_replay_result.planned_count == 2,
+             "PIBT active-bag replay should plan both merge-group tasks");
+  test.check(pibt_merge_replay_result.post_shield_conflicts == 0,
+             "PIBT active-bag replay should avoid merge-group conflicts");
 
   const auto later = planner.plan(0, 2, 6.0, &reservations, {}, 3);
   test.check(later.size() == 3, "sample later route should have 3 nodes");

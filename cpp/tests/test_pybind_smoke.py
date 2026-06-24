@@ -299,6 +299,99 @@ def main() -> None:
     assert periodic_repair["summary"]["unplanned_count"] == 0
     assert periodic_repair["summary"]["post_shield_conflicts"] == 0
 
+    parallel_node_records = [
+        (0, 1, 0.0, 0, 0, [2]),
+        (1, 1, 0.0, 0, 1, [3]),
+        (2, 4, 0.0, 1, 0, [4]),
+        (3, 4, 0.0, 1, 1, [5]),
+        (4, 2, 0.0, 2, 0, []),
+        (5, 2, 0.0, 2, 1, []),
+    ]
+    parallel_edge_records = [
+        (0, 2, 5.0, 2.5),
+        (1, 3, 5.0, 2.5),
+        (2, 4, 5.0, 2.5),
+        (3, 5, 5.0, 2.5),
+    ]
+    parallel_heuristic_time = [
+        [0.0, 999.0, 2.0, 999.0, 4.0, 999.0],
+        [999.0, 0.0, 999.0, 2.0, 999.0, 4.0],
+        [999.0, 999.0, 0.0, 999.0, 2.0, 999.0],
+        [999.0, 999.0, 999.0, 0.0, 999.0, 2.0],
+        [999.0, 999.0, 999.0, 999.0, 0.0, 999.0],
+        [999.0, 999.0, 999.0, 999.0, 999.0, 0.0],
+    ]
+    parallel_merge_groups = [(0, 2, 7), (1, 3, 7)]
+    parallel_tasks = [
+        ("merge-left", 601, 601, 0.0, 20.0, 0, 4, 0, 4, 0.0, "direct", False, 1),
+        ("merge-right", 602, 602, 0.0, 20.0, 1, 5, 1, 5, 0.0, "direct", False, 2),
+    ]
+    sipp_merge_route = czr005_cpp.sipp_plan_from_records(
+        parallel_node_records,
+        parallel_edge_records,
+        parallel_heuristic_time,
+        start=0,
+        goal=4,
+        edge_reservations=[(99, 1, 3, 0.0, 2.0)],
+        merge_groups=parallel_merge_groups,
+        task_id=601,
+    )
+    assert [row["location"] for row in sipp_merge_route] == [0, 2, 4]
+    assert abs(sipp_merge_route[1]["t1"] - 4.0) < 1.0e-9
+
+    rolling_merge = czr005_cpp.rolling_horizon_sipp_from_records(
+        parallel_node_records,
+        parallel_edge_records,
+        parallel_heuristic_time,
+        parallel_tasks,
+        max_tasks=2,
+        horizon_seconds=60.0,
+        merge_groups=parallel_merge_groups,
+    )
+    assert rolling_merge["summary"]["planned_count"] == 2
+    assert rolling_merge["summary"]["post_shield_conflicts"] == 0
+    assert rolling_merge["events"][1]["finish_time"] >= 6.0
+
+    periodic_merge = czr005_cpp.periodic_replanning_sipp_from_records(
+        parallel_node_records,
+        parallel_edge_records,
+        parallel_heuristic_time,
+        parallel_tasks,
+        max_tasks=2,
+        interval_seconds=1.0,
+        max_ticks=16,
+        merge_groups=parallel_merge_groups,
+    )
+    assert periodic_merge["summary"]["planned_count"] == 2
+    assert periodic_merge["summary"]["post_shield_conflicts"] == 0
+
+    pibt_parallel_merge = czr005_cpp.pibt_resolve_from_records(
+        parallel_node_records,
+        parallel_edge_records,
+        parallel_heuristic_time,
+        [
+            (1, 0, 4, 0.0, 10.0, 0.0),
+            (2, 1, 5, 0.0, 20.0, 0.0),
+        ],
+        merge_groups=parallel_merge_groups,
+    )
+    assert [action["action"] for action in pibt_parallel_merge] == ["move", "hold"]
+    assert pibt_parallel_merge[1]["reason"] == "no_safe_edge"
+
+    pibt_parallel_replay = czr005_cpp.pibt_active_bag_replay_from_records(
+        parallel_node_records,
+        parallel_edge_records,
+        parallel_heuristic_time,
+        parallel_tasks,
+        max_tasks=2,
+        interval_seconds=2.0,
+        max_ticks=16,
+        hold_seconds=2.0,
+        merge_groups=parallel_merge_groups,
+    )
+    assert pibt_parallel_replay["summary"]["planned_count"] == 2
+    assert pibt_parallel_replay["summary"]["post_shield_conflicts"] == 0
+
     pibt_merge_node_records = [
         (0, 1, 0.0, 0, 0, [2]),
         (1, 1, 0.0, 0, 1, [2]),

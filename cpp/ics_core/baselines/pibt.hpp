@@ -58,9 +58,15 @@ class PIBTStyleOneStepResolver {
       const EdgeReservationTable* edge_reservations = nullptr,
       int edge_capacity = 1,
       double edge_headway_seconds = 0.0,
-      const std::unordered_map<int, int>& node_capacities = {}) const {
+      const std::unordered_map<int, int>& node_capacities = {},
+      const std::vector<MergeGroupEdge>& merge_groups = {},
+      int merge_capacity = 1,
+      double merge_headway_seconds = 0.0) const {
     if (edge_capacity <= 0) {
       throw std::invalid_argument("edge_capacity must be positive");
+    }
+    if (merge_capacity <= 0) {
+      throw std::invalid_argument("merge_capacity must be positive");
     }
     const ReservationTable empty_reservations;
     const ReservationTable& node_reservations =
@@ -95,6 +101,8 @@ class PIBTStyleOneStepResolver {
     std::unordered_map<int, PIBTResolvedAction> chosen_by_task;
     std::vector<LocalNodeWindow> local_node_windows;
     local_node_windows.reserve(agents.size());
+    std::vector<LocalEdgeWindow> local_edge_windows;
+    local_edge_windows.reserve(agents.size());
     std::set<std::pair<int, int>> local_edges;
 
     for (const auto& agent : agents) {
@@ -110,12 +118,16 @@ class PIBTStyleOneStepResolver {
                                              edge_capacity,
                                              edge_headway_seconds,
                                              node_capacities,
+                                             merge_groups,
+                                             merge_capacity,
+                                             merge_headway_seconds,
                                              fault_edges,
                                              agents_by_task,
                                              current_owner,
                                              priority_ranks,
                                              chosen_by_task,
                                              local_node_windows,
+                                             local_edge_windows,
                                              local_edges,
                                              blocked_targets,
                                              false,
@@ -141,6 +153,14 @@ class PIBTStyleOneStepResolver {
     int task_id = -1;
   };
 
+  struct LocalEdgeWindow {
+    int start_node = -1;
+    int end_node = -1;
+    double start = 0.0;
+    double end = 0.0;
+    int task_id = -1;
+  };
+
   [[nodiscard]] bool assign_recursive(
       const PIBTAgentState& agent,
       int priority_rank,
@@ -149,12 +169,16 @@ class PIBTStyleOneStepResolver {
       int edge_capacity,
       double edge_headway_seconds,
       const std::unordered_map<int, int>& node_capacities,
+      const std::vector<MergeGroupEdge>& merge_groups,
+      int merge_capacity,
+      double merge_headway_seconds,
       const std::set<std::pair<int, int>>& fault_edges,
       const std::unordered_map<int, PIBTAgentState>& agents_by_task,
       const std::unordered_map<int, int>& current_owner,
       const std::unordered_map<int, int>& priority_ranks,
       std::unordered_map<int, PIBTResolvedAction>& chosen_by_task,
       std::vector<LocalNodeWindow>& local_node_windows,
+      std::vector<LocalEdgeWindow>& local_edge_windows,
       std::set<std::pair<int, int>>& local_edges,
       const std::unordered_set<int>& blocked_targets,
       bool inherited,
@@ -203,6 +227,27 @@ class PIBTStyleOneStepResolver {
                                                  agent.task_id)) {
         continue;
       }
+      if (edge_reservations.has_merge_group_conflict(agent.current,
+                                                     next_node,
+                                                     edge_start,
+                                                     edge_end,
+                                                     merge_groups,
+                                                     merge_capacity,
+                                                     merge_headway_seconds,
+                                                     agent.task_id)) {
+        continue;
+      }
+      if (local_merge_group_conflict(agent.current,
+                                     next_node,
+                                     edge_start,
+                                     edge_end,
+                                     agent.task_id,
+                                     local_edge_windows,
+                                     merge_groups,
+                                     merge_capacity,
+                                     merge_headway_seconds)) {
+        continue;
+      }
 
       if (next_node != agent.goal &&
           reservations.has_capacity_conflict(next_node,
@@ -235,12 +280,16 @@ class PIBTStyleOneStepResolver {
                                 edge_capacity,
                                 edge_headway_seconds,
                                 node_capacities,
+                                merge_groups,
+                                merge_capacity,
+                                merge_headway_seconds,
                                 fault_edges,
                                 agents_by_task,
                                 current_owner,
                                 priority_ranks,
                                 chosen_by_task,
                                 local_node_windows,
+                                local_edge_windows,
                                 local_edges,
                                 blocker_blocked_targets,
                                 true,
@@ -257,6 +306,17 @@ class PIBTStyleOneStepResolver {
           continue;
         }
         if (local_edges.find({agent.current, next_node}) != local_edges.end()) {
+          continue;
+        }
+        if (local_merge_group_conflict(agent.current,
+                                       next_node,
+                                       edge_start,
+                                       edge_end,
+                                       agent.task_id,
+                                       local_edge_windows,
+                                       merge_groups,
+                                       merge_capacity,
+                                       merge_headway_seconds)) {
           continue;
         }
         if (local_node_conflict(next_node,
@@ -281,6 +341,11 @@ class PIBTStyleOneStepResolver {
                                                          reason,
                                                          priority_rank};
       local_node_windows.push_back(LocalNodeWindow{next_node, node_start, node_end, agent.task_id});
+      local_edge_windows.push_back(LocalEdgeWindow{agent.current,
+                                                   next_node,
+                                                   edge_start,
+                                                   edge_end,
+                                                   agent.task_id});
       local_edges.insert({agent.current, next_node});
       visiting.erase(agent.task_id);
       return true;
@@ -355,6 +420,51 @@ class PIBTStyleOneStepResolver {
       }
     }
     return false;
+  }
+
+  [[nodiscard]] static int merge_group(
+      int start_node,
+      int end_node,
+      const std::vector<MergeGroupEdge>& merge_groups) {
+    for (const auto& edge : merge_groups) {
+      if (edge.start_node == start_node && edge.end_node == end_node) {
+        return edge.group;
+      }
+    }
+    return -1;
+  }
+
+  [[nodiscard]] static bool local_merge_group_conflict(
+      int start_node,
+      int end_node,
+      double start,
+      double end,
+      int task_id,
+      const std::vector<LocalEdgeWindow>& local_windows,
+      const std::vector<MergeGroupEdge>& merge_groups,
+      int merge_capacity,
+      double merge_headway_seconds) {
+    const int group = merge_group(start_node, end_node, merge_groups);
+    if (group < 0) {
+      return false;
+    }
+    int overlapping = 0;
+    for (const auto& window : local_windows) {
+      if (window.task_id == task_id) {
+        continue;
+      }
+      if (merge_group(window.start_node, window.end_node, merge_groups) != group) {
+        continue;
+      }
+      if (!(start >= window.end - 1.0e-9 || end <= window.start + 1.0e-9)) {
+        ++overlapping;
+      }
+      const double gap = window.start > start ? window.start - start : start - window.start;
+      if (merge_headway_seconds > 0.0 && gap < merge_headway_seconds) {
+        return true;
+      }
+    }
+    return overlapping >= merge_capacity;
   }
 
   const Graph& graph_;

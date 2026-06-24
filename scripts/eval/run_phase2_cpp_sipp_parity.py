@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
+import os
 from pathlib import Path
 import sys
 from typing import Any
@@ -16,6 +17,7 @@ FLOAT_TOLERANCE = 1.0e-9
 RouteRow = dict[str, float | int]
 NodeReservationRecord = tuple[int, int, float, float]
 EdgeReservationRecord = tuple[int, int, int, float, float]
+MergeGroupRecord = tuple[int, int, int]
 
 
 @dataclass(frozen=True)
@@ -32,14 +34,27 @@ class SippParityCase:
     edge_reservations: tuple[EdgeReservationRecord, ...] = ()
     edge_capacity: int = 1
     edge_headway_seconds: float = 0.0
+    merge_groups: tuple[MergeGroupRecord, ...] = ()
+    merge_capacity: int = 1
+    merge_headway_seconds: float = 0.0
     fault_edges: tuple[tuple[int, int], ...] = ()
     task_id: int = 1
 
 
 def _prepare_imports() -> None:
     sys.path.insert(0, str(ROOT / "src"))
-    sys.path.insert(0, str(BUILD_PYTHON_PATH))
     sys.path.insert(0, str(Path(__file__).resolve().parent))
+    build_candidates = (
+        Path(os.environ["CZR005_CPP_PYTHON_PATH"])
+        if os.environ.get("CZR005_CPP_PYTHON_PATH")
+        else None,
+        ROOT / "build_vs" / "python" / "Debug",
+        ROOT / "build_vs" / "python" / "Release",
+        BUILD_PYTHON_PATH,
+    )
+    for candidate in reversed([path for path in build_candidates if path is not None]):
+        if candidate.exists() or str(candidate) == os.environ.get("CZR005_CPP_PYTHON_PATH"):
+            sys.path.insert(0, str(candidate))
 
 
 def _line_graph_case_inputs() -> tuple[Any, tuple[Any, ...], tuple[Any, ...], tuple[tuple[float, ...], ...]]:
@@ -58,6 +73,55 @@ def _line_graph_case_inputs() -> tuple[Any, tuple[Any, ...], tuple[Any, ...], tu
         (0.0, 2.0, 4.0),
         (4.0, 0.0, 2.0),
         (4.0, 2.0, 0.0),
+    )
+    graph = IcsGraph(
+        nodes={
+            location: SimNode(
+                location=location,
+                node_type=node_type,
+                service_time=service_time,
+                x=x,
+                y=y,
+                outgoing=tuple(outgoing),
+            )
+            for location, node_type, service_time, x, y, outgoing in node_records
+        },
+        edges={
+            (start, end): SimEdge(start=start, end=end, length=length, speed=speed)
+            for start, end, length, speed in edge_records
+        },
+        heuristic_time=heuristic_time,
+        agv_length=1.0,
+        safe_length=1.0,
+        fault_threshold=1.0,
+    )
+    return graph, node_records, edge_records, heuristic_time
+
+
+def _parallel_merge_group_case_inputs() -> tuple[Any, tuple[Any, ...], tuple[Any, ...], tuple[tuple[float, ...], ...]]:
+    from czr005.sim_py import IcsGraph, SimEdge, SimNode  # pylint: disable=import-outside-toplevel
+
+    node_records = (
+        (0, 1, 0.0, 0, 0, [2]),
+        (1, 1, 0.0, 0, 1, [3]),
+        (2, 4, 0.0, 1, 0, [4]),
+        (3, 4, 0.0, 1, 1, [5]),
+        (4, 2, 0.0, 2, 0, []),
+        (5, 2, 0.0, 2, 1, []),
+    )
+    edge_records = (
+        (0, 2, 5.0, 2.5),
+        (1, 3, 5.0, 2.5),
+        (2, 4, 5.0, 2.5),
+        (3, 5, 5.0, 2.5),
+    )
+    heuristic_time = (
+        (0.0, 999.0, 2.0, 999.0, 4.0, 999.0),
+        (999.0, 0.0, 999.0, 2.0, 999.0, 4.0),
+        (999.0, 999.0, 0.0, 999.0, 2.0, 999.0),
+        (999.0, 999.0, 999.0, 0.0, 999.0, 2.0),
+        (999.0, 999.0, 999.0, 999.0, 0.0, 999.0),
+        (999.0, 999.0, 999.0, 999.0, 999.0, 0.0),
     )
     graph = IcsGraph(
         nodes={
@@ -118,6 +182,9 @@ def _python_sipp_route(case: SippParityCase) -> list[RouteRow]:
         edge_reservations=edge_table,
         edge_capacity=case.edge_capacity,
         edge_headway_seconds=case.edge_headway_seconds,
+        merge_groups={(start, end): group for start, end, group in case.merge_groups},
+        merge_capacity=case.merge_capacity,
+        merge_headway_seconds=case.merge_headway_seconds,
         fault_edges=set(case.fault_edges),
         task_id=case.task_id,
     )
@@ -147,6 +214,9 @@ def _cpp_sipp_route(case: SippParityCase) -> list[RouteRow]:
             edge_reservations=list(case.edge_reservations),
             edge_capacity=case.edge_capacity,
             edge_headway_seconds=case.edge_headway_seconds,
+            merge_groups=list(case.merge_groups),
+            merge_capacity=case.merge_capacity,
+            merge_headway_seconds=case.merge_headway_seconds,
             fault_edges=list(case.fault_edges),
             task_id=case.task_id,
         )
@@ -200,8 +270,10 @@ def _case_row(case: SippParityCase) -> dict[str, float | int | str | bool]:
         "cpp_finish": float(cpp_route[-1]["t2"]) if cpp_route else 0.0,
         "node_reservation_count": len(case.node_reservations),
         "edge_reservation_count": len(case.edge_reservations),
+        "merge_group_count": len(case.merge_groups),
         "fault_edge_count": len(case.fault_edges),
         "edge_headway_seconds": case.edge_headway_seconds,
+        "merge_headway_seconds": case.merge_headway_seconds,
         "parity_pass": parity_pass,
         "first_mismatch_status": mismatch["status"],
         "first_mismatch_node": mismatch["node_index"],
@@ -218,6 +290,7 @@ def _cases() -> tuple[SippParityCase, ...]:
     )
 
     line_graph, node_records, edge_records, heuristic_time = _line_graph_case_inputs()
+    merge_graph, merge_nodes, merge_edges, merge_heuristic = _parallel_merge_group_case_inputs()
     cases: list[SippParityCase] = [
         SippParityCase("line_clear", line_graph, node_records, edge_records, heuristic_time, 0, 2),
         SippParityCase(
@@ -261,6 +334,17 @@ def _cases() -> tuple[SippParityCase, ...]:
             2,
             fault_edges=((1, 2),),
         ),
+        SippParityCase(
+            "parallel_merge_group_wait",
+            merge_graph,
+            merge_nodes,
+            merge_edges,
+            merge_heuristic,
+            0,
+            4,
+            edge_reservations=((99, 1, 3, 0.0, 2.0),),
+            merge_groups=((0, 2, 7), (1, 3, 7)),
+        ),
     ]
     for manifest_case in load_manifest_cases():
         task = manifest_case.task_records[0]
@@ -303,7 +387,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "This diagnostic compares the Python SIPP baseline against the new C++ SIPP planner "
             "through the pybind in-memory record API. It covers clear routing, node-reservation "
             "waiting, edge-capacity waiting, edge-headway waiting, fault-edge blocking, and "
-            "first-task routes from the persisted synthetic manifest."
+            "merge-group waiting, plus first-task routes from the persisted synthetic manifest."
         ),
         "",
         "## Metrics",
@@ -329,9 +413,10 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "",
             "- C++ SIPP route/timing parity: PASS" if strict_pass else "- C++ SIPP route/timing parity: FAIL",
             "- node and edge reservation waiting cases: covered",
+            "- merge-group waiting case: covered",
             "- persisted synthetic manifest first-task cases: covered",
             "- rolling-horizon C++ replay: not covered",
-            "- full merge-group/buffer-capacity replay integration: not covered",
+            "- full active-bag replay integration: not covered",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

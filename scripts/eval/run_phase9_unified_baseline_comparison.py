@@ -41,6 +41,9 @@ FIELDNAMES = [
     "fault_edges",
     "fault_windows",
     "node_capacities",
+    "merge_groups",
+    "merge_capacity",
+    "merge_headway_seconds",
     "planned_count",
     "unplanned_count",
     "post_shield_conflicts",
@@ -116,6 +119,9 @@ def _outcome_rows() -> list[dict[str, str]]:
                 fault_edges="none",
                 fault_windows="none",
                 node_capacities="none",
+                merge_groups="none",
+                merge_capacity="1",
+                merge_headway_seconds="0.0",
                 planned_count=_int_text(source["planned_count"]),
                 unplanned_count=_int_text(source["unplanned_count"]),
                 post_shield_conflicts=_int_text(source["post_shield_conflicts"]),
@@ -141,6 +147,9 @@ def _outcome_rows() -> list[dict[str, str]]:
                 fault_edges=source.get("fault_edges", "none"),
                 fault_windows="none",
                 node_capacities="none",
+                merge_groups="none",
+                merge_capacity="1",
+                merge_headway_seconds="0.0",
                 planned_count=_int_text(source["planned_count"]),
                 unplanned_count=_int_text(source["unplanned_count"]),
                 post_shield_conflicts=_int_text(source["post_shield_conflicts"]),
@@ -170,6 +179,9 @@ def _legacy_event_parity_rows() -> list[dict[str, str]]:
                 fault_edges=source.get("fault_edges", "none"),
                 fault_windows=source.get("fault_windows", "none"),
                 node_capacities=source.get("node_capacities", "none"),
+                merge_groups=source.get("merge_groups", "none"),
+                merge_capacity=source.get("merge_capacity", "1"),
+                merge_headway_seconds=source.get("merge_headway_seconds", "0.0"),
                 planned_count=_int_text(source["cpp_planned"]),
                 unplanned_count=_int_text(source["cpp_unplanned"]),
                 post_shield_conflicts=_int_text(source["cpp_conflicts"]),
@@ -206,6 +218,9 @@ def _matched_rows() -> list[dict[str, str]]:
                 fault_edges=source.get("fault_edges", "none"),
                 fault_windows=source.get("fault_windows", "none"),
                 node_capacities=source.get("node_capacities", "none"),
+                merge_groups=source.get("merge_groups", "none"),
+                merge_capacity=source.get("merge_capacity", "1"),
+                merge_headway_seconds=source.get("merge_headway_seconds", "0.0"),
                 planned_count=_int_text(source["cpp_planned"]),
                 unplanned_count=_int_text(source["cpp_unplanned"]),
                 post_shield_conflicts=_int_text(source["cpp_conflicts"]),
@@ -244,6 +259,9 @@ def _runtime_rows() -> list[dict[str, str]]:
                 fault_edges=source.get("fault_edges", "none"),
                 fault_windows=source.get("fault_windows", "none"),
                 node_capacities=source.get("node_capacities", "none"),
+                merge_groups=source.get("merge_groups", "none"),
+                merge_capacity=source.get("merge_capacity", "1"),
+                merge_headway_seconds=source.get("merge_headway_seconds", "0.0"),
                 planned_count=_int_text(source["cpp_planned"]),
                 unplanned_count=_int_text(source["cpp_unplanned"]),
                 post_shield_conflicts=_int_text(source["cpp_conflicts"]),
@@ -380,6 +398,17 @@ def _fault_label(row: dict[str, str]) -> str:
     return row["fault_windows"]
 
 
+def _config_label(row: dict[str, str]) -> str:
+    parts = []
+    if row["node_capacities"] and row["node_capacities"] != "none":
+        parts.append(f"nodes={row['node_capacities']}")
+    if row["merge_groups"] and row["merge_groups"] != "none":
+        parts.append(
+            f"merge={row['merge_groups']},cap={row['merge_capacity']},headway={row['merge_headway_seconds']}"
+        )
+    return "; ".join(parts) if parts else "none"
+
+
 def write_report(rows: list[dict[str, str]]) -> None:
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     summary = _summarize(rows)
@@ -403,7 +432,7 @@ def write_report(rows: list[dict[str, str]]) -> None:
         "",
         (
             "The table is intentionally an evidence index, not a final paper benchmark. Rows come from different "
-            "scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window windows, "
+            "scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window/merge-group windows, "
             "so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and "
             "hardware-normalized timing."
         ),
@@ -426,15 +455,15 @@ def write_report(rows: list[dict[str, str]]) -> None:
             "",
             "## Matched Baseline Evidence",
             "",
-            "| Scenario | Family | Tasks | Faults | Buffer | C++ planned | C++ active steps | Conflicts | Speedup | Parity |",
+            "| Scenario | Family | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity |",
             "|---|---|---:|---|---|---:|---:|---:|---:|---|",
         ]
     )
     for row in matched_rows:
         lines.append(
-            "| {case} | {policy_or_baseline} | {max_tasks} | {fault_label} | {node_capacities} | {planned_count} | "
+            "| {case} | {policy_or_baseline} | {max_tasks} | {fault_label} | {config_label} | {planned_count} | "
             "{decision_count} | {post_shield_conflicts} | {cpp_decision_speedup} | {strict_parity_pass} |".format(
-                **{**row, "fault_label": _fault_label(row)}
+                **{**row, "fault_label": _fault_label(row), "config_label": _config_label(row)}
             )
         )
 
@@ -504,10 +533,10 @@ def write_report(rows: list[dict[str, str]]) -> None:
             else "- baseline-family parity summaries pass: FAIL",
             f"- median C++ decision-throughput speedup in runtime rows: `{summary['median_speedup']:.3f}x`",
             "- matched paper-grade Phase9 comparison: not covered",
+            "- matched merge-group scenario: covered",
             "",
             "## Remaining Work",
             "",
-            "- extend matched Phase9 rows to merge-group scenarios once every included family accepts shared merge config",
             "- add a separate real heldout airport map when fixture data is available",
             "- add hardware-normalized repeated timing and confidence intervals for every compared baseline family",
         ]

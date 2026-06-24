@@ -20,6 +20,7 @@ EdgeRecord = tuple[int, int, float, float]
 TaskRecord = tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
 FaultWindow = tuple[int, int, float, float]
 NodeCapacity = tuple[int, int]
+MergeGroup = tuple[int, int, int]
 
 SUMMARY_FIELDS = (
     "planned_count",
@@ -74,6 +75,9 @@ class PeriodicParityCase:
     fault_edges: tuple[tuple[int, int], ...] = ()
     fault_windows: tuple[FaultWindow, ...] = ()
     node_capacities: tuple[NodeCapacity, ...] = ()
+    merge_groups: tuple[MergeGroup, ...] = ()
+    merge_capacity: int = 1
+    merge_headway_seconds: float = 0.0
 
 
 def _prepare_imports() -> None:
@@ -241,6 +245,9 @@ def _python_payload(case: PeriodicParityCase) -> dict[str, Any]:
         edge_capacity=case.edge_capacity,
         edge_headway_seconds=case.edge_headway_seconds,
         node_capacities=dict(case.node_capacities),
+        merge_groups={(start, end): group for start, end, group in case.merge_groups},
+        merge_capacity=case.merge_capacity,
+        merge_headway_seconds=case.merge_headway_seconds,
     )
     result = baseline.run_episode(
         case.tasks,
@@ -277,6 +284,9 @@ def _cpp_payload(case: PeriodicParityCase) -> dict[str, Any]:
         fault_edges=list(case.fault_edges),
         fault_windows=list(case.fault_windows),
         node_capacities=list(case.node_capacities),
+        merge_groups=list(case.merge_groups),
+        merge_capacity=case.merge_capacity,
+        merge_headway_seconds=case.merge_headway_seconds,
     )
     return {
         "summary": dict(payload["summary"]),
@@ -334,6 +344,8 @@ def _case_row(case: PeriodicParityCase) -> dict[str, float | int | str | bool]:
         "case": case.name,
         "max_tasks": case.max_tasks,
         "interval_seconds": case.interval_seconds,
+        "merge_group_count": len(case.merge_groups),
+        "merge_headway_seconds": case.merge_headway_seconds,
         "python_planned": int(python["summary"]["planned_count"]),
         "cpp_planned": int(cpp["summary"]["planned_count"]),
         "python_unplanned": int(python["summary"]["unplanned_count"]),
@@ -366,10 +378,12 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
         load_manifest_cases,
         tasks_from_case,
     )
+    from run_phase2_cpp_sipp_parity import _parallel_merge_group_case_inputs  # pylint: disable=import-outside-toplevel
 
     line_graph, line_nodes, line_edges, line_heuristic = _line_graph_inputs()
     branch_graph, branch_nodes, branch_edges, branch_heuristic = _branch_graph_inputs()
     single_graph, single_nodes, single_edges, single_heuristic = _single_edge_inputs()
+    merge_graph, merge_nodes, merge_edges, merge_heuristic = _parallel_merge_group_case_inputs()
     line_tasks = (
         _task("urgent", 1, 0.0, 20.0, 0, 2),
         _task("loose", 2, 0.1, 100.0, 0, 2),
@@ -384,6 +398,10 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
     buffer_tasks = (
         _task("buffer-first", 8, 0.0, 20.0, 0, 2),
         _task("buffer-second", 9, 0.0, 20.0, 0, 2),
+    )
+    merge_tasks = (
+        _task("merge-left", 10, 0.0, 20.0, 0, 4),
+        _task("merge-right", 11, 0.0, 20.0, 1, 5),
     )
     cases: list[PeriodicParityCase] = [
         PeriodicParityCase(
@@ -464,6 +482,19 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
             edge_capacity=2,
             node_capacities=((1, 2),),
         ),
+        PeriodicParityCase(
+            "parallel_merge_group_capacity",
+            merge_graph,
+            merge_nodes,
+            merge_edges,
+            merge_heuristic,
+            merge_tasks,
+            tuple(_task_record(task) for task in merge_tasks),
+            max_tasks=2,
+            interval_seconds=1.0,
+            max_ticks=32,
+            merge_groups=((0, 2, 7), (1, 3, 7)),
+        ),
     ]
     for manifest_case in load_manifest_cases()[:2]:
         tasks = tasks_from_case(manifest_case)
@@ -482,6 +513,7 @@ def _cases() -> tuple[PeriodicParityCase, ...]:
                 fault_edges=manifest_case.spec.fault_edges,
                 fault_windows=manifest_case.spec.fault_windows,
                 node_capacities=manifest_case.spec.node_capacities,
+                merge_groups=manifest_case.spec.merge_groups,
             )
         )
     return tuple(cases)
@@ -515,8 +547,8 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         (
             "It covers two active bags, edge-capacity pressure, static-fault alternate routing, "
             "repair-window alternate/repaired routing, node buffer-capacity overlap, "
-            "and two persisted synthetic manifest slices. Recursive PIBT and real heldout "
-            "airport maps are not covered."
+            "merge-group capacity, and two persisted synthetic manifest slices. Recursive "
+            "PIBT and real heldout airport maps are not covered."
         ),
         "",
         "## Metrics",
@@ -551,6 +583,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "- route-discarding one-step replanning: covered",
             "- static-fault alternate routing: covered",
             "- repair-window periodic replanning: covered",
+            "- merge-group periodic replanning: covered",
             "- recursive PIBT: not covered",
         ]
     )

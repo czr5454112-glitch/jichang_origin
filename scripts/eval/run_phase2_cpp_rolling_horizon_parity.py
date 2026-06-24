@@ -20,6 +20,7 @@ EdgeRecord = tuple[int, int, float, float]
 TaskRecord = tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
 FaultWindow = tuple[int, int, float, float]
 NodeCapacity = tuple[int, int]
+MergeGroup = tuple[int, int, int]
 
 SUMMARY_FIELDS = (
     "planned_count",
@@ -62,19 +63,24 @@ class RollingParityCase:
     fault_edges: tuple[tuple[int, int], ...] = ()
     fault_windows: tuple[FaultWindow, ...] = ()
     node_capacities: tuple[NodeCapacity, ...] = ()
+    merge_groups: tuple[MergeGroup, ...] = ()
+    merge_capacity: int = 1
+    merge_headway_seconds: float = 0.0
 
 
 def _prepare_imports() -> None:
     sys.path.insert(0, str(ROOT / "src"))
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     build_candidates = (
-        BUILD_PYTHON_PATH,
+        Path(os.environ["CZR005_CPP_PYTHON_PATH"])
+        if os.environ.get("CZR005_CPP_PYTHON_PATH")
+        else None,
         ROOT / "build_vs" / "python" / "Debug",
         ROOT / "build_vs" / "python" / "Release",
         ROOT / "build_nmake" / "python",
     )
-    for candidate in reversed(build_candidates):
-        if candidate.exists():
+    for candidate in reversed([path for path in build_candidates if path is not None]):
+        if candidate.exists() or str(candidate) == os.environ.get("CZR005_CPP_PYTHON_PATH"):
             sys.path.insert(0, str(candidate))
 
 
@@ -201,6 +207,9 @@ def _python_payload(case: RollingParityCase) -> dict[str, Any]:
         edge_capacity=case.edge_capacity,
         edge_headway_seconds=case.edge_headway_seconds,
         node_capacities=dict(case.node_capacities),
+        merge_groups={(start, end): group for start, end, group in case.merge_groups},
+        merge_capacity=case.merge_capacity,
+        merge_headway_seconds=case.merge_headway_seconds,
     )
     result = baseline.run_episode(
         case.tasks,
@@ -211,6 +220,10 @@ def _python_payload(case: RollingParityCase) -> dict[str, Any]:
     edge_conflicts = baseline.edge_reservations.conflict_count(
         capacity=case.edge_capacity,
         headway_seconds=case.edge_headway_seconds,
+    ) + baseline.edge_reservations.merge_group_conflict_count(
+        {(start, end): group for start, end, group in case.merge_groups},
+        case.merge_capacity,
+        case.merge_headway_seconds,
     )
     return {
         "summary": {
@@ -238,6 +251,9 @@ def _cpp_payload(case: RollingParityCase) -> dict[str, Any]:
         fault_edges=list(case.fault_edges),
         fault_windows=list(case.fault_windows),
         node_capacities=list(case.node_capacities),
+        merge_groups=list(case.merge_groups),
+        merge_capacity=case.merge_capacity,
+        merge_headway_seconds=case.merge_headway_seconds,
     )
     return {
         "summary": dict(payload["summary"]),
@@ -297,6 +313,8 @@ def _case_row(case: RollingParityCase) -> dict[str, float | int | str | bool]:
         "horizon_seconds": case.horizon_seconds,
         "edge_capacity": case.edge_capacity,
         "edge_headway_seconds": case.edge_headway_seconds,
+        "merge_group_count": len(case.merge_groups),
+        "merge_headway_seconds": case.merge_headway_seconds,
         "python_planned": int(python["summary"]["planned_count"]),
         "cpp_planned": int(cpp["summary"]["planned_count"]),
         "python_unplanned": int(python["summary"]["unplanned_count"]),
@@ -323,14 +341,21 @@ def _cases() -> tuple[RollingParityCase, ...]:
         load_manifest_cases,
         tasks_from_case,
     )
+    from czr005.sim_py.task_stream import TaskLeg  # pylint: disable=import-outside-toplevel
+    from run_phase2_cpp_sipp_parity import _parallel_merge_group_case_inputs  # pylint: disable=import-outside-toplevel
 
     line_graph, line_nodes, line_edges, line_heuristic = _line_graph_inputs()
     single_graph, single_nodes, single_edges, single_heuristic = _single_edge_inputs()
+    merge_graph, merge_nodes, merge_edges, merge_heuristic = _parallel_merge_group_case_inputs()
     priority_tasks = (_task("loose", 1, 0.1, 100.0, 2), _task("urgent", 2, 0.0, 20.0, 2))
     edge_tasks = (_task("urgent", 1, 0.0, 10.0, 1), _task("loose", 2, 0.1, 20.0, 1))
     buffer_tasks = (
         _task("buffer-first", 6, 0.0, 10.0, 2),
         _task("buffer-second", 7, 0.1, 20.0, 2),
+    )
+    merge_tasks = (
+        TaskLeg("merge-left", 8, 8, 0.0, 10.0, 0, 4, 0, 4, 0.0, "direct", False, 8),
+        TaskLeg("merge-right", 9, 9, 0.0, 20.0, 1, 5, 1, 5, 0.0, "direct", False, 9),
     )
     cases: list[RollingParityCase] = [
         RollingParityCase(
@@ -415,6 +440,18 @@ def _cases() -> tuple[RollingParityCase, ...]:
             edge_capacity=2,
             node_capacities=((1, 2),),
         ),
+        RollingParityCase(
+            "parallel_merge_group_capacity",
+            merge_graph,
+            merge_nodes,
+            merge_edges,
+            merge_heuristic,
+            merge_tasks,
+            tuple(_task_record(task) for task in merge_tasks),
+            max_tasks=2,
+            horizon_seconds=60.0,
+            merge_groups=((0, 2, 7), (1, 3, 7)),
+        ),
     ]
     for manifest_case in load_manifest_cases():
         tasks = tasks_from_case(manifest_case)
@@ -432,6 +469,7 @@ def _cases() -> tuple[RollingParityCase, ...]:
                 fault_edges=manifest_case.spec.fault_edges,
                 fault_windows=manifest_case.spec.fault_windows,
                 node_capacities=manifest_case.spec.node_capacities,
+                merge_groups=manifest_case.spec.merge_groups,
             )
         )
     return tuple(cases)
@@ -460,7 +498,8 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "This diagnostic compares the Python rolling-horizon SIPP baseline against the C++ "
             "rolling-horizon SIPP replay through pybind. It checks aggregate summaries and "
             "planned/unplanned event rows across priority, static fault, repair-window fault, "
-            "edge-capacity, edge-headway, node buffer-capacity, and persisted synthetic-map schedules."
+            "edge-capacity, edge-headway, node buffer-capacity, merge-group capacity, and "
+            "persisted synthetic-map schedules."
         ),
         "",
         "## Metrics",
@@ -498,7 +537,8 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             "- persisted synthetic manifest schedules: covered",
             "- repair-window rolling-horizon planning-time semantics: covered",
             "- node buffer-capacity rolling-horizon planning semantics: covered",
-            "- full active-bag PIBT replay and full merge-group replay integration: not covered",
+            "- merge-group rolling-horizon planning semantics: covered",
+            "- full active-bag PIBT replay integration: not covered",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

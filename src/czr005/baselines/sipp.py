@@ -58,12 +58,18 @@ class SIPPPlanner:
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
         node_capacities: dict[int, int] | None = None,
+        merge_groups: dict[tuple[int, int], int] | None = None,
+        merge_capacity: int = 1,
+        merge_headway_seconds: float = 0.0,
         fault_edges: set[tuple[int, int]] | None = None,
         task_id: int | None = None,
     ) -> list[SIPPNode]:
+        if merge_capacity <= 0:
+            raise ValueError("merge_capacity must be positive")
         reservations = reservations or ReservationTable()
         edge_reservations = edge_reservations or EdgeReservationTable()
         node_capacities = node_capacities or {}
+        merge_groups = merge_groups or {}
         fault_edges = fault_edges or set()
         sequence = count()
         open_heap: list[tuple[float, int, SIPPNode]] = []
@@ -101,6 +107,9 @@ class SIPPPlanner:
                     edge_capacity=edge_capacity,
                     edge_headway_seconds=edge_headway_seconds,
                     node_capacities=node_capacities,
+                    merge_groups=merge_groups,
+                    merge_capacity=merge_capacity,
+                    merge_headway_seconds=merge_headway_seconds,
                     task_id=task_id,
                 )
                 if transition is None:
@@ -137,10 +146,17 @@ class SIPPPlanner:
         edge_capacity: int,
         edge_headway_seconds: float,
         node_capacities: dict[int, int],
+        merge_groups: dict[tuple[int, int], int],
+        merge_capacity: int,
+        merge_headway_seconds: float,
         task_id: int | None,
     ) -> tuple[float, float] | None:
         edge_start = current.t2
-        for _ in range(len(edge_reservations.intervals(current.location, next_location)) * 2 + 4):
+        attempts = (
+            len(edge_reservations.intervals(current.location, next_location))
+            + len(edge_reservations.all_intervals())
+        ) * 3 + 8
+        for _ in range(attempts):
             edge_start = edge_reservations.earliest_start(
                 current.location,
                 next_location,
@@ -148,6 +164,16 @@ class SIPPPlanner:
                 travel_time,
                 edge_capacity,
                 edge_headway_seconds,
+                task_id,
+            )
+            edge_start = edge_reservations.earliest_merge_group_start(
+                current.location,
+                next_location,
+                edge_start,
+                travel_time,
+                merge_groups,
+                merge_capacity,
+                merge_headway_seconds,
                 task_id,
             )
             node_start = edge_start + travel_time

@@ -5,6 +5,7 @@
 #include <limits>
 #include <queue>
 #include <set>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -31,7 +32,13 @@ class SIPPPlanner {
       double edge_headway_seconds = 0.0,
       const std::set<std::pair<int, int>>& fault_edges = {},
       int task_id = -1,
-      const std::unordered_map<int, int>& node_capacities = {}) const {
+      const std::unordered_map<int, int>& node_capacities = {},
+      const std::vector<MergeGroupEdge>& merge_groups = {},
+      int merge_capacity = 1,
+      double merge_headway_seconds = 0.0) const {
+    if (merge_capacity <= 0) {
+      throw std::invalid_argument("merge_capacity must be positive");
+    }
     const ReservationTable empty_reservations;
     const EdgeReservationTable empty_edge_reservations;
     const auto& node_table = reservations == nullptr ? empty_reservations : *reservations;
@@ -83,7 +90,10 @@ class SIPPPlanner {
                                                          edge_capacity,
                                                          edge_headway_seconds,
                                                          task_id,
-                                                         node_capacities);
+                                                         node_capacities,
+                                                         merge_groups,
+                                                         merge_capacity,
+                                                         merge_headway_seconds);
         if (!transition.valid) {
           continue;
         }
@@ -152,10 +162,15 @@ class SIPPPlanner {
       int edge_capacity,
       double edge_headway_seconds,
       int task_id,
-      const std::unordered_map<int, int>& node_capacities) const {
+      const std::unordered_map<int, int>& node_capacities,
+      const std::vector<MergeGroupEdge>& merge_groups,
+      int merge_capacity,
+      double merge_headway_seconds) const {
     double edge_start = current.t2;
     const auto& intervals = edge_reservations.intervals(current.location, next_location);
-    for (std::size_t attempt = 0; attempt < intervals.size() * 2 + 4; ++attempt) {
+    const auto all_intervals = edge_reservations.all_intervals();
+    const std::size_t attempts = (intervals.size() + all_intervals.size()) * 3 + 8;
+    for (std::size_t attempt = 0; attempt < attempts; ++attempt) {
       edge_start = edge_reservations.earliest_start(current.location,
                                                     next_location,
                                                     edge_start,
@@ -163,6 +178,14 @@ class SIPPPlanner {
                                                     edge_capacity,
                                                     edge_headway_seconds,
                                                     task_id);
+      edge_start = edge_reservations.earliest_merge_group_start(current.location,
+                                                                next_location,
+                                                                edge_start,
+                                                                travel_time,
+                                                                merge_groups,
+                                                                merge_capacity,
+                                                                merge_headway_seconds,
+                                                                task_id);
       double node_start = edge_start + travel_time;
       if (next_location != goal) {
         const auto safe_node_start = earliest_safe_node_start(

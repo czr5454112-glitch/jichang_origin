@@ -56,6 +56,9 @@ class PIBTActiveBagReplayBaseline:
         edge_capacity: int = 1,
         edge_headway_seconds: float = 0.0,
         node_capacities: dict[int, int] | None = None,
+        merge_groups: dict[tuple[int, int], int] | None = None,
+        merge_capacity: int = 1,
+        merge_headway_seconds: float = 0.0,
     ) -> None:
         if interval_seconds <= 0.0:
             raise ValueError("interval_seconds must be positive")
@@ -63,6 +66,8 @@ class PIBTActiveBagReplayBaseline:
             raise ValueError("max_ticks must be positive")
         if edge_capacity <= 0:
             raise ValueError("edge_capacity must be positive")
+        if merge_capacity <= 0:
+            raise ValueError("merge_capacity must be positive")
         self.graph = graph
         self.interval_seconds = interval_seconds
         self.max_ticks = max_ticks
@@ -74,6 +79,9 @@ class PIBTActiveBagReplayBaseline:
         self.edge_capacity = edge_capacity
         self.edge_headway_seconds = edge_headway_seconds
         self.node_capacities = dict(node_capacities or {})
+        self.merge_groups = dict(merge_groups or {})
+        self.merge_capacity = merge_capacity
+        self.merge_headway_seconds = merge_headway_seconds
         self.resolver = PIBTStyleOneStepResolver(graph, hold_seconds=self.hold_seconds)
         self.summary = PIBTActiveBagReplaySummary(0, 0, 0, 0, 0, 0, 0, 0, 0)
 
@@ -140,6 +148,9 @@ class PIBTActiveBagReplayBaseline:
                     edge_capacity=self.edge_capacity,
                     edge_headway_seconds=self.edge_headway_seconds,
                     node_capacities=self.node_capacities,
+                    merge_groups=self.merge_groups,
+                    merge_capacity=self.merge_capacity,
+                    merge_headway_seconds=self.merge_headway_seconds,
                     fault_edges=slice_faults,
                 )
                 for action in actions:
@@ -194,6 +205,10 @@ class PIBTActiveBagReplayBaseline:
         edge_conflicts = self.edge_reservations.conflict_count(
             capacity=self.edge_capacity,
             headway_seconds=self.edge_headway_seconds,
+        ) + self.edge_reservations.merge_group_conflict_count(
+            self.merge_groups,
+            self.merge_capacity,
+            self.merge_headway_seconds,
         )
         self.summary = PIBTActiveBagReplaySummary(
             planned_count=metrics.planned_count,

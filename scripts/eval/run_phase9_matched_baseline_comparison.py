@@ -26,6 +26,7 @@ EdgeRecord = tuple[int, int, float, float]
 TaskRecord = tuple[str, int, int, float, float, int, int, int, int, float, str, bool, int]
 FaultWindow = tuple[int, int, float, float]
 NodeCapacity = tuple[int, int]
+MergeGroup = tuple[int, int, int]
 
 ROW_FIELDS = [
     "scenario",
@@ -35,6 +36,9 @@ ROW_FIELDS = [
     "fault_edges",
     "fault_windows",
     "node_capacities",
+    "merge_groups",
+    "merge_capacity",
+    "merge_headway_seconds",
     "python_planned",
     "cpp_planned",
     "python_unplanned",
@@ -124,6 +128,9 @@ class MatchedScenario:
     fault_edges: tuple[tuple[int, int], ...] = ()
     fault_windows: tuple[FaultWindow, ...] = ()
     node_capacities: tuple[NodeCapacity, ...] = ()
+    merge_groups: tuple[MergeGroup, ...] = ()
+    merge_capacity: int = 1
+    merge_headway_seconds: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -215,6 +222,12 @@ def _format_node_capacities(node_capacities: tuple[NodeCapacity, ...]) -> str:
     return ";".join(f"{node}:{capacity}" for node, capacity in sorted(node_capacities))
 
 
+def _format_merge_groups(merge_groups: tuple[MergeGroup, ...]) -> str:
+    if not merge_groups:
+        return "none"
+    return ";".join(f"{start}->{end}:{group}" for start, end, group in sorted(merge_groups))
+
+
 def _case_plan() -> tuple[MatchedScenario, ...]:
     return (
         MatchedScenario("legacy_first16", 0, 16),
@@ -222,6 +235,7 @@ def _case_plan() -> tuple[MatchedScenario, ...]:
         MatchedScenario("legacy_first32", 0, 32),
         MatchedScenario("legacy_offset32_static16", 32, 16, fault_edges=((16, 17),)),
         MatchedScenario("legacy_offset64_repair32", 64, 32, fault_windows=((28, 47, 0.0, 12000.0),)),
+        MatchedScenario("legacy_offset64_merge32", 64, 32, merge_groups=((13, 23, 9), (18, 22, 9))),
     )
 
 
@@ -242,6 +256,9 @@ def _python_rolling(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[st
         inputs.graph,
         horizon_seconds=300.0,
         node_capacities=dict(scenario.node_capacities),
+        merge_groups={(start, end): group for start, end, group in scenario.merge_groups},
+        merge_capacity=scenario.merge_capacity,
+        merge_headway_seconds=scenario.merge_headway_seconds,
     )
     result = baseline.run_episode(
         _selected_tasks(inputs, scenario),
@@ -249,7 +266,11 @@ def _python_rolling(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[st
         fault_edges=set(scenario.fault_edges),
         fault_windows=scenario.fault_windows,
     )
-    edge_conflicts = baseline.edge_reservations.conflict_count()
+    edge_conflicts = baseline.edge_reservations.conflict_count() + baseline.edge_reservations.merge_group_conflict_count(
+        {(start, end): group for start, end, group in scenario.merge_groups},
+        scenario.merge_capacity,
+        scenario.merge_headway_seconds,
+    )
     return {
         **result.metrics.to_dict(),
         "decision_count": len(result.events),
@@ -274,6 +295,9 @@ def _cpp_rolling(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, 
         fault_edges=list(scenario.fault_edges),
         fault_windows=list(scenario.fault_windows),
         node_capacities=list(scenario.node_capacities),
+        merge_groups=list(scenario.merge_groups),
+        merge_capacity=scenario.merge_capacity,
+        merge_headway_seconds=scenario.merge_headway_seconds,
     )
     return dict(payload["summary"])
 
@@ -286,6 +310,9 @@ def _python_periodic(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[s
         interval_seconds=5.0,
         max_ticks=2048,
         node_capacities=dict(scenario.node_capacities),
+        merge_groups={(start, end): group for start, end, group in scenario.merge_groups},
+        merge_capacity=scenario.merge_capacity,
+        merge_headway_seconds=scenario.merge_headway_seconds,
     )
     result = baseline.run_episode(
         _selected_tasks(inputs, scenario),
@@ -320,6 +347,9 @@ def _cpp_periodic(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str,
         fault_edges=list(scenario.fault_edges),
         fault_windows=list(scenario.fault_windows),
         node_capacities=list(scenario.node_capacities),
+        merge_groups=list(scenario.merge_groups),
+        merge_capacity=scenario.merge_capacity,
+        merge_headway_seconds=scenario.merge_headway_seconds,
     )
     return dict(payload["summary"])
 
@@ -333,6 +363,9 @@ def _python_pibt(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, 
         max_ticks=2048,
         hold_seconds=5.0,
         node_capacities=dict(scenario.node_capacities),
+        merge_groups={(start, end): group for start, end, group in scenario.merge_groups},
+        merge_capacity=scenario.merge_capacity,
+        merge_headway_seconds=scenario.merge_headway_seconds,
     )
     result = baseline.run_episode(
         _selected_tasks(inputs, scenario),
@@ -370,6 +403,9 @@ def _cpp_pibt(inputs: RuntimeInputs, scenario: MatchedScenario) -> dict[str, Any
         fault_edges=list(scenario.fault_edges),
         fault_windows=list(scenario.fault_windows),
         node_capacities=list(scenario.node_capacities),
+        merge_groups=list(scenario.merge_groups),
+        merge_capacity=scenario.merge_capacity,
+        merge_headway_seconds=scenario.merge_headway_seconds,
     )
     return dict(payload["summary"])
 
@@ -385,6 +421,9 @@ def _python_event(inputs: RuntimeInputs, scenario: MatchedScenario, runtime_mode
         fault_edges=set(scenario.fault_edges),
         fault_windows=scenario.fault_windows,
         node_capacities=dict(scenario.node_capacities),
+        merge_groups={(start, end): group for start, end, group in scenario.merge_groups},
+        merge_capacity=scenario.merge_capacity,
+        merge_headway_seconds=scenario.merge_headway_seconds,
         max_decisions_per_task=MAX_DECISIONS_PER_TASK,
     )
     return dict(run.summary)
@@ -399,6 +438,9 @@ def _cpp_event(inputs: RuntimeInputs, scenario: MatchedScenario, model_path: Pat
         "fault_edges": list(scenario.fault_edges),
         "fault_windows": list(scenario.fault_windows),
         "node_capacities": list(scenario.node_capacities),
+        "merge_groups": list(scenario.merge_groups),
+        "merge_capacity": scenario.merge_capacity,
+        "merge_headway_seconds": scenario.merge_headway_seconds,
         "max_decisions_per_task": MAX_DECISIONS_PER_TASK,
     }
     if model_path is None:
@@ -506,6 +548,9 @@ def _row(
         "fault_edges": _format_faults(scenario.fault_edges),
         "fault_windows": _format_fault_windows(scenario.fault_windows),
         "node_capacities": _format_node_capacities(scenario.node_capacities),
+        "merge_groups": _format_merge_groups(scenario.merge_groups),
+        "merge_capacity": scenario.merge_capacity,
+        "merge_headway_seconds": scenario.merge_headway_seconds,
         "python_planned": _summary_int(python_summary, "planned_count"),
         "cpp_planned": _summary_int(cpp_summary, "planned_count"),
         "python_unplanned": _summary_int(python_summary, "unplanned_count"),
@@ -551,7 +596,19 @@ def _fault_label(row: dict[str, float | int | str | bool]) -> str:
 
 def _config_label(row: dict[str, float | int | str | bool]) -> str:
     node_capacities = str(row["node_capacities"])
-    return node_capacities
+    merge_groups = str(row["merge_groups"])
+    parts = []
+    if node_capacities != "none":
+        parts.append(f"nodes={node_capacities}")
+    if merge_groups != "none":
+        parts.append(
+            "merge={groups},cap={capacity},headway={headway}".format(
+                groups=merge_groups,
+                capacity=row["merge_capacity"],
+                headway=row["merge_headway_seconds"],
+            )
+        )
+    return "; ".join(parts) if parts else "none"
 
 
 def build_rows(inputs: RuntimeInputs) -> list[dict[str, float | int | str | bool]]:
@@ -604,8 +661,8 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This diagnostic reruns Python and C++ implementations of the main event/baseline families "
-            "on the same real legacy `map2/inputdata` task windows. It covers no-fault, buffer-capacity, static-fault, and repair-window "
-            "scenarios that are supported by every included family."
+            "on the same real legacy `map2/inputdata` task windows. It covers no-fault, buffer-capacity, static-fault, repair-window, "
+            "and merge-group scenarios that are supported by every included family."
         ),
         "",
         f"Map: `{MAP_PATH.relative_to(ROOT).as_posix()}`",
@@ -614,7 +671,7 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
         "",
         (
             "This is a matched diagnostic gate, not a final paper benchmark: timings are single local "
-            "passes and merge-group variants are handled by the dedicated parity gates."
+            "passes intended to verify common-scenario parity before repeated timing."
         ),
         "",
         "## Matched Rows",
@@ -661,11 +718,10 @@ def write_report(rows: list[dict[str, float | int | str | bool]]) -> None:
             f"- median C++ local-call speedup: `{_median(speedups):.3f}x`",
             "- repair-window common-family comparison: covered",
             "- buffer-capacity common-family comparison: covered",
-            "- merge-group common-family comparison: not covered",
+            "- merge-group common-family comparison: covered",
             "",
             "## Remaining Work",
             "",
-            "- add merge-group matched rows once every included family accepts the shared config",
             "- replace single local timing with repeated hardware-normalized timing across the matched table",
         ]
     )
