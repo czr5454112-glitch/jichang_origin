@@ -692,3 +692,12 @@
 - Tests / validation: parser tests passed `4 passed`; CTest passed 2/2; direct pybind smoke passed; example1 A* parity reported `example1_cases=10 parity_pass=True anchor_pass=True`.
 - Safety / parity notes: This is a non-learning Phase1 parser/A* parity fixture over the bundled legacy example topology. It does not add RL, teacher data, BC training, or learning-policy evidence.
 - Follow-up: keep remaining work focused on Python/C++ translation gates and prerequisite non-learning baseline/runtime parity; do not start RL or learning unless the user explicitly changes scope.
+
+## 2026-06-25 00:10 - Phase1D Python C++ backend loader
+
+- Request: Continue the Python/C++ port objective and stop short of RL/learning work.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `src/czr005/cpp_backend.py`, added `tests/test_cpp_backend.py`, refreshed `outputs/reports/phase1d_pybind_report.md`, and updated README status.
+- Key observations: The master plan explicitly called for `src/czr005/cpp_backend.py`, while the existing scripts and pybind smoke imported `czr005_cpp` directly from manually configured build-tree paths. The new wrapper centralizes build-tree discovery through `CZR005_CPP_PYTHON_PATH`, `build_vs/python/Debug`, `build_vs/python/Release`, and `build_nmake/python`, then exposes thin non-learning wrappers for legacy map/task summaries, A* routes, batch routes, and route benchmarks.
+- Tests / validation: `py_compile src/czr005/cpp_backend.py` passed; non-learning target pytest passed `37 passed`; standalone default-discovery `tests/test_cpp_backend.py` passed `3 passed`; CTest passed 2/2; direct pybind smoke passed.
+- Safety / parity notes: This is a packaging/boundary improvement for the existing C++ extension. It does not add teacher data, BC, RL, or learning-policy execution.
