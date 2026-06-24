@@ -33,6 +33,7 @@ namespace {
 using EdgeFaultWindowTuple = std::tuple<int, int, double, double>;
 using EdgeRecordTuple = std::tuple<int, int, double, double>;
 using EdgeReservationTuple = std::tuple<int, int, int, double, double>;
+using LegacyWindowFaultEventTuple = std::tuple<int, int, int, bool>;
 using MergeGroupTuple = std::tuple<int, int, int>;
 using NodeRecordTuple = std::tuple<int, int, double, int, int, std::vector<int>>;
 using NodeCapacityTuple = std::tuple<int, int>;
@@ -191,6 +192,9 @@ py::dict legacy_no_fault_window_result_row(
   result["generated_count"] = window.generated_count;
   result["planned_count"] = window.planned_count;
   result["completed_count"] = window.completed_count;
+  result["fault_event_count"] = window.fault_event_count;
+  result["repair_event_count"] = window.repair_event_count;
+  result["active_fault_count"] = window.active_fault_count;
   result["unplanned_retry_count"] = window.unplanned_retry_count;
   result["active_route_count"] = window.active_route_count;
   result["unfinished_count"] = window.unfinished_count;
@@ -200,6 +204,19 @@ py::dict legacy_no_fault_window_result_row(
   result["elapsed_seconds"] = elapsed_seconds;
   if (include_routes) {
     result["planned_routes"] = legacy_window_planned_route_rows(window.planned_routes);
+  }
+  return result;
+}
+
+std::vector<czr005::ics::LegacyWindowFaultEvent> legacy_window_fault_events_from_tuples(
+    const std::vector<LegacyWindowFaultEventTuple>& events) {
+  std::vector<czr005::ics::LegacyWindowFaultEvent> result;
+  result.reserve(events.size());
+  for (const auto& event : events) {
+    result.push_back(czr005::ics::LegacyWindowFaultEvent{std::get<0>(event),
+                                                         std::get<1>(event),
+                                                         std::get<2>(event),
+                                                         std::get<3>(event)});
   }
   return result;
 }
@@ -219,6 +236,30 @@ py::dict legacy_no_fault_window_summary(const std::string& map_path,
       start_epoch,
       max_epochs,
       max_new_tasks);
+  const auto end_time = std::chrono::steady_clock::now();
+  const std::chrono::duration<double> elapsed = end_time - start_time;
+  return legacy_no_fault_window_result_row(window, elapsed.count(), include_routes);
+}
+
+py::dict legacy_scheduled_fault_window_summary(
+    const std::string& map_path,
+    const std::string& task_path,
+    int start_epoch,
+    int max_epochs,
+    int max_new_tasks,
+    const std::vector<LegacyWindowFaultEventTuple>& fault_schedule,
+    bool include_routes,
+    bool allow_ragged_heuristic = false) {
+  const auto schedule = legacy_window_fault_events_from_tuples(fault_schedule);
+  const auto start_time = std::chrono::steady_clock::now();
+  const auto legacy_map = czr005::ics::read_legacy_map2(map_path, 2.5, allow_ragged_heuristic);
+  const auto window = czr005::ics::run_legacy_no_fault_window_from_files(
+      legacy_map.graph,
+      task_path,
+      start_epoch,
+      max_epochs,
+      max_new_tasks,
+      schedule);
   const auto end_time = std::chrono::steady_clock::now();
   const std::chrono::duration<double> elapsed = end_time - start_time;
   return legacy_no_fault_window_result_row(window, elapsed.count(), include_routes);
@@ -1340,6 +1381,16 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("start_epoch") = 8260,
              py::arg("max_epochs") = 512,
              py::arg("max_new_tasks") = 128,
+             py::arg("include_routes") = false,
+             py::arg("allow_ragged_heuristic") = false);
+  module.def("legacy_scheduled_fault_window_summary",
+             &legacy_scheduled_fault_window_summary,
+             py::arg("map_path"),
+             py::arg("task_path"),
+             py::arg("start_epoch") = 8260,
+             py::arg("max_epochs") = 512,
+             py::arg("max_new_tasks") = 128,
+             py::arg("fault_schedule") = std::vector<LegacyWindowFaultEventTuple>{},
              py::arg("include_routes") = false,
              py::arg("allow_ragged_heuristic") = false);
   module.def("edge_score_scores",

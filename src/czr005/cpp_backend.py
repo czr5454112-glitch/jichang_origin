@@ -184,6 +184,36 @@ def legacy_no_fault_window_summary(
     )
 
 
+def legacy_scheduled_fault_window_summary(
+    map_path: PathLike,
+    task_path: PathLike,
+    *,
+    start_epoch: int = 8260,
+    max_epochs: int = 512,
+    max_new_tasks: int = 128,
+    fault_schedule: Sequence[tuple[int, int, int, bool]] = (),
+    include_routes: bool = False,
+    allow_ragged_heuristic: bool = False,
+    search_path: PathLike | None = None,
+) -> dict[str, Any]:
+    module = load_cpp_module(search_path)
+    return dict(
+        module.legacy_scheduled_fault_window_summary(
+            str(map_path),
+            str(task_path),
+            int(start_epoch),
+            int(max_epochs),
+            int(max_new_tasks),
+            [
+                (int(epoch), int(start), int(end), bool(repair))
+                for epoch, start, end, repair in fault_schedule
+            ],
+            bool(include_routes),
+            allow_ragged_heuristic=allow_ragged_heuristic,
+        )
+    )
+
+
 def reference_simulator_from_records(
     node_records: Sequence[tuple[int, int, float, int, int, Sequence[int]]],
     edge_records: Sequence[tuple[int, int, float, float]],

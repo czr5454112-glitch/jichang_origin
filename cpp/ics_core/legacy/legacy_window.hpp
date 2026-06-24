@@ -30,6 +30,13 @@ struct LegacyWindowPlannedRoute {
   std::vector<int> path;
 };
 
+struct LegacyWindowFaultEvent {
+  int epoch = 0;
+  int start = -1;
+  int end = -1;
+  bool repair = false;
+};
+
 struct LegacyNoFaultWindowResult {
   int start_epoch = 0;
   int max_epochs = 0;
@@ -38,6 +45,9 @@ struct LegacyNoFaultWindowResult {
   int generated_count = 0;
   int planned_count = 0;
   int completed_count = 0;
+  int fault_event_count = 0;
+  int repair_event_count = 0;
+  int active_fault_count = 0;
   int unplanned_retry_count = 0;
   int active_route_count = 0;
   int unfinished_count = 0;
@@ -203,7 +213,8 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
     std::map<int, std::deque<TaskLeg>> task_groups,
     int start_epoch,
     int max_epochs,
-    int max_new_tasks) {
+    int max_new_tasks,
+    const std::vector<LegacyWindowFaultEvent>& fault_schedule = {}) {
   if (max_epochs <= 0) {
     throw std::invalid_argument("max_epochs must be positive");
   }
@@ -220,11 +231,26 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
   AStarPlanner planner(graph);
   std::map<int, std::vector<PathNode>> saved_routes;
   std::deque<TaskLeg> unfinished;
+  std::set<std::pair<int, int>> active_fault_edges;
 
   for (int epoch_index = 0; epoch_index < max_epochs; ++epoch_index) {
     const double epoch = static_cast<double>(start_epoch + epoch_index);
+    const int epoch_int = start_epoch + epoch_index;
     result.last_epoch = epoch;
     result.epochs_run = epoch_index + 1;
+
+    for (const auto& event : fault_schedule) {
+      if (event.epoch != epoch_int) {
+        continue;
+      }
+      if (event.repair) {
+        active_fault_edges.erase({event.start, event.end});
+        ++result.repair_event_count;
+      } else {
+        active_fault_edges.insert({event.start, event.end});
+        ++result.fault_event_count;
+      }
+    }
 
     struct OnPathTask {
       int task_id = -1;
@@ -301,7 +327,7 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
                                 current.goal,
                                 epoch,
                                 &reservations,
-                                std::set<std::pair<int, int>>{},
+                                active_fault_edges,
                                 current.task_id);
       if (route.empty()) {
         unfinished.push_back(current);
@@ -329,6 +355,7 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
 
   result.active_route_count = static_cast<int>(saved_routes.size());
   result.unfinished_count = static_cast<int>(unfinished.size());
+  result.active_fault_count = static_cast<int>(active_fault_edges.size());
   return result;
 }
 
@@ -337,12 +364,14 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window_from_files(
     const std::string& task_path,
     int start_epoch,
     int max_epochs,
-    int max_new_tasks) {
+    int max_new_tasks,
+    const std::vector<LegacyWindowFaultEvent>& fault_schedule = {}) {
   return run_legacy_no_fault_window(graph,
                                     legacy_window_detail::read_java_style_task_groups(task_path),
                                     start_epoch,
                                     max_epochs,
-                                    max_new_tasks);
+                                    max_new_tasks,
+                                    fault_schedule);
 }
 
 }  // namespace czr005::ics

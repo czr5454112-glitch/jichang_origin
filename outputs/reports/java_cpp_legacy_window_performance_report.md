@@ -17,10 +17,10 @@ This benchmark compares the read-only legacy Java `ICS_PathFinding` no-fault hea
 
 | Runtime | Repeats | Elapsed seconds | Windows/s | Plans/s | Generated | Planned | Completed | Active | Unfinished | Route checksum |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| legacy_java_ics_no_fault_window | 3 | 25.083801 | 0.1196 | 7.5347 | 64 | 63 | 57 | 6 | 1 | 85226 |
-| cpp_pybind_legacy_no_fault_window | 3 | 0.540906 | 5.5463 | 349.4138 | 64 | 63 | 57 | 6 | 1 | 85226 |
+| legacy_java_ics_no_fault_window | 3 | 24.871284 | 0.1206 | 7.5991 | 64 | 63 | 57 | 6 | 1 | 85226 |
+| cpp_pybind_legacy_no_fault_window | 3 | 0.511108 | 5.8696 | 369.7846 | 64 | 63 | 57 | 6 | 1 | 85226 |
 
-C++/Java no-fault window planner throughput ratio: `46.374x`.
+C++/Java no-fault window planner throughput ratio: `48.661x`.
 
 Performance CSV: `outputs/tables/java_cpp_legacy_window_performance.csv`
 Route parity CSV: `outputs/tables/java_cpp_legacy_window_route_parity.csv`
