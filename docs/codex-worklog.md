@@ -648,3 +648,14 @@
 - Tests / validation: CTest passed 2/2; direct pybind smoke passed; Phase2 PIBT active-bag parity reported `rows=7 strict_pass=True`; Phase9 synthetic matched comparison reported `rows=25 scenarios=5 families=5` with all family conflicts zero; Phase9 matched baseline comparison reported `rows=30 scenarios=6 families=5`; Phase9 matched runtime scaling reported `rows=30 repeats=3`; regenerated unified comparison reported `rows=126 outcome_rows=17 event_rows=14 parity_families=10`; full Python pytest passed.
 - Safety / parity notes: Current fixed-seed dense synthetic PIBT rows are now safety-clean with exact Python/C++ summary parity. This still needs broader randomized dense stress and real heldout airport-map evidence before paper-grade safety claims.
 - Follow-up: expand dense active-bag PIBT stress seeds and add a separate real heldout airport map if fixture data becomes available.
+
+## 2026-06-24 22:45 - Phase9 dense PIBT stress sweep
+
+- Request: Continue the Python/C++ port objective by broadening dense active-bag PIBT stress evidence after the safety hardening pass.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_phase9_dense_pibt_stress_sweep.py`, generated `outputs/tables/phase9_dense_pibt_stress_sweep.csv` plus `outputs/reports/phase9_dense_pibt_stress_sweep_report.md`, extended `scripts/eval/run_phase9_unified_baseline_comparison.py` to ingest the stress sweep as both evidence rows and a parity-family summary, regenerated the unified Phase9 CSV/report, and refreshed README/C++/safety status docs.
+- Commands run: Python py_compile for the new/updated Phase9 diagnostics, `scripts/eval/run_phase9_dense_pibt_stress_sweep.py` with `CZR005_CPP_PYTHON_PATH=build_vs/python/Debug`, and `scripts/eval/run_phase9_unified_baseline_comparison.py`.
+- Key observations: The stress sweep covers `12` additional fixed random dense synthetic task streams (`422` total tasks), including low-spacing overload, static-fault, repair-window, repeated-repair, buffer-capacity, and merge-group configurations.
+- Tests / validation: Dense PIBT stress sweep reported `rows=12 tasks=422`; every row matched Python/C++ summary metrics and had `0/0` post-shield conflicts. Regenerated unified comparison reported `rows=139 outcome_rows=17 event_rows=14 parity_families=11`; all reported safety, event parity, dense PIBT stress parity, and baseline-family parity gates passed.
+- Safety / parity notes: Dense fixed-seed active-bag PIBT stress is now covered separately from the broader synthetic matched comparison. This is still synthetic evidence, not a separate real heldout airport map or a paper-grade stress benchmark.
+- Follow-up: expand randomized graph topologies and task-source distributions, then add real heldout airport-map evidence if fixture data becomes available.

@@ -4,7 +4,7 @@ Date: 2026-06-24
 
 ## Scope
 
-This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
+This diagnostic builds a single Phase9 evidence table from the existing generated CSV outputs. It combines same-map policy/baseline outcome rows, real legacy event-scheduler Python/C++ parity, heldout-like synthetic matched rows, dense active-bag PIBT stress rows, repeated native event runtime rows, repeated matched-baseline runtime rows, and aggregate parity coverage for the Phase2/Phase8 baseline families.
 
 The table is intentionally an evidence index, not a final paper benchmark. Rows come from different scopes, and the first matched Phase9 rows are still limited to small no-fault/buffer-capacity/static-fault/repair-window/merge-group windows, so cross-policy ranking should wait for expanded matched maps, task windows, fault schedules, and multi-machine hardware-normalized timing.
 
@@ -97,6 +97,23 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | synthetic_seed31_merge_buffer | edge_score_event | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 22 | 109 | 0 | 1.826956 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
 | synthetic_seed31_merge_buffer | fallback_event | 26 | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 22 | 109 | 0 | 0.863828 | True | fixed-seed synthetic heldout-like map; not a separate real airport map |
 
+## Dense PIBT Stress Evidence
+
+| Scenario | Tasks | Faults | Config | C++ planned | C++ active steps | Conflicts | Speedup | Parity |
+|---|---:|---|---|---:|---:|---:|---:|---|
+| dense_pibt_seed101_low_spacing | 30 | none | none | 30 | 191 | 0 | 1.679895 | True |
+| dense_pibt_seed103_low_spacing | 32 | none | none | 32 | 173 | 0 | 0.622856 | True |
+| dense_pibt_seed107_static | 32 | 4->7 | none | 32 | 238 | 0 | 0.572558 | True |
+| dense_pibt_seed109_static | 34 | 5->8 | none | 34 | 359 | 0 | 0.550459 | True |
+| dense_pibt_seed113_repair | 34 | 4->8@[2.000,13.000) | none | 34 | 244 | 0 | 0.535565 | True |
+| dense_pibt_seed127_multi_repair | 36 | 4->8@[3.000,10.000);8->9@[9.000,20.000) | none | 36 | 403 | 0 | 0.563414 | True |
+| dense_pibt_seed131_merge_buffer | 36 | 4->8@[2.000,13.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 36 | 323 | 0 | 0.622344 | True |
+| dense_pibt_seed137_merge_buffer | 38 | 5->8@[3.000,16.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 38 | 433 | 0 | 0.567351 | True |
+| dense_pibt_seed139_static_repair | 34 | 4->7 | none | 34 | 364 | 0 | 0.522651 | True |
+| dense_pibt_seed149_repeated_repair | 36 | 4->8@[3.000,8.000);4->8@[14.000,21.000);8->9@[9.000,15.000) | none | 36 | 517 | 0 | 0.586604 | True |
+| dense_pibt_seed151_overload | 40 | none | none | 40 | 365 | 0 | 0.596818 | True |
+| dense_pibt_seed157_overload_merge | 40 | 4->8@[2.000,13.000) | nodes=8:2;9:2; merge=4->7:7;4->8:7;5->8:8;6->8:8,cap=1,headway=0.0 | 40 | 435 | 0 | 0.580988 | True |
+
 ## Legacy Event Parity Evidence
 
 | Case | Policy | Tasks | Py planned | C++ planned | C++ decisions | Conflicts | Strict parity |
@@ -170,21 +187,23 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 | phase9_matched_baseline_comparison | 30 | 30 | True | `outputs/tables/phase9_matched_baseline_comparison.csv` |
 | phase9_runtime_scaling | 8 | 8 | True | `outputs/tables/phase9_event_runtime_scaling.csv` |
 | phase9_matched_runtime_scaling | 30 | 30 | True | `outputs/tables/phase9_matched_runtime_scaling.csv` |
+| phase9_dense_pibt_stress_sweep | 12 | 12 | True | `outputs/tables/phase9_dense_pibt_stress_sweep.csv` |
 
 ## Gate Status
 
 - unified outcome rows: `17`
 - matched baseline rows: `30`
 - synthetic matched baseline rows: `25`
+- dense PIBT stress rows: `12`
 - matched baseline runtime rows: `30`
 - native event parity/runtime rows: `14`
-- baseline-family parity summaries: `10`
+- baseline-family parity summaries: `11`
 - policies/baselines surfaced: `astar_guided, dagger_bc, edge_score_event, fallback_event, periodic_replanning_sipp, pibt_active_bag_replay, reference_astar, rolling_horizon_sipp`
-- parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
+- parity families surfaced: `periodic_replanning_sipp, phase8_legacy_event_scheduler, phase8_randomized_synthetic, phase8_synthetic_event_scheduler, phase9_dense_pibt_stress_sweep, phase9_matched_baseline_comparison, phase9_matched_runtime_scaling, phase9_runtime_scaling, pibt_active_bag_replay, rolling_horizon_sipp, sipp_planner`
 - gate-scoped post-shield conflicts are zero: PASS
 - all reported post-shield conflicts are zero: PASS
-- dense synthetic PIBT negative rows reported: `0`
-- dense synthetic PIBT rows are safety-clean: PASS
+- dense PIBT stress Python/C++ parity rows pass: PASS
+- dense PIBT stress rows are safety-clean: PASS
 - native event Python/C++ parity rows pass: PASS
 - baseline-family parity summaries pass: PASS
 - median C++ decision-throughput speedup in runtime rows: `1.065x`
@@ -192,9 +211,10 @@ CSV: `outputs/tables/phase9_unified_baseline_comparison.csv`
 - matched merge-group scenario: covered
 - repeated matched-baseline runtime timing with 95% CI: covered
 - heldout-like synthetic matched comparison: covered
+- dense active-bag PIBT stress sweep: covered
 
 ## Remaining Work
 
 - add a separate real heldout airport map when fixture data is available
-- expand dense active-bag PIBT stress coverage beyond the current fixed synthetic seeds
+- expand randomized graph topologies and task-source distributions before paper-grade stress claims
 - expand timing to multi-machine hardware-normalized runs and confidence intervals before paper-grade speed claims

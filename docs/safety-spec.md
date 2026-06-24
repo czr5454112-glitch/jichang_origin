@@ -62,8 +62,13 @@ Currently covered by Phase2 active-bag PIBT replay parity:
 - Python and C++ active-bag PIBT replay match on summary metrics and event streams.
 - Static-fault, repair-window, recursive handoff, and persisted synthetic slices stay at zero post-shield conflicts.
 
+Currently covered by Phase9 dense active-bag PIBT stress:
+
+- Additional fixed random dense synthetic task streams match on Python/C++ summary metrics.
+- Static-fault, repair-window, repeated-repair, buffer-capacity, and merge-group stress rows stay at zero post-shield conflicts.
+
 Still pending:
 
 - event-simulation safety counters
-- full buffer-capacity replay integration across every baseline
-- full merge-group replay integration across every baseline
+- separate real heldout airport-map safety evidence
+- broader randomized graph topologies and task-source distributions

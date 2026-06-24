@@ -23,7 +23,8 @@ Implemented so far:
 - early Phase9 event runtime scaling diagnostic over real legacy task windows
 - Phase9 matched baseline comparison over common real legacy no-fault/buffer-capacity/static-fault/repair-window task windows
 - Phase9 heldout-like synthetic matched comparison over persisted Phase8 ICS-like maps, including dense active-bag PIBT safety-clean rows
+- Phase9 dense active-bag PIBT stress sweep over additional fixed random synthetic seeds, with Python/C++ summary parity and zero post-shield conflicts
 - Phase9 unified baseline-comparison evidence table across existing Phase2/Phase5/Phase8/Phase9 outputs
 - pybind smoke boundary
 
-Paper-grade repeated-run high-throughput validation across every baseline family, separate heldout-map event parity, broader dense active-bag PIBT stress coverage, and broad runtime replay validation are still pending.
+Paper-grade repeated-run high-throughput validation across every baseline family, separate heldout-map event parity, broader randomized graph/task-source stress coverage, and broad runtime replay validation are still pending.
