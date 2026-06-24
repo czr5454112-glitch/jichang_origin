@@ -167,6 +167,8 @@ def legacy_no_fault_window_summary(
     max_epochs: int = 512,
     max_new_tasks: int = 128,
     include_routes: bool = False,
+    fault_probability: float = 0.0,
+    repair_probability: float = 0.0,
     allow_ragged_heuristic: bool = False,
     search_path: PathLike | None = None,
 ) -> dict[str, Any]:
@@ -179,6 +181,8 @@ def legacy_no_fault_window_summary(
             int(max_epochs),
             int(max_new_tasks),
             bool(include_routes),
+            float(fault_probability),
+            float(repair_probability),
             allow_ragged_heuristic=allow_ragged_heuristic,
         )
     )
@@ -193,6 +197,8 @@ def legacy_scheduled_fault_window_summary(
     max_new_tasks: int = 128,
     fault_schedule: Sequence[tuple[int, int, int, bool]] = (),
     include_routes: bool = False,
+    fault_probability: float = 0.0,
+    repair_probability: float = 0.0,
     allow_ragged_heuristic: bool = False,
     search_path: PathLike | None = None,
 ) -> dict[str, Any]:
@@ -209,6 +215,8 @@ def legacy_scheduled_fault_window_summary(
                 for epoch, start, end, repair in fault_schedule
             ],
             bool(include_routes),
+            float(fault_probability),
+            float(repair_probability),
             allow_ragged_heuristic=allow_ragged_heuristic,
         )
     )

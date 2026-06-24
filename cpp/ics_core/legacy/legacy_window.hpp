@@ -47,6 +47,8 @@ struct LegacyNoFaultWindowResult {
   int completed_count = 0;
   int fault_event_count = 0;
   int repair_event_count = 0;
+  int generated_fault_edge_count = 0;
+  int generated_repair_edge_count = 0;
   int active_fault_count = 0;
   int unplanned_retry_count = 0;
   int active_route_count = 0;
@@ -206,6 +208,20 @@ inline void add_checksum(LegacyNoFaultWindowResult& result, const std::vector<Pa
   }
 }
 
+inline bool deterministic_probability(double probability) {
+  return probability == 0.0 || probability == 1.0;
+}
+
+inline std::vector<std::pair<int, int>> graph_edges(const Graph& graph) {
+  std::vector<std::pair<int, int>> edges;
+  for (int location = 0; location < static_cast<int>(graph.node_count()); ++location) {
+    for (const int next : graph.outgoing(location)) {
+      edges.push_back({location, next});
+    }
+  }
+  return edges;
+}
+
 }  // namespace legacy_window_detail
 
 inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
@@ -214,12 +230,18 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
     int start_epoch,
     int max_epochs,
     int max_new_tasks,
-    const std::vector<LegacyWindowFaultEvent>& fault_schedule = {}) {
+    const std::vector<LegacyWindowFaultEvent>& fault_schedule = {},
+    double fault_probability = 0.0,
+    double repair_probability = 0.0) {
   if (max_epochs <= 0) {
     throw std::invalid_argument("max_epochs must be positive");
   }
   if (max_new_tasks < 0) {
     throw std::invalid_argument("max_new_tasks must be non-negative");
+  }
+  if (!legacy_window_detail::deterministic_probability(fault_probability) ||
+      !legacy_window_detail::deterministic_probability(repair_probability)) {
+    throw std::invalid_argument("legacy window only supports deterministic probabilities 0.0 or 1.0");
   }
 
   LegacyNoFaultWindowResult result;
@@ -228,10 +250,12 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
   result.max_new_tasks = max_new_tasks;
 
   const auto start_nodes = legacy_window_detail::start_nodes_from_task_groups(task_groups);
+  const auto graph_edges = legacy_window_detail::graph_edges(graph);
   AStarPlanner planner(graph);
   std::map<int, std::vector<PathNode>> saved_routes;
   std::deque<TaskLeg> unfinished;
   std::set<std::pair<int, int>> active_fault_edges;
+  std::set<std::pair<int, int>> auto_repair_fault_edges;
 
   for (int epoch_index = 0; epoch_index < max_epochs; ++epoch_index) {
     const double epoch = static_cast<double>(start_epoch + epoch_index);
@@ -246,6 +270,7 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
       }
       if (event.repair) {
         active_fault_edges.erase({event.start, event.end});
+        auto_repair_fault_edges.erase({event.start, event.end});
         ++result.repair_event_count;
       } else {
         const auto edge = std::pair<int, int>{event.start, event.end};
@@ -253,6 +278,31 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
         epoch_fault_edges.insert(edge);
         ++result.fault_event_count;
       }
+    }
+
+    std::set<std::pair<int, int>> probability_fault_edges;
+    if (fault_probability == 1.0) {
+      for (const auto& edge : graph_edges) {
+        if (active_fault_edges.find(edge) == active_fault_edges.end()) {
+          probability_fault_edges.insert(edge);
+        }
+      }
+    }
+    for (const auto& edge : probability_fault_edges) {
+      epoch_fault_edges.insert(edge);
+    }
+    result.generated_fault_edge_count += static_cast<int>(epoch_fault_edges.size());
+
+    std::set<std::pair<int, int>> epoch_repair_edges;
+    if (repair_probability == 1.0) {
+      epoch_repair_edges = active_fault_edges;
+    } else {
+      epoch_repair_edges = auto_repair_fault_edges;
+    }
+    result.generated_repair_edge_count += static_cast<int>(epoch_repair_edges.size());
+    for (const auto& edge : epoch_repair_edges) {
+      active_fault_edges.erase(edge);
+      auto_repair_fault_edges.erase(edge);
     }
 
     struct OnPathTask {
@@ -298,6 +348,13 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window(
       if (on_path_ids.find(entry.first) == on_path_ids.end()) {
         reservations.add_route(entry.first, entry.second);
       }
+    }
+
+    for (const auto& edge : epoch_fault_edges) {
+      active_fault_edges.insert(edge);
+    }
+    for (const auto& edge : probability_fault_edges) {
+      auto_repair_fault_edges.insert(edge);
     }
 
     std::vector<int> faulted_route_ids;
@@ -384,13 +441,17 @@ inline LegacyNoFaultWindowResult run_legacy_no_fault_window_from_files(
     int start_epoch,
     int max_epochs,
     int max_new_tasks,
-    const std::vector<LegacyWindowFaultEvent>& fault_schedule = {}) {
+    const std::vector<LegacyWindowFaultEvent>& fault_schedule = {},
+    double fault_probability = 0.0,
+    double repair_probability = 0.0) {
   return run_legacy_no_fault_window(graph,
                                     legacy_window_detail::read_java_style_task_groups(task_path),
                                     start_epoch,
                                     max_epochs,
                                     max_new_tasks,
-                                    fault_schedule);
+                                    fault_schedule,
+                                    fault_probability,
+                                    repair_probability);
 }
 
 }  // namespace czr005::ics

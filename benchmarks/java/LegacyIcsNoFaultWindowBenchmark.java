@@ -57,6 +57,8 @@ public class LegacyIcsNoFaultWindowBenchmark {
         int completedCount;
         int faultEventCount;
         int repairEventCount;
+        int generatedFaultEdgeCount;
+        int generatedRepairEdgeCount;
         int activeFaultCount;
         int activeRouteCount;
         int unfinishedCount;
@@ -84,7 +86,8 @@ public class LegacyIcsNoFaultWindowBenchmark {
         if (args.length < 9) {
             throw new IllegalArgumentException(
                 "usage: LegacyIcsNoFaultWindowBenchmark <mapPath> <inputdataPath> <startEpoch> "
-                + "<maxEpochs> <maxNewTasks> <repeats> <warmupRepeats> <routeCsv> <summaryCsv> [faultSchedule]"
+                + "<maxEpochs> <maxNewTasks> <repeats> <warmupRepeats> <routeCsv> <summaryCsv> "
+                + "[faultSchedule] [faultProbability] [repairProbability]"
             );
         }
         System.setProperty("java.awt.headless", "true");
@@ -98,15 +101,37 @@ public class LegacyIcsNoFaultWindowBenchmark {
         String routeCsv = args[7];
         String summaryCsv = args[8];
         ArrayList<ScheduleEvent> schedule = args.length > 9 ? parseSchedule(args[9]) : new ArrayList<ScheduleEvent>();
+        double faultProbability = args.length > 10 ? Double.parseDouble(args[10]) : 0.0;
+        double repairProbability = args.length > 11 ? Double.parseDouble(args[11]) : 0.0;
 
         for (int repeat = 0; repeat < warmupRepeats; repeat++) {
-            runOnce(mapPath, inputdataPath, startEpoch, maxEpochs, maxNewTasks, schedule);
+            runOnce(
+                mapPath,
+                inputdataPath,
+                startEpoch,
+                maxEpochs,
+                maxNewTasks,
+                schedule,
+                faultProbability,
+                repairProbability
+            );
         }
 
         ArrayList<RunResult> runs = new ArrayList<>();
         long startNs = System.nanoTime();
         for (int repeat = 0; repeat < repeats; repeat++) {
-            runs.add(runOnce(mapPath, inputdataPath, startEpoch, maxEpochs, maxNewTasks, schedule));
+            runs.add(
+                runOnce(
+                    mapPath,
+                    inputdataPath,
+                    startEpoch,
+                    maxEpochs,
+                    maxNewTasks,
+                    schedule,
+                    faultProbability,
+                    repairProbability
+                )
+            );
         }
         long elapsedNs = System.nanoTime() - startNs;
         if (runs.isEmpty()) {
@@ -134,6 +159,8 @@ public class LegacyIcsNoFaultWindowBenchmark {
         System.out.println("completed_count=" + first.completedCount);
         System.out.println("fault_event_count=" + first.faultEventCount);
         System.out.println("repair_event_count=" + first.repairEventCount);
+        System.out.println("generated_fault_edge_count=" + first.generatedFaultEdgeCount);
+        System.out.println("generated_repair_edge_count=" + first.generatedRepairEdgeCount);
         System.out.println("active_fault_count=" + first.activeFaultCount);
         System.out.println("active_route_count=" + first.activeRouteCount);
         System.out.println("unfinished_count=" + first.unfinishedCount);
@@ -148,7 +175,9 @@ public class LegacyIcsNoFaultWindowBenchmark {
         int startEpoch,
         int maxEpochs,
         int maxNewTasks,
-        ArrayList<ScheduleEvent> schedule
+        ArrayList<ScheduleEvent> schedule,
+        double faultProbability,
+        double repairProbability
     ) throws IOException {
         prepareWorkingFiles();
         RunResult result = new RunResult();
@@ -173,7 +202,9 @@ public class LegacyIcsNoFaultWindowBenchmark {
             result.epochsRun = epochIndex + 1;
             applyScheduleEvents(schedule, startEpoch + epochIndex, ics, result);
             Tasks newTasks = new Tasks();
-            newTasks.generate_tasks(taskList, newTasks, epoch, ics, 0.0, 0.0, 0.0);
+            newTasks.generate_tasks(taskList, newTasks, epoch, ics, faultProbability, repairProbability, 0.0);
+            result.generatedFaultEdgeCount += newTasks.getFault_edges().size();
+            result.generatedRepairEdgeCount += newTasks.getRepaired_edges().size();
             result.generatedCount += newTasks.getNew_tasks_list().size();
             HashSet<Integer> beforeKeys = new HashSet<>(ics.getSaved_routes().keySet());
             ics.ICS_path_finding(newTasks, ics.getMap(), epoch, ics);
@@ -408,7 +439,8 @@ public class LegacyIcsNoFaultWindowBenchmark {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             writer.write(
                 "repeat,start_epoch,max_epochs,max_new_tasks,epochs_run,generated_count,planned_count,"
-                    + "completed_count,fault_event_count,repair_event_count,active_fault_count,"
+                + "completed_count,fault_event_count,repair_event_count,active_fault_count,"
+                    + "generated_fault_edge_count,generated_repair_edge_count,"
                     + "active_route_count,unfinished_count,route_size_checksum,"
                     + "route_location_checksum,last_epoch"
             );
@@ -419,7 +451,8 @@ public class LegacyIcsNoFaultWindowBenchmark {
                     (index + 1) + "," + run.startEpoch + "," + run.maxEpochs + "," + run.maxNewTasks + ","
                         + run.epochsRun + "," + run.generatedCount + "," + run.plannedCount + ","
                         + run.completedCount + "," + run.faultEventCount + "," + run.repairEventCount + ","
-                        + run.activeFaultCount + "," + run.activeRouteCount + "," + run.unfinishedCount + ","
+                        + run.activeFaultCount + "," + run.generatedFaultEdgeCount + ","
+                        + run.generatedRepairEdgeCount + "," + run.activeRouteCount + "," + run.unfinishedCount + ","
                         + run.routeSizeChecksum + "," + run.routeLocationChecksum + "," + run.lastEpoch
                 );
                 writer.newLine();

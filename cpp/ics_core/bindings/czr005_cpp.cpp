@@ -194,6 +194,8 @@ py::dict legacy_no_fault_window_result_row(
   result["completed_count"] = window.completed_count;
   result["fault_event_count"] = window.fault_event_count;
   result["repair_event_count"] = window.repair_event_count;
+  result["generated_fault_edge_count"] = window.generated_fault_edge_count;
+  result["generated_repair_edge_count"] = window.generated_repair_edge_count;
   result["active_fault_count"] = window.active_fault_count;
   result["unplanned_retry_count"] = window.unplanned_retry_count;
   result["active_route_count"] = window.active_route_count;
@@ -227,6 +229,8 @@ py::dict legacy_no_fault_window_summary(const std::string& map_path,
                                         int max_epochs,
                                         int max_new_tasks,
                                         bool include_routes,
+                                        double fault_probability = 0.0,
+                                        double repair_probability = 0.0,
                                         bool allow_ragged_heuristic = false) {
   const auto start_time = std::chrono::steady_clock::now();
   const auto legacy_map = czr005::ics::read_legacy_map2(map_path, 2.5, allow_ragged_heuristic);
@@ -235,7 +239,10 @@ py::dict legacy_no_fault_window_summary(const std::string& map_path,
       task_path,
       start_epoch,
       max_epochs,
-      max_new_tasks);
+      max_new_tasks,
+      {},
+      fault_probability,
+      repair_probability);
   const auto end_time = std::chrono::steady_clock::now();
   const std::chrono::duration<double> elapsed = end_time - start_time;
   return legacy_no_fault_window_result_row(window, elapsed.count(), include_routes);
@@ -249,6 +256,8 @@ py::dict legacy_scheduled_fault_window_summary(
     int max_new_tasks,
     const std::vector<LegacyWindowFaultEventTuple>& fault_schedule,
     bool include_routes,
+    double fault_probability = 0.0,
+    double repair_probability = 0.0,
     bool allow_ragged_heuristic = false) {
   const auto schedule = legacy_window_fault_events_from_tuples(fault_schedule);
   const auto start_time = std::chrono::steady_clock::now();
@@ -259,7 +268,9 @@ py::dict legacy_scheduled_fault_window_summary(
       start_epoch,
       max_epochs,
       max_new_tasks,
-      schedule);
+      schedule,
+      fault_probability,
+      repair_probability);
   const auto end_time = std::chrono::steady_clock::now();
   const std::chrono::duration<double> elapsed = end_time - start_time;
   return legacy_no_fault_window_result_row(window, elapsed.count(), include_routes);
@@ -1382,6 +1393,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("max_epochs") = 512,
              py::arg("max_new_tasks") = 128,
              py::arg("include_routes") = false,
+             py::arg("fault_probability") = 0.0,
+             py::arg("repair_probability") = 0.0,
              py::arg("allow_ragged_heuristic") = false);
   module.def("legacy_scheduled_fault_window_summary",
              &legacy_scheduled_fault_window_summary,
@@ -1392,6 +1405,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("max_new_tasks") = 128,
              py::arg("fault_schedule") = std::vector<LegacyWindowFaultEventTuple>{},
              py::arg("include_routes") = false,
+             py::arg("fault_probability") = 0.0,
+             py::arg("repair_probability") = 0.0,
              py::arg("allow_ragged_heuristic") = false);
   module.def("edge_score_scores",
              &edge_score_scores,
