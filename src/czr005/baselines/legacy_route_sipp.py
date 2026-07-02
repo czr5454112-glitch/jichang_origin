@@ -15,6 +15,9 @@ from czr005.sim_py.reservation import EdgeReservationTable, ReservationTable
 from czr005.sim_py.task_stream import TaskLeg, TaskStream
 
 
+UNBOUNDED_EDGE_CAPACITY = 1_000_000_000
+
+
 @dataclass(frozen=True)
 class LegacyRouteSIPPStats:
     planned_count: int
@@ -33,7 +36,7 @@ class LegacyRouteSIPPPlanner:
 
     - Legacy/CIE A* chooses the path.
     - This wrapper keeps that path fixed and only moves timestamps later when
-      node, edge, or merge reservations require waiting.
+      node or explicitly requested diagnostic reservations require waiting.
     """
 
     def __init__(self, graph: IcsGraph, max_time: float = 86_400.0) -> None:
@@ -48,7 +51,7 @@ class LegacyRouteSIPPPlanner:
         start_time: float = 0.0,
         reservations: ReservationTable | None = None,
         edge_reservations: EdgeReservationTable | None = None,
-        edge_capacity: int = 1,
+        edge_capacity: int | None = None,
         edge_headway_seconds: float = 0.0,
         node_capacities: dict[int, int] | None = None,
         merge_groups: dict[tuple[int, int], int] | None = None,
@@ -58,8 +61,7 @@ class LegacyRouteSIPPPlanner:
         task_id: int | None = None,
         legacy_path: Iterable[int] | None = None,
     ) -> list[SIPPNode]:
-        if edge_capacity <= 0:
-            raise ValueError("edge_capacity must be positive")
+        normalized_edge_capacity = _normalize_edge_capacity(edge_capacity)
         if merge_capacity <= 0:
             raise ValueError("merge_capacity must be positive")
         reservations = reservations or ReservationTable()
@@ -108,7 +110,7 @@ class LegacyRouteSIPPPlanner:
                 goal=goal,
                 reservations=reservations,
                 edge_reservations=edge_reservations,
-                edge_capacity=edge_capacity,
+                edge_capacity=normalized_edge_capacity,
                 edge_headway_seconds=edge_headway_seconds,
                 node_capacities=node_capacities,
                 merge_groups=merge_groups,
@@ -268,21 +270,25 @@ class LegacyRouteSIPPBaseline:
         graph: IcsGraph,
         reservations: ReservationTable | None = None,
         edge_reservations: EdgeReservationTable | None = None,
-        edge_capacity: int = 1,
+        edge_capacity: int | None = None,
         edge_headway_seconds: float = 0.0,
         node_capacities: dict[int, int] | None = None,
         merge_groups: dict[tuple[int, int], int] | None = None,
         merge_capacity: int = 1,
         merge_headway_seconds: float = 0.0,
     ) -> None:
-        if edge_capacity <= 0:
-            raise ValueError("edge_capacity must be positive")
+        normalized_edge_capacity = _normalize_edge_capacity(edge_capacity)
         if merge_capacity <= 0:
             raise ValueError("merge_capacity must be positive")
         self.graph = graph
         self.reservations = reservations or ReservationTable()
         self.edge_reservations = edge_reservations or EdgeReservationTable()
-        self.edge_capacity = edge_capacity
+        self.edge_capacity = normalized_edge_capacity
+        self.edge_capacity_model = (
+            "not_applied_original_cie_node_window_primary"
+            if edge_capacity is None
+            else f"diagnostic_explicit_edge_capacity_{edge_capacity}"
+        )
         self.edge_headway_seconds = edge_headway_seconds
         self.node_capacities = dict(node_capacities or {})
         self.merge_groups = dict(merge_groups or {})
@@ -452,3 +458,11 @@ def _inserted_wait_count(graph: IcsGraph, route: list[SIPPNode]) -> int:
         if edge_start > left.t2 + EPSILON:
             waits += 1
     return waits
+
+
+def _normalize_edge_capacity(edge_capacity: int | None) -> int:
+    if edge_capacity is None:
+        return UNBOUNDED_EDGE_CAPACITY
+    if edge_capacity <= 0:
+        raise ValueError("edge_capacity must be positive")
+    return edge_capacity

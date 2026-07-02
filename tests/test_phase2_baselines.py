@@ -282,6 +282,22 @@ def test_legacy_route_sipp_preserves_astar_path_while_waiting_for_edge_capacity(
     assert not edge_reservations.has_capacity_conflict(0, 1, route[1].t1 - 2.0, route[1].t1, 1, task_id=1)
 
 
+def test_legacy_route_sipp_default_does_not_invent_edge_capacity() -> None:
+    edge_reservations = EdgeReservationTable()
+    edge_reservations.reserve(task_id=99, start_node=0, end_node=1, start=0.0, end=2.0)
+
+    route = LegacyRouteSIPPPlanner(_branch_graph()).plan(
+        0,
+        3,
+        edge_reservations=edge_reservations,
+        task_id=1,
+    )
+
+    assert [node.location for node in route] == [0, 1, 3]
+    assert route[1].t1 == 2.0
+    assert edge_reservations.has_capacity_conflict(0, 1, 0.0, 2.0, 1, task_id=1)
+
+
 def test_legacy_route_sipp_baseline_runs_ics_style_episode() -> None:
     tasks = (
         _task("urgent", 1, pass_time=0.0, std=10.0, goal=1),

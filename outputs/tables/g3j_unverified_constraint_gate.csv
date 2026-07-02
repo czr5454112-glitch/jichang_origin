@@ -1,0 +1,8 @@
+gate,pass,value,threshold,decision
+primary_scope_matches_original_java,True,edge=not_applied_original_cie_node_window_primary;merge=not_applied_original_java_primary,no unverified edge-capacity or merge-group constraint in primary,use_node_window_primary
+primary_planned_count_gate,True,127,>=115,g4a_pilot_candidate_under_verified_scope
+primary_node_window_conflicts_zero,True,0,zero original node-window conflicts,validated_constraints_clean
+primary_preserves_astar_path,True,127/127,all planned routes keep CIE/A* path,path_effect_preserved
+edge_capacity_demoted_to_diagnostic,True,433,strict edge-capacity overlaps are reported but not counted as primary failure,do_not_use_edge_capacity1_as_primary_constraint
+edge_capacity_changes_timing,True,primary=127;edge_diag=132;previous_style=132,unverified constraint changes outcomes,keep_as_optional_stress_only
+remaining_cie_no_path_inventory,True,17,track remaining CIE no-path cases,audit_no_path_before_broad_training

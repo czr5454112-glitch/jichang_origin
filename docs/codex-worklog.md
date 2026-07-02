@@ -833,6 +833,19 @@
 - Key observations: The new planner first asks original CIE/Legacy A* for the route, then retimes that fixed path with SIPP-style node/edge/merge reservation checks. In the real `map2/inputdata` matched windows it reaches `132/144` planned, `0` real node/edge/merge conflicts, and `132/132` planned routes preserve the A* path exactly.
 - Tests / validation: Added tests prove no-reservation timing/path parity with A*, edge-capacity waiting without path drift, and an ICS-style two-task replay with zero edge conflicts. The G3i script asserts planned count is at least `115`, real conflicts are zero, and A* path mismatches are zero.
 - Safety / parity notes: No legacy Java files were modified. SIPP is integrated as an execution-timing wrapper only; it is not the route teacher. No BC/RL/PPO/MAPPO/GNN/Transformer training was started.
-- Interpretation: G3i is the first clean pilot candidate: it keeps the paper-faithful CIE/A* route effect while making timing executable under hard runtime constraints.
+- Interpretation: G3i is the first path-constrained integration pass, but its edge-capacity interpretation is superseded by G3j because single-occupancy conveyor-edge capacity is not validated by the original Java/CIE scope.
 - Next blocking question: Why do the remaining `12` CIE/A* no-path cases concentrate in the repair-window and merge-group windows?
 - Follow-up: Audit the remaining CIE no-path inventory, then build a small G4A pilot manifest from G3i path-preserving executable labels.
+
+## 2026-07-02 17:20 - G3j unverified edge-capacity removal
+
+- Request: Remove unverified conveyor-edge capacity from the primary model because the original CIE/Legacy Java project does not validate a single-occupancy edge-capacity constraint.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: changed `LegacyRouteSIPPPlanner` / `LegacyRouteSIPPBaseline` so edge capacity is not applied by default, added a regression test proving default CIE/SIPP timing does not invent edge capacity, added `scripts/eval/run_g3j_remove_unverified_edge_capacity.py`, generated `outputs/reports/g3j_unverified_edge_capacity_audit_report.md`, `outputs/tables/g3j_constraint_model_comparison.csv`, `outputs/tables/g3j_primary_path_parity.csv`, `outputs/tables/g3j_primary_unplanned_inventory.csv`, `outputs/tables/g3j_unverified_constraint_gate.csv`, `artifacts/teacher/legacy_astar/g3j_node_window_primary_sample.jsonl`, and `outputs/figures/g3j_constraint_model_comparison.png`; updated README status; added the G3j plan file.
+- Commands run: `python -m py_compile src/czr005/baselines/legacy_route_sipp.py scripts/eval/run_g3j_remove_unverified_edge_capacity.py`; `python -m pytest tests/test_phase2_baselines.py -q`; `python scripts/eval/run_g3j_remove_unverified_edge_capacity.py`; follow-up full validation recorded in the final turn summary.
+- Key observations: Under the corrected primary scope, CIE/A* path-constrained timing reaches `127/144`, has `0` original node-window conflicts, and preserves the A* path for `127/127` planned routes. The old strict edge-capacity overlap count is `433`, but it is now diagnostic only and must not drive teacher labels or gates.
+- Tests / validation: The G3j script asserts the primary planned-count gate (`>=115`), zero node-window conflicts, zero A* path mismatches, and no edge-capacity model in the primary row.
+- Safety / parity notes: No legacy Java files were modified. Edge capacity and merge-group capacity remain available only as optional stress diagnostics. No BC/RL/PPO/MAPPO/GNN/Transformer training was started.
+- Interpretation: This is a correction pass. The primary verified model is original CIE/A* route intent plus Java-style node time windows and fault edges, not single-occupancy conveyor-edge capacity.
+- Next blocking question: What causes the remaining `17` CIE/A* no-path rows under the verified node-window scope?
+- Follow-up: Audit those no-path rows before building the corrected G4A pilot manifest.
