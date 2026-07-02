@@ -875,3 +875,17 @@
 - Interpretation: G4B is a positive pilot and a G4C candidate, but not a final replacement for CIE/A*. The remaining `14` interface disagreements are precisely the cases to feed into learner-visited-state data aggregation and relabeling.
 - Next blocking question: Can G4C collect states reached after those 14 wrong local decisions, query verified CIE/A* where possible, and reduce the remaining route-exact failures without broad RL?
 - Follow-up: Run G4C data aggregation / DAgger-style relabeling next; keep RL and larger architectures paused.
+
+## 2026-07-02 20:45 - G4C failure-driven decentralized policy aggregation
+
+- Request: Complete `czr005_g4c_failure_driven_decentralized_policy_plan.md` with quality and push; diagnose the G4B failures before any RL or larger architecture work.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_g4c_failure_driven_data_aggregation.py` and `scripts/eval/run_g4c_learner_visited_closed_loop.py`; generated the required G4C reports, tables, teacher sample, and `artifacts/models/g4c_minimal_policy_round1.json`; corrected the G4A feature schema so `scenario` is metadata-only; updated README status; added the G4C plan file.
+- Commands run: `python -m py_compile scripts/eval/run_g4c_failure_driven_data_aggregation.py`; `python -m py_compile scripts/eval/run_g4c_learner_visited_closed_loop.py`; `python scripts/eval/run_g4c_failure_driven_data_aggregation.py`; `python scripts/eval/run_g4c_learner_visited_closed_loop.py`; full validation recorded in the final turn summary.
+- Key observations: G4C confirms the G4B model does not use `scenario` as an input and keeps teacher next-hop, full route suffixes, future schedule, label source, and post-hoc success out of model features. The `14` G4B wrong high-confidence interface decisions cluster into four risky branch patterns: `6->{8,12}`, `11->{13,14}`, `16->{17,21}`, and `19->{18,25}`.
+- G4C result: learner-visited relabeling adds `28` relabel rows covering the original failure state and the off-route state after the wrong move. Round1 without calibration still plans `132/144`, but calibrated cluster abstain reaches `144/144`, keeps node-window conflicts at `0`, and reduces wrong high-confidence actions from `14` to `0`.
+- Runtime cost: the calibrated policy calls verified CIE/A* fallback on `114/1186` interface decisions (`9.6%` fallback) and saves `90.4%` of per-interface fallback calls versus always asking the teacher.
+- Safety / parity notes: No legacy Java files were modified. `edge_capacity=1` and edge-overlap accounting remain non-primary diagnostics. No PPO/MAPPO/RL, GNN, Transformer, or broad model scaling was started.
+- Interpretation: G4C is a stronger pilot than G4B because it handles the known failure clusters through explicit abstain/fallback. It is still not a final learned replacement for CIE/A*, because the best result depends on calibrated fallback in risky branch clusters.
+- Next blocking question: Does the same verified CIE retry teacher plus failure-cluster abstain generalize beyond this small matched window when expanded to larger CIE/Java-style windows?
+- Follow-up: Proceed to G4D large-window teacher expansion and robustness auditing before considering RL.

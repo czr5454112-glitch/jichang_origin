@@ -389,7 +389,7 @@ def _teacher_replay_parity_rows(interface_rows: list[dict[str, Any]]) -> list[di
 def _candidate_schema_rows() -> list[dict[str, Any]]:
     rows = [
         ("sample_id", "metadata", False, False, "stable row id"),
-        ("scenario", "metadata", True, False, "runtime scenario key for split and audit"),
+        ("scenario", "metadata", False, False, "metadata-only key for split and audit; not a runtime model input"),
         ("current_node", "runtime_feature", True, False, "current bag node"),
         ("goal_node", "runtime_feature", True, False, "task destination"),
         ("candidate_next_nodes", "runtime_feature", True, False, "available outgoing neighbors"),

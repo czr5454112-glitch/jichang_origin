@@ -1,0 +1,4 @@
+iteration,train_slice_count,relabelled_slice_count,offline_top1_all,route_exact_planned,wrong_high_confidence_actions,abstain_or_fallback_actions,notes
+round0_g4b_no_scenario,821,0,0.98819562,132,14,0,Existing G4B model; feature names do not include scenario.
+round1_dagger_relabel_no_calibration,849,28,0.98819562,132,14,0,Round1 adds learner-visited relabels but does not yet use risk-cluster abstain.
+round1_dagger_with_cluster_abstain,849,28,0.98819562,144,0,114,Abstain on failure-derived current-node/candidate-set clusters; fallback is verified CIE retry.
