@@ -309,10 +309,10 @@ def _overlap_count(intervals: list[tuple[float, float]], start: float, end: floa
 
 def _earliest_safe(reservations: dict[int, list[tuple[float, float]]], node: int, start: float, service: float) -> float:
     current = start
-    for _ in range(1000):
+    for left, right in sorted(reservations[node]):
         end = current + service
-        blockers = [(left, right) for left, right in reservations[node] if not (end < left or current > right)]
-        if not blockers:
+        if end < left:
             return current
-        current = max(right for _left, right in blockers) + EPSILON
+        if not (end < left or current > right):
+            current = right + EPSILON
     return current
