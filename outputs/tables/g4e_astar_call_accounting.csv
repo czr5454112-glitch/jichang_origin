@@ -1,0 +1,6 @@
+policy,role,planned_count,teacher_planned_scope,node_window_conflicts,model_inference_count,fallback_astar_calls,original_cie_retry_astar_calls,interface_level_astar_saved_rate,task_zero_fallback_count,task_zero_fallback_share,astar_call_reduction_rate,call_count_interpretation
+cie_retry_teacher_baseline,original_cost_reference,4449,4449,0,0,15852,15852,,0,0,0,original task-level CIE retry baseline
+g4d_route_exact_risk_head,previous_g4d_baseline,4449,4449,0,39313,6786,15852,0.82738534,0,0,0.57191522,G4D aggregate A* reduction but zero task-level full replacement
+g4e_route_exact_risk_reduced,development_main_route_exact,4449,4449,0,39313,6395,15852,0.83733116,76,0.01708249,0.59658087,reduces A* calls and improves task-level zero-fallback share
+g4e_goal_reaching_model_only,diagnostic_true_decentralized_no_fallback,4449,4449,0,34477,0,15852,1,4449,1,1,"diagnostic: no A* after admission, but requires runtime validation before deployment"
+g4e_goal_reaching_with_fallback,engineering_goal_reaching_policy,4449,4449,0,35190,6644,15852,0.83099738,76,0.01708249,0.58087308,reduces A* calls and improves task-level zero-fallback share

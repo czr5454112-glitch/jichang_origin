@@ -904,3 +904,17 @@
 - Safety / parity notes: No legacy Java files were modified. `edge_capacity=1` and edge overlaps remain diagnostic-only. Forbidden feature audit passes: no scenario input, teacher next-hop, full route suffix, future schedule, label source, or post-hoc success is used as model input.
 - Interpretation: G4D is a safety and aggregate-cost pass for G4E/C++ runtime evaluation, not a paper-grade final replacement. The next work should reduce conservative fallback on small windows and test C++ runtime latency/throughput.
 - Follow-up: Proceed to G4E C++ runtime / latency evaluation and fallback-reduction audit before any RL.
+
+## 2026-07-02 23:30 - G4E fallback reduction and true decentralized loop
+
+- Request: Complete `czr005_g4e_fallback_reduction_and_true_decentralized_loop_plan.md` with quality and do not downgrade the plan.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_g4e_fallback_reduction_audit.py`, `scripts/train/train_g4e_risk_calibrated_policy.py`, `scripts/eval/run_g4e_true_decentralized_closed_loop.py`, and `scripts/eval/run_g4e_runtime_call_accounting.py`; generated the required G4E reports, tables, hardcase teacher sample, hardcase taxonomy/addition tables, and `artifacts/models/g4e_risk_calibrated_policy.json`; updated README status and added the G4E plan file.
+- Commands run: G4E script compile/run commands from the plan; full validation recorded in the final turn summary.
+- Fallback audit: G4D's `6786` fallback calls are now ledgered by node, window, and task. Only `1771` fallback calls directly prevented a wrong model action, while `0/4449` teacher-planned tasks had zero fallback, confirming the need for task-level fallback reduction rather than just interface-level savings.
+- Risk calibration: G4E keeps the G4D small MLP weights and calibrates only the risk head, adding `16` runtime-visible hardcase rules. Route-exact fallback calls fall from `6786` to `6395`; planned scope remains `4449/4449`; node-window conflicts remain `0`; wrong high-confidence actions remain `0`; zero-fallback tasks improve to `76/4449`.
+- True decentralized loop: G4E records route-exact, goal-reaching model-only, and goal-reaching with fallback separately. The diagnostic model-only loop reaches `4449/4449` while deviating safely from the CIE path on `1599` tasks; fallback-assisted goal-reaching also reaches `4449/4449`, with `1372` deviated-but-success cases. These are diagnostic until runtime/export validation.
+- Runtime accounting: route-exact G4E reduces A* calls from the original CIE retry baseline `15852` to `6395` (`59.7%` reduction), improving over G4D's `6786` (`57.2%`). Fallback rate is `16.3%`, still above the `12%` promotion target.
+- Safety / parity notes: No legacy Java files were modified. `edge_capacity=1` and edge overlaps remain diagnostic-only. No RL, PPO/MAPPO, GNN, Transformer, or model-family downgrade was used.
+- Interpretation: G4E is a development pass, not a G4F promotion candidate. It proves fallback can be reduced without losing the verified teacher planned scope, but it does not reach the `70%` A* reduction or `<=12%` fallback promotion thresholds.
+- Follow-up: Continue G4E/G4F-prep by reducing fallback around the remaining high-frequency risk rules and validating the model-only local-wait loop in the runtime/export path before C++ promotion.
