@@ -1,0 +1,4 @@
+case,current,next_node,goal,ready_time,candidate_safe,blocked_reasons,expected_safe,expected_absent_reason,expected_present_reason,case_pass,why
+repairable_downstream_fault,0,1,2,0.0,True,none,True,unreachable_goal,,True,upstream move 0->1 should stay available so the bag can wait at node 1 until edge 1->2 repairs
+permanent_downstream_fault,0,1,2,0.0,False,unreachable_goal,False,,unreachable_goal,True,permanent downstream fault should still make candidate 0->1 unreachable
+currently_faulted_candidate_edge,0,1,2,4.0,False,fault_edge,False,,fault_edge,True,the repair-horizon fix must not make the currently faulted edge itself safe

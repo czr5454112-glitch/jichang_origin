@@ -268,6 +268,38 @@ def test_action_mask_blocks_unreachable_goal_candidates() -> None:
     assert compatibility_candidates[0].safe is True
 
 
+def test_action_mask_allows_waiting_toward_repairable_downstream_fault() -> None:
+    graph = _line_graph()
+    task = _task("repairable-downstream", 1, pass_time=0.0, std=20.0)
+
+    candidates = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=ReservationTable(),
+        edge_reservations=EdgeReservationTable(),
+        fault_windows=((1, 2, 0.0, 5.0),),
+    )
+
+    assert candidates[0].next_node == 1
+    assert candidates[0].safe is True
+    assert "unreachable_goal" not in candidates[0].blocked_reasons
+
+    static_plus_window = build_action_candidates(
+        graph=graph,
+        task=task,
+        current=0,
+        ready_time=0.0,
+        reservations=ReservationTable(),
+        edge_reservations=EdgeReservationTable(),
+        fault_edges={(1, 2)},
+        fault_windows=((1, 2, 0.0, 5.0),),
+    )
+    assert static_plus_window[0].safe is False
+    assert "unreachable_goal" in static_plus_window[0].blocked_reasons
+
+
 def test_junction_env_shortest_policy_runs_without_post_shield_conflicts() -> None:
     tasks = (
         _task("first", 1, pass_time=0.0, std=20.0),

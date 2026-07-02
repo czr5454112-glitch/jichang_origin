@@ -771,3 +771,16 @@
 - Interpretation: G3d is a diagnostic pass, not a G4A green light. Planned count stays below the `115/144` gate even though wait labels improve branch label coverage, so broad teacher scaling and training remain paused.
 - Next blocking question: Which edge-capacity timing convention differs between Legacy-A* route timing, Python event replay, and the intended Java/C++ scheduler semantics?
 - Follow-up: Run a focused G3e/G3b event-semantics repair on edge-capacity release timing, no-path under repair windows, and route/state alignment before generating a G4A pilot dataset.
+
+## 2026-07-02 13:45 - G3e repair-window reachability semantics
+
+- Request: Continue autonomously by fixing the semantics blockers before pushing the project forward.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: repaired downstream repair-window reachability pruning in `src/czr005/envs/action_mask.py`, added a regression test in `tests/test_phase3_env.py`, added `scripts/eval/run_g3e_event_semantics_repair.py`, generated `outputs/reports/g3e_event_semantics_repair_report.md`, `outputs/tables/g3e_repair_window_reachability_cases.csv`, and `outputs/tables/g3e_matched_gate_after_repair.csv`, and refreshed G3d outputs after the core fix.
+- Commands run: `python -m pytest tests/test_phase3_env.py -q`; `python scripts/eval/run_g3d_legacy_teacher_wait_horizon_audit.py`; `python -m py_compile scripts/eval/run_g3e_event_semantics_repair.py`; `python scripts/eval/run_g3e_event_semantics_repair.py`; follow-up validation commands recorded in the final turn summary.
+- Key observations: The action mask no longer marks an upstream move as `unreachable_goal` just because a downstream edge is temporarily inside a repair window; bags can now move toward safe waiting nodes. Permanent downstream faults still produce `unreachable_goal`, and a currently faulted candidate edge still produces `fault_edge`.
+- Tests / validation: G3e reachability cases pass (`3/3`), including repairable downstream fault, permanent downstream fault, and currently faulted candidate edge. The targeted Phase3 environment tests pass.
+- Safety / parity notes: This is a semantic repair, not a mask relaxation. It does not make an active fault edge safe and does not change legacy Java.
+- Interpretation: The repair is necessary but not sufficient. Regenerated matched G3d evidence still fails the G4A gate: best primary replay remains `94/144`, while disabling edge capacity reaches `125/144` only by introducing `491` real-constraint conflicts.
+- Next blocking question: Can an edge-capacity-aware Legacy teacher planner reserve or wait on bottleneck edges without replacing the paper-faithful route source with SIPP?
+- Follow-up: Build the next non-learning repair around edge-capacity-aware teacher timing, likely by separating Legacy route intent from an execution-level safe-wait scheduler and preserving label_source.

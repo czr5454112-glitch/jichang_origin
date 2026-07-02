@@ -92,6 +92,7 @@ def build_action_candidates(
     node_capacities = node_capacities or {}
     merge_groups = merge_groups or {}
     active_faults = active_fault_edges(fault_edges, fault_windows, ready_time)
+    reachability_faults = _reachability_fault_edges(fault_edges, fault_windows, ready_time)
     planner = AStarPlanner(graph) if require_reachable_goal else None
     candidates: list[ActionCandidate] = []
 
@@ -147,7 +148,7 @@ def build_action_candidates(
         if (
             planner is not None
             and next_node != task.goal
-            and not planner.plan(next_node, task.goal, fault_edges=active_faults)
+            and not planner.plan(next_node, task.goal, fault_edges=reachability_faults)
         ):
             reasons.append("unreachable_goal")
 
@@ -228,6 +229,27 @@ def _has_merge_group_conflict(
         if merge_headway_seconds > 0.0 and abs(start - interval.start) < merge_headway_seconds:
             return True
     return overlapping >= merge_capacity
+
+
+def _reachability_fault_edges(
+    fault_edges: set[tuple[int, int]] | None,
+    fault_windows: tuple[EdgeFaultWindow, ...] | None,
+    _ready_time: float,
+) -> set[tuple[int, int]]:
+    """Faults used only for downstream reachability pruning.
+
+    A currently failed repair-window edge should still block immediate travel
+    through that edge, but it should not make an upstream node look permanently
+    unreachable. Keeping permanent faults here while dropping future-repair
+    windows lets event policies move toward safe waiting nodes instead of
+    forcing premature no-path labels.
+    """
+
+    permanent = set(fault_edges or set())
+    for _, _, fault_start, repair_time in fault_windows or ():
+        if repair_time <= fault_start:
+            raise ValueError("repair_time must be greater than fault_start")
+    return permanent
 
 
 def action_mask(candidates: tuple[ActionCandidate, ...]) -> tuple[bool, ...]:
