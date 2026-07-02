@@ -797,3 +797,16 @@
 - Interpretation: G3f is a diagnostic pass, not a training green light. It proves the route-intent/executable-label split is viable and sharply reduces unresolved edge-capacity cases, but planned count remains too low for the G4A pilot gate.
 - Next blocking question: Which scheduler timing convention still differs across Legacy route timing, Python event replay, and the intended Java/C++ runtime when no-path labels persist after capacity waits?
 - Follow-up: Continue with G3g Legacy Scheduler Semantics Alignment before any G4A pilot or training.
+
+## 2026-07-02 15:05 - G3g Legacy scheduler semantics alignment
+
+- Request: Continue pushing the project forward after G3f, without jumping into training.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_g3g_legacy_scheduler_semantics_alignment.py`; generated `outputs/reports/g3g_legacy_scheduler_semantics_alignment_report.md`, `outputs/tables/g3g_scheduler_semantics_matrix.csv`, `outputs/tables/g3g_hold_conflict_taxonomy.csv`, `outputs/tables/g3g_current_vs_upstream_wait_cases.csv`, `outputs/tables/g3g_scheduler_replay_comparison.csv`, `outputs/tables/g3g_full_route_alignment.csv`, `outputs/tables/g3g_backpressure_edge_hotspots.csv`, `outputs/tables/g3g_next_step_gate.csv`, `artifacts/teacher/legacy_astar/g3g_scheduler_semantics_trace_sample.jsonl`, and `outputs/figures/g3g_scheduler_semantics_gap.png`; updated README status; added the G3g plan file.
+- Commands run: `python -m py_compile scripts/eval/run_g3g_legacy_scheduler_semantics_alignment.py`; `python scripts/eval/run_g3g_legacy_scheduler_semantics_alignment.py`; follow-up validation commands recorded in the final turn summary.
+- Key observations: All `29/29` G3f best-variant unresolved capacity cases are current-node hold-capacity failures. Legacy node-window full-route scheduling reaches `127/144`, but produces `458` real edge/merge conflicts under the runtime shield. Full-route SIPP scheduling reaches `144/144` with zero conflicts and plans all `29/29` unresolved local cases.
+- Tests / validation: The G3g report, source-level semantics matrix, hold taxonomy, current-vs-upstream wait case table, replay comparison, full-route alignment, backpressure hotspot table, next-step gate, JSONL trace sample, and PNG figure were regenerated from the local code and G3f artifacts.
+- Safety / parity notes: No legacy Java files were modified. Edge capacity stayed enabled. SIPP is used as a runtime-safe semantics reference, not as a replacement for the paper-faithful Legacy-A* route-intent teacher. No G4A, BC, RL, PPO/MAPPO, GNN, or Transformer work was started.
+- Interpretation: G3g explains the remaining blocker as a scheduler-scope/backpressure mismatch: local executable WAIT consumes current-node capacity, while route-window/full-route schedulers can delay or reserve upstream before the bag reaches the blocked current node.
+- Next blocking question: Can a backpressure-aware executable teacher preserve Legacy route intent while emitting upstream delay/pre-reservation labels that replay safely and push planned count past the `115/144` gate?
+- Follow-up: Build a G3h backpressure/pre-reservation diagnostic before any G4A pilot or training.
