@@ -719,3 +719,16 @@
 - Key observations: Existing Phase1 evidence was present but used narrower file names such as `phase1e_astar_py_cpp_parity.csv`. The new acceptance script emits the canonical Phase1 artifact names requested by the master plan and combines 40 `map2` start/end A* parity rows with 10 legacy `example1` ragged-heuristic rows.
 - Tests / validation: `tests/test_cpp_binding_smoke.py` passed `2 passed`; Phase1 port acceptance reported `phase1_parity_rows=50 strict_parity_pass=True speed_rows=2`; non-learning target pytest passed `40 passed`; CTest passed 2/2; direct pybind smoke passed.
 - Safety / parity notes: This is a non-learning acceptance/reporting improvement for the Python/C++ port. It does not add teacher data, BC, RL, or learned policy execution.
+
+## 2026-07-02 00:30 - G2 learning gap autopsy
+
+- Request: Complete `czr005_next_research_push_plan.md` with quality and push the result; the plan recommends doing one auditable G stage, with G2 as the highest-leverage immediate round.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_g2_learning_gap_autopsy.py`; generated `outputs/reports/g2_learning_gap_autopsy.md`, `outputs/tables/g2_failed_task_inventory.csv`, `outputs/tables/g2_first_divergence_by_task.csv`, `outputs/tables/g2_policy_vs_sipp_decision_slices.csv`, `outputs/tables/g2_decision_failure_slices.csv`, `outputs/tables/g2_policy_vs_sipp_counterfactual.csv`, `outputs/tables/g2_failure_motif_summary.csv`, `outputs/tables/g2_family_summary.csv`, and `outputs/figures/g2_failure_heatmap.png`; updated README status.
+- Commands run: `python -m py_compile scripts/eval/run_g2_learning_gap_autopsy.py`; `python scripts/eval/run_g2_learning_gap_autopsy.py`; CSV/report spot checks with PowerShell; follow-up validation commands recorded in the final turn summary.
+- Key observations: On the Phase9 matched real `map2/inputdata` windows, rolling-horizon SIPP and periodic SIPP remain `144/144`, while EdgeScore-event remains `97/144`, fallback-event `93/144`, and PIBT active-bag replay `39/144`. The G2 inventory localizes EdgeScore's `47` failed task-scenario rows against the rolling-horizon SIPP teacher, plus `51` fallback and `105` PIBT rows. First-divergence rows now skip non-decision arrivals and point to actual move/hold/unplanned decisions.
+- Tests / validation: G2 script regenerated all tables and the heatmap; the script asserts the EdgeScore failure gap is exactly `47`. The report explicitly labels this as failure diagnosis, not a learning-success or RL claim.
+- Safety / parity notes: No legacy Java files were modified. No safety shield was weakened. This round adds diagnostics only; it does not train a larger model or start RL.
+- Interpretation: The gap is completion/coordination, not post-shield safety. Failed rows usually show the local policy holding when SIPP advances, taking a branch that later cannot recover, or exhausting the decision horizon.
+- Next blocking question: Can a local candidate-ranking oracle using richer SIPP-derived features recover most of the EdgeScore failed rows, or is the remaining gap fundamentally horizon/memory/global-guidance limited?
+- Follow-up: Do G3 teacher/oracle upper-bound analysis before G4/G5 expansion or any RL fine-tuning.

@@ -20,6 +20,7 @@ Current scope:
 - Phase2 non-learning baselines: A*, reservation/SIPP, queue-aware shortest path, rolling-horizon SIPP, route-discarding periodic SIPP replanning with static/repair-window faults, explicit buffer-capacity and merge-group shield checks, PIBT-style shield with bounded recursive handoff, active-bag PIBT replay parity, and active-bag/replan-cost diagnostics.
 - Phase8 native C++ event replay with Python/C++ parity over persisted synthetic schedules and real legacy `map2/inputdata` windows, including repair windows plus explicit buffer-capacity and merge-group configurations where configured.
 - Phase9 early runtime scaling, matched baseline-comparison, heldout-like synthetic matched diagnostics, dense active-bag PIBT stress sweeps, randomized-topology/task-source PIBT stress and all-family matched sweeps, repeated matched-family timing with local hardware metadata/95% CIs, and unified evidence diagnostics compare Python/native C++ throughput while surfacing existing Phase2/Phase5/Phase8 baseline evidence in one table.
+- G2 learning-gap autopsy over the Phase9 matched real windows: `outputs/reports/g2_learning_gap_autopsy.md` localizes the current EdgeScore gap (`97/144` vs SIPP `144/144`) into failed task inventories, first-divergence rows, policy-vs-SIPP decision slices, failure motifs, and a heatmap. This is diagnostic evidence for the next teacher/oracle stage, not a learning-success claim.
 - Learning experiments are still smoke/prototype scope, not final paper-grade RL results.
 - Legacy Java files are read-only reference material.
 
