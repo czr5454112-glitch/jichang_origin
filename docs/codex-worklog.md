@@ -732,3 +732,16 @@
 - Interpretation: The gap is completion/coordination, not post-shield safety. Failed rows usually show the local policy holding when SIPP advances, taking a branch that later cannot recover, or exhausting the decision horizon.
 - Next blocking question: Can a local candidate-ranking oracle using richer SIPP-derived features recover most of the EdgeScore failed rows, or is the remaining gap fundamentally horizon/memory/global-guidance limited?
 - Follow-up: Do G3 teacher/oracle upper-bound analysis before G4/G5 expansion or any RL fine-tuning.
+
+## 2026-07-02 01:20 - G3 oracle upper-bound diagnosis
+
+- Request: Complete `czr005_g3_oracle_teacher_push_plan.md` and push; implement G3 Oracle Upper Bound and Teacher-in-Mask Diagnosis, without PPO/MAPPO, GNN/Transformer training, or learning-success claims.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_g3_oracle_upper_bound.py`; generated `outputs/reports/g3_oracle_upper_bound_report.md`, `outputs/tables/g3_teacher_next_in_mask.csv`, `outputs/tables/g3_local_oracle_replay_summary.csv`, `outputs/tables/g3_oracle_recovered_failures.csv`, `outputs/tables/g3_unrecoverable_failures.csv`, `outputs/tables/g3_oracle_failure_decomposition.csv`, `outputs/tables/g3_feature_need_summary.csv`, and `outputs/figures/g3_oracle_recovery_heatmap.png`; updated README status; added the G3 push plan file.
+- Commands run: `python -m py_compile scripts/eval/run_g3_oracle_upper_bound.py`; `python scripts/eval/run_g3_oracle_upper_bound.py`; PowerShell spot checks over G3 report and tables; full validation recorded in the final turn summary.
+- Key observations: G3 replays oracle policies under the same event candidate set and hard shield. Teacher next-hop is always present in the failed-decision candidate list (`teacher_next_candidate_recall=1.000`) but is safe in only `0.319` of first-divergence rows. Oracle-1 recovers `10/47` EdgeScore failures; the best K-step local oracle recovers `11/47`, has `10` new regressions, and still leaves `36/47` failures. All oracle rows report zero post-shield conflicts.
+- Tests / validation: The G3 script asserts `47` first-divergence audit rows and covers all `47` G2 EdgeScore failures. It generates recovered/unrecoverable/decomposition/feature-need tables and a recovery heatmap.
+- Safety / parity notes: No legacy Java files were modified. The hard shield remains active. No model training, RL, PPO/MAPPO, GNN, or Transformer work was added.
+- Interpretation: This is Development pass B: the bottleneck is mostly mask/shield/event-horizon behavior, not merely EdgeScore ranking. Only a small subset is cleanly suitable for immediate SIPP-rank supervision.
+- Next blocking question: For rows still unrecovered by `oracle3_lookahead_k5`, is the blocker an event-horizon artifact in local replay, or does it require nonlocal reservation guidance beyond candidate ranking?
+- Follow-up: Run G3b mask/shield/event-horizon audit before broad G4/G5 scaling, while preserving the recovered `sipp_rank_supervision` rows as targeted teacher-data seeds.
