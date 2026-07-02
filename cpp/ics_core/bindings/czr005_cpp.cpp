@@ -295,6 +295,168 @@ int edge_score_predict(const std::vector<std::vector<double>>& w1,
   return model.predict(features, action_mask);
 }
 
+struct G4HFallbackWeights {
+  double static_weight = 1.0;
+  double wait_weight = 0.0;
+  double pressure_weight = 0.0;
+  double loop_weight = 12.0;
+  double backtrack_weight = 6.0;
+  double traffic_weight = 0.0;
+  double progress_weight = 0.0;
+  double slack_wait_multiplier = 0.0;
+  double fault_penalty = 1.0e9;
+};
+
+G4HFallbackWeights g4h_fallback_weights(const std::string& fallback_name) {
+  G4HFallbackWeights weights;
+  if (fallback_name == "static_distance") {
+    weights.progress_weight = 0.1;
+  } else if (fallback_name == "node_window_aware") {
+    weights.wait_weight = 1.4;
+    weights.pressure_weight = 4.0;
+    weights.progress_weight = 0.2;
+  } else if (fallback_name == "node_window_pibt_lite") {
+    weights.wait_weight = 1.8;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 18.0;
+    weights.backtrack_weight = 10.0;
+    weights.progress_weight = 0.35;
+    weights.slack_wait_multiplier = 0.4;
+  } else if (fallback_name == "bounded_local_search") {
+    weights.wait_weight = 1.6;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 22.0;
+    weights.backtrack_weight = 12.0;
+    weights.traffic_weight = 4.0;
+    weights.progress_weight = 0.35;
+  } else if (fallback_name != "none") {
+    throw std::invalid_argument("unknown G4H fallback: " + fallback_name);
+  }
+  return weights;
+}
+
+void g4h_expect_size(const std::vector<double>& values,
+                     std::size_t expected,
+                     const std::string& name) {
+  if (values.size() != expected) {
+    throw std::invalid_argument(name + " size must match candidates");
+  }
+}
+
+void g4h_expect_size_bool(const std::vector<bool>& values,
+                          std::size_t expected,
+                          const std::string& name) {
+  if (values.size() != expected) {
+    throw std::invalid_argument(name + " size must match candidates");
+  }
+}
+
+py::dict g4h_no_astar_policy_decision(
+    const std::vector<std::vector<double>>& w1,
+    const std::vector<double>& b1,
+    const std::vector<double>& w2,
+    double b2,
+    const std::vector<std::vector<double>>& features,
+    const std::vector<int>& candidates,
+    const std::vector<double>& historical_risk,
+    const std::vector<double>& bottleneck_score,
+    double risk_margin_threshold,
+    double risk_historical_threshold,
+    double risk_bottleneck_threshold,
+    const std::string& fallback_name,
+    const std::vector<double>& static_cost,
+    const std::vector<double>& wait_seconds,
+    const std::vector<double>& pressure,
+    const std::vector<double>& progress,
+    const std::vector<double>& loop_penalty,
+    const std::vector<double>& backtrack,
+    const std::vector<double>& traffic_penalty,
+    const std::vector<double>& slack_pressure,
+    const std::vector<double>& lookahead_cost,
+    const std::vector<bool>& faulted) {
+  if (features.empty() || candidates.empty()) {
+    throw std::invalid_argument("G4H candidates/features must not be empty");
+  }
+  if (features.size() != candidates.size()) {
+    throw std::invalid_argument("features size must match candidates");
+  }
+  const std::size_t count = candidates.size();
+  g4h_expect_size(historical_risk, count, "historical_risk");
+  g4h_expect_size(bottleneck_score, count, "bottleneck_score");
+  g4h_expect_size(static_cost, count, "static_cost");
+  g4h_expect_size(wait_seconds, count, "wait_seconds");
+  g4h_expect_size(pressure, count, "pressure");
+  g4h_expect_size(progress, count, "progress");
+  g4h_expect_size(loop_penalty, count, "loop_penalty");
+  g4h_expect_size(backtrack, count, "backtrack");
+  g4h_expect_size(traffic_penalty, count, "traffic_penalty");
+  g4h_expect_size(slack_pressure, count, "slack_pressure");
+  g4h_expect_size(lookahead_cost, count, "lookahead_cost");
+  g4h_expect_size_bool(faulted, count, "faulted");
+
+  const czr005::ics::EdgeScoreModel model(w1, b1, w2, b2);
+  const auto scores = model.scores(features);
+  int predicted_index = 0;
+  for (std::size_t index = 1; index < scores.size(); ++index) {
+    if (scores[index] > scores[static_cast<std::size_t>(predicted_index)]) {
+      predicted_index = static_cast<int>(index);
+    }
+  }
+  std::vector<double> sorted_scores = scores;
+  std::sort(sorted_scores.begin(), sorted_scores.end(), std::greater<double>());
+  const double margin = sorted_scores.size() > 1 ? sorted_scores[0] - sorted_scores[1] : 999.0;
+  const bool should_fallback =
+      margin < risk_margin_threshold ||
+      historical_risk[static_cast<std::size_t>(predicted_index)] >= risk_historical_threshold ||
+      bottleneck_score[static_cast<std::size_t>(predicted_index)] >= risk_bottleneck_threshold;
+
+  int selected_index = predicted_index;
+  std::string decision_source = "model";
+  std::vector<double> fallback_scores(count, 0.0);
+  if (should_fallback && fallback_name != "none") {
+    const auto weights = g4h_fallback_weights(fallback_name);
+    double best_score = weights.fault_penalty;
+    selected_index = -1;
+    for (std::size_t index = 0; index < count; ++index) {
+      double value = weights.fault_penalty;
+      if (!faulted[index]) {
+        value = weights.static_weight * static_cost[index] +
+                weights.wait_weight * wait_seconds[index] +
+                weights.pressure_weight * pressure[index] +
+                weights.loop_weight * loop_penalty[index] +
+                weights.backtrack_weight * backtrack[index] +
+                weights.traffic_weight * traffic_penalty[index] -
+                weights.progress_weight * progress[index] +
+                weights.slack_wait_multiplier * slack_pressure[index] +
+                lookahead_cost[index];
+      }
+      fallback_scores[index] = value;
+      if (selected_index < 0 || value < best_score ||
+          (value == best_score && candidates[index] < candidates[static_cast<std::size_t>(selected_index)])) {
+        best_score = value;
+        selected_index = static_cast<int>(index);
+      }
+    }
+    if (selected_index < 0) {
+      throw std::invalid_argument("no fallback candidate selected");
+    }
+    decision_source = fallback_name;
+  }
+
+  py::dict result;
+  result["predicted_index"] = predicted_index;
+  result["predicted_next"] = candidates[static_cast<std::size_t>(predicted_index)];
+  result["margin"] = margin;
+  result["model_scores"] = scores;
+  result["should_fallback"] = should_fallback;
+  result["selected_index"] = selected_index;
+  result["selected_next"] = candidates[static_cast<std::size_t>(selected_index)];
+  result["decision_source"] = decision_source;
+  result["fallback_scores"] = fallback_scores;
+  result["runtime_full_cie_astar_calls"] = 0;
+  return result;
+}
+
 py::dict edge_score_load_summary(const std::string& path) {
   const auto model = czr005::ics::load_edge_score_model_text(path);
   py::dict summary;
@@ -1423,6 +1585,30 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("b2"),
              py::arg("features"),
              py::arg("action_mask"));
+  module.def("g4h_no_astar_policy_decision",
+             &g4h_no_astar_policy_decision,
+             py::arg("w1"),
+             py::arg("b1"),
+             py::arg("w2"),
+             py::arg("b2"),
+             py::arg("features"),
+             py::arg("candidates"),
+             py::arg("historical_risk"),
+             py::arg("bottleneck_score"),
+             py::arg("risk_margin_threshold"),
+             py::arg("risk_historical_threshold"),
+             py::arg("risk_bottleneck_threshold"),
+             py::arg("fallback_name"),
+             py::arg("static_cost"),
+             py::arg("wait_seconds"),
+             py::arg("pressure"),
+             py::arg("progress"),
+             py::arg("loop_penalty"),
+             py::arg("backtrack"),
+             py::arg("traffic_penalty"),
+             py::arg("slack_pressure"),
+             py::arg("lookahead_cost"),
+             py::arg("faulted"));
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,

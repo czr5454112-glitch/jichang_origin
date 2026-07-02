@@ -284,3 +284,58 @@ def reference_simulator_from_records(
             fault_edges=[(int(start), int(end)) for start, end in fault_edges],
         )
     )
+
+
+def g4h_no_astar_policy_decision(
+    *,
+    w1: Sequence[Sequence[float]],
+    b1: Sequence[float],
+    w2: Sequence[float],
+    b2: float,
+    features: Sequence[Sequence[float]],
+    candidates: Sequence[int],
+    historical_risk: Sequence[float],
+    bottleneck_score: Sequence[float],
+    risk_margin_threshold: float,
+    risk_historical_threshold: float,
+    risk_bottleneck_threshold: float,
+    fallback_name: str,
+    static_cost: Sequence[float],
+    wait_seconds: Sequence[float],
+    pressure: Sequence[float],
+    progress: Sequence[float],
+    loop_penalty: Sequence[float],
+    backtrack: Sequence[float],
+    traffic_penalty: Sequence[float],
+    slack_pressure: Sequence[float],
+    lookahead_cost: Sequence[float],
+    faulted: Sequence[bool],
+    search_path: PathLike | None = None,
+) -> dict[str, Any]:
+    module = load_cpp_module(search_path)
+    return dict(
+        module.g4h_no_astar_policy_decision(
+            [[float(value) for value in row] for row in w1],
+            [float(value) for value in b1],
+            [float(value) for value in w2],
+            float(b2),
+            [[float(value) for value in row] for row in features],
+            [int(value) for value in candidates],
+            [float(value) for value in historical_risk],
+            [float(value) for value in bottleneck_score],
+            float(risk_margin_threshold),
+            float(risk_historical_threshold),
+            float(risk_bottleneck_threshold),
+            str(fallback_name),
+            [float(value) for value in static_cost],
+            [float(value) for value in wait_seconds],
+            [float(value) for value in pressure],
+            [float(value) for value in progress],
+            [float(value) for value in loop_penalty],
+            [float(value) for value in backtrack],
+            [float(value) for value in traffic_penalty],
+            [float(value) for value in slack_pressure],
+            [float(value) for value in lookahead_cost],
+            [bool(value) for value in faulted],
+        )
+    )
