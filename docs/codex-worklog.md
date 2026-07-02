@@ -862,3 +862,16 @@
 - Interpretation: The G3j no-path rows are not true structural no-path cases. They are current-time no-path cases that recover by waiting at source and retrying CIE/A* at a later Java scheduler time.
 - Next blocking question: Can the G4A pilot dataset convert this verified source-wait retry plus `MOVE_TO_NEXT_CIE` route-step taxonomy into clean per-bag junction labels without reintroducing unverified edge-capacity assumptions?
 - Follow-up: Build a small G4A pilot manifest from G3k only; keep broad training paused until the pilot labels and replay checks pass.
+
+## 2026-07-02 19:10 - G4A/G4B verified CIE retry policy pilot
+
+- Request: Complete `czr005_g4a_g4b_verified_cie_retry_policy_plan.md` with quality; first build the verified CIE retry teacher dataset, then train/evaluate only a minimal pilot model if G4A gates pass.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/data/build_g4a_cie_retry_junction_teacher.py`, `src/czr005/models/g4b_cie_retry.py`, `scripts/train/train_g4b_cie_retry_edge_ranker.py`, and `scripts/eval/run_g4b_shadow_and_closed_loop.py`; generated the required G4A/G4B reports, tables, JSONL teacher sample, and `artifacts/models/g4b_cie_retry_edge_ranker_smoke.json`; updated README status; added the G4A/G4B plan file.
+- Commands run: G4A/G4B script compile/run commands from the plan; full validation recorded in the final turn summary.
+- Key observations: G4A converts the G3k route-level teacher into `1186` per-interface `MOVE_TO_NEXT_CIE` slices and `17` `WAIT_AT_SOURCE_RETRY` source-admission slices. Forbidden fields such as teacher next-hop, full CIE route suffix, future schedule, route finish time, label source, and post-hoc success are blocked from model inputs. G4A gates all pass.
+- G4B result: the minimal MLP candidate scorer reaches all-split offline top-1 `0.98819562`, beating the shortest-time heuristic `0.85581788`. Shadow replay logs `14/1186` next-hop disagreements and `0` unsafe fault-edge predictions. Under conservative route-exact replay, non-abstained wrong predictions make the task fail; the pilot still reaches `132/144` planned with `0` node-window conflicts, exceeding old EdgeScore `97/144` and fallback `93/144`.
+- Safety / parity notes: No legacy Java files were modified. `edge_capacity=1` remains disabled as a primary constraint. SIPP is only a diagnostic upper bound. No PPO/MAPPO/RL, GNN, or Transformer work was started.
+- Interpretation: G4B is a positive pilot and a G4C candidate, but not a final replacement for CIE/A*. The remaining `14` interface disagreements are precisely the cases to feed into learner-visited-state data aggregation and relabeling.
+- Next blocking question: Can G4C collect states reached after those 14 wrong local decisions, query verified CIE/A* where possible, and reduce the remaining route-exact failures without broad RL?
+- Follow-up: Run G4C data aggregation / DAgger-style relabeling next; keep RL and larger architectures paused.

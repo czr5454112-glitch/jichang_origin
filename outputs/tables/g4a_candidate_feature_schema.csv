@@ -1,0 +1,18 @@
+field,scope,allowed_model_input,contains_label,notes
+sample_id,metadata,False,False,stable row id
+scenario,metadata,True,False,runtime scenario key for split and audit
+current_node,runtime_feature,True,False,current bag node
+goal_node,runtime_feature,True,False,task destination
+candidate_next_nodes,runtime_feature,True,False,available outgoing neighbors
+teacher_next_node,label,False,True,"supervision target, forbidden as input"
+current_time,runtime_feature,True,False,decision time
+deadline_or_std,runtime_feature,True,False,task deadline/std from inputdata
+time_slack,runtime_feature,True,False,deadline_or_std minus current_time
+candidate_shortest_time_to_goal,runtime_feature,True,False,map heuristic from candidate to goal
+candidate_travel_time,runtime_feature,True,False,edge travel time from current to candidate
+candidate_service_time,runtime_feature,True,False,candidate node service time
+candidate_node_type,runtime_feature,True,False,candidate node type from map
+candidate_fault_status,runtime_feature,True,False,active fault on current->candidate at decision time
+local_node_time_window_pressure,runtime_feature,True,False,prior local node-window occupancy count
+local_queue_or_occupancy_summary,runtime_feature,True,False,local pressure summary available at decision time
+label_type,label,False,True,MOVE or WAIT teacher label
