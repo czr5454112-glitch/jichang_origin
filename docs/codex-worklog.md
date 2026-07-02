@@ -784,3 +784,16 @@
 - Interpretation: The repair is necessary but not sufficient. Regenerated matched G3d evidence still fails the G4A gate: best primary replay remains `94/144`, while disabling edge capacity reaches `125/144` only by introducing `491` real-constraint conflicts.
 - Next blocking question: Can an edge-capacity-aware Legacy teacher planner reserve or wait on bottleneck edges without replacing the paper-faithful route source with SIPP?
 - Follow-up: Build the next non-learning repair around edge-capacity-aware teacher timing, likely by separating Legacy route intent from an execution-level safe-wait scheduler and preserving label_source.
+
+## 2026-07-02 14:35 - G3f edge-capacity-aware Legacy scheduler audit
+
+- Request: Complete `czr005_g3f_edge_capacity_legacy_scheduler_plan.md` with quality; keep training paused and push the result.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_g3f_edge_capacity_legacy_scheduler.py`; generated `outputs/reports/g3f_edge_capacity_legacy_scheduler_report.md`, all required `outputs/tables/g3f_*` audit tables, `outputs/figures/g3f_edge_hotspot_timeline.png`, `artifacts/teacher/legacy_astar/g3f_route_intent_teacher_sample.jsonl`, and `artifacts/teacher/legacy_astar/g3f_executable_wait_teacher_sample.jsonl`; updated README status; added the G3f plan file.
+- Commands run: `python -m py_compile scripts/eval/run_g3f_edge_capacity_legacy_scheduler.py`; `python scripts/eval/run_g3f_edge_capacity_legacy_scheduler.py`; follow-up validation commands recorded in the final turn summary.
+- Key observations: G3f cleanly separates Legacy-A* route intent from executable labels. Route-intent-only coverage is `144/144`. The best pure Legacy executable variant is `capacity_wait_budget_5s`, reaching `96/144` planned, branch executable coverage `0.967`, unresolved edge-capacity share `29/541 = 0.054`, and `0` post-shield or real-constraint conflicts. The G3d reroute anchor reproduces `94/144`.
+- Tests / validation: The script regenerated the required report, block ledger, release audit, queue summary, route/executable label table, wait taxonomy, scheduler comparison, hotspot timeline, unresolved cases, pilot eligibility table, JSONL samples, and PNG figure. The G4A eligibility table marks every variant ineligible because planned count remains below `115/144`.
+- Safety / parity notes: No legacy Java files were modified. Edge capacity stayed enabled. SIPP/fallback rows in the hybrid variant remain auxiliary and are not counted as pure Legacy executable teacher success. No PPO/MAPPO/RL, GNN, Transformer, BC, or G4A dataset build was started.
+- Interpretation: G3f is a diagnostic pass, not a training green light. It proves the route-intent/executable-label split is viable and sharply reduces unresolved edge-capacity cases, but planned count remains too low for the G4A pilot gate.
+- Next blocking question: Which scheduler timing convention still differs across Legacy route timing, Python event replay, and the intended Java/C++ runtime when no-path labels persist after capacity waits?
+- Follow-up: Continue with G3g Legacy Scheduler Semantics Alignment before any G4A pilot or training.
