@@ -1,0 +1,7 @@
+policy,planned_count,max_tasks,teacher_planned_count,teacher_unplanned_count,node_window_conflicts,model_inference_count,verified_cie_fallback_calls,estimated_original_cie_astar_calls,actual_astar_call_reduction_rate,fallback_rate_by_interface,fallback_rate_by_task,mean_route_finish_delay,max_route_finish_delay,source_retry_count,wrong_high_confidence_count,learner_visited_failures,wall_clock_seconds,notes
+cie_retry_teacher_baseline,4449,4496,4449,47,0,0,15852,15852,0,,,0,0,962,0,0,,Verified CIE/A* retry baseline; this is the original A* call cost reference.
+g4b_no_calibration_large_window,3728,4496,4449,47,0,39313,0,15852,1,0,0,0,0,962,837,721,2.1368387,Large-window replay of the G4B scorer without calibration.
+g4c_cluster_abstain_large_window,4289,4496,4449,47,0,39313,2982,15852,0.81188494,0.07585277,0.61410142,0,0,962,171,160,2.1047139,G4C failure-cluster abstain replayed on G4D windows.
+g4d_enhanced_mlp_risk_head,4449,4496,4449,47,0,39313,6786,15852,0.57191522,0.17261466,0.98954626,0,0,962,0,0,3.7362286,G4D enhanced small MLP plus calibrated risk head.
+shortest_time_heuristic_large_window,263,4496,4449,47,0,39313,0,15852,1,0,0,0,0,962,5445,4186,0.3012449,No learned model; chooses minimum static travel plus heuristic time.
+fallback_only_per_interface,4449,4496,4449,47,0,0,39313,15852,-1.48000252,1,0.98954626,0,0,962,0,0,,Diagnostic only: asking verified CIE/A* at every interface preserves routes but costs more A* calls than the original retry baseline.

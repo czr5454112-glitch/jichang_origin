@@ -1,0 +1,40 @@
+field,scope,allowed_model_input,contains_label,notes
+sample_id,metadata,False,False,stable row id
+window_name,metadata,False,False,large-window audit key
+scenario,metadata,False,False,metadata-only split/audit key; not a model input
+context,metadata,False,False,"audit context, not a model input"
+current_node,runtime_feature,True,False,current bag node
+goal_node,runtime_feature,True,False,task destination
+candidate_next_nodes,runtime_feature,True,False,available outgoing neighbors
+current_time,runtime_feature,True,False,local decision time
+time_slack,runtime_feature,True,False,deadline/std slack at decision time
+local_queue_or_occupancy_summary,runtime_feature,True,False,local node-window pressure summary
+g4d_enhanced_features,runtime_feature,True,False,runtime/static local enhanced candidate features
+source_retry_pressure,runtime_feature,True,False,source retry pressure available at admission
+unfinished_task_queue_size_near_current_source,runtime_feature,True,False,local source retry queue pressure
+teacher_next_node,label,False,True,supervision target only
+route_path,forbidden_label_context,False,True,full teacher route is forbidden as model input
+label_source,metadata,False,False,not emitted into G4D model rows
+post_hoc_success,forbidden_posthoc,False,True,not emitted into G4D model rows
+candidate_shortest_time_to_goal_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_travel_time_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_service_time_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_node_type_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_faulted,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_is_goal,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+time_slack_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+current_node_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+goal_node_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+out_degree_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+is_branch_node,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+local_node_pressure_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_node_pressure_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_downstream_node_pressure_2hop_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_downstream_node_pressure_3hop_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_static_remaining_hops_to_goal_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_static_second_best_gap_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_bottleneck_score_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_goal_direction_score_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+candidate_historical_risk_from_training_only_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+source_retry_pressure_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer
+unfinished_task_queue_size_near_current_source_scaled,featurized_model_input,True,False,derived scalar consumed by the tiny scorer

@@ -1,0 +1,7 @@
+policy,planned_count,max_tasks,model_inference_count,verified_cie_fallback_calls,estimated_original_cie_astar_calls,actual_astar_call_reduction_rate,fallback_rate_by_interface,fallback_rate_by_task,cost_interpretation
+cie_retry_teacher_baseline,4449,4496,0,15852,15852,0,,,reference baseline
+g4b_no_calibration_large_window,3728,4496,39313,0,15852,1,0,0,lower A* calls are not sufficient because planned count drops
+g4c_cluster_abstain_large_window,4289,4496,39313,2982,15852,0.81188494,0.07585277,0.61410142,lower A* calls are not sufficient because planned count drops
+g4d_enhanced_mlp_risk_head,4449,4496,39313,6786,15852,0.57191522,0.17261466,0.98954626,matches verified teacher planned scope and reduces CIE/A* calls
+shortest_time_heuristic_large_window,263,4496,39313,0,15852,1,0,0,lower A* calls are not sufficient because planned count drops
+fallback_only_per_interface,4449,4496,0,39313,15852,-1.48000252,1,0.98954626,more A* calls than original retry baseline
