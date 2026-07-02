@@ -849,3 +849,16 @@
 - Interpretation: This is a correction pass. The primary verified model is original CIE/A* route intent plus Java-style node time windows and fault edges, not single-occupancy conveyor-edge capacity.
 - Next blocking question: What causes the remaining `17` CIE/A* no-path rows under the verified node-window scope?
 - Follow-up: Audit those no-path rows before building the corrected G4A pilot manifest.
+
+## 2026-07-02 18:05 - G3k CIE node-window retry audit
+
+- Request: Audit whether the `17` G3j no-path cases are true no-path or only temporarily blocked under the original Java `unfinishTasks` retry logic; do not train, do not use `edge_capacity=1`, and do not modify legacy Java.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `scripts/eval/run_g3k_cie_node_window_retry_audit.py`; generated `outputs/reports/g3k_cie_node_window_retry_audit_report.md`, `outputs/tables/g3k_retry_summary.csv`, `outputs/tables/g3k_no_path_retry_timeline.csv`, `outputs/tables/g3k_recovered_no_path_cases.csv`, `outputs/tables/g3k_remaining_no_path_cases.csv`, `outputs/tables/g3k_java_semantics_alignment.csv`, `outputs/tables/g3k_teacher_label_taxonomy.csv`, `outputs/tables/g3k_edge_overlap_diagnostic_only.csv`, `artifacts/teacher/legacy_astar/g3k_cie_retry_teacher_sample.jsonl`, and `outputs/figures/g3k_retry_recovery_timeline.png`; updated README status; added the G3k plan file.
+- Commands run: `python -m py_compile scripts/eval/run_g3k_cie_node_window_retry_audit.py`; `python scripts/eval/run_g3k_cie_node_window_retry_audit.py`; full validation recorded in the final turn summary.
+- Key observations: The script first reproduces G3j primary exactly: `127/144` planned, `17` CIE no-path rows, `0` node-window conflicts, and edge overlap demoted to diagnostic (`433`). With Java-style source retry, the recommended `1s` tick / `60s` max-delay variant reaches `144/144`, recovers all `17/17` G3j no-path cases, and keeps node-window conflicts at `0`.
+- Tests / validation: The audit writes the required report, retry summary, no-path timeline, recovered/remaining case tables, Java semantics alignment, teacher-label taxonomy, edge-overlap diagnostic table, teacher JSONL sample, and PNG figure. The script asserts the G3j reproduction, the G4A pilot planned-count gate (`>=132/144`), zero node-window conflicts, no edge-capacity primary model, and full coverage of the `17` no-path cases.
+- Safety / parity notes: No legacy Java files were modified. No BC/RL/PPO/MAPPO/GNN/Transformer training was started. `edge_capacity=1` and merge capacity remain diagnostic only, even though retry increases strict edge-overlap diagnostics to `556`.
+- Interpretation: The G3j no-path rows are not true structural no-path cases. They are current-time no-path cases that recover by waiting at source and retrying CIE/A* at a later Java scheduler time.
+- Next blocking question: Can the G4A pilot dataset convert this verified source-wait retry plus `MOVE_TO_NEXT_CIE` route-step taxonomy into clean per-bag junction labels without reintroducing unverified edge-capacity assumptions?
+- Follow-up: Build a small G4A pilot manifest from G3k only; keep broad training paused until the pilot labels and replay checks pass.

@@ -1,0 +1,7 @@
+label,scope,meaning,count_in_recommended_variant,example_action,teacher_use
+MOVE_TO_NEXT_CIE,route_step,Use the next node on the verified CIE/A* route.,144,move from current conveyor node to the next CIE node,positive next-hop label for per-bag junction policy
+WAIT_AT_SOURCE_RETRY,source_admission,Keep the bag outside the committed route and retry CIE/A* at a later scheduler time.,17,do not reserve a route yet; retry when node windows clear,source wait label for recovered G3j no-path cases
+WAIT_AT_NODE_TIME_WINDOW,in_route_timing,Wait before entering a node whose verified node time window is occupied.,0,hold before the next node until its time window clears,reserved for fixed-route retiming labels
+REROUTE_CIE_RETRY,source_or_current_node,Call CIE/A* again after time advances and follow the newly valid route.,0,retry CIE/A* from current valid node,reserved for future reroute audits
+CIE_NO_PATH_AFTER_RETRY,blocker,CIE/A* still cannot find a route after the configured retry horizon.,0,mark unresolved and do not train as success,negative label retained for blocker analysis
+ABSTAIN_TO_SAFE_FALLBACK,runtime_fallback,Do not trust a learned move; fall back to a verified safe planner.,0,call original CIE/A* or a verified scheduler instead of policy action,fallback label for later safety wrapper datasets
