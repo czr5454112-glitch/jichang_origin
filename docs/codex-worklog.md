@@ -823,3 +823,16 @@
 - Interpretation: G3h is a diagnostic pass, not a training green light. It says the next practical move is a closed-loop CIE backpressure replay that waits upstream before congested edges while preserving the original CIE route intent.
 - Next blocking question: Does the projected `117/144` or `119/144` survive a real closed-loop replay with current reservations, edge capacity, merge groups, and the hard shield enabled?
 - Follow-up: Implement G3i closed-loop CIE backpressure replay before any G4A pilot or training.
+
+## 2026-07-02 16:45 - G3i CIE/A* path-constrained SIPP integration
+
+- Request: Integrate SIPP while preserving the same route effect as the current A* and make it runnable in the airport ICS simulation.
+- Branch: `codex/czr005-rewrite`.
+- Files changed: added `src/czr005/baselines/legacy_route_sipp.py`, exported `LegacyRouteSIPPPlanner`, `LegacyRouteSIPPBaseline`, and `LegacyRouteSIPPStats`, expanded Phase2 baseline tests, added `scripts/eval/run_g3i_cie_sipp_integration.py`, generated `outputs/reports/g3i_cie_sipp_integration_report.md`, `outputs/tables/g3i_cie_sipp_integration_summary.csv`, `outputs/tables/g3i_cie_sipp_path_parity.csv`, `outputs/tables/g3i_cie_sipp_gate.csv`, `artifacts/teacher/legacy_astar/g3i_cie_sipp_integration_sample.jsonl`, and `outputs/figures/g3i_cie_sipp_integration.png`; updated README status; added the G3i plan file.
+- Commands run: `python -m py_compile scripts/eval/run_g3i_cie_sipp_integration.py src/czr005/baselines/legacy_route_sipp.py`; `python -m pytest tests/test_phase2_baselines.py -q`; `python scripts/eval/run_g3i_cie_sipp_integration.py`; follow-up full validation recorded in the final turn summary.
+- Key observations: The new planner first asks original CIE/Legacy A* for the route, then retimes that fixed path with SIPP-style node/edge/merge reservation checks. In the real `map2/inputdata` matched windows it reaches `132/144` planned, `0` real node/edge/merge conflicts, and `132/132` planned routes preserve the A* path exactly.
+- Tests / validation: Added tests prove no-reservation timing/path parity with A*, edge-capacity waiting without path drift, and an ICS-style two-task replay with zero edge conflicts. The G3i script asserts planned count is at least `115`, real conflicts are zero, and A* path mismatches are zero.
+- Safety / parity notes: No legacy Java files were modified. SIPP is integrated as an execution-timing wrapper only; it is not the route teacher. No BC/RL/PPO/MAPPO/GNN/Transformer training was started.
+- Interpretation: G3i is the first clean pilot candidate: it keeps the paper-faithful CIE/A* route effect while making timing executable under hard runtime constraints.
+- Next blocking question: Why do the remaining `12` CIE/A* no-path cases concentrate in the repair-window and merge-group windows?
+- Follow-up: Audit the remaining CIE no-path inventory, then build a small G4A pilot manifest from G3i path-preserving executable labels.

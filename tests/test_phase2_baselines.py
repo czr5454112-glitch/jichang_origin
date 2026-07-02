@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from czr005.baselines import (
     AgentState,
+    LegacyRouteSIPPBaseline,
+    LegacyRouteSIPPPlanner,
     PeriodicReplanningBaseline,
     PIBTActiveBagReplayBaseline,
     PIBTStyleOneStepResolver,
@@ -250,6 +252,49 @@ def test_sipp_waits_for_merge_group_reservation() -> None:
         {(0, 2): 7, (1, 3): 7},
         task_id=1,
     )
+
+
+def test_legacy_route_sipp_matches_astar_without_reservations() -> None:
+    graph = _branch_graph()
+    astar_route = AStarPlanner(graph).plan(0, 3, task_id=1)
+    route = LegacyRouteSIPPPlanner(graph).plan(0, 3, task_id=1)
+
+    assert [node.location for node in route] == [node.location for node in astar_route]
+    assert [(node.t1, node.t2) for node in route] == [(node.t1, node.t2) for node in astar_route]
+
+
+def test_legacy_route_sipp_preserves_astar_path_while_waiting_for_edge_capacity() -> None:
+    graph = _branch_graph()
+    edge_reservations = EdgeReservationTable()
+    edge_reservations.reserve(task_id=99, start_node=0, end_node=1, start=0.0, end=2.0)
+
+    astar_path = [node.location for node in AStarPlanner(graph).plan(0, 3, task_id=1)]
+    route = LegacyRouteSIPPPlanner(graph).plan(
+        0,
+        3,
+        edge_reservations=edge_reservations,
+        edge_capacity=1,
+        task_id=1,
+    )
+
+    assert [node.location for node in route] == astar_path
+    assert route[1].t1 >= 4.0
+    assert not edge_reservations.has_capacity_conflict(0, 1, route[1].t1 - 2.0, route[1].t1, 1, task_id=1)
+
+
+def test_legacy_route_sipp_baseline_runs_ics_style_episode() -> None:
+    tasks = (
+        _task("urgent", 1, pass_time=0.0, std=10.0, goal=1),
+        _task("loose", 2, pass_time=0.1, std=20.0, goal=1),
+    )
+    baseline = LegacyRouteSIPPBaseline(_single_edge_goal_graph(), edge_capacity=1)
+    result = baseline.run_episode(tasks)
+
+    assert result.metrics.planned_count == 2
+    assert result.metrics.unplanned_count == 0
+    assert baseline.stats.legacy_path_mismatch_count == 0
+    assert baseline.stats.edge_conflicts == 0
+    assert result.routes["loose"][1].t1 >= 4.0
 
 
 def _task(segment_id: str, task_id: int, pass_time: float, std: float, goal: int = 2) -> TaskLeg:
