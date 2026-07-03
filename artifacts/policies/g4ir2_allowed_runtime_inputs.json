@@ -1,0 +1,30 @@
+{
+  "allowed_inputs": [
+    "static map nodes: id, node_type, service_time, x, y, outgoing node ids",
+    "static map edges: start, end, length, speed",
+    "static heuristic_time matrix derived from the verified map",
+    "current task local record: task_id, segment_id, start, goal, entry_time, attempt_time, std_time",
+    "current window metadata: name, offset, size, context, source, fault_edges, fault_windows",
+    "runtime node reservations created by previous decentralized decisions in the same replay",
+    "policy weights and thresholds from the frozen G4E/G4H policy bundle",
+    "historical risk rules learned offline and frozen before runtime"
+  ],
+  "edge_overlap_policy": "diagnostic_only_not_primary_capacity_constraint",
+  "forbidden_inputs": [
+    "teacher_next",
+    "teacher_path",
+    "route_path",
+    "full_cie_route",
+    "future_schedule",
+    "future_sipp_schedule",
+    "post_hoc_success",
+    "label_source",
+    "scenario_lookup",
+    "SIPPPlanner",
+    "AStarPlanner",
+    "plan_legacy_map_path"
+  ],
+  "notes": "Offline audit scripts may read teacher paths for evaluation only; the promoted runtime entrypoint must not.",
+  "runtime": "g4ir2_no_astar_decentralized_cpp_replay",
+  "runtime_full_cie_astar_fallback": false
+}

@@ -356,6 +356,10 @@ def _cpp_replay(
     route_records: list[Any],
     policy_data: dict[str, Any],
     trace_limit: int = TRACE_LIMIT,
+    summary_only: bool = False,
+    profile_enabled: bool = False,
+    enable_edge_overlap_diagnostic: bool = True,
+    audit_final_conflicts: bool = True,
 ) -> dict[str, Any]:
     from czr005 import cpp_backend
 
@@ -384,6 +388,10 @@ def _cpp_replay(
         bounded_depth=mode.bounded_depth,
         max_steps=max_steps,
         trace_limit=trace_limit,
+        summary_only=summary_only,
+        profile_enabled=profile_enabled,
+        enable_edge_overlap_diagnostic=enable_edge_overlap_diagnostic,
+        audit_final_conflicts=audit_final_conflicts,
     )
 
 

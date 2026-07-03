@@ -1,0 +1,4 @@
+comparison,candidate,candidate_mean_seconds,baseline,baseline_mean_seconds,speedup,status,claim_allowed,notes
+optimized_cpp_vs_python_reference,cpp_no_edge_diag_no_final_scan_trace0_summary,0.38162104,python_reference_no_astar,8.63101872,22.61672658,PASS,C++ runtime is faster than Python no-A* reference,
+optimized_cpp_vs_static_astar_lower_bound_proxy,cpp_no_edge_diag_no_final_scan_trace0_summary,0.38162104,static_astar_proxy_lower_bound,0.12578112,0.32959692,FAIL,Only if PASS; otherwise keep runtime replacement blocker,Static A* proxy is intentionally strict and narrower than the Java scheduler.
+debug_cpp_trace500_vs_optimized_cpp,cpp_trace500_tasks_profile_off,0.44381448,cpp_no_edge_diag_no_final_scan_trace0_summary,0.38162104,1.16297173,INFO,Trace and payload overhead isolated,

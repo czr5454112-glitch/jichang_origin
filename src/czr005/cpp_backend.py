@@ -377,6 +377,10 @@ def g4i_no_astar_batch_replay(
     bounded_depth: int = 1,
     max_steps: int = 80,
     trace_limit: int = 500,
+    summary_only: bool = False,
+    profile_enabled: bool = False,
+    enable_edge_overlap_diagnostic: bool = True,
+    audit_final_conflicts: bool = True,
     search_path: PathLike | None = None,
 ) -> dict[str, Any]:
     module = load_cpp_module(search_path)
@@ -443,5 +447,9 @@ def g4i_no_astar_batch_replay(
             int(bounded_depth),
             int(max_steps),
             int(trace_limit),
+            bool(summary_only),
+            bool(profile_enabled),
+            bool(enable_edge_overlap_diagnostic),
+            bool(audit_final_conflicts),
         )
     )

@@ -1,0 +1,6 @@
+component,quality_delta_vs_rule_only_planned,quality_delta_vs_model_only_planned,quality_delta_vs_ablation,latency_stage,mean_stage_seconds,recommendation
+mlp_policy_score,3867,,,model_inference,0.04520038,keep; rule-only collapses planned count on G4D scope
+pibt_lite_fallback,,0,,pibt_lite_fallback_scoring,0.02726482,keep as safety fallback; optimize only if profile dominates
+historical_risk_gate,,,0,historical_risk_lookup,0.0044605,retain unless next training shows no effect under shift
+bottleneck_risk_gate,,,0,bottleneck_score_computation,0.00469446,retain as interpretable local pressure feature
+trace_payload,,,0,trace_row_construction,0.0201963,disable in promoted runtime unless debugging

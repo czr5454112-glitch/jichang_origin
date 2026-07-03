@@ -1,0 +1,10 @@
+criterion,status,evidence
+state_reconciled,PASS,state audit table exists
+runtime_profile_repeat_ge_5,PASS,benchmark repeats
+optimized_cpp_faster_than_python_reference,PASS,0.38162104s vs 8.63101872s; speedup=22.61672658
+optimized_cpp_faster_than_static_astar_proxy,FAIL,0.38162104s vs 0.12578112s; proxy_speedup=0.32959692
+guardrail_planned_and_zero_astar,PASS,failed_rounds=none
+official_policy_beats_rule_only_planned,PASS,4449 > 582
+scale_32000_zero_conflict_zero_astar,PASS,planned=32000/32000; conflicts=0; full_astar=0
+no_leakage_runtime_checks_pass,PASS,failed_checks=none
+overall_g4ir2_gate,FAIL,Do not claim final replacement; keep blockers explicit.
