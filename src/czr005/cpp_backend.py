@@ -453,3 +453,85 @@ def g4i_no_astar_batch_replay(
             bool(audit_final_conflicts),
         )
     )
+
+
+def g4irsf4_no_astar_streaming_replay_from_jsonl(
+    *,
+    node_records: Sequence[tuple[int, int, float, int, int, Sequence[int]]],
+    edge_records: Sequence[tuple[int, int, float, float]],
+    heuristic_time: Sequence[Sequence[float]],
+    task_jsonl_path: PathLike,
+    w1: Sequence[Sequence[float]],
+    b1: Sequence[float],
+    w2: Sequence[float],
+    b2: float,
+    risk_margin_threshold: float,
+    risk_historical_threshold: float,
+    risk_bottleneck_threshold: float,
+    historical_risk_rules: Sequence[tuple[int, Sequence[int], int]],
+    fallback_rules: Sequence[tuple[int, int, Sequence[int], int]],
+    policy_name: str,
+    use_model: bool,
+    rule_only: bool,
+    risk_gated_rule: bool,
+    fallback_name: str,
+    bounded_depth: int = 1,
+    max_steps: int = 80,
+    trace_limit: int = 500,
+    summary_only: bool = True,
+    profile_enabled: bool = False,
+    enable_edge_overlap_diagnostic: bool = True,
+    audit_final_conflicts: bool = True,
+    fault_edges: Sequence[tuple[int, int]] = (),
+    fault_windows: Sequence[tuple[int, int, float, float]] = (),
+    max_tasks: int = -1,
+    search_path: PathLike | None = None,
+) -> dict[str, Any]:
+    module = load_cpp_module(search_path)
+    return dict(
+        module.g4irsf4_no_astar_streaming_replay_from_jsonl(
+            [
+                (int(location), int(node_type), float(service_time), int(x), int(y), [int(value) for value in outgoing])
+                for location, node_type, service_time, x, y, outgoing in node_records
+            ],
+            [
+                (int(start), int(end), float(length), float(speed))
+                for start, end, length, speed in edge_records
+            ],
+            [[float(value) for value in row] for row in heuristic_time],
+            str(task_jsonl_path),
+            [[float(value) for value in row] for row in w1],
+            [float(value) for value in b1],
+            [float(value) for value in w2],
+            float(b2),
+            float(risk_margin_threshold),
+            float(risk_historical_threshold),
+            float(risk_bottleneck_threshold),
+            [
+                (int(current), [int(value) for value in candidates], int(predicted))
+                for current, candidates, predicted in historical_risk_rules
+            ],
+            [
+                (int(current), int(goal), [int(value) for value in candidates], int(predicted))
+                for current, goal, candidates, predicted in fallback_rules
+            ],
+            str(policy_name),
+            bool(use_model),
+            bool(rule_only),
+            bool(risk_gated_rule),
+            str(fallback_name),
+            int(bounded_depth),
+            int(max_steps),
+            int(trace_limit),
+            bool(summary_only),
+            bool(profile_enabled),
+            bool(enable_edge_overlap_diagnostic),
+            bool(audit_final_conflicts),
+            [(int(start), int(end)) for start, end in fault_edges],
+            [
+                (int(start), int(end), float(fault_start), float(repair_time))
+                for start, end, fault_start, repair_time in fault_windows
+            ],
+            int(max_tasks),
+        )
+    )

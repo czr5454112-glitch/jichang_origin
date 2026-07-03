@@ -1,8 +1,11 @@
 #include <chrono>
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <deque>
+#include <fstream>
 #include <functional>
+#include <limits>
 #include <map>
 #include <optional>
 #include <set>
@@ -349,6 +352,55 @@ G4HFallbackWeights g4h_fallback_weights(const std::string& fallback_name) {
     weights.backtrack_weight = 10.0;
     weights.progress_weight = 0.35;
     weights.slack_wait_multiplier = 0.4;
+  } else if (fallback_name == "fault_aware_node_window_pibt_lite") {
+    weights.wait_weight = 1.8;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 24.0;
+    weights.backtrack_weight = 12.0;
+    weights.progress_weight = 0.45;
+    weights.slack_wait_multiplier = 0.4;
+  } else if (fallback_name == "cycle_memory_penalty_low") {
+    weights.wait_weight = 1.8;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 30.0;
+    weights.backtrack_weight = 10.0;
+    weights.progress_weight = 0.35;
+    weights.slack_wait_multiplier = 0.4;
+  } else if (fallback_name == "cycle_memory_penalty_mid") {
+    weights.wait_weight = 1.8;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 60.0;
+    weights.backtrack_weight = 12.0;
+    weights.progress_weight = 0.45;
+    weights.slack_wait_multiplier = 0.4;
+  } else if (fallback_name == "cycle_memory_penalty_high" || fallback_name == "fallback_no_repeat_ring") {
+    weights.wait_weight = 1.8;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 120.0;
+    weights.backtrack_weight = 20.0;
+    weights.progress_weight = 0.5;
+    weights.slack_wait_multiplier = 0.4;
+  } else if (fallback_name == "tabu_recent_nodes_8" || fallback_name == "tabu_recent_nodes_16") {
+    weights.wait_weight = 1.8;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 90.0;
+    weights.backtrack_weight = 20.0;
+    weights.progress_weight = 0.45;
+    weights.slack_wait_multiplier = 0.4;
+  } else if (fallback_name == "goal_progress_guard" || fallback_name == "model_margin_plus_cycle_guard") {
+    weights.wait_weight = 1.8;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 60.0;
+    weights.backtrack_weight = 12.0;
+    weights.progress_weight = 1.2;
+    weights.slack_wait_multiplier = 0.4;
+  } else if (fallback_name == "escape_cycle_depth2" || fallback_name == "escape_cycle_depth3") {
+    weights.wait_weight = 1.6;
+    weights.pressure_weight = 6.0;
+    weights.loop_weight = 70.0;
+    weights.backtrack_weight = 15.0;
+    weights.traffic_weight = 4.0;
+    weights.progress_weight = 0.45;
   } else if (fallback_name == "bounded_local_search") {
     weights.wait_weight = 1.6;
     weights.pressure_weight = 6.0;
@@ -618,12 +670,35 @@ int g4i_overlap_count(const std::vector<std::pair<double, double>>& intervals,
                       double start,
                       double end) {
   int count = 0;
-  for (const auto& [left, right] : intervals) {
+  auto iter = std::lower_bound(
+      intervals.begin(), intervals.end(), std::make_pair(start, -std::numeric_limits<double>::infinity()));
+  if (iter != intervals.begin()) {
+    --iter;
+  }
+  for (; iter != intervals.end(); ++iter) {
+    const auto [left, right] = *iter;
+    if (right < start) {
+      continue;
+    }
+    if (left > end) {
+      break;
+    }
     if (!(end < left || start > right)) {
       ++count;
     }
   }
   return count;
+}
+
+void g4i_insert_interval_sorted(std::map<int, std::vector<std::pair<double, double>>>& reservations,
+                                int node,
+                                std::pair<double, double> interval) {
+  auto& intervals = reservations[node];
+  const auto pos = std::upper_bound(
+      intervals.begin(), intervals.end(), interval, [](const auto& left, const auto& right) {
+        return std::make_tuple(left.first, left.second) < std::make_tuple(right.first, right.second);
+      });
+  intervals.insert(pos, interval);
 }
 
 double g4i_earliest_safe(const std::map<int, std::vector<std::pair<double, double>>>& reservations,
@@ -636,13 +711,21 @@ double g4i_earliest_safe(const std::map<int, std::vector<std::pair<double, doubl
   if (found == reservations.end()) {
     return current;
   }
-  auto intervals = found->second;
-  std::sort(intervals.begin(), intervals.end());
-  for (const auto& [left, right] : intervals) {
+  const auto& intervals = found->second;
+  auto iter = std::lower_bound(
+      intervals.begin(), intervals.end(), std::make_pair(start, -std::numeric_limits<double>::infinity()));
+  if (iter != intervals.begin()) {
+    --iter;
+  }
+  for (; iter != intervals.end(); ++iter) {
+    const auto [left, right] = *iter;
     if (scan_count != nullptr) {
       *scan_count += 1;
     }
     const double end = current + service;
+    if (right < current) {
+      continue;
+    }
     if (end < left) {
       return current;
     }
@@ -663,6 +746,59 @@ bool g4i_edge_faulted(const G4IWindow& window, int current, int next, double rea
     }
   }
   return false;
+}
+
+bool g4i_fault_dead_end_within_depth(const czr005::ics::Graph& graph,
+                                     const G4IWindow& window,
+                                     int node,
+                                     double ready_time,
+                                     int depth,
+                                     std::set<int>& visiting) {
+  if (depth < 0) {
+    return false;
+  }
+  if (!visiting.insert(node).second) {
+    return false;
+  }
+  const auto outgoing = graph.outgoing(node);
+  if (outgoing.empty()) {
+    visiting.erase(node);
+    return false;
+  }
+  std::vector<int> available;
+  for (const int next : outgoing) {
+    const auto& edge = graph.edge(node, next);
+    if (!g4i_edge_faulted(window, node, next, ready_time + edge.travel_time())) {
+      available.push_back(next);
+    }
+  }
+  if (available.empty()) {
+    visiting.erase(node);
+    return true;
+  }
+  for (const int next : available) {
+    const auto& edge = graph.edge(node, next);
+    if (!g4i_fault_dead_end_within_depth(graph,
+                                         window,
+                                         next,
+                                         ready_time + edge.travel_time() + graph.service_time(next),
+                                         depth - 1,
+                                         visiting)) {
+      visiting.erase(node);
+      return false;
+    }
+  }
+  visiting.erase(node);
+  return true;
+}
+
+bool g4i_fault_dead_end_within_depth(const czr005::ics::Graph& graph,
+                                     const G4IWindow& window,
+                                     int node,
+                                     double ready_time,
+                                     int depth) {
+  std::set<int> visiting;
+  return g4i_fault_dead_end_within_depth(graph, window, node, ready_time, depth, visiting);
 }
 
 int g4i_hop_distance(const czr005::ics::Graph& graph,
@@ -880,7 +1016,54 @@ G4IFallbackDecision g4i_fallback_decision(
   G4IFallbackDecision decision;
   decision.decision_source = fallback_name;
   const auto weights = g4h_fallback_weights(fallback_name);
-  const int depth = fallback_name == "bounded_local_search" ? std::max(2, bounded_depth) : 1;
+  int depth = 1;
+  if (fallback_name == "bounded_local_search") {
+    depth = std::max(2, bounded_depth);
+  } else if (fallback_name == "escape_cycle_depth2") {
+    depth = 2;
+  } else if (fallback_name == "escape_cycle_depth3") {
+    depth = 3;
+  }
+  const bool fault_aware = fallback_name == "fault_aware_node_window_pibt_lite";
+  const bool no_repeat_ring = fallback_name == "fallback_no_repeat_ring" ||
+                              fallback_name == "model_margin_plus_cycle_guard";
+  const bool progress_guard = fallback_name == "goal_progress_guard" ||
+                              fallback_name == "model_margin_plus_cycle_guard";
+  int tabu_window = 0;
+  if (fallback_name == "tabu_recent_nodes_8") {
+    tabu_window = 8;
+  } else if (fallback_name == "tabu_recent_nodes_16") {
+    tabu_window = 16;
+  }
+  auto recently_seen = [&](int candidate) {
+    if (tabu_window <= 0) {
+      return false;
+    }
+    int inspected = 0;
+    for (auto iter = path.rbegin(); iter != path.rend() && inspected < tabu_window; ++iter, ++inspected) {
+      if (*iter == candidate) {
+        return true;
+      }
+    }
+    return false;
+  };
+  bool has_tabu_escape = false;
+  bool has_nonrepeat_escape = false;
+  bool has_progress_escape = false;
+  for (const int candidate : candidates) {
+    if (g4i_edge_faulted(window, current, candidate, ready_time)) {
+      continue;
+    }
+    if (!recently_seen(candidate)) {
+      has_tabu_escape = true;
+    }
+    if (std::find(path.begin(), path.end(), candidate) == path.end()) {
+      has_nonrepeat_escape = true;
+    }
+    if (graph.heuristic(current, goal) - graph.heuristic(candidate, goal) > 0.0) {
+      has_progress_escape = true;
+    }
+  }
   decision.scores.assign(candidates.size(), G4I_UNREACHABLE);
   decision.static_cost.assign(candidates.size(), 0.0);
   decision.wait_seconds.assign(candidates.size(), 0.0);
@@ -926,10 +1109,24 @@ G4IFallbackDecision g4i_fallback_decision(
                                        : 0.0;
     double score = G4I_UNREACHABLE;
     if (!faulted) {
+      double guard_penalty = 0.0;
+      if (fault_aware && g4i_fault_dead_end_within_depth(graph, window, candidate, service_start + service, 3)) {
+        guard_penalty += 5.0e8;
+      }
+      if (tabu_window > 0 && has_tabu_escape && recently_seen(candidate)) {
+        guard_penalty += 5.0e8;
+      }
+      if (no_repeat_ring && has_nonrepeat_escape && loop_penalty > 0.0) {
+        guard_penalty += 5.0e8;
+      }
+      if (progress_guard && has_progress_escape && progress <= 0.0) {
+        guard_penalty += 1.0e6;
+      }
       score = weights.static_weight * static_cost + weights.wait_weight * wait +
               weights.pressure_weight * pressure + weights.loop_weight * loop_penalty +
               weights.backtrack_weight * backtrack + weights.traffic_weight * traffic_penalty -
-              weights.progress_weight * progress + weights.slack_wait_multiplier * slack_pressure + lookahead;
+              weights.progress_weight * progress + weights.slack_wait_multiplier * slack_pressure + lookahead +
+              guard_penalty;
     }
     decision.faulted[index] = faulted;
     decision.static_cost[index] = static_cost;
@@ -972,6 +1169,108 @@ int g4i_node_window_conflicts(const std::map<int, std::vector<std::pair<double, 
     }
   }
   return conflicts;
+}
+
+std::string g4irsf4_json_raw_value(const std::string& line, const std::string& key) {
+  const std::string pattern = "\"" + key + "\"";
+  const auto key_pos = line.find(pattern);
+  if (key_pos == std::string::npos) {
+    throw std::invalid_argument("missing JSONL task field: " + key);
+  }
+  const auto colon_pos = line.find(':', key_pos + pattern.size());
+  if (colon_pos == std::string::npos) {
+    throw std::invalid_argument("malformed JSONL task field: " + key);
+  }
+  std::size_t pos = colon_pos + 1;
+  while (pos < line.size() && std::isspace(static_cast<unsigned char>(line[pos]))) {
+    ++pos;
+  }
+  if (pos >= line.size()) {
+    throw std::invalid_argument("empty JSONL task field: " + key);
+  }
+  if (line[pos] == '"') {
+    std::string value;
+    ++pos;
+    bool escaped = false;
+    for (; pos < line.size(); ++pos) {
+      const char ch = line[pos];
+      if (escaped) {
+        value.push_back(ch);
+        escaped = false;
+        continue;
+      }
+      if (ch == '\\') {
+        escaped = true;
+        continue;
+      }
+      if (ch == '"') {
+        return value;
+      }
+      value.push_back(ch);
+    }
+    throw std::invalid_argument("unterminated JSONL string field: " + key);
+  }
+  const std::size_t start = pos;
+  while (pos < line.size() && line[pos] != ',' && line[pos] != '}') {
+    ++pos;
+  }
+  std::size_t end = pos;
+  while (end > start && std::isspace(static_cast<unsigned char>(line[end - 1]))) {
+    --end;
+  }
+  return line.substr(start, end - start);
+}
+
+int g4irsf4_json_int_value(const std::string& line, const std::string& key) {
+  return std::stoi(g4irsf4_json_raw_value(line, key));
+}
+
+double g4irsf4_json_double_value(const std::string& line, const std::string& key) {
+  return std::stod(g4irsf4_json_raw_value(line, key));
+}
+
+std::vector<G4IRouteRecordTuple> g4irsf4_routes_from_jsonl(const std::string& task_jsonl_path,
+                                                           const std::string& experiment_scope,
+                                                           const std::string& window_name,
+                                                           int max_tasks,
+                                                           int* line_count,
+                                                           int* order_violation_count) {
+  std::ifstream input(task_jsonl_path);
+  if (!input) {
+    throw std::invalid_argument("failed to open G4IRSF4 task JSONL: " + task_jsonl_path);
+  }
+  std::vector<G4IRouteRecordTuple> routes;
+  if (max_tasks > 0) {
+    routes.reserve(static_cast<std::size_t>(max_tasks));
+  }
+  std::string line;
+  std::tuple<double, int, std::string> previous_key{
+      -std::numeric_limits<double>::infinity(), -1, ""};
+  while (std::getline(input, line)) {
+    if (line.empty()) {
+      continue;
+    }
+    const int task_id = g4irsf4_json_int_value(line, "task_id");
+    const std::string segment_id = g4irsf4_json_raw_value(line, "segment_id");
+    const int start = g4irsf4_json_int_value(line, "start");
+    const int goal = g4irsf4_json_int_value(line, "goal");
+    const double pass_time = g4irsf4_json_double_value(line, "pass_time");
+    const double std_time = g4irsf4_json_double_value(line, "std");
+    const auto current_key = std::make_tuple(pass_time, task_id, segment_id);
+    if (current_key < previous_key && order_violation_count != nullptr) {
+      *order_violation_count += 1;
+    }
+    previous_key = current_key;
+    routes.push_back(G4IRouteRecordTuple{
+        experiment_scope, window_name, task_id, segment_id, start, goal, pass_time, pass_time, std_time});
+    if (line_count != nullptr) {
+      *line_count += 1;
+    }
+    if (max_tasks > 0 && static_cast<int>(routes.size()) >= max_tasks) {
+      break;
+    }
+  }
+  return routes;
 }
 
 using G4IClock = std::chrono::steady_clock;
@@ -1065,6 +1364,8 @@ py::dict g4i_no_astar_batch_replay(
   std::vector<G4ITaskResult> task_results;
   py::list trace_rows;
   int total_edge_overlap_diagnostic = 0;
+  int peak_reservation_entries = 0;
+  int peak_edge_interval_entries = 0;
   const auto start_time = G4IClock::now();
   for (const auto& [window_name, items] : routes_by_window) {
     const auto window_found = window_by_name.find(window_name);
@@ -1076,6 +1377,8 @@ py::dict g4i_no_astar_batch_replay(
     std::map<std::pair<int, int>, std::vector<std::pair<double, double>>> edge_intervals;
     std::map<std::pair<int, int>, int> hop_cache;
     G4ITrafficMemory traffic;
+    int current_reservation_entries = 0;
+    int current_edge_interval_entries = 0;
     for (const auto& route : items) {
       G4ITaskResult result;
       result.policy = policy_name;
@@ -1104,7 +1407,9 @@ py::dict g4i_no_astar_batch_replay(
       }
       double current_t2 = start_t1 + graph.service_time(current);
       stage_start = G4IClock::now();
-      reservations[current].push_back({start_t1, current_t2});
+      g4i_insert_interval_sorted(reservations, current, {start_t1, current_t2});
+      current_reservation_entries += 1;
+      peak_reservation_entries = std::max(peak_reservation_entries, current_reservation_entries);
       g4i_add_stage(stage_seconds, "reservation_append", stage_start, profile_enabled);
       const int steps_limit = rule_only ? std::min(max_steps, 24) : max_steps;
       for (int step = 0; step < steps_limit; ++step) {
@@ -1179,6 +1484,16 @@ py::dict g4i_no_astar_batch_replay(
                      bottleneck_score[static_cast<std::size_t>(predicted_index)] >= risk_bottleneck_threshold ||
                      g4i_rule_override(fallback_rules, current, goal, candidates, predicted_next);
         }
+        if (use_model && policy_name == "model_plus_pibt_lite_fault_aware_v1" &&
+            g4i_fault_dead_end_within_depth(graph, window, predicted_next, current_t2, 3)) {
+          use_rule = true;
+        }
+        if (use_model && fallback_name == "model_margin_plus_cycle_guard") {
+          const double predicted_progress = graph.heuristic(current, goal) - graph.heuristic(predicted_next, goal);
+          if (std::find(path.begin(), path.end(), predicted_next) != path.end() || predicted_progress <= 0.0) {
+            use_rule = true;
+          }
+        }
         g4i_add_stage(stage_seconds, "risk_gate_rule_override", stage_start, profile_enabled);
         int selected = predicted_next;
         std::string decision_source = "model";
@@ -1248,6 +1563,8 @@ py::dict g4i_no_astar_batch_replay(
           total_edge_overlap_diagnostic += edge_overlap;
         }
         edge_intervals[edge_key].push_back({current_t2, arrival});
+        current_edge_interval_entries += 1;
+        peak_edge_interval_entries = std::max(peak_edge_interval_entries, current_edge_interval_entries);
         g4i_add_stage(stage_seconds, "edge_overlap_diagnostic", stage_start, profile_enabled);
         if (static_cast<int>(trace_rows.size()) < trace_limit) {
           stage_start = G4IClock::now();
@@ -1277,7 +1594,9 @@ py::dict g4i_no_astar_batch_replay(
           break;
         }
         stage_start = G4IClock::now();
-        reservations[selected].push_back({service_start, service_end});
+        g4i_insert_interval_sorted(reservations, selected, {service_start, service_end});
+        current_reservation_entries += 1;
+        peak_reservation_entries = std::max(peak_reservation_entries, current_reservation_entries);
         g4i_add_stage(stage_seconds, "reservation_append", stage_start, profile_enabled);
         traffic.update(current, selected, step_wait);
         current = selected;
@@ -1320,16 +1639,51 @@ py::dict g4i_no_astar_batch_replay(
   int total_bounded_calls = 0;
   int total_node_conflicts = 0;
   int total_source_retry = 0;
+  int total_failed = 0;
+  int total_loop_count = 0;
+  int total_nonprogress_steps = 0;
+  int total_wait_events = 0;
+  std::map<std::string, int> failed_reason_counts;
+  py::list failed_task_rows;
+  constexpr int G4I_FAILED_TASK_ROW_LIMIT = 10000;
   stage_start = G4IClock::now();
   for (const auto& task : task_results) {
     by_window[task.window_name].push_back(&task);
     total_planned += task.goal_reached ? 1 : 0;
+    if (!task.goal_reached) {
+      total_failed += 1;
+      failed_reason_counts[task.failed_reason] += 1;
+    }
     total_model_decisions += task.model_inference_count;
     total_model_selected += task.model_selected_decision_count;
     total_rule_calls += task.rule_fallback_calls;
     total_bounded_calls += task.bounded_local_search_calls;
     total_node_conflicts += task.node_window_conflicts;
     total_source_retry += task.source_retry_count;
+    total_loop_count += task.loop_count;
+    total_nonprogress_steps += task.nonprogress_steps;
+    total_wait_events += task.wait_events;
+    if (!task.goal_reached && static_cast<int>(failed_task_rows.size()) < G4I_FAILED_TASK_ROW_LIMIT) {
+      py::dict failed_row;
+      failed_row["policy"] = task.policy;
+      failed_row["experiment_scope"] = task.experiment_scope;
+      failed_row["window_name"] = task.window_name;
+      failed_row["task_id"] = task.task_id;
+      failed_row["segment_id"] = task.segment_id;
+      failed_row["attempt_time"] = task.attempt_time;
+      failed_row["failed_reason"] = task.failed_reason;
+      failed_row["path"] = task.path;
+      failed_row["steps"] = task.steps;
+      failed_row["wait_seconds"] = task.wait_seconds;
+      failed_row["source_retry_count"] = task.source_retry_count;
+      failed_row["loop_count"] = task.loop_count;
+      failed_row["nonprogress_steps"] = task.nonprogress_steps;
+      failed_row["model_inference_count"] = task.model_inference_count;
+      failed_row["rule_fallback_calls"] = task.rule_fallback_calls;
+      failed_row["node_window_conflicts"] = task.node_window_conflicts;
+      failed_row["edge_overlap_diagnostic_only"] = task.edge_overlap_diagnostic_count;
+      failed_task_rows.append(failed_row);
+    }
     if (!summary_only) {
       py::dict row;
       row["policy"] = task.policy;
@@ -1433,15 +1787,32 @@ py::dict g4i_no_astar_batch_replay(
   summary["policy"] = policy_name;
   summary["task_count"] = static_cast<int>(task_results.size());
   summary["planned_count"] = total_planned;
+  summary["failed_count"] = total_failed;
   summary["unplanned_count"] = static_cast<int>(task_results.size()) - total_planned;
   summary["node_window_conflicts"] = total_node_conflicts;
   summary["runtime_full_cie_astar_calls"] = 0;
   summary["model_inference_count"] = total_model_decisions;
+  summary["model_decisions"] = total_model_decisions;
   summary["model_selected_decision_count"] = total_model_selected;
   summary["rule_fallback_calls"] = total_rule_calls;
+  summary["fallback_calls"] = total_rule_calls;
   summary["bounded_local_search_calls"] = total_bounded_calls;
   summary["source_retry_count"] = total_source_retry;
+  summary["loop_count"] = total_loop_count;
+  summary["nonprogress_steps"] = total_nonprogress_steps;
+  summary["wait_events"] = total_wait_events;
   summary["edge_overlap_diagnostic_only"] = total_edge_overlap_diagnostic;
+  summary["peak_reservation_entries"] = peak_reservation_entries;
+  summary["peak_edge_interval_entries"] = peak_edge_interval_entries;
+  summary["peak_memory_estimate_bytes"] =
+      static_cast<long long>(peak_reservation_entries + peak_edge_interval_entries) *
+      static_cast<long long>(sizeof(std::pair<double, double>));
+  py::dict failed_counts;
+  for (const auto& [reason, count] : failed_reason_counts) {
+    failed_counts[py::str(reason)] = count;
+  }
+  summary["failed_reason_counts"] = failed_counts;
+  summary["failed_task_rows_capped"] = total_failed > static_cast<int>(failed_task_rows.size());
   summary["elapsed_seconds"] = elapsed.count();
   summary["decisions_per_second"] =
       elapsed.count() > 0.0 ? static_cast<double>(total_model_decisions + total_rule_calls) / elapsed.count() : 0.0;
@@ -1460,11 +1831,99 @@ py::dict g4i_no_astar_batch_replay(
   payload["summary"] = summary;
   payload["per_window"] = per_window_rows;
   payload["tasks"] = task_rows;
+  payload["failed_tasks"] = failed_task_rows;
   payload["trace"] = trace_rows;
   payload["profile"] = g4i_profile_dict(stage_seconds);
   payload["profile_counters"] = g4i_profile_dict(profile_counters);
   g4i_add_stage(stage_seconds, "pybind_payload_construction", stage_start, profile_enabled);
   payload["profile"] = g4i_profile_dict(stage_seconds);
+  return payload;
+}
+
+py::dict g4irsf4_no_astar_streaming_replay_from_jsonl(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    const std::string& task_jsonl_path,
+    const std::vector<std::vector<double>>& w1,
+    const std::vector<double>& b1,
+    const std::vector<double>& w2,
+    double b2,
+    double risk_margin_threshold,
+    double risk_historical_threshold,
+    double risk_bottleneck_threshold,
+    const std::vector<G4IHistoricalRiskRuleTuple>& historical_risk_rules,
+    const std::vector<G4IFallbackRuleTuple>& fallback_rules,
+    const std::string& policy_name,
+    bool use_model,
+    bool rule_only,
+    bool risk_gated_rule,
+    const std::string& fallback_name,
+    int bounded_depth,
+    int max_steps,
+    int trace_limit,
+    bool summary_only,
+    bool profile_enabled,
+    bool enable_edge_overlap_diagnostic,
+    bool audit_final_conflicts,
+    const std::vector<std::pair<int, int>>& fault_edges,
+    const std::vector<EdgeFaultWindowTuple>& fault_windows,
+    int max_tasks) {
+  const std::string window_name = "full_manifest_348824_continuous_state";
+  const std::string experiment_scope = "g4irsf4_continuous_state_cpp_jsonl_stream";
+  int line_count = 0;
+  int order_violations = 0;
+  auto route_records = g4irsf4_routes_from_jsonl(
+      task_jsonl_path, experiment_scope, window_name, max_tasks, &line_count, &order_violations);
+  const int window_size = static_cast<int>(route_records.size());
+  std::vector<G4IWindowTuple> window_records;
+  window_records.push_back(G4IWindowTuple{
+      window_name,
+      0,
+      window_size,
+      "continuous_full_manifest",
+      "g4irsf2_high_flow_tasks_jsonl_cpp_stream",
+      fault_edges,
+      fault_windows});
+
+  py::dict payload = g4i_no_astar_batch_replay(node_records,
+                                               edge_records,
+                                               heuristic_time,
+                                               window_records,
+                                               route_records,
+                                               w1,
+                                               b1,
+                                               w2,
+                                               b2,
+                                               risk_margin_threshold,
+                                               risk_historical_threshold,
+                                               risk_bottleneck_threshold,
+                                               historical_risk_rules,
+                                               fallback_rules,
+                                               policy_name,
+                                               use_model,
+                                               rule_only,
+                                               risk_gated_rule,
+                                               fallback_name,
+                                               bounded_depth,
+                                               max_steps,
+                                               trace_limit,
+                                               summary_only,
+                                               profile_enabled,
+                                               enable_edge_overlap_diagnostic,
+                                               audit_final_conflicts);
+  py::dict summary = payload["summary"].cast<py::dict>();
+  summary["continuous_state"] = true;
+  summary["chunk_reset_count"] = 0;
+  summary["source_state_reset_between_tasks"] = false;
+  summary["reservation_state_reset_between_tasks"] = false;
+  summary["traffic_memory_reset_between_tasks"] = false;
+  summary["reader_mode"] = "cpp_jsonl_stream_to_internal_records";
+  summary["task_jsonl_path"] = task_jsonl_path;
+  summary["jsonl_line_count"] = line_count;
+  summary["task_order_violations"] = order_violations;
+  summary["python_route_record_list_used"] = false;
+  payload["summary"] = summary;
   return payload;
 }
 
@@ -2648,6 +3107,36 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("profile_enabled") = false,
              py::arg("enable_edge_overlap_diagnostic") = true,
              py::arg("audit_final_conflicts") = true);
+  module.def("g4irsf4_no_astar_streaming_replay_from_jsonl",
+             &g4irsf4_no_astar_streaming_replay_from_jsonl,
+             py::arg("node_records"),
+             py::arg("edge_records"),
+             py::arg("heuristic_time"),
+             py::arg("task_jsonl_path"),
+             py::arg("w1"),
+             py::arg("b1"),
+             py::arg("w2"),
+             py::arg("b2"),
+             py::arg("risk_margin_threshold"),
+             py::arg("risk_historical_threshold"),
+             py::arg("risk_bottleneck_threshold"),
+             py::arg("historical_risk_rules"),
+             py::arg("fallback_rules"),
+             py::arg("policy_name"),
+             py::arg("use_model"),
+             py::arg("rule_only"),
+             py::arg("risk_gated_rule"),
+             py::arg("fallback_name"),
+             py::arg("bounded_depth") = 1,
+             py::arg("max_steps") = 80,
+             py::arg("trace_limit") = 500,
+             py::arg("summary_only") = true,
+             py::arg("profile_enabled") = false,
+             py::arg("enable_edge_overlap_diagnostic") = true,
+             py::arg("audit_final_conflicts") = true,
+             py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
+             py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
+             py::arg("max_tasks") = -1);
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,

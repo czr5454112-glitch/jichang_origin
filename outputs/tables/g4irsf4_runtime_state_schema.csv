@@ -1,0 +1,9 @@
+state_component,owner,continuous_across_tasks,exported,schema,notes
+node_reservations,C++ runtime,True,False,"map<int, vector<pair<double,double>>>",Single JSONL replay keeps this in-process.
+traffic_memory,C++ runtime,True,False,node/edge visit and wait counters,Used by local fallback traffic penalty.
+source_queue_order,JSONL stream,True,n/a,"pass_time, task_id, segment_id ordering",Order violations are counted by the C++ reader.
+active_fault_state,window config,True,False,fault_edges + scheduled fault_windows,No teacher or future route suffix used.
+runtime_clock,per task route state,True,False,attempt_time/current_t2,Each task starts from its release time; reservations encode cross-task clock pressure.
+edge_diagnostic_state,C++ runtime,True,False,"map<pair<int,int>, vector<pair<double,double>>>","Diagnostic only, not a primary capacity constraint."
+policy_counters,C++ runtime summary,True,True,model/fallback/source/loop/nonprogress counts,Returned in pybind payload summary.
+loop_memory,per task path,per-task,failed_samples,visited node path,No teacher path; only current task history.

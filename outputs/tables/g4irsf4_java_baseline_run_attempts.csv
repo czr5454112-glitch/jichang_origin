@@ -1,0 +1,14 @@
+attempt,status,command,returncode,stdout_excerpt,stderr_excerpt,notes
+dependency_inventory,PASS,,,jars=96 sources=15,,Netty jars are present under legacy Java_jar.
+compile_original_java_with_discovered_jars,PASS,javac -encoding UTF-8 -cp <discovered_jars> -sourcepath src -d <temp> @sources,0,,"注: C:\PROGRAMING\czr005\legacy\jichang_origin_readonly\src\ICS_GUI\ICS_GUI.java使用或覆盖了已过时的 API。
+注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+",Output directory is temporary; legacy tree is not modified.
+run_original_java_headless_RUN_Main,BLOCKED,java -Djava.awt.headless=true -cp <temp+jars> RUN.Main,1,,"Exception in thread ""main"" java.awt.HeadlessException
+	at java.desktop/java.awt.GraphicsEnvironment.checkHeadless(GraphicsEnvironment.java:166)
+	at java.desktop/java.awt.Window.<init>(Window.java:553)
+	at java.desktop/java.awt.Frame.<init>(Frame.java:428)
+	at java.desktop/javax.swing.JFrame.<init>(JFrame.java:224)
+	at ICS_GUI.ICS_GUI.showmap(ICS_GUI.java:98)
+	at RUN.Main.run(Main.java:53)
+	at RUN.Main.main(Main.java:135)
+",A nonzero result keeps Java/CIE runtime baseline blocked.

@@ -1,0 +1,7 @@
+item,before,after,status,quality_guardrail,notes
+avoid_pybind_huge_payload,Python route_records list for G4I batch replay,C++ JSONL reader path,IMPLEMENTED,same C++ no-A* replay summary,Python no longer passes 348824 route tuples through pybind.
+summary_only_streaming,optional task rows payload,summary + failed samples,IMPLEMENTED,failed_reason_counts and failed_tasks retained,Keeps loop autopsy possible without materializing all task rows in Python.
+reservation_lookup,copy+sort node intervals and scan from front,sorted insertion plus binary-positioned earliest_safe/overlap scans,IMPLEMENTED,same reservation semantics and node-window conflict audit,This optimization was required for full continuous state to return without changing policy behavior.
+loop_cycle_detection_cache,path count per step,guard variants on failed subset,PARTIAL,"no full A*, no teacher",Full promotion requires full-manifest variant run.
+edge_overlap_fast_path,diagnostic interval scans,diagnostic remains optional,BOUNDARY_HELD,not a primary capacity constraint,Continuous row records whether diagnostic was enabled.
+full_edge_overlap_diagnostic,attempted continuous diagnostic scan,full_edge_overlap_diagnostic_attempt_exceeded_1700_cpu_seconds_without_returning_binary_reservation_lookup_optimized,BLOCKED,negative/resource blocker is preserved,Full continuous planning result is still measured separately from this diagnostic.
