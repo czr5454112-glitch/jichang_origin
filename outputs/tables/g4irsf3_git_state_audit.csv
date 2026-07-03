@@ -1,0 +1,9 @@
+check,status,local_value,expected_or_remote_value,details
+branch,PASS,codex/czr005-rewrite,origin/codex/czr005-rewrite,current local branch and tracking branch
+head,INFO,209f8956f331554a75ad9dff465fc92c3412174d,209f8956f331554a75ad9dff465fc92c3412174d,209f895
+head_contains_209f895,PASS,True,209f895,G4IRSF2 commit must be an ancestor
+head_is_ancestor_of_upstream,PASS,True,origin/codex/czr005-rewrite,Before this run local should match upstream; after new commit it will become ahead until push.
+working_tree_status_during_g4irsf3_generation,INFO,dirty_entries=33; first=A  artifacts/policies/g4irsf3_allowed_runtime_inputs.json,clean_before_generation,The tree is expected to become dirty while G4IRSF3 artifacts are generated or staged; legacy diff is checked separately.
+legacy_java_diff_empty,PASS,,,legacy Java must stay read-only
+g4irsf2_high_flow_tasks_jsonl_ignored,PASS,".gitignore:18:artifacts/tasks/g4irsf2_high_flow_tasks.jsonl	""artifacts\\tasks\\g4irsf2_high_flow_tasks.jsonl""",.gitignore entry,"large JSONL is reproduced, not committed"
+g4irsf2_high_flow_tasks_jsonl_exists,PASS,True,artifacts/tasks/g4irsf2_high_flow_tasks.jsonl,reproduction script can regenerate it if missing

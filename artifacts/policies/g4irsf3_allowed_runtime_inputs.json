@@ -1,0 +1,28 @@
+{
+  "allowed_runtime_inputs": [
+    "current_node",
+    "candidate_next_nodes",
+    "goal_node",
+    "current_time",
+    "std_time",
+    "local_node_window_reservation_state",
+    "current_fault_edges",
+    "local_static_topology_depth3",
+    "runtime_traffic_pressure_from_past_and_present"
+  ],
+  "forbidden_runtime_inputs": [
+    "teacher_next_node",
+    "teacher_path",
+    "full_cie_route_suffix",
+    "future_schedule",
+    "future_sipp_schedule",
+    "post_hoc_success",
+    "label_source",
+    "edge_capacity_1_primary_constraint"
+  ],
+  "governance_doc": "docs/czr005_project_governance.md",
+  "notes": "Fault-aware shadow variants are not promoted in G4IRSF3. Edge overlap remains diagnostic only.",
+  "runtime_full_cie_astar_fallback": false,
+  "stage": "g4irsf3",
+  "topology_changed": false
+}

@@ -1,0 +1,5 @@
+optimization,status,baseline_or_input,task_count,runtime_seconds,tasks_per_second,quality_guardrail,notes
+summary_only_trace0_edge_diag_off,MEASURED,g4irsf3_full_manifest_chunks,348824,1022.2416231,341.23439324,planned/conflict/full_astar columns in chunk table,This is already the lean mode used for full-manifest chunking.
+profile_sample_top_stage,MEASURED,python_wall_clock,4096,1.3496631,,same C++ replay summary,"Use stage profile to decide whether reservation lookup, feature construction, or final scans dominate."
+cross_chunk_reservation_carryover,BLOCKED_API,current pybind no export/import state,348824,,,required before continuous 348824 claim,Do not reset chunks and claim continuity.
+single_call_full_manifest_streaming,BLOCKED_RESOURCE_BUDGET,chunk_mean_seconds=92.931,348824,,,would need complete node-window final audit,Projected runtime and memory risk kept as blocker.

@@ -1,0 +1,11 @@
+coverage_item,g4irsf2_rule_name,source_evidence_status,g4irsf3_status,level_b_ready,notes
+fixed_real_map2_topology,fixed_map2_topology,FOUND,PASS,True,G4IRSF3 keeps data/processed/maps/map2.json unchanged.
+inputdata_source_queue,read_inputdata_as_source_queues,FOUND,PASS,True,Original inputdata queue semantics are audited.
+early_bag_storage_in,storage_in_goal_47,FOUND,PASS,True,Storage-in split exists in parsed task stream.
+storage_out_lead_time,storage_out_lead_2700,FOUND,PASS,True,Storage-out split exists in parsed task stream.
+source_queue_sort,java_pass_time_sort,FOUND,PASS,True,Pass-time ordering is preserved by generated JSONL sort.
+unfinished_task_retry,unfinish_task_retry,FOUND,PARTIAL,False,Known from Java source; G4IRSF3 no-A* loop does not execute Java retry online.
+node_time_window_constraint,node_time_window_constraint,FOUND,PARTIAL,False,Primary node-window conflicts are audited; full Java equivalence still blocked.
+fault_repair_sampling,fault_probability_per_edge,FOUND,PARTIAL,False,Static and scheduled faults are supported; random Java event stream not reproduced.
+active_large_flow_generator,original_large_flow_generator,MISSING,FAIL,False,No active original generator found; current stream remains Level C distribution-preserving resample.
+continuous_full_manifest_state,,not_applicable,FAIL,False,C++ API cannot carry reservation/traffic memory across chunks yet.

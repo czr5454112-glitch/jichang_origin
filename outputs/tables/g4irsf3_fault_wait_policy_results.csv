@@ -1,0 +1,5 @@
+case,allowed_runtime_inputs,action,planned_as_success,uses_repair_eta,node_window_conflicts_evaluated,runtime_full_cie_astar_calls,notes
+already_at_node18_static_fault_18_22,"current_node,outgoing_edges,current_fault_edges",FAIL_SAFE_OR_HOLD_AT_NODE,False,False,False,0,"18 has only one outgoing edge, so the local policy cannot create a new route at node 18."
+upstream_no_safe_candidate_visible,"current_node,outgoing_edges,current_fault_edges,local_static_topology_depth3",WAIT_AT_SOURCE_OR_UPSTREAM_RETRY,False,False,False,0,Shadow wait variant held 1150 baseline failures instead of entering the dead-end corridor.
+scheduled_repair_window_known_by_operations,"current_node,current_fault_edges,repair_schedule_if_operationally_available",WAIT_UNTIL_REPAIR_THEN_RETRY,diagnostic_only,True,False,0,Repair ETA is not a default allowed input for promoted runtime; it can only be used if the real ICS runtime exposes it before decision time.
+unknown_repair_time,"current_node,current_fault_edges",WAIT_WITH_MAX_HOLD_THEN_SAFE_FAIL,False,False,False,0,Do not spin forever; preserve no-path/fail result after a configured operational hold budget.
