@@ -1,0 +1,6 @@
+system,scope,repeat_count,mean_seconds,std_seconds,ci95_seconds,min_seconds,max_seconds,planned_count,runtime_full_cie_astar_calls,model_inference_count,pibt_lite_fallback_calls,tasks_per_second,decisions_per_second,notes
+python_model_plus_pibt_lite,g4d_teacher_planned_scope,3,10.6607754,1.39965713,1.58386115,9.0446217,11.4775412,4449,0,35235,6612,417.32424078,3305.10668105,Python reference event loop over G4D teacher planned scope
+cpp_model_plus_pibt_lite,g4d_teacher_planned_scope,3,0.50506883,0.09574562,0.10834637,0.4224926,0.6100209,4449,0,35235,6612,8808.70033387,69762.76832186,C++ owns full no-A* episode replay; Python only invokes pybind once per repeat
+verified_cie_retry_baseline_astar_proxy,g4d_teacher_planned_scope,3,0.18993917,0.02060683,0.02331882,0.1661588,0.2025448,4449,15852,17796,0,23423.28903552,93693.1561421,"Measured C++ static A* plan proxy scaled to original retry attempt count; this is a lower-bound proxy, not the Java GUI runtime"
+g4d_model_plus_cie_fallback_call_count,g4d_teacher_planned_scope,0,,,,,,4449,6786,39313,0,,,Existing call-count baseline retained for G4D/G4E; no new speed claim from this row.
+g4e_model_plus_cie_fallback_call_count,g4d_teacher_planned_scope,0,,,,,,4449,6395,39313,0,,,Existing call-count baseline retained for G4D/G4E; no new speed claim from this row.
