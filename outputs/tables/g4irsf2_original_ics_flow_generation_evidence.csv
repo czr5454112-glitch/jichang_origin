@@ -1,0 +1,13 @@
+rule_name,source_file,source_line_or_snippet,evidence_status,used_in_generation,notes
+read_inputdata_as_source_queues,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\RUN\Main.java,"38: String path = ""inputdata.txt"";//任务数据路径",FOUND,True,Main reads inputdata.txt and groups tasks by start node.
+early_bag_threshold_4800,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\RUN\Main.java,40: double time = 4800;//早到时间,FOUND,True,"If STD-entry >= 4800, bag goes to storage first."
+storage_in_goal_47,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\RUN\Main.java,116: newtask.setGoal(47);,FOUND,True,Early bag first segment targets storage node 47.
+storage_out_start_52,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\RUN\Main.java,125: newtask1.setStar(52);,FOUND,True,Early bag second segment starts at node 52.
+storage_out_lead_2700,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\RUN\Main.java,123: double passtime = newtask1.getSTD()-2700;,FOUND,True,Storage-out pass_time is STD - 2700.
+java_pass_time_sort,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\RUN\Main.java,89: private static void Sort(ArrayList<task> arrayList) {,FOUND,True,Source queues are sorted by pass_time with Java integer comparator.
+epoch_release_from_source_queue,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\App\Tasks.java,149: //产生新任务,FOUND,True,generate_tasks releases the first queued task at each enabled source when pass_time <= epoch.
+random_od_generation_disabled,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\App\Tasks.java,120: //				Random random = new Random();,FOUND,False,Random goal generation exists only in commented-out code; not used for main generation.
+fault_probability_per_edge,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\App\Tasks.java,"128: //产生故障弧,故障率服从标准正太分布，若概率p<fault则认为有故障",FOUND,False,Fault events are sampled by Math.random per edge during generate_tasks.
+repair_probability_per_fault_edge,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\App\Tasks.java,138: //修好的弧,FOUND,False,Repair events are sampled by Math.random over current fault edges.
+original_large_flow_generator,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation,,MISSING,False,No source file was found that creates new flight/OD/pass_time distributions beyond inputdata.txt.
+distribution_preserving_resample,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\inputdata.txt,1: ID EntryTime(s) STD(s) star end Unloader Loader,INFERRED_FROM_DATA,True,G4IRSF2 may only resample/copy audited inputdata distribution with drift audit.

@@ -1,0 +1,24 @@
+{
+  "allowed_inputs": [
+    "fixed map2 topology converted to data/processed/maps/map2.json",
+    "task_id, segment_id, start, goal, pass_time, std from audited generated task manifest",
+    "current runtime node reservations created by earlier no-A* decisions",
+    "frozen G4E/G4H policy weights and local fallback rules",
+    "diagnostic edge-overlap counter only"
+  ],
+  "edge_overlap_policy": "diagnostic_or_shadow_only_not_primary_capacity_constraint",
+  "forbidden_inputs": [
+    "teacher_next",
+    "teacher_path",
+    "full_cie_route",
+    "future_schedule",
+    "future_sipp_schedule",
+    "post_hoc_success",
+    "label_source",
+    "scenario_lookup"
+  ],
+  "governance_doc": "docs/czr005_project_governance.md",
+  "runtime": "g4irsf2_fixed_map_high_flow_no_astar",
+  "runtime_full_cie_astar_fallback": false,
+  "task_stream_generation_level": "distribution_preserving_resample"
+}

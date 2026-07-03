@@ -1,0 +1,17 @@
+criterion,status,evidence
+original_ics_project_access_or_missing_audit,PASS,original ICS project found and audited
+project_governance_written,PASS,docs\czr005_project_governance.md
+original_data_rule_inventory_exists,PASS,outputs\tables\g4irsf2_original_ics_rule_inventory.csv
+topology_changed_false,PASS,False
+generation_level_level_a_b_c,PASS,distribution_preserving_resample
+fixed_map_high_flow_at_least_8x_scope,PASS,>=32768 generated segments at flow_scale=8
+noastar_zero_full_astar_calls,PASS,slope rows
+node_window_conflicts_zero,PASS,slope rows
+same_data_astar_proxy_baseline_exists,PASS,outputs\tables\g4irsf2_fixed_map_noastar_vs_astar_slope.csv
+astar_hardness_gate,FAIL,static A* proxy did not become hard if FAIL
+fault_18_22_autopsy_done,PASS,outputs\reports\g4irsf2_fault_18_22_autopsy.md
+edge_pressure_shadow_done,PASS,outputs\reports\g4irsf2_edge_physical_pressure_report.md
+no_leakage_pass,PASS,outputs\tables\g4irsf2_no_leakage_checks.csv
+legacy_java_diff_empty,PASS,
+overall_g4irsf2_audit_gate,PASS,Audit and limited Level C benchmark complete
+g4j_paper_grade_promotion_gate,FAIL,Requires Level A/B plus A* hardness; not satisfied by this Level C run
