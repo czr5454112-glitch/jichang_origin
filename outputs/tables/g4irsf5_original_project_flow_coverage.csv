@@ -1,0 +1,10 @@
+﻿flow_element,coverage,paper_evidence,original_project_evidence,repo_mapping,notes
+original_project_access,PASS,governance path,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目,external project root,Main claim blocked if missing.
+raw_inputdata_day,PASS,paper says 28506 bags/day,inputdata.txt lines=28507,43603 processed JSONL segments,Header + 28506 raw bag rows expected.
+early_bag_split_to_ebs,PASS,EBS数量=1; code routes early bags to storage,RUN.Main ReadTaskList uses goal 47 then start 52 for early bags,split_bag_count=15097; processed_segments=43603,THT must sum storage-in and storage-out segment durations.
+topology_and_arc_ids,PARTIAL,"表5.1: 44 crossings, 72 conveyors",map2.txt present=True; arc.txt rows=69,map2.json edges=69 directed arcs,Paper conveyor count and executable arc rows differ; keep this boundary explicit.
+primary_no_fault_2_5_result,PASS,表5.2 2.5m/s avg THT 3.96,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\项目仿真（数据+分析）\仿真数据2\2.5 0.txt,baseline parser groups segment rows by task_id,Parsed original-project text aligns with paper THT.
+speed_sweep_files,PARTIAL,表5.2 speed sweep 1.5/2.0/2.5/3.0,1.5/2.0/2.5 text files present under 仿真数据2,"3.0 result exists in T2 xlsx/text area, not same flat filename",Primary replay remains 2.5m/s.
+dispersed_heuristic_baseline,AVAILABLE_AS_PROJECT_ARTIFACT,表5.3,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\项目仿真（数据+分析）\仿真结果数据整理（与分散启发式方法对比）.xlsx,paper baseline inventory only,No executable dispersed heuristic rerun in this pass.
+fault_scenario_artifacts,AVAILABLE_AS_PROJECT_ARTIFACT,表5.5 fixed interrupted conveyor scenarios,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\项目仿真（数据+分析）\仿真数据2\仿真结果数据整理（设备中断影响）.xlsx,G4IRSF5 maps arc IDs through arc.txt for diagnostic no-A* sweeps,Metric scope differs: paper baggage success vs processed-segment success.
+java_gui_entrypoint,BLOCKED_HEADLESS_EXPECTED,simulation system described in chapter 5,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\RUN\Main.java,temporary compile/run attempts only; no source modification,"RUN.Main calls ICS_GUI.showmap(), so headless full runtime is blocked."

@@ -19,6 +19,26 @@ Do not invent arbitrary flow scaling, random OD generation, random pass_time gen
 
 If the original ICS project path is unavailable in the current environment, Codex must block main-claim data generation and produce an access-missing audit instead.
 
+## Original Paper / Original Project Experimental Protocol Rule
+
+Paper-grade validation must first audit and follow the original thesis and original ICS project experimental protocol before making comparative claims.
+
+Primary thesis path on the user's machine:
+
+`C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\毕业设计\毕业论文-2019210484-冯汝琛-基于物联网的机场行李处理系统动态路由规划方法-物流工程-戚铭尧.docx`
+
+Primary original ICS project path on the user's machine:
+
+`C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目`
+
+Codex must not downgrade a paper-protocol validation into a convenience-only stress test. If the thesis or original project cannot be read, the run must record `paper_protocol_access=BLOCKED` or `original_project_access=BLOCKED` in the generated audit artifacts instead of inventing the missing protocol.
+
+The original thesis protocol, original project simulator/data artifacts, and repository high-flow extensions are separate evidence layers. A high-flow experiment such as the 348824-task G4IRSF4 run may be reported only as an extension unless the generated reports also prove that it is directly comparable to the paper's main experiment.
+
+Static A* paths are lower-bound or diagnostic baselines only. They must not be reported as the full original Java/CIE runtime, the thesis IoT-DRPA runtime, or a paper-grade dynamic/centralized baseline.
+
+G4J remains closed unless an explicit paper-protocol comparison exists and the generated claim-boundary report allows promotion.
+
 ## Data Claim Levels
 
 High-flow data must be labeled with one of:
