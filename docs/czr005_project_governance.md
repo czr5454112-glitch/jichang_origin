@@ -53,6 +53,32 @@ High-flow data must be labeled with one of:
 The promoted runtime remains decentralized no-A*:
 no runtime full CIE/A* fallback, no teacher path, no teacher_next, no full future schedule, no post-hoc success feature.
 
+## THT Denominator and Source Release Semantics Rule
+
+Any experiment that changes task release time, pass_time, source queue order, source queue gating, or reservation semantics must explicitly declare the THT denominator.
+
+For paper-protocol comparisons, Codex must distinguish:
+
+- `original_entry_time_tth`: THT measured from the original inputdata EntryTime/pass_time.
+- `java_release_time_tth`: THT measured from Java epoch release time / cur_time when the task actually enters path planning.
+- `processed_segment_attempt_time_tth`: THT measured from processed JSONL segment attempt_time.
+- `diagnostic_runtime_tth`: any engineering timing used only for diagnostics.
+
+A candidate may not be promoted as paper-protocol superior if it improves THT by changing the denominator unless the original thesis/project evidence proves the denominator is the same.
+
+All release semantics variants must preserve:
+
+- original task_id mapping,
+- original bag count,
+- original source/goal distribution,
+- storage-in/out grouping,
+- no runtime full A*,
+- no teacher path/future schedule leakage,
+- no node-window conflicts.
+
+If denominator equivalence is unresolved, the result must be labeled:
+`engineering_candidate_pending_denominator_audit`.
+
 ## Legacy Rule
 
 Do not modify legacy Java or original ICS source code for CZR005 experiments unless a separate explicit integration stage is opened.

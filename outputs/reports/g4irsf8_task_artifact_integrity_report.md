@@ -1,0 +1,11 @@
+# G4IRSF8 Task Artifact Integrity Report
+
+Formal artifact: `C:\PROGRAMING\czr005\artifacts\tasks\g4irsf7\java_source_queue_one_per_epoch.jsonl`
+Line count: 43603
+SHA256: `abb03e6d6d46031bfb653fece7ade8a94d58a54e8142c53448704f800ec5d386`
+
+| Check | Status | Observed | Expected |
+| --- | --- | --- | --- |
+| line_count | PASS | 43603 | 43603 |
+| source_input_hash | PASS | 968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f | 968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f |
+| test_write_guard | PASS | tests pass temp artifact_dir | no test writes formal g4irsf7 artifact path |
