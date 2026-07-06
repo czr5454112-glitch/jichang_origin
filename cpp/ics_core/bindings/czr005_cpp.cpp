@@ -701,10 +701,60 @@ void g4i_insert_interval_sorted(std::map<int, std::vector<std::pair<double, doub
   intervals.insert(pos, interval);
 }
 
+struct G4IReservationSemantics {
+  std::string name = "baseline";
+  bool open_end_boundary = false;
+  bool skip_source_lookup = false;
+  bool reserve_source_node = true;
+};
+
+G4IReservationSemantics g4i_reservation_semantics_from_name(const std::string& name) {
+  G4IReservationSemantics semantics;
+  semantics.name = name.empty() ? "baseline" : name;
+  if (semantics.name == "baseline") {
+    return semantics;
+  }
+  if (semantics.name == "reservation_open_end_boundary" ||
+      semantics.name == "entry_node_open_interval") {
+    semantics.open_end_boundary = true;
+    return semantics;
+  }
+  if (semantics.name == "source_node_no_reservation") {
+    semantics.open_end_boundary = true;
+    semantics.skip_source_lookup = true;
+    semantics.reserve_source_node = false;
+    return semantics;
+  }
+  if (semantics.name == "storage_segment_independent_reservation") {
+    semantics.open_end_boundary = true;
+    return semantics;
+  }
+  if (semantics.name == "source_node_zero_service" ||
+      semantics.name == "java_service_time_parity") {
+    return semantics;
+  }
+  throw std::invalid_argument("unknown G4I reservation semantics: " + name);
+}
+
+bool g4i_interval_blocks(const G4IReservationSemantics& semantics,
+                         double left,
+                         double right,
+                         double start,
+                         double end) {
+  if (semantics.open_end_boundary) {
+    if (right <= left || end <= start) {
+      return false;
+    }
+    return start < right && end > left;
+  }
+  return !(end < left || start > right);
+}
+
 double g4i_earliest_safe(const std::map<int, std::vector<std::pair<double, double>>>& reservations,
                          int node,
                          double start,
                          double service,
+                         const G4IReservationSemantics& semantics,
                          int* scan_count = nullptr) {
   double current = start;
   const auto found = reservations.find(node);
@@ -726,11 +776,11 @@ double g4i_earliest_safe(const std::map<int, std::vector<std::pair<double, doubl
     if (right < current) {
       continue;
     }
-    if (end < left) {
+    if (semantics.open_end_boundary ? end <= left : end < left) {
       return current;
     }
-    if (!(end < left || current > right)) {
-      current = right + G4I_EPSILON;
+    if (g4i_interval_blocks(semantics, left, right, current, end)) {
+      current = semantics.open_end_boundary ? right : right + G4I_EPSILON;
     }
   }
   return current;
@@ -1004,6 +1054,7 @@ G4IFallbackDecision g4i_fallback_decision(
     const czr005::ics::Graph& graph,
     const G4IWindow& window,
     const std::map<int, std::vector<std::pair<double, double>>>& reservations,
+    const G4IReservationSemantics& reservation_semantics,
     const G4ITrafficMemory& traffic,
     const std::vector<int>& path,
     const std::vector<int>& candidates,
@@ -1082,7 +1133,8 @@ G4IFallbackDecision g4i_fallback_decision(
     const auto& edge = graph.edge(current, candidate);
     const double arrival = ready_time + edge.travel_time();
     const double service = graph.service_time(candidate);
-    const double service_start = g4i_earliest_safe(reservations, candidate, arrival, service);
+    const double service_start =
+        g4i_earliest_safe(reservations, candidate, arrival, service, reservation_semantics);
     const auto found = reservations.find(candidate);
     const double pressure = found == reservations.end() ? 0.0 : static_cast<double>(g4i_overlap_count(found->second, arrival, arrival + service));
     const double wait = std::max(0.0, service_start - arrival);
@@ -1154,7 +1206,8 @@ G4IFallbackDecision g4i_fallback_decision(
   return decision;
 }
 
-int g4i_node_window_conflicts(const std::map<int, std::vector<std::pair<double, double>>>& reservations) {
+int g4i_node_window_conflicts(const std::map<int, std::vector<std::pair<double, double>>>& reservations,
+                              const G4IReservationSemantics& reservation_semantics) {
   int conflicts = 0;
   for (const auto& [node, intervals] : reservations) {
     (void)node;
@@ -1162,7 +1215,7 @@ int g4i_node_window_conflicts(const std::map<int, std::vector<std::pair<double, 
       for (std::size_t right_index = left_index + 1; right_index < intervals.size(); ++right_index) {
         const auto [left_start, left_end] = intervals[left_index];
         const auto [right_start, right_end] = intervals[right_index];
-        if (!(left_end < right_start || left_start > right_end)) {
+        if (g4i_interval_blocks(reservation_semantics, left_start, left_end, right_start, right_end)) {
           ++conflicts;
         }
       }
@@ -1329,12 +1382,14 @@ py::dict g4i_no_astar_batch_replay(
     bool summary_only,
     bool profile_enabled,
     bool enable_edge_overlap_diagnostic,
-    bool audit_final_conflicts) {
+    bool audit_final_conflicts,
+    const std::string& reservation_semantics_name = "baseline") {
   std::map<std::string, double> stage_seconds;
   std::map<std::string, double> profile_counters;
 
   auto stage_start = G4IClock::now();
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
+  const auto reservation_semantics = g4i_reservation_semantics_from_name(reservation_semantics_name);
   g4i_add_stage(stage_seconds, "graph_construction", stage_start, profile_enabled);
 
   stage_start = G4IClock::now();
@@ -1393,8 +1448,15 @@ py::dict g4i_no_astar_batch_replay(
       std::string failed_reason;
       stage_start = G4IClock::now();
       int source_scan_count = 0;
-      const double start_t1 = g4i_earliest_safe(
-          reservations, current, route.attempt_time, graph.service_time(current), &source_scan_count);
+      const double start_t1 =
+          reservation_semantics.skip_source_lookup
+              ? route.attempt_time
+              : g4i_earliest_safe(reservations,
+                                  current,
+                                  route.attempt_time,
+                                  graph.service_time(current),
+                                  reservation_semantics,
+                                  &source_scan_count);
       g4i_add_stage(stage_seconds, "source_reservation_lookup", stage_start, profile_enabled);
       g4i_add_count(profile_counters, "earliest_safe_lookup_count", 1.0, profile_enabled);
       g4i_add_count(profile_counters, "earliest_safe_scan_count", source_scan_count, profile_enabled);
@@ -1406,11 +1468,13 @@ py::dict g4i_no_astar_batch_replay(
         result.source_retry_count += 1;
       }
       double current_t2 = start_t1 + graph.service_time(current);
-      stage_start = G4IClock::now();
-      g4i_insert_interval_sorted(reservations, current, {start_t1, current_t2});
-      current_reservation_entries += 1;
-      peak_reservation_entries = std::max(peak_reservation_entries, current_reservation_entries);
-      g4i_add_stage(stage_seconds, "reservation_append", stage_start, profile_enabled);
+      if (reservation_semantics.reserve_source_node) {
+        stage_start = G4IClock::now();
+        g4i_insert_interval_sorted(reservations, current, {start_t1, current_t2});
+        current_reservation_entries += 1;
+        peak_reservation_entries = std::max(peak_reservation_entries, current_reservation_entries);
+        g4i_add_stage(stage_seconds, "reservation_append", stage_start, profile_enabled);
+      }
       const int steps_limit = rule_only ? std::min(max_steps, 24) : max_steps;
       for (int step = 0; step < steps_limit; ++step) {
         if (current == goal) {
@@ -1504,6 +1568,7 @@ py::dict g4i_no_astar_batch_replay(
           fallback_decision = g4i_fallback_decision(graph,
                                                     window,
                                                     reservations,
+                                                    reservation_semantics,
                                                     traffic,
                                                     path,
                                                     candidates,
@@ -1539,8 +1604,12 @@ py::dict g4i_no_astar_batch_replay(
         const double arrival = current_t2 + edge.travel_time();
         stage_start = G4IClock::now();
         int move_scan_count = 0;
-        const double service_start = g4i_earliest_safe(
-            reservations, selected, arrival, graph.service_time(selected), &move_scan_count);
+        const double service_start = g4i_earliest_safe(reservations,
+                                                       selected,
+                                                       arrival,
+                                                       graph.service_time(selected),
+                                                       reservation_semantics,
+                                                       &move_scan_count);
         g4i_add_stage(stage_seconds, "earliest_safe_reservation_lookup", stage_start, profile_enabled);
         g4i_add_count(profile_counters, "earliest_safe_lookup_count", 1.0, profile_enabled);
         g4i_add_count(profile_counters, "earliest_safe_scan_count", move_scan_count, profile_enabled);
@@ -1617,7 +1686,8 @@ py::dict g4i_no_astar_batch_replay(
       task_results.push_back(std::move(result));
     }
     stage_start = G4IClock::now();
-    const int conflicts = audit_final_conflicts ? g4i_node_window_conflicts(reservations) : 0;
+    const int conflicts =
+        audit_final_conflicts ? g4i_node_window_conflicts(reservations, reservation_semantics) : 0;
     g4i_add_stage(stage_seconds, "node_window_conflict_audit", stage_start, profile_enabled);
     if (conflicts > 0) {
       for (auto& task : task_results) {
@@ -1825,6 +1895,7 @@ py::dict g4i_no_astar_batch_replay(
   summary["profile_enabled"] = profile_enabled;
   summary["edge_overlap_diagnostic_enabled"] = enable_edge_overlap_diagnostic;
   summary["final_conflict_audit_enabled"] = audit_final_conflicts;
+  summary["reservation_semantics"] = reservation_semantics.name;
 
   stage_start = G4IClock::now();
   py::dict payload;
@@ -1868,7 +1939,8 @@ py::dict g4irsf4_no_astar_streaming_replay_from_jsonl(
     bool audit_final_conflicts,
     const std::vector<std::pair<int, int>>& fault_edges,
     const std::vector<EdgeFaultWindowTuple>& fault_windows,
-    int max_tasks) {
+    int max_tasks,
+    const std::string& reservation_semantics_name = "baseline") {
   const std::string window_name = "full_manifest_348824_continuous_state";
   const std::string experiment_scope = "g4irsf4_continuous_state_cpp_jsonl_stream";
   int line_count = 0;
@@ -1911,7 +1983,8 @@ py::dict g4irsf4_no_astar_streaming_replay_from_jsonl(
                                                summary_only,
                                                profile_enabled,
                                                enable_edge_overlap_diagnostic,
-                                               audit_final_conflicts);
+                                               audit_final_conflicts,
+                                               reservation_semantics_name);
   py::dict summary = payload["summary"].cast<py::dict>();
   summary["continuous_state"] = true;
   summary["chunk_reset_count"] = 0;
@@ -3106,7 +3179,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("summary_only") = false,
              py::arg("profile_enabled") = false,
              py::arg("enable_edge_overlap_diagnostic") = true,
-             py::arg("audit_final_conflicts") = true);
+             py::arg("audit_final_conflicts") = true,
+             py::arg("reservation_semantics") = std::string("baseline"));
   module.def("g4irsf4_no_astar_streaming_replay_from_jsonl",
              &g4irsf4_no_astar_streaming_replay_from_jsonl,
              py::arg("node_records"),
@@ -3136,7 +3210,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("audit_final_conflicts") = true,
              py::arg("fault_edges") = std::vector<std::pair<int, int>>{},
              py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
-             py::arg("max_tasks") = -1);
+             py::arg("max_tasks") = -1,
+             py::arg("reservation_semantics") = std::string("baseline"));
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,

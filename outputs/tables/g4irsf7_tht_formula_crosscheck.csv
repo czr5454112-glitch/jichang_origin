@@ -1,0 +1,11 @@
+﻿check,status,observed,expected,notes
+original_text_result_exists,PASS,C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\项目仿真（数据+分析）\仿真数据2\2.5 0.txt,readable,Original 2.5m/s result text.
+raw_inputdata_row_count,PASS,28507,28507,Header plus 28506 raw bags.
+processed_segment_count,PASS,43603,43603,Storage-in/out split retained.
+complete_bag_count,PASS,28506,28506,Grouped by task_id.
+storage_dwell_excluded,PASS,segment duration sum only,exclude dwell between storage-in and storage-out,"THT uses finish-start per routed segment, not storage waiting dwell."
+minutes_conversion,PASS,seconds / 60,seconds / 60,No rounding before mean.
+min_recompute,PASS,3.13333333,3.13333333,
+mean_recompute,PASS,3.96712271,3.96712271,
+max_recompute,PASS,5.98333333,5.98333333,
+rounding_precision,PASS,8 decimal CSV precision after recompute,no pre-aggregation rounding,Stable reproduction of parsed original mean.

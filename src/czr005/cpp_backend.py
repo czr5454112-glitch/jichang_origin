@@ -381,6 +381,7 @@ def g4i_no_astar_batch_replay(
     profile_enabled: bool = False,
     enable_edge_overlap_diagnostic: bool = True,
     audit_final_conflicts: bool = True,
+    reservation_semantics: str = "baseline",
     search_path: PathLike | None = None,
 ) -> dict[str, Any]:
     module = load_cpp_module(search_path)
@@ -451,6 +452,7 @@ def g4i_no_astar_batch_replay(
             bool(profile_enabled),
             bool(enable_edge_overlap_diagnostic),
             bool(audit_final_conflicts),
+            str(reservation_semantics),
         )
     )
 
@@ -485,6 +487,7 @@ def g4irsf4_no_astar_streaming_replay_from_jsonl(
     fault_edges: Sequence[tuple[int, int]] = (),
     fault_windows: Sequence[tuple[int, int, float, float]] = (),
     max_tasks: int = -1,
+    reservation_semantics: str = "baseline",
     search_path: PathLike | None = None,
 ) -> dict[str, Any]:
     module = load_cpp_module(search_path)
@@ -533,5 +536,6 @@ def g4irsf4_no_astar_streaming_replay_from_jsonl(
                 for start, end, fault_start, repair_time in fault_windows
             ],
             int(max_tasks),
+            str(reservation_semantics),
         )
     )

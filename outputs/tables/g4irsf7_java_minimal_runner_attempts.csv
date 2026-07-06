@@ -1,0 +1,21 @@
+﻿attempt,status,command,returncode,stdout_excerpt,stderr_excerpt,notes
+dependency_inventory_original_project,PASS,,,sources=15 jars=96,,Read-only inventory from original project path.
+compile_original_project_java,PASS,javac -encoding UTF-8 -cp <discovered_jars> -sourcepath src -d <temp> @sources,0,,"注: C:\STUDY\民航二所项目相关\冯汝琛相关材料\冯汝琛相关材料\ICS项目\代码-ICSsimulation\src\ICS_GUI\ICS_GUI.java使用或覆盖了已过时的 API。
+注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+",Class output stays in a temp directory; original project is not modified.
+run_original_project_RUN_Main_headless,BLOCKED,java -Djava.awt.headless=true -cp <temp+jars> RUN.Main,1,,"Exception in thread ""main"" java.awt.HeadlessException
+	at java.desktop/java.awt.GraphicsEnvironment.checkHeadless(GraphicsEnvironment.java:166)
+	at java.desktop/java.awt.Window.<init>(Window.java:553)
+	at java.desktop/java.awt.Frame.<init>(Frame.java:428)
+	at java.desktop/javax.swing.JFrame.<init>(JFrame.java:224)
+	at ICS_GUI.ICS_GUI.showmap(ICS_GUI.java:98)
+	at RUN.Main.run(Main.java:53)
+	at RUN.Main.main(Main.java:135)
+",Swing GUI entrypoint is expected to block paper-grade Java runtime in headless mode.
+run_temp_headless_astar_probe,PASS,java -cp <temp+jars> G4IRSF5HeadlessAstarProbe map2.txt,0,"path_size=9
+first=3 last=47
+",,This proves static Java A* can run headlessly; it is not the full Java/CIE scheduler baseline.
+compile_original_project_with_external_stub_gui,PASS,javac -encoding UTF-8 -cp <jars> -sourcepath <stubsrc;src> -d <temp> @sources,0,,,Original sources are not modified; original ICS_GUI.java is excluded and replaced by a temp stub class.
+run_external_stub_gui_RUN_Main,BLOCKED_TIMEOUT,java -Djava.awt.headless=true -cp <temp+jars> RUN.Main,timeout,"G4IRSF6_STUB_GUI_SHOWN
+",,Stub removes the JFrame blocker but does not complete a trustworthy full Java/CIE paper runtime within timeout.
+g4irsf7_first_n_epoch_release_evidence,EVIDENCE_ONLY,static Java source inspection,,,,Tasks.generate_tasks proves per-source one-head-per-epoch release; full RUN.Main still blocked by GUI/time horizon.
