@@ -1,0 +1,87 @@
+{
+  "allowed_label_sources": [
+    "v2_safe_successful_decision",
+    "paper_or_original_project_offline_reference_where_available",
+    "static_shortest_path_diagnostic_reference",
+    "local_fallback_counterfactual",
+    "high_flow_success_failure_outcome"
+  ],
+  "allowed_model_families": [
+    "supervised_candidate_ranking",
+    "pairwise_ranking",
+    "listwise_ranking",
+    "tiny_mlp",
+    "calibrated_small_mlp",
+    "feature_pruned_scorer",
+    "latency_aware_scorer",
+    "risk_calibration_head"
+  ],
+  "allowed_runtime_feature_names": [
+    "candidate_shortest_time_to_goal_scaled",
+    "candidate_travel_time_scaled",
+    "candidate_service_time_scaled",
+    "candidate_node_type_scaled",
+    "candidate_faulted",
+    "candidate_is_goal",
+    "time_slack_scaled",
+    "current_node_scaled",
+    "goal_node_scaled",
+    "out_degree_scaled",
+    "is_branch_node",
+    "local_node_pressure_scaled",
+    "candidate_node_pressure_scaled",
+    "candidate_downstream_node_pressure_2hop_scaled",
+    "candidate_downstream_node_pressure_3hop_scaled",
+    "candidate_static_remaining_hops_to_goal_scaled",
+    "candidate_static_second_best_gap_scaled",
+    "candidate_bottleneck_score_scaled",
+    "candidate_goal_direction_score_scaled",
+    "candidate_historical_risk_from_training_only_scaled",
+    "source_retry_pressure_scaled",
+    "unfinished_task_queue_size_near_current_source_scaled"
+  ],
+  "candidate_record_fields": [
+    "case_id",
+    "task_id",
+    "segment_id",
+    "current_node",
+    "goal_node",
+    "candidate_next_node",
+    "allowed_runtime_features",
+    "label",
+    "label_type",
+    "weight",
+    "split"
+  ],
+  "forbidden_model_inputs": [
+    "teacher_next",
+    "teacher_next_node",
+    "teacher_path",
+    "full_cie_route_suffix",
+    "route_path",
+    "future_sipp_schedule",
+    "future_schedule",
+    "route_finish_time",
+    "label_source",
+    "post_hoc_success",
+    "post_hoc_success_flag"
+  ],
+  "hard_case_manifest": "C:\\PROGRAMING\\czr005\\artifacts\\datasets\\g4irsf10_hard_case_manifest.json",
+  "metadata_only_fields": [
+    "scenario",
+    "label_source",
+    "post_hoc_success",
+    "teacher_path",
+    "future_schedule"
+  ],
+  "no_leakage_pass": true,
+  "policy_source": "model_plus_pibt_lite_java_source_queue_v2_safe",
+  "schema_id": "g4irsf10_v3_training_schema",
+  "temporarily_forbidden_model_families": [
+    "PPO",
+    "MAPPO",
+    "GNN",
+    "Transformer",
+    "full_RL_runtime"
+  ]
+}
