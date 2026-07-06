@@ -79,6 +79,20 @@ All release semantics variants must preserve:
 If denominator equivalence is unresolved, the result must be labeled:
 `engineering_candidate_pending_denominator_audit`.
 
+## No-A* Candidate Tiering Rule
+
+When a no-A* candidate includes multiple semantic changes, Codex must separate proven and unproven parts.
+
+A candidate whose release semantics and THT denominator are supported by original Java/project evidence, but whose reservation semantics are still engineering-only, must be split into:
+
+- a conservative candidate that uses only proven semantics;
+- an enhanced candidate that includes the engineering-only improvement.
+
+The conservative candidate may be used for stronger paper-protocol discussion.
+The enhanced candidate must remain an engineering candidate until the missing semantic proof is supplied.
+
+Do not merge these layers into one claim.
+
 ## Legacy Rule
 
 Do not modify legacy Java or original ICS source code for CZR005 experiments unless a separate explicit integration stage is opened.
