@@ -1,0 +1,40 @@
+{
+  "blockers": [
+    "decision manifest: file does not exist: C:\\PROGRAMING\\czr005\\artifacts\\datasets\\g4irsf11_decision_trace_manifest.json",
+    "gate manifest: file does not exist: C:\\PROGRAMING\\czr005\\artifacts\\gates\\g4irsf11_pretraining_gate_manifest.json"
+  ],
+  "claim_boundary": "No v3 model was trained. A-H and decision-data gates are fail-closed; a blocker is never replaced by smoke evidence or an assumed PASS.",
+  "decision_manifest": {
+    "path": "artifacts/datasets/g4irsf11_decision_trace_manifest.json",
+    "sha256": ""
+  },
+  "gate_manifest": {
+    "path": "artifacts/gates/g4irsf11_pretraining_gate_manifest.json",
+    "sha256": ""
+  },
+  "gate_statuses": {
+    "A": "MISSING",
+    "B": "MISSING",
+    "C": "MISSING",
+    "D": "MISSING",
+    "E": "MISSING",
+    "F": "MISSING",
+    "G": "MISSING",
+    "H": "MISSING"
+  },
+  "models_written": [],
+  "reproduce_command": "\"C:\\\\Users\\\\38908\\\\.conda\\\\envs\\\\czr005\\\\python.exe\" \"scripts/train/train_g4irsf11_v3_rankers.py\" \"--gate-manifest\" \"artifacts/gates/g4irsf11_pretraining_gate_manifest.json\" \"--decision-manifest\" \"artifacts/datasets/g4irsf11_decision_trace_manifest.json\" \"--output-dir\" \"artifacts/models/g4irsf11_v3\" \"--status-output\" \"outputs/reports/g4irsf11_v3_training_status.json\" \"--split-audit-output\" \"outputs/tables/g4irsf11_v3_grouped_split_audit.csv\" \"--epochs\" \"80\" \"--learning-rate\" \"0.03\" \"--seed\" \"11\"",
+  "required_gates": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+  ],
+  "schema": "czr005.g4irsf11.v3_training_status.v1",
+  "status": "PARTIAL_WITH_EXPLICIT_BLOCKER",
+  "trained": false
+}
