@@ -13,6 +13,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -106,6 +107,9 @@ struct EventDrivenJunctionConfig {
   bool enable_backpressure = true;
   bool enable_pibt_lite = true;
   bool enable_deadlock_escape = true;
+  // Controls proactive use of locally advertised fault state.  The physical
+  // edge-entry interlock is independent and cannot be disabled.
+  bool enable_fault_policy = true;
 };
 
 struct EventCandidateRecord {
@@ -121,6 +125,7 @@ struct EventCandidateRecord {
   int recent_visit_count = 0;
   int two_hop_queue_pressure = 0;
   double model_score = 0.0;
+  double pre_fault_policy_score = 0.0;
   bool shield_allowed = false;
   std::string shield_reason;
 };
@@ -210,6 +215,15 @@ struct EventRuntimeSummary {
   // A true safety violation is a new EDGE_ENTER while the directed edge's
   // physical fault state is active.  The physical shield should keep this 0.
   int physical_fault_edge_entry_violation_count = 0;
+  int fault_affected_bag_count = 0;
+  int fault_target_edge_candidate_exposure_count = 0;
+  int fault_target_edge_attempt_count = 0;
+  int physical_fault_interlock_rejection_count = 0;
+  int physical_fault_interlock_hold_count = 0;
+  int physical_fault_interlock_reroute_count = 0;
+  int local_fault_policy_action_count = 0;
+  int local_fault_policy_hold_count = 0;
+  int local_fault_policy_reroute_count = 0;
   int reservation_conflicts = 0;
   int shield_rejection_count = 0;
   int stale_fault_shield_rejection_count = 0;
@@ -253,6 +267,7 @@ struct EventRuntimeSummary {
   bool event_limit_reached = false;
   bool time_limit_reached = false;
   bool sensor_loss_mode_used = false;
+  bool fault_policy_enabled = true;
   bool decision_trace_truncated = false;
   bool event_trace_truncated = false;
 };
@@ -277,6 +292,13 @@ struct EventRuntimeFaultAuditRow {
   int physical_generation = 0;
   int inflight_traversal_count = 0;
   bool notification_dropped = false;
+  int task_id = -1;
+  int runtime_bag_id = -1;
+  std::string segment_id;
+  int current_node = -1;
+  int intended_next_node = -1;
+  int selected_next_node = -1;
+  bool fault_policy_enabled = true;
 };
 
 struct EventDrivenJunctionResult {
@@ -496,6 +518,7 @@ class EventDrivenJunctionRuntime {
     result_.summary.trace_limit = config_.trace_limit;
     result_.summary.trace_shard_count = config_.trace_shard_count;
     result_.summary.trace_shard_index = config_.trace_shard_index;
+    result_.summary.fault_policy_enabled = config_.enable_fault_policy;
 
     double latest_release = 0.0;
     int next_runtime_bag_id = 0;
@@ -634,6 +657,7 @@ class EventDrivenJunctionRuntime {
     corridors_.clear();
     physical_faults_.clear();
     advertised_faults_.clear();
+    fault_affected_bags_.clear();
     events_ = {};
     next_event_seq_ = 1;
     next_decision_id_ = 1;
@@ -940,6 +964,21 @@ class EventDrivenJunctionRuntime {
       }
       trace.max_fault_message_age_seconds =
           std::max(trace.max_fault_message_age_seconds, record.fault_message_age_seconds);
+      const long long physical_key = event_runtime_detail::directed_key(node, candidate);
+      const auto physical = physical_faults_.find(physical_key);
+      if (physical != physical_faults_.end() && physical->second.active_count > 0) {
+        ++result_.summary.fault_target_edge_candidate_exposure_count;
+        fault_affected_bags_.insert(bag.request.runtime_bag_id);
+        result_.summary.fault_affected_bag_count =
+            static_cast<int>(fault_affected_bags_.size());
+        append_fault_decision_audit(arrive_event_seq,
+                                    "target_edge_candidate_exposure",
+                                    time,
+                                    bag,
+                                    node,
+                                    candidate,
+                                    -1);
+      }
     }
 
     std::vector<std::size_t> ranking(trace.candidates.size());
@@ -955,6 +994,43 @@ class EventDrivenJunctionRuntime {
       return left_record.next_node < right_record.next_node;
     });
 
+    std::vector<std::size_t> pre_policy_ranking(ranking.size());
+    for (std::size_t index = 0; index < pre_policy_ranking.size(); ++index) {
+      pre_policy_ranking[index] = index;
+    }
+    std::sort(pre_policy_ranking.begin(),
+              pre_policy_ranking.end(),
+              [&](std::size_t left, std::size_t right) {
+                const auto& left_record = trace.candidates[left];
+                const auto& right_record = trace.candidates[right];
+                if (left_record.pre_fault_policy_score !=
+                    right_record.pre_fault_policy_score) {
+                  return left_record.pre_fault_policy_score <
+                         right_record.pre_fault_policy_score;
+                }
+                return left_record.next_node < right_record.next_node;
+              });
+    int pre_policy_prediction = -1;
+    std::size_t pre_policy_prediction_index = 0;
+    if (!pre_policy_ranking.empty()) {
+      pre_policy_prediction_index = pre_policy_ranking.front();
+      pre_policy_prediction =
+          trace.candidates[pre_policy_prediction_index].next_node;
+      const long long intended_key =
+          event_runtime_detail::directed_key(node, pre_policy_prediction);
+      const auto physical = physical_faults_.find(intended_key);
+      if (physical != physical_faults_.end() && physical->second.active_count > 0) {
+        ++result_.summary.fault_target_edge_attempt_count;
+        append_fault_decision_audit(arrive_event_seq,
+                                    "target_edge_attempt",
+                                    time,
+                                    bag,
+                                    node,
+                                    pre_policy_prediction,
+                                    -1);
+      }
+    }
+
     if (!ranking.empty()) {
       trace.model_prediction = trace.candidates[ranking.front()].next_node;
       if (ranking.size() > 1) {
@@ -967,9 +1043,14 @@ class EventDrivenJunctionRuntime {
 
     int selected = -1;
     std::string selected_reason = "no_outgoing_candidate";
+    bool physical_interlock_rejected = false;
+    int physical_interlock_intended_next = -1;
+    bool local_fault_policy_acted = false;
     if (!ranking.empty()) {
       const auto& predicted = trace.candidates[ranking.front()];
-      if (predicted.shield_allowed && !predicted.advertised_fault) {
+      const bool advertised_policy_block =
+          config_.enable_fault_policy && predicted.advertised_fault;
+      if (predicted.shield_allowed && !advertised_policy_block) {
         selected = predicted.next_node;
         selected_reason = "predicted_candidate_allowed";
       } else {
@@ -980,15 +1061,35 @@ class EventDrivenJunctionRuntime {
             ++result_.summary.stale_fault_shield_rejection_count;
           }
         }
-        selected_reason = predicted.advertised_fault ? "advertised_fault_hold"
-                                                     : predicted.shield_reason;
-        if (config_.enable_pibt_lite) {
+        if (predicted.shield_reason == "physical_fault") {
+          physical_interlock_rejected = true;
+          physical_interlock_intended_next = predicted.next_node;
+          ++result_.summary.physical_fault_interlock_rejection_count;
+          append_fault_decision_audit(arrive_event_seq,
+                                      "physical_fault_interlock_rejection",
+                                      time,
+                                      bag,
+                                      node,
+                                      predicted.next_node,
+                                      -1);
+          selected_reason = "physical_fault_interlock_hold";
+        } else {
+          selected_reason = advertised_policy_block ? "advertised_fault_hold"
+                                                    : predicted.shield_reason;
+        }
+        const bool may_reroute_fault =
+            !physical_interlock_rejected || config_.enable_fault_policy;
+        if (config_.enable_pibt_lite && may_reroute_fault) {
           for (std::size_t rank = 1; rank < ranking.size(); ++rank) {
             const auto& alternative = trace.candidates[ranking[rank]];
-            if (alternative.shield_allowed && !alternative.advertised_fault) {
+            const bool alternative_advertised_block =
+                config_.enable_fault_policy && alternative.advertised_fault;
+            if (alternative.shield_allowed && !alternative_advertised_block) {
               selected = alternative.next_node;
               trace.fallback_selected_next = selected;
-              selected_reason = "pibt_lite_safe_handoff";
+              selected_reason = physical_interlock_rejected
+                                    ? "physical_fault_interlock_pibt_handoff"
+                                    : "pibt_lite_safe_handoff";
               ++result_.summary.pibt_lite_handoff_count;
               break;
             }
@@ -997,13 +1098,69 @@ class EventDrivenJunctionRuntime {
       }
     }
 
+    if (physical_interlock_rejected) {
+      if (selected >= 0) {
+        ++result_.summary.physical_fault_interlock_reroute_count;
+        append_fault_decision_audit(arrive_event_seq,
+                                    "physical_fault_interlock_reroute",
+                                    time,
+                                    bag,
+                                    node,
+                                    physical_interlock_intended_next,
+                                    selected);
+      } else {
+        ++result_.summary.physical_fault_interlock_hold_count;
+        append_fault_decision_audit(arrive_event_seq,
+                                    "physical_fault_interlock_hold",
+                                    time,
+                                    bag,
+                                    node,
+                                    physical_interlock_intended_next,
+                                    -1);
+      }
+    }
+
+    if (config_.enable_fault_policy && pre_policy_prediction >= 0) {
+      const auto& pre_policy_candidate =
+          trace.candidates[pre_policy_prediction_index];
+      if (pre_policy_candidate.advertised_fault && selected != pre_policy_prediction) {
+        local_fault_policy_acted = true;
+        ++result_.summary.local_fault_policy_action_count;
+        if (selected >= 0) {
+          ++result_.summary.local_fault_policy_reroute_count;
+          append_fault_decision_audit(arrive_event_seq,
+                                      "local_fault_policy_reroute",
+                                      time,
+                                      bag,
+                                      node,
+                                      pre_policy_prediction,
+                                      selected);
+        } else {
+          ++result_.summary.local_fault_policy_hold_count;
+          append_fault_decision_audit(arrive_event_seq,
+                                      "local_fault_policy_hold",
+                                      time,
+                                      bag,
+                                      node,
+                                      pre_policy_prediction,
+                                      -1);
+        }
+      }
+    }
+
     ++bag.decision_count;
     ++result_.summary.decision_count;
     trace.selected_next = selected;
     if (selected >= 0) {
-      trace.decision_source = escape_active ? "deadlock_escape" :
-                              (selected == trace.model_prediction ? "local_static_potential"
-                                                                  : "local_pibt_lite_shield");
+      trace.decision_source = local_fault_policy_acted
+                                  ? "local_fault_policy"
+                              : physical_interlock_rejected
+                                  ? "physical_fault_interlock"
+                              : escape_active
+                                  ? "deadlock_escape"
+                              : (selected == trace.model_prediction
+                                     ? "local_static_potential"
+                                     : "local_pibt_lite_shield");
       trace.rule_reason = selected_reason;
       dispatch_selected_edge(bag, node, selected, time);
       controller.queue.erase(controller.queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
@@ -1026,7 +1183,11 @@ class EventDrivenJunctionRuntime {
       }
     } else {
       ++bag.retry_count;
-      trace.decision_source = escape_active ? "deadlock_escape_hold" : "local_hold";
+      trace.decision_source = local_fault_policy_acted
+                                  ? "local_fault_policy_hold"
+                              : physical_interlock_rejected
+                                  ? "physical_fault_interlock_hold"
+                              : escape_active ? "deadlock_escape_hold" : "local_hold";
       trace.rule_reason = selected_reason;
       if (bag.retry_count >= config_.deadlock_retry_threshold && bag.deadlock_started_at < 0.0) {
         bag.deadlock_started_at = time;
@@ -1081,7 +1242,7 @@ class EventDrivenJunctionRuntime {
 
     const long long edge_key = event_runtime_detail::directed_key(current, candidate);
     const auto advertised = advertised_faults_.find(edge_key);
-    if (advertised != advertised_faults_.end()) {
+    if (config_.enable_fault_policy && advertised != advertised_faults_.end()) {
       record.advertised_fault = advertised->second.faulted;
       record.fault_message_age_seconds = std::max(0.0, time - advertised->second.received_at);
     }
@@ -1101,20 +1262,22 @@ class EventDrivenJunctionRuntime {
         std::max(0.0, record.target_next_available - (time + record.travel_time));
     const double pressure = static_cast<double>(record.target_queue_length +
                                                 record.target_scheduled_incoming);
-    record.model_score = record.static_potential + record.travel_time +
-                         config_.calendar_wait_weight * (corridor_wait + target_wait) +
-                         (config_.enable_backpressure ? config_.pressure_weight * pressure : 0.0) +
-                         config_.history_penalty * static_cast<double>(record.recent_visit_count);
+    record.pre_fault_policy_score =
+        record.static_potential + record.travel_time +
+        config_.calendar_wait_weight * (corridor_wait + target_wait) +
+        (config_.enable_backpressure ? config_.pressure_weight * pressure : 0.0) +
+        config_.history_penalty * static_cast<double>(record.recent_visit_count);
     if (bag.history.size() >= 2 && candidate == bag.history[bag.history.size() - 2]) {
-      record.model_score += config_.backtrack_penalty;
-    }
-    if (record.advertised_fault) {
-      record.model_score += 1.0e12;
+      record.pre_fault_policy_score += config_.backtrack_penalty;
     }
     if (escape_active) {
       // The escape token changes only local priority.  It never bypasses the
       // physical shield or reserves more than one edge.
-      record.model_score -= 0.5 * config_.history_penalty;
+      record.pre_fault_policy_score -= 0.5 * config_.history_penalty;
+    }
+    record.model_score = record.pre_fault_policy_score;
+    if (config_.enable_fault_policy && record.advertised_fault) {
+      record.model_score += 1.0e12;
     }
 
     record.shield_reason = shield_reason(bag, current, candidate, time);
@@ -1313,13 +1476,15 @@ class EventDrivenJunctionRuntime {
   void process_fault_message(const RuntimeEvent& event) {
     const long long key = event_runtime_detail::directed_key(event.from_node, event.to_node);
     if (event.notification) {
-      auto& advertised = advertised_faults_[key];
-      if (event.message_generation >= advertised.generation) {
-        advertised.generation = event.message_generation;
-        advertised.faulted = event.type == JunctionEventType::kFault;
-        advertised.received_at = event.time;
+      if (config_.enable_fault_policy) {
+        auto& advertised = advertised_faults_[key];
+        if (event.message_generation >= advertised.generation) {
+          advertised.generation = event.message_generation;
+          advertised.faulted = event.type == JunctionEventType::kFault;
+          advertised.received_at = event.time;
+        }
+        schedule_junction_wakeup(event.from_node, event.time);
       }
-      schedule_junction_wakeup(event.from_node, event.time);
       append_event_trace(event,
                          -1,
                          event.from_node,
@@ -1371,10 +1536,12 @@ class EventDrivenJunctionRuntime {
                          0,
                          true);
     } else if (event.message_delay <= event_runtime_detail::kEpsilon) {
-      auto& advertised = advertised_faults_[key];
-      advertised.generation = physical.physical_generation;
-      advertised.faulted = physical.active_count > 0;
-      advertised.received_at = event.time;
+      if (config_.enable_fault_policy) {
+        auto& advertised = advertised_faults_[key];
+        advertised.generation = physical.physical_generation;
+        advertised.faulted = physical.active_count > 0;
+        advertised.received_at = event.time;
+      }
       append_fault_audit(event,
                          "local_message_delivery",
                          physical.active_count,
@@ -1406,17 +1573,57 @@ class EventDrivenJunctionRuntime {
                           int physical_generation,
                           int inflight_traversal_count,
                           bool notification_dropped) {
-    result_.fault_events.push_back(EventRuntimeFaultAuditRow{
-        event.seq,
-        junction_event_name(event.type),
-        phase,
-        event.time,
-        event.from_node,
-        event.to_node,
-        physical_active_count,
-        physical_generation,
-        inflight_traversal_count,
-        notification_dropped});
+    EventRuntimeFaultAuditRow row;
+    row.seq = event.seq;
+    row.event = junction_event_name(event.type);
+    row.phase = phase;
+    row.time = event.time;
+    row.from_node = event.from_node;
+    row.to_node = event.to_node;
+    row.physical_active_count = physical_active_count;
+    row.physical_generation = physical_generation;
+    row.inflight_traversal_count = inflight_traversal_count;
+    row.notification_dropped = notification_dropped;
+    row.current_node = event.node;
+    row.intended_next_node = event.to_node;
+    row.fault_policy_enabled = config_.enable_fault_policy;
+    const auto bag = bags_.find(event.task_id);
+    if (bag != bags_.end()) {
+      row.task_id = bag->second.request.task_id;
+      row.runtime_bag_id = bag->second.request.runtime_bag_id;
+      row.segment_id = bag->second.request.segment_id;
+    }
+    result_.fault_events.push_back(std::move(row));
+  }
+
+  void append_fault_decision_audit(std::uint64_t arrive_event_seq,
+                                   const std::string& phase,
+                                   double time,
+                                   const BagState& bag,
+                                   int current,
+                                   int intended_next,
+                                   int selected_next) {
+    const long long key = event_runtime_detail::directed_key(current, intended_next);
+    const auto physical = physical_faults_.find(key);
+    EventRuntimeFaultAuditRow row;
+    row.seq = arrive_event_seq;
+    row.event = "ARRIVE_JUNCTION";
+    row.phase = phase;
+    row.time = time;
+    row.from_node = current;
+    row.to_node = intended_next;
+    row.physical_active_count =
+        physical == physical_faults_.end() ? 0 : physical->second.active_count;
+    row.physical_generation =
+        physical == physical_faults_.end() ? 0 : physical->second.physical_generation;
+    row.task_id = bag.request.task_id;
+    row.runtime_bag_id = bag.request.runtime_bag_id;
+    row.segment_id = bag.request.segment_id;
+    row.current_node = current;
+    row.intended_next_node = intended_next;
+    row.selected_next_node = selected_next;
+    row.fault_policy_enabled = config_.enable_fault_policy;
+    result_.fault_events.push_back(std::move(row));
   }
 
   void schedule_source_wakeup(int node, double time) {
@@ -1683,6 +1890,7 @@ class EventDrivenJunctionRuntime {
     accounted += corridors_.size() * sizeof(LocalCalendar);
     accounted += physical_faults_.size() * sizeof(event_runtime_detail::FaultState);
     accounted += advertised_faults_.size() * sizeof(event_runtime_detail::AdvertisedFaultState);
+    accounted += fault_affected_bags_.size() * sizeof(int);
     accounted += result_.bags.capacity() * sizeof(EventRuntimeBagResult);
     accounted += result_.events.capacity() * sizeof(EventRuntimeTraceRow);
     accounted += result_.decisions.capacity() * sizeof(EventDecisionTraceRow);
@@ -1792,6 +2000,7 @@ class EventDrivenJunctionRuntime {
   std::unordered_map<long long, LocalCalendar> corridors_;
   std::unordered_map<long long, event_runtime_detail::FaultState> physical_faults_;
   std::unordered_map<long long, event_runtime_detail::AdvertisedFaultState> advertised_faults_;
+  std::unordered_set<int> fault_affected_bags_;
   std::priority_queue<RuntimeEvent,
                       std::vector<RuntimeEvent>,
                       event_runtime_detail::RuntimeEventLater>

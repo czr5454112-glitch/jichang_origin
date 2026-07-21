@@ -569,6 +569,7 @@ def g4irsf11_event_runtime_from_records(
     enable_backpressure: bool = True,
     enable_pibt_lite: bool = True,
     enable_deadlock_escape: bool = True,
+    enable_fault_policy: bool = True,
     scenario: str = "manual",
     scale: float = 1.0,
     search_path: PathLike | None = None,
@@ -643,6 +644,7 @@ def g4irsf11_event_runtime_from_records(
             bool(enable_backpressure),
             bool(enable_pibt_lite),
             bool(enable_deadlock_escape),
+            bool(enable_fault_policy),
             str(scenario),
             float(scale),
         )

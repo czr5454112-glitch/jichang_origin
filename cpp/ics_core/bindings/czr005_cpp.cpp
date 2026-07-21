@@ -3072,6 +3072,20 @@ py::dict g4irsf11_event_runtime_summary_row(
       summary.physical_fault_window_traversal_count;
   row["physical_fault_edge_entry_violation_count"] =
       summary.physical_fault_edge_entry_violation_count;
+  row["fault_policy_enabled"] = summary.fault_policy_enabled;
+  row["fault_affected_bag_count"] = summary.fault_affected_bag_count;
+  row["fault_target_edge_candidate_exposure_count"] =
+      summary.fault_target_edge_candidate_exposure_count;
+  row["fault_target_edge_attempt_count"] = summary.fault_target_edge_attempt_count;
+  row["physical_fault_interlock_rejection_count"] =
+      summary.physical_fault_interlock_rejection_count;
+  row["physical_fault_interlock_hold_count"] =
+      summary.physical_fault_interlock_hold_count;
+  row["physical_fault_interlock_reroute_count"] =
+      summary.physical_fault_interlock_reroute_count;
+  row["local_fault_policy_action_count"] = summary.local_fault_policy_action_count;
+  row["local_fault_policy_hold_count"] = summary.local_fault_policy_hold_count;
+  row["local_fault_policy_reroute_count"] = summary.local_fault_policy_reroute_count;
   row["sensor_loss_mode_used"] = summary.sensor_loss_mode_used;
   row["sensor_loss_supported"] = true;
   row["reservation_conflicts"] = summary.reservation_conflicts;
@@ -3126,7 +3140,8 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["event_limit_reached"] = summary.event_limit_reached;
   row["time_limit_reached"] = summary.time_limit_reached;
   row["safe_execution_pass"] = summary.reservation_conflicts == 0 &&
-                                 summary.runtime_full_astar_calls == 0;
+                                 summary.runtime_full_astar_calls == 0 &&
+                                 summary.physical_fault_edge_entry_violation_count == 0;
   return row;
 }
 
@@ -3314,6 +3329,13 @@ py::list g4irsf11_event_runtime_fault_rows(
     row["physical_generation"] = event.physical_generation;
     row["inflight_traversal_count"] = event.inflight_traversal_count;
     row["notification_dropped"] = event.notification_dropped;
+    row["task_id"] = event.task_id;
+    row["runtime_bag_id"] = event.runtime_bag_id;
+    row["segment_id"] = event.segment_id;
+    row["current_node"] = event.current_node;
+    row["intended_next_node"] = event.intended_next_node;
+    row["selected_next_node"] = event.selected_next_node;
+    row["fault_policy_enabled"] = event.fault_policy_enabled;
     rows.append(std::move(row));
   }
   return rows;
@@ -3343,6 +3365,7 @@ py::dict g4irsf11_event_runtime_from_records(
     bool enable_backpressure,
     bool enable_pibt_lite,
     bool enable_deadlock_escape,
+    bool enable_fault_policy,
     const std::string& scenario,
     double scale) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
@@ -3395,6 +3418,7 @@ py::dict g4irsf11_event_runtime_from_records(
   config.enable_backpressure = enable_backpressure;
   config.enable_pibt_lite = enable_pibt_lite;
   config.enable_deadlock_escape = enable_deadlock_escape;
+  config.enable_fault_policy = enable_fault_policy;
 
   czr005::ics::EventDrivenJunctionRuntime runtime(graph, config);
   const auto result = runtime.run(requests, faults);
@@ -3417,7 +3441,16 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["runtime_bag_identity"] = "input_record_ordinal";
   trace_context["original_task_id_rewritten"] = false;
   trace_context["sensor_loss_supported"] = true;
-  trace_context["fault_audit_trace_cap"] = "uncapped_control_events_only";
+  trace_context["enable_fault_policy"] = enable_fault_policy;
+  trace_context["physical_fault_interlock_always_enabled"] = true;
+  trace_context["fault_policy_off_semantics"] =
+      "ignore_advertised_fault_and_disable_fault_driven_reroute_while_interlock_holds";
+  trace_context["fault_affected_cohort_semantics"] =
+      "unique_runtime_bags_with_physical_target_edge_candidate_exposure";
+  trace_context["fault_target_edge_attempt_semantics"] =
+      "pre_advertised-policy_argmin_targets_physically_faulted_edge";
+  trace_context["fault_audit_trace_cap"] =
+      "uncapped_fault_control_and_exposure_events";
   trace_context["fault_audit_global_scan_used_for_action_selection"] = false;
   trace_context["inflight_at_fault_semantics"] =
       "grandfathered_audit_not_unsafe_entry";
@@ -3631,6 +3664,7 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("enable_backpressure") = true,
              py::arg("enable_pibt_lite") = true,
              py::arg("enable_deadlock_escape") = true,
+             py::arg("enable_fault_policy") = true,
              py::arg("scenario") = std::string("manual"),
              py::arg("scale") = 1.0);
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));

@@ -296,6 +296,62 @@ void test_delayed_fault_policy_handoff(Checks& checks) {
                  "delayed fault must change only the shielded one-step action");
 }
 
+void test_fault_policy_toggle_keeps_physical_interlock_independent(Checks& checks) {
+  Graph graph;
+  graph.add_node(Node{0, 1, 0.001, 0, 0, {}});
+  graph.add_node(Node{1, 2, 0.001, 2, 0, {}});
+  graph.add_node(Node{2, 4, 0.001, 1, 1, {}});
+  graph.add_edge(Edge{0, 1, 1.0, 1.0});
+  graph.add_edge(Edge{0, 2, 1.0, 1.0});
+  graph.add_edge(Edge{2, 1, 1.0, 1.0});
+  graph.set_heuristic({{0.0, 0.0, 0.0}, {1.0, 0.0, 1.0}, {1.0, 1.0, 0.0}});
+
+  auto policy_on_config = test_config();
+  policy_on_config.enable_fault_policy = true;
+  EventDrivenJunctionRuntime policy_on_runtime(graph, policy_on_config);
+  const auto policy_on = policy_on_runtime.run(
+      {{"fault-policy-on", 451, 0.0, 20.0, 0, 1, "source"}},
+      {{0, 1, 0.0, 1.0, 0.0}});
+  check_core_invariants(checks, policy_on, 1);
+  checks.require(policy_on.summary.fault_policy_enabled,
+                 "policy-on run must report its independent configuration");
+  checks.require(policy_on.summary.fault_affected_bag_count == 1 &&
+                     policy_on.summary.fault_target_edge_candidate_exposure_count > 0 &&
+                     policy_on.summary.fault_target_edge_attempt_count > 0,
+                 "policy-on run must expose a real affected cohort and target attempt");
+  checks.require(policy_on.summary.local_fault_policy_reroute_count > 0 &&
+                     policy_on.summary.local_fault_policy_action_count > 0,
+                 "advertised policy must proactively reroute the base target action");
+  checks.require(policy_on.summary.physical_fault_edge_entry_violation_count == 0,
+                 "proactive policy must retain the physical edge-entry boundary");
+
+  auto policy_off_config = test_config();
+  policy_off_config.enable_fault_policy = false;
+  EventDrivenJunctionRuntime policy_off_runtime(graph, policy_off_config);
+  const auto policy_off = policy_off_runtime.run(
+      {{"fault-policy-off", 452, 0.0, 20.0, 0, 1, "source"}},
+      {{0, 1, 0.0, 1.0, 0.0}});
+  check_core_invariants(checks, policy_off, 1);
+  checks.require(!policy_off.summary.fault_policy_enabled,
+                 "policy-off run must report its independent configuration");
+  checks.require(policy_off.summary.local_fault_policy_action_count == 0 &&
+                     policy_off.summary.local_fault_policy_hold_count == 0 &&
+                     policy_off.summary.local_fault_policy_reroute_count == 0,
+                 "policy-off must suppress every advertised-fault action");
+  checks.require(policy_off.summary.physical_fault_interlock_rejection_count > 0 &&
+                     policy_off.summary.physical_fault_interlock_hold_count > 0 &&
+                     policy_off.summary.physical_fault_interlock_reroute_count == 0,
+                 "policy-off must hold at the non-disableable physical interlock");
+  checks.require(policy_off.summary.physical_fault_edge_entry_violation_count == 0,
+                 "policy-off can never disable the physical edge-entry interlock");
+  for (const auto& hold : policy_off.hold_attempts) {
+    for (const auto& candidate : hold.candidates) {
+      checks.require(!candidate.advertised_fault,
+                     "policy-off candidate state must not expose advertised faults");
+    }
+  }
+}
+
 void test_deterministic_trace_shards(Checks& checks) {
   const auto graph = line_graph(0.01);
   auto left_config = test_config();
@@ -363,6 +419,13 @@ void test_explicit_sensor_loss_keeps_physical_shield(Checks& checks) {
                  "fault and repair messages must both be explicitly dropped");
   checks.require(result.summary.stale_fault_shield_rejection_count > 0,
                  "physical shield must remain effective when the local sensor message is lost");
+  checks.require(result.summary.fault_affected_bag_count == 1 &&
+                     result.summary.fault_target_edge_candidate_exposure_count > 0 &&
+                     result.summary.fault_target_edge_attempt_count > 0,
+                 "sensor loss evidence must contain a real affected target-edge cohort");
+  checks.require(result.summary.physical_fault_interlock_rejection_count > 0 &&
+                     result.summary.local_fault_policy_action_count == 0,
+                 "sensor loss must exercise only the physical interlock boundary");
   checks.require(result.summary.physical_fault_edge_entry_violation_count == 0,
                  "no bag may enter a directed edge after its physical fault activates");
   for (const auto& event : result.events) {
@@ -382,6 +445,7 @@ int main() {
   test_non_goal_terminal_successor_trap_is_locally_shielded(checks);
   test_fault_repair_delay_and_escape(checks);
   test_delayed_fault_policy_handoff(checks);
+  test_fault_policy_toggle_keeps_physical_interlock_independent(checks);
   test_deterministic_trace_shards(checks);
   test_duplicate_original_task_segments_keep_internal_identity(checks);
   test_explicit_sensor_loss_keeps_physical_shield(checks);

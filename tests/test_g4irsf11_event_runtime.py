@@ -209,6 +209,93 @@ def test_fault_message_delay_is_shielded_and_repair_resumes_without_astar() -> N
     assert all(row["selected_next"] is None for row in payload["hold_attempts"])
 
 
+def test_fault_policy_off_disables_advertised_actions_but_not_physical_interlock() -> None:
+    from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metrics
+
+    nodes = [
+        (0, 1, 0.001, 0, 0, [1, 2]),
+        (1, 2, 0.001, 2, 0, []),
+        (2, 4, 0.001, 1, 1, [1]),
+    ]
+    edges = [(0, 1, 1.0, 1.0), (0, 2, 1.0, 1.0), (2, 1, 1.0, 1.0)]
+    heuristic = [[0.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0]]
+    common = dict(
+        nodes=nodes,
+        edges=edges,
+        heuristic=heuristic,
+        bags=[("fault-policy", 351, 0.0, 20.0, 0, 1, "source")],
+        faults=[(0, 1, 0.0, 1.0, 0.0)],
+        retry_interval=0.05,
+    )
+
+    policy_on = _run(**common, enable_fault_policy=True, scenario="fault_policy_on")
+    _assert_invariants(policy_on, 1)
+    on_summary = policy_on["summary"]
+    assert on_summary["fault_policy_enabled"] is True
+    assert on_summary["fault_affected_bag_count"] == 1
+    assert on_summary["fault_target_edge_candidate_exposure_count"] > 0
+    assert on_summary["fault_target_edge_attempt_count"] > 0
+    assert on_summary["local_fault_policy_action_count"] > 0
+    assert on_summary["local_fault_policy_reroute_count"] > 0
+    assert {
+        row["phase"] for row in policy_on["fault_events"]
+    } >= {"target_edge_candidate_exposure", "target_edge_attempt", "local_fault_policy_reroute"}
+
+    policy_off = _run(**common, enable_fault_policy=False, scenario="fault_policy_off")
+    _assert_invariants(policy_off, 1)
+    off_summary = policy_off["summary"]
+    assert off_summary["fault_policy_enabled"] is False
+    assert off_summary["fault_affected_bag_count"] == 1
+    assert off_summary["fault_target_edge_candidate_exposure_count"] > 0
+    assert off_summary["fault_target_edge_attempt_count"] > 0
+    assert off_summary["local_fault_policy_action_count"] == 0
+    assert off_summary["local_fault_policy_hold_count"] == 0
+    assert off_summary["local_fault_policy_reroute_count"] == 0
+    assert off_summary["physical_fault_interlock_rejection_count"] > 0
+    assert off_summary["physical_fault_interlock_hold_count"] > 0
+    assert off_summary["physical_fault_interlock_reroute_count"] == 0
+    assert off_summary["physical_fault_edge_entry_violation_count"] == 0
+    assert all(
+        candidate["features"]["advertised_fault"] is False
+        for row in policy_off["hold_attempts"]
+        for candidate in row["candidate_records"]
+    )
+    assert not [
+        row
+        for row in policy_off["fault_events"]
+        if row["phase"].startswith("local_fault_policy_")
+    ]
+    assert {
+        row["phase"] for row in policy_off["fault_events"]
+    } >= {
+        "target_edge_candidate_exposure",
+        "target_edge_attempt",
+        "physical_fault_interlock_rejection",
+        "physical_fault_interlock_hold",
+    }
+
+    window = FaultWindow(0, 1, 0.0, 1.0, 0.0)
+    on_gate = fault_window_metrics(
+        policy_on["bags"],
+        policy_on["fault_events"],
+        policy_on["summary"],
+        [window],
+        max_recovery_seconds=5.0,
+    )[0]
+    off_gate = fault_window_metrics(
+        policy_off["bags"],
+        policy_off["fault_events"],
+        policy_off["summary"],
+        [window],
+        max_recovery_seconds=5.0,
+    )[0]
+    assert on_gate["fault_recovery_pass"] is True
+    assert on_gate["local_fault_policy_action_count"] > 0
+    assert off_gate["fault_recovery_pass"] is True
+    assert off_gate["local_fault_policy_action_count"] == 0
+    assert off_gate["physical_interlock_rejection_count"] > 0
+
+
 def test_fault_during_traversal_does_not_retroactively_create_future_replan() -> None:
     nodes = [(0, 1, 0.001, 0, 0, [1]), (1, 2, 0.001, 1, 0, [])]
     edges = [(0, 1, 5.0, 1.0)]
@@ -340,6 +427,8 @@ def test_duplicate_original_task_id_segments_keep_unique_runtime_identity() -> N
 
 
 def test_explicit_dropped_fault_notifications_do_not_fake_message_delivery() -> None:
+    from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metrics
+
     nodes, edges, heuristic = _line_records(service_time=0.001)
     payload = _run(
         nodes=nodes,
@@ -356,10 +445,32 @@ def test_explicit_dropped_fault_notifications_do_not_fake_message_delivery() -> 
     assert not [
         event for event in payload["events"] if event["reason"] == "local_message_delivery"
     ]
-    assert {row["phase"] for row in payload["fault_events"]} == {
+    assert {row["phase"] for row in payload["fault_events"]} >= {
         "physical_state_change",
         "notification_dropped",
+        "target_edge_candidate_exposure",
+        "target_edge_attempt",
+        "physical_fault_interlock_rejection",
+        "physical_fault_interlock_hold",
     }
+    assert payload["summary"]["fault_affected_bag_count"] == 1
+    assert payload["summary"]["physical_fault_interlock_rejection_count"] > 0
+    assert payload["summary"]["local_fault_policy_action_count"] == 0
+    assert not [
+        row
+        for row in payload["fault_events"]
+        if row["phase"].startswith("local_fault_policy_")
+    ]
+    gate = fault_window_metrics(
+        payload["bags"],
+        payload["fault_events"],
+        payload["summary"],
+        [FaultWindow(0, 1, 0.0, 1.0, 0.25, True)],
+        max_recovery_seconds=5.0,
+    )[0]
+    assert gate["sensor_loss_interlock_boundary_pass"] is True
+    assert gate["physical_interlock_rejection_count"] > 0
+    assert gate["fault_recovery_pass"] is True
 
 
 def test_real_map_sink_sentinel_is_normalised_for_every_terminal_goal() -> None:
