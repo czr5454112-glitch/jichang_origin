@@ -12,15 +12,19 @@ from typing import Any, Mapping
 from scripts.eval.g4irsf11_workloads import FORMAL_WORKLOAD_MODES, FRONTIER_SCALES
 
 
-PROTOCOL_SCHEMA = "czr005.g4irsf11.event_runtime_protocol.v1"
-PROTOCOL_VERSION = "g4irsf11-formal-2026-07-21-v2"
-EXTENSION_PROTOCOL_SCHEMA = "czr005.g4irsf11.system_extension_protocol.v1"
-EXTENSION_PROTOCOL_VERSION = "g4irsf11-system-extension-2026-07-21-v1"
+PROTOCOL_SCHEMA = "czr005.g4irsf11.event_runtime_protocol.v3"
+PROTOCOL_VERSION = "g4irsf11-formal-2026-07-21-v3"
+EXTENSION_PROTOCOL_SCHEMA = "czr005.g4irsf11.system_extension_protocol.v2"
+EXTENSION_PROTOCOL_VERSION = "g4irsf11-system-extension-2026-07-21-v2"
 
 # These thresholds are declared before looking at G4IRSF11 outcomes.  They are
 # engineering SLOs, not a claim that they reproduce an unstated paper SLO.
 CAPACITY_SLO = {
-    "max_backlog_slope_fraction": 0.01,
+    # Queue stability means non-increasing long-run backlog.  A positive
+    # engineering allowance would turn a slowly diverging queue into a false
+    # capacity PASS; only machine-scale regression tolerance is applied by the
+    # metric implementation.
+    "max_backlog_slope_fraction": 0.0,
     "max_drain_seconds": 1800.0,
     "max_p95_service_seconds": 600.0,
     "max_p99_service_seconds": 900.0,
@@ -43,6 +47,7 @@ class CaseSpec:
     enable_backpressure: bool = True
     enable_pibt_lite: bool = True
     enable_deadlock_escape: bool = True
+    enable_fault_policy: bool = True
     diagnostic_hops: int = 2
     fault_profile: str = "no_fault"
     trace_complete: bool = False
@@ -61,6 +66,7 @@ class CaseSpec:
             "enable_backpressure": self.enable_backpressure,
             "enable_pibt_lite": self.enable_pibt_lite,
             "enable_deadlock_escape": self.enable_deadlock_escape,
+            "enable_fault_policy": self.enable_fault_policy,
             "diagnostic_hops": self.diagnostic_hops,
             "fault_profile": self.fault_profile,
             "trace_complete": self.trace_complete,
@@ -141,7 +147,10 @@ def formal_cases() -> tuple[CaseSpec, ...]:
         ("single_delayed_30s", "one temporal window with stale local state"),
         ("sensor_loss", "fault and repair notifications explicitly dropped"),
         ("repeated_delayed_5s", "two physical fault/repair cycles"),
-        ("fault_policy_off", "temporal fault with local escape disabled"),
+        (
+            "fault_policy_off",
+            "local advertised-fault policy disabled; non-disableable physical interlock remains active",
+        ),
     ):
         cases.append(
             CaseSpec(
@@ -150,7 +159,7 @@ def formal_cases() -> tuple[CaseSpec, ...]:
                 workload_mode="empirical_interarrival_jitter",
                 scale=2.5,
                 fault_profile=profile,
-                enable_deadlock_escape=profile != "fault_policy_off",
+                enable_fault_policy=profile != "fault_policy_off",
                 notes=notes,
                 tags=("temporal_fault",),
             )

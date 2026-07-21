@@ -10,7 +10,9 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 from pathlib import Path
+import platform
 import sys
 import time
 from typing import Any, Mapping
@@ -29,6 +31,21 @@ from scripts.eval.g4irsf11_capacity_metrics import (
     quantile,
 )
 from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metrics
+from scripts.eval.g4irsf11_continuity_metrics import rolling_continuity_metrics
+from scripts.eval.g4irsf11_experiment_protocol import CAPACITY_SLO, FAULT_SLO
+from scripts.eval.g4irsf11_result_validation import (
+    ResultExpectation,
+    WORKER_RUNTIME_DEFAULTS,
+    atomic_write_json,
+    atomic_write_jsonl,
+    fault_binding,
+    parse_json_object,
+    read_json_array,
+    runtime_config_from_namespace,
+    sha256_file,
+    validate_event_result,
+    workload_binding,
+)
 from scripts.eval.g4irsf11_workloads import (
     aggregate_raw_bags,
     binding_bag_records,
@@ -87,18 +104,11 @@ def _json_safe(value: Any) -> Any:
 
 
 def _write_json(path: Path, value: Mapping[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(_json_safe(dict(value)), ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False) + "\n",
-        encoding="utf-8",
-    )
+    atomic_write_json(path, _json_safe(dict(value)))
 
 
 def _write_jsonl(path: Path, rows: list[Mapping[str, Any]]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="\n") as handle:
-        for row in rows:
-            handle.write(json.dumps(_json_safe(dict(row)), ensure_ascii=False, sort_keys=True, allow_nan=False) + "\n")
+    atomic_write_jsonl(path, [_json_safe(dict(row)) for row in rows])
 
 
 def _outcomes(
@@ -188,6 +198,33 @@ def _outcomes(
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
     workload = load_jsonl(args.workload)
+    case_spec = parse_json_object(args.case_spec_json, label="--case-spec-json")
+    input_artifact = parse_json_object(
+        args.input_artifact_json, label="--input-artifact-json"
+    )
+    fault_artifact = parse_json_object(
+        args.fault_artifact_json, label="--fault-artifact-json"
+    )
+    actual_input_artifact = workload_binding(args.workload, workload)
+    if actual_input_artifact != input_artifact:
+        raise ValueError(
+            f"workload artifact does not match parent declaration: "
+            f"actual={actual_input_artifact}, declared={input_artifact}"
+        )
+    raw_fault_rows: list[dict[str, Any]] = []
+    if args.fault_windows is not None:
+        raw_fault_rows = read_json_array(args.fault_windows)
+    actual_fault_artifact = fault_binding(args.fault_windows, raw_fault_rows)
+    if actual_fault_artifact != fault_artifact:
+        raise ValueError(
+            f"fault artifact does not match parent declaration: "
+            f"actual={actual_fault_artifact}, declared={fault_artifact}"
+        )
+    actual_map_sha256 = sha256_file(args.map_path)
+    if actual_map_sha256 != args.map_sha256:
+        raise ValueError(
+            f"map sha256 mismatch: actual={actual_map_sha256}, declared={args.map_sha256}"
+        )
     nodes, edges, heuristic = graph_records(args.map_path)
     windows = _fault_windows(args.fault_windows)
     memory_before, peak_before = process_working_set_bytes()
@@ -226,6 +263,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         enable_backpressure=args.enable_backpressure,
         enable_pibt_lite=args.enable_pibt_lite,
         enable_deadlock_escape=args.enable_deadlock_escape,
+        enable_fault_policy=args.enable_fault_policy,
         scenario=args.scenario,
         scale=args.scale,
         search_path=args.search_path,
@@ -254,7 +292,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
     decisions = list(payload["decision_trace"])
     trace_context = dict(payload["trace_context"])
-    trace_context["run_id"] = args.scenario
+    trace_context["run_id"] = args.run_id
+    trace_context["scenario"] = args.scenario
     trace_context["fault_mode"] = args.fault_mode
     if args.trace_output is not None:
         _write_json(
@@ -297,22 +336,38 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         and int(summary.get("two_step_reservation_count", 0)) == 0
         and int(summary.get("full_future_routes_stored", 0)) == 0
     )
-    return {
+    config = runtime_config_from_namespace(args)
+    measurement_cohort = {
+        "name": args.measurement_cohort,
+        "declared_concurrent_worker_target": args.concurrent_worker_target,
+    }
+    result: dict[str, Any] = {
+        "schema": "czr005.g4irsf11.event_runtime_result.v3",
+        "run_id": args.run_id,
+        "case": case_spec,
+        "protocol_version": args.protocol_version,
+        "protocol_manifest_sha256": args.protocol_manifest_sha256,
+        "input_artifact": input_artifact,
+        "fault_artifact": fault_artifact,
+        "map_sha256": args.map_sha256,
+        "source_sha256": args.source_sha256,
+        "implementation_sha256": args.implementation_sha256,
         "scenario": args.scenario,
         "scale": args.scale,
         "workload_mode": args.workload_mode,
-        "workload_path": str(args.workload),
+        "workload_path": str(args.workload.resolve()),
         "workload_segment_count": len(workload),
         "raw_bag_count": len(raw_bags),
-        "config": {
-            "queue_discipline": args.queue_discipline,
-            "enable_source_admission": args.enable_source_admission,
-            "enable_backpressure": args.enable_backpressure,
-            "enable_pibt_lite": args.enable_pibt_lite,
-            "enable_deadlock_escape": args.enable_deadlock_escape,
-            "trace_limit": args.trace_limit,
-            "trace_shard_count": args.trace_shard_count,
-            "trace_shard_index": args.trace_shard_index,
+        "config": config,
+        "measurement_cohort": measurement_cohort,
+        "environment": {
+            "python_executable": str(Path(sys.executable).resolve()),
+            "python_version": platform.python_version(),
+            "python_implementation": platform.python_implementation(),
+            "platform": platform.platform(),
+            "machine": platform.machine(),
+            "os_name": os.name,
+            "search_path": str(args.search_path.resolve()) if args.search_path else "",
         },
         "summary": summary,
         "raw_bag_capacity_metrics": bag_metrics,
@@ -341,12 +396,57 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "bag_sample": enriched_segments[:100],
         "junction_state": list(payload["junction_state"]),
         "event_runtime_invariant_pass": invariant_pass,
-        "completion_pass": int(summary.get("completed_count", 0)) == len(workload),
+        "completion_pass": (
+            int(summary.get("completed_count", 0)) == len(workload)
+            and int(summary.get("failed_count", 0)) == 0
+            and not bool(summary.get("event_limit_reached", False))
+            and not bool(summary.get("time_limit_reached", False))
+        ),
     }
+    if args.workload_mode == "rolling_multiday_carryover" and args.scale in {2.0, 7.0}:
+        result["continuity_metrics"] = rolling_continuity_metrics(
+            workload,
+            enriched_segments,
+            expected_copies=int(args.scale),
+            runtime_instance_id=args.run_id,
+        )
+    expectation = ResultExpectation(
+        run_id=args.run_id,
+        case=case_spec,
+        protocol_version=args.protocol_version,
+        protocol_manifest_sha256=args.protocol_manifest_sha256,
+        input_artifact=input_artifact,
+        fault_artifact=fault_artifact,
+        fault_rows=raw_fault_rows,
+        map_sha256=args.map_sha256,
+        source_sha256=args.source_sha256,
+        implementation_sha256=args.implementation_sha256,
+        config=config,
+        measurement_cohort=measurement_cohort,
+    )
+    validation_errors = validate_event_result(
+        result,
+        expectation,
+        workload_rows=workload,
+    )
+    if validation_errors:
+        raise ValueError("strict v3 result validation failed: " + "; ".join(validation_errors))
+    return result
 
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
+    result.add_argument("--run-id", required=True)
+    result.add_argument("--protocol-version", required=True)
+    result.add_argument("--protocol-manifest-sha256", required=True)
+    result.add_argument("--case-spec-json", required=True)
+    result.add_argument("--input-artifact-json", required=True)
+    result.add_argument("--fault-artifact-json", required=True)
+    result.add_argument("--map-sha256", required=True)
+    result.add_argument("--source-sha256", required=True)
+    result.add_argument("--implementation-sha256", required=True)
+    result.add_argument("--measurement-cohort", required=True)
+    result.add_argument("--concurrent-worker-target", type=int, required=True)
     result.add_argument("--workload", type=Path, required=True)
     result.add_argument("--map", dest="map_path", type=Path, required=True)
     result.add_argument("--output", type=Path, required=True)
@@ -355,40 +455,45 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--scale", type=float, required=True)
     result.add_argument("--workload-mode", required=True)
     result.add_argument("--fault-mode", default="no_fault")
-    result.add_argument("--fault-windows", type=Path)
+    result.add_argument("--fault-windows", type=Path, required=True)
     result.add_argument("--trace-output", type=Path)
     result.add_argument("--outcome-output", type=Path)
     result.add_argument("--trace-task-output", type=Path)
     result.add_argument("--queue-discipline", choices=("fifo", "deadline", "aging"), default="aging")
-    result.add_argument("--retry-interval", type=float, default=0.25)
-    result.add_argument("--minimum-service-seconds", type=float, default=0.001)
-    result.add_argument("--dispatch-headway-seconds", type=float, default=0.001)
-    result.add_argument("--history-limit", type=int, default=8)
-    result.add_argument("--max-decisions-per-bag", type=int, default=512)
+    result.add_argument("--retry-interval", type=float, default=WORKER_RUNTIME_DEFAULTS["retry_interval"])
+    result.add_argument("--minimum-service-seconds", type=float, default=WORKER_RUNTIME_DEFAULTS["minimum_service_seconds"])
+    result.add_argument("--dispatch-headway-seconds", type=float, default=WORKER_RUNTIME_DEFAULTS["dispatch_headway_seconds"])
+    result.add_argument("--history-limit", type=int, default=WORKER_RUNTIME_DEFAULTS["history_limit"])
+    result.add_argument("--max-decisions-per-bag", type=int, default=WORKER_RUNTIME_DEFAULTS["max_decisions_per_bag"])
     result.add_argument("--max-events", type=int, default=20_000_000)
-    result.add_argument("--max-simulation-time", type=float, default=-1.0)
+    result.add_argument("--max-simulation-time", type=float, default=WORKER_RUNTIME_DEFAULTS["max_simulation_time"])
     result.add_argument("--trace-limit", type=int, default=0)
-    result.add_argument("--trace-shard-count", type=int, default=1)
-    result.add_argument("--trace-shard-index", type=int, default=0)
-    result.add_argument("--local-queue-capacity", type=int, default=0)
-    result.add_argument("--deadlock-retry-threshold", type=int, default=8)
+    result.add_argument("--trace-shard-count", type=int, default=WORKER_RUNTIME_DEFAULTS["trace_shard_count"])
+    result.add_argument("--trace-shard-index", type=int, default=WORKER_RUNTIME_DEFAULTS["trace_shard_index"])
+    result.add_argument("--local-queue-capacity", type=int, default=WORKER_RUNTIME_DEFAULTS["local_queue_capacity"])
+    result.add_argument("--deadlock-retry-threshold", type=int, default=WORKER_RUNTIME_DEFAULTS["deadlock_retry_threshold"])
     result.add_argument("--diagnostic-hops", type=int, default=2)
     result.add_argument("--enable-source-admission", action=argparse.BooleanOptionalAction, default=True)
     result.add_argument("--enable-backpressure", action=argparse.BooleanOptionalAction, default=True)
     result.add_argument("--enable-pibt-lite", action=argparse.BooleanOptionalAction, default=True)
     result.add_argument("--enable-deadlock-escape", action=argparse.BooleanOptionalAction, default=True)
-    result.add_argument("--max-backlog-slope-fraction", type=float, default=0.01)
-    result.add_argument("--max-drain-seconds", type=float, default=1800.0)
-    result.add_argument("--max-p95-service-seconds", type=float, default=600.0)
-    result.add_argument("--max-p99-service-seconds", type=float, default=900.0)
-    result.add_argument("--max-deadline-miss-rate", type=float, default=0.0)
-    result.add_argument("--starvation-seconds", type=float, default=1800.0)
-    result.add_argument("--max-fault-recovery-seconds", type=float, default=1800.0)
+    result.add_argument("--enable-fault-policy", action=argparse.BooleanOptionalAction, default=True)
+    result.add_argument("--max-backlog-slope-fraction", type=float, default=CAPACITY_SLO["max_backlog_slope_fraction"])
+    result.add_argument("--max-drain-seconds", type=float, default=CAPACITY_SLO["max_drain_seconds"])
+    result.add_argument("--max-p95-service-seconds", type=float, default=CAPACITY_SLO["max_p95_service_seconds"])
+    result.add_argument("--max-p99-service-seconds", type=float, default=CAPACITY_SLO["max_p99_service_seconds"])
+    result.add_argument("--max-deadline-miss-rate", type=float, default=CAPACITY_SLO["max_deadline_miss_rate"])
+    result.add_argument("--starvation-seconds", type=float, default=CAPACITY_SLO["starvation_seconds"])
+    result.add_argument("--max-fault-recovery-seconds", type=float, default=FAULT_SLO["max_fault_recovery_seconds"])
     return result
 
 
 def main() -> None:
     args = parser().parse_args()
+    if args.concurrent_worker_target <= 0:
+        raise SystemExit("--concurrent-worker-target must be positive")
+    if not args.measurement_cohort.strip():
+        raise SystemExit("--measurement-cohort must be non-empty")
     output = run(args)
     _write_json(args.output, output)
     print(json.dumps({"scenario": args.scenario, "output": str(args.output), "completion_pass": output["completion_pass"]}))

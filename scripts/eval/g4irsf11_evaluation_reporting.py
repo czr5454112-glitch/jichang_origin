@@ -5,12 +5,14 @@ from __future__ import annotations
 import csv
 from datetime import date
 import hashlib
+import io
 import json
 import math
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 from scripts.eval.g4irsf11_experiment_protocol import CaseSpec, formal_cases
+from scripts.eval.g4irsf11_result_validation import atomic_write_text
 
 
 def sha256_file(path: Path) -> str:
@@ -47,6 +49,12 @@ def case_row(
     summary = _value(result, "summary", default={})
     resource = _value(result, "resource_metrics", default={})
     fault_rows = _value(result, "fault_window_metrics", default=[])
+    continuity = _value(result, "continuity_metrics", default={})
+    if not isinstance(continuity, Mapping):
+        continuity = {}
+    continuity_input = _value(continuity, "input_audit", default={})
+    if not isinstance(continuity_input, Mapping):
+        continuity_input = {}
     if not isinstance(fault_rows, list):
         fault_rows = []
     fault_pass = bool(fault_rows) and all(
@@ -62,7 +70,18 @@ def case_row(
         "segment_limit": "" if case.segment_limit is None else case.segment_limit,
         "execution_status": execution.get("status", "NOT_RUN"),
         "return_code": execution.get("return_code", ""),
+        "run_id": execution.get("run_id", ""),
+        "protocol_version": execution.get("protocol_version", ""),
+        "protocol_manifest_sha256": execution.get("protocol_manifest_sha256", ""),
         "input_sha256": execution.get("input_sha256", ""),
+        "result_sha256": _value(execution, "result_artifact", "sha256", default=""),
+        "measurement_cohort": _value(execution, "measurement_cohort", "name", default=""),
+        "declared_concurrent_worker_target": _value(
+            execution,
+            "measurement_cohort",
+            "declared_concurrent_worker_target",
+            default="",
+        ),
         "command": execution.get("command", ""),
         "workload_segment_count": result.get("workload_segment_count", ""),
         "raw_bag_count": result.get("raw_bag_count", ""),
@@ -75,6 +94,30 @@ def case_row(
         "service_level_pass": bag.get("service_level_pass", False),
         "capacity_pass": bag.get("capacity_pass", False),
         "fault_recovery_pass": fault_pass,
+        "continuity_status": continuity.get("status", ""),
+        "continuity_single_runtime_invocation_pass": continuity.get(
+            "single_runtime_invocation_pass", ""
+        ),
+        "continuity_runtime_instance_id": continuity.get("runtime_instance_id", ""),
+        "continuity_boundary_count": continuity.get("boundary_count", ""),
+        "continuity_cross_boundary_completion_count": continuity.get(
+            "cross_boundary_completion_count", ""
+        ),
+        "continuity_carry_over_observed": continuity.get("carry_over_observed", ""),
+        "continuity_input_audit_status": continuity_input.get("status", ""),
+        "continuity_input_expected_copy_count": continuity_input.get(
+            "expected_copy_count", ""
+        ),
+        "continuity_input_workload_row_count": continuity_input.get(
+            "workload_row_count", ""
+        ),
+        "continuity_input_base_segment_count": continuity_input.get(
+            "base_segment_count", ""
+        ),
+        "continuity_input_coverage_sha256": continuity_input.get("coverage_sha256", ""),
+        "continuity_blockers": "; ".join(
+            str(value) for value in continuity.get("blockers", [])
+        ),
         "backlog_slope_fraction": _finite(bag.get("backlog_slope_fraction_of_arrival_rate", "")),
         "end_backlog": bag.get("end_backlog", ""),
         "drain_time_seconds": _finite(bag.get("drain_time_seconds", "")),
@@ -109,6 +152,7 @@ def case_row(
         "enable_backpressure": case.enable_backpressure,
         "enable_pibt_lite": case.enable_pibt_lite,
         "enable_deadlock_escape": case.enable_deadlock_escape,
+        "enable_fault_policy": case.enable_fault_policy,
         "diagnostic_hops": case.diagnostic_hops,
         "notes": case.notes,
         "blocker": execution.get("blocker", ""),
@@ -124,10 +168,11 @@ def write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
         for key in row:
             if key not in fieldnames:
                 fieldnames.append(str(key))
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
-        writer.writeheader()
-        writer.writerows(rows)
+    handle = io.StringIO(newline="")
+    writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+    writer.writeheader()
+    writer.writerows(rows)
+    atomic_write_text(path, handle.getvalue())
 
 
 def _table(headers: Sequence[str], rows: Iterable[Sequence[Any]]) -> str:
@@ -200,12 +245,13 @@ def write_reports(root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str, Pa
             ),
             "",
         ]
-        path.write_text("\n".join(content), encoding="utf-8")
+        atomic_write_text(path, "\n".join(content))
         written[category] = path
 
     resource_path = report_dir / "g4irsf11_runtime_resource_report.md"
     executed = [row for row in rows if row.get("execution_status") == "EXECUTED"]
-    resource_path.write_text(
+    atomic_write_text(
+        resource_path,
         "\n".join(
             [
                 "# G4IRSF11 Runtime Resource Measurements",
@@ -228,7 +274,6 @@ def write_reports(root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str, Pa
                 "",
             ]
         ),
-        encoding="utf-8",
     )
     written["resources"] = resource_path
     return written
@@ -280,7 +325,8 @@ def write_claim_boundary(root: Path, rows: Sequence[Mapping[str, Any]], gates: S
     failed_capacity = [row for row in rows if row.get("category") == "capacity_frontier" and row.get("execution_status") == "EXECUTED" and not row.get("capacity_pass")]
     blockers = [row for row in rows if row.get("execution_status") != "EXECUTED"]
     overall = "PASS" if all(gate.get("status") == "PASS" for gate in gates) else "PARTIAL_WITH_EXPLICIT_BLOCKER"
-    path.write_text(
+    atomic_write_text(
+        path,
         "\n".join(
             [
                 "# G4IRSF11 Claim Boundary",
@@ -300,6 +346,5 @@ def write_claim_boundary(root: Path, rows: Sequence[Mapping[str, Any]], gates: S
                 "",
             ]
         ),
-        encoding="utf-8",
     )
     return path

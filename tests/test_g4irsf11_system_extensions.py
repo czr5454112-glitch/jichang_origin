@@ -41,15 +41,55 @@ def test_rolling_seven_day_audit_requires_all_rows_and_six_boundaries() -> None:
     base = {
         "case_id": "extension_rolling_7day_full",
         "execution_status": "EXECUTED",
+        "run_id": "run-seven-day",
         "workload_segment_count": 305_221,
         "arrival_span_seconds": 6 * 86_400.0 + 1.0,
+        "continuity_status": "PASS",
+        "continuity_single_runtime_invocation_pass": True,
+        "continuity_runtime_instance_id": "run-seven-day",
+        "continuity_boundary_count": 6,
+        "continuity_carry_over_observed": False,
+        "continuity_input_audit_status": "PASS",
+        "continuity_input_expected_copy_count": 7,
+        "continuity_input_workload_row_count": 305_221,
+        "continuity_input_base_segment_count": 43_603,
+        "continuity_input_coverage_sha256": "a" * 64,
+        "continuity_blockers": "",
     }
     exact_rows = _ReleaseRows(305_221, 6 * 86_400.0 + 1.0)
-    assert _continuity_audit(base, workload_rows=exact_rows)["no_smoke_substitution_pass"] is True
+    audited = _continuity_audit(base, workload_rows=exact_rows)
+    assert audited["no_smoke_substitution_pass"] is True
+    assert audited["continuity_evidence_pass"] is True
+    assert audited["carry_over_observed"] is False
     truncated = dict(base, workload_segment_count=32_768)
     assert _continuity_audit(truncated, workload_rows=exact_rows)["no_smoke_substitution_pass"] is False
     one_day_rows = _ReleaseRows(305_221, 86_399.0)
     assert _continuity_audit(base, workload_rows=one_day_rows)["no_smoke_substitution_pass"] is False
+
+
+def test_rolling_audit_fails_closed_on_unbound_or_incomplete_continuity_evidence() -> None:
+    base = {
+        "case_id": "extension_rolling_2day_full",
+        "execution_status": "EXECUTED",
+        "run_id": "run-two-day",
+        "workload_segment_count": 87_206,
+        "continuity_status": "PASS",
+        "continuity_single_runtime_invocation_pass": True,
+        "continuity_runtime_instance_id": "different-run",
+        "continuity_boundary_count": 1,
+        "continuity_input_audit_status": "PASS",
+        "continuity_input_expected_copy_count": 2,
+        "continuity_input_workload_row_count": 87_206,
+        "continuity_input_base_segment_count": 43_603,
+        "continuity_input_coverage_sha256": "b" * 64,
+        "continuity_blockers": "",
+    }
+    rows = _ReleaseRows(87_206, 86_401.0)
+    assert _continuity_audit(base, workload_rows=rows)["continuity_evidence_pass"] is False
+    bound = dict(base, continuity_runtime_instance_id="run-two-day")
+    assert _continuity_audit(bound, workload_rows=rows)["no_smoke_substitution_pass"] is True
+    bad_coverage = dict(bound, continuity_input_coverage_sha256="not-a-digest")
+    assert _continuity_audit(bad_coverage, workload_rows=rows)["no_smoke_substitution_pass"] is False
 
 
 def test_extension_audit_fails_closed_when_retained_exact_input_is_missing() -> None:

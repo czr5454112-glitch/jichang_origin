@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from scripts.eval.g4irsf11_experiment_protocol import (
     CAPACITY_SLO,
+    EXTENSION_PROTOCOL_SCHEMA,
+    EXTENSION_PROTOCOL_VERSION,
+    PROTOCOL_SCHEMA,
+    PROTOCOL_VERSION,
     fault_windows,
     formal_cases,
     protocol_manifest,
@@ -41,6 +45,12 @@ def test_fault_profiles_are_temporal_repair_and_sensor_loss_is_explicit() -> Non
     repeated = fault_windows("repeated_delayed_5s", minimum_release=100.0, maximum_release=1100.0)
     assert len(repeated) == 2
     assert repeated[0]["repair_time"] < repeated[1]["fault_time"]
+    policy_off = next(case for case in formal_cases() if case.case_id == "fault_fault_policy_off")
+    assert policy_off.enable_fault_policy is False
+    assert policy_off.enable_deadlock_escape is True
+    assert policy_off.as_dict()["enable_fault_policy"] is False
+    assert "advertised-fault policy disabled" in policy_off.notes
+    assert "physical interlock remains" in policy_off.notes
 
 
 def test_protocol_freezes_independent_safety_queue_and_service_thresholds() -> None:
@@ -48,3 +58,7 @@ def test_protocol_freezes_independent_safety_queue_and_service_thresholds() -> N
     assert manifest["capacity_slo"] == CAPACITY_SLO
     assert "no pooled" in manifest["claim_boundaries"]["load_modes"]
     assert CAPACITY_SLO["max_p99_service_seconds"] >= CAPACITY_SLO["max_p95_service_seconds"]
+    assert PROTOCOL_SCHEMA.endswith(".v3")
+    assert PROTOCOL_VERSION.endswith("-v3")
+    assert EXTENSION_PROTOCOL_SCHEMA.endswith(".v2")
+    assert EXTENSION_PROTOCOL_VERSION.endswith("-v2")

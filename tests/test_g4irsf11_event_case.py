@@ -1,6 +1,53 @@
 from __future__ import annotations
 
-from scripts.eval.run_g4irsf11_event_case import _outcomes
+from scripts.eval.g4irsf11_experiment_protocol import CAPACITY_SLO
+from scripts.eval.run_g4irsf11_event_case import _outcomes, parser
+
+
+def test_direct_worker_command_uses_frozen_capacity_slope_default() -> None:
+    args = parser().parse_args(
+        [
+            "--run-id",
+            "run-1",
+            "--protocol-version",
+            "protocol-v3",
+            "--protocol-manifest-sha256",
+            "a" * 64,
+            "--case-spec-json",
+            "{}",
+            "--input-artifact-json",
+            "{}",
+            "--fault-artifact-json",
+            "{}",
+            "--map-sha256",
+            "b" * 64,
+            "--source-sha256",
+            "c" * 64,
+            "--implementation-sha256",
+            "d" * 64,
+            "--measurement-cohort",
+            "developer_validation_sequential1",
+            "--concurrent-worker-target",
+            "1",
+            "--workload",
+            "workload.jsonl",
+            "--map",
+            "map.json",
+            "--output",
+            "result.json",
+            "--scenario",
+            "mixed",
+            "--scale",
+            "1.0",
+            "--workload-mode",
+            "capacity",
+            "--fault-windows",
+            "faults.json",
+        ]
+    )
+
+    assert CAPACITY_SLO["max_backlog_slope_fraction"] == 0.0
+    assert args.max_backlog_slope_fraction == CAPACITY_SLO["max_backlog_slope_fraction"]
 
 
 def test_outcomes_join_duplicate_task_id_by_runtime_and_segment_identity() -> None:

@@ -21,11 +21,14 @@ from scripts.eval.g4irsf11_experiment_protocol import (  # noqa: E402
     system_extension_manifest,
 )
 from scripts.eval.g4irsf11_workloads import load_jsonl  # noqa: E402
+from scripts.eval.g4irsf11_result_validation import atomic_write_text  # noqa: E402
 from scripts.eval.run_g4irsf11_event_runtime_evaluation import (  # noqa: E402
     MAP_PATH,
     SOURCE_TASK_PATH,
     _case_paths,
     _descriptor_matches,
+    _acquire_case_lock,
+    _release_case_lock,
     _read_json,
     _write_json,
     execute_case,
@@ -36,6 +39,14 @@ from scripts.eval.run_g4irsf11_event_runtime_evaluation import (  # noqa: E402
 PROTOCOL_PATH = ROOT / "artifacts" / "gates" / "g4irsf11_system_extension_protocol.json"
 TABLE_PATH = ROOT / "outputs" / "tables" / "g4irsf11_system_extension_matrix.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "g4irsf11_system_extension_report.md"
+PROTOCOL_LOCK = ROOT / ".pytest_cache" / "g4irsf11" / "event_evaluation" / "system_extension_protocol.lock"
+CONSOLIDATION_LOCK = (
+    ROOT
+    / ".pytest_cache"
+    / "g4irsf11"
+    / "event_evaluation"
+    / "system_extension_consolidation.lock"
+)
 
 
 def _continuity_audit(
@@ -74,11 +85,39 @@ def _continuity_audit(
     item["day_boundary_pass"] = (
         int(span // 86_400.0) >= required_boundaries if required_boundaries else True
     )
+    expected_copies = 7 if row.get("case_id") == "extension_rolling_7day_full" else (
+        2 if row.get("case_id") == "extension_rolling_2day_full" else 0
+    )
+    is_rolling = expected_copies > 0
+    coverage_sha256 = str(row.get("continuity_input_coverage_sha256") or "")
+    coverage_digest_valid = (
+        len(coverage_sha256) == 64
+        and all(character in "0123456789abcdef" for character in coverage_sha256)
+    )
+    item["continuity_evidence_required"] = is_rolling
+    item["continuity_evidence_pass"] = (
+        row.get("continuity_status") == "PASS"
+        and row.get("continuity_single_runtime_invocation_pass") is True
+        and str(row.get("continuity_runtime_instance_id") or "")
+        == str(row.get("run_id") or "")
+        and bool(str(row.get("run_id") or ""))
+        and int(row.get("continuity_boundary_count") or -1) == expected_copies - 1
+        and row.get("continuity_input_audit_status") == "PASS"
+        and int(row.get("continuity_input_expected_copy_count") or -1) == expected_copies
+        and int(row.get("continuity_input_workload_row_count") or -1) == actual
+        and int(row.get("continuity_input_base_segment_count") or -1) > 0
+        and coverage_digest_valid
+        and not str(row.get("continuity_blockers") or "")
+    ) if is_rolling else ""
+    item["carry_over_observed"] = (
+        row.get("continuity_carry_over_observed") is True if is_rolling else ""
+    )
     item["no_smoke_substitution_pass"] = (
         row.get("execution_status") == "EXECUTED"
         and bool(item["exact_segment_count_pass"])
         and bool(item["retained_workload_count_pass"])
         and bool(item["day_boundary_pass"])
+        and (not is_rolling or item["continuity_evidence_pass"] is True)
     )
     return item
 
@@ -124,14 +163,15 @@ def _write_report(rows: Sequence[Mapping[str, Any]]) -> None:
         "",
         "These cases supplement the frozen 84-case matrix. They do not replace it and use no first-N segment limit.",
         "",
-        "| Case | Execution | Exact input | Day boundary | Completed / requested | Capacity | Blocker |",
-        "| --- | --- | --- | --- | ---: | --- | --- |",
+        "| Case | Execution | Exact input | Continuity evidence | Carry-over observed | Day boundary | Completed / requested | Capacity | Blocker |",
+        "| --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
     ]
     for row in rows:
         completed = f"{row.get('completed_segment_count', 0)} / {row.get('workload_segment_count', 0)}"
         lines.append(
             "| {case_id} | {execution_status} | {exact_segment_count_pass} | "
-            "{day_boundary_pass} | {completed} | {capacity_pass} | {blocker} |".format(
+            "{continuity_evidence_pass} | {carry_over_observed} | {day_boundary_pass} | "
+            "{completed} | {capacity_pass} | {blocker} |".format(
                 completed=completed,
                 **row,
             )
@@ -140,10 +180,11 @@ def _write_report(rows: Sequence[Mapping[str, Any]]) -> None:
         [
             "",
             "Safe execution and capacity are independent. An 8x/16x run is never promoted merely because it avoids conflicts.",
+            "For rolling cases, carry-over is reported as an observed fact separate from continuity validity; a false value is never described as observed carry-over.",
             "",
         ]
     )
-    REPORT_PATH.write_text("\n".join(lines), encoding="utf-8")
+    atomic_write_text(REPORT_PATH, "\n".join(lines))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -159,6 +200,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--execute-only", action="store_true")
     parser.add_argument("--timeout-seconds", type=float, default=14_400.0)
     parser.add_argument("--max-events", type=int, default=50_000_000)
+    parser.add_argument("--measurement-cohort", required=True)
+    parser.add_argument("--concurrent-worker-target", type=int, required=True)
     parser.add_argument("--python", type=Path, default=Path(sys.executable))
     parser.add_argument("--search-path", type=Path, default=ROOT / "build_vs" / "python" / "Release")
     return parser
@@ -166,6 +209,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.concurrent_worker_target <= 0:
+        raise SystemExit("--concurrent-worker-target must be positive")
+    if not args.measurement_cohort.strip():
+        raise SystemExit("--measurement-cohort must be non-empty")
     cases = system_extension_cases()
     by_id = {case.case_id: case for case in cases}
     if args.case:
@@ -176,7 +223,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         selected = list(cases)
 
-    _write_json(PROTOCOL_PATH, system_extension_manifest())
+    manifest = system_extension_manifest()
+    protocol_lock = _acquire_case_lock(PROTOCOL_LOCK, "system_extension_protocol", wait_seconds=60.0)
+    if protocol_lock is None:
+        raise SystemExit(f"could not acquire system extension protocol lock {PROTOCOL_LOCK}")
+    try:
+        _write_json(PROTOCOL_PATH, manifest)
+    finally:
+        _release_case_lock(protocol_lock)
     base_rows = load_jsonl(SOURCE_TASK_PATH)
     if len(base_rows) != 43_603:
         raise SystemExit(f"formal source task count must be 43603, got {len(base_rows)}")
@@ -194,6 +248,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             map_sha256=map_sha256,
             implementation_digest=implementation_digest,
             protocol_version=EXTENSION_PROTOCOL_VERSION,
+            protocol_manifest_value=manifest,
         )
         failures += execution.get("status") != "EXECUTED"
         print(
@@ -202,13 +257,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     if args.execute_only:
         return 2 if failures else 0
-    rows = _load_rows(
-        source_sha256=source_sha256,
-        map_sha256=map_sha256,
-        implementation_digest=implementation_digest,
+    consolidation_lock = _acquire_case_lock(
+        CONSOLIDATION_LOCK,
+        "system_extension_consolidation",
+        wait_seconds=60.0,
     )
-    write_csv(TABLE_PATH, rows)
-    _write_report(rows)
+    if consolidation_lock is None:
+        raise SystemExit(
+            f"could not acquire system extension consolidation lock {CONSOLIDATION_LOCK}"
+        )
+    try:
+        rows = _load_rows(
+            source_sha256=source_sha256,
+            map_sha256=map_sha256,
+            implementation_digest=implementation_digest,
+        )
+        write_csv(TABLE_PATH, rows)
+        _write_report(rows)
+    finally:
+        _release_case_lock(consolidation_lock)
     print(
         json.dumps(
             {
