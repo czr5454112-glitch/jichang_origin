@@ -30,9 +30,10 @@ MANIFEST = ROOT / "artifacts" / "datasets" / "g4irsf11_decision_trace_manifest.j
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
+    payload = path.read_bytes()
+    if path.suffix.lower() in {".csv", ".json", ".jsonl", ".md", ".py", ".txt", ".yml", ".yaml"}:
+        payload = payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    digest.update(payload)
     return digest.hexdigest()
 
 
@@ -59,6 +60,10 @@ def validate_committed_artifacts(root: Path = ROOT) -> dict[str, Any]:
     failures: list[str] = []
     if manifest.get("schema_id") != SCHEMA_ID:
         failures.append("decision manifest schema_id is unexpected")
+    if manifest.get("artifact_hash_semantics") != (
+        "sha256 of UTF-8 text after CRLF/CR newline normalization to LF"
+    ):
+        failures.append("artifact hash semantics are missing or unexpected")
     for section in ("validation", "coverage", "trace_completeness"):
         value = manifest.get(section)
         if not isinstance(value, Mapping) or value.get("status") != "PASS":

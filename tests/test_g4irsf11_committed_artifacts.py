@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 
 from scripts.eval.validate_g4irsf11_committed_artifacts import ROOT, validate_committed_artifacts
+from scripts.eval.run_g4irsf11_decision_trace_sampling import _sha256 as manifest_sha256
 
 
 def test_repository_decision_artifacts_pass_hash_and_semantic_validation() -> None:
@@ -35,3 +36,11 @@ def test_changed_artifact_hash_fails_closed(tmp_path: Path) -> None:
     result = validate_committed_artifacts(tmp_path)
     assert result["status"] == "FAIL"
     assert any("SHA-256 mismatch" in failure for failure in result["failures"])
+
+
+def test_manifest_text_hash_is_cross_platform_newline_stable(tmp_path: Path) -> None:
+    lf = tmp_path / "lf.jsonl"
+    crlf = tmp_path / "crlf.jsonl"
+    lf.write_bytes(b'{"a":1}\n{"b":2}\n')
+    crlf.write_bytes(b'{"a":1}\r\n{"b":2}\r\n')
+    assert manifest_sha256(lf) == manifest_sha256(crlf)

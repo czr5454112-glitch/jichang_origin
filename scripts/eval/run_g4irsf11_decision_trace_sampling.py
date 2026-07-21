@@ -54,9 +54,13 @@ SOURCE_IDENTITY_REPORT = REPORT_DIR / "g4irsf11_source_identity_audit.md"
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
+    payload = path.read_bytes()
+    # Git normalises committed text to LF while Windows working trees may use
+    # CRLF.  Dataset bindings must describe semantic text bytes identically on
+    # both platforms; binary artifacts remain byte-exact.
+    if path.suffix.lower() in {".csv", ".json", ".jsonl", ".md", ".py", ".txt", ".yml", ".yaml"}:
+        payload = payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    digest.update(payload)
     return digest.hexdigest()
 
 
@@ -717,6 +721,7 @@ def write_artifacts(
     }
     manifest = {
         "schema_id": SCHEMA_ID,
+        "artifact_hash_semantics": "sha256 of UTF-8 text after CRLF/CR newline normalization to LF",
         "generated_date": date.today().isoformat(),
         "trace_shards": trace_shards,
         "source_task": {
