@@ -8,9 +8,11 @@ tables, reports, schemas and balanced samples are repository artifacts.
 from __future__ import annotations
 
 import argparse
+import atexit
 import gc
 import hashlib
 import json
+import os
 from pathlib import Path
 import shlex
 import subprocess
@@ -157,7 +159,43 @@ def _case_paths(case: CaseSpec) -> dict[str, Path]:
         "outcomes": TRACE_DIR / f"{case.case_id}.outcomes.jsonl",
         "tasks": TRACE_DIR / f"{case.case_id}.tasks.jsonl",
         "history": EXECUTION_DIR / f"{case.case_id}.attempt_history.jsonl",
+        "lock": EXECUTION_DIR / f"{case.case_id}.lock",
     }
+
+
+def _release_case_lock(token: dict[str, Any]) -> None:
+    if token.get("released"):
+        return
+    descriptor = int(token["descriptor"])
+    try:
+        os.close(descriptor)
+    except OSError:
+        pass
+    Path(token["path"]).unlink(missing_ok=True)
+    token["released"] = True
+
+
+def _acquire_case_lock(path: Path, case_id: str) -> dict[str, Any] | None:
+    """Acquire an atomic per-case writer lease, or fail closed.
+
+    A stale lock is intentionally not guessed away.  Operators must first
+    prove that no worker owns it, retain the failed attempt, and then remove
+    that exact file before retrying.
+    """
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        descriptor = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        return None
+    payload = json.dumps(
+        {"case_id": case_id, "pid": os.getpid(), "acquired_unix_time": time.time()},
+        sort_keys=True,
+    ).encode("utf-8")
+    os.write(descriptor, payload)
+    token: dict[str, Any] = {"descriptor": descriptor, "path": path, "released": False}
+    atexit.register(_release_case_lock, token)
+    return token
 
 
 def _archive_existing_attempt(case: CaseSpec, paths: Mapping[str, Path]) -> None:
@@ -309,6 +347,17 @@ def execute_case(
         ):
             return _read_json(paths["result"]), descriptor
 
+    lock_token = _acquire_case_lock(paths["lock"], case.case_id)
+    if lock_token is None:
+        existing = _read_json(paths["execution"]) if paths["execution"].is_file() else {}
+        blocked = dict(existing)
+        blocked["status"] = "PARTIAL_WITH_EXPLICIT_BLOCKER"
+        blocked["blocker"] = (
+            f"another writer owns exact case lock {paths['lock']}; do not delete it until the owning "
+            "process is proven stopped, then rerun the exact case"
+        )
+        return None, blocked
+
     if not args.resume:
         _archive_existing_attempt(case, paths)
 
@@ -374,6 +423,7 @@ def execute_case(
     _write_json(paths["execution"], descriptor)
     if not args.keep_workloads and not case.trace_complete:
         paths["workload"].unlink(missing_ok=True)
+    _release_case_lock(lock_token)
     return result, descriptor
 
 

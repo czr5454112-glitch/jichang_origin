@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from scripts.eval.g4irsf11_evaluation_reporting import case_row, gate_rows
 from scripts.eval.g4irsf11_experiment_protocol import formal_cases
 from scripts.eval.g4irsf11_experiment_protocol import PROTOCOL_VERSION
 from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
     _descriptor_matches,
+    _acquire_case_lock,
+    _release_case_lock,
     timeline_spanning_sample,
 )
 from scripts.eval.run_g4irsf11_event_case import _outcomes
@@ -81,6 +85,17 @@ def test_execution_descriptor_is_bound_to_exact_inputs_and_implementation() -> N
         map_sha256="map",
         implementation_digest="changed-implementation",
     )
+
+
+def test_case_writer_lock_prevents_concurrent_descriptor_clobber(tmp_path: Path) -> None:
+    path = tmp_path / "same-case.lock"
+    first = _acquire_case_lock(path, "same-case")
+    assert first is not None
+    assert _acquire_case_lock(path, "same-case") is None
+    _release_case_lock(first)
+    second = _acquire_case_lock(path, "same-case")
+    assert second is not None
+    _release_case_lock(second)
 
 
 def test_outcomes_join_duplicate_original_task_ids_by_runtime_segment_identity() -> None:
