@@ -35,6 +35,16 @@ def test_input_audit_requires_every_base_copy_and_fixed_day_offset() -> None:
     shifted[-1]["release_time"] += 1.0
     assert rolling_input_audit(shifted, expected_copies=3)["status"] == "FAIL"
 
+    overlapping = [
+        {"segment_id": "a:g4irsf11_c0:s", "generation_copy_index": 0, "release_time": 0.0},
+        {"segment_id": "a:g4irsf11_c1:s", "generation_copy_index": 1, "release_time": 86_400.0},
+        {"segment_id": "b:g4irsf11_c0:s", "generation_copy_index": 0, "release_time": 90_000.0},
+        {"segment_id": "b:g4irsf11_c1:s", "generation_copy_index": 1, "release_time": 176_400.0},
+    ]
+    overlap_audit = rolling_input_audit(overlapping, expected_copies=2)
+    assert overlap_audit["status"] == "FAIL"
+    assert overlap_audit["overlapping_copy_boundary_indices"] == [1]
+
 
 def test_runtime_audit_records_pending_and_cross_boundary_completion() -> None:
     workload = _rolling_rows()
@@ -81,3 +91,32 @@ def test_runtime_audit_fails_without_single_runtime_identity_or_complete_join() 
     assert audit["status"] == "FAIL"
     assert audit["single_runtime_invocation_pass"] is False
     assert any("omitted segments" in blocker for blocker in audit["blockers"])
+
+
+def test_same_time_service_completion_precedes_next_copy_release() -> None:
+    workload = _rolling_rows(copies=2)
+    boundary = min(
+        row["release_time"] for row in workload if row["generation_copy_index"] == 1
+    )
+    results = [
+        {
+            "segment_id": row["segment_id"],
+            "completed": True,
+            "finish_time": (
+                boundary
+                if row["generation_copy_index"] == 0
+                else row["release_time"] + 1.0
+            ),
+        }
+        for row in workload
+    ]
+    audit = rolling_continuity_metrics(
+        workload,
+        results,
+        expected_copies=2,
+        runtime_instance_id="run-equal-boundary",
+    )
+    assert audit["status"] == "PASS"
+    assert audit["boundaries"][0]["pending_before_boundary"] == 0
+    assert audit["boundaries"][0]["cross_boundary_completion_count"] == 0
+    assert audit["carry_over_observed"] is False

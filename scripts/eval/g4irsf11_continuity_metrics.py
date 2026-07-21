@@ -10,6 +10,7 @@ from typing import Any, Mapping, Sequence
 
 
 _COPY_RE = re.compile(r"^(?P<base>.+):g4irsf11_c(?P<copy>\d+)(?::.+)?$")
+_EVENT_EPSILON_SECONDS = 1.0e-9
 
 
 def _canonical(value: Any) -> bytes:
@@ -113,6 +114,27 @@ def rolling_input_audit(
         blockers.append(f"unexpected base/copy pairs:{extra_pairs}")
     if offset_mismatches:
         blockers.append(f"nonlinear copy offsets:{offset_mismatches}")
+    copy_release_ranges = {
+        copy_index: {
+            "minimum_release_time": min(copies[copy_index] for copies in by_base.values() if copy_index in copies),
+            "maximum_release_time": max(copies[copy_index] for copies in by_base.values() if copy_index in copies),
+        }
+        for copy_index in range(expected_copies)
+        if any(copy_index in copies for copies in by_base.values())
+    }
+    overlapping_boundaries = []
+    for copy_index in range(expected_copies - 1):
+        left = copy_release_ranges.get(copy_index)
+        right = copy_release_ranges.get(copy_index + 1)
+        if left is None or right is None:
+            continue
+        if float(left["maximum_release_time"]) >= float(right["minimum_release_time"]):
+            overlapping_boundaries.append(copy_index + 1)
+    if overlapping_boundaries:
+        blockers.append(
+            "copy release windows overlap at boundaries:"
+            + ",".join(map(str, overlapping_boundaries))
+        )
     expected_rows = len(by_base) * expected_copies
     if len(workload_rows) != expected_rows:
         blockers.append(
@@ -137,6 +159,8 @@ def rolling_input_audit(
         "unexpected_base_copy_pair_count": extra_pairs,
         "offset_mismatch_count": offset_mismatches,
         "day_stride_seconds": stride,
+        "copy_release_ranges": copy_release_ranges,
+        "overlapping_copy_boundary_indices": overlapping_boundaries,
         "coverage_sha256": hashlib.sha256(_canonical(coverage_rows)).hexdigest(),
     }
 
@@ -197,7 +221,10 @@ def rolling_continuity_metrics(
             if result is None or not bool(result.get("completed", result.get("complete", False))):
                 return True
             finish = _finite(result.get("finish_time"), f"{segment_id}.finish_time")
-            return finish >= boundary
+            # SERVICE_COMPLETE has higher same-time priority than BAG_RELEASE
+            # in the runtime.  Equality (and epsilon-scale roundoff) is already
+            # complete before the next copy enters and is not carry-over.
+            return finish > boundary + _EVENT_EPSILON_SECONDS
 
         pending_before = sum(unfinished_at(segment_id) for segment_id in prior_ids)
         pending_after = sum(
@@ -205,7 +232,8 @@ def rolling_continuity_metrics(
         )
         cross_boundary_completed = sum(
             bool(results.get(segment_id, {}).get("completed", results.get(segment_id, {}).get("complete", False)))
-            and _finite(results[segment_id].get("finish_time"), f"{segment_id}.finish_time") >= boundary
+            and _finite(results[segment_id].get("finish_time"), f"{segment_id}.finish_time")
+            > boundary + _EVENT_EPSILON_SECONDS
             for segment_id in prior_ids
             if segment_id in results
         )
