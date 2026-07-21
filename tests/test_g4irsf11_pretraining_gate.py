@@ -32,7 +32,23 @@ def _complete_fixture(root: Path) -> None:
     _json(gates / "g4irsf11_event_runtime_protocol.json", {"case_count": 84})
     _json(
         reports / "g4irsf11_gate_integrity_audit.json",
-        {"overall_status": "PASS", "remote_ci_status": "PASS"},
+        {
+            "schema": "czr005.g4irsf11.provenance_ci_audit.v1",
+            "overall_status": "PASS",
+            "remote_ci_status": "PASS",
+            "local_state_clean": True,
+            "protected_inputs_clean": True,
+            "audited_head_sha": "a" * 40,
+            "audited_upstream_head_sha": "a" * 40,
+            "remote_ci": {
+                "head_sha": "a" * 40,
+                "workflow": "g4irsf11-gate-integrity",
+                "branch": "codex/czr005-rewrite",
+                "event": "push",
+                "conclusion": "success",
+                "run_url": "https://github.com/example/actions/runs/1",
+            },
+        },
     )
     _json(
         datasets / "g4irsf11_decision_trace_manifest.json",
@@ -126,7 +142,17 @@ def test_gate_passes_only_with_all_exact_a_through_h_evidence(tmp_path: Path) ->
 def test_gate_fails_closed_for_missing_ci_and_incomplete_paper_full(tmp_path: Path) -> None:
     _complete_fixture(tmp_path)
     provenance = tmp_path / "outputs" / "reports" / "g4irsf11_gate_integrity_audit.json"
-    _json(provenance, {"overall_status": "PASS", "remote_ci_status": "UNVERIFIED"})
+    _json(
+        provenance,
+        {
+            "schema": "czr005.g4irsf11.provenance_ci_audit.v1",
+            "overall_status": "PASS",
+            "remote_ci_status": "UNVERIFIED",
+            "audited_head_sha": "a" * 40,
+            "audited_upstream_head_sha": "a" * 40,
+            "remote_ci": {"head_sha": "a" * 40},
+        },
+    )
     ledger = tmp_path / "outputs" / "tables" / "g4irsf11_event_runtime_case_ledger.csv"
     _csv(
         ledger,

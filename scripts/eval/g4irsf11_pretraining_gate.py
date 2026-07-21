@@ -100,12 +100,33 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
     resources = _read_csv(resource_table)
     provenance = _read_json(provenance_path)
 
-    a_ok = provenance.get("overall_status") == "PASS" and provenance.get("remote_ci_status") == "PASS"
+    remote_ci = provenance.get("remote_ci") if isinstance(provenance.get("remote_ci"), Mapping) else {}
+    a_ok = (
+        provenance.get("schema") == "czr005.g4irsf11.provenance_ci_audit.v1"
+        and provenance.get("overall_status") == "PASS"
+        and provenance.get("remote_ci_status") == "PASS"
+        and bool(provenance.get("local_state_clean"))
+        and bool(provenance.get("protected_inputs_clean"))
+        and bool(provenance.get("audited_head_sha"))
+        and provenance.get("audited_head_sha") == provenance.get("audited_upstream_head_sha")
+        and provenance.get("audited_head_sha") == remote_ci.get("head_sha")
+        and remote_ci.get("workflow") == "g4irsf11-gate-integrity"
+        and remote_ci.get("branch") == "codex/czr005-rewrite"
+        and remote_ci.get("event") == "push"
+        and str(remote_ci.get("conclusion", "")).lower() == "success"
+        and bool(remote_ci.get("run_url"))
+    )
     a_blockers: list[str] = []
     if provenance.get("overall_status") != "PASS":
         a_blockers.append("local Git/protected-file provenance is missing or not PASS")
     if provenance.get("remote_ci_status") != "PASS":
         a_blockers.append("remote GitHub Actions status is not independently verified PASS")
+    if provenance.get("audited_head_sha") != provenance.get("audited_upstream_head_sha"):
+        a_blockers.append("provenance audit does not bind identical local and upstream heads")
+    if provenance.get("audited_head_sha") != remote_ci.get("head_sha"):
+        a_blockers.append("remote CI head is not the exact audited Git head")
+    if provenance.get("schema") != "czr005.g4irsf11.provenance_ci_audit.v1":
+        a_blockers.append("provenance/CI audit schema is missing or unexpected")
 
     validation = decision.get("validation") if isinstance(decision.get("validation"), Mapping) else {}
     completeness = decision.get("trace_completeness") if isinstance(decision.get("trace_completeness"), Mapping) else {}
