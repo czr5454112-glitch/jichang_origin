@@ -1,0 +1,157 @@
+{
+  "accepted_full_baseline": false,
+  "artifacts": {
+    "attempt_table": {
+      "path": "outputs/tables/g4irsf11_java_cie_attempt_audit.csv",
+      "sha256": "85fb1410ca077dd2eefe9251c691b3d1a03a4ddd3f5a424e7e05a6cc59224245"
+    },
+    "gate_table": {
+      "path": "outputs/tables/g4irsf11_java_cie_boundary_gate.csv",
+      "sha256": "66887e1dc06c75abb3515fef2a51aa71f0c8ffb25158f57f96d0043e2e4ac528"
+    },
+    "inventory_table": {
+      "path": "outputs/tables/g4irsf11_java_cie_evidence_inventory.csv",
+      "sha256": "892aa7527f5b26846b8686f711ca0c8fe86b0774bda9f606fff74ce0d85fab65"
+    },
+    "report": {
+      "path": "outputs/reports/g4irsf11_java_cie_boundary_report.md",
+      "sha256": "51b809463d9911ca14574fb6a826ff92819715793d600098883168dae0476cd7"
+    }
+  },
+  "blockers": [
+    "external GUI-stub RUN.Main attempt timed out without an accepted result",
+    "no accepted first-N/full-run source queue + saved_routes + constrains delta trace",
+    "no full-run manifest records exact command, return code 0, input/output hashes, and full-scope counts",
+    "no headless Java/CIE run covers 28506 raw bags / 43603 Java segments and drains active/unfinished state",
+    "original RUN.Main headless full attempt remains blocked by Swing/HeadlessException",
+    "real external Java/CIE evidence is bounded to 64 generated tasks (first-N), not the full 28,506-bag stream"
+  ],
+  "checks": [
+    {
+      "criterion": "protected_legacy_map_input_clean",
+      "evidence": "git status --porcelain=v1 --untracked-files=all -- legacy data/processed/maps/map2.json data/processed/tasks/inputdata.jsonl | git diff --name-only 3ae9092ed0cfa0d5d75cfde1c35ae53c61a25d64..HEAD -- legacy data/processed/maps/map2.json data/processed/tasks/inputdata.jsonl",
+      "observed": "clean",
+      "required": "no worktree or baseline diff under legacy/map/inputdata",
+      "status": "PASS"
+    },
+    {
+      "criterion": "legacy_java_lifecycle_identified",
+      "evidence": "legacy RUN/Main.java, App/Tasks.java, App/ICS_PathFinding.java",
+      "observed": "{\"harness_imports_legacy_scheduler\": true, \"harness_is_non_gui\": true, \"harness_records_route_state\": true, \"harness_runs_epoch_loop\": true, \"main_calls_generate_tasks\": true, \"main_calls_ics_path_finding\": true, \"main_gui_coupled\": true, \"scheduler_has_saved_routes\": true, \"scheduler_has_unfinished_retry\": true, \"scheduler_rebuilds_constrains\": true, \"tasks_one_head_per_source_epoch\": true}",
+      "required": "GUI boundary plus Tasks.generate_tasks and ICS_PathFinding lifecycle present",
+      "status": "PASS"
+    },
+    {
+      "criterion": "external_non_gui_java_cie_wrapper",
+      "evidence": "benchmarks/java/LegacyIcsNoFaultWindowBenchmark.java",
+      "observed": "true",
+      "required": "external Java class directly invokes read-only Tasks and ICS_PathFinding without showmap",
+      "status": "PASS"
+    },
+    {
+      "criterion": "java_source_queue_trace_complete",
+      "evidence": "artifacts/tasks/g4irsf7/java_source_queue_one_per_epoch.jsonl",
+      "observed": "43603",
+      "required": "43603",
+      "status": "PASS"
+    },
+    {
+      "criterion": "first_n_epoch_real_java_cie_evidence",
+      "evidence": "outputs/tables/java_cpp_legacy_*_window_performance.csv",
+      "observed": "3 real Java windows; max generated=64",
+      "required": "at least one non-GUI external Java ICS_PathFinding first-N run",
+      "status": "PASS"
+    },
+    {
+      "criterion": "first_n_java_source_saved_routes_constrains_trace",
+      "evidence": "g4irsf7 source queue artifact + LegacyIcsNoFaultWindowBenchmark outputs",
+      "observed": "source release trace exists; Java windows persist route/summary snapshots but not per-epoch constrains deltas",
+      "required": "first-N per-epoch source queue, saved_routes before/after, constrains before/after",
+      "status": "FAIL"
+    },
+    {
+      "criterion": "full_java_cie_scope",
+      "evidence": "historical attempts and Java performance tables",
+      "observed": "full candidates=0; bounded Java windows=3",
+      "required": ">=43603 generated, >=28506 completed, active=0, unfinished=0",
+      "status": "FAIL"
+    },
+    {
+      "criterion": "full_java_source_saved_routes_constrains_trace",
+      "evidence": "existing Java window outputs record routes/summary, not constraint deltas",
+      "observed": "no accepted per-epoch full-run saved_routes/constrains delta artifact",
+      "required": "source queue plus saved_routes/constrains before/after for first N and full run",
+      "status": "FAIL"
+    },
+    {
+      "criterion": "full_java_exact_command_returncode_manifest",
+      "evidence": "C:\\Users\\38908\\.conda\\envs\\czr005\\python.exe C:\\PROGRAMING\\czr005\\scripts\\eval\\run_java_cpp_legacy_window_performance.py --start-epoch 8260 --max-epochs 90000 --max-new-tasks 0 --repeats 1 --java-warmup-repeats 0 --cpp-warmup-repeats 0 --cpp-python-path C:\\PROGRAMING\\czr005\\build_vs\\python\\Release",
+      "observed": "missing",
+      "required": "exact javac/java or Java-orchestrating command, return code 0, hashes, full-scope counts",
+      "status": "FAIL"
+    },
+    {
+      "criterion": "python_cpp_proxy_excluded_from_java_identity",
+      "evidence": "attempt classification audit",
+      "observed": "all cpp_pybind/static_astar/noastar rows are classified non-Java or lower-bound",
+      "required": "no Python/C++ proxy accepted as Java",
+      "status": "PASS"
+    },
+    {
+      "criterion": "accepted_headless_java_cie_full_baseline",
+      "evidence": "aggregate fail-closed gate",
+      "observed": "false",
+      "required": "all full-scope, identity, command, trace, and protected-file checks PASS",
+      "status": "FAIL"
+    },
+    {
+      "criterion": "g4j_closed",
+      "evidence": "governance: G4J requires a separate accepted Java/CIE or paper-protocol boundary",
+      "observed": "CLOSED",
+      "required": "CLOSED",
+      "status": "PASS"
+    }
+  ],
+  "claim_boundary": "G4J remains closed. First-N real Java/CIE evidence is retained, but no Python/C++ proxy, static A* probe, parsed historical text, or timed-out GUI stub is a full Java baseline.",
+  "commands": {
+    "reproduce_first_n_java_cie": "C:\\Users\\38908\\.conda\\envs\\czr005\\python.exe C:\\PROGRAMING\\czr005\\scripts\\eval\\run_java_cpp_legacy_window_performance.py --start-epoch 8260 --max-epochs 5000 --max-new-tasks 64 --repeats 3 --java-warmup-repeats 1 --cpp-warmup-repeats 1 --cpp-python-path C:\\PROGRAMING\\czr005\\build_vs\\python\\Release",
+    "required_full_java_cie_attempt": "C:\\Users\\38908\\.conda\\envs\\czr005\\python.exe C:\\PROGRAMING\\czr005\\scripts\\eval\\run_java_cpp_legacy_window_performance.py --start-epoch 8260 --max-epochs 90000 --max-new-tasks 0 --repeats 1 --java-warmup-repeats 0 --cpp-warmup-repeats 0 --cpp-python-path C:\\PROGRAMING\\czr005\\build_vs\\python\\Release"
+  },
+  "expected_java_segments": 43603,
+  "expected_raw_bags": 28506,
+  "full_candidate_count": 0,
+  "g4j_opened": false,
+  "g4j_status": "CLOSED",
+  "git_commands": [
+    {
+      "command": "git status --porcelain=v1 --untracked-files=all -- legacy data/processed/maps/map2.json data/processed/tasks/inputdata.jsonl",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": "git diff --name-only 3ae9092ed0cfa0d5d75cfde1c35ae53c61a25d64..HEAD -- legacy data/processed/maps/map2.json data/processed/tasks/inputdata.jsonl",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "historical_attempt_count": 19,
+  "legacy_protected_clean": true,
+  "real_java_bounded_window_count": 3,
+  "schema": "czr005.g4irsf11.java_cie_boundary.v1",
+  "status": "PARTIAL_WITH_EXPLICIT_BLOCKER",
+  "structure": {
+    "harness_imports_legacy_scheduler": true,
+    "harness_is_non_gui": true,
+    "harness_records_route_state": true,
+    "harness_runs_epoch_loop": true,
+    "main_calls_generate_tasks": true,
+    "main_calls_ics_path_finding": true,
+    "main_gui_coupled": true,
+    "scheduler_has_saved_routes": true,
+    "scheduler_has_unfinished_retry": true,
+    "scheduler_rebuilds_constrains": true,
+    "tasks_one_head_per_source_epoch": true
+  }
+}

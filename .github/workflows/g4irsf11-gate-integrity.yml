@@ -1,0 +1,21 @@
+name: g4irsf11-gate-integrity
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependency
+        run: python -m pip install pytest==9.1.0
+      - name: Run fail-closed gate regressions
+        run: python -m pytest tests/test_g4irsf11_gate_integrity.py
