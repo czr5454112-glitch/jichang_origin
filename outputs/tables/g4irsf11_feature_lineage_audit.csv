@@ -1,0 +1,87 @@
+field_path,lineage,role,origin,availability,sources,available_at_decision,model_input_allowed,derivation,prohibited_as_runtime_feature,lineage_status,storage_boundary
+event_scheduler.current_time,runtime,dependency_leaf,event_scheduler,decision_time,[],true,false,,false,PASS,lineage_dependency
+bag.current_node,runtime,dependency_leaf,bag_agent_local_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+bag.goal_node,runtime,dependency_leaf,immutable_task_request,static,[],true,false,,false,PASS,lineage_dependency
+bag.bounded_history,runtime,dependency_leaf,bag_agent_local_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+graph.outgoing_adjacency,runtime,dependency_leaf,official_map_local_adjacency,static,[],true,false,,false,PASS,lineage_dependency
+graph.static_potential,runtime,dependency_leaf,official_map_static_goal_potential,static,[],true,false,,false,PASS,lineage_dependency
+graph.edge_travel_time,runtime,dependency_leaf,official_map_directed_edge,static,[],true,false,,false,PASS,lineage_dependency
+local_neighbor.queue_length,runtime,dependency_leaf,bounded_neighbor_beacon,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_neighbor.scheduled_incoming,runtime,dependency_leaf,bounded_neighbor_beacon,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_neighbor.next_available_time,runtime,dependency_leaf,bounded_neighbor_beacon,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_edge.next_available_time,runtime,dependency_leaf,junction_owned_one_step_calendar,decision_time,[],true,false,,false,PASS,lineage_dependency
+congestion_beacon.advertised_fault,runtime,dependency_leaf,bounded_neighbor_beacon,decision_time,[],true,false,,false,PASS,lineage_dependency
+congestion_beacon.fault_message_timestamp,runtime,dependency_leaf,bounded_neighbor_beacon,decision_time,[],true,false,,false,PASS,lineage_dependency
+bounded_two_hop.queue_summary,runtime,dependency_leaf,bounded_two_hop_beacon,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_junction.queue_length,runtime,dependency_leaf,junction_controller_local_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_junction.next_available_time,runtime,dependency_leaf,junction_controller_local_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_junction.faulted_outgoing_count,runtime,dependency_leaf,junction_controller_local_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_junction.message_age_seconds,runtime,dependency_leaf,junction_controller_local_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_junction.downstream_pressure,runtime,dependency_leaf,bounded_neighbor_beacon,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_junction.recent_throughput,runtime,dependency_leaf,junction_controller_local_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_junction.local_wait_seconds,runtime,dependency_leaf,junction_controller_local_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_junction.active_reservation_count,runtime,dependency_leaf,junction_owned_one_step_calendar,decision_time,[],true,false,,false,PASS,lineage_dependency
+local_safety_shield.state,runtime,dependency_leaf,bounded_local_safety_state,decision_time,[],true,false,,false,PASS,lineage_dependency
+runtime.model_parameters,runtime,dependency_leaf,frozen_policy_bundle,static,[],true,false,,false,PASS,lineage_dependency
+runtime.full_astar_counter,runtime,dependency_leaf,event_runtime_invariant_counter,decision_time,[],true,false,,false,PASS,lineage_dependency
+decision_id,metadata,identity,event_runtime,decision_time,[],true,false,stable runtime decision identifier,false,PASS,trace_or_sample_metadata
+task_id,metadata,identity,source_task_jsonl,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+segment_id,metadata,identity,source_task_jsonl,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+event_time,runtime,observation,event_scheduler,decision_time,"[""event_scheduler.current_time""]",true,true,,false,PASS,decision_trace
+current_node,runtime,observation,bag_agent,decision_time,"[""bag.current_node""]",true,true,,false,PASS,decision_trace
+goal_node,runtime,observation,task_request,static,"[""bag.goal_node""]",true,true,,false,PASS,decision_trace
+candidate_next_nodes,runtime,candidate_structure,official_map,static,"[""graph.outgoing_adjacency"",""current_node""]",true,false,,false,PASS,decision_trace
+candidate_records[].next_node,runtime,candidate_structure,official_map,static,"[""candidate_next_nodes""]",true,false,,false,PASS,decision_trace
+candidate_records[].features.static_potential,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""graph.static_potential"",""goal_node"",""candidate_records[].next_node""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.travel_time,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""graph.edge_travel_time"",""current_node"",""candidate_records[].next_node""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.target_queue_length,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""local_neighbor.queue_length""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.target_scheduled_incoming,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""local_neighbor.scheduled_incoming""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.corridor_next_available,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""local_edge.next_available_time"",""event_time""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.target_next_available,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""local_neighbor.next_available_time"",""event_time""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.advertised_fault,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""congestion_beacon.advertised_fault""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.fault_message_age_seconds,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""event_time"",""congestion_beacon.fault_message_timestamp""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.recent_visit_count,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""short_history"",""candidate_records[].next_node""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.two_hop_queue_pressure,runtime,model_feature,bounded_local_feature_builder,decision_time,"[""bounded_two_hop.queue_summary""]",true,true,deterministic candidate-local feature,false,PASS,decision_trace
+candidate_records[].features.*,runtime,feature_group,approved_feature_allowlist,decision_time,"[""candidate_records[].features.static_potential"",""candidate_records[].features.travel_time"",""candidate_records[].features.target_queue_length"",""candidate_records[].features.target_scheduled_incoming"",""candidate_records[].features.corridor_next_available"",""candidate_records[].features.target_next_available"",""candidate_records[].features.advertised_fault"",""candidate_records[].features.fault_message_age_seconds"",""candidate_records[].features.recent_visit_count"",""candidate_records[].features.two_hop_queue_pressure""]",true,false,closed allow-list; unknown feature names fail validation,false,PASS,decision_trace
+candidate_records[].model_score,runtime,model_output,frozen_local_scorer,decision_time,"[""candidate_records[].features.static_potential"",""candidate_records[].features.travel_time"",""candidate_records[].features.target_queue_length"",""candidate_records[].features.target_scheduled_incoming"",""candidate_records[].features.corridor_next_available"",""candidate_records[].features.target_next_available"",""candidate_records[].features.advertised_fault"",""candidate_records[].features.fault_message_age_seconds"",""candidate_records[].features.recent_visit_count"",""candidate_records[].features.two_hop_queue_pressure"",""runtime.model_parameters""]",true,false,cost/score under trace metadata score semantics,false,PASS,decision_trace
+candidate_records[].shield_allowed,runtime,shield_output,local_safety_shield,decision_time,"[""local_safety_shield.state"",""candidate_records[].next_node""]",true,false,,false,PASS,decision_trace
+candidate_records[].shield_reason,runtime,shield_diagnostic,local_safety_shield,decision_time,"[""candidate_records[].shield_allowed""]",true,false,,false,PASS,decision_trace
+model_score_semantics,runtime,model_contract,event_runtime,static,[],true,false,lower_is_better_cost,false,PASS,decision_trace
+model_prediction,runtime,model_output,local_scorer,decision_time,"[""candidate_records[].model_score"",""candidate_records[].next_node"",""model_score_semantics""]",true,false,minimum cost; ties by ascending next_node,false,PASS,decision_trace
+model_margin,runtime,model_output,local_scorer,decision_time,"[""candidate_records[].model_score"",""model_score_semantics""]",true,false,second minimum cost minus minimum cost; 999 for one candidate,false,PASS,decision_trace
+risk_gate_triggered,runtime,shield_output,local_safety_shield,decision_time,"[""model_prediction"",""candidate_records[].shield_allowed""]",true,false,,false,PASS,decision_trace
+fallback_selected_next,runtime,action_diagnostic,local_pibt_lite_shield,decision_time,"[""candidate_records[].shield_allowed"",""candidate_records[].model_score""]",true,false,,false,PASS,decision_trace
+selected_next,runtime,committed_action,junction_controller,decision_time,"[""model_prediction"",""fallback_selected_next"",""candidate_records[].shield_allowed""]",true,false,,false,PASS,decision_trace
+decision_source,runtime,action_diagnostic,junction_controller,decision_time,"[""selected_next"",""model_prediction"",""fallback_selected_next""]",true,false,,false,PASS,decision_trace
+rule_reason,runtime,action_diagnostic,local_safety_shield,decision_time,"[""candidate_records[].shield_reason""]",true,false,,false,PASS,decision_trace
+local_snapshot.junction_queue_length,runtime,model_feature,junction_controller_local_state,decision_time,"[""local_junction.queue_length""]",true,true,,false,PASS,decision_trace
+local_snapshot.next_available_time,runtime,model_feature,junction_controller_local_state,decision_time,"[""local_junction.next_available_time""]",true,true,,false,PASS,decision_trace
+local_snapshot.faulted_outgoing_count,runtime,model_feature,junction_controller_local_state,decision_time,"[""local_junction.faulted_outgoing_count""]",true,true,,false,PASS,decision_trace
+local_snapshot.message_age_seconds,runtime,model_feature,junction_controller_local_state,decision_time,"[""local_junction.message_age_seconds""]",true,true,,false,PASS,decision_trace
+local_snapshot.downstream_pressure,runtime,model_feature,junction_controller_local_state,decision_time,"[""local_junction.downstream_pressure""]",true,true,,false,PASS,decision_trace
+local_snapshot.recent_throughput,runtime,model_feature,junction_controller_local_state,decision_time,"[""local_junction.recent_throughput""]",true,true,,false,PASS,decision_trace
+local_snapshot.local_wait_seconds,runtime,model_feature,junction_controller_local_state,decision_time,"[""local_junction.local_wait_seconds""]",true,true,,false,PASS,decision_trace
+local_snapshot.active_reservation_count,runtime,model_feature,junction_controller_local_state,decision_time,"[""local_junction.active_reservation_count""]",true,true,,false,PASS,decision_trace
+local_snapshot.*,runtime,feature_group,bounded_local_snapshot,decision_time,"[""local_snapshot.junction_queue_length"",""local_snapshot.next_available_time"",""local_snapshot.faulted_outgoing_count"",""local_snapshot.message_age_seconds"",""local_snapshot.downstream_pressure"",""local_snapshot.recent_throughput"",""local_snapshot.local_wait_seconds"",""local_snapshot.active_reservation_count""]",true,false,,false,PASS,decision_trace
+short_history,runtime,model_feature,bag_agent,decision_time,"[""bag.bounded_history""]",true,true,"past-only, maximum eight nodes",false,PASS,decision_trace
+full_astar_used,runtime,invariant,event_runtime,decision_time,"[""runtime.full_astar_counter""]",true,false,,false,PASS,decision_trace
+metadata.scenario,metadata,experiment_context,experiment_manifest,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.scale,metadata,experiment_context,experiment_manifest,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.run_id,metadata,experiment_context,experiment_manifest,pre_run,[],true,false,excluded from semantic repeat fingerprint,false,PASS,trace_or_sample_metadata
+metadata.trace_shard,metadata,shard_context,trace_input_manifest,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.trace_shard_count,metadata,shard_context,event_runtime_trace_context,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.trace_shard_index,metadata,shard_context,event_runtime_trace_context,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.runtime_bag_id,metadata,runtime_identity,event_runtime_internal_identity,decision_time,[],true,false,internal unique key; original task_id is never rewritten,false,PASS,trace_or_sample_metadata
+source_node,metadata,source_release_mapping,source_task_jsonl,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+original_arrival_time,metadata,source_release_mapping,source_task_jsonl.g4irsf7_original_pass_time,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+java_arrival_epoch,metadata,source_release_mapping,source_task_jsonl,pre_run,"[""original_arrival_time""]",true,false,floor(original_arrival_time),false,PASS,trace_or_sample_metadata
+release_time,metadata,source_release_mapping,source_task_jsonl.pass_time,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+source_queue_delay_seconds,metadata,source_release_mapping,source_task_jsonl,pre_run,"[""java_arrival_epoch"",""release_time""]",true,false,release_time-java_arrival_epoch,false,PASS,trace_or_sample_metadata
+sample_weight,metadata,sampling_metadata,stratified_reservoir,post_hoc,[],false,false,unique stratum population/effective quota,false,PASS,trace_or_sample_metadata
+reached_goal,label,training_label,separate_outcome_join,post_hoc,[],false,false,event outcome join,true,PASS,separate_outcome_table
+realized_local_wait_seconds,label,training_label,separate_outcome_join,post_hoc,[],false,false,post-hoc event interval,true,PASS,separate_outcome_table
+realized_downstream_wait_seconds,label,training_label,separate_outcome_join,post_hoc,[],false,false,post-hoc event interval,true,PASS,separate_outcome_table
+loop_or_dead_end,label,training_label,separate_outcome_join,post_hoc,[],false,false,post-hoc event outcome,true,PASS,separate_outcome_table
+bag_tth_seconds,label,training_label,separate_outcome_join,post_hoc,[],false,false,post-hoc bag aggregation,true,PASS,separate_outcome_table
+tail_bucket,label,training_label,separate_outcome_join,post_hoc,[],false,false,post-hoc p95/p99 membership,true,PASS,separate_outcome_table
+fault_recovery_outcome,label,training_label,separate_outcome_join,post_hoc,[],false,false,post-hoc fault outcome,true,PASS,separate_outcome_table

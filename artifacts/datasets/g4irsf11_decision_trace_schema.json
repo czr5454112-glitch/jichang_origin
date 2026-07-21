@@ -1,0 +1,238 @@
+{
+  "$id": "czr005.g4irsf11.decision_trace.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One online ARRIVE_JUNCTION decision. Outcomes/labels and full future routes are excluded.",
+  "properties": {
+    "candidate_next_nodes": {
+      "items": {
+        "type": "integer"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "candidate_order_digest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "candidate_ordering": {
+      "const": "next_node_ascending"
+    },
+    "candidate_records": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "features": {
+            "additionalProperties": {
+              "type": [
+                "number",
+                "integer",
+                "boolean"
+              ]
+            },
+            "type": "object"
+          },
+          "model_score": {
+            "type": "number"
+          },
+          "next_node": {
+            "type": "integer"
+          },
+          "shield_allowed": {
+            "type": "boolean"
+          },
+          "shield_reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "next_node",
+          "features",
+          "model_score"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "current_node": {
+      "type": "integer"
+    },
+    "decision_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "decision_source": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "event_time": {
+      "type": "number"
+    },
+    "fallback_selected_next": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "full_astar_used": {
+      "const": false
+    },
+    "goal_node": {
+      "type": "integer"
+    },
+    "local_snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "active_reservation_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "downstream_pressure": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "faulted_outgoing_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "junction_queue_length": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "local_wait_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "message_age_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "next_available_time": {
+          "type": "number"
+        },
+        "recent_throughput": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "junction_queue_length",
+        "next_available_time",
+        "faulted_outgoing_count",
+        "message_age_seconds"
+      ],
+      "type": "object"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null"
+        ]
+      },
+      "properties": {
+        "model_score_semantics": {
+          "const": "lower_is_better_cost"
+        },
+        "runtime_bag_id": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "model_score_semantics",
+        "runtime_bag_id"
+      ],
+      "type": "object"
+    },
+    "model_fallback_disagreement": {
+      "type": "boolean"
+    },
+    "model_margin": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "model_prediction": {
+      "type": "integer"
+    },
+    "model_score_semantics": {
+      "const": "lower_is_better_cost"
+    },
+    "risk_gate_triggered": {
+      "type": "boolean"
+    },
+    "rule_reason": {
+      "type": "string"
+    },
+    "schema_id": {
+      "const": "czr005.g4irsf11.decision_trace.v1"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "segment_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "selected_next": {
+      "type": "integer"
+    },
+    "short_history": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 8,
+      "type": "array"
+    },
+    "task_id": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "candidate_next_nodes",
+    "candidate_order_digest",
+    "candidate_ordering",
+    "candidate_records",
+    "current_node",
+    "decision_id",
+    "decision_source",
+    "event_time",
+    "fallback_selected_next",
+    "full_astar_used",
+    "goal_node",
+    "local_snapshot",
+    "metadata",
+    "model_fallback_disagreement",
+    "model_margin",
+    "model_prediction",
+    "model_score_semantics",
+    "risk_gate_triggered",
+    "rule_reason",
+    "schema_id",
+    "schema_version",
+    "segment_id",
+    "selected_next",
+    "short_history",
+    "task_id"
+  ],
+  "title": "CZR005 G4IRSF11 decision-level runtime trace",
+  "type": "object",
+  "x-semantic-invariants": [
+    "candidate_next_nodes equals the graph outgoing-neighbor set for current_node",
+    "candidate_records is sorted by next_node and aligns features/scores with that node",
+    "model_prediction, fallback_selected_next when present, and selected_next belong to candidates",
+    "model_prediction is the minimum-cost candidate; ties break by ascending next_node",
+    "model_margin equals second_min_cost minus min_cost (999 for one candidate)",
+    "short_history is non-empty, contains only bounded past state, and ends at current_node",
+    "model_fallback_disagreement iff fallback_selected_next is present and differs from model_prediction",
+    "model_margin is finite and non-null",
+    "metadata.runtime_bag_id is a non-negative internal identity; original task_id is unchanged",
+    "full_astar_used is false",
+    "no future path/route suffix, teacher field, or post-hoc label is present"
+  ]
+}
