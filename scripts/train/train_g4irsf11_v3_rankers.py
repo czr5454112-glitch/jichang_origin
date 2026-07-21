@@ -34,6 +34,7 @@ from czr005.models.g4irsf11_v3 import (  # noqa: E402
     V3TrainingError,
     build_split_readiness_audit,
     preflight_training,
+    raw_sha256_file,
     sha256_file,
     split_audit_rows,
     train_all_models,
@@ -292,6 +293,105 @@ def _referenced_training_artifacts(
     return paths, descriptors
 
 
+def _approved_gate_c_readiness_blockers(
+    args: argparse.Namespace,
+    recomputed_readiness: Mapping[str, Any],
+) -> list[str]:
+    """Bind a PASS Gate C to its immutable canonical readiness evidence.
+
+    Once Gate C says PASS, the evidence it approved is an input to training,
+    not an output that this invocation may refresh.  In particular, changing
+    the split seed must require a new Gate C evaluation instead of silently
+    replacing the already-hashed readiness artifact.
+    """
+
+    blockers: list[str] = []
+    canonical = DEFAULT_SPLIT_READINESS.resolve()
+    if args.split_readiness_output.resolve() != canonical:
+        blockers.append(
+            "Gate C PASS is bound to the canonical split-readiness output; "
+            "the requested output path differs"
+        )
+
+    try:
+        gate = json.loads(args.gate_manifest.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return [f"Gate C PASS manifest could not be re-read: {exc}"] + blockers
+    if not isinstance(gate, Mapping):
+        return ["Gate C PASS manifest must be a JSON object"] + blockers
+    gates = gate.get("gates")
+    gate_c = gates.get("C") if isinstance(gates, Mapping) else None
+    if not isinstance(gate_c, Mapping) or gate_c.get("status") != "PASS":
+        return ["Gate C approval disappeared during readiness lock validation"] + blockers
+    evidence = gate_c.get("evidence")
+    if not isinstance(evidence, list):
+        return ["Gate C PASS has no evidence list"] + blockers
+
+    matching: list[Mapping[str, Any]] = []
+    for descriptor in evidence:
+        if not isinstance(descriptor, Mapping):
+            continue
+        value = descriptor.get("path")
+        if not isinstance(value, str) or not value.strip():
+            continue
+        raw = Path(value)
+        resolved = raw.resolve() if raw.is_absolute() else (ROOT / raw).resolve()
+        if resolved == canonical:
+            matching.append(descriptor)
+    if len(matching) != 1:
+        blockers.append(
+            "Gate C PASS must contain exactly one evidence descriptor for the canonical "
+            "split-readiness artifact"
+        )
+        return blockers
+    descriptor = matching[0]
+    if not canonical.is_file():
+        blockers.append("Gate C-approved canonical split-readiness artifact is missing")
+        return blockers
+
+    expected_sha = str(descriptor.get("sha256") or "").lower()
+    if len(expected_sha) != 64 or any(
+        character not in "0123456789abcdef" for character in expected_sha
+    ):
+        blockers.append("Gate C split-readiness evidence SHA-256 is missing or invalid")
+    semantics = descriptor.get("hash_semantics")
+    try:
+        if semantics in (None, EXACT_BYTES_HASH):
+            actual_sha = raw_sha256_file(canonical)
+        elif semantics == SEMANTIC_TEXT_HASH:
+            actual_sha = sha256_file(canonical)
+        else:
+            actual_sha = ""
+            blockers.append("Gate C split-readiness evidence hash semantics are unsupported")
+    except OSError as exc:
+        blockers.append(f"Gate C-approved split readiness could not be hashed: {exc}")
+        return blockers
+    if expected_sha and actual_sha != expected_sha:
+        blockers.append(
+            "Gate C split-readiness evidence SHA-256 does not match the current canonical artifact"
+        )
+
+    expected_content = _json_bytes(recomputed_readiness)
+    try:
+        current_content = canonical.read_bytes()
+        current_payload = json.loads(current_content.decode("utf-8"))
+    except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
+        blockers.append(f"Gate C-approved split readiness could not be read exactly: {exc}")
+        return blockers
+    if not isinstance(current_payload, Mapping) or dict(current_payload) != dict(
+        recomputed_readiness
+    ):
+        blockers.append(
+            "Gate C-approved split readiness differs from the newly recomputed readiness"
+        )
+    if current_content != expected_content:
+        blockers.append(
+            "Gate C-approved split readiness is not the exact canonical encoding of the "
+            "newly recomputed readiness"
+        )
+    return blockers
+
+
 def run(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
     # Revoke first.  A crash or failed revalidation must never leave yesterday's
     # mutable active pointer consumable while a new publication is attempted.
@@ -359,9 +459,22 @@ def run(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         readiness["status"] = "PARTIAL_WITH_EXPLICIT_BLOCKER"
         readiness["blockers"] = sorted(set(readiness_blockers))
         readiness_dataset = None
-    _atomic_write_json(args.split_readiness_output, readiness)
-    readiness_descriptor = _descriptor(args.split_readiness_output)
     gate_statuses = dict(approval.gate_statuses)
+    if gate_statuses.get("C") == "PASS":
+        # A PASS Gate C has already approved and hashed this exact artifact.
+        # Revalidate it, but never mutate it from inside the training attempt.
+        blockers.extend(_approved_gate_c_readiness_blockers(args, readiness))
+        readiness_descriptor = (
+            _descriptor(args.split_readiness_output)
+            if args.split_readiness_output.resolve().is_file()
+            and args.split_readiness_output.resolve().is_relative_to(ROOT.resolve())
+            else None
+        )
+    else:
+        # A non-PASS Gate C may receive a fresh no-weights dry-run artifact so
+        # the next independent gate evaluation can approve (or reject) it.
+        _atomic_write_json(args.split_readiness_output, readiness)
+        readiness_descriptor = _descriptor(args.split_readiness_output)
     if readiness.get("status") != "PASS" or readiness_dataset is None:
         gate_statuses["C"] = "PARTIAL_WITH_EXPLICIT_BLOCKER"
         blockers.extend(map(str, readiness.get("blockers") or ["split readiness is not PASS"]))

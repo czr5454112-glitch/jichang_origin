@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import copy
 import csv
 import hashlib
@@ -8,6 +9,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+
+from scripts.train import train_g4irsf11_v3_rankers as v3_trainer
 
 from czr005.models.g4irsf11_v3 import (
     ACTIVE_RELEASE_SCHEMA,
@@ -36,6 +39,7 @@ from czr005.models.g4irsf11_v3 import (
     preflight_training,
     prepare_dataset,
     score_v3_candidates,
+    score_unpublished_v3_candidates_for_offline_evaluation,
     semantic_text_sha256,
     split_audit_rows,
     train_all_models,
@@ -177,6 +181,100 @@ def test_preflight_rejects_partial_decision_coverage_even_when_a_h_say_pass(tmp_
     assert "decision manifest: high-flow/fault/tail coverage is not PASS" in approval.blockers
 
 
+def test_passed_gate_c_seed_mismatch_never_overwrites_trains_or_publishes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate_path, decision_path, gate = _write_preflight_fixture(tmp_path)
+    decision = json.loads(decision_path.read_text(encoding="utf-8"))
+    artifacts = decision["artifacts"]
+    assert isinstance(artifacts, dict)
+    readiness_path = (
+        tmp_path / "outputs" / "reports" / "g4irsf11_v3_split_readiness.json"
+    )
+    approved_readiness = {
+        "schema": SPLIT_READINESS_SCHEMA,
+        "status": "PASS",
+        "model_weights_initialised": False,
+        "bindings": {
+            "decision_manifest_sha256": _sha(decision_path),
+            "hard_case_index": artifacts["hard_case_index"],
+            "outcome_sample": artifacts["outcome_sample"],
+        },
+        "metrics": {"seed": 11, "input_decision_count": 30},
+        "required_splits": list(SPLIT_NAMES),
+        "split_statuses": {name: "PASS" for name in SPLIT_NAMES},
+        "split_audit": [],
+        "dataset_sha256": hashlib.sha256(b"dataset").hexdigest(),
+        "blockers": [],
+        "manifest_artifact_descriptors": {
+            "hard_case_index": artifacts["hard_case_index"],
+            "outcome_sample": artifacts["outcome_sample"],
+        },
+    }
+    readiness_path.parent.mkdir(parents=True, exist_ok=True)
+    readiness_path.write_bytes(v3_trainer._json_bytes(approved_readiness))
+    gates = gate["gates"]
+    assert isinstance(gates, dict)
+    gate_c = gates["C"]
+    assert isinstance(gate_c, dict)
+    gate_c["evidence"].append(_descriptor(tmp_path, readiness_path))
+    gate_path.write_text(json.dumps(gate, sort_keys=True), encoding="utf-8")
+
+    recomputed_readiness = copy.deepcopy(approved_readiness)
+    recomputed_readiness["metrics"]["seed"] = 29
+    original_bytes = readiness_path.read_bytes()
+    training_called = False
+
+    def _recompute(*args: object, **kwargs: object) -> tuple[dict[str, object], object]:
+        assert kwargs["seed"] == 29
+        return copy.deepcopy(recomputed_readiness), object()
+
+    def _must_not_train(*args: object, **kwargs: object) -> None:
+        nonlocal training_called
+        training_called = True
+        raise AssertionError("training must not start for a Gate C readiness mismatch")
+
+    monkeypatch.setattr(v3_trainer, "ROOT", tmp_path)
+    monkeypatch.setattr(v3_trainer, "DEFAULT_GATE_MANIFEST", gate_path)
+    monkeypatch.setattr(v3_trainer, "DEFAULT_DECISION_MANIFEST", decision_path)
+    monkeypatch.setattr(v3_trainer, "DEFAULT_SPLIT_READINESS", readiness_path)
+    monkeypatch.setattr(
+        v3_trainer,
+        "DEFAULT_ACTIVE_RELEASE",
+        tmp_path / CANONICAL_ACTIVE_RELEASE,
+    )
+    monkeypatch.setattr(v3_trainer, "build_split_readiness_audit", _recompute)
+    monkeypatch.setattr(v3_trainer, "train_all_models", _must_not_train)
+    output_dir = tmp_path / "artifacts" / "models" / "g4irsf11_v3"
+    args = argparse.Namespace(
+        gate_manifest=gate_path,
+        decision_manifest=decision_path,
+        output_dir=output_dir,
+        status_output=tmp_path / "outputs" / "reports" / "training_status.json",
+        split_readiness_output=readiness_path,
+        split_audit_output=tmp_path / "outputs" / "tables" / "split_audit.csv",
+        epochs=1,
+        learning_rate=0.01,
+        seed=29,
+    )
+
+    code, status = v3_trainer.run(args)
+
+    assert code == 2
+    assert status["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    assert status["trained"] is False
+    assert any(
+        "differs from the newly recomputed readiness" in blocker
+        for blocker in status["blockers"]
+    )
+    assert readiness_path.read_bytes() == original_bytes
+    assert training_called is False
+    assert not (output_dir / "releases").exists()
+    active = json.loads((tmp_path / CANONICAL_ACTIVE_RELEASE).read_text(encoding="utf-8"))
+    assert active["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    assert active["active_release"] is None
+
+
 def _example(
     index: int,
     *,
@@ -280,8 +378,8 @@ def test_four_models_are_small_node_id_free_and_reproducible() -> None:
             }
             for candidate_index, node in enumerate(source.candidate_nodes)
         ]
-        prediction = score_v3_candidates(
-            model, records, allow_unpublished_for_offline_evaluation=True
+        prediction = score_unpublished_v3_candidates_for_offline_evaluation(
+            model, records
         )
         assert prediction["selected_next"] in source.candidate_nodes
         assert len(prediction["scores"]) == len(source.candidate_nodes)
@@ -468,17 +566,19 @@ def test_candidate_order_and_lowest_node_tie_break_are_explicit(tmp_path: Path) 
         }
         for index, node in enumerate(source.candidate_nodes)
     ]
-    prediction = score_v3_candidates(
-        model, records, allow_unpublished_for_offline_evaluation=True
-    )
+    prediction = score_unpublished_v3_candidates_for_offline_evaluation(model, records)
     assert prediction["selected_next"] == min(source.candidate_nodes)
     assert prediction["candidate_ordering"] == "next_node_ascending"
     assert prediction["tie_break"] == "lowest_next_node"
     with pytest.raises(V3TrainingError, match="ascending order"):
-        score_v3_candidates(
-            model,
-            list(reversed(records)),
-            allow_unpublished_for_offline_evaluation=True,
+        score_unpublished_v3_candidates_for_offline_evaluation(
+            model, list(reversed(records))
+        )
+    with pytest.raises(V3TrainingError, match="load_active_v3_model"):
+        score_v3_candidates(model, records)  # type: ignore[arg-type]
+    with pytest.raises(TypeError):
+        score_v3_candidates(  # type: ignore[call-arg, arg-type]
+            model, records, allow_unpublished_for_offline_evaluation=True
         )
 
     path = tmp_path / "legacy_model.json"
@@ -571,6 +671,25 @@ def test_active_release_is_hash_bound_and_revocation_blocks_old_models(tmp_path:
         decision_manifest_path=decision_path,
     )
     assert loaded["release_binding"] == binding
+    source = dataset.examples[0]
+    records = [
+        {
+            "next_node": node,
+            "features": {
+                feature_name: float(
+                    source.candidate_features[candidate_index, feature_index]
+                )
+                for feature_index, feature_name in enumerate(FEATURE_NAMES)
+            },
+        }
+        for candidate_index, node in enumerate(source.candidate_nodes)
+    ]
+    assert (
+        score_v3_candidates(loaded, records)["selected_next"]
+        in source.candidate_nodes
+    )
+    with pytest.raises(V3TrainingError, match="does not accept an active release wrapper"):
+        score_unpublished_v3_candidates_for_offline_evaluation(loaded, records)
     old_model = release_dir / "v3_linear_ranker.json"
     assert old_model.is_file()
     active["status"] = "PARTIAL_WITH_EXPLICIT_BLOCKER"

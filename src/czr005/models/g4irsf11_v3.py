@@ -1572,7 +1572,7 @@ def load_active_v3_model(
     *,
     gate_manifest_path: Path | str,
     decision_manifest_path: Path | str,
-) -> Mapping[str, Any]:
+) -> _ActiveV3Model:
     """Load only the currently published, non-revoked, hash-bound model."""
 
     repo_path = Path(repo).resolve()
@@ -1740,32 +1740,50 @@ def _inference_candidates(
 
 
 def score_v3_candidates(
+    model: _ActiveV3Model,
+    candidate_records: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Score with a model returned by :func:`load_active_v3_model` only."""
+
+    if not isinstance(model, _ActiveV3Model):
+        raise V3TrainingError(
+            "production scoring requires a model returned by load_active_v3_model"
+        )
+    return _score_v3_payload(model.payload, candidate_records)
+
+
+def score_unpublished_v3_candidates_for_offline_evaluation(
     model: Mapping[str, Any],
     candidate_records: Sequence[Mapping[str, Any]],
-    *,
-    allow_unpublished_for_offline_evaluation: bool = False,
 ) -> dict[str, Any]:
-    """Score one bounded local candidate set with a portable v3 model."""
+    """Score an unpublished payload for explicit offline tests/evaluation only.
+
+    Keeping this entry point separate prevents a runtime boolean from turning
+    the production scorer into an unpublished-model loading path.
+    """
 
     if isinstance(model, _ActiveV3Model):
-        payload = model.payload
-    elif allow_unpublished_for_offline_evaluation:
-        payload = model
-    else:
         raise V3TrainingError(
-            "production scoring requires a model returned by load_active_v3_model; "
-            "the offline override is test/evaluation only"
+            "offline unpublished scoring does not accept an active release wrapper"
         )
+    return _score_v3_payload(model, candidate_records)
+
+
+def _score_v3_payload(
+    payload: Mapping[str, Any],
+    candidate_records: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Validate and score one bounded candidate set from a model payload."""
+
     validate_model_payload(payload)
-    model = payload
-    names = tuple(map(str, model["feature_names"]))
+    names = tuple(map(str, payload["feature_names"]))
     nodes, matrix = _inference_candidates(candidate_records, names)
-    normalisation = model["normalisation"]
+    normalisation = payload["normalisation"]
     mean = np.asarray(normalisation["mean"], dtype=np.float64)
     std = np.asarray(normalisation["std"], dtype=np.float64)
     normalised = (matrix - mean) / std
     try:
-        scores = _rank_scores(model["ranker"], normalised)
+        scores = _rank_scores(payload["ranker"], normalised)
     except (TypeError, ValueError) as exc:
         raise V3TrainingError(f"ranker parameter dimension mismatch: {exc}") from exc
     if scores.shape != (len(nodes),) or not np.all(np.isfinite(scores)):
@@ -1779,7 +1797,7 @@ def score_v3_candidates(
         "candidate_ordering": "next_node_ascending",
         "tie_break": "lowest_next_node",
     }
-    risk_head = model.get("risk_head")
+    risk_head = payload.get("risk_head")
     if risk_head is not None:
         # Construct a temporary example only for the already-normalised bounded
         # candidate aggregate used by the separately trained risk head.
