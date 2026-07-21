@@ -18,12 +18,16 @@ from scripts.eval.g4irsf11_experiment_protocol import (
 from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metrics
 from scripts.eval.g4irsf11_result_validation import (
     EXECUTION_DESCRIPTOR_SCHEMA,
+    JUNCTION_BOTTLENECK_SCORE_SEMANTICS,
+    JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS,
+    JUNCTION_SERVICE_UTILIZATION_SEMANTICS,
     RESULT_SCHEMA,
     ResultExpectation,
     artifact_binding,
     atomic_write_json,
     atomic_write_jsonl,
     canonical_manifest_sha256,
+    derive_junction_evidence,
     fault_binding,
     read_json_object,
     validate_event_result,
@@ -31,7 +35,10 @@ from scripts.eval.g4irsf11_result_validation import (
     workload_binding,
 )
 from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
+    _command_text,
+    _descriptor_matches,
     _measurement_cohort,
+    _worker_command,
     _worker_config,
 )
 
@@ -81,6 +88,9 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         "requested_count": 2,
         "completed_count": 2,
         "failed_count": 0,
+        "peak_active_bag_count": 2,
+        "final_active_bag_count": 0,
+        "end_time": 12.0,
         "reservation_conflicts": 0,
         "runtime_full_astar_calls": 0,
         "global_reservation_scan_count": 0,
@@ -89,6 +99,7 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         "two_step_reservation_count": 0,
         "full_future_routes_stored": 0,
         "event_count": 4,
+        "bag_release_event_count": 2,
         "decision_count": 2,
         "runtime_seconds": 1.0,
         "decision_latency_us_p50": 1.0,
@@ -126,6 +137,30 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         starvation_seconds=CAPACITY_SLO["starvation_seconds"],
     )
     capacity = capacity_metrics(rows, summary, gate)
+    junction_state = derive_junction_evidence(
+        [
+            {
+                "node": 0,
+                "final_source_queue_length": 0,
+                "peak_source_queue_length": 1,
+                "final_junction_queue_length": 0,
+                "peak_junction_queue_length": 1,
+                "final_service_calendar_intervals": 0,
+                "peak_service_calendar_intervals": 1,
+                "final_local_state_accounted_bytes": 64,
+                "peak_local_state_accounted_bytes": 80,
+                "local_state_accounting_semantics": (
+                    JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS
+                ),
+                "service_reservation_count": 2,
+                "cumulative_service_reserved_seconds": 6.0,
+                "first_service_reservation_start_time": 0.0,
+                "last_service_reservation_end_time": 12.0,
+                "scheduled_incoming": 0,
+                "next_dispatch_time": 12.0,
+            }
+        ]
+    )
     environment = {
         "python_executable": str((tmp_path / "python.exe").resolve()),
         "python_version": "3.11.0",
@@ -161,12 +196,29 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         "fault_window_metrics": [],
         "resource_metrics": {
             "measurement_scope": "isolated_worker_process",
+            "runtime_thread_count": 1,
+            "junction_count": 1,
+            "peak_active_bag_count": 2,
             "working_set_before_bytes": 1000,
             "peak_working_set_before_bytes": 1100,
             "working_set_after_bytes": 1200,
             "peak_working_set_bytes": 1300,
             "peak_working_set_growth_from_initial_current_bytes": 300,
             "cpp_internal_accounted_bytes": 100,
+            "peak_junction_local_state_accounted_bytes": 80,
+            "sum_final_junction_local_state_accounted_bytes": 64,
+            "max_junction_service_utilization": 0.5,
+            "bottleneck_node": 0,
+            "bottleneck_score": 3.5,
+            "junction_local_state_accounting_semantics": (
+                JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS
+            ),
+            "junction_service_utilization_semantics": (
+                JUNCTION_SERVICE_UTILIZATION_SEMANTICS
+            ),
+            "junction_bottleneck_score_semantics": (
+                JUNCTION_BOTTLENECK_SCORE_SEMANTICS
+            ),
             "wall_seconds_including_pybind_materialization": 1.0,
         },
         "trace": {
@@ -185,7 +237,7 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         "event_sample": [],
         "fault_event_sample": [],
         "bag_sample": [],
-        "junction_state": [],
+        "junction_state": junction_state,
         "event_runtime_invariant_pass": True,
         "completion_pass": True,
     }
@@ -253,10 +305,80 @@ def test_valid_v3_result_and_descriptor_bundle_passes(tmp_path: Path) -> None:
     ) == []
 
 
+def test_current_cohort_descriptor_validation_rebuilds_canonical_inputs(
+    tmp_path: Path,
+) -> None:
+    descriptor, result, expectation, _, result_path, _, rows = _valid_bundle(tmp_path)
+    case = CaseSpec("validator_case", "test", "time_compressed", 1.0)
+    args = SimpleNamespace(
+        max_events=20_000_000,
+        measurement_cohort="pytest_sequential1",
+        concurrent_worker_target=1,
+        timeout_seconds=60.0,
+        python=Path(result["environment"]["python_executable"]),
+        search_path=tmp_path,
+    )
+    paths = {
+        "workload": tmp_path / "workload.jsonl",
+        "fault": tmp_path / "fault.json",
+        "result": result_path,
+        "trace": tmp_path / "trace.json",
+        "outcomes": tmp_path / "outcomes.json",
+        "tasks": tmp_path / "tasks.json",
+    }
+    command = _worker_command(
+        case,
+        paths,
+        args,
+        run_id=str(descriptor["run_id"]),
+        protocol_version=PROTOCOL_VERSION,
+        protocol_manifest_digest=canonical_manifest_sha256(protocol_manifest()),
+        input_artifact=expectation.input_artifact,
+        fault_artifact=expectation.fault_artifact,
+        source_sha256="b" * 64,
+        map_sha256="a" * 64,
+        implementation_digest="c" * 64,
+    )
+    descriptor["normalized_argv"] = command
+    descriptor["command"] = _command_text(command)
+    atomic_write_json(result_path, result)
+
+    assert _descriptor_matches(
+        descriptor,
+        case,
+        source_sha256="b" * 64,
+        map_sha256="a" * 64,
+        implementation_digest="c" * 64,
+        paths=paths,
+        expected_args=args,
+        expected_workload_rows=rows,
+        expected_fault_rows=[],
+    )
+    foreign_rows = deepcopy(rows)
+    foreign_rows[0]["release_time"] = 999.0
+    assert not _descriptor_matches(
+        descriptor,
+        case,
+        source_sha256="b" * 64,
+        map_sha256="a" * 64,
+        implementation_digest="c" * 64,
+        paths=paths,
+        expected_args=args,
+        expected_workload_rows=foreign_rows,
+        expected_fault_rows=[],
+    )
+
+
 @pytest.mark.parametrize(
     ("mutation", "needle"),
     [
         (lambda result: result.__setitem__("run_id", str(uuid.uuid4())), "run_id"),
+        (
+            lambda result: result.__setitem__(
+                "run_id", "00000000-0000-0000-0000-000000000000"
+            ),
+            "UUIDv4",
+        ),
         (lambda result: result["summary"].__setitem__("requested_count", 3), "counts differ"),
         (lambda result: result.__setitem__("completion_pass", False), "completion_pass"),
         (
@@ -275,6 +397,66 @@ def test_valid_v3_result_and_descriptor_bundle_passes(tmp_path: Path) -> None:
             lambda result: result["summary"].__setitem__("decision_latency_us_p99", "INF"),
             "non-finite",
         ),
+        (
+            lambda result: result["summary"].__setitem__(
+                "event_limit_reached", "False"
+            ),
+            "event_limit_reached must be a boolean",
+        ),
+        (
+            lambda result: result["summary"].__setitem__("peak_active_bag_count", 3),
+            "peak_active_bag_count",
+        ),
+        (
+            lambda result: result["summary"].__setitem__("final_active_bag_count", 1),
+            "final_active_bag_count",
+        ),
+        (
+            lambda result: (
+                result["summary"].__setitem__("peak_active_bag_count", 0),
+                result["resource_metrics"].__setitem__("peak_active_bag_count", 0),
+            ),
+            "completed bags",
+        ),
+        (
+            lambda result: result["junction_state"][0].__setitem__(
+                "service_reservation_count", 1
+            ),
+            "service reservations are below completed_count",
+        ),
+        (
+            lambda result: result["junction_state"][0].update(
+                {
+                    "final_junction_queue_length": 1,
+                    "peak_junction_queue_length": 1,
+                }
+            ),
+            "final_junction_queue_length must be zero",
+        ),
+        (
+            lambda result: result["junction_state"][0].__setitem__(
+                "service_utilization", 0.25
+            ),
+            "service_utilization",
+        ),
+        (
+            lambda result: result["resource_metrics"].__setitem__(
+                "runtime_thread_count", 2
+            ),
+            "single-thread",
+        ),
+        (
+            lambda result: result["resource_metrics"].__setitem__(
+                "working_set_before_bytes", 0
+            ),
+            "must be positive",
+        ),
+        (
+            lambda result: result["resource_metrics"].__setitem__(
+                "peak_working_set_before_bytes", 1
+            ),
+            "initial peak working set",
+        ),
     ],
 )
 def test_result_semantic_mutations_fail_closed(
@@ -285,6 +467,177 @@ def test_result_semantic_mutations_fail_closed(
     errors = validate_event_result(result, expectation, workload_rows=rows)
     assert errors
     assert any(needle in error for error in errors)
+
+
+def test_junction_evidence_uses_real_reservation_window_and_deterministic_rank() -> None:
+    def raw(
+        node: int,
+        *,
+        source_peak: int,
+        queue_peak: int,
+        calendar_peak: int,
+        peak_bytes: int,
+        reservations: int,
+        reserved_seconds: float,
+        first_start: float,
+        last_end: float,
+    ) -> dict[str, object]:
+        return {
+            "node": node,
+            "final_source_queue_length": 0,
+            "peak_source_queue_length": source_peak,
+            "final_junction_queue_length": 0,
+            "peak_junction_queue_length": queue_peak,
+            "final_service_calendar_intervals": 0,
+            "peak_service_calendar_intervals": calendar_peak,
+            "final_local_state_accounted_bytes": 64,
+            "peak_local_state_accounted_bytes": peak_bytes,
+            "local_state_accounting_semantics": (
+                JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS
+            ),
+            "service_reservation_count": reservations,
+            "cumulative_service_reserved_seconds": reserved_seconds,
+            "first_service_reservation_start_time": first_start,
+            "last_service_reservation_end_time": last_end,
+            "scheduled_incoming": 0,
+            "next_dispatch_time": 0.0,
+        }
+
+    rows = derive_junction_evidence(
+        [
+            raw(
+                7,
+                source_peak=2,
+                queue_peak=1,
+                calendar_peak=1,
+                peak_bytes=100,
+                reservations=2,
+                reserved_seconds=10.0,
+                first_start=100.0,
+                last_end=120.0,
+            ),
+            raw(
+                3,
+                source_peak=2,
+                queue_peak=1,
+                calendar_peak=1,
+                peak_bytes=120,
+                reservations=2,
+                reserved_seconds=10.0,
+                first_start=200.0,
+                last_end=220.0,
+            ),
+            raw(
+                1,
+                source_peak=0,
+                queue_peak=0,
+                calendar_peak=0,
+                peak_bytes=64,
+                reservations=0,
+                reserved_seconds=0.0,
+                first_start=-1.0,
+                last_end=-1.0,
+            ),
+        ]
+    )
+    by_node = {int(row["node"]): row for row in rows}
+    assert by_node[7]["service_observation_span_seconds"] == 20.0
+    assert by_node[7]["service_utilization"] == 0.5
+    assert by_node[3]["bottleneck_score"] == 4.5
+    assert by_node[3]["bottleneck_rank"] == 1
+    assert by_node[7]["bottleneck_rank"] == 2
+    assert by_node[1]["service_utilization"] == 0.0
+    assert by_node[1]["bottleneck_rank"] == 3
+
+
+def test_junction_evidence_and_cpp_lower_bound_fail_closed(tmp_path: Path) -> None:
+    _, result, expectation, _, _, _, rows = _valid_bundle(tmp_path)
+    result["summary"]["cpp_internal_accounted_bytes"] = 63
+    result["resource_metrics"]["cpp_internal_accounted_bytes"] = 63
+    errors = validate_event_result(result, expectation, workload_rows=rows)
+    assert any("do not cover final per-junction" in error for error in errors)
+
+    invalid_window = deepcopy(result["junction_state"])
+    invalid_window[0]["last_service_reservation_end_time"] = 5.0
+    with pytest.raises(ValueError, match="exceeds reservation observation span"):
+        derive_junction_evidence(invalid_window)
+
+
+def test_pre_release_time_limit_accepts_exact_empty_junction_evidence(
+    tmp_path: Path,
+) -> None:
+    _, result, expectation, _, _, _, rows = _valid_bundle(tmp_path)
+    summary = result["summary"]
+    summary.update(
+        {
+            "completed_count": 0,
+            "failed_count": 2,
+            "peak_active_bag_count": 0,
+            "end_time": 0.0,
+            "event_count": 0,
+            "bag_release_event_count": 0,
+            "decision_count": 0,
+            "event_limit_reached": False,
+            "time_limit_reached": True,
+        }
+    )
+    for name in ("raw_bag_capacity_metrics", "segment_capacity_metrics"):
+        metrics = result[name]
+        metrics.update(
+            {
+                "complete_count": 0,
+                "failed_count": 2,
+                "event_count": 0,
+                "decision_count": 0,
+                "service_level_pass": False,
+                "capacity_pass": False,
+            }
+        )
+    result["junction_state"] = []
+    result["completion_pass"] = False
+    result["resource_metrics"].update(
+        {
+            "junction_count": 0,
+            "peak_active_bag_count": 0,
+            "peak_junction_local_state_accounted_bytes": 0,
+            "sum_final_junction_local_state_accounted_bytes": 0,
+            "max_junction_service_utilization": 0.0,
+            "bottleneck_node": -1,
+            "bottleneck_score": 0.0,
+        }
+    )
+
+    assert derive_junction_evidence([]) == []
+    assert validate_event_result(result, expectation, workload_rows=rows) == []
+
+    unlimited = deepcopy(result)
+    unlimited["summary"]["time_limit_reached"] = False
+    unlimited_errors = validate_event_result(
+        unlimited, expectation, workload_rows=rows
+    )
+    assert any("explicit event/time limit" in error for error in unlimited_errors)
+
+    after_release = deepcopy(result)
+    after_release["summary"]["bag_release_event_count"] = 1
+    after_release_errors = validate_event_result(
+        after_release, expectation, workload_rows=rows
+    )
+    assert any("bag_release_event_count == 0" in error for error in after_release_errors)
+
+    double_limited = deepcopy(result)
+    double_limited["summary"]["event_limit_reached"] = True
+    double_errors = validate_event_result(
+        double_limited, expectation, workload_rows=rows
+    )
+    assert any("cannot both be reached" in error for error in double_errors)
+
+
+def test_malformed_summary_returns_errors_instead_of_raising(tmp_path: Path) -> None:
+    _, result, expectation, _, _, _, rows = _valid_bundle(tmp_path)
+    result["summary"]["requested_count"] = "not-an-integer"
+    errors = validate_event_result(result, expectation, workload_rows=rows)
+    assert errors
+    assert any("requested_count" in error for error in errors)
 
 
 def test_descriptor_binds_result_hash_argv_timeout_and_cohort(tmp_path: Path) -> None:

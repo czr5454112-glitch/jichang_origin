@@ -24,6 +24,17 @@ from scripts.eval.g4irsf11_experiment_protocol import CAPACITY_SLO, FAULT_SLO
 
 RESULT_SCHEMA = "czr005.g4irsf11.event_runtime_result.v3"
 EXECUTION_DESCRIPTOR_SCHEMA = "czr005.g4irsf11.event_runtime_execution_descriptor.v3"
+JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS = (
+    "cpp_object_plus_live_deque_payload_plus_calendar_capacity_lower_bound"
+)
+JUNCTION_SERVICE_UTILIZATION_SEMANTICS = (
+    "cumulative_service_reserved_seconds_over_first_start_to_last_end_reservation_span"
+)
+JUNCTION_BOTTLENECK_SCORE_SEMANTICS = (
+    "peak_source_queue_length_plus_peak_junction_queue_length_plus_"
+    "peak_service_calendar_intervals_plus_service_utilization;"
+    "rank_by_score_desc_then_peak_local_state_accounted_bytes_desc_then_node_asc"
+)
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _NONFINITE_TOKENS = {"NAN", "INF", "+INF", "-INF", "INFINITY", "+INFINITY", "-INFINITY"}
 
@@ -339,6 +350,171 @@ def _integer(value: Any, label: str) -> int:
     return int(number)
 
 
+def derive_junction_evidence(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Validate raw C++ junction counters and derive comparable local evidence.
+
+    Utilization uses each junction's actual reservation coverage window, from
+    its first reserved service start through its last reserved service end.
+    This remains valid when an event/time-limited run has future reservations
+    beyond ``summary.end_time``.  The local calendar is non-overlapping, so
+    cumulative reserved service may not exceed that window apart from roundoff.
+    """
+    # A fail-closed event/time limit may fire before the first future release.
+    # In that legitimate negative run no junction-local state has been
+    # materialized yet, so the exact raw evidence is an empty array.
+    if not rows:
+        return []
+
+    enriched: list[dict[str, Any]] = []
+    seen_nodes: set[int] = set()
+    integer_fields = (
+        "final_source_queue_length",
+        "peak_source_queue_length",
+        "final_junction_queue_length",
+        "peak_junction_queue_length",
+        "final_service_calendar_intervals",
+        "peak_service_calendar_intervals",
+        "final_local_state_accounted_bytes",
+        "peak_local_state_accounted_bytes",
+        "service_reservation_count",
+        "scheduled_incoming",
+    )
+    for index, value in enumerate(rows):
+        if not isinstance(value, Mapping):
+            raise ValueError(f"junction_state[{index}] must be an object")
+        node = _integer(value.get("node"), f"junction_state[{index}].node")
+        if node < 0:
+            raise ValueError(f"junction_state[{index}].node must be non-negative")
+        if node in seen_nodes:
+            raise ValueError(f"junction_state contains duplicate node {node}")
+        seen_nodes.add(node)
+        counters = {
+            key: _integer(value.get(key), f"junction_state[{index}].{key}")
+            for key in integer_fields
+        }
+        if any(counter < 0 for counter in counters.values()):
+            raise ValueError(f"junction_state[{index}] counters must be non-negative")
+        for final_key, peak_key in (
+            ("final_source_queue_length", "peak_source_queue_length"),
+            ("final_junction_queue_length", "peak_junction_queue_length"),
+            ("final_service_calendar_intervals", "peak_service_calendar_intervals"),
+            ("final_local_state_accounted_bytes", "peak_local_state_accounted_bytes"),
+        ):
+            if counters[final_key] > counters[peak_key]:
+                raise ValueError(
+                    f"junction_state[{index}].{peak_key} is below {final_key}"
+                )
+        if counters["final_local_state_accounted_bytes"] <= 0:
+            raise ValueError(
+                f"junction_state[{index}].final_local_state_accounted_bytes must be positive"
+            )
+        if (
+            value.get("local_state_accounting_semantics")
+            != JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS
+        ):
+            raise ValueError(
+                f"junction_state[{index}].local_state_accounting_semantics mismatch"
+            )
+        if (
+            counters["peak_service_calendar_intervals"]
+            > counters["service_reservation_count"]
+        ):
+            raise ValueError(
+                f"junction_state[{index}] calendar peak exceeds reservation count"
+            )
+        reserved_seconds = _finite_number(
+            value.get("cumulative_service_reserved_seconds"),
+            f"junction_state[{index}].cumulative_service_reserved_seconds",
+        )
+        if reserved_seconds < 0.0:
+            raise ValueError(
+                f"junction_state[{index}].cumulative_service_reserved_seconds must be non-negative"
+            )
+        first_reservation_start = _finite_number(
+            value.get("first_service_reservation_start_time"),
+            f"junction_state[{index}].first_service_reservation_start_time",
+        )
+        last_reservation_end = _finite_number(
+            value.get("last_service_reservation_end_time"),
+            f"junction_state[{index}].last_service_reservation_end_time",
+        )
+        if counters["service_reservation_count"] == 0:
+            if reserved_seconds != 0.0:
+                raise ValueError(
+                    f"junction_state[{index}] has service seconds without reservations"
+                )
+            if first_reservation_start != -1.0 or last_reservation_end != -1.0:
+                raise ValueError(
+                    f"junction_state[{index}] empty reservation window must use -1 sentinels"
+                )
+            span = 0.0
+            utilization = 0.0
+        else:
+            if reserved_seconds <= 0.0:
+                raise ValueError(
+                    f"junction_state[{index}] has reservations without positive service seconds"
+                )
+            if first_reservation_start < 0.0 or last_reservation_end <= first_reservation_start:
+                raise ValueError(
+                    f"junction_state[{index}] reservation observation window is invalid"
+                )
+            span = last_reservation_end - first_reservation_start
+            span_tolerance = max(
+                1.0e-9,
+                abs(span) * 1.0e-9,
+                counters["service_reservation_count"] * 1.0e-12,
+            )
+            if reserved_seconds > span + span_tolerance:
+                raise ValueError(
+                    f"junction_state[{index}] reserved service exceeds reservation observation span"
+                )
+            utilization = reserved_seconds / span
+            if utilization > 1.0 + 1.0e-9:
+                raise ValueError(
+                    f"junction_state[{index}].service_utilization exceeds one"
+                )
+        next_dispatch_time = _finite_number(
+            value.get("next_dispatch_time"),
+            f"junction_state[{index}].next_dispatch_time",
+        )
+        if next_dispatch_time < 0.0:
+            raise ValueError(
+                f"junction_state[{index}].next_dispatch_time must be non-negative"
+            )
+
+        score = float(
+            counters["peak_source_queue_length"]
+            + counters["peak_junction_queue_length"]
+            + counters["peak_service_calendar_intervals"]
+        ) + utilization
+        row = dict(value)
+        row.update(
+            {
+                "service_observation_span_seconds": span,
+                "service_utilization": utilization,
+                "service_utilization_semantics": JUNCTION_SERVICE_UTILIZATION_SEMANTICS,
+                "bottleneck_score": score,
+                "bottleneck_score_semantics": JUNCTION_BOTTLENECK_SCORE_SEMANTICS,
+            }
+        )
+        enriched.append(row)
+
+    ranked = sorted(
+        enriched,
+        key=lambda row: (
+            -float(row["bottleneck_score"]),
+            -int(row["peak_local_state_accounted_bytes"]),
+            int(row["node"]),
+        ),
+    )
+    rank_by_node = {int(row["node"]): rank for rank, row in enumerate(ranked, start=1)}
+    for row in enriched:
+        row["bottleneck_rank"] = rank_by_node[int(row["node"])]
+    return enriched
+
+
 def _walk_finite(value: Any, label: str, errors: list[str]) -> None:
     if isinstance(value, float) and not math.isfinite(value):
         errors.append(f"{label} is non-finite")
@@ -368,6 +544,8 @@ def _validate_capacity_metrics(
     metrics_value: Any,
     *,
     expected_count: int,
+    expected_completed: int | None = None,
+    expected_failed: int | None = None,
     summary: Mapping[str, Any],
     errors: list[str],
 ) -> None:
@@ -379,6 +557,18 @@ def _validate_capacity_metrics(
         _add(errors, bag_count == expected_count, f"{label}.bag_count != expected count")
         _add(errors, complete_count + failed_count == bag_count, f"{label} completion counters do not partition bag_count")
         _add(errors, all(value >= 0 for value in (bag_count, complete_count, failed_count)), f"{label} counters must be non-negative")
+        if expected_completed is not None:
+            _add(
+                errors,
+                complete_count == expected_completed,
+                f"{label}.complete_count != runtime completed_count",
+            )
+        if expected_failed is not None:
+            _add(
+                errors,
+                failed_count == expected_failed,
+                f"{label}.failed_count != runtime failed_count",
+            )
 
         projections = {
             "conflict_count": "reservation_conflicts",
@@ -541,9 +731,11 @@ def validate_event_result(
     _add(errors, result.get("schema") == RESULT_SCHEMA, "result schema mismatch")
     _add(errors, result.get("run_id") == expectation.run_id, "result run_id mismatch")
     try:
-        uuid.UUID(str(result.get("run_id")))
+        parsed_run_id = uuid.UUID(str(result.get("run_id")))
+        if parsed_run_id.version != 4 or str(parsed_run_id) != str(result.get("run_id")):
+            errors.append("result run_id must be a canonical UUIDv4")
     except (ValueError, AttributeError):
-        errors.append("result run_id must be a UUID")
+        errors.append("result run_id must be a canonical UUIDv4")
     _add(errors, result.get("case") == dict(expectation.case), "result CaseSpec echo mismatch")
     _add(errors, result.get("protocol_version") == expectation.protocol_version, "result protocol version mismatch")
     _add(
@@ -646,9 +838,16 @@ def validate_event_result(
     _add(errors, result.get("workload_path") == expectation.input_artifact.get("path"), "result workload path mismatch")
 
     summary = _mapping(result.get("summary"), "summary", errors)
+    completed_count: int | None = None
+    peak_active_count: int | None = None
+    bag_release_event_count: int | None = None
+    event_limited_flag: bool | None = None
+    time_limited_flag: bool | None = None
+    successful_completion_flag: bool | None = None
     try:
         requested = _integer(summary.get("requested_count"), "summary.requested_count")
         completed = _integer(summary.get("completed_count"), "summary.completed_count")
+        completed_count = completed
         failed = _integer(summary.get("failed_count"), "summary.failed_count")
         workload_count = _integer(result.get("workload_segment_count"), "result.workload_segment_count")
         expected_count = _integer(expectation.input_artifact.get("row_count"), "input_artifact.row_count")
@@ -661,9 +860,65 @@ def validate_event_result(
             )
         _add(errors, completed + failed == requested, "completed_count + failed_count != requested_count")
         _add(errors, min(requested, completed, failed) >= 0, "summary counts must be non-negative")
-        event_limited = bool(summary.get("event_limit_reached", False))
-        time_limited = bool(summary.get("time_limit_reached", False))
+        peak_active_bags = _integer(
+            summary.get("peak_active_bag_count"), "summary.peak_active_bag_count"
+        )
+        peak_active_count = peak_active_bags
+        final_active_bags = _integer(
+            summary.get("final_active_bag_count"),
+            "summary.final_active_bag_count",
+        )
+        _add(
+            errors,
+            final_active_bags == 0,
+            "summary.final_active_bag_count must be zero after finalization",
+        )
+        _add(
+            errors,
+            0 <= peak_active_bags <= requested,
+            "summary.peak_active_bag_count must be within requested_count",
+        )
+        _add(
+            errors,
+            completed == 0 or peak_active_bags >= 1,
+            "completed bags require a positive peak active bag count",
+        )
+        runtime_end_time = _finite_number(summary.get("end_time"), "summary.end_time")
+        event_limited_value = summary.get("event_limit_reached")
+        time_limited_value = summary.get("time_limit_reached")
+        _add(
+            errors,
+            isinstance(event_limited_value, bool),
+            "summary.event_limit_reached must be a boolean",
+        )
+        _add(
+            errors,
+            isinstance(time_limited_value, bool),
+            "summary.time_limit_reached must be a boolean",
+        )
+        event_limited = event_limited_value is True
+        time_limited = time_limited_value is True
+        event_limited_flag = event_limited
+        time_limited_flag = time_limited
+        _add(
+            errors,
+            not (event_limited and time_limited),
+            "event and time limits cannot both be reached",
+        )
+        _add(errors, runtime_end_time >= 0.0, "summary.end_time must be non-negative")
+        _add(
+            errors,
+            event_limited
+            or time_limited
+            or runtime_end_time
+            >= _finite_number(
+                expectation.input_artifact.get("minimum_release_time"),
+                "input_artifact.minimum_release_time",
+            ),
+            "unlimited summary.end_time must not precede the first input release",
+        )
         expected_completion = completed == requested and failed == 0 and not event_limited and not time_limited
+        successful_completion_flag = expected_completion
         _add(errors, result.get("completion_pass") is expected_completion, "completion_pass inconsistent")
 
         invariant_pairs = (
@@ -682,6 +937,7 @@ def validate_event_result(
         )
         for key in (
             "event_count",
+            "bag_release_event_count",
             "decision_count",
             "reservation_conflicts",
             "runtime_full_astar_calls",
@@ -692,6 +948,10 @@ def validate_event_result(
             "loop_count",
         ):
             _add(errors, _integer(summary.get(key, 0), f"summary.{key}") >= 0, f"summary.{key} must be non-negative")
+        bag_release_event_count = _integer(
+            summary.get("bag_release_event_count"),
+            "summary.bag_release_event_count",
+        )
         if all(key in summary for key in ("deadlock_count", "resolved_deadlock_count", "unresolved_deadlock_count")):
             _add(
                 errors,
@@ -776,9 +1036,138 @@ def validate_event_result(
             "segment_capacity_metrics",
             result.get("segment_capacity_metrics"),
             expected_count=requested,
+            expected_completed=completed,
+            expected_failed=failed,
             summary=summary,
             errors=errors,
         )
+    except ValueError as exc:
+        errors.append(str(exc))
+
+    junction_count = 0
+    peak_junction_bytes = 0
+    final_junction_bytes = 0
+    max_junction_utilization = 0.0
+    bottleneck_node = -1
+    bottleneck_score = 0.0
+    junction_value = result.get("junction_state")
+    _add(errors, isinstance(junction_value, list), "junction_state must be an array")
+    junction_rows = junction_value if isinstance(junction_value, list) else []
+    try:
+        expected_junction_rows = derive_junction_evidence(
+            junction_rows,
+        )
+        total_service_reservations = sum(
+            int(row["service_reservation_count"])
+            for row in expected_junction_rows
+        )
+        if completed_count is not None:
+            _add(
+                errors,
+                total_service_reservations >= completed_count,
+                "per-junction service reservations are below completed_count",
+            )
+        junction_count = len(expected_junction_rows)
+        if junction_count == 0:
+            _add(
+                errors,
+                completed_count == 0,
+                "empty junction_state requires completed_count == 0",
+            )
+            _add(
+                errors,
+                peak_active_count == 0,
+                "empty junction_state requires peak_active_bag_count == 0",
+            )
+            _add(
+                errors,
+                bag_release_event_count == 0,
+                "empty junction_state requires bag_release_event_count == 0",
+            )
+            _add(
+                errors,
+                event_limited_flag is True or time_limited_flag is True,
+                "empty junction_state requires an explicit event/time limit",
+            )
+        if successful_completion_flag is True:
+            for index, row in enumerate(expected_junction_rows):
+                for field in (
+                    "final_source_queue_length",
+                    "final_junction_queue_length",
+                    "final_service_calendar_intervals",
+                    "scheduled_incoming",
+                ):
+                    _add(
+                        errors,
+                        int(row[field]) == 0,
+                        f"successful junction_state[{index}].{field} must be zero",
+                    )
+        peak_junction_bytes = max(
+            (
+                int(row["peak_local_state_accounted_bytes"])
+                for row in expected_junction_rows
+            ),
+            default=0,
+        )
+        final_junction_bytes = sum(
+            int(row["final_local_state_accounted_bytes"])
+            for row in expected_junction_rows
+        )
+        max_junction_utilization = max(
+            (
+                float(row["service_utilization"])
+                for row in expected_junction_rows
+            ),
+            default=0.0,
+        )
+        if expected_junction_rows:
+            top_junction = min(
+                expected_junction_rows,
+                key=lambda row: int(row["bottleneck_rank"]),
+            )
+            bottleneck_node = int(top_junction["node"])
+            bottleneck_score = float(top_junction["bottleneck_score"])
+        for index, (observed, expected) in enumerate(
+            zip(junction_rows, expected_junction_rows)
+        ):
+            _add(
+                errors,
+                observed.get("service_utilization_semantics")
+                == JUNCTION_SERVICE_UTILIZATION_SEMANTICS,
+                f"junction_state[{index}] service utilization semantics mismatch",
+            )
+            _add(
+                errors,
+                observed.get("bottleneck_score_semantics")
+                == JUNCTION_BOTTLENECK_SCORE_SEMANTICS,
+                f"junction_state[{index}] bottleneck score semantics mismatch",
+            )
+            _add(
+                errors,
+                _integer(
+                    observed.get("bottleneck_rank"),
+                    f"junction_state[{index}].bottleneck_rank",
+                )
+                == int(expected["bottleneck_rank"]),
+                f"junction_state[{index}] bottleneck rank mismatch",
+            )
+            for key in (
+                "service_observation_span_seconds",
+                "service_utilization",
+                "bottleneck_score",
+            ):
+                _add(
+                    errors,
+                    math.isclose(
+                        _finite_number(
+                            observed.get(key), f"junction_state[{index}].{key}"
+                        ),
+                        float(expected[key]),
+                        rel_tol=0.0,
+                        abs_tol=1.0e-12,
+                    ),
+                    f"junction_state[{index}] {key} mismatch",
+                )
     except ValueError as exc:
         errors.append(str(exc))
 
@@ -791,10 +1180,109 @@ def validate_event_result(
         peak = _integer(resource.get("peak_working_set_bytes"), "resource peak working set")
         growth = _integer(resource.get("peak_working_set_growth_from_initial_current_bytes"), "resource peak growth")
         cpp_bytes = _integer(resource.get("cpp_internal_accounted_bytes"), "resource cpp bytes")
-        _add(errors, min(before, peak_before, after, peak, growth, cpp_bytes) >= 0, "resource byte counters must be non-negative")
+        runtime_thread_count = _integer(
+            resource.get("runtime_thread_count"), "resource runtime thread count"
+        )
+        _add(errors, growth >= 0, "resource growth must be non-negative")
+        _add(
+            errors,
+            min(before, peak_before, after, peak, cpp_bytes) > 0,
+            "measured working-set and C++ accounted bytes must be positive",
+        )
+        _add(
+            errors,
+            peak_before >= before,
+            "initial peak working set is below the initial current working set",
+        )
         _add(errors, peak >= max(before, peak_before, after), "peak working set is below an observed working set")
         _add(errors, growth == max(0, peak - before), "peak working set growth inconsistent")
         _add(errors, cpp_bytes == _integer(summary.get("cpp_internal_accounted_bytes"), "summary cpp bytes"), "C++ accounted bytes mismatch")
+        _add(
+            errors,
+            cpp_bytes >= final_junction_bytes
+            and (junction_count == 0 or final_junction_bytes > 0),
+            "C++ accounted bytes do not cover final per-junction local lower bounds",
+        )
+        _add(errors, runtime_thread_count == 1, "runtime thread count must be the single-thread baseline")
+        _add(
+            errors,
+            _integer(resource.get("junction_count"), "resource junction count")
+            == junction_count,
+            "resource junction count mismatch",
+        )
+        _add(
+            errors,
+            _integer(resource.get("peak_active_bag_count"), "resource peak active bags")
+            == _integer(summary.get("peak_active_bag_count"), "summary peak active bags"),
+            "resource peak active bag count mismatch",
+        )
+        _add(
+            errors,
+            _integer(
+                resource.get("peak_junction_local_state_accounted_bytes"),
+                "resource peak junction local bytes",
+            )
+            == peak_junction_bytes,
+            "resource peak junction local bytes mismatch",
+        )
+        _add(
+            errors,
+            _integer(
+                resource.get("sum_final_junction_local_state_accounted_bytes"),
+                "resource sum final junction local bytes",
+            )
+            == final_junction_bytes,
+            "resource final junction local byte sum mismatch",
+        )
+        _add(
+            errors,
+            math.isclose(
+                _finite_number(
+                    resource.get("max_junction_service_utilization"),
+                    "resource max junction utilization",
+                ),
+                max_junction_utilization,
+                rel_tol=0.0,
+                abs_tol=1.0e-12,
+            ),
+            "resource max junction utilization mismatch",
+        )
+        _add(
+            errors,
+            _integer(resource.get("bottleneck_node"), "resource bottleneck node")
+            == bottleneck_node,
+            "resource bottleneck node mismatch",
+        )
+        _add(
+            errors,
+            math.isclose(
+                _finite_number(
+                    resource.get("bottleneck_score"), "resource bottleneck score"
+                ),
+                bottleneck_score,
+                rel_tol=0.0,
+                abs_tol=1.0e-12,
+            ),
+            "resource bottleneck score mismatch",
+        )
+        _add(
+            errors,
+            resource.get("junction_local_state_accounting_semantics")
+            == JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS,
+            "resource junction local-state accounting semantics mismatch",
+        )
+        _add(
+            errors,
+            resource.get("junction_service_utilization_semantics")
+            == JUNCTION_SERVICE_UTILIZATION_SEMANTICS,
+            "resource junction utilization semantics mismatch",
+        )
+        _add(
+            errors,
+            resource.get("junction_bottleneck_score_semantics")
+            == JUNCTION_BOTTLENECK_SCORE_SEMANTICS,
+            "resource junction bottleneck semantics mismatch",
+        )
         _add(errors, _finite_number(resource.get("wall_seconds_including_pybind_materialization"), "resource wall seconds") > 0.0, "resource wall seconds must be positive")
     except ValueError as exc:
         errors.append(str(exc))

@@ -14,8 +14,10 @@ import json
 import os
 from pathlib import Path
 import shlex
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from typing import Any, Mapping, Sequence
 import uuid
@@ -56,13 +58,13 @@ from scripts.eval.g4irsf11_result_validation import (
     ResultExpectation,
     WORKER_RUNTIME_DEFAULTS,
     artifact_binding,
-    atomic_write_bytes,
     atomic_write_json,
     atomic_write_jsonl,
     canonical_json_bytes,
     canonical_manifest_sha256,
     count_jsonl_rows,
     fault_binding,
+    parse_json_object,
     read_json_array,
     read_json_object,
     validate_execution_descriptor,
@@ -107,6 +109,36 @@ def _write_json(path: Path, value: Mapping[str, Any]) -> None:
 
 def _read_json(path: Path) -> dict[str, Any]:
     return read_json_object(path)
+
+
+def _atomic_copy_file(source: Path, destination: Path) -> None:
+    """Stream an exact copy into place without exposing partial archive bytes."""
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.", suffix=".tmp", dir=str(destination.parent)
+    )
+    temporary = Path(temporary_name)
+    try:
+        with source.open("rb") as input_handle, os.fdopen(descriptor, "wb") as output_handle:
+            shutil.copyfileobj(input_handle, output_handle, length=1024 * 1024)
+            output_handle.flush()
+            os.fsync(output_handle.fileno())
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _read_jsonl_objects(path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            rows.append(
+                parse_json_object(line, label=f"{path}:{line_number}")
+            )
+    return rows
 
 
 def implementation_sha256(search_path: Path) -> str:
@@ -248,7 +280,16 @@ def _archive_existing_attempt(
 ) -> None:
     """Archive stale/mismatched evidence while holding the exact case lock."""
 
-    if not any(paths[name].is_file() for name in ("execution", "result", "trace", "outcomes", "tasks")):
+    artifact_names = (
+        "execution",
+        "result",
+        "trace",
+        "outcomes",
+        "tasks",
+        "workload",
+        "fault",
+    )
+    if not any(paths[name].is_file() for name in artifact_names):
         return
     try:
         execution = _read_json(paths["execution"]) if paths["execution"].is_file() else {}
@@ -258,10 +299,16 @@ def _archive_existing_attempt(
         result = _read_json(paths["result"]) if paths["result"].is_file() else {}
     except (OSError, ValueError):
         result = {}
-    summary = result.get("summary") or {}
-    capacity = result.get("raw_bag_capacity_metrics") or {}
+    summary_value = result.get("summary")
+    summary = summary_value if isinstance(summary_value, Mapping) else {}
+    capacity_value = result.get("raw_bag_capacity_metrics")
+    capacity = capacity_value if isinstance(capacity_value, Mapping) else {}
     sample_reasons: dict[str, int] = {}
-    for row in result.get("bag_sample") or []:
+    bag_sample_value = result.get("bag_sample")
+    bag_sample = bag_sample_value if isinstance(bag_sample_value, list) else []
+    for row in bag_sample:
+        if not isinstance(row, Mapping):
+            continue
         failure_reason = str(row.get("failure_reason") or "")
         if failure_reason:
             sample_reasons[failure_reason] = sample_reasons.get(failure_reason, 0) + 1
@@ -297,43 +344,88 @@ def _archive_existing_attempt(
         ),
         "archived_unix_time": time.time(),
     }
-    artifact_evidence: dict[str, Any] = {}
-    for name in ("execution", "result", "trace", "outcomes", "tasks", "workload", "fault"):
-        path = paths[name]
-        if path.is_file():
-            artifact_evidence[name] = {
-                "path": str(path.resolve()),
-                "sha256": sha256_file(path),
-                "size_bytes": path.stat().st_size,
-            }
-    compact["artifact_evidence"] = artifact_evidence
-
     run_id = str(execution.get("run_id") or "legacy-no-run-id")
     run_token = hashlib.sha256(run_id.encode("utf-8")).hexdigest()[:16]
     archive_token = f"{time.time_ns()}-{run_token}"
     archive_dir = paths["archive"] / archive_token
     archive_dir.mkdir(parents=True, exist_ok=False)
-    atomic_write_json(archive_dir / "archive_manifest.json", compact)
-    if paths["execution"].is_file():
-        atomic_write_bytes(archive_dir / "execution.json", paths["execution"].read_bytes())
-    if paths["result"].is_file():
-        atomic_write_bytes(archive_dir / "result.json", paths["result"].read_bytes())
-
+    archive_filenames = {
+        "execution": "execution.json",
+        "result": "result.json",
+        "trace": "trace.json",
+        "outcomes": "outcomes.jsonl",
+        "tasks": "tasks.jsonl",
+        "workload": "workload.jsonl",
+        "fault": "fault.json",
+    }
+    artifact_evidence: dict[str, Any] = {}
+    for name in artifact_names:
+        path = paths[name]
+        if path.is_file():
+            artifact_evidence[name] = {
+                "source_path": str(path.resolve()),
+                "archived_path": str((archive_dir / archive_filenames[name]).resolve()),
+                "sha256": sha256_file(path),
+                "size_bytes": path.stat().st_size,
+            }
+    compact["artifact_evidence"] = artifact_evidence
+    compact["archive_transaction_status"] = "ARCHIVE_IN_PROGRESS"
+    in_progress_path = archive_dir / "archive_in_progress.json"
+    atomic_write_json(in_progress_path, compact)
+    # Copy first and retain every active source until all archived bytes have
+    # been rehashed.  A crash before the final manifest therefore leaves an
+    # explicit IN_PROGRESS record and the original attempt remains recoverable.
+    for name, evidence in artifact_evidence.items():
+        source = paths[name]
+        destination = archive_dir / archive_filenames[name]
+        _atomic_copy_file(source, destination)
+        if (
+            sha256_file(destination) != evidence["sha256"]
+            or destination.stat().st_size != evidence["size_bytes"]
+        ):
+            raise ValueError(f"archive copy verification failed for {name}")
     previous: list[dict[str, Any]] = []
     if paths["history"].is_file():
         try:
-            for row in load_jsonl(paths["history"]):
+            for row in _read_jsonl_objects(paths["history"]):
                 previous.append(dict(row))
         except (OSError, ValueError, json.JSONDecodeError):
+            corrupt_history_sha256 = sha256_file(paths["history"])
+            corrupt_history_size = paths["history"].stat().st_size
+            corrupt_history_archive = archive_dir / "corrupt_prior_attempt_history.jsonl"
+            _atomic_copy_file(paths["history"], corrupt_history_archive)
+            if (
+                sha256_file(corrupt_history_archive) != corrupt_history_sha256
+                or corrupt_history_archive.stat().st_size != corrupt_history_size
+            ):
+                raise ValueError("corrupt prior history archive copy verification failed")
             previous.append(
                 {
-                    "archived_status": "CORRUPT_PRIOR_HISTORY_RETAINED_BY_HASH",
-                    "sha256": sha256_file(paths["history"]),
-                    "size_bytes": paths["history"].stat().st_size,
+                    "archived_status": "CORRUPT_PRIOR_HISTORY_RETAINED_EXACTLY",
+                    "archived_path": str(corrupt_history_archive.resolve()),
+                    "sha256": corrupt_history_sha256,
+                    "size_bytes": corrupt_history_size,
                 }
             )
-    previous.append(compact)
+            compact["corrupt_prior_history_evidence"] = {
+                "archived_path": str(corrupt_history_archive.resolve()),
+                "sha256": corrupt_history_sha256,
+                "size_bytes": corrupt_history_size,
+            }
+    complete = dict(compact)
+    complete["archive_transaction_status"] = "COMPLETE"
+    complete["archive_completed_unix_time"] = time.time()
+    # Publish the commit point with one same-filesystem rename: first replace
+    # the marker contents atomically with COMPLETE, then rename that single
+    # file to its final name.  No instant can expose both marker names.
+    atomic_write_json(in_progress_path, complete)
+    os.replace(in_progress_path, archive_dir / "archive_manifest.json")
+    previous.append(complete)
     atomic_write_jsonl(paths["history"], previous)
+    # Only a fully published, rehashed and history-recorded archive may clear
+    # active paths.  A history-write failure therefore retains every source.
+    for name in artifact_evidence:
+        paths[name].unlink(missing_ok=True)
 
 
 def _descriptor_matches(
@@ -346,6 +438,9 @@ def _descriptor_matches(
     protocol_version: str = PROTOCOL_VERSION,
     protocol_manifest_value: Mapping[str, Any] | None = None,
     paths: Mapping[str, Path] | None = None,
+    expected_args: argparse.Namespace | None = None,
+    expected_workload_rows: Sequence[Mapping[str, Any]] | None = None,
+    expected_fault_rows: Sequence[Mapping[str, Any]] | None = None,
 ) -> bool:
     manifest = dict(
         protocol_manifest_value
@@ -375,19 +470,60 @@ def _descriptor_matches(
         result = _read_json(bundle_paths["result"])
         workload_rows = load_jsonl(bundle_paths["workload"])
         fault_payload = read_json_array(bundle_paths["fault"])
+        run_id = str(descriptor.get("run_id") or "")
+        if expected_args is None:
+            input_artifact = dict(descriptor.get("input_artifact") or {})
+            fault_artifact = dict(descriptor.get("fault_artifact") or {})
+            validation_workload_rows = workload_rows
+            validation_fault_rows = [dict(row) for row in fault_payload]
+            expected_config = dict(descriptor.get("config") or {})
+            expected_cohort = dict(descriptor.get("measurement_cohort") or {})
+            expected_argv = list(descriptor.get("normalized_argv") or [])
+            expected_timeout = float(descriptor.get("parent_timeout_seconds"))
+        else:
+            if expected_workload_rows is None or expected_fault_rows is None:
+                raise ValueError(
+                    "current-cohort descriptor validation requires canonical workload/fault rows"
+                )
+            validation_workload_rows = [dict(row) for row in expected_workload_rows]
+            validation_fault_rows = [dict(row) for row in expected_fault_rows]
+            if workload_rows != validation_workload_rows:
+                raise ValueError("retained workload differs from current canonical derivation")
+            if fault_payload != validation_fault_rows:
+                raise ValueError("retained fault rows differ from current canonical derivation")
+            input_artifact = workload_binding(
+                bundle_paths["workload"], validation_workload_rows
+            )
+            fault_artifact = fault_binding(bundle_paths["fault"], validation_fault_rows)
+            expected_config = _worker_config(case, expected_args)
+            expected_cohort = _measurement_cohort(expected_args)
+            expected_argv = _worker_command(
+                case,
+                bundle_paths,
+                expected_args,
+                run_id=run_id,
+                protocol_version=protocol_version,
+                protocol_manifest_digest=canonical_manifest_sha256(manifest),
+                input_artifact=input_artifact,
+                fault_artifact=fault_artifact,
+                source_sha256=source_sha256,
+                map_sha256=map_sha256,
+                implementation_digest=implementation_digest,
+            )
+            expected_timeout = float(expected_args.timeout_seconds)
         expectation = ResultExpectation(
-            run_id=str(descriptor.get("run_id") or ""),
+            run_id=run_id,
             case=case.as_dict(),
             protocol_version=protocol_version,
             protocol_manifest_sha256=canonical_manifest_sha256(manifest),
-            input_artifact=dict(descriptor.get("input_artifact") or {}),
-            fault_artifact=dict(descriptor.get("fault_artifact") or {}),
-            fault_rows=[dict(row) for row in fault_payload],
+            input_artifact=input_artifact,
+            fault_artifact=fault_artifact,
+            fault_rows=validation_fault_rows,
             map_sha256=map_sha256,
             source_sha256=source_sha256,
             implementation_sha256=implementation_digest,
-            config=dict(descriptor.get("config") or {}),
-            measurement_cohort=dict(descriptor.get("measurement_cohort") or {}),
+            config=expected_config,
+            measurement_cohort=expected_cohort,
         )
         return not _bundle_validation_errors(
             descriptor,
@@ -395,9 +531,9 @@ def _descriptor_matches(
             expectation,
             case=case,
             paths=bundle_paths,
-            normalized_argv=list(descriptor.get("normalized_argv") or []),
-            parent_timeout_seconds=float(descriptor.get("parent_timeout_seconds")),
-            workload_rows=workload_rows,
+            normalized_argv=expected_argv,
+            parent_timeout_seconds=expected_timeout,
+            workload_rows=validation_workload_rows,
         )
     except (FileNotFoundError, OSError, ValueError, TypeError, KeyError):
         return False
@@ -414,6 +550,19 @@ def _fault_rows(case: CaseSpec, workload: Sequence[Mapping[str, Any]]) -> list[d
         minimum_release=min(releases),
         maximum_release=max(releases),
     )
+
+
+def _canonical_case_inputs(
+    case: CaseSpec,
+    base_rows: Sequence[Mapping[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Rebuild the only workload/fault inputs valid for a protocol case."""
+
+    workload = build_workload(base_rows, scale=case.scale, mode=case.workload_mode)
+    workload = namespace_workload(workload, scenario=case.case_id, task_id_offset=0)
+    if case.segment_limit is not None:
+        workload = timeline_spanning_sample(workload, case.segment_limit)
+    return workload, _fault_rows(case, workload)
 
 
 def _measurement_cohort(args: argparse.Namespace) -> dict[str, Any]:
@@ -562,6 +711,151 @@ def _trace_artifact_bindings(
     }
 
 
+def _trace_semantic_errors(
+    case: CaseSpec,
+    paths: Mapping[str, Path],
+    result: Mapping[str, Any],
+    workload_rows: Sequence[Mapping[str, Any]] | None = None,
+) -> list[str]:
+    """Cross-bind external trace files to the validated worker result."""
+
+    if not case.trace_complete:
+        return []
+    errors: list[str] = []
+    try:
+        trace_payload = _read_json(paths["trace"])
+        outcomes = _read_jsonl_objects(paths["outcomes"])
+        tasks = _read_jsonl_objects(paths["tasks"])
+    except (OSError, ValueError, TypeError) as exc:
+        return [f"trace semantic bundle could not be decoded: {exc}"]
+    decisions_value = trace_payload.get("decision_trace")
+    if not isinstance(decisions_value, list) or not all(
+        isinstance(row, Mapping) for row in decisions_value
+    ):
+        return ["external trace decision_trace must be an array of objects"]
+    decisions = [dict(row) for row in decisions_value]
+    result_trace = result.get("trace")
+    if not isinstance(result_trace, Mapping):
+        return ["result trace metadata is missing for external trace binding"]
+    for key, path_name in (
+        ("trace_output", "trace"),
+        ("outcome_output", "outcomes"),
+        ("trace_task_output", "tasks"),
+    ):
+        try:
+            declared = Path(str(result_trace.get(key) or "")).resolve()
+        except (OSError, ValueError):
+            errors.append(f"result {key} path is invalid")
+            continue
+        if declared != paths[path_name].resolve():
+            errors.append(f"result {key} path differs from bound {path_name} artifact")
+    if trace_payload.get("trace_context") != result_trace.get("trace_context"):
+        errors.append("external trace context differs from result trace context")
+    if trace_payload.get("summary") != result.get("summary"):
+        errors.append("external trace summary differs from result summary")
+    if result_trace.get("decision_rows_stored") != len(decisions):
+        errors.append("external trace decision count differs from result")
+
+    def identity(
+        row: Mapping[str, Any], label: str, *, decision_row: bool
+    ) -> tuple[str, int, str, int]:
+        decision_id = row.get("decision_id")
+        segment_id = row.get("segment_id")
+        if (
+            not isinstance(decision_id, str)
+            or not decision_id.strip()
+            or not isinstance(segment_id, str)
+            or not segment_id.strip()
+        ):
+            raise ValueError(f"{label} has an empty decision/segment identity")
+        task_id_value = row.get("task_id")
+        if isinstance(task_id_value, bool) or not isinstance(task_id_value, int):
+            raise ValueError(f"{label}.task_id must be an integer")
+        task_id = task_id_value
+        metadata = row.get("metadata") if decision_row else None
+        if decision_row:
+            if not isinstance(metadata, Mapping):
+                raise ValueError(f"{label}.metadata must be an object")
+            runtime_bag_value = metadata.get("runtime_bag_id")
+        else:
+            runtime_bag_value = row.get("runtime_bag_id")
+        if isinstance(runtime_bag_value, bool) or not isinstance(
+            runtime_bag_value, int
+        ):
+            raise ValueError(f"{label}.runtime_bag_id must be an integer")
+        runtime_bag_id = runtime_bag_value
+        if task_id < 0 or runtime_bag_id < 0:
+            raise ValueError(f"{label} has a negative task/runtime bag identity")
+        return decision_id, task_id, segment_id, runtime_bag_id
+
+    def task_identity(row: Mapping[str, Any], label: str) -> tuple[int, str]:
+        task_id = row.get("task_id")
+        segment_id = row.get("segment_id")
+        if isinstance(task_id, bool) or not isinstance(task_id, int):
+            raise ValueError(f"{label}.task_id must be an integer")
+        if task_id < 0 or not isinstance(segment_id, str) or not segment_id.strip():
+            raise ValueError(f"{label} has an invalid task/segment identity")
+        return task_id, segment_id
+
+    try:
+        decision_identities = [
+            identity(row, f"decision[{index}]", decision_row=True)
+            for index, row in enumerate(decisions)
+        ]
+        outcome_identities = [
+            identity(row, f"outcome[{index}]", decision_row=False)
+            for index, row in enumerate(outcomes)
+        ]
+        task_identities = [
+            task_identity(row, f"task[{index}]")
+            for index, row in enumerate(tasks)
+        ]
+    except (TypeError, ValueError) as exc:
+        errors.append(f"trace identity decoding failed: {exc}")
+        return sorted(set(errors))
+    decision_ids = [identity_row[0] for identity_row in decision_identities]
+    if len(set(decision_ids)) != len(decision_ids):
+        errors.append("external trace decision_ids are not unique")
+    if len(set(decision_identities)) != len(decision_identities):
+        errors.append("external trace decision identities are not unique")
+    if outcome_identities != decision_identities:
+        errors.append("outcome decision identities/order differ from external trace")
+    expected_task_identities = {
+        (task_id, segment_id)
+        for _, task_id, segment_id, _ in decision_identities
+    }
+    if len(set(task_identities)) != len(task_identities):
+        errors.append("trace task identities are not unique")
+    if set(task_identities) != expected_task_identities:
+        errors.append("trace task identities differ from decision task identities")
+    runtime_to_original: dict[int, tuple[int, str]] = {}
+    original_to_runtime: dict[tuple[int, str], int] = {}
+    for _, task_id, segment_id, runtime_bag_id in decision_identities:
+        original = (task_id, segment_id)
+        if runtime_bag_id in runtime_to_original and runtime_to_original[runtime_bag_id] != original:
+            errors.append("runtime_bag_id aliases multiple original segments")
+        if original in original_to_runtime and original_to_runtime[original] != runtime_bag_id:
+            errors.append("original segment changes runtime_bag_id")
+        runtime_to_original[runtime_bag_id] = original
+        original_to_runtime[original] = runtime_bag_id
+    if workload_rows is not None:
+        expected_task_rows = [
+            dict(row)
+            for row in workload_rows
+            if (int(row.get("task_id")), str(row.get("segment_id") or ""))
+            in expected_task_identities
+        ]
+        try:
+            task_bytes_equal = canonical_json_bytes(tasks) == canonical_json_bytes(
+                expected_task_rows
+            )
+        except (TypeError, ValueError):
+            task_bytes_equal = False
+        if not task_bytes_equal:
+            errors.append("trace task rows differ from canonical workload rows")
+    return sorted(set(errors))
+
+
 def _expectation(
     case: CaseSpec,
     args: argparse.Namespace,
@@ -618,6 +912,7 @@ def _bundle_validation_errors(
     except (FileNotFoundError, OSError, ValueError) as exc:
         errors.append(f"output artifact validation failed: {exc}")
         return sorted(set(errors))
+    errors.extend(_trace_semantic_errors(case, paths, result, workload_rows))
     errors.extend(
         validate_execution_descriptor(
             descriptor,
@@ -672,12 +967,8 @@ def execute_case(
     try:
         manifest = dict(protocol_manifest_value or protocol_manifest())
         protocol_manifest_digest = canonical_manifest_sha256(manifest)
-        workload = build_workload(base_rows, scale=case.scale, mode=case.workload_mode)
-        workload = namespace_workload(workload, scenario=case.case_id, task_id_offset=0)
-        if case.segment_limit is not None:
-            workload = timeline_spanning_sample(workload, case.segment_limit)
+        workload, windows = _canonical_case_inputs(case, base_rows)
         input_artifact = workload_binding(paths["workload"], workload)
-        windows = _fault_rows(case, workload)
         fault_artifact = fault_binding(paths["fault"], windows)
 
         if args.resume and paths["execution"].is_file() and paths["result"].is_file():
@@ -732,7 +1023,15 @@ def execute_case(
             )
         elif any(
             paths[name].is_file()
-            for name in ("execution", "result", "trace", "outcomes", "tasks")
+            for name in (
+                "execution",
+                "result",
+                "trace",
+                "outcomes",
+                "tasks",
+                "workload",
+                "fault",
+            )
         ):
             _archive_existing_attempt(
                 case,
@@ -888,45 +1187,88 @@ def _load_all_rows(
     source_sha256: str,
     map_sha256: str,
     implementation_digest: str,
+    expected_args: argparse.Namespace | None = None,
+    base_rows: Sequence[Mapping[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
+    if expected_args is not None and base_rows is None:
+        raise ValueError(
+            "formal consolidation requires current source rows for canonical input rebuild"
+        )
     rows: list[dict[str, Any]] = []
     for case in cases:
         paths = _case_paths(case)
         execution: dict[str, Any] = {"status": "NOT_RUN", "blocker": "formal case not executed"}
         result: dict[str, Any] | None = None
+        expected_workload_rows: list[dict[str, Any]] | None = None
+        expected_fault_rows: list[dict[str, Any]] | None = None
+        if expected_args is not None:
+            try:
+                expected_workload_rows, expected_fault_rows = _canonical_case_inputs(
+                    case, base_rows or []
+                )
+            except (KeyError, TypeError, ValueError) as exc:
+                execution = {
+                    "status": "FAILED",
+                    "return_code": "CANONICAL_INPUT_REBUILD_ERROR",
+                    "blocker": (
+                        "current source rows could not rebuild the protocol-defined workload/fault "
+                        f"for consolidation ({type(exc).__name__}: {exc})"
+                    ),
+                }
+                rows.append(case_row(case, None, execution))
+                continue
         if paths["execution"].is_file():
-            candidate = _read_json(paths["execution"])
-            if _descriptor_matches(
-                candidate,
-                case,
-                source_sha256=source_sha256,
-                map_sha256=map_sha256,
-                implementation_digest=implementation_digest,
-            ):
-                execution = candidate
-                if paths["result"].is_file():
-                    result = _read_json(paths["result"])
-                else:
-                    execution = dict(candidate)
-                    execution["status"] = "FAILED"
-                    execution["blocker"] = "execution descriptor exists but result JSON is missing"
-            elif candidate.get("status") == "RUNNING":
-                execution = dict(candidate)
-                execution["status"] = "PARTIAL_WITH_EXPLICIT_BLOCKER"
-                execution["blocker"] = (
-                    "stale/unverified RUNNING descriptor is not reusable; acquire the case lock, "
-                    "archive it explicitly, and rerun"
-                )
-            elif candidate.get("status") == "EXECUTED":
-                execution = dict(candidate)
-                execution["claimed_execution_status"] = "EXECUTED"
-                execution["status"] = "FAILED"
-                execution["blocker"] = (
-                    "descriptor claimed EXECUTED but strict v3 identity/artifact/semantic "
-                    "bundle validation failed; result is not reusable or reportable as executed"
-                )
+            try:
+                candidate = _read_json(paths["execution"])
+            except (OSError, TypeError, ValueError) as exc:
+                execution = {
+                    "status": "FAILED",
+                    "return_code": "DESCRIPTOR_DECODE_ERROR",
+                    "blocker": (
+                        "execution descriptor could not be decoded; the case evidence "
+                        f"is not consolidatable ({type(exc).__name__})"
+                    ),
+                }
             else:
-                execution = candidate
+                if _descriptor_matches(
+                    candidate,
+                    case,
+                    source_sha256=source_sha256,
+                    map_sha256=map_sha256,
+                    implementation_digest=implementation_digest,
+                    expected_args=expected_args,
+                    expected_workload_rows=expected_workload_rows,
+                    expected_fault_rows=expected_fault_rows,
+                ):
+                    execution = candidate
+                    try:
+                        result = _read_json(paths["result"])
+                    except (OSError, TypeError, ValueError) as exc:
+                        execution = dict(candidate)
+                        execution["claimed_execution_status"] = "EXECUTED"
+                        execution["status"] = "FAILED"
+                        execution["return_code"] = "RESULT_DECODE_ERROR"
+                        execution["blocker"] = (
+                            "validated result could not be decoded during consolidation; "
+                            f"the case evidence is not reportable ({type(exc).__name__})"
+                        )
+                elif candidate.get("status") == "RUNNING":
+                    execution = dict(candidate)
+                    execution["status"] = "PARTIAL_WITH_EXPLICIT_BLOCKER"
+                    execution["blocker"] = (
+                        "stale/unverified RUNNING descriptor is not reusable; acquire the case lock, "
+                        "archive it explicitly, and rerun"
+                    )
+                elif candidate.get("status") == "EXECUTED":
+                    execution = dict(candidate)
+                    execution["claimed_execution_status"] = "EXECUTED"
+                    execution["status"] = "FAILED"
+                    execution["blocker"] = (
+                        "descriptor claimed EXECUTED but strict v3 identity/artifact/semantic "
+                        "bundle validation failed; result is not reusable or reportable as executed"
+                    )
+                else:
+                    execution = candidate
         rows.append(case_row(case, result, execution))
     return rows
 
@@ -945,7 +1287,11 @@ def _write_tables_and_reports(rows: Sequence[Mapping[str, Any]]) -> list[dict[st
         write_csv(table_dir / filename, category_rows)
     resource_fields = (
         "case_id", "category", "workload_mode", "scale", "execution_status",
-        "workload_segment_count", "peak_working_set_bytes", "cpp_internal_accounted_bytes",
+        "workload_segment_count", "raw_bag_count", "junction_count",
+        "peak_active_bag_count", "runtime_thread_count", "peak_working_set_bytes",
+        "cpp_internal_accounted_bytes", "peak_junction_local_state_accounted_bytes",
+        "sum_final_junction_local_state_accounted_bytes",
+        "max_junction_service_utilization", "bottleneck_node", "bottleneck_score",
         "decision_latency_us_p50", "decision_latency_us_p95", "decision_latency_us_p99",
         "event_throughput_per_second", "wall_seconds", "blocker",
     )
@@ -994,13 +1340,35 @@ def _build_decision_artifacts(
     source_sha256: str,
     map_sha256: str,
     implementation_digest: str,
+    expected_args: argparse.Namespace | None = None,
+    base_rows: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any] | None:
     trace_cases = [case for case in cases if case.category == "decision_trace"]
     if not trace_cases:
         return None
     if not all(_case_paths(case)["execution"].is_file() for case in trace_cases):
         return None
-    executions = [_read_json(_case_paths(case)["execution"]) for case in trace_cases]
+    try:
+        executions = [_read_json(_case_paths(case)["execution"]) for case in trace_cases]
+    except (OSError, TypeError, ValueError):
+        # The case ledger already records the explicit descriptor blocker.  A
+        # corrupt decision descriptor must suppress derived artifacts, not abort
+        # consolidation after the ledger/report have been built.
+        return None
+    canonical_inputs: list[
+        tuple[list[dict[str, Any]] | None, list[dict[str, Any]] | None]
+    ] = []
+    if expected_args is not None:
+        if base_rows is None:
+            return None
+        try:
+            canonical_inputs = [
+                _canonical_case_inputs(case, base_rows) for case in trace_cases
+            ]
+        except (KeyError, TypeError, ValueError):
+            return None
+    else:
+        canonical_inputs = [(None, None) for _ in trace_cases]
     if not all(
         _descriptor_matches(
             row,
@@ -1008,8 +1376,11 @@ def _build_decision_artifacts(
             source_sha256=source_sha256,
             map_sha256=map_sha256,
             implementation_digest=implementation_digest,
+            expected_args=expected_args,
+            expected_workload_rows=canonical[0],
+            expected_fault_rows=canonical[1],
         )
-        for row, case in zip(executions, trace_cases)
+        for row, case, canonical in zip(executions, trace_cases, canonical_inputs)
     ):
         return None
     required = [
@@ -1168,6 +1539,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             source_sha256=source_sha256,
             map_sha256=map_sha256,
             implementation_digest=implementation_digest,
+            expected_args=args,
+            base_rows=base_rows,
         )
         gates = _write_tables_and_reports(rows)
         decision_manifest = _build_decision_artifacts(
@@ -1175,6 +1548,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             source_sha256=source_sha256,
             map_sha256=map_sha256,
             implementation_digest=implementation_digest,
+            expected_args=args,
+            base_rows=base_rows,
         )
     finally:
         _release_case_lock(consolidation_lock)

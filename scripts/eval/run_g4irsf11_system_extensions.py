@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 import sys
 from typing import Any, Mapping, Sequence
@@ -26,6 +27,7 @@ from scripts.eval.run_g4irsf11_event_runtime_evaluation import (  # noqa: E402
     MAP_PATH,
     SOURCE_TASK_PATH,
     _case_paths,
+    _canonical_case_inputs,
     _descriptor_matches,
     _acquire_case_lock,
     _release_case_lock,
@@ -123,8 +125,17 @@ def _continuity_audit(
 
 
 def _load_rows(
-    *, source_sha256: str, map_sha256: str, implementation_digest: str
+    *,
+    source_sha256: str,
+    map_sha256: str,
+    implementation_digest: str,
+    expected_args: argparse.Namespace | None = None,
+    base_rows: Sequence[Mapping[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
+    if expected_args is not None and base_rows is None:
+        raise ValueError(
+            "extension consolidation requires current source rows for canonical input rebuild"
+        )
     rows: list[dict[str, Any]] = []
     for case in system_extension_cases():
         paths = _case_paths(case)
@@ -133,20 +144,102 @@ def _load_rows(
             "blocker": "exact system extension case not executed",
         }
         result = None
-        if paths["execution"].is_file():
-            candidate = _read_json(paths["execution"])
-            if _descriptor_matches(
-                candidate,
-                case,
-                source_sha256=source_sha256,
-                map_sha256=map_sha256,
-                implementation_digest=implementation_digest,
-                protocol_version=EXTENSION_PROTOCOL_VERSION,
-            ):
-                execution = candidate
-                if paths["result"].is_file():
-                    result = _read_json(paths["result"])
-        workload_rows = load_jsonl(paths["workload"]) if paths["workload"].is_file() else []
+        expected_workload_rows: list[dict[str, Any]] | None = None
+        expected_fault_rows: list[dict[str, Any]] | None = None
+        canonical_inputs_valid = True
+        if expected_args is not None:
+            try:
+                expected_workload_rows, expected_fault_rows = _canonical_case_inputs(
+                    case, base_rows or []
+                )
+            except (KeyError, TypeError, ValueError) as exc:
+                canonical_inputs_valid = False
+                execution = {
+                    "status": "FAILED",
+                    "return_code": "CANONICAL_INPUT_REBUILD_ERROR",
+                    "blocker": (
+                        "current source rows could not rebuild the extension workload/fault "
+                        f"for consolidation ({type(exc).__name__}: {exc})"
+                    ),
+                }
+        if canonical_inputs_valid and paths["execution"].is_file():
+            try:
+                candidate = _read_json(paths["execution"])
+            except (OSError, TypeError, ValueError) as exc:
+                execution = {
+                    "status": "FAILED",
+                    "return_code": "DESCRIPTOR_DECODE_ERROR",
+                    "blocker": (
+                        "extension execution descriptor could not be decoded; the case "
+                        f"evidence is not consolidatable ({type(exc).__name__})"
+                    ),
+                }
+            else:
+                if _descriptor_matches(
+                    candidate,
+                    case,
+                    source_sha256=source_sha256,
+                    map_sha256=map_sha256,
+                    implementation_digest=implementation_digest,
+                    protocol_version=EXTENSION_PROTOCOL_VERSION,
+                    expected_args=expected_args,
+                    expected_workload_rows=expected_workload_rows,
+                    expected_fault_rows=expected_fault_rows,
+                ):
+                    execution = candidate
+                    try:
+                        result = _read_json(paths["result"])
+                    except (OSError, TypeError, ValueError) as exc:
+                        execution = dict(candidate)
+                        execution["claimed_execution_status"] = "EXECUTED"
+                        execution["status"] = "FAILED"
+                        execution["return_code"] = "RESULT_DECODE_ERROR"
+                        execution["blocker"] = (
+                            "validated extension result could not be decoded during "
+                            f"consolidation ({type(exc).__name__})"
+                        )
+                elif candidate.get("status") == "RUNNING":
+                    execution = dict(candidate)
+                    execution["status"] = "PARTIAL_WITH_EXPLICIT_BLOCKER"
+                    execution["blocker"] = (
+                        "stale/unverified extension RUNNING descriptor is not reusable; "
+                        "archive it explicitly and rerun"
+                    )
+                elif candidate.get("status") == "EXECUTED":
+                    execution = dict(candidate)
+                    execution["claimed_execution_status"] = "EXECUTED"
+                    execution["status"] = "FAILED"
+                    execution["blocker"] = (
+                        "extension descriptor claimed EXECUTED but strict identity/artifact/"
+                        "semantic bundle validation failed; result is not reportable as executed"
+                    )
+                else:
+                    execution = candidate
+        workload_rows: list[dict[str, Any]] = []
+        if paths["workload"].is_file():
+            try:
+                candidate_workload_rows = load_jsonl(paths["workload"])
+                for index, workload_row in enumerate(candidate_workload_rows):
+                    release_time = float(workload_row["release_time"])
+                    if not math.isfinite(release_time):
+                        raise ValueError(
+                            f"workload row {index} release_time must be finite"
+                        )
+                workload_rows = candidate_workload_rows
+            except (KeyError, OSError, TypeError, ValueError) as exc:
+                prior_blocker = str(execution.get("blocker") or "")
+                execution = dict(execution)
+                if execution.get("status") == "EXECUTED":
+                    execution["claimed_execution_status"] = "EXECUTED"
+                execution["status"] = "FAILED"
+                execution["return_code"] = "WORKLOAD_DECODE_ERROR"
+                workload_blocker = (
+                    "retained extension workload could not be decoded and semantically "
+                    f"validated ({type(exc).__name__})"
+                )
+                execution["blocker"] = "; ".join(
+                    blocker for blocker in (prior_blocker, workload_blocker) if blocker
+                )
         rows.append(
             _continuity_audit(
                 case_row(case, result, execution),
@@ -187,6 +280,16 @@ def _write_report(rows: Sequence[Mapping[str, Any]]) -> None:
     atomic_write_text(REPORT_PATH, "\n".join(lines))
 
 
+def _consolidation_complete(rows: Sequence[Mapping[str, Any]]) -> bool:
+    """Require every frozen extension bundle and its exact-input audit."""
+
+    return bool(rows) and all(
+        row.get("execution_status") == "EXECUTED"
+        and row.get("no_smoke_substitution_pass") is True
+        for row in rows
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--case", action="append", help="Exact extension case ID; repeatable")
@@ -209,6 +312,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if not args.keep_workloads:
+        raise SystemExit(
+            "strict extension v2 forbids --no-keep-workloads because consolidation "
+            "must rebuild and rehash exact inputs"
+        )
     if args.concurrent_worker_target <= 0:
         raise SystemExit("--concurrent-worker-target must be positive")
     if not args.measurement_cohort.strip():
@@ -271,6 +379,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             source_sha256=source_sha256,
             map_sha256=map_sha256,
             implementation_digest=implementation_digest,
+            expected_args=args,
+            base_rows=base_rows,
         )
         write_csv(TABLE_PATH, rows)
         _write_report(rows)
@@ -288,7 +398,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
         flush=True,
     )
-    return 2 if failures else 0
+    complete = _consolidation_complete(rows)
+    return 2 if failures or not complete else 0
 
 
 if __name__ == "__main__":

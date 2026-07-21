@@ -34,10 +34,14 @@ from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metric
 from scripts.eval.g4irsf11_continuity_metrics import rolling_continuity_metrics
 from scripts.eval.g4irsf11_experiment_protocol import CAPACITY_SLO, FAULT_SLO
 from scripts.eval.g4irsf11_result_validation import (
+    JUNCTION_BOTTLENECK_SCORE_SEMANTICS,
+    JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS,
+    JUNCTION_SERVICE_UTILIZATION_SEMANTICS,
     ResultExpectation,
     WORKER_RUNTIME_DEFAULTS,
     atomic_write_json,
     atomic_write_jsonl,
+    derive_junction_evidence,
     fault_binding,
     parse_json_object,
     read_json_array,
@@ -170,6 +174,9 @@ def _outcomes(
         rows.append(
             {
                 "decision_id": decision["decision_id"],
+                "task_id": int(bag["task_id"]),
+                "segment_id": str(bag["segment_id"]),
+                "runtime_bag_id": int(bag["runtime_bag_id"]),
                 "reached_goal": completed,
                 "local_wait_seconds": float(bag.get("total_local_wait", 0.0)),
                 "downstream_wait_seconds": float(bag.get("source_queue_delay", 0.0)),
@@ -341,6 +348,32 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "name": args.measurement_cohort,
         "declared_concurrent_worker_target": args.concurrent_worker_target,
     }
+    junction_state = derive_junction_evidence(
+        list(payload["junction_state"]),
+    )
+    peak_junction_local_bytes = max(
+        (
+            int(row["peak_local_state_accounted_bytes"])
+            for row in junction_state
+        ),
+        default=0,
+    )
+    sum_final_junction_local_bytes = sum(
+        int(row["final_local_state_accounted_bytes"]) for row in junction_state
+    )
+    max_junction_service_utilization = max(
+        (float(row["service_utilization"]) for row in junction_state),
+        default=0.0,
+    )
+    if junction_state:
+        bottleneck = min(
+            junction_state, key=lambda row: int(row["bottleneck_rank"])
+        )
+        bottleneck_node = int(bottleneck["node"])
+        bottleneck_score = float(bottleneck["bottleneck_score"])
+    else:
+        bottleneck_node = -1
+        bottleneck_score = 0.0
     result: dict[str, Any] = {
         "schema": "czr005.g4irsf11.event_runtime_result.v3",
         "run_id": args.run_id,
@@ -375,12 +408,29 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "fault_window_metrics": fault_rows,
         "resource_metrics": {
             "measurement_scope": "isolated_worker_process",
+            "runtime_thread_count": 1,
+            "junction_count": len(junction_state),
+            "peak_active_bag_count": int(summary["peak_active_bag_count"]),
             "working_set_before_bytes": memory_before,
             "peak_working_set_before_bytes": peak_before,
             "working_set_after_bytes": memory_after,
             "peak_working_set_bytes": peak_after,
             "peak_working_set_growth_from_initial_current_bytes": max(0, peak_after - memory_before),
             "cpp_internal_accounted_bytes": int(summary.get("cpp_internal_accounted_bytes", 0)),
+            "peak_junction_local_state_accounted_bytes": peak_junction_local_bytes,
+            "sum_final_junction_local_state_accounted_bytes": sum_final_junction_local_bytes,
+            "max_junction_service_utilization": max_junction_service_utilization,
+            "bottleneck_node": bottleneck_node,
+            "bottleneck_score": bottleneck_score,
+            "junction_local_state_accounting_semantics": (
+                JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS
+            ),
+            "junction_service_utilization_semantics": (
+                JUNCTION_SERVICE_UTILIZATION_SEMANTICS
+            ),
+            "junction_bottleneck_score_semantics": (
+                JUNCTION_BOTTLENECK_SCORE_SEMANTICS
+            ),
             "wall_seconds_including_pybind_materialization": wall_seconds,
         },
         "trace": {
@@ -394,7 +444,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "event_sample": list(payload["events"])[:100],
         "fault_event_sample": list(payload["fault_events"])[:100],
         "bag_sample": enriched_segments[:100],
-        "junction_state": list(payload["junction_state"]),
+        "junction_state": junction_state,
         "event_runtime_invariant_pass": invariant_pass,
         "completion_pass": (
             int(summary.get("completed_count", 0)) == len(workload)

@@ -1564,10 +1564,13 @@ def stratified_reservoir_sample(
 
 
 def outcome_rows_by_decision(rows: Iterable[Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
-    """Index a separate outcome JSONL while rejecting runtime-field ambiguity."""
+    """Index outcome labels while allowing only explicit join identities."""
 
     allowed = {
         "decision_id",
+        "task_id",
+        "segment_id",
+        "runtime_bag_id",
         "reached_goal",
         "local_wait_seconds",
         "downstream_wait_seconds",
@@ -1586,8 +1589,70 @@ def outcome_rows_by_decision(rows: Iterable[Mapping[str, Any]]) -> dict[str, dic
         decision_id = _required_text(row.get("decision_id"), f"outcome[{index}].decision_id")
         if decision_id in result:
             raise DecisionTraceValidationError(f"duplicate outcome decision_id: {decision_id}")
-        result[decision_id] = dict(row)
+        identity_fields = {"task_id", "segment_id", "runtime_bag_id"}
+        present_identity_fields = identity_fields.intersection(row)
+        if present_identity_fields and present_identity_fields != identity_fields:
+            raise DecisionTraceValidationError(
+                f"outcome row {index} must provide all identity fields together"
+            )
+        normalized = dict(row)
+        if present_identity_fields:
+            task_id = _required_int(row.get("task_id"), f"outcome[{index}].task_id")
+            runtime_bag_id = _required_int(
+                row.get("runtime_bag_id"), f"outcome[{index}].runtime_bag_id"
+            )
+            if task_id < 0 or runtime_bag_id < 0:
+                raise DecisionTraceValidationError(
+                    f"outcome row {index} identity integers must be non-negative"
+                )
+            normalized["task_id"] = task_id
+            normalized["segment_id"] = _required_text(
+                row.get("segment_id"), f"outcome[{index}].segment_id"
+            )
+            normalized["runtime_bag_id"] = runtime_bag_id
+        result[decision_id] = normalized
     return result
+
+
+def validate_outcome_decision_identities(
+    outcomes: Mapping[str, Mapping[str, Any]],
+    decisions: Iterable[Mapping[str, Any]],
+) -> None:
+    """Cross-bind optional outcome identities to their exact decision rows."""
+
+    decisions_by_id = {str(row.get("decision_id")): row for row in decisions}
+    for decision_id, outcome in outcomes.items():
+        identity_fields = {"task_id", "segment_id", "runtime_bag_id"}
+        if not identity_fields.intersection(outcome):
+            continue
+        decision = decisions_by_id.get(decision_id)
+        if decision is None:
+            continue
+        metadata = decision.get("metadata")
+        if not isinstance(metadata, Mapping):
+            raise DecisionTraceValidationError(
+                f"decision {decision_id} metadata is missing for outcome identity binding"
+            )
+        expected = (
+            _required_int(decision.get("task_id"), f"decision[{decision_id}].task_id"),
+            _required_text(
+                decision.get("segment_id"), f"decision[{decision_id}].segment_id"
+            ),
+            _required_int(
+                metadata.get("runtime_bag_id"),
+                f"decision[{decision_id}].metadata.runtime_bag_id",
+            ),
+        )
+        observed = (
+            int(outcome["task_id"]),
+            str(outcome["segment_id"]),
+            int(outcome["runtime_bag_id"]),
+        )
+        if observed != expected:
+            raise DecisionTraceValidationError(
+                f"outcome identity differs from decision {decision_id}: "
+                f"observed={observed}, expected={expected}"
+            )
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:

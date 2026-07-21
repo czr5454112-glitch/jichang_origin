@@ -3056,6 +3056,8 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["requested_count"] = summary.requested_count;
   row["completed_count"] = summary.completed_count;
   row["failed_count"] = summary.failed_count;
+  row["peak_active_bag_count"] = summary.peak_active_bag_count;
+  row["final_active_bag_count"] = summary.final_active_bag_count;
   row["decision_count"] = summary.decision_count;
   row["event_count"] = summary.event_count;
   row["bag_release_event_count"] = summary.bag_release_event_count;
@@ -3305,8 +3307,24 @@ py::list g4irsf11_event_runtime_junction_rows(
     py::dict row;
     row["node"] = junction.node;
     row["final_source_queue_length"] = junction.final_source_queue_length;
+    row["peak_source_queue_length"] = junction.peak_source_queue_length;
     row["final_junction_queue_length"] = junction.final_junction_queue_length;
+    row["peak_junction_queue_length"] = junction.peak_junction_queue_length;
     row["final_service_calendar_intervals"] = junction.final_service_calendar_intervals;
+    row["peak_service_calendar_intervals"] = junction.peak_service_calendar_intervals;
+    row["final_local_state_accounted_bytes"] =
+        py::int_(junction.final_local_state_accounted_bytes);
+    row["peak_local_state_accounted_bytes"] =
+        py::int_(junction.peak_local_state_accounted_bytes);
+    row["local_state_accounting_semantics"] =
+        "cpp_object_plus_live_deque_payload_plus_calendar_capacity_lower_bound";
+    row["service_reservation_count"] = py::int_(junction.service_reservation_count);
+    row["cumulative_service_reserved_seconds"] =
+        junction.cumulative_service_reserved_seconds;
+    row["first_service_reservation_start_time"] =
+        junction.first_service_reservation_start_time;
+    row["last_service_reservation_end_time"] =
+        junction.last_service_reservation_end_time;
     row["scheduled_incoming"] = junction.scheduled_incoming;
     row["next_dispatch_time"] = junction.next_dispatch_time;
     rows.append(std::move(row));

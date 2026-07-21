@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any
 
 from scripts.eval.g4irsf11_experiment_protocol import (
@@ -8,7 +9,11 @@ from scripts.eval.g4irsf11_experiment_protocol import (
     system_extension_cases,
     system_extension_manifest,
 )
-from scripts.eval.run_g4irsf11_system_extensions import _continuity_audit
+from scripts.eval.run_g4irsf11_system_extensions import (
+    _consolidation_complete,
+    _continuity_audit,
+    _load_rows,
+)
 
 
 class _ReleaseRows(Sequence[dict[str, Any]]):
@@ -100,3 +105,77 @@ def test_extension_audit_fails_closed_when_retained_exact_input_is_missing() -> 
         "arrival_span_seconds": 7 * 86_400.0,
     }
     assert _continuity_audit(row)["no_smoke_substitution_pass"] is False
+
+
+def test_extension_consolidation_exit_contract_rejects_mixed_or_inexact_rows() -> None:
+    exact = {
+        "execution_status": "EXECUTED",
+        "no_smoke_substitution_pass": True,
+    }
+    assert _consolidation_complete([exact]) is True
+    assert _consolidation_complete([]) is False
+    assert _consolidation_complete([exact, dict(exact, execution_status="FAILED")]) is False
+    assert _consolidation_complete(
+        [exact, dict(exact, no_smoke_substitution_pass=False)]
+    ) is False
+
+
+def test_extension_consolidation_reports_corrupt_descriptor_as_failed(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    case = system_extension_cases()[0]
+    paths = {
+        "execution": tmp_path / "execution.json",
+        "result": tmp_path / "result.json",
+        "workload": tmp_path / "workload.jsonl",
+    }
+    paths["execution"].write_text('{"status":', encoding="utf-8")
+    monkeypatch.setattr(  # type: ignore[attr-defined]
+        "scripts.eval.run_g4irsf11_system_extensions.system_extension_cases",
+        lambda: [case],
+    )
+    monkeypatch.setattr(  # type: ignore[attr-defined]
+        "scripts.eval.run_g4irsf11_system_extensions._case_paths",
+        lambda ignored: paths,
+    )
+    rows = _load_rows(
+        source_sha256="a" * 64,
+        map_sha256="b" * 64,
+        implementation_digest="c" * 64,
+    )
+    assert len(rows) == 1
+    assert rows[0]["execution_status"] == "FAILED"
+    assert rows[0]["return_code"] == "DESCRIPTOR_DECODE_ERROR"
+    assert "descriptor could not be decoded" in rows[0]["blocker"]
+    assert rows[0]["no_smoke_substitution_pass"] is False
+
+
+def test_extension_consolidation_reports_semantically_corrupt_workload_as_failed(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    case = system_extension_cases()[0]
+    paths = {
+        "execution": tmp_path / "execution.json",
+        "result": tmp_path / "result.json",
+        "workload": tmp_path / "workload.jsonl",
+    }
+    paths["workload"].write_text('{"missing_release_time": 1}\n', encoding="utf-8")
+    monkeypatch.setattr(  # type: ignore[attr-defined]
+        "scripts.eval.run_g4irsf11_system_extensions.system_extension_cases",
+        lambda: [case],
+    )
+    monkeypatch.setattr(  # type: ignore[attr-defined]
+        "scripts.eval.run_g4irsf11_system_extensions._case_paths",
+        lambda ignored: paths,
+    )
+    rows = _load_rows(
+        source_sha256="a" * 64,
+        map_sha256="b" * 64,
+        implementation_digest="c" * 64,
+    )
+    assert len(rows) == 1
+    assert rows[0]["execution_status"] == "FAILED"
+    assert rows[0]["return_code"] == "WORKLOAD_DECODE_ERROR"
+    assert "workload could not be decoded" in rows[0]["blocker"]
+    assert rows[0]["retained_workload_row_count"] == 0
+    assert rows[0]["no_smoke_substitution_pass"] is False

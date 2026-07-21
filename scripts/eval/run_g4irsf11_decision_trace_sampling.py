@@ -30,6 +30,7 @@ from czr005.datasets.decision_trace import (
     stratified_reservoir_sample,
     validate_decision_rows,
     validate_feature_lineage,
+    validate_outcome_decision_identities,
     validate_runtime_bag_identity,
 )
 
@@ -510,6 +511,7 @@ def write_artifacts(
     unknown_outcomes = sorted(set(outcomes) - {str(row["decision_id"]) for row in decisions})
     if unknown_outcomes:
         raise ValueError(f"outcome file references unknown decision_id(s): {unknown_outcomes[:10]}")
+    validate_outcome_decision_identities(outcomes, decisions)
 
     sample = stratified_reservoir_sample(
         decisions,

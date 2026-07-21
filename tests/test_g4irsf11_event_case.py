@@ -93,6 +93,10 @@ def test_outcomes_join_duplicate_task_id_by_runtime_and_segment_identity() -> No
     ]
 
     rows = _outcomes(decisions, segments, fault_mode="no_fault")
+    assert [(row["task_id"], row["segment_id"], row["runtime_bag_id"]) for row in rows] == [
+        (77, "77:storage_in", 10),
+        (77, "77:storage_out", 11),
+    ]
     by_decision = {row["decision_id"]: row for row in rows}
 
     storage_in = by_decision["storage-in-decision"]

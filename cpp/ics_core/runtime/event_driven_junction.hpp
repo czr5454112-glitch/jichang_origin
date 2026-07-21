@@ -197,6 +197,8 @@ struct EventRuntimeSummary {
   int requested_count = 0;
   int completed_count = 0;
   int failed_count = 0;
+  int peak_active_bag_count = 0;
+  int final_active_bag_count = 0;
   int decision_count = 0;
   int event_count = 0;
   int bag_release_event_count = 0;
@@ -275,8 +277,20 @@ struct EventRuntimeSummary {
 struct EventRuntimeJunctionResult {
   int node = -1;
   int final_source_queue_length = 0;
+  int peak_source_queue_length = 0;
   int final_junction_queue_length = 0;
+  int peak_junction_queue_length = 0;
   int final_service_calendar_intervals = 0;
+  int peak_service_calendar_intervals = 0;
+  // These are conservative C++ storage lower bounds: object bytes, live deque
+  // element payloads, and reserved LocalCalendar interval payload capacity.  They
+  // deliberately exclude allocator, deque block, and unordered-map node overhead.
+  std::size_t final_local_state_accounted_bytes = 0;
+  std::size_t peak_local_state_accounted_bytes = 0;
+  std::uint64_t service_reservation_count = 0;
+  double cumulative_service_reserved_seconds = 0.0;
+  double first_service_reservation_start_time = -1.0;
+  double last_service_reservation_end_time = -1.0;
   int scheduled_incoming = 0;
   double next_dispatch_time = 0.0;
 };
@@ -382,6 +396,16 @@ class LocalCalendar {
 
   [[nodiscard]] int size() const { return static_cast<int>(intervals_.size()); }
 
+  // Payload lower bound for intervals that are logically active right now.
+  [[nodiscard]] std::size_t dynamic_interval_lower_bound_bytes() const noexcept {
+    return intervals_.size() * sizeof(CalendarInterval);
+  }
+
+  // Payload lower bound for the interval storage retained by std::vector.
+  [[nodiscard]] std::size_t dynamic_interval_capacity_accounted_bytes() const noexcept {
+    return intervals_.capacity() * sizeof(CalendarInterval);
+  }
+
  private:
   std::vector<CalendarInterval> intervals_;
 };
@@ -399,6 +423,7 @@ enum class BagStatus {
 struct BagState {
   EventRuntimeBagRequest request;
   BagStatus status = BagStatus::kPendingRelease;
+  bool active_in_runtime = false;
   int current = -1;
   int transit_from = -1;
   int transit_to = -1;
@@ -419,6 +444,14 @@ struct JunctionState {
   std::deque<int> source_queue;
   std::deque<int> queue;
   LocalCalendar service_calendar;
+  int peak_source_queue_length = 0;
+  int peak_junction_queue_length = 0;
+  int peak_service_calendar_intervals = 0;
+  std::size_t peak_local_state_accounted_bytes = 0;
+  std::uint64_t service_reservation_count = 0;
+  double cumulative_service_reserved_seconds = 0.0;
+  double first_service_reservation_start_time = -1.0;
+  double last_service_reservation_end_time = -1.0;
   double next_dispatch_time = 0.0;
   int scheduled_incoming = 0;
   std::uint64_t source_wakeup_generation = 0;
@@ -426,6 +459,39 @@ struct JunctionState {
   bool source_wakeup_pending = false;
   bool junction_wakeup_pending = false;
   int escape_token_task = -1;
+
+  [[nodiscard]] std::size_t current_local_state_accounted_bytes() const noexcept {
+    // std::deque does not expose retained block capacity, so live element
+    // payload is the strongest portable lower bound available here.
+    return sizeof(JunctionState) + source_queue.size() * sizeof(int) +
+           queue.size() * sizeof(int) +
+           service_calendar.dynamic_interval_capacity_accounted_bytes();
+  }
+
+  void observe_local_state() noexcept {
+    peak_source_queue_length =
+        std::max(peak_source_queue_length, static_cast<int>(source_queue.size()));
+    peak_junction_queue_length =
+        std::max(peak_junction_queue_length, static_cast<int>(queue.size()));
+    peak_service_calendar_intervals =
+        std::max(peak_service_calendar_intervals, service_calendar.size());
+    peak_local_state_accounted_bytes =
+        std::max(peak_local_state_accounted_bytes, current_local_state_accounted_bytes());
+  }
+
+  void record_service_reservation(double start_time, double end_time) noexcept {
+    if (service_reservation_count == 0) {
+      first_service_reservation_start_time = start_time;
+      last_service_reservation_end_time = end_time;
+    } else {
+      first_service_reservation_start_time =
+          std::min(first_service_reservation_start_time, start_time);
+      last_service_reservation_end_time =
+          std::max(last_service_reservation_end_time, end_time);
+    }
+    ++service_reservation_count;
+    cumulative_service_reserved_seconds += end_time - start_time;
+  }
 };
 
 struct FaultState {
@@ -662,6 +728,7 @@ class EventDrivenJunctionRuntime {
     next_event_seq_ = 1;
     next_decision_id_ = 1;
     now_ = 0.0;
+    active_bag_count_ = 0;
     waits_.clear();
     decision_latencies_us_.clear();
   }
@@ -749,6 +816,10 @@ class EventDrivenJunctionRuntime {
       }
       auto& bag = found->second;
       bag.status = BagStatus::kSourceQueue;
+      bag.active_in_runtime = true;
+      ++active_bag_count_;
+      result_.summary.peak_active_bag_count =
+          std::max(result_.summary.peak_active_bag_count, active_bag_count_);
       bag.source_enqueued_at = event.time;
       controller.source_queue.push_back(event.task_id);
       update_queue_maxima(controller);
@@ -780,6 +851,7 @@ class EventDrivenJunctionRuntime {
   int try_admit_source(int node, double time) {
     auto& controller = junctions_[node];
     controller.service_calendar.purge(time);
+    controller.observe_local_state();
     if (controller.source_queue.empty()) {
       return -1;
     }
@@ -794,8 +866,10 @@ class EventDrivenJunctionRuntime {
     }
 
     controller.service_calendar.reserve(task_id, time, time + duration);
+    controller.record_service_reservation(time, time + duration);
     update_calendar_maxima(controller, nullptr);
     controller.source_queue.erase(controller.source_queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
+    controller.observe_local_state();
     bag.status = BagStatus::kInService;
     bag.current = node;
     bag.admitted_time = time;
@@ -920,6 +994,7 @@ class EventDrivenJunctionRuntime {
     if (bag.decision_count >= config_.max_decisions_per_bag) {
       fail_bag(bag, "max_decisions_exceeded", time);
       controller.queue.erase(controller.queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
+      controller.observe_local_state();
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
                        time,
                        task_id,
@@ -935,6 +1010,7 @@ class EventDrivenJunctionRuntime {
     }
 
     controller.service_calendar.purge(time);
+    controller.observe_local_state();
     std::vector<int> outgoing = graph_.outgoing(node);
     std::sort(outgoing.begin(), outgoing.end());
     result_.summary.max_candidate_count =
@@ -1164,6 +1240,7 @@ class EventDrivenJunctionRuntime {
       trace.rule_reason = selected_reason;
       dispatch_selected_edge(bag, node, selected, time);
       controller.queue.erase(controller.queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
+      controller.observe_local_state();
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
                        time,
                        task_id,
@@ -1233,6 +1310,7 @@ class EventDrivenJunctionRuntime {
     auto& corridor = corridors_[event_runtime_detail::corridor_key(current, candidate)];
     corridor.purge(time);
     target.service_calendar.purge(time);
+    target.observe_local_state();
     record.target_queue_length = static_cast<int>(target.queue.size());
     record.target_scheduled_incoming = target.scheduled_incoming;
     record.corridor_next_available = corridor.earliest_start(time, record.travel_time);
@@ -1323,6 +1401,7 @@ class EventDrivenJunctionRuntime {
 
     auto& target = junctions_[candidate];
     target.service_calendar.purge(time);
+    target.observe_local_state();
     const double service_start = time + travel;
     const double service_end = service_start + service_duration(candidate);
     if (!target.service_calendar.available(service_start,
@@ -1354,6 +1433,7 @@ class EventDrivenJunctionRuntime {
     }
     corridor.reserve(bag.request.runtime_bag_id, time, exit_time);
     target.service_calendar.reserve(bag.request.runtime_bag_id, exit_time, service_end);
+    target.record_service_reservation(exit_time, service_end);
     ++target.scheduled_incoming;
     update_calendar_maxima(target, &corridor);
 
@@ -1748,6 +1828,7 @@ class EventDrivenJunctionRuntime {
   }
 
   void complete_bag(BagState& bag, double time) {
+    deactivate_bag(bag);
     bag.status = BagStatus::kCompleted;
     bag.finish_time = time;
     record_wait_outcome(bag, time);
@@ -1759,6 +1840,7 @@ class EventDrivenJunctionRuntime {
     } else if (bag.status == BagStatus::kJunctionQueue && bag.junction_enqueued_at >= 0.0) {
       bag.total_wait += std::max(0.0, time - bag.junction_enqueued_at);
     }
+    deactivate_bag(bag);
     bag.status = BagStatus::kFailed;
     bag.failure_reason = reason;
     if (bag.deadlock_started_at >= 0.0) {
@@ -1782,6 +1864,14 @@ class EventDrivenJunctionRuntime {
     if (wait > config_.starvation_threshold) {
       ++result_.summary.starvation_count;
     }
+  }
+
+  void deactivate_bag(BagState& bag) noexcept {
+    if (!bag.active_in_runtime) {
+      return;
+    }
+    bag.active_in_runtime = false;
+    --active_bag_count_;
   }
 
   void finalize_incomplete() {
@@ -1847,17 +1937,33 @@ class EventDrivenJunctionRuntime {
     for (const int node : nodes) {
       auto& controller = junctions_.at(node);
       controller.service_calendar.purge(now_);
-      result_.junctions.push_back(EventRuntimeJunctionResult{
-          node,
-          static_cast<int>(controller.source_queue.size()),
-          static_cast<int>(controller.queue.size()),
-          controller.service_calendar.size(),
-          controller.scheduled_incoming,
-          controller.next_dispatch_time});
+      controller.observe_local_state();
+      EventRuntimeJunctionResult row;
+      row.node = node;
+      row.final_source_queue_length = static_cast<int>(controller.source_queue.size());
+      row.peak_source_queue_length = controller.peak_source_queue_length;
+      row.final_junction_queue_length = static_cast<int>(controller.queue.size());
+      row.peak_junction_queue_length = controller.peak_junction_queue_length;
+      row.final_service_calendar_intervals = controller.service_calendar.size();
+      row.peak_service_calendar_intervals = controller.peak_service_calendar_intervals;
+      row.final_local_state_accounted_bytes =
+          controller.current_local_state_accounted_bytes();
+      row.peak_local_state_accounted_bytes = controller.peak_local_state_accounted_bytes;
+      row.service_reservation_count = controller.service_reservation_count;
+      row.cumulative_service_reserved_seconds =
+          controller.cumulative_service_reserved_seconds;
+      row.first_service_reservation_start_time =
+          controller.first_service_reservation_start_time;
+      row.last_service_reservation_end_time =
+          controller.last_service_reservation_end_time;
+      row.scheduled_incoming = controller.scheduled_incoming;
+      row.next_dispatch_time = controller.next_dispatch_time;
+      result_.junctions.push_back(std::move(row));
     }
   }
 
   void finish_summary() {
+    result_.summary.final_active_bag_count = active_bag_count_;
     for (const auto& entry : bags_) {
       if (entry.second.status == BagStatus::kCompleted) {
         ++result_.summary.completed_count;
@@ -1886,8 +1992,13 @@ class EventDrivenJunctionRuntime {
     }
     std::size_t accounted = sizeof(*this);
     accounted += bags_.size() * sizeof(BagState);
-    accounted += junctions_.size() * sizeof(JunctionState);
-    accounted += corridors_.size() * sizeof(LocalCalendar);
+    for (const auto& entry : junctions_) {
+      accounted += entry.second.current_local_state_accounted_bytes();
+    }
+    for (const auto& entry : corridors_) {
+      accounted += sizeof(LocalCalendar) +
+                   entry.second.dynamic_interval_capacity_accounted_bytes();
+    }
     accounted += physical_faults_.size() * sizeof(event_runtime_detail::FaultState);
     accounted += advertised_faults_.size() * sizeof(event_runtime_detail::AdvertisedFaultState);
     accounted += fault_affected_bags_.size() * sizeof(int);
@@ -1895,6 +2006,7 @@ class EventDrivenJunctionRuntime {
     accounted += result_.events.capacity() * sizeof(EventRuntimeTraceRow);
     accounted += result_.decisions.capacity() * sizeof(EventDecisionTraceRow);
     accounted += result_.hold_attempts.capacity() * sizeof(EventDecisionTraceRow);
+    accounted += result_.junctions.capacity() * sizeof(EventRuntimeJunctionResult);
     accounted += result_.fault_events.capacity() * sizeof(EventRuntimeFaultAuditRow);
     result_.summary.cpp_internal_accounted_bytes = accounted;
   }
@@ -1972,7 +2084,8 @@ class EventDrivenJunctionRuntime {
     return config_.trace_limit < 0 || static_cast<int>(current_size) < config_.trace_limit;
   }
 
-  void update_queue_maxima(const JunctionState& controller) {
+  void update_queue_maxima(JunctionState& controller) {
+    controller.observe_local_state();
     result_.summary.max_junction_queue_length =
         std::max(result_.summary.max_junction_queue_length,
                  static_cast<int>(controller.queue.size()));
@@ -1981,7 +2094,8 @@ class EventDrivenJunctionRuntime {
                  static_cast<int>(controller.source_queue.size()));
   }
 
-  void update_calendar_maxima(const JunctionState& controller, const LocalCalendar* corridor) {
+  void update_calendar_maxima(JunctionState& controller, const LocalCalendar* corridor) {
+    controller.observe_local_state();
     result_.summary.max_local_calendar_intervals =
         std::max(result_.summary.max_local_calendar_intervals,
                  controller.service_calendar.size());
@@ -2008,6 +2122,7 @@ class EventDrivenJunctionRuntime {
   std::uint64_t next_event_seq_ = 1;
   std::uint64_t next_decision_id_ = 1;
   double now_ = 0.0;
+  int active_bag_count_ = 0;
   std::vector<double> waits_;
   std::vector<double> decision_latencies_us_;
 };

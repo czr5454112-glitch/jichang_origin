@@ -1,4 +1,6 @@
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <set>
 #include <string>
@@ -83,6 +85,63 @@ void check_core_invariants(Checks& checks,
                  "two-hop diagnostics must never create a reservation");
   checks.require(result.summary.max_history_observed <= 8,
                  "bag history must remain bounded");
+  checks.require(result.summary.peak_active_bag_count >= 0 &&
+                     result.summary.peak_active_bag_count <= result.summary.requested_count,
+                 "peak active bag count must stay within the requested cohort");
+  checks.require(result.summary.final_active_bag_count == 0,
+                 "final active bag count must be fully drained");
+  std::size_t final_junction_accounted_bytes = 0;
+  std::uint64_t service_reservation_count = 0;
+  double cumulative_service_reserved_seconds = 0.0;
+  for (const auto& junction : result.junctions) {
+    checks.require(junction.final_source_queue_length == 0 &&
+                       junction.final_junction_queue_length == 0 &&
+                       junction.final_service_calendar_intervals == 0 &&
+                       junction.scheduled_incoming == 0,
+                   "successful runtime must drain all junction-local work");
+    checks.require(junction.final_source_queue_length >= 0 &&
+                       junction.peak_source_queue_length >=
+                           junction.final_source_queue_length,
+                   "per-junction source queue peak must dominate its final length");
+    checks.require(junction.final_junction_queue_length >= 0 &&
+                       junction.peak_junction_queue_length >=
+                           junction.final_junction_queue_length,
+                   "per-junction dispatch queue peak must dominate its final length");
+    checks.require(junction.final_service_calendar_intervals >= 0 &&
+                       junction.peak_service_calendar_intervals >=
+                           junction.final_service_calendar_intervals,
+                   "per-junction service calendar peak must dominate its final size");
+    checks.require(junction.final_local_state_accounted_bytes > 0 &&
+                       junction.peak_local_state_accounted_bytes >=
+                           junction.final_local_state_accounted_bytes,
+                   "per-junction accounted byte peak must dominate its positive final lower bound");
+    checks.require(junction.cumulative_service_reserved_seconds >= 0.0,
+                   "per-junction cumulative reserved service seconds must be non-negative");
+    if (junction.service_reservation_count == 0) {
+      checks.require(junction.first_service_reservation_start_time == -1.0 &&
+                         junction.last_service_reservation_end_time == -1.0 &&
+                         junction.cumulative_service_reserved_seconds == 0.0,
+                     "junctions without reservations must retain the explicit time sentinel");
+    } else {
+      const double reservation_span = junction.last_service_reservation_end_time -
+                                      junction.first_service_reservation_start_time;
+      checks.require(junction.first_service_reservation_start_time >= 0.0 &&
+                         junction.last_service_reservation_end_time >
+                             junction.first_service_reservation_start_time &&
+                         junction.cumulative_service_reserved_seconds <=
+                             reservation_span + 1.0e-9,
+                     "reserved service load must fit its exact non-overlapping time span");
+    }
+    final_junction_accounted_bytes += junction.final_local_state_accounted_bytes;
+    service_reservation_count += junction.service_reservation_count;
+    cumulative_service_reserved_seconds += junction.cumulative_service_reserved_seconds;
+  }
+  checks.require(result.summary.cpp_internal_accounted_bytes >= final_junction_accounted_bytes,
+                 "runtime accounted bytes must include all final junction lower bounds");
+  checks.require(service_reservation_count >= static_cast<std::uint64_t>(expected_completed),
+                 "completed bags must leave raw service reservation evidence");
+  checks.require(cumulative_service_reserved_seconds >= 0.0,
+                 "aggregate reserved service seconds must be non-negative");
   for (const auto& event : result.events) {
     if (event.event == "ARRIVE_JUNCTION") {
       checks.require(event.selected_edge_count <= 1,
@@ -105,6 +164,24 @@ void check_core_invariants(Checks& checks,
   }
 }
 
+void test_local_calendar_dynamic_accounting(Checks& checks) {
+  czr005::ics::event_runtime_detail::LocalCalendar calendar;
+  checks.require(calendar.dynamic_interval_lower_bound_bytes() == 0,
+                 "empty calendar must report zero live interval payload");
+  calendar.reserve(1, 0.0, 1.0);
+  calendar.reserve(2, 1.0, 2.0);
+  const std::size_t live_bytes =
+      2 * sizeof(czr005::ics::event_runtime_detail::CalendarInterval);
+  checks.require(calendar.dynamic_interval_lower_bound_bytes() == live_bytes,
+                 "calendar live interval accounting must use actual interval count");
+  checks.require(calendar.dynamic_interval_capacity_accounted_bytes() >= live_bytes,
+                 "calendar retained capacity must account for all live intervals");
+  calendar.purge(3.0);
+  checks.require(calendar.dynamic_interval_lower_bound_bytes() == 0 &&
+                     calendar.dynamic_interval_capacity_accounted_bytes() >= live_bytes,
+                 "purge must reduce live bytes without hiding retained vector capacity");
+}
+
 void test_burst_sizes(Checks& checks) {
   for (const int count : {1, 2, 4, 8, 16}) {
     const auto graph = line_graph();
@@ -115,12 +192,32 @@ void test_burst_sizes(Checks& checks) {
                    "line graph must decide independently at both junctions");
     checks.require(result.summary.max_source_queue_length >= count - 1,
                    "source burst must be represented as a real local queue");
+    checks.require(result.summary.peak_active_bag_count == count,
+                   "simultaneous burst must expose the exact active-bag peak");
+    std::uint64_t reservation_count = 0;
+    double reserved_seconds = 0.0;
+    for (const auto& junction : result.junctions) {
+      reservation_count += junction.service_reservation_count;
+      reserved_seconds += junction.cumulative_service_reserved_seconds;
+    }
+    checks.require(reservation_count == static_cast<std::uint64_t>(count * 3),
+                   "line graph must count source and both downstream service reservations");
+    checks.require(std::abs(reserved_seconds - static_cast<double>(count * 3)) <= 1.0e-9,
+                   "line graph must accumulate the exact reserved service duration");
     if (count == 16) {
       checks.require(result.summary.max_source_queue_delay >= 14.9,
                      "16-bag burst must expose source admission delay");
       checks.require(result.summary.fairness_jain > 0.0 &&
                          result.summary.fairness_jain <= 1.0,
                      "fairness metric must be in (0, 1]");
+      const auto source = std::find_if(result.junctions.begin(),
+                                       result.junctions.end(),
+                                       [](const auto& row) { return row.node == 0; });
+      checks.require(source != result.junctions.end() &&
+                         source->peak_source_queue_length >= count - 1 &&
+                         source->peak_local_state_accounted_bytes >
+                             source->final_local_state_accounted_bytes,
+                     "source junction must retain queue-specific peak memory evidence");
     }
     if (count == 1) {
       bool service_complete = false;
@@ -438,6 +535,7 @@ void test_explicit_sensor_loss_keeps_physical_shield(Checks& checks) {
 
 int main() {
   Checks checks;
+  test_local_calendar_dynamic_accounting(checks);
   test_burst_sizes(checks);
   test_bidirectional_corridor(checks);
   test_loop_tabu(checks);

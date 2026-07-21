@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from czr005.datasets import decision_trace as dt
 from scripts.eval import run_g4irsf11_decision_trace_sampling as runner
+from scripts.eval.run_g4irsf11_event_case import _outcomes
 
 
 def _raw_decision(
@@ -421,15 +422,28 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
     task_path = tmp_path / "tasks.jsonl"
     outcome_path = tmp_path / "outcomes.jsonl"
     map_path = tmp_path / "map.json"
-    trace_path.write_text(
-        json.dumps(_raw_decision(fault_mode="single_delayed_30s")) + "\n",
-        encoding="utf-8",
-    )
+    decision = _raw_decision(fault_mode="single_delayed_30s")
+    trace_path.write_text(json.dumps(decision) + "\n", encoding="utf-8")
     task_path.write_text(json.dumps(_mapping_rows()[0]) + "\n", encoding="utf-8")
-    outcome_path.write_text(
-        json.dumps({"decision_id": "d-1", "reached_goal": True, "tail_bucket": "p99"}) + "\n",
-        encoding="utf-8",
+    outcome_rows = _outcomes(
+        [decision],
+        [
+            {
+                "runtime_bag_id": 1,
+                "task_id": 1,
+                "segment_id": "1:direct",
+                "release_time": 0.0,
+                "finish_time": 20.0,
+                "completed": True,
+                "total_local_wait": 2.0,
+                "source_queue_delay": 1.0,
+                "loop_count": 0,
+                "failure_reason": "",
+            }
+        ],
+        fault_mode="single_delayed_30s",
     )
+    outcome_path.write_text(json.dumps(outcome_rows[0]) + "\n", encoding="utf-8")
     map_path.write_text(
         json.dumps({"nodes": [{"location": 0, "outgoing": [1, 2]}]}),
         encoding="utf-8",
@@ -471,6 +485,9 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
     assert "reached_goal" not in runtime_row
     assert "tail_bucket" not in runtime_row
     assert outcome_row["reached_goal"] is True
+    assert outcome_row["task_id"] == 1
+    assert outcome_row["segment_id"] == "1:direct"
+    assert outcome_row["runtime_bag_id"] == 1
     assert manifest["validation"]["candidate_equals_true_outgoing_set"] == "PASS"
     assert manifest["validation"]["runtime_bag_identity"]["status"] == "PASS"
     assert manifest["source_task"]["identity_audit"]["original_task_ids_rewritten"] is False
@@ -485,6 +502,24 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
         "fault_scenario_inactive_here": 1
     }
     assert "missing_fault_decisions" in manifest["coverage"]["blockers"]
+
+    outcome_path.write_text(
+        json.dumps(dict(outcome_rows[0], task_id=999)) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(dt.DecisionTraceValidationError, match="outcome identity differs"):
+        runner.write_artifacts(
+            trace_paths=[trace_path],
+            task_path=task_path,
+            map_path=map_path,
+            outcome_path=outcome_path,
+            scenario="paper_repeat_01",
+            scale="2x",
+            fault_mode="single_delayed_30s",
+            config=dt.SamplingConfig(
+                limit=10, minimum_per_stratum=1, maximum_per_stratum=2
+            ),
+        )
+    outcome_path.write_text(json.dumps(outcome_rows[0]) + "\n", encoding="utf-8")
 
     active_fault = _raw_decision(fault_mode="single_delayed_30s")
     active_fault["local_snapshot"]["faulted_outgoing_count"] = 1  # type: ignore[index]

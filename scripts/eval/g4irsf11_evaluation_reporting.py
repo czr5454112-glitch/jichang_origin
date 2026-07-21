@@ -143,8 +143,22 @@ def case_row(
         "decision_latency_us_p95": _finite(summary.get("decision_latency_us_p95", "")),
         "decision_latency_us_p99": _finite(summary.get("decision_latency_us_p99", "")),
         "event_throughput_per_second": _finite(summary.get("event_throughput_per_second", "")),
+        "runtime_thread_count": resource.get("runtime_thread_count", ""),
+        "junction_count": resource.get("junction_count", ""),
+        "peak_active_bag_count": resource.get("peak_active_bag_count", ""),
         "peak_working_set_bytes": resource.get("peak_working_set_bytes", ""),
         "cpp_internal_accounted_bytes": resource.get("cpp_internal_accounted_bytes", ""),
+        "peak_junction_local_state_accounted_bytes": resource.get(
+            "peak_junction_local_state_accounted_bytes", ""
+        ),
+        "sum_final_junction_local_state_accounted_bytes": resource.get(
+            "sum_final_junction_local_state_accounted_bytes", ""
+        ),
+        "max_junction_service_utilization": _finite(
+            resource.get("max_junction_service_utilization", "")
+        ),
+        "bottleneck_node": resource.get("bottleneck_node", ""),
+        "bottleneck_score": _finite(resource.get("bottleneck_score", "")),
         "wall_seconds": _finite(resource.get("wall_seconds_including_pybind_materialization", "")),
         "fault_profile": case.fault_profile,
         "queue_discipline": case.queue_discipline,
@@ -258,14 +272,24 @@ def write_reports(root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str, Pa
                 "",
                 f"Generated: `{date.today().isoformat()}`.",
                 "",
-                "Peak memory is the isolated worker process peak working set. `cpp_internal_accounted_bytes` is separately labelled as a lower-bound accounting value; neither is a JSON-size estimate.",
+                "Peak memory is the isolated worker process peak working set. `cpp_internal_accounted_bytes` and per-junction local bytes are separately labelled C++ lower-bound accounting values; neither is a JSON-size estimate. The event runtime is the declared single-thread baseline.",
                 "",
                 _table(
-                    ["Case", "Segments", "Peak working set", "C++ bytes", "Decision p99 us", "Events/s", "Wall s"],
+                    [
+                        "Case", "Segments", "Junctions", "Peak active bags", "Threads",
+                        "Peak working set", "C++ bytes", "Peak junction bytes",
+                        "Final junction byte sum", "Max junction util.", "Bottleneck node",
+                        "Bottleneck score", "Decision p99 us", "Events/s", "Wall s",
+                    ],
                     (
                         (
-                            row["case_id"], row["workload_segment_count"], row["peak_working_set_bytes"],
-                            row["cpp_internal_accounted_bytes"], row["decision_latency_us_p99"],
+                            row["case_id"], row["workload_segment_count"], row["junction_count"],
+                            row["peak_active_bag_count"], row["runtime_thread_count"],
+                            row["peak_working_set_bytes"], row["cpp_internal_accounted_bytes"],
+                            row["peak_junction_local_state_accounted_bytes"],
+                            row["sum_final_junction_local_state_accounted_bytes"],
+                            row["max_junction_service_utilization"], row["bottleneck_node"],
+                            row["bottleneck_score"], row["decision_latency_us_p99"],
                             row["event_throughput_per_second"], row["wall_seconds"],
                         )
                         for row in executed

@@ -85,6 +85,66 @@ def _assert_invariants(payload: dict[str, object], completed: int) -> None:
     assert summary["decision_latency_us_p50"] <= summary["decision_latency_us_p95"]
     assert summary["decision_latency_us_p95"] <= summary["decision_latency_us_p99"]
     assert summary["cpp_internal_accounted_bytes"] > 0
+    assert 0 <= summary["peak_active_bag_count"] <= summary["requested_count"]
+    assert summary["final_active_bag_count"] == 0
+
+    junction_state = payload["junction_state"]
+    assert isinstance(junction_state, list)
+    assert junction_state
+    final_junction_accounted_bytes = 0
+    service_reservation_count = 0
+    cumulative_service_reserved_seconds = 0.0
+    for junction in junction_state:
+        assert junction["final_source_queue_length"] == 0
+        assert junction["final_junction_queue_length"] == 0
+        assert junction["final_service_calendar_intervals"] == 0
+        assert junction["scheduled_incoming"] == 0
+        assert 0 <= junction["final_source_queue_length"] <= junction["peak_source_queue_length"]
+        assert (
+            0
+            <= junction["final_junction_queue_length"]
+            <= junction["peak_junction_queue_length"]
+        )
+        assert (
+            0
+            <= junction["final_service_calendar_intervals"]
+            <= junction["peak_service_calendar_intervals"]
+        )
+        assert (
+            0
+            < junction["final_local_state_accounted_bytes"]
+            <= junction["peak_local_state_accounted_bytes"]
+        )
+        assert junction["local_state_accounting_semantics"] == (
+            "cpp_object_plus_live_deque_payload_plus_calendar_capacity_lower_bound"
+        )
+        assert junction["service_reservation_count"] >= 0
+        assert junction["cumulative_service_reserved_seconds"] >= 0.0
+        if junction["service_reservation_count"] == 0:
+            assert junction["first_service_reservation_start_time"] == -1.0
+            assert junction["last_service_reservation_end_time"] == -1.0
+            assert junction["cumulative_service_reserved_seconds"] == 0.0
+        else:
+            reservation_span = (
+                junction["last_service_reservation_end_time"]
+                - junction["first_service_reservation_start_time"]
+            )
+            assert junction["first_service_reservation_start_time"] >= 0.0
+            assert junction["last_service_reservation_end_time"] > junction[
+                "first_service_reservation_start_time"
+            ]
+            assert (
+                junction["cumulative_service_reserved_seconds"]
+                <= reservation_span + 1.0e-9
+            )
+        final_junction_accounted_bytes += junction["final_local_state_accounted_bytes"]
+        service_reservation_count += junction["service_reservation_count"]
+        cumulative_service_reserved_seconds += junction[
+            "cumulative_service_reserved_seconds"
+        ]
+    assert summary["cpp_internal_accounted_bytes"] >= final_junction_accounted_bytes
+    assert service_reservation_count >= completed
+    assert cumulative_service_reserved_seconds >= 0.0
 
     events = payload["events"]
     assert isinstance(events, list)
@@ -108,6 +168,29 @@ def _assert_invariants(payload: dict[str, object], completed: int) -> None:
         canonicalise_decision_row(decision)
 
 
+def test_pre_release_time_limit_returns_exact_empty_junction_negative_evidence() -> None:
+    nodes, edges, heuristic = _line_records()
+    payload = _run(
+        nodes=nodes,
+        edges=edges,
+        heuristic=heuristic,
+        bags=[("future-release", 1, 10.0, 100.0, 0, 2, "source-0")],
+        max_simulation_time=0.0,
+    )
+    summary = payload["summary"]
+    assert summary["completed_count"] == 0
+    assert summary["failed_count"] == 1
+    assert summary["event_count"] == 0
+    assert summary["bag_release_event_count"] == 0
+    assert summary["peak_active_bag_count"] == 0
+    assert summary["final_active_bag_count"] == 0
+    assert summary["end_time"] == 0.0
+    assert summary["event_limit_reached"] is False
+    assert summary["time_limit_reached"] is True
+    assert summary["cpp_internal_accounted_bytes"] > 0
+    assert payload["junction_state"] == []
+
+
 @pytest.mark.parametrize("count", [1, 2, 4, 8, 16])
 def test_event_runtime_burst_sizes_are_online_and_conflict_free(count: int) -> None:
     nodes, edges, heuristic = _line_records()
@@ -116,9 +199,21 @@ def test_event_runtime_burst_sizes_are_online_and_conflict_free(count: int) -> N
     summary = payload["summary"]
     assert summary["decision_count"] >= count * 2
     assert summary["max_source_queue_length"] >= count - 1
+    assert summary["peak_active_bag_count"] == count
+    junction_state = payload["junction_state"]
+    assert sum(row["service_reservation_count"] for row in junction_state) == count * 3
+    assert sum(row["cumulative_service_reserved_seconds"] for row in junction_state) == pytest.approx(
+        count * 3.0
+    )
     if count == 16:
         assert summary["max_source_queue_delay"] >= 14.9
         assert 0.0 < summary["fairness_jain"] <= 1.0
+        source = next(row for row in junction_state if row["node"] == 0)
+        assert source["peak_source_queue_length"] >= count - 1
+        assert (
+            source["peak_local_state_accounted_bytes"]
+            > source["final_local_state_accounted_bytes"]
+        )
 
 
 def test_event_runtime_exposes_real_scheduler_event_vocabulary() -> None:
