@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from scripts.eval.g4irsf11_evaluation_reporting import case_row, gate_rows
 from scripts.eval.g4irsf11_experiment_protocol import formal_cases
-from scripts.eval.run_g4irsf11_event_runtime_evaluation import timeline_spanning_sample
+from scripts.eval.g4irsf11_experiment_protocol import PROTOCOL_VERSION
+from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
+    _descriptor_matches,
+    timeline_spanning_sample,
+)
 from scripts.eval.run_g4irsf11_event_case import _outcomes
 
 
@@ -51,6 +55,32 @@ def test_missing_formal_cases_are_explicit_blockers() -> None:
     gates = gate_rows([])
     assert gates
     assert all(row["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER" for row in gates)
+
+
+def test_execution_descriptor_is_bound_to_exact_inputs_and_implementation() -> None:
+    case = formal_cases()[0]
+    descriptor = {
+        "protocol_version": PROTOCOL_VERSION,
+        "case": case.as_dict(),
+        "source_sha256": "source",
+        "map_sha256": "map",
+        "implementation_sha256": "implementation",
+        "status": "EXECUTED",
+    }
+    assert _descriptor_matches(
+        descriptor,
+        case,
+        source_sha256="source",
+        map_sha256="map",
+        implementation_digest="implementation",
+    )
+    assert not _descriptor_matches(
+        descriptor,
+        case,
+        source_sha256="source",
+        map_sha256="map",
+        implementation_digest="changed-implementation",
+    )
 
 
 def test_outcomes_join_duplicate_original_task_ids_by_runtime_segment_identity() -> None:

@@ -476,14 +476,29 @@ def _merge_trace_inputs(trace_cases: Sequence[CaseSpec]) -> tuple[list[Path], Pa
     return trace_paths, task_path, outcome_path
 
 
-def _build_decision_artifacts(cases: Sequence[CaseSpec]) -> dict[str, Any] | None:
+def _build_decision_artifacts(
+    cases: Sequence[CaseSpec],
+    *,
+    source_sha256: str,
+    map_sha256: str,
+    implementation_digest: str,
+) -> dict[str, Any] | None:
     trace_cases = [case for case in cases if case.category == "decision_trace"]
     if not trace_cases:
         return None
     if not all(_case_paths(case)["execution"].is_file() for case in trace_cases):
         return None
     executions = [_read_json(_case_paths(case)["execution"]) for case in trace_cases]
-    if not all(row.get("status") == "EXECUTED" for row in executions):
+    if not all(
+        _descriptor_matches(
+            row,
+            case,
+            source_sha256=source_sha256,
+            map_sha256=map_sha256,
+            implementation_digest=implementation_digest,
+        )
+        for row, case in zip(executions, trace_cases)
+    ):
         return None
     required = [
         path
@@ -604,7 +619,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         implementation_digest=implementation_digest,
     )
     gates = _write_tables_and_reports(rows)
-    decision_manifest = _build_decision_artifacts(cases)
+    decision_manifest = _build_decision_artifacts(
+        cases,
+        source_sha256=source_sha256,
+        map_sha256=map_sha256,
+        implementation_digest=implementation_digest,
+    )
     complete = all(row["execution_status"] == "EXECUTED" for row in rows)
     print(
         "[g4irsf11-event] summary",
