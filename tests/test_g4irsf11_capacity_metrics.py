@@ -32,7 +32,7 @@ def test_capacity_requires_safety_stability_and_service() -> None:
         "decision_latency_us_p99": 7.0,
     }
     gate = CapacityGateConfig(
-        max_backlog_slope_fraction=0.02,
+        max_backlog_slope_fraction=0.0,
         max_drain_seconds=10.0,
         max_p95_total_seconds=10.0,
         max_p99_total_seconds=10.0,
@@ -52,7 +52,7 @@ def test_capacity_requires_safety_stability_and_service() -> None:
 def test_completion_alone_does_not_pass_overloaded_queue() -> None:
     bags = [_bag(index, float(index), float(index), 100.0 + index * 5.0) for index in range(30)]
     gate = CapacityGateConfig(
-        max_backlog_slope_fraction=0.02,
+        max_backlog_slope_fraction=0.0,
         max_drain_seconds=30.0,
         max_p95_total_seconds=20.0,
         max_p99_total_seconds=30.0,
@@ -84,3 +84,68 @@ def test_peak_memory_is_os_measurement() -> None:
     assert current > 0
     assert peak >= current
     assert current_peak_working_set_bytes() >= current
+
+
+def test_slowly_positive_backlog_slope_never_passes_capacity() -> None:
+    bags = [
+        _bag(index, float(index), float(index), float(index) / 0.995)
+        for index in range(1000)
+    ]
+    gate = CapacityGateConfig(
+        max_backlog_slope_fraction=0.0,
+        max_drain_seconds=10.0,
+        max_p95_total_seconds=20.0,
+        max_p99_total_seconds=20.0,
+        starvation_seconds=20.0,
+    )
+
+    row = capacity_metrics(
+        bags,
+        {"conflict_count": 0, "runtime_full_astar_calls": 0},
+        gate,
+    )
+
+    assert row["backlog_slope_per_second"] > 0.0
+    assert row["backlog_slope_fraction_of_arrival_rate"] > 0.0
+    assert row["queue_slope_pass"] is False
+    assert row["queue_stability_pass"] is False
+    assert row["capacity_pass"] is False
+
+
+def test_missing_safety_summary_is_unverified_and_fails_closed() -> None:
+    bags = [_bag(0, 0.0, 0.0, 1.0)]
+    gate = CapacityGateConfig(
+        max_backlog_slope_fraction=0.0,
+        max_drain_seconds=10.0,
+        max_p95_total_seconds=10.0,
+        max_p99_total_seconds=10.0,
+    )
+
+    row = capacity_metrics(bags, {}, gate)
+
+    assert row["safety_evidence_status"] == "UNVERIFIED_MISSING_REQUIRED_SUMMARY"
+    assert row["missing_required_summary_fields"] == [
+        "reservation_conflicts",
+        "runtime_full_astar_calls",
+    ]
+    assert row["safe_execution_pass"] is False
+    assert row["capacity_pass"] is False
+
+
+def test_nonfinite_or_fractional_safety_counters_fail_closed() -> None:
+    gate = CapacityGateConfig(
+        max_backlog_slope_fraction=0.0,
+        max_drain_seconds=10.0,
+        max_p95_total_seconds=10.0,
+        max_p99_total_seconds=10.0,
+    )
+    row = capacity_metrics(
+        [_bag(0, 0.0, 0.0, 1.0)],
+        {"reservation_conflicts": "NAN", "runtime_full_astar_calls": 0.5},
+        gate,
+    )
+    assert row["safe_execution_pass"] is False
+    assert row["missing_required_summary_fields"] == [
+        "reservation_conflicts:invalid",
+        "runtime_full_astar_calls:invalid",
+    ]

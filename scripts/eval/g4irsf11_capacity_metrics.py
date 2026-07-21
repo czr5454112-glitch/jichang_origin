@@ -33,6 +33,18 @@ def _truth(value: Any) -> bool:
     return bool(value)
 
 
+def _strict_nonnegative_integer(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number) or number < 0.0 or not number.is_integer():
+        return None
+    return int(number)
+
+
 def quantile(values: Sequence[float], probability: float) -> float:
     if not values:
         return 0.0
@@ -173,6 +185,10 @@ class CapacityGateConfig:
         ):
             if _number(getattr(self, name), -1.0) < 0.0:
                 raise ValueError(f"{name} must be non-negative")
+        if _number(self.max_backlog_slope_fraction, -1.0) != 0.0:
+            raise ValueError(
+                "max_backlog_slope_fraction must be zero: stable backlog may not have a positive slope"
+            )
 
 
 def capacity_metrics(
@@ -241,18 +257,33 @@ def capacity_metrics(
     source_backlog = backlog_metrics(arrivals, admitted)
     network_backlog = backlog_metrics(admitted, finishes)
 
-    conflict_count = _integer(
-        summary.get(
-            "conflict_count",
-            summary.get("conflicts", summary.get("reservation_conflicts")),
-        )
+    conflict_keys = ("conflict_count", "conflicts", "reservation_conflicts")
+    astar_keys = ("runtime_full_astar_calls", "full_astar_calls")
+    conflict_key = next((key for key in conflict_keys if key in summary), None)
+    astar_key = next((key for key in astar_keys if key in summary), None)
+    missing_summary_fields = []
+    if conflict_key is None:
+        missing_summary_fields.append("reservation_conflicts")
+    if astar_key is None:
+        missing_summary_fields.append("runtime_full_astar_calls")
+    conflict_value = _strict_nonnegative_integer(summary.get(conflict_key)) if conflict_key else None
+    astar_value = _strict_nonnegative_integer(summary.get(astar_key)) if astar_key else None
+    if conflict_key is not None and conflict_value is None:
+        missing_summary_fields.append("reservation_conflicts:invalid")
+    if astar_key is not None and astar_value is None:
+        missing_summary_fields.append("runtime_full_astar_calls:invalid")
+    conflict_count = conflict_value if conflict_value is not None else 0
+    full_astar_calls = astar_value if astar_value is not None else 0
+    safety_evidence_complete = not missing_summary_fields
+    safe_pass = safety_evidence_complete and conflict_count == 0 and full_astar_calls == 0
+    # Linear regression introduces tiny floating-point noise around a flat
+    # series.  The tolerance is twelve orders below the observed arrival rate;
+    # it is numerical, not an engineering allowance for queue growth.
+    numerical_slope_tolerance = max(
+        1.0e-12,
+        abs(total_backlog.arrival_rate_per_second) * 1.0e-12,
     )
-    full_astar_calls = _integer(summary.get("runtime_full_astar_calls", summary.get("full_astar_calls")))
-    safe_pass = conflict_count == 0 and full_astar_calls == 0
-    slope_pass = (
-        total_backlog.backlog_slope_fraction_of_arrival_rate
-        <= gate.max_backlog_slope_fraction
-    )
+    slope_pass = total_backlog.backlog_slope_per_second <= numerical_slope_tolerance
     drain_pass = (
         total_backlog.end_backlog == 0
         and total_backlog.drain_time_seconds <= gate.max_drain_seconds
@@ -321,6 +352,10 @@ def capacity_metrics(
         "deadlock_count": _integer(summary.get("deadlock_count")),
         "loop_count": _integer(summary.get("loop_count")),
         "runtime_full_astar_calls": full_astar_calls,
+        "safety_evidence_status": (
+            "PASS" if safety_evidence_complete else "UNVERIFIED_MISSING_REQUIRED_SUMMARY"
+        ),
+        "missing_required_summary_fields": missing_summary_fields,
         "event_count": event_count,
         "decision_count": decision_count,
         "runtime_seconds": runtime_seconds,
@@ -345,6 +380,7 @@ def capacity_metrics(
         "service_level_pass": service_pass,
         "capacity_pass": safe_pass and queue_pass and service_pass,
         "gate_max_backlog_slope_fraction": gate.max_backlog_slope_fraction,
+        "gate_backlog_slope_numerical_tolerance_per_second": numerical_slope_tolerance,
         "gate_max_drain_seconds": gate.max_drain_seconds,
         "gate_max_p95_total_seconds": gate.max_p95_total_seconds,
         "gate_max_p99_total_seconds": gate.max_p99_total_seconds,
