@@ -38,7 +38,9 @@ TABLE_PATH = ROOT / "outputs" / "tables" / "g4irsf11_system_extension_matrix.csv
 REPORT_PATH = ROOT / "outputs" / "reports" / "g4irsf11_system_extension_report.md"
 
 
-def _continuity_audit(row: Mapping[str, Any]) -> dict[str, Any]:
+def _continuity_audit(
+    row: Mapping[str, Any], *, workload_rows: Sequence[Mapping[str, Any]] = ()
+) -> dict[str, Any]:
     item = dict(row)
     expected = {
         "extension_rolling_2day_full": 87_206,
@@ -50,7 +52,20 @@ def _continuity_audit(row: Mapping[str, Any]) -> dict[str, Any]:
     actual = int(float(row.get("workload_segment_count") or 0))
     item["expected_exact_segment_count"] = expected if expected is not None else ""
     item["exact_segment_count_pass"] = expected is not None and actual == expected
-    span = float(row.get("arrival_span_seconds") or 0.0)
+    release_min = float("inf")
+    release_max = float("-inf")
+    for workload_row in workload_rows:
+        release = float(workload_row["release_time"])
+        release_min = min(release_min, release)
+        release_max = max(release_max, release)
+    span = (
+        release_max - release_min
+        if workload_rows
+        else float(row.get("arrival_span_seconds") or 0.0)
+    )
+    item["arrival_span_seconds"] = span
+    item["retained_workload_row_count"] = len(workload_rows)
+    item["retained_workload_count_pass"] = bool(workload_rows) and len(workload_rows) == actual
     required_boundaries = 6 if row.get("case_id") == "extension_rolling_7day_full" else (
         1 if row.get("case_id") == "extension_rolling_2day_full" else 0
     )
@@ -62,6 +77,7 @@ def _continuity_audit(row: Mapping[str, Any]) -> dict[str, Any]:
     item["no_smoke_substitution_pass"] = (
         row.get("execution_status") == "EXECUTED"
         and bool(item["exact_segment_count_pass"])
+        and bool(item["retained_workload_count_pass"])
         and bool(item["day_boundary_pass"])
     )
     return item
@@ -91,7 +107,13 @@ def _load_rows(
                 execution = candidate
                 if paths["result"].is_file():
                     result = _read_json(paths["result"])
-        rows.append(_continuity_audit(case_row(case, result, execution)))
+        workload_rows = load_jsonl(paths["workload"]) if paths["workload"].is_file() else []
+        rows.append(
+            _continuity_audit(
+                case_row(case, result, execution),
+                workload_rows=workload_rows,
+            )
+        )
     return rows
 
 
@@ -128,7 +150,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--case", action="append", help="Exact extension case ID; repeatable")
     parser.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)
-    parser.add_argument("--keep-workloads", action="store_true")
+    parser.add_argument(
+        "--keep-workloads",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Retain ignored exact inputs so full row counts and day boundaries can be re-audited.",
+    )
     parser.add_argument("--execute-only", action="store_true")
     parser.add_argument("--timeout-seconds", type=float, default=14_400.0)
     parser.add_argument("--max-events", type=int, default=50_000_000)
