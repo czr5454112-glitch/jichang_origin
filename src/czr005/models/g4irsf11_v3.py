@@ -38,6 +38,21 @@ from czr005.datasets.decision_trace import EVENT_RUNTIME_FEATURE_SOURCES, SCHEMA
 PRETRAINING_GATE_SCHEMA = "czr005.g4irsf11.pretraining_gate.v1"
 TRAINING_STATUS_SCHEMA = "czr005.g4irsf11.v3_training_status.v1"
 MODEL_SCHEMA = "czr005.g4irsf11.v3_model.v1"
+SPLIT_READINESS_SCHEMA = "czr005.g4irsf11.v3_split_readiness.v1"
+RELEASE_MANIFEST_SCHEMA = "czr005.g4irsf11.v3_release_manifest.v1"
+ACTIVE_RELEASE_SCHEMA = "czr005.g4irsf11.v3_active_release.v1"
+SEMANTIC_TEXT_HASH = "sha256 of UTF-8 text after CRLF/CR newline normalization to LF"
+EXACT_BYTES_HASH = "sha256 of exact bytes"
+TEXT_ARTIFACT_SUFFIXES = frozenset(
+    {".csv", ".json", ".jsonl", ".md", ".py", ".txt", ".yml", ".yaml"}
+)
+CANONICAL_GATE_MANIFEST = Path(
+    "artifacts/gates/g4irsf11_pretraining_gate_manifest.json"
+)
+CANONICAL_DECISION_MANIFEST = Path(
+    "artifacts/datasets/g4irsf11_decision_trace_manifest.json"
+)
+CANONICAL_ACTIVE_RELEASE = Path("artifacts/models/g4irsf11_v3/active_release.json")
 REQUIRED_STAGE_GATES = tuple("ABCDEFGH")
 MODEL_NAMES = (
     "v3_linear_ranker",
@@ -147,6 +162,39 @@ class PreparedDataset:
     dataset_sha256: str
 
 
+@dataclass(frozen=True)
+class _ActiveV3Model(Mapping[str, Any]):
+    """In-memory marker returned only after current-release verification."""
+
+    payload: Mapping[str, Any]
+    release_id: str
+    active_release_sha256: str
+
+    def __getitem__(self, key: str) -> Any:
+        return self.payload[key]
+
+    def __iter__(self):  # type: ignore[no-untyped-def]
+        return iter(self.payload)
+
+    def __len__(self) -> int:
+        return len(self.payload)
+
+
+def _artifact_descriptor(path: Path, *, row_count: int | None = None) -> dict[str, Any]:
+    descriptor: dict[str, Any] = {
+        "path": str(path.resolve()),
+        "sha256": sha256_file(path),
+        "hash_semantics": (
+            SEMANTIC_TEXT_HASH
+            if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES
+            else EXACT_BYTES_HASH
+        ),
+    }
+    if row_count is not None:
+        descriptor["row_count"] = row_count
+    return descriptor
+
+
 def _canonical_json(value: Any) -> str:
     return json.dumps(
         value,
@@ -161,12 +209,33 @@ def _sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
-def sha256_file(path: Path) -> str:
+def raw_sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def semantic_text_sha256(path: Path) -> str:
+    payload = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return _sha256_bytes(payload)
+
+
+def sha256_file(path: Path) -> str:
+    """Hash portable text semantically and binary artifacts byte-for-byte."""
+
+    if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES:
+        return semantic_text_sha256(path)
+    return raw_sha256_file(path)
+
+
+def _sha256_with_semantics(path: Path, semantics: str) -> str:
+    if semantics == SEMANTIC_TEXT_HASH:
+        return semantic_text_sha256(path)
+    if semantics == EXACT_BYTES_HASH:
+        return raw_sha256_file(path)
+    raise ValueError(f"unsupported artifact hash semantics: {semantics!r}")
 
 
 def _reject_duplicate_object_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -178,9 +247,15 @@ def _reject_duplicate_object_pairs(pairs: list[tuple[str, Any]]) -> dict[str, An
     return result
 
 
+def _reject_nonfinite_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON number is forbidden: {value}")
+
+
 def _read_json_object(path: Path, label: str) -> dict[str, Any]:
     value = json.loads(
-        path.read_text(encoding="utf-8"), object_pairs_hook=_reject_duplicate_object_pairs
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=_reject_duplicate_object_pairs,
+        parse_constant=_reject_nonfinite_json_constant,
     )
     if not isinstance(value, dict):
         raise ValueError(f"{label} must be a JSON object")
@@ -206,6 +281,7 @@ def _verify_descriptor(
     blockers: list[str],
     *,
     require_rows: bool = False,
+    hash_semantics: str | None = None,
 ) -> Path | None:
     if not isinstance(descriptor, Mapping):
         blockers.append(f"{label}: artifact descriptor is missing or not an object")
@@ -219,7 +295,30 @@ def _verify_descriptor(
     except (OSError, ValueError) as exc:
         blockers.append(f"{label}: {exc}")
         return None
-    actual = sha256_file(path)
+    declared_semantics = descriptor.get("hash_semantics")
+    if declared_semantics is not None and declared_semantics not in {
+        SEMANTIC_TEXT_HASH,
+        EXACT_BYTES_HASH,
+    }:
+        blockers.append(f"{label}: hash_semantics is unsupported")
+        return None
+    if (
+        hash_semantics is not None
+        and declared_semantics is not None
+        and declared_semantics != hash_semantics
+    ):
+        blockers.append(f"{label}: hash_semantics conflicts with its owning manifest")
+        return None
+    effective_semantics = str(
+        hash_semantics
+        or declared_semantics
+        or EXACT_BYTES_HASH
+    )
+    try:
+        actual = _sha256_with_semantics(path, effective_semantics)
+    except (OSError, ValueError) as exc:
+        blockers.append(f"{label}: {exc}")
+        return None
     if actual != expected:
         blockers.append(f"{label}: sha256 mismatch (expected {expected}, actual {actual})")
         return None
@@ -328,6 +427,11 @@ def preflight_training(
     if decision:
         if decision.get("schema_id") != SCHEMA_ID:
             blockers.append(f"decision manifest: schema_id must be {SCHEMA_ID!r}")
+        decision_hash_semantics = decision.get("artifact_hash_semantics")
+        if decision_hash_semantics != SEMANTIC_TEXT_HASH:
+            blockers.append(
+                "decision manifest: artifact_hash_semantics is missing or unsupported"
+            )
         validation = decision.get("validation")
         if not isinstance(validation, Mapping):
             blockers.append("decision manifest: validation object is missing")
@@ -361,6 +465,11 @@ def preflight_training(
                 f"decision artifact {name}",
                 blockers,
                 require_rows=True,
+                hash_semantics=(
+                    SEMANTIC_TEXT_HASH
+                    if decision_hash_semantics == SEMANTIC_TEXT_HASH
+                    else None
+                ),
             )
             if resolved is not None:
                 artifacts[name] = resolved
@@ -481,9 +590,9 @@ def load_training_examples(
                 row.get("candidate_records"),
                 f"{hard_path}:{row_number}:candidate_records",
             )
-            if not isinstance(raw_candidates, list) or len(raw_candidates) < 2:
+            if not isinstance(raw_candidates, list) or not raw_candidates:
                 raise V3TrainingError(
-                    f"{hard_path}:{row_number}: candidate_records must contain at least two candidates"
+                    f"{hard_path}:{row_number}: candidate_records must contain at least one candidate"
                 )
             nodes: list[int] = []
             matrix: list[list[float]] = []
@@ -494,7 +603,7 @@ def load_training_examples(
                     )
                 try:
                     node = int(candidate["next_node"])
-                except (KeyError, TypeError, ValueError) as exc:
+                except (KeyError, TypeError, ValueError, OverflowError) as exc:
                     raise V3TrainingError(
                         f"{hard_path}:{row_number}: candidate[{candidate_index}].next_node invalid"
                     ) from exc
@@ -522,13 +631,39 @@ def load_training_examples(
                 )
             if len(nodes) != len(set(nodes)):
                 raise V3TrainingError(f"{hard_path}:{row_number}: duplicate candidate nodes")
-            selected = int(row["selected_next"])
-            target_index = nodes.index(selected) if reached_goal and not loop and not failed_recovery else None
+            if nodes != sorted(nodes):
+                raise V3TrainingError(
+                    f"{hard_path}:{row_number}: candidate_records must use next_node ascending order"
+                )
+            try:
+                selected = int(row["selected_next"])
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                raise V3TrainingError(
+                    f"{hard_path}:{row_number}: selected_next is missing or invalid"
+                ) from exc
+            if selected not in nodes:
+                raise V3TrainingError(
+                    f"{hard_path}:{row_number}: selected_next is absent from candidate_records"
+                )
+            # A singleton candidate is a real decision-time observation and is
+            # retained for the separately supervised risk head, but it carries
+            # no pairwise/listwise ranking information.  Treating the forced
+            # choice as an imitation label would inflate ranker metrics.
+            ranker_eligible = len(nodes) >= 2
+            target_index = (
+                nodes.index(selected)
+                if ranker_eligible and reached_goal and not loop and not failed_recovery
+                else None
+            )
             task_id = str(row.get("task_id") or "").strip()
             scenario = _strip_repeat(str(row.get("scenario_observed") or row.get("scenario") or ""))
             if not task_id or not scenario:
                 raise V3TrainingError(f"{hard_path}:{row_number}: task/scenario is missing")
-            task_family = f"{scenario}|{_strip_repeat(task_id)}"
+            # The same source task may be replayed in several scenarios.  The
+            # scenario is a held-out evaluation dimension, never part of task
+            # identity, otherwise cross-scenario copies could leak across a
+            # train/test boundary.
+            task_family = _strip_repeat(task_id)
             source = str(row.get("source_node") or "").strip()
             goal = str(row.get("goal_node") or "").strip()
             fault = str(row.get("fault_bucket") or "").strip()
@@ -664,6 +799,57 @@ def _value_heldout_split(
     return _make_split(name, groups, test_groups, {attribute: heldout_value})
 
 
+def _strict_chronological_test_groups(
+    examples: Sequence[DecisionExample],
+    groups: Mapping[str, tuple[int, ...]],
+) -> tuple[tuple[str, ...], float, float]:
+    """Choose a near-20% whole-group suffix with no temporal overlap.
+
+    Connected groups may span multiple timestamps.  A suffix based only on a
+    group's final timestamp is not chronological: an early row from a held-out
+    group can precede a late training row.  This routine admits only boundaries
+    whose complete training range ends no later than the complete test range.
+    """
+
+    chronology = sorted(
+        groups,
+        key=lambda group: (
+            min(examples[index].event_time for index in groups[group]),
+            max(examples[index].event_time for index in groups[group]),
+            group,
+        ),
+    )
+    if len(chronology) < 2:
+        raise V3TrainingError("time_heldout: at least two connected groups are required")
+    minima = [min(examples[index].event_time for index in groups[group]) for group in chronology]
+    maxima = [max(examples[index].event_time for index in groups[group]) for group in chronology]
+    prefix_max: list[float] = []
+    current_max = -math.inf
+    for value in maxima:
+        current_max = max(current_max, value)
+        prefix_max.append(current_max)
+    suffix_min = [math.inf] * len(chronology)
+    current_min = math.inf
+    for position in range(len(chronology) - 1, -1, -1):
+        current_min = min(current_min, minima[position])
+        suffix_min[position] = current_min
+    valid: list[tuple[int, int, float, float]] = []
+    for boundary in range(1, len(chronology)):
+        train_max = prefix_max[boundary - 1]
+        test_min = suffix_min[boundary]
+        if train_max < test_min:
+            test_count = len(chronology) - boundary
+            valid.append(
+                (abs(test_count * 5 - len(chronology)), boundary, train_max, test_min)
+            )
+    if not valid:
+        raise V3TrainingError(
+            "time_heldout: connected groups have no leakage-free chronological boundary"
+        )
+    _, boundary, train_max, test_min = min(valid)
+    return tuple(chronology[boundary:]), train_max, test_min
+
+
 def build_grouped_splits(
     examples: Sequence[DecisionExample],
     *,
@@ -708,26 +894,17 @@ def build_grouped_splits(
         {"day": latest_day},
     )
 
-    chronology = sorted(
-        groups,
-        key=lambda group: (
-            max(examples[index].event_time for index in groups[group]),
-            group,
-        ),
+    time_test_groups, train_max_event_time, test_min_event_time = (
+        _strict_chronological_test_groups(examples, groups)
     )
-    time_count = max(1, math.ceil(len(chronology) * 0.2))
-    if time_count >= len(chronology):
-        time_count = len(chronology) - 1
     splits["time_heldout"] = _make_split(
         "time_heldout",
         groups,
-        chronology[-time_count:],
+        time_test_groups,
         {
-            "minimum_heldout_event_time": min(
-                examples[index].event_time
-                for group in chronology[-time_count:]
-                for index in groups[group]
-            )
+            "maximum_training_event_time": train_max_event_time,
+            "minimum_heldout_event_time": test_min_event_time,
+            "policy": "strict_non_overlapping_whole_group_boundary",
         },
     )
     splits["source_heldout"] = _value_heldout_split(
@@ -753,8 +930,24 @@ def build_grouped_splits(
         },
         {"od": heldout_od},
     )
-    splits["fault_heldout"] = _value_heldout_split(
-        "fault_heldout", examples, groups, "fault", prefer_fault=True
+    active_fault = "fault_local_active"
+    if not any(example.fault == active_fault for example in examples):
+        raise V3TrainingError(
+            "fault_heldout: no fault_local_active decisions are available"
+        )
+    fault_test_groups = {
+        group
+        for group, indices in groups.items()
+        if any(examples[index].fault == active_fault for index in indices)
+    }
+    splits["fault_heldout"] = _make_split(
+        "fault_heldout",
+        groups,
+        fault_test_groups,
+        {
+            "fault": active_fault,
+            "policy": "all connected groups containing an active-fault decision",
+        },
     )
 
     for split in splits.values():
@@ -772,6 +965,15 @@ def build_grouped_splits(
         }
         if train_fingerprints & test_fingerprints:
             raise AssertionError(f"{split.name}: deterministic duplicate leakage")
+        if split.name == "time_heldout":
+            train_max = max(examples[index].event_time for index in split.train_indices)
+            test_min = min(examples[index].event_time for index in split.test_indices)
+            if train_max >= test_min:
+                raise AssertionError("time_heldout: chronological leakage")
+        if split.name == "fault_heldout" and any(
+            examples[index].fault == "fault_local_active" for index in split.train_indices
+        ):
+            raise AssertionError("fault_heldout: active-fault decision leaked into training")
         if not any(examples[index].target_index is not None for index in split.train_indices):
             raise V3TrainingError(f"{split.name}: training side has no successful rank labels")
         if not any(examples[index].target_index is not None for index in split.test_indices):
@@ -810,6 +1012,125 @@ def prepare_dataset(
         splits=splits,
         dataset_sha256=_sha256_bytes(_canonical_json(digest_rows).encode("utf-8")),
     )
+
+
+def build_split_readiness_audit(
+    hard_case_path: Path | str,
+    outcome_path: Path | str,
+    *,
+    decision_manifest_sha256: str,
+    seed: int = 11,
+) -> tuple[dict[str, Any], PreparedDataset | None]:
+    """Dry-run exact training data and every split without creating weights.
+
+    The returned audit is suitable for hashing as Gate-C evidence.  It binds
+    the exact decision manifest, hard-case CSV, and outcome JSONL.  Ordinary
+    data insufficiency is represented as an explicit partial result rather
+    than an exception or an assumed PASS.
+    """
+
+    hard_path = Path(hard_case_path).resolve()
+    outcomes_path = Path(outcome_path).resolve()
+    blockers: list[str] = []
+    bindings: dict[str, Any] = {
+        "decision_manifest_sha256": str(decision_manifest_sha256).lower(),
+    }
+    bound_paths: dict[str, Path] = {}
+    for name, path, suffix in (
+        ("hard_case_index", hard_path, ".csv"),
+        ("outcome_sample", outcomes_path, ".jsonl"),
+    ):
+        if not path.is_file():
+            blockers.append(f"{name}: file does not exist: {path}")
+            continue
+        try:
+            if suffix == ".csv":
+                with path.open("r", encoding="utf-8-sig", newline="") as handle:
+                    row_count = sum(1 for _ in csv.DictReader(handle))
+            else:
+                with path.open("r", encoding="utf-8") as handle:
+                    row_count = sum(1 for line in handle if line.strip())
+            bindings[name] = _artifact_descriptor(path, row_count=row_count)
+            bound_paths[name] = path
+        except OSError as exc:
+            blockers.append(f"{name}: artifact is unreadable: {exc}")
+    metrics: dict[str, Any] = {
+        "seed": seed,
+        "input_decision_count": 0,
+        "ranker_eligible_decision_count": 0,
+        "rank_supervised_decision_count": 0,
+        "risk_head_only_single_candidate_count": 0,
+        "actual_day_bucket_count": 0,
+        "actual_day_buckets": [],
+        "active_fault_decision_count": 0,
+        "task_family_count": 0,
+    }
+    dataset: PreparedDataset | None = None
+    split_rows: list[dict[str, Any]] = []
+    if not _SHA256_RE.fullmatch(str(decision_manifest_sha256).lower()):
+        blockers.append("decision manifest SHA-256 is missing or invalid")
+    if not blockers:
+        try:
+            examples = load_training_examples(hard_path, outcomes_path)
+            days = sorted({example.day for example in examples})
+            metrics.update(
+                {
+                    "input_decision_count": len(examples),
+                    "ranker_eligible_decision_count": sum(
+                        len(example.candidate_nodes) >= 2 for example in examples
+                    ),
+                    "rank_supervised_decision_count": sum(
+                        example.target_index is not None for example in examples
+                    ),
+                    "risk_head_only_single_candidate_count": sum(
+                        len(example.candidate_nodes) == 1 for example in examples
+                    ),
+                    "actual_day_bucket_count": len(days),
+                    "actual_day_buckets": days,
+                    "active_fault_decision_count": sum(
+                        example.fault == "fault_local_active" for example in examples
+                    ),
+                    "task_family_count": len({example.task_family for example in examples}),
+                }
+            )
+            dataset = prepare_dataset(examples, seed=seed)
+            split_rows = split_audit_rows(dataset)
+        except (OSError, ValueError, KeyError, TypeError, OverflowError) as exc:
+            blockers.append(f"split readiness: {exc}")
+            dataset = None
+    # Bind the dry-run to stable bytes.  Re-opened parsing is acceptable only
+    # when the before/after descriptors match exactly; otherwise the audit is
+    # explicitly unusable rather than claiming readiness for raced inputs.
+    for name, path in bound_paths.items():
+        descriptor = bindings[name]
+        try:
+            if sha256_file(path) != descriptor["sha256"]:
+                blockers.append(f"{name}: artifact changed during split-readiness dry-run")
+        except OSError as exc:
+            blockers.append(f"{name}: artifact became unreadable during dry-run: {exc}")
+    if blockers:
+        dataset = None
+    status = "PASS" if dataset is not None and not blockers else "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    passed_splits = {str(row["split"]) for row in split_rows}
+    audit = {
+        "schema": SPLIT_READINESS_SCHEMA,
+        "status": status,
+        "model_weights_initialised": False,
+        "bindings": bindings,
+        "metrics": metrics,
+        "required_splits": list(SPLIT_NAMES),
+        "split_statuses": {
+            name: "PASS" if name in passed_splits and status == "PASS" else status
+            for name in SPLIT_NAMES
+        },
+        "split_audit": split_rows,
+        "dataset_sha256": dataset.dataset_sha256 if dataset is not None else "",
+        "blockers": sorted(set(blockers)),
+        "single_candidate_policy": (
+            "retained for risk-head supervision; excluded from ranker labels, normalisation, and metrics"
+        ),
+    }
+    return audit, dataset
 
 
 def _normalisation(
@@ -1048,47 +1369,335 @@ def _serialise_array(value: Any) -> Any:
     return value
 
 
-def validate_model_payload(payload: Mapping[str, Any]) -> None:
+def _strict_finite_number(value: Any, label: str) -> float:
+    if isinstance(value, bool) or not isinstance(
+        value, (int, float, np.integer, np.floating)
+    ):
+        raise V3TrainingError(f"{label} must be a JSON number")
+    result = float(value)
+    if not math.isfinite(result):
+        raise V3TrainingError(f"{label} must be finite")
+    return result
+
+
+def _reject_nonfinite_payload_numbers(value: Any, label: str = "model") -> None:
+    if isinstance(value, (float, np.floating)) and not math.isfinite(float(value)):
+        raise V3TrainingError(f"{label} contains NaN or Infinity")
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            _reject_nonfinite_payload_numbers(item, f"{label}.{key}")
+    elif isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            _reject_nonfinite_payload_numbers(item, f"{label}[{index}]")
+
+
+def _finite_vector(value: Any, length: int, label: str) -> tuple[float, ...]:
+    if not isinstance(value, list) or len(value) != length:
+        raise V3TrainingError(f"{label} dimension mismatch")
+    result: list[float] = []
+    for index, item in enumerate(value):
+        result.append(_strict_finite_number(item, f"{label}[{index}]"))
+    return tuple(result)
+
+
+def _finite_matrix(value: Any, rows: int, label: str) -> tuple[tuple[float, ...], ...]:
+    if not isinstance(value, list) or len(value) != rows or not value:
+        raise V3TrainingError(f"{label} row dimension mismatch")
+    if not all(isinstance(row, list) for row in value):
+        raise V3TrainingError(f"{label} must be a numeric matrix")
+    columns = len(value[0])
+    if columns <= 0:
+        raise V3TrainingError(f"{label} must have at least one column")
+    return tuple(
+        _finite_vector(row, columns, f"{label}[{index}]")
+        for index, row in enumerate(value)
+    )
+
+
+def _validate_release_binding(
+    value: Any, *, expected: Mapping[str, Any] | None
+) -> dict[str, str]:
+    if not isinstance(value, Mapping):
+        raise V3TrainingError("model release_binding is missing")
+    required_hashes = (
+        "gate_manifest_sha256",
+        "decision_manifest_sha256",
+        "split_readiness_sha256",
+        "dataset_sha256",
+    )
+    expected_keys = {"release_id", *required_hashes}
+    if set(value) != expected_keys:
+        raise V3TrainingError("model release_binding fields are incomplete or unknown")
+    release_id = str(value.get("release_id") or "")
+    if not re.fullmatch(r"[0-9a-f]{24,64}", release_id):
+        raise V3TrainingError("model release_binding.release_id is invalid")
+    for name in required_hashes:
+        if not _SHA256_RE.fullmatch(str(value.get(name) or "").lower()):
+            raise V3TrainingError(f"model release_binding.{name} is invalid")
+    if expected is not None and dict(value) != dict(expected):
+        raise V3TrainingError("model release_binding does not match active release")
+    return {str(key): str(item) for key, item in value.items()}
+
+
+def validate_model_payload(
+    payload: Mapping[str, Any],
+    *,
+    expected_release_binding: Mapping[str, Any] | None = None,
+) -> None:
     """Validate the portable JSON model contract before inference."""
 
+    if not isinstance(payload, Mapping):
+        raise V3TrainingError("model payload must be an object")
+    _reject_nonfinite_payload_numbers(payload)
     if payload.get("schema") != MODEL_SCHEMA:
         raise V3TrainingError(f"model schema must be {MODEL_SCHEMA!r}")
     if payload.get("model_name") not in MODEL_NAMES:
         raise V3TrainingError("unknown v3 model_name")
     if payload.get("absolute_node_id_features") is not False:
         raise V3TrainingError("absolute node ID features must remain disabled")
+    if payload.get("model_score_semantics") != "higher_is_preferred":
+        raise V3TrainingError("model score semantics must be higher_is_preferred")
+    if payload.get("candidate_ordering") != "next_node_ascending":
+        raise V3TrainingError("model candidate_ordering must be next_node_ascending")
+    if payload.get("tie_break") != "lowest_next_node":
+        raise V3TrainingError("model tie_break must be lowest_next_node")
     raw_names = payload.get("feature_names")
     if not isinstance(raw_names, list) or not raw_names:
         raise V3TrainingError("model feature_names must be a non-empty array")
     names = tuple(map(str, raw_names))
     if len(names) != len(set(names)) or any(name not in FEATURE_NAMES for name in names):
         raise V3TrainingError("model contains duplicate or unapproved feature names")
+    required_names = (
+        PRUNED_FEATURE_NAMES
+        if payload.get("model_name") == "v3_feature_pruned_mlp"
+        else FEATURE_NAMES
+    )
+    if names != required_names:
+        raise V3TrainingError("model feature order does not match its exact feature contract")
+    if payload.get("candidate_input_contract") != "bounded_decision_time_local_features_only":
+        raise V3TrainingError("model candidate input contract is invalid")
     normalisation = payload.get("normalisation")
     if not isinstance(normalisation, Mapping):
         raise V3TrainingError("model normalisation object is missing")
-    for field in ("mean", "std"):
-        values = normalisation.get(field)
-        if not isinstance(values, list) or len(values) != len(names):
-            raise V3TrainingError(f"model normalisation.{field} dimension mismatch")
-        if not all(math.isfinite(float(value)) for value in values):
-            raise V3TrainingError(f"model normalisation.{field} must be finite")
-    if any(float(value) <= 0 for value in normalisation["std"]):
+    _finite_vector(normalisation.get("mean"), len(names), "model normalisation.mean")
+    std = _finite_vector(normalisation.get("std"), len(names), "model normalisation.std")
+    if any(value <= 0 for value in std):
         raise V3TrainingError("model normalisation.std must be positive")
     ranker = payload.get("ranker")
     if not isinstance(ranker, Mapping) or ranker.get("kind") not in {"linear", "tiny_mlp"}:
         raise V3TrainingError("model ranker is missing or unsupported")
+    expected_ranker_kind = (
+        "linear" if payload.get("model_name") == "v3_linear_ranker" else "tiny_mlp"
+    )
+    if ranker.get("kind") != expected_ranker_kind:
+        raise V3TrainingError("model ranker kind does not match model_name")
+    if ranker["kind"] == "linear":
+        _finite_vector(ranker.get("weights"), len(names), "model ranker.weights")
+        if set(ranker) != {"kind", "weights"}:
+            raise V3TrainingError("linear ranker contains unknown fields")
+    else:
+        matrix = _finite_matrix(ranker.get("w1"), len(names), "model ranker.w1")
+        hidden = len(matrix[0])
+        _finite_vector(ranker.get("b1"), hidden, "model ranker.b1")
+        _finite_vector(ranker.get("w2"), hidden, "model ranker.w2")
+        _strict_finite_number(ranker.get("b2"), "model ranker.b2")
+        if set(ranker) != {"kind", "w1", "b1", "w2", "b2"}:
+            raise V3TrainingError("tiny_mlp ranker contains unknown fields")
     risk_head = payload.get("risk_head")
     if payload.get("model_name") == "v3_risk_head_plus_ranker":
         if not isinstance(risk_head, Mapping) or risk_head.get("kind") != "logistic":
             raise V3TrainingError("risk-head model has no logistic risk head")
+        _finite_vector(
+            risk_head.get("weights"),
+            3 * len(names) + 1,
+            "model risk_head.weights",
+        )
+        _strict_finite_number(risk_head.get("bias"), "model risk_head.bias")
+        if set(risk_head) != {"kind", "weights", "bias"}:
+            raise V3TrainingError("risk head contains unknown fields")
     elif risk_head is not None:
         raise V3TrainingError("non-risk model unexpectedly contains a risk head")
+    training = payload.get("training")
+    if not isinstance(training, Mapping):
+        raise V3TrainingError("model training provenance is missing")
+    for digest_name in ("dataset_sha256", "train_group_digest", "test_group_digest"):
+        if not _SHA256_RE.fullmatch(str(training.get(digest_name) or "").lower()):
+            raise V3TrainingError(f"model training.{digest_name} is invalid")
+    epochs = training.get("epochs")
+    if isinstance(epochs, bool) or not isinstance(epochs, int) or epochs <= 0:
+        raise V3TrainingError("model training.epochs must be a positive integer")
+    if _strict_finite_number(
+        training.get("learning_rate"), "model training.learning_rate"
+    ) <= 0:
+        raise V3TrainingError("model training.learning_rate must be positive")
+    for seed_name in ("seed", "derived_seed"):
+        seed_value = training.get(seed_name)
+        if isinstance(seed_value, bool) or not isinstance(seed_value, int):
+            raise V3TrainingError(f"model training.{seed_name} must be an integer")
+    binding = payload.get("release_binding")
+    if expected_release_binding is not None:
+        _validate_release_binding(binding, expected=expected_release_binding)
+    elif binding is not None:
+        _validate_release_binding(binding, expected=None)
 
 
 def load_v3_model(path: Path | str) -> dict[str, Any]:
+    del path
+    raise V3TrainingError(
+        "direct model loading is disabled; use load_active_v3_model so the canonical "
+        "active pointer, current gates, status, release, and artifact hashes are verified"
+    )
+
+
+def _load_bound_v3_model(
+    path: Path, expected_release_binding: Mapping[str, Any]
+) -> dict[str, Any]:
     payload = _read_json_object(Path(path), "v3 model")
-    validate_model_payload(payload)
+    validate_model_payload(payload, expected_release_binding=expected_release_binding)
     return payload
+
+
+def _required_bound_artifact(repo: Path, descriptor: Any, label: str) -> Path:
+    blockers: list[str] = []
+    path = _verify_descriptor(repo, descriptor, label, blockers)
+    if blockers or path is None:
+        raise V3TrainingError("; ".join(blockers) or f"{label}: invalid descriptor")
+    return path
+
+
+def load_active_v3_model(
+    repo: Path | str,
+    active_release_path: Path | str,
+    model_name: str,
+    *,
+    gate_manifest_path: Path | str,
+    decision_manifest_path: Path | str,
+) -> Mapping[str, Any]:
+    """Load only the currently published, non-revoked, hash-bound model."""
+
+    repo_path = Path(repo).resolve()
+    active_path = Path(active_release_path).resolve()
+    canonical_active = (repo_path / CANONICAL_ACTIVE_RELEASE).resolve()
+    canonical_gate = (repo_path / CANONICAL_GATE_MANIFEST).resolve()
+    canonical_decision = (repo_path / CANONICAL_DECISION_MANIFEST).resolve()
+    if active_path != canonical_active:
+        raise V3TrainingError("only the canonical active release pointer may be loaded")
+    if Path(gate_manifest_path).resolve() != canonical_gate:
+        raise V3TrainingError("gate manifest is not the canonical current manifest")
+    if Path(decision_manifest_path).resolve() != canonical_decision:
+        raise V3TrainingError("decision manifest is not the canonical current manifest")
+    if not active_path.is_file():
+        raise V3TrainingError("canonical active release manifest is missing")
+    active = _read_json_object(active_path, "active release")
+    if active.get("schema") != ACTIVE_RELEASE_SCHEMA or active.get("status") != "PASS":
+        raise V3TrainingError("active v3 release is revoked or not PASS")
+    if model_name not in MODEL_NAMES:
+        raise V3TrainingError("requested model_name is not a supported v3 model")
+
+    gate_path = _required_bound_artifact(repo_path, active.get("gate_manifest"), "active gate manifest")
+    decision_path = _required_bound_artifact(
+        repo_path, active.get("decision_manifest"), "active decision manifest"
+    )
+    if gate_path != canonical_gate or decision_path != canonical_decision:
+        raise V3TrainingError("active release does not bind the canonical current manifests")
+    current_approval = preflight_training(repo_path, canonical_gate, canonical_decision)
+    if not current_approval.allowed:
+        raise V3TrainingError(
+            "current gate/decision preflight is not PASS: "
+            + "; ".join(current_approval.blockers)
+        )
+    status_path = _required_bound_artifact(
+        repo_path, active.get("training_status"), "active training status"
+    )
+    status = _read_json_object(status_path, "active training status")
+    if (
+        status.get("schema") != TRAINING_STATUS_SCHEMA
+        or status.get("status") != "PASS"
+        or status.get("trained") is not True
+    ):
+        raise V3TrainingError("current v3 training status is not a trained PASS")
+    release_path = _required_bound_artifact(
+        repo_path, active.get("release_manifest"), "active release manifest"
+    )
+    release = _read_json_object(release_path, "v3 release manifest")
+    if release.get("schema") != RELEASE_MANIFEST_SCHEMA or release.get("status") != "PASS":
+        raise V3TrainingError("release manifest is not PASS")
+    release_id = str(active.get("release_id") or "")
+    if release_id != release.get("release_id"):
+        raise V3TrainingError("active pointer/release ID mismatch")
+    binding = release.get("release_binding")
+    binding = _validate_release_binding(binding, expected=None)
+    if binding["release_id"] != release_id:
+        raise V3TrainingError("release binding/release ID mismatch")
+    if status.get("release_id") != release_id or status.get("release_binding") != binding:
+        raise V3TrainingError("training status is not bound to the active release")
+    if binding["gate_manifest_sha256"] != current_approval.gate_manifest_sha256:
+        raise V3TrainingError("release binding gate SHA is stale")
+    if binding["decision_manifest_sha256"] != current_approval.decision_manifest_sha256:
+        raise V3TrainingError("release binding decision SHA is stale")
+    for descriptor_name, expected_path in (
+        ("gate_manifest", gate_path),
+        ("decision_manifest", decision_path),
+    ):
+        descriptor = release.get(descriptor_name)
+        bound_path = _required_bound_artifact(
+            repo_path, descriptor, f"release {descriptor_name.replace('_', ' ')}"
+        )
+        if bound_path != expected_path:
+            raise V3TrainingError(f"release {descriptor_name} path mismatch")
+    readiness_path = _required_bound_artifact(
+        repo_path, release.get("split_readiness"), "release split readiness"
+    )
+    if sha256_file(readiness_path) != binding["split_readiness_sha256"]:
+        raise V3TrainingError("release binding split-readiness SHA is stale")
+    readiness = _read_json_object(readiness_path, "release split readiness")
+    if (
+        readiness.get("schema") != SPLIT_READINESS_SCHEMA
+        or readiness.get("status") != "PASS"
+        or readiness.get("model_weights_initialised") is not False
+        or readiness.get("dataset_sha256") != binding["dataset_sha256"]
+        or readiness.get("required_splits") != list(SPLIT_NAMES)
+        or readiness.get("split_statuses")
+        != {name: "PASS" for name in SPLIT_NAMES}
+        or readiness.get("blockers") not in ([], ())
+    ):
+        raise V3TrainingError("release split readiness is not an exact PASS")
+    readiness_bindings = readiness.get("bindings")
+    if not isinstance(readiness_bindings, Mapping) or (
+        readiness_bindings.get("decision_manifest_sha256")
+        != binding["decision_manifest_sha256"]
+    ):
+        raise V3TrainingError("split readiness is not bound to the current decision manifest")
+    for name in ("hard_case_index", "outcome_sample"):
+        descriptor = readiness_bindings.get(name)
+        bound_path = _required_bound_artifact(
+            repo_path, descriptor, f"split readiness {name.replace('_', ' ')}"
+        )
+        if bound_path != current_approval.artifacts.get(name):
+            raise V3TrainingError(f"split readiness {name} is not the approved artifact")
+    status_release = status.get("release_manifest")
+    if not isinstance(status_release, Mapping) or dict(status_release) != dict(
+        active.get("release_manifest") or {}
+    ):
+        raise V3TrainingError("training status/release manifest binding mismatch")
+    models = release.get("model_artifacts")
+    if not isinstance(models, Mapping) or set(models) != set(MODEL_NAMES):
+        raise V3TrainingError("release model_artifacts must contain exactly all v3 models")
+    if status.get("model_artifacts") != models:
+        raise V3TrainingError("training status/model artifact binding mismatch")
+    model_path = _required_bound_artifact(
+        repo_path, models.get(model_name), f"release model {model_name}"
+    )
+    model = _load_bound_v3_model(model_path, binding)
+    if model.get("model_name") != model_name:
+        raise V3TrainingError("release model name does not match requested model")
+    if model.get("training", {}).get("dataset_sha256") != binding["dataset_sha256"]:
+        raise V3TrainingError("model training dataset does not match release binding")
+    return _ActiveV3Model(
+        payload=model,
+        release_id=release_id,
+        active_release_sha256=sha256_file(active_path),
+    )
 
 
 def _inference_candidates(
@@ -1104,7 +1713,7 @@ def _inference_candidates(
             raise V3TrainingError(f"candidate[{index}] must be an object")
         try:
             node = int(candidate["next_node"])
-        except (KeyError, TypeError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
             raise V3TrainingError(f"candidate[{index}].next_node is invalid") from exc
         features = candidate.get("features")
         if not isinstance(features, Mapping):
@@ -1123,16 +1732,32 @@ def _inference_candidates(
         )
     if len(nodes) != len(set(nodes)):
         raise V3TrainingError("inference candidate nodes must be unique")
+    if nodes != sorted(nodes):
+        raise V3TrainingError(
+            "inference candidate records must use canonical next_node ascending order"
+        )
     return tuple(nodes), np.asarray(rows, dtype=np.float64)
 
 
 def score_v3_candidates(
     model: Mapping[str, Any],
     candidate_records: Sequence[Mapping[str, Any]],
+    *,
+    allow_unpublished_for_offline_evaluation: bool = False,
 ) -> dict[str, Any]:
     """Score one bounded local candidate set with a portable v3 model."""
 
-    validate_model_payload(model)
+    if isinstance(model, _ActiveV3Model):
+        payload = model.payload
+    elif allow_unpublished_for_offline_evaluation:
+        payload = model
+    else:
+        raise V3TrainingError(
+            "production scoring requires a model returned by load_active_v3_model; "
+            "the offline override is test/evaluation only"
+        )
+    validate_model_payload(payload)
+    model = payload
     names = tuple(map(str, model["feature_names"]))
     nodes, matrix = _inference_candidates(candidate_records, names)
     normalisation = model["normalisation"]
@@ -1151,6 +1776,8 @@ def score_v3_candidates(
         "scores": [float(value) for value in scores],
         "selected_next": nodes[best],
         "score_semantics": "higher_is_preferred",
+        "candidate_ordering": "next_node_ascending",
+        "tie_break": "lowest_next_node",
     }
     risk_head = model.get("risk_head")
     if risk_head is not None:
@@ -1265,6 +1892,8 @@ def fit_model_for_split(
         "absolute_node_id_features": False,
         "candidate_input_contract": "bounded_decision_time_local_features_only",
         "model_score_semantics": "higher_is_preferred",
+        "candidate_ordering": "next_node_ascending",
+        "tie_break": "lowest_next_node",
         "normalisation": {"mean": mean, "std": std},
         "ranker": ranker,
         "risk_head": risk_head,
@@ -1330,6 +1959,20 @@ def split_audit_rows(dataset: PreparedDataset) -> list[dict[str, Any]]:
         test_fingerprints = {
             dataset.examples[index].semantic_fingerprint for index in split.test_indices
         }
+        train_max_event_time = max(
+            dataset.examples[index].event_time for index in split.train_indices
+        )
+        test_min_event_time = min(
+            dataset.examples[index].event_time for index in split.test_indices
+        )
+        active_fault_train = sum(
+            dataset.examples[index].fault == "fault_local_active"
+            for index in split.train_indices
+        )
+        active_fault_test = sum(
+            dataset.examples[index].fault == "fault_local_active"
+            for index in split.test_indices
+        )
         rows.append(
             {
                 "split": name,
@@ -1339,6 +1982,15 @@ def split_audit_rows(dataset: PreparedDataset) -> list[dict[str, Any]]:
                 "test_groups": len(split.test_groups),
                 "task_repeat_overlap": len(train_tasks & test_tasks),
                 "semantic_duplicate_overlap": len(train_fingerprints & test_fingerprints),
+                "train_max_event_time": train_max_event_time,
+                "test_min_event_time": test_min_event_time,
+                "chronological_overlap": (
+                    train_max_event_time >= test_min_event_time
+                    if name == "time_heldout"
+                    else False
+                ),
+                "active_fault_train_decisions": active_fault_train,
+                "active_fault_test_decisions": active_fault_test,
                 "heldout": dict(split.heldout),
                 "status": "PASS",
             }

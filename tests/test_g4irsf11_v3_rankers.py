@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import csv
 import hashlib
 import json
@@ -9,32 +10,52 @@ import numpy as np
 import pytest
 
 from czr005.models.g4irsf11_v3 import (
+    ACTIVE_RELEASE_SCHEMA,
+    CANONICAL_ACTIVE_RELEASE,
+    CANONICAL_DECISION_MANIFEST,
+    CANONICAL_GATE_MANIFEST,
+    EXACT_BYTES_HASH,
     FEATURE_NAMES,
     MODEL_NAMES,
     PRETRAINING_GATE_SCHEMA,
+    RELEASE_MANIFEST_SCHEMA,
     REQUIRED_DECISION_VALIDATIONS,
     REQUIRED_STAGE_GATES,
     SPLIT_NAMES,
+    SPLIT_READINESS_SCHEMA,
+    SEMANTIC_TEXT_HASH,
+    TEXT_ARTIFACT_SUFFIXES,
+    TRAINING_STATUS_SCHEMA,
     DecisionExample,
     V3TrainingError,
+    build_split_readiness_audit,
     connected_group_ids,
+    load_active_v3_model,
     load_training_examples,
+    load_v3_model,
     preflight_training,
     prepare_dataset,
     score_v3_candidates,
+    semantic_text_sha256,
     split_audit_rows,
     train_all_models,
+    validate_model_payload,
 )
 
 
 def _sha(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return semantic_text_sha256(path)
 
 
 def _descriptor(root: Path, path: Path, *, rows: int | None = None) -> dict[str, object]:
     result: dict[str, object] = {
         "path": path.relative_to(root).as_posix(),
         "sha256": _sha(path),
+        "hash_semantics": (
+            SEMANTIC_TEXT_HASH
+            if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES
+            else EXACT_BYTES_HASH
+        ),
     }
     if rows is not None:
         result["row_count"] = rows
@@ -55,6 +76,7 @@ def _write_preflight_fixture(root: Path) -> tuple[Path, Path, dict[str, object]]
     source.write_text("decision_id\nd-1\n", encoding="utf-8")
     decision = {
         "schema_id": "czr005.g4irsf11.decision_trace.v1",
+        "artifact_hash_semantics": SEMANTIC_TEXT_HASH,
         "validation": {
             "status": "PASS",
             **{name: "PASS" for name in REQUIRED_DECISION_VALIDATIONS},
@@ -69,7 +91,8 @@ def _write_preflight_fixture(root: Path) -> tuple[Path, Path, dict[str, object]]
             "source_release_mapping": _descriptor(root, source, rows=1),
         },
     }
-    decision_path = root / "decision.json"
+    decision_path = root / CANONICAL_DECISION_MANIFEST
+    decision_path.parent.mkdir(parents=True, exist_ok=True)
     decision_path.write_text(json.dumps(decision, sort_keys=True), encoding="utf-8")
 
     gates: dict[str, object] = {}
@@ -82,7 +105,8 @@ def _write_preflight_fixture(root: Path) -> tuple[Path, Path, dict[str, object]]
         "gates": gates,
         "decision_manifest": _descriptor(root, decision_path),
     }
-    gate_path = root / "gate.json"
+    gate_path = root / CANONICAL_GATE_MANIFEST
+    gate_path.parent.mkdir(parents=True, exist_ok=True)
     gate_path.write_text(json.dumps(gate, sort_keys=True), encoding="utf-8")
     return gate_path, decision_path, gate
 
@@ -99,6 +123,22 @@ def test_preflight_requires_hashed_a_through_h_and_exact_decision_binding(tmp_pa
         "feature_lineage_table",
         "source_release_mapping",
     }
+
+
+def test_preflight_treats_lf_and_crlf_text_as_the_same_manifest_artifact(
+    tmp_path: Path,
+) -> None:
+    gate_path, decision_path, _ = _write_preflight_fixture(tmp_path)
+    hard = tmp_path / "artifacts" / "hard.csv"
+    lf = b"decision_id\nd-1\n"
+    crlf = b"decision_id\r\nd-1\r\n"
+    assert hashlib.sha256(lf).hexdigest() != hashlib.sha256(crlf).hexdigest()
+    hard.write_bytes(crlf)
+    assert semantic_text_sha256(hard) == hashlib.sha256(lf).hexdigest()
+
+    approval = preflight_training(tmp_path, gate_path, decision_path)
+    assert approval.allowed
+    assert not any("hard_case_index" in blocker for blocker in approval.blockers)
 
 
 def test_preflight_fails_closed_for_partial_stage_or_stale_evidence(tmp_path: Path) -> None:
@@ -194,6 +234,13 @@ def test_all_required_splits_have_zero_task_and_duplicate_overlap() -> None:
     assert all(row["status"] == "PASS" for row in rows)
     assert all(row["task_repeat_overlap"] == 0 for row in rows)
     assert all(row["semantic_duplicate_overlap"] == 0 for row in rows)
+    by_name = {row["split"]: row for row in rows}
+    assert by_name["time_heldout"]["train_max_event_time"] < by_name["time_heldout"][
+        "test_min_event_time"
+    ]
+    assert by_name["time_heldout"]["chronological_overlap"] is False
+    assert by_name["fault_heldout"]["active_fault_train_decisions"] == 0
+    assert by_name["fault_heldout"]["active_fault_test_decisions"] > 0
 
 
 def test_split_builder_refuses_missing_fault_dimension() -> None:
@@ -233,7 +280,9 @@ def test_four_models_are_small_node_id_free_and_reproducible() -> None:
             }
             for candidate_index, node in enumerate(source.candidate_nodes)
         ]
-        prediction = score_v3_candidates(model, records)
+        prediction = score_v3_candidates(
+            model, records, allow_unpublished_for_offline_evaluation=True
+        )
         assert prediction["selected_next"] in source.candidate_nodes
         assert len(prediction["scores"]) == len(source.candidate_nodes)
         assert ("risk_probability" in prediction) == (name == "v3_risk_head_plus_ranker")
@@ -265,9 +314,9 @@ def test_loader_uses_failed_rows_only_for_risk_and_rejects_unapproved_feature(tm
         rows.append(
             {
                 "decision_id": f"d-{index}",
-                "task_id": f"t-{index}",
+                "task_id": f"shared-task_repeat_{index + 1}",
                 "scenario": "paper",
-                "scenario_observed": "paper",
+                "scenario_observed": "paper" if index == 0 else "fault",
                 "source_node": 1,
                 "goal_node": 9,
                 "fault_bucket": "no_fault",
@@ -297,6 +346,7 @@ def test_loader_uses_failed_rows_only_for_risk_and_rejects_unapproved_feature(tm
     assert loaded[0].risk_label == 0
     assert loaded[1].target_index is None
     assert loaded[1].risk_label == 1
+    assert loaded[0].task_family == loaded[1].task_family == "shared-task"
 
     rows[0]["candidate_records"] = json.dumps(
         [
@@ -310,3 +360,227 @@ def test_loader_uses_failed_rows_only_for_risk_and_rejects_unapproved_feature(tm
         writer.writerows(rows)
     with pytest.raises(V3TrainingError, match="unapproved candidate features"):
         load_training_examples(hard, outcomes)
+
+
+def test_loader_retains_single_candidate_only_for_risk_supervision(tmp_path: Path) -> None:
+    hard = tmp_path / "hard.csv"
+    outcomes = tmp_path / "outcomes.jsonl"
+    row = {
+        "decision_id": "forced-1",
+        "task_id": "task-1",
+        "scenario": "fault",
+        "scenario_observed": "fault",
+        "source_node": 1,
+        "goal_node": 9,
+        "fault_bucket": "advertised_fault",
+        "original_arrival_time": 0,
+        "event_time": 10,
+        "candidate_records": json.dumps(
+            [{"next_node": 2, "features": {"travel_time": 2.0}}]
+        ),
+        "selected_next": 2,
+        "semantic_fingerprint": hashlib.sha256(b"forced-1").hexdigest(),
+    }
+    with hard.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(row))
+        writer.writeheader()
+        writer.writerow(row)
+    outcomes.write_text(
+        json.dumps({"decision_id": "forced-1", "reached_goal": False}) + "\n",
+        encoding="utf-8",
+    )
+
+    # Keep a rank-labelled row in the same artifact because the loader is
+    # deliberately fail-closed when the complete dataset has no rank signal.
+    ranked = dict(row)
+    ranked.update(
+        decision_id="ranked-1",
+        task_id="task-2",
+        candidate_records=json.dumps(
+            [
+                {"next_node": 2, "features": {"travel_time": 2.0}},
+                {"next_node": 3, "features": {"travel_time": 1.0}},
+            ]
+        ),
+        selected_next=3,
+        semantic_fingerprint=hashlib.sha256(b"ranked-1").hexdigest(),
+    )
+    with hard.open("a", encoding="utf-8", newline="") as handle:
+        csv.DictWriter(handle, fieldnames=list(row)).writerow(ranked)
+    with outcomes.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({"decision_id": "ranked-1", "reached_goal": True}) + "\n")
+
+    loaded = load_training_examples(hard, outcomes)
+    forced = next(example for example in loaded if example.decision_id == "forced-1")
+    assert forced.candidate_nodes == (2,)
+    assert forced.target_index is None
+    assert forced.risk_label == 1
+    ranked_example = next(example for example in loaded if example.decision_id == "ranked-1")
+    assert ranked_example.target_index == 1
+
+    readiness, dataset = build_split_readiness_audit(
+        hard,
+        outcomes,
+        decision_manifest_sha256=hashlib.sha256(b"decision-manifest").hexdigest(),
+    )
+    assert dataset is None
+    assert readiness["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    assert readiness["model_weights_initialised"] is False
+    assert readiness["metrics"]["actual_day_bucket_count"] == 1
+    assert readiness["metrics"]["risk_head_only_single_candidate_count"] == 1
+    assert readiness["bindings"]["hard_case_index"]["sha256"] == _sha(hard)
+    assert readiness["bindings"]["outcome_sample"]["sha256"] == _sha(outcomes)
+
+
+def test_payload_validation_rejects_nonfinite_and_wrong_dimensions() -> None:
+    dataset = prepare_dataset(tuple(_example(index, risk=index % 7 == 0) for index in range(30)))
+    models, _ = train_all_models(dataset, epochs=1, learning_rate=0.01, seed=7)
+    linear = models["v3_linear_ranker"]
+    validate_model_payload(linear)
+
+    invalid = copy.deepcopy(linear)
+    invalid["ranker"]["weights"][0] = float("nan")
+    with pytest.raises(V3TrainingError, match="NaN or Infinity|finite"):
+        validate_model_payload(invalid)
+    invalid = copy.deepcopy(linear)
+    invalid["ranker"]["weights"].pop()
+    with pytest.raises(V3TrainingError, match="dimension mismatch"):
+        validate_model_payload(invalid)
+    invalid = copy.deepcopy(models["v3_tiny_mlp"])
+    invalid["ranker"]["b2"] = True
+    with pytest.raises(V3TrainingError, match="JSON number"):
+        validate_model_payload(invalid)
+
+
+def test_candidate_order_and_lowest_node_tie_break_are_explicit(tmp_path: Path) -> None:
+    dataset = prepare_dataset(tuple(_example(index, risk=index % 7 == 0) for index in range(30)))
+    models, _ = train_all_models(dataset, epochs=1, learning_rate=0.01, seed=9)
+    model = copy.deepcopy(models["v3_linear_ranker"])
+    model["ranker"]["weights"] = [0.0] * len(model["feature_names"])
+    source = dataset.examples[0]
+    records = [
+        {
+            "next_node": node,
+            "features": {
+                name: float(source.candidate_features[index, FEATURE_NAMES.index(name)])
+                for name in model["feature_names"]
+            },
+        }
+        for index, node in enumerate(source.candidate_nodes)
+    ]
+    prediction = score_v3_candidates(
+        model, records, allow_unpublished_for_offline_evaluation=True
+    )
+    assert prediction["selected_next"] == min(source.candidate_nodes)
+    assert prediction["candidate_ordering"] == "next_node_ascending"
+    assert prediction["tie_break"] == "lowest_next_node"
+    with pytest.raises(V3TrainingError, match="ascending order"):
+        score_v3_candidates(
+            model,
+            list(reversed(records)),
+            allow_unpublished_for_offline_evaluation=True,
+        )
+
+    path = tmp_path / "legacy_model.json"
+    path.write_text(json.dumps(model), encoding="utf-8")
+    with pytest.raises(V3TrainingError, match="direct model loading is disabled"):
+        load_v3_model(path)
+
+
+def test_active_release_is_hash_bound_and_revocation_blocks_old_models(tmp_path: Path) -> None:
+    gate_path, decision_path, _ = _write_preflight_fixture(tmp_path)
+    dataset = prepare_dataset(tuple(_example(index, risk=index % 7 == 0) for index in range(30)))
+    models, _ = train_all_models(dataset, epochs=1, learning_rate=0.01, seed=13)
+    release_id = "a" * 32
+    release_dir = tmp_path / "artifacts" / "models" / "g4irsf11_v3" / "releases" / release_id
+    release_dir.mkdir(parents=True)
+    hard = tmp_path / "artifacts" / "hard.csv"
+    outcomes = tmp_path / "artifacts" / "outcomes.jsonl"
+    readiness_path = release_dir / "split_readiness.json"
+    readiness = {
+        "schema": SPLIT_READINESS_SCHEMA,
+        "status": "PASS",
+        "model_weights_initialised": False,
+        "bindings": {
+            "decision_manifest_sha256": _sha(decision_path),
+            "hard_case_index": _descriptor(tmp_path, hard, rows=1),
+            "outcome_sample": _descriptor(tmp_path, outcomes, rows=1),
+        },
+        "dataset_sha256": dataset.dataset_sha256,
+        "required_splits": list(SPLIT_NAMES),
+        "split_statuses": {name: "PASS" for name in SPLIT_NAMES},
+        "blockers": [],
+    }
+    readiness_path.write_text(json.dumps(readiness, sort_keys=True), encoding="utf-8")
+    binding = {
+        "release_id": release_id,
+        "gate_manifest_sha256": _sha(gate_path),
+        "decision_manifest_sha256": _sha(decision_path),
+        "split_readiness_sha256": _sha(readiness_path),
+        "dataset_sha256": dataset.dataset_sha256,
+    }
+    model_artifacts: dict[str, object] = {}
+    for name in MODEL_NAMES:
+        payload = copy.deepcopy(models[name])
+        payload["release_binding"] = binding
+        path = release_dir / f"{name}.json"
+        path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+        model_artifacts[name] = _descriptor(tmp_path, path)
+    release = {
+        "schema": RELEASE_MANIFEST_SCHEMA,
+        "status": "PASS",
+        "release_id": release_id,
+        "release_binding": binding,
+        "gate_manifest": _descriptor(tmp_path, gate_path),
+        "decision_manifest": _descriptor(tmp_path, decision_path),
+        "split_readiness": _descriptor(tmp_path, readiness_path),
+        "model_artifacts": model_artifacts,
+    }
+    release_path = release_dir / "release_manifest.json"
+    release_path.write_text(json.dumps(release, sort_keys=True), encoding="utf-8")
+    status_path = tmp_path / "outputs" / "reports" / "v3_status.json"
+    status_path.parent.mkdir(parents=True)
+    status = {
+        "schema": TRAINING_STATUS_SCHEMA,
+        "status": "PASS",
+        "trained": True,
+        "release_id": release_id,
+        "release_binding": binding,
+        "release_manifest": _descriptor(tmp_path, release_path),
+        "model_artifacts": model_artifacts,
+    }
+    status_path.write_text(json.dumps(status, sort_keys=True), encoding="utf-8")
+    active_path = tmp_path / CANONICAL_ACTIVE_RELEASE
+    active_path.parent.mkdir(parents=True, exist_ok=True)
+    active = {
+        "schema": ACTIVE_RELEASE_SCHEMA,
+        "status": "PASS",
+        "release_id": release_id,
+        "gate_manifest": _descriptor(tmp_path, gate_path),
+        "decision_manifest": _descriptor(tmp_path, decision_path),
+        "training_status": _descriptor(tmp_path, status_path),
+        "release_manifest": _descriptor(tmp_path, release_path),
+    }
+    active_path.write_text(json.dumps(active, sort_keys=True), encoding="utf-8")
+
+    loaded = load_active_v3_model(
+        tmp_path,
+        active_path,
+        "v3_linear_ranker",
+        gate_manifest_path=gate_path,
+        decision_manifest_path=decision_path,
+    )
+    assert loaded["release_binding"] == binding
+    old_model = release_dir / "v3_linear_ranker.json"
+    assert old_model.is_file()
+    active["status"] = "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    active["release_id"] = None
+    active_path.write_text(json.dumps(active, sort_keys=True), encoding="utf-8")
+    with pytest.raises(V3TrainingError, match="revoked or not PASS"):
+        load_active_v3_model(
+            tmp_path,
+            active_path,
+            "v3_linear_ranker",
+            gate_manifest_path=gate_path,
+            decision_manifest_path=decision_path,
+        )
