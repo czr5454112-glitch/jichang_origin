@@ -539,3 +539,111 @@ def g4irsf4_no_astar_streaming_replay_from_jsonl(
             str(reservation_semantics),
         )
     )
+
+
+def g4irsf11_event_runtime_from_records(
+    *,
+    node_records: Sequence[tuple[int, int, float, int, int, Sequence[int]]],
+    edge_records: Sequence[tuple[int, int, float, float]],
+    heuristic_time: Sequence[Sequence[float]],
+    bag_records: Sequence[tuple[str, int, float, float, int, int, str]],
+    fault_windows: Sequence[
+        tuple[int, int, float, float, float]
+        | tuple[int, int, float, float, float, bool]
+    ] = (),
+    queue_discipline: str = "aging",
+    retry_interval: float = 0.25,
+    minimum_service_seconds: float = 1.0e-3,
+    dispatch_headway_seconds: float = 1.0e-3,
+    history_limit: int = 8,
+    max_decisions_per_bag: int = 512,
+    max_events: int = 2_000_000,
+    max_simulation_time: float = -1.0,
+    trace_limit: int = 20_000,
+    trace_shard_count: int = 1,
+    trace_shard_index: int = 0,
+    local_queue_capacity: int = 0,
+    deadlock_retry_threshold: int = 8,
+    diagnostic_hops: int = 2,
+    enable_source_admission: bool = True,
+    enable_backpressure: bool = True,
+    enable_pibt_lite: bool = True,
+    enable_deadlock_escape: bool = True,
+    scenario: str = "manual",
+    scale: float = 1.0,
+    search_path: PathLike | None = None,
+) -> dict[str, Any]:
+    """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
+
+    ``bag_records`` contain only identity, release/deadline, current source and
+    final goal.  There is intentionally no future-route argument.
+    """
+
+    module = load_cpp_module(search_path)
+    normalized_fault_windows: list[tuple[int, int, float, float, float] | tuple[int, int, float, float, float, bool]] = []
+    for record in fault_windows:
+        if len(record) not in (5, 6):
+            raise ValueError(
+                "fault window must be (start,end,fault_time,repair_time,message_delay[,drop_notification])"
+            )
+        base = (
+            int(record[0]),
+            int(record[1]),
+            float(record[2]),
+            float(record[3]),
+            float(record[4]),
+        )
+        normalized_fault_windows.append(base if len(record) == 5 else (*base, bool(record[5])))
+    return dict(
+        module.g4irsf11_event_runtime_from_records(
+            [
+                (
+                    int(location),
+                    int(node_type),
+                    float(service_time),
+                    int(x),
+                    int(y),
+                    [int(value) for value in outgoing],
+                )
+                for location, node_type, service_time, x, y, outgoing in node_records
+            ],
+            [
+                (int(start), int(end), float(length), float(speed))
+                for start, end, length, speed in edge_records
+            ],
+            [[float(value) for value in row] for row in heuristic_time],
+            [
+                (
+                    str(segment_id),
+                    int(task_id),
+                    float(release_time),
+                    float(deadline),
+                    int(start),
+                    int(goal),
+                    str(source),
+                )
+                for segment_id, task_id, release_time, deadline, start, goal, source in bag_records
+            ],
+            normalized_fault_windows,
+            str(queue_discipline),
+            float(retry_interval),
+            float(minimum_service_seconds),
+            float(dispatch_headway_seconds),
+            int(history_limit),
+            int(max_decisions_per_bag),
+            int(max_events),
+            float(max_simulation_time),
+            int(trace_limit),
+            int(trace_shard_count),
+            int(trace_shard_index),
+            int(local_queue_capacity),
+            int(deadlock_retry_threshold),
+            int(diagnostic_hops),
+            bool(enable_source_admission),
+            bool(enable_backpressure),
+            bool(enable_pibt_lite),
+            bool(enable_deadlock_escape),
+            str(scenario),
+            float(scale),
+        )
+    )

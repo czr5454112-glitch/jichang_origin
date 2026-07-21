@@ -32,6 +32,7 @@
 #include "ics_core/routing/astar.hpp"
 #include "ics_core/routing/sipp.hpp"
 #include "ics_core/runtime/edge_score_replay.hpp"
+#include "ics_core/runtime/event_driven_junction.hpp"
 
 namespace py = pybind11;
 
@@ -40,6 +41,8 @@ namespace {
 using EdgeFaultWindowTuple = std::tuple<int, int, double, double>;
 using EdgeRecordTuple = std::tuple<int, int, double, double>;
 using EdgeReservationTuple = std::tuple<int, int, int, double, double>;
+using EventRuntimeBagTuple = std::tuple<std::string, int, double, double, int, int, std::string>;
+using EventRuntimeFaultTuple = std::tuple<int, int, double, double, double>;
 using G4IFallbackRuleTuple = std::tuple<int, int, std::vector<int>, int>;
 using G4IHistoricalRiskRuleTuple = std::tuple<int, std::vector<int>, int>;
 using G4IRouteRecordTuple = std::tuple<std::string,
@@ -3045,6 +3048,397 @@ py::dict edge_score_native_event_fallback_replay_trace_from_records(
   return payload;
 }
 
+py::dict g4irsf11_event_runtime_summary_row(
+    const czr005::ics::EventRuntimeSummary& summary) {
+  py::dict row;
+  row["runtime_name"] = "event_driven_local_decision_runtime";
+  row["runtime_loop_owner"] = "cpp_event_scheduler";
+  row["requested_count"] = summary.requested_count;
+  row["completed_count"] = summary.completed_count;
+  row["failed_count"] = summary.failed_count;
+  row["decision_count"] = summary.decision_count;
+  row["event_count"] = summary.event_count;
+  row["bag_release_event_count"] = summary.bag_release_event_count;
+  row["arrive_junction_event_count"] = summary.arrive_junction_event_count;
+  row["junction_service_complete_event_count"] = summary.junction_service_complete_event_count;
+  row["edge_enter_event_count"] = summary.edge_enter_event_count;
+  row["edge_exit_event_count"] = summary.edge_exit_event_count;
+  row["fault_event_count"] = summary.fault_event_count;
+  row["repair_event_count"] = summary.repair_event_count;
+  row["local_queue_update_event_count"] = summary.local_queue_update_event_count;
+  row["congestion_beacon_update_event_count"] = summary.congestion_beacon_update_event_count;
+  row["fault_notification_drop_count"] = summary.fault_notification_drop_count;
+  row["physical_fault_window_traversal_count"] =
+      summary.physical_fault_window_traversal_count;
+  row["physical_fault_edge_entry_violation_count"] =
+      summary.physical_fault_edge_entry_violation_count;
+  row["sensor_loss_mode_used"] = summary.sensor_loss_mode_used;
+  row["sensor_loss_supported"] = true;
+  row["reservation_conflicts"] = summary.reservation_conflicts;
+  row["conflicts"] = summary.reservation_conflicts;
+  row["shield_rejection_count"] = summary.shield_rejection_count;
+  row["stale_fault_shield_rejection_count"] = summary.stale_fault_shield_rejection_count;
+  row["pibt_lite_handoff_count"] = summary.pibt_lite_handoff_count;
+  row["deadlock_count"] = summary.deadlock_count;
+  row["resolved_deadlock_count"] = summary.resolved_deadlock_count;
+  row["unresolved_deadlock_count"] = summary.unresolved_deadlock_count;
+  row["deadlock_escape_activation_count"] = summary.deadlock_escape_activation_count;
+  row["starvation_count"] = summary.starvation_count;
+  row["loop_count"] = summary.loop_count;
+  row["runtime_full_astar_calls"] = summary.runtime_full_astar_calls;
+  row["full_cie_astar_runtime_fallback"] = false;
+  row["global_reservation_scan_count"] = summary.global_reservation_scan_count;
+  row["max_edges_selected_per_arrive"] = summary.max_edges_selected_per_arrive;
+  row["release_selected_edge_count"] = summary.release_selected_edge_count;
+  row["reservation_depth"] = 1;
+  row["diagnostic_hops"] = summary.diagnostic_hops;
+  row["decision_trace_seen_count"] = summary.decision_trace_seen_count;
+  row["decision_trace_shard_seen_count"] = summary.decision_trace_shard_seen_count;
+  row["decision_trace_stored_count"] = summary.decision_trace_stored_count;
+  row["hold_trace_stored_count"] = summary.hold_trace_stored_count;
+  row["trace_limit"] = summary.trace_limit;
+  row["trace_shard_count"] = summary.trace_shard_count;
+  row["trace_shard_index"] = summary.trace_shard_index;
+  row["decision_trace_truncated"] = summary.decision_trace_truncated;
+  row["event_trace_truncated"] = summary.event_trace_truncated;
+  row["two_step_reservation_count"] = summary.two_step_reservation_count;
+  row["bag_future_path_field_present"] = false;
+  row["full_future_routes_stored"] = 0;
+  row["max_history_observed"] = summary.max_history_observed;
+  row["max_junction_queue_length"] = summary.max_junction_queue_length;
+  row["max_source_queue_length"] = summary.max_source_queue_length;
+  row["max_local_calendar_intervals"] = summary.max_local_calendar_intervals;
+  row["max_corridor_calendar_intervals"] = summary.max_corridor_calendar_intervals;
+  row["max_candidate_count"] = summary.max_candidate_count;
+  row["max_individual_wait"] = summary.max_individual_wait;
+  row["max_source_queue_delay"] = summary.max_source_queue_delay;
+  row["fairness_jain"] = summary.fairness_jain;
+  row["max_deadlock_duration"] = summary.max_deadlock_duration;
+  row["end_time"] = summary.end_time;
+  row["runtime_seconds"] = summary.runtime_seconds;
+  row["decision_latency_us_p50"] = summary.decision_latency_us_p50;
+  row["decision_latency_us_p95"] = summary.decision_latency_us_p95;
+  row["decision_latency_us_p99"] = summary.decision_latency_us_p99;
+  row["event_throughput_per_second"] = summary.event_throughput_per_second;
+  row["cpp_internal_accounted_bytes"] = py::int_(summary.cpp_internal_accounted_bytes);
+  row["internal_state_bytes"] = py::int_(summary.cpp_internal_accounted_bytes);
+  row["internal_state_bytes_semantics"] = "accounted_cpp_lower_bound_not_process_rss";
+  row["event_limit_reached"] = summary.event_limit_reached;
+  row["time_limit_reached"] = summary.time_limit_reached;
+  row["safe_execution_pass"] = summary.reservation_conflicts == 0 &&
+                                 summary.runtime_full_astar_calls == 0;
+  return row;
+}
+
+py::list g4irsf11_event_runtime_bag_rows(
+    const std::vector<czr005::ics::EventRuntimeBagResult>& bags) {
+  py::list rows;
+  for (const auto& bag : bags) {
+    py::dict row;
+    row["segment_id"] = bag.segment_id;
+    row["task_id"] = bag.task_id;
+    row["runtime_bag_id"] = bag.runtime_bag_id;
+    row["start"] = bag.start;
+    row["goal"] = bag.goal;
+    row["final_node"] = bag.final_node;
+    row["arrival_time"] = bag.arrival_time;
+    row["release_time"] = bag.release_time;
+    row["deadline"] = bag.deadline;
+    row["source"] = bag.source;
+    row["admitted_time"] = bag.admitted_time;
+    row["finish_time"] = bag.finish_time;
+    row["source_queue_delay"] = bag.source_queue_delay;
+    row["total_local_wait"] = bag.total_local_wait;
+    row["decision_count"] = bag.decision_count;
+    row["retry_count"] = bag.retry_count;
+    row["loop_count"] = bag.loop_count;
+    row["completed"] = bag.completed;
+    row["starved"] = bag.starved;
+    row["failure_reason"] = bag.failure_reason;
+    row["short_history"] = bag.short_history;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf11_event_runtime_event_rows(
+    const std::vector<czr005::ics::EventRuntimeTraceRow>& events) {
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["seq"] = py::int_(event.seq);
+    row["event"] = event.event;
+    row["time"] = event.time;
+    row["task_id"] = event.task_id;
+    row["runtime_bag_id"] = event.runtime_bag_id;
+    row["segment_id"] = event.segment_id;
+    row["node"] = event.node;
+    row["from_node"] = event.from_node;
+    row["to_node"] = event.to_node;
+    row["reason"] = event.reason;
+    row["selected_edge_count"] = event.selected_edge_count;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf11_event_candidate_rows(
+    const std::vector<czr005::ics::EventCandidateRecord>& candidates) {
+  py::list rows;
+  for (const auto& candidate : candidates) {
+    py::dict features;
+    features["static_potential"] = candidate.static_potential;
+    features["travel_time"] = candidate.travel_time;
+    features["target_queue_length"] = candidate.target_queue_length;
+    features["target_scheduled_incoming"] = candidate.target_scheduled_incoming;
+    features["corridor_next_available"] = candidate.corridor_next_available;
+    features["target_next_available"] = candidate.target_next_available;
+    features["advertised_fault"] = candidate.advertised_fault;
+    features["fault_message_age_seconds"] = candidate.fault_message_age_seconds;
+    features["recent_visit_count"] = candidate.recent_visit_count;
+    features["two_hop_queue_pressure"] = candidate.two_hop_queue_pressure;
+
+    py::dict row;
+    row["next_node"] = candidate.next_node;
+    row["features"] = std::move(features);
+    row["model_score"] = candidate.model_score;
+    row["shield_allowed"] = candidate.shield_allowed;
+    row["shield_reason"] = candidate.shield_reason;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf11_event_decision_rows(
+    const std::vector<czr005::ics::EventDecisionTraceRow>& decisions,
+    const std::string& scenario,
+    double scale,
+    bool hold_attempts) {
+  py::list rows;
+  for (const auto& decision : decisions) {
+    py::dict local_snapshot;
+    local_snapshot["junction_queue_length"] = decision.junction_queue_length;
+    local_snapshot["next_available_time"] = decision.junction_next_dispatch_time;
+    local_snapshot["faulted_outgoing_count"] = decision.advertised_faulted_outgoing_count;
+    local_snapshot["message_age_seconds"] = decision.max_fault_message_age_seconds;
+    int downstream_pressure = 0;
+    std::vector<int> candidate_nodes;
+    candidate_nodes.reserve(decision.candidates.size());
+    for (const auto& candidate : decision.candidates) {
+      candidate_nodes.push_back(candidate.next_node);
+      downstream_pressure += candidate.target_queue_length + candidate.target_scheduled_incoming;
+    }
+    local_snapshot["downstream_pressure"] = downstream_pressure;
+
+    py::dict metadata;
+    metadata["scenario"] = scenario;
+    metadata["scale"] = scale;
+    metadata["decision_ordinal"] = py::int_(decision.decision_id);
+    metadata["arrive_event_seq"] = py::int_(decision.arrive_event_seq);
+    metadata["runtime_bag_id"] = decision.runtime_bag_id;
+    metadata["model_score_semantics"] = "lower_is_better_cost";
+    metadata["trace_kind"] = hold_attempts ? "hold_attempt" : "committed_edge_action";
+
+    py::dict row;
+    row["schema_id"] = "czr005.g4irsf11.decision_trace.v1";
+    row["schema_version"] = 1;
+    row["decision_id"] = scenario + ":" + std::to_string(decision.task_id) + ":" +
+                         std::to_string(decision.decision_id);
+    row["task_id"] = decision.task_id;
+    row["segment_id"] = decision.segment_id;
+    row["event_time"] = decision.event_time;
+    row["current_node"] = decision.current_node;
+    row["goal_node"] = decision.goal_node;
+    row["candidate_next_nodes"] = candidate_nodes;
+    row["candidate_records"] = g4irsf11_event_candidate_rows(decision.candidates);
+    if (decision.model_prediction >= 0) {
+      row["model_prediction"] = decision.model_prediction;
+    } else {
+      row["model_prediction"] = py::none();
+    }
+    row["model_margin"] = decision.model_margin;
+    row["risk_gate_triggered"] = decision.risk_gate_triggered;
+    if (decision.fallback_selected_next >= 0) {
+      row["fallback_selected_next"] = decision.fallback_selected_next;
+    } else {
+      row["fallback_selected_next"] = py::none();
+    }
+    if (decision.selected_next >= 0) {
+      row["selected_next"] = decision.selected_next;
+    } else {
+      row["selected_next"] = py::none();
+    }
+    row["decision_source"] = decision.decision_source;
+    row["rule_reason"] = decision.rule_reason;
+    row["local_snapshot"] = std::move(local_snapshot);
+    row["short_history"] = decision.short_history;
+    row["full_astar_used"] = false;
+    row["model_fallback_disagreement"] =
+        decision.fallback_selected_next >= 0 &&
+        decision.fallback_selected_next != decision.model_prediction;
+    row["candidate_ordering"] = "next_node_ascending";
+    row["metadata"] = std::move(metadata);
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf11_event_runtime_junction_rows(
+    const std::vector<czr005::ics::EventRuntimeJunctionResult>& junctions) {
+  py::list rows;
+  for (const auto& junction : junctions) {
+    py::dict row;
+    row["node"] = junction.node;
+    row["final_source_queue_length"] = junction.final_source_queue_length;
+    row["final_junction_queue_length"] = junction.final_junction_queue_length;
+    row["final_service_calendar_intervals"] = junction.final_service_calendar_intervals;
+    row["scheduled_incoming"] = junction.scheduled_incoming;
+    row["next_dispatch_time"] = junction.next_dispatch_time;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf11_event_runtime_fault_rows(
+    const std::vector<czr005::ics::EventRuntimeFaultAuditRow>& fault_events) {
+  py::list rows;
+  for (const auto& event : fault_events) {
+    py::dict row;
+    row["seq"] = py::int_(event.seq);
+    row["event"] = event.event;
+    row["phase"] = event.phase;
+    row["time"] = event.time;
+    row["from_node"] = event.from_node;
+    row["to_node"] = event.to_node;
+    row["physical_active_count"] = event.physical_active_count;
+    row["physical_generation"] = event.physical_generation;
+    row["inflight_traversal_count"] = event.inflight_traversal_count;
+    row["notification_dropped"] = event.notification_dropped;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::dict g4irsf11_event_runtime_from_records(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    const std::vector<EventRuntimeBagTuple>& bag_records,
+    const py::sequence& fault_windows,
+    const std::string& queue_discipline,
+    double retry_interval,
+    double minimum_service_seconds,
+    double dispatch_headway_seconds,
+    int history_limit,
+    int max_decisions_per_bag,
+    int max_events,
+    double max_simulation_time,
+    int trace_limit,
+    int trace_shard_count,
+    int trace_shard_index,
+    int local_queue_capacity,
+    int deadlock_retry_threshold,
+    int diagnostic_hops,
+    bool enable_source_admission,
+    bool enable_backpressure,
+    bool enable_pibt_lite,
+    bool enable_deadlock_escape,
+    const std::string& scenario,
+    double scale) {
+  const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
+  std::vector<czr005::ics::EventRuntimeBagRequest> requests;
+  requests.reserve(bag_records.size());
+  for (const auto& record : bag_records) {
+    requests.push_back(czr005::ics::EventRuntimeBagRequest{
+        std::get<0>(record),
+        std::get<1>(record),
+        std::get<2>(record),
+        std::get<3>(record),
+        std::get<4>(record),
+        std::get<5>(record),
+        std::get<6>(record)});
+  }
+  std::vector<czr005::ics::EventRuntimeFaultWindow> faults;
+  faults.reserve(static_cast<std::size_t>(py::len(fault_windows)));
+  for (const py::handle item : fault_windows) {
+    const auto record = py::reinterpret_borrow<py::sequence>(item);
+    const auto field_count = py::len(record);
+    if (field_count != 5 && field_count != 6) {
+      throw std::invalid_argument(
+          "fault window must be (start,end,fault_time,repair_time,message_delay[,drop_notification])");
+    }
+    faults.push_back(czr005::ics::EventRuntimeFaultWindow{
+        py::cast<int>(record[0]),
+        py::cast<int>(record[1]),
+        py::cast<double>(record[2]),
+        py::cast<double>(record[3]),
+        py::cast<double>(record[4]),
+        field_count == 6 ? py::cast<bool>(record[5]) : false});
+  }
+
+  czr005::ics::EventDrivenJunctionConfig config;
+  config.queue_discipline = queue_discipline;
+  config.retry_interval = retry_interval;
+  config.minimum_service_seconds = minimum_service_seconds;
+  config.dispatch_headway_seconds = dispatch_headway_seconds;
+  config.history_limit = history_limit;
+  config.max_decisions_per_bag = max_decisions_per_bag;
+  config.max_events = max_events;
+  config.max_simulation_time = max_simulation_time;
+  config.trace_limit = trace_limit;
+  config.trace_shard_count = trace_shard_count;
+  config.trace_shard_index = trace_shard_index;
+  config.local_queue_capacity = local_queue_capacity;
+  config.deadlock_retry_threshold = deadlock_retry_threshold;
+  config.diagnostic_hops = diagnostic_hops;
+  config.enable_source_admission = enable_source_admission;
+  config.enable_backpressure = enable_backpressure;
+  config.enable_pibt_lite = enable_pibt_lite;
+  config.enable_deadlock_escape = enable_deadlock_escape;
+
+  czr005::ics::EventDrivenJunctionRuntime runtime(graph, config);
+  const auto result = runtime.run(requests, faults);
+  py::dict trace_context;
+  trace_context["schema_id"] = "czr005.g4irsf11.decision_trace.v1";
+  trace_context["scenario"] = scenario;
+  trace_context["scale"] = scale;
+  trace_context["candidate_ordering"] = "next_node_ascending";
+  trace_context["model_score_semantics"] = "lower_is_better_cost";
+  trace_context["reservation_depth"] = 1;
+  trace_context["diagnostic_hops"] = diagnostic_hops;
+  trace_context["trace_limit"] = trace_limit;
+  trace_context["trace_shard_count"] = trace_shard_count;
+  trace_context["trace_shard_index"] = trace_shard_index;
+  trace_context["trace_sampling"] = "deterministic_task_id_modulo_shard_then_limit";
+  trace_context["full_astar_used"] = false;
+  trace_context["global_reservation_scan_used"] = false;
+  trace_context["bag_future_path_field_present"] = false;
+  trace_context["hold_attempts_are_not_training_actions"] = true;
+  trace_context["runtime_bag_identity"] = "input_record_ordinal";
+  trace_context["original_task_id_rewritten"] = false;
+  trace_context["sensor_loss_supported"] = true;
+  trace_context["fault_audit_trace_cap"] = "uncapped_control_events_only";
+  trace_context["fault_audit_global_scan_used_for_action_selection"] = false;
+  trace_context["inflight_at_fault_semantics"] =
+      "grandfathered_audit_not_unsafe_entry";
+  trace_context["unsafe_fault_entry_semantics"] =
+      "EDGE_ENTER_after_directed_physical_fault_activation";
+
+  py::dict payload;
+  payload["summary"] = g4irsf11_event_runtime_summary_row(result.summary);
+  payload["bags"] = g4irsf11_event_runtime_bag_rows(result.bags);
+  payload["events"] = g4irsf11_event_runtime_event_rows(result.events);
+  payload["decisions"] =
+      g4irsf11_event_decision_rows(result.decisions, scenario, scale, false);
+  payload["decision_trace"] = payload["decisions"];
+  payload["hold_attempts"] =
+      g4irsf11_event_decision_rows(result.hold_attempts, scenario, scale, true);
+  payload["junction_state"] = g4irsf11_event_runtime_junction_rows(result.junctions);
+  payload["fault_events"] = g4irsf11_event_runtime_fault_rows(result.fault_events);
+  payload["trace_context"] = std::move(trace_context);
+  return payload;
+}
+
 }  // namespace
 
 PYBIND11_MODULE(czr005_cpp, module) {
@@ -3212,6 +3606,33 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("fault_windows") = std::vector<EdgeFaultWindowTuple>{},
              py::arg("max_tasks") = -1,
              py::arg("reservation_semantics") = std::string("baseline"));
+  module.def("g4irsf11_event_runtime_from_records",
+             &g4irsf11_event_runtime_from_records,
+             py::arg("node_records"),
+             py::arg("edge_records"),
+             py::arg("heuristic_time"),
+             py::arg("bag_records"),
+             py::arg("fault_windows") = py::list(),
+             py::arg("queue_discipline") = std::string("aging"),
+             py::arg("retry_interval") = 0.25,
+             py::arg("minimum_service_seconds") = 1.0e-3,
+             py::arg("dispatch_headway_seconds") = 1.0e-3,
+             py::arg("history_limit") = 8,
+             py::arg("max_decisions_per_bag") = 512,
+             py::arg("max_events") = 2000000,
+             py::arg("max_simulation_time") = -1.0,
+             py::arg("trace_limit") = 20000,
+             py::arg("trace_shard_count") = 1,
+             py::arg("trace_shard_index") = 0,
+             py::arg("local_queue_capacity") = 0,
+             py::arg("deadlock_retry_threshold") = 8,
+             py::arg("diagnostic_hops") = 2,
+             py::arg("enable_source_admission") = true,
+             py::arg("enable_backpressure") = true,
+             py::arg("enable_pibt_lite") = true,
+             py::arg("enable_deadlock_escape") = true,
+             py::arg("scenario") = std::string("manual"),
+             py::arg("scale") = 1.0);
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,
