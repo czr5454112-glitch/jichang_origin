@@ -19,6 +19,7 @@ add_test(NAME cpp_core_smoke COMMAND test_cpp_core_smoke)
 
 add_executable(test_event_driven_junction cpp/tests/test_event_driven_junction.cpp)
 target_link_libraries(test_event_driven_junction PRIVATE ics_core)
+target_compile_definitions(test_event_driven_junction PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME event_driven_junction COMMAND test_event_driven_junction)
 
 if(CZR005_BUILD_PYBIND)

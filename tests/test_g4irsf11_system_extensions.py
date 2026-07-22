@@ -13,6 +13,11 @@ from scripts.eval.run_g4irsf11_system_extensions import (
     _consolidation_complete,
     _continuity_audit,
     _load_rows,
+    extension_protocol_manifest,
+)
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_RELATIVE_PATH,
+    CANONICAL_MAP_SHA256,
 )
 
 
@@ -40,6 +45,16 @@ def test_extension_protocol_is_exact_and_never_smoke_limited() -> None:
     manifest = system_extension_manifest()
     assert manifest["protocol_version"] == EXTENSION_PROTOCOL_VERSION
     assert manifest["case_count"] == 5
+
+    bound = extension_protocol_manifest()
+    assert bound["fixed_real_map_only"] is True
+    assert bound["canonical_map"] == {
+        "fixed_real_map_only": True,
+        "repo_relative_path": CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+        "sha256": CANONICAL_MAP_SHA256,
+        "sha256_semantics": "utf8_text_with_crlf_normalized_to_lf",
+        "topology_mutation_allowed": False,
+    }
 
 
 def test_rolling_seven_day_audit_requires_all_rows_and_six_boundaries() -> None:

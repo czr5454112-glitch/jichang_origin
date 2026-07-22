@@ -199,15 +199,27 @@ def audit_hard_case_rows(
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     scenario_counts: Counter[str] = Counter()
     category_counts: Counter[str] = Counter()
+    source_counts: Counter[str] = Counter()
     current_counts: Counter[str] = Counter()
     goal_counts: Counter[str] = Counter()
+    stratum_counts: Counter[str] = Counter()
     fingerprints: Counter[str] = Counter()
+    sampling_weight_count = 0
 
     for row in rows:
         scenario = str(row.get("scenario", ""))
         scenario_counts[scenario] += 1
+        source = str(row.get("source_node", "")).strip()
+        if source:
+            source_counts[source] += 1
         current_counts[str(row.get("current_node", ""))] += 1
         goal_counts[str(row.get("goal_node", ""))] += 1
+        stratum = str(row.get("stratum_id", "")).strip()
+        if stratum:
+            stratum_counts[stratum] += 1
+        weight = _number(row.get("sample_weight"), default=0.0)
+        if weight > 0.0:
+            sampling_weight_count += 1
         fingerprints[_case_fingerprint(row)] += 1
         for category in _json_list(row.get("why_hard")):
             category_counts[str(category)] += 1
@@ -221,21 +233,50 @@ def audit_hard_case_rows(
         ),
     }
     unique_count = len(fingerprints)
+    complete_source_goal = (
+        sum(source_counts.values()) == len(rows)
+        and sum(goal_counts.values()) == len(rows)
+        and bool(rows)
+    )
+    complete_sampling_evidence = (
+        sum(stratum_counts.values()) == len(rows)
+        and sampling_weight_count == len(rows)
+        and bool(rows)
+    )
     summary = {
         "row_count": len(rows),
         "unique_content_count": unique_count,
         "duplicate_content_count": len(rows) - unique_count,
         "duplicate_rate": (len(rows) - unique_count) / len(rows) if rows else 0.0,
         "scenario_count": len(scenario_counts),
+        "source_node_evidence_count": sum(source_counts.values()),
+        "goal_node_evidence_count": sum(goal_counts.values()),
+        "stratum_evidence_count": sum(stratum_counts.values()),
+        "positive_sample_weight_count": sampling_weight_count,
+        "source_goal_distribution_status": (
+            "PASS" if complete_source_goal else "UNVERIFIED_MISSING_SOURCE_OR_GOAL"
+        ),
+        "sampling_bias_status": (
+            "PASS" if complete_sampling_evidence else "UNVERIFIED_NO_STRATUM_WEIGHT_EVIDENCE"
+        ),
         **{f"covers_{family}": coverage[family] for family in REQUIRED_HARD_CASE_FAMILIES},
         "required_family_gate": all(coverage.values()),
+        "legacy_hardcase_gate_status": (
+            "PASS"
+            if all(coverage.values())
+            and complete_source_goal
+            and complete_sampling_evidence
+            else "FAIL"
+        ),
     }
     distributions: list[dict[str, Any]] = []
     for dimension, counts in (
         ("scenario", scenario_counts),
         ("category", category_counts),
+        ("source_node", source_counts),
         ("current_node", current_counts),
         ("goal_node", goal_counts),
+        ("stratum_id", stratum_counts),
     ):
         for value, count in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
             distributions.append(

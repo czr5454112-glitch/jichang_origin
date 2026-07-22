@@ -10,11 +10,18 @@ import tempfile
 import pytest
 
 from scripts.eval import g4irsf11_gate_integrity as gate
+from scripts.eval.run_g4irsf11_gate_a_production_audit import (
+    _validate_gate_command_payload,
+)
 
 
 SHA_A = "a" * 40
 SHA_B = "b" * 40
 HASH_A = "1" * 64
+REAL_ADJACENCY = gate.read_graph_adjacency(gate.CANONICAL_MAP_PATH)
+REAL_DECISION_NODES = (6, 9, 11, 16, 19)
+REAL_SOURCE_NODES = (0, 1, 2, 3, 4)
+REAL_GOAL_NODES = (47, 48, 49, 50, 51)
 
 
 @pytest.fixture
@@ -47,6 +54,20 @@ def _provenance_commands() -> tuple[gate.CommandRecord, ...]:
     return tuple(gate.CommandRecord(item, ".", 0, "", "") for item in argv)
 
 
+def test_production_runner_rejects_stale_or_contradictory_gate_payload() -> None:
+    with pytest.raises(RuntimeError, match="contradicts"):
+        _validate_gate_command_payload(
+            {
+                "schema": "czr005.g4irsf11.gate_integrity.v1",
+                "overall_status": "PASS",
+            },
+            2,
+        )
+    with pytest.raises(RuntimeError, match="unexpected audit schema"):
+        _validate_gate_command_payload(
+            {"schema": "stale.v0", "overall_status": "FAIL"},
+            2,
+        )
 def _provenance(**overrides: object) -> gate.GitProvenance:
     values: dict[str, object] = {
         "head": SHA_A,
@@ -196,47 +217,61 @@ def _hard_row(
     scale: str = "1x",
     fault: bool = False,
 ) -> dict[str, object]:
+    offset = (task_id - 1) % len(REAL_DECISION_NODES)
+    current_node = REAL_DECISION_NODES[offset]
+    candidates = list(REAL_ADJACENCY.get(current_node, ()))
+    assert len(candidates) == 2
     return {
         "scenario": scenario,
         "scale": scale,
         "task_id": task_id,
         "segment_id": f"{task_id}:direct",
         "decision_time": float(task_id),
-        "current_node": task_id,
-        "goal_node": 99,
-        "true_outgoing_candidates": [task_id + 1, task_id + 2],
+        "source_node": REAL_SOURCE_NODES[offset],
+        "current_node": current_node,
+        "goal_node": REAL_GOAL_NODES[offset],
+        "true_outgoing_candidates": candidates,
         "candidate_records": [
             {
-                "next_node": task_id + 1,
+                "next_node": candidates[0],
                 "features": {"pressure": 0.0},
                 "model_score": 0.0,
             },
             {
-                "next_node": task_id + 2,
+                "next_node": candidates[1],
                 "features": {"pressure": 1.0},
                 "model_score": 0.5,
             },
         ],
-        "selected_next_node": task_id + 1,
-        "model_prediction": task_id + 1,
+        "selected_next_node": candidates[0],
+        "model_prediction": candidates[0],
         "model_margin": 0.5,
         "model_score_semantics": "lower_is_better_cost",
-        "fallback_selected_next": task_id + 2,
+        "fallback_selected_next": candidates[1],
         "model_fallback_disagreement": True,
         "full_astar_used": False,
         "hard_reasons": reasons,
         "fault_active": fault,
         "candidate_validity": True,
+        "stratum_id": f"real-map-stratum-{task_id}",
+        "sample_weight": 1.0,
     }
 
 
-def _hard_adjacency(rows: list[dict[str, object]]) -> dict[int, list[int]]:
-    result: dict[int, list[int]] = {}
+def _hard_adjacency(rows: list[dict[str, object]]) -> gate.CanonicalAdjacency:
     for row in rows:
         current = int(row.get("current_node", row.get("junction_node")))
         candidates = row.get("true_outgoing_candidates", row.get("candidate_next_nodes"))
-        result[current] = [int(node) for node in candidates]  # type: ignore[union-attr]
-    return result
+        assert list(REAL_ADJACENCY.get(current, ())) == [
+            int(node) for node in candidates  # type: ignore[union-attr]
+        ]
+    return REAL_ADJACENCY
+
+
+def test_graph_loader_rejects_non_map_repository_input() -> None:
+    non_map = gate.ROOT / "data" / "processed" / "tasks" / "inputdata.jsonl"
+    with pytest.raises(ValueError, match="only data/processed/maps/map2.json"):
+        gate.read_graph_adjacency(non_map)
 
 
 def test_hard_case_gate_covers_high_flow_fault_tail_and_valid_candidates() -> None:
@@ -299,7 +334,10 @@ def test_hard_case_gate_requires_graph_adjacency_evidence() -> None:
         {"minimum_per_required_category": 0},
         {"max_duplicate_fraction": 0.21},
         {"max_single_scenario_family_fraction": 0.61},
+        {"max_single_source_fraction": 0.61},
+        {"max_single_goal_fraction": 0.61},
         {"require_graph_adjacency": False},
+        {"require_sampling_evidence": False},
     ],
 )
 def test_hard_case_policy_cannot_be_configured_weaker(kwargs: dict[str, object]) -> None:
@@ -334,7 +372,7 @@ def test_hard_case_gate_rejects_path_suffix_as_candidates() -> None:
     row["candidate_next_nodes"] = [2, 3, 4]
 
     rows = [row, {**row, "task_id": 2}, {**row, "task_id": 3}]
-    result = gate.audit_hard_case_coverage(rows, adjacency={1: [2, 3]})
+    result = gate.audit_hard_case_coverage(rows, adjacency=REAL_ADJACENCY)
 
     assert result.status == gate.FAIL
     assert result.metrics["invalid_candidate_count"] == 3
@@ -346,7 +384,6 @@ def test_candidate_next_nodes_requires_and_passes_exact_graph_validation() -> No
         _hard_row("temporal_fault", 2, reasons=["fault_reroute"], fault=True),
         _hard_row("latency_tail", 3, reasons=["p99_delay_tail"]),
     ]
-    adjacency: dict[int, list[int]] = {}
     for row in rows:
         candidates = row.pop("true_outgoing_candidates")
         current = int(row.pop("current_node"))
@@ -357,11 +394,11 @@ def test_candidate_next_nodes_requires_and_passes_exact_graph_validation() -> No
             for index, node in enumerate(candidates)  # type: ignore[union-attr]
         ]
         row["selected_next"] = row.pop("selected_next_node")
-        adjacency[current] = list(candidates)  # type: ignore[arg-type]
 
-    assert gate.audit_hard_case_coverage(rows, adjacency=adjacency).status == gate.PASS
-    adjacency[1] = [2, 3, 999]
-    assert gate.audit_hard_case_coverage(rows, adjacency=adjacency).status == gate.FAIL
+    assert gate.audit_hard_case_coverage(rows, adjacency=REAL_ADJACENCY).status == gate.PASS
+    candidates = rows[0]["candidate_next_nodes"]
+    rows[0]["candidate_next_nodes"] = [*candidates, 999]  # type: ignore[misc]
+    assert gate.audit_hard_case_coverage(rows, adjacency=REAL_ADJACENCY).status == gate.FAIL
 
 
 def test_hard_case_gate_rejects_selection_outside_true_candidates() -> None:
@@ -543,6 +580,7 @@ def test_full_integrity_config_exercises_all_required_sections(
                 "execution_status": gate.EXECUTED,
                 "executable_command": f"python paper.py --scenario {scenario}",
                 "return_code": 0,
+                "topology_changed": False,
             }
             for scenario in sorted(gate.DEFAULT_PAPER_SCENARIOS)
         ],
@@ -558,6 +596,7 @@ def test_full_integrity_config_exercises_all_required_sections(
                 "artifact_sha256": HASH_A,
                 "executable_command": f"python optional.py --scenario {scenario}",
                 "return_code": 0,
+                "topology_changed": False,
             }
             for scenario in sorted(gate.DEFAULT_OPTIONAL_SCENARIOS)
         ],
@@ -570,10 +609,6 @@ def test_full_integrity_config_exercises_all_required_sections(
     ]
     hard_path = workspace_tmp / "hard.csv"
     _write_test_csv(hard_path, hard_rows)
-    adjacency_path = workspace_tmp / "adjacency.json"
-    adjacency_path.write_text(
-        json.dumps(_hard_adjacency(hard_rows), sort_keys=True), encoding="utf-8"
-    )
 
     lineage_path = workspace_tmp / "lineage.csv"
     _write_test_csv(
@@ -605,6 +640,11 @@ def test_full_integrity_config_exercises_all_required_sections(
     checks = gate.evaluate_integrity_config(
         gate.ROOT,
         {
+            "fixed_real_map": {
+                "fixed_real_map_only": True,
+                "path": gate.CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+                "sha256": gate.CANONICAL_MAP_SHA256,
+            },
             "paper": {
                 "csv": str(paper_path),
                 "expected_scenarios": sorted(gate.DEFAULT_PAPER_SCENARIOS),
@@ -616,11 +656,26 @@ def test_full_integrity_config_exercises_all_required_sections(
             },
             "hard_cases": {
                 "csv": str(hard_path),
-                "adjacency_json": str(adjacency_path),
+                "adjacency_json": gate.CANONICAL_MAP_RELATIVE_PATH.as_posix(),
             },
             "lineage": {"csv": str(lineage_path)},
         },
     )
 
-    assert len(checks) == 4
+    assert len(checks) == 5
     assert all(check.status == gate.PASS for check in checks)
+
+
+def test_full_integrity_config_rejects_non_map_repository_input() -> None:
+    non_map = gate.ROOT / "data" / "processed" / "tasks" / "inputdata.jsonl"
+    with pytest.raises(ValueError, match="only data/processed/maps/map2.json"):
+        gate.evaluate_integrity_config(
+            gate.ROOT,
+            {
+                "fixed_real_map": {
+                    "fixed_real_map_only": True,
+                    "path": str(non_map),
+                    "sha256": gate.CANONICAL_MAP_SHA256,
+                }
+            },
+        )

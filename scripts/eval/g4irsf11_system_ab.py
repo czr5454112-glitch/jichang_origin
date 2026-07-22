@@ -12,6 +12,17 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from scripts.eval.g4irsf11_experiment_protocol import (
+    formal_cases,
+    protocol_manifest,
+    system_extension_manifest,
+)
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_SHA256,
+    canonical_map_protocol_identity,
+)
+from scripts.eval.g4irsf11_result_validation import canonical_manifest_sha256
+
 
 PARTIAL = "PARTIAL_WITH_EXPLICIT_BLOCKER"
 VARIANTS = (
@@ -35,6 +46,55 @@ SCENARIOS = (
     "rolling_7day_full",
     "topology_generalization_engineering",
 )
+
+
+def _bound_protocol_digest(*, extension: bool = False) -> str:
+    manifest = system_extension_manifest() if extension else protocol_manifest()
+    manifest["fixed_real_map_only"] = True
+    manifest["canonical_map"] = canonical_map_protocol_identity()
+    return canonical_manifest_sha256(manifest)
+
+
+def _rows_bound_to_fixed_map(
+    rows: list[Mapping[str, Any]], protocol_digest: str
+) -> bool:
+    return bool(rows) and all(
+        row.get("protocol_manifest_sha256") == protocol_digest
+        and row.get("map_sha256") == CANONICAL_MAP_SHA256
+        for row in rows
+    )
+
+
+def _rows_bound_to_completion(
+    rows: list[Mapping[str, Any]], completion: Mapping[str, Any]
+) -> bool:
+    producer = (
+        completion.get("producer")
+        if isinstance(completion.get("producer"), Mapping)
+        else {}
+    )
+    cohort = (
+        producer.get("measurement_cohort")
+        if isinstance(producer.get("measurement_cohort"), Mapping)
+        else {}
+    )
+    implementation = str(producer.get("implementation_sha256") or "")
+    cohort_name = str(cohort.get("name") or "")
+    worker_target = str(cohort.get("declared_concurrent_worker_target") or "")
+    return bool(rows) and bool(implementation) and bool(cohort_name) and all(
+        str(row.get("implementation_sha256") or "") == implementation
+        and str(row.get("measurement_cohort") or "") == cohort_name
+        and str(row.get("declared_concurrent_worker_target") or "") == worker_target
+        for row in rows
+    )
+
+
+def _legacy_rows_bound_to_fixed_map(rows: list[Mapping[str, Any]]) -> bool:
+    return bool(rows) and all(
+        _truth(row.get("fixed_real_map_only"))
+        and row.get("map_sha256") == CANONICAL_MAP_SHA256
+        for row in rows
+    )
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -64,6 +124,9 @@ def _default_row(variant: str, scenario: str) -> dict[str, Any]:
         "queue_stability_pass": "",
         "service_level_pass": "",
         "capacity_pass": "",
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": CANONICAL_MAP_SHA256,
+        "evidence_protocol_manifest_sha256": "",
         "evidence_paths": "[]",
         "metrics": "{}",
         "blocker": "this exact variant/scenario cell has not been executed",
@@ -83,6 +146,7 @@ def _set(
     queue: Any = "",
     service: Any = "",
     capacity: Any = "",
+    protocol_digest: str = "",
 ) -> None:
     index[(variant, scenario)] = {
         "variant": variant,
@@ -92,13 +156,23 @@ def _set(
         "queue_stability_pass": queue,
         "service_level_pass": service,
         "capacity_pass": capacity,
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": CANONICAL_MAP_SHA256,
+        "evidence_protocol_manifest_sha256": protocol_digest,
         "evidence_paths": json.dumps(evidence, ensure_ascii=False, sort_keys=True),
         "metrics": json.dumps(dict(metrics or {}), ensure_ascii=False, sort_keys=True),
         "blocker": blocker,
     }
 
 
-def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
+def _build_system_ab_matrix_unlocked(root: Path) -> list[dict[str, Any]]:
+    from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
+        formal_completion_validation_errors,
+    )
+    from scripts.eval.run_g4irsf11_system_extensions import (
+        extension_completion_validation_errors,
+    )
+
     index = {(variant, scenario): _default_row(variant, scenario) for variant in VARIANTS for scenario in SCENARIOS}
     tables = root / "outputs" / "tables"
     reports = root / "outputs" / "reports"
@@ -109,6 +183,12 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
     extension_path = tables / "g4irsf11_system_extension_matrix.csv"
     fault_path = tables / "g4irsf11_temporal_fault_repair.csv"
     v3_path = reports / "g4irsf11_v3_training_status.json"
+    formal_completion_path = (
+        root / "artifacts" / "gates" / "g4irsf11_event_runtime_completion.json"
+    )
+    extension_completion_path = (
+        root / "artifacts" / "gates" / "g4irsf11_system_extension_completion.json"
+    )
 
     legacy = _read_csv(legacy_path)
     paper = _read_csv(paper_path)
@@ -117,11 +197,28 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
     extensions = _read_csv(extension_path)
     faults = _read_csv(fault_path)
     v3 = _read_json(v3_path)
+    formal_completion = _read_json(formal_completion_path)
+    extension_completion = _read_json(extension_completion_path)
+    formal_publication_ok = not formal_completion_validation_errors(root)
+    extension_publication_ok = not extension_completion_validation_errors(root)
+    formal_protocol_digest = _bound_protocol_digest()
+    extension_protocol_digest = _bound_protocol_digest(extension=True)
+    formal_case_ids = {case.case_id for case in formal_cases()}
+    frontier_case_ids = {
+        case.case_id for case in formal_cases() if case.category == "capacity_frontier"
+    }
+    fault_case_ids = {
+        case.case_id for case in formal_cases() if case.category == "temporal_fault"
+    }
     legacy_by_id = {row.get("scenario", ""): row for row in legacy}
     event_by_id = {row.get("case_id", ""): row for row in event}
     ext_by_id = {row.get("case_id", ""): row for row in extensions}
 
-    if len(paper) == 5 and all(row.get("failed_segments") == "0" for row in paper):
+    if (
+        len(paper) == 5
+        and _legacy_rows_bound_to_fixed_map(paper)
+        and all(row.get("failed_segments") == "0" for row in paper)
+    ):
         _set(
             index,
             "v2_safe_legacy_full_route_replay",
@@ -132,7 +229,7 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
             metrics={"repeat_count": 5, "runtime_full_astar_calls": 0},
         )
     speed_rows = [row for row in legacy if row.get("scenario", "").startswith("speed_deviation_")]
-    if len(speed_rows) == 3:
+    if len(speed_rows) == 3 and _legacy_rows_bound_to_fixed_map(speed_rows):
         _set(
             index,
             "v2_safe_legacy_full_route_replay",
@@ -149,7 +246,7 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
         ("rolling_2day_full", "rolling_2_day_1x"),
     ):
         source = legacy_by_id.get(source_id)
-        if source:
+        if source and _legacy_rows_bound_to_fixed_map([source]):
             capacity = False if scenario in {"stress_8x_full", "extreme_16x_full"} else ""
             _set(
                 index,
@@ -192,7 +289,12 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
     )
 
     paper_event = event_by_id.get("real_map_paper_full")
-    if paper_event:
+    if (
+        paper_event
+        and formal_publication_ok
+        and _rows_bound_to_fixed_map([paper_event], formal_protocol_digest)
+        and _rows_bound_to_completion([paper_event], formal_completion)
+    ):
         _set(
             index,
             "event_static_potential_heuristic",
@@ -208,8 +310,28 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
                 "completed_segments": paper_event.get("completed_segment_count", ""),
                 "requested_segments": paper_event.get("workload_segment_count", ""),
             },
+            protocol_digest=formal_protocol_digest,
         )
-    if len(frontier) == 63 and all(row.get("execution_status") == "EXECUTED" for row in frontier):
+    elif paper_event:
+        _set(
+            index,
+            "event_static_potential_heuristic",
+            "paper_main_2_5",
+            status=PARTIAL,
+            evidence=[event_path.relative_to(root).as_posix()],
+            blocker=(
+                "event evidence is not bound to a COMPLETE atomic fixed-map formal publication"
+            ),
+        )
+    if (
+        formal_publication_ok
+        and
+        len(frontier) == 63
+        and {row.get("case_id", "") for row in frontier} == frontier_case_ids
+        and _rows_bound_to_fixed_map(frontier, formal_protocol_digest)
+        and _rows_bound_to_completion(frontier, formal_completion)
+        and all(row.get("execution_status") == "EXECUTED" for row in frontier)
+    ):
         _set(
             index,
             "event_static_potential_heuristic",
@@ -221,6 +343,7 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
             service=all(_truth(row.get("service_level_pass")) for row in frontier),
             capacity=all(_truth(row.get("capacity_pass")) for row in frontier),
             metrics={"exact_case_count": 63, "capacity_pass_count": sum(_truth(row.get("capacity_pass")) for row in frontier)},
+            protocol_digest=formal_protocol_digest,
         )
     for scenario, source_id in (
         ("stress_8x_full", "extension_synchronized_8x_full"),
@@ -229,12 +352,21 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
         ("rolling_7day_full", "extension_rolling_7day_full"),
     ):
         source = ext_by_id.get(source_id)
-        if source:
+        if (
+            source
+            and extension_publication_ok
+            and _rows_bound_to_fixed_map([source], extension_protocol_digest)
+            and _rows_bound_to_completion([source], extension_completion)
+        ):
+            qualified = (
+                source.get("execution_status") == "EXECUTED"
+                and _truth(source.get("no_smoke_substitution_pass"))
+            )
             _set(
                 index,
                 "event_static_potential_heuristic",
                 scenario,
-                status=source.get("execution_status", PARTIAL),
+                status="EXECUTED" if qualified else PARTIAL,
                 evidence=[extension_path.relative_to(root).as_posix()],
                 blocker="" if _truth(source.get("no_smoke_substitution_pass")) else "exact full-input/day-boundary audit did not pass",
                 safe=source.get("safe_execution_pass", ""),
@@ -245,15 +377,37 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
                     "segments": source.get("workload_segment_count", ""),
                     "day_boundaries": source.get("observed_full_day_boundaries", ""),
                 },
+                protocol_digest=extension_protocol_digest,
+            )
+        elif source:
+            _set(
+                index,
+                "event_static_potential_heuristic",
+                scenario,
+                status=PARTIAL,
+                evidence=[extension_path.relative_to(root).as_posix()],
+                blocker=(
+                    "exact full-input evidence is not bound to a COMPLETE atomic "
+                    "system-extension publication"
+                ),
             )
 
     fault16 = ext_by_id.get("extension_fault_delayed_16x_full")
-    if fault16:
+    if (
+        fault16
+        and extension_publication_ok
+        and _rows_bound_to_fixed_map([fault16], extension_protocol_digest)
+        and _rows_bound_to_completion([fault16], extension_completion)
+    ):
+        qualified = (
+            fault16.get("execution_status") == "EXECUTED"
+            and _truth(fault16.get("no_smoke_substitution_pass"))
+        )
         _set(
             index,
             "event_fault_policy",
             "fault_16",
-            status=fault16.get("execution_status", PARTIAL),
+            status="EXECUTED" if qualified else PARTIAL,
             evidence=[extension_path.relative_to(root).as_posix()],
             blocker="" if _truth(fault16.get("no_smoke_substitution_pass")) else "exact 16x temporal-fault input audit did not pass",
             safe=fault16.get("safe_execution_pass", ""),
@@ -261,8 +415,29 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
             service=fault16.get("service_level_pass", ""),
             capacity=fault16.get("capacity_pass", ""),
             metrics={"fault_recovery_pass": fault16.get("fault_recovery_pass", "")},
+            protocol_digest=extension_protocol_digest,
         )
-    if len(faults) == 5 and all(row.get("execution_status") == "EXECUTED" for row in faults):
+    elif fault16:
+        _set(
+            index,
+            "event_fault_policy",
+            "fault_16",
+            status=PARTIAL,
+            evidence=[extension_path.relative_to(root).as_posix()],
+            blocker=(
+                "exact 16x temporal-fault evidence is not bound to a COMPLETE atomic "
+                "system-extension publication"
+            ),
+        )
+    if (
+        formal_publication_ok
+        and
+        len(faults) == 5
+        and {row.get("case_id", "") for row in faults} == fault_case_ids
+        and _rows_bound_to_fixed_map(faults, formal_protocol_digest)
+        and _rows_bound_to_completion(faults, formal_completion)
+        and all(row.get("execution_status") == "EXECUTED" for row in faults)
+    ):
         # This is useful adjacent evidence, but it cannot replace the exact 16x
         # cell above and is therefore stored only in the metrics when present.
         target = index[("event_fault_policy", "fault_16")]
@@ -292,6 +467,43 @@ def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
     return [index[(variant, scenario)] for variant in VARIANTS for scenario in SCENARIOS]
 
 
+def build_system_ab_matrix(root: Path) -> list[dict[str, Any]]:
+    from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
+        CONSOLIDATION_LOCK as FORMAL_LOCK,
+        ROOT as RUNNER_ROOT,
+        _acquire_case_lock,
+        _release_case_lock,
+    )
+    from scripts.eval.run_g4irsf11_system_extensions import (
+        CONSOLIDATION_LOCK as EXTENSION_LOCK,
+    )
+
+    formal_token = _acquire_case_lock(
+        root / FORMAL_LOCK.relative_to(RUNNER_ROOT),
+        "system_ab_formal_reader_snapshot",
+        wait_seconds=60.0,
+    )
+    if formal_token is None:
+        raise RuntimeError(
+            "formal publication is being consolidated; system A/B has no stable reader snapshot"
+        )
+    extension_token = _acquire_case_lock(
+        root / EXTENSION_LOCK.relative_to(RUNNER_ROOT),
+        "system_ab_extension_reader_snapshot",
+        wait_seconds=60.0,
+    )
+    if extension_token is None:
+        _release_case_lock(formal_token)
+        raise RuntimeError(
+            "extension publication is being consolidated; system A/B has no stable reader snapshot"
+        )
+    try:
+        return _build_system_ab_matrix_unlocked(root)
+    finally:
+        _release_case_lock(extension_token)
+        _release_case_lock(formal_token)
+
+
 def write_system_ab_artifacts(root: Path, rows: list[Mapping[str, Any]]) -> tuple[Path, Path]:
     table = root / "outputs" / "tables" / "g4irsf11_system_ab_matrix.csv"
     report = root / "outputs" / "reports" / "g4irsf11_system_ab_report.md"
@@ -301,7 +513,10 @@ def write_system_ab_artifacts(root: Path, rows: list[Mapping[str, Any]]) -> tupl
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
-    executed = sum(str(row["execution_status"]).startswith("EXECUTED") for row in rows)
+    executed = sum(
+        str(row["execution_status"]).startswith("EXECUTED") and not row["blocker"]
+        for row in rows
+    )
     report.write_text(
         "\n".join(
             [

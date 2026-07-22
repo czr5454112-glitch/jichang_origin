@@ -37,9 +37,17 @@ def test_case_row_and_resource_report_expose_junction_scaling_evidence(
         "fault_window_metrics": [],
         "resource_metrics": resource,
     }
-    execution = {"status": "EXECUTED", "run_id": "resource-run", "return_code": 0}
+    execution = {
+        "status": "EXECUTED",
+        "run_id": "resource-run",
+        "return_code": 0,
+        "protocol_manifest_sha256": "a" * 64,
+        "map_sha256": "b" * 64,
+    }
 
     row = case_row(case, result, execution)
+    assert row["protocol_manifest_sha256"] == "a" * 64
+    assert row["map_sha256"] == "b" * 64
     for key, expected in resource.items():
         if key == "wall_seconds_including_pybind_materialization":
             assert row["wall_seconds"] == expected

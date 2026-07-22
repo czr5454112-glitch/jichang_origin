@@ -19,10 +19,23 @@ import sys
 from collections import Counter
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Iterable, Mapping, Sequence
 
-
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_PATH,
+    CANONICAL_MAP_RELATIVE_PATH,
+    CANONICAL_MAP_SHA256,
+    FixedRealMapError,
+    assert_canonical_map,
+    canonical_map_data,
+    canonical_map_identity,
+)
+
 G4IRSF10_START_HEAD = "3ae9092ed0cfa0d5d75cfde1c35ae53c61a25d64"
 G4IRSF10_PAPER_TASK_SHA256 = "abb03e6d6d46031bfb653fece7ade8a94d58a54e8142c53448704f800ec5d386"
 
@@ -487,6 +500,7 @@ def audit_paper_scenarios(
             "expected_count": len(spec.scenarios),
             "actual_count": len(rows),
             "command_evidence": command_evidence,
+            "violation_count": len(violations),
         },
     )
 
@@ -494,6 +508,13 @@ def audit_paper_scenarios(
 def _int_or_none(value: Any) -> int | None:
     try:
         return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _number_or_none(value: Any) -> float | None:
+    try:
+        return float(value)
     except (TypeError, ValueError):
         return None
 
@@ -557,6 +578,7 @@ def audit_optional_scenarios(
             "expected_count": len(expected),
             "row_count": len(rows),
             "command_evidence": command_evidence,
+            "violation_count": len(violations),
         },
     )
 
@@ -714,7 +736,10 @@ class HardCasePolicy:
     minimum_per_required_category: int = 1
     max_duplicate_fraction: float = 0.20
     max_single_scenario_family_fraction: float = 0.60
+    max_single_source_fraction: float = 0.60
+    max_single_goal_fraction: float = 0.60
     require_graph_adjacency: bool = True
+    require_sampling_evidence: bool = True
 
     def __post_init__(self) -> None:
         if self.minimum_rows < 3:
@@ -725,29 +750,90 @@ class HardCasePolicy:
             raise ValueError("hard-case duplicate threshold must be within [0, 0.20]")
         if not 0.0 < self.max_single_scenario_family_fraction <= 0.60:
             raise ValueError("hard-case scenario-family threshold must be within (0, 0.60]")
+        if not 0.0 < self.max_single_source_fraction <= 0.60:
+            raise ValueError("hard-case source threshold must be within (0, 0.60]")
+        if not 0.0 < self.max_single_goal_fraction <= 0.60:
+            raise ValueError("hard-case goal threshold must be within (0, 0.60]")
         if not self.require_graph_adjacency:
             raise ValueError("graph adjacency validation cannot be disabled")
+        if not self.require_sampling_evidence:
+            raise ValueError("hard-case sampling evidence cannot be disabled")
+
+
+@dataclass(frozen=True)
+class CanonicalAdjacency:
+    """Adjacency whose path, digest, and content were verified against map2."""
+
+    adjacency: Mapping[int, tuple[int, ...]]
+    start_nodes: frozenset[int]
+    end_nodes: frozenset[int]
+    resolved_path: str
+    sha256: str
+
+    def get(self, node: int, default: Sequence[int] = ()) -> Sequence[int]:
+        return self.adjacency.get(node, default)
+
+    def __contains__(self, node: object) -> bool:
+        return node in self.adjacency
+
+
+def _verified_canonical_adjacency(
+    value: object,
+) -> CanonicalAdjacency | None:
+    if not isinstance(value, CanonicalAdjacency):
+        return None
+    if (
+        Path(value.resolved_path).resolve() != CANONICAL_MAP_PATH
+        or value.sha256 != CANONICAL_MAP_SHA256
+    ):
+        return None
+    expected = read_graph_adjacency(CANONICAL_MAP_PATH)
+    if (
+        dict(value.adjacency) != dict(expected.adjacency)
+        or value.start_nodes != expected.start_nodes
+        or value.end_nodes != expected.end_nodes
+    ):
+        return None
+    return value
 
 
 def audit_hard_case_coverage(
     rows: Sequence[Mapping[str, Any]],
     policy: HardCasePolicy = HardCasePolicy(),
     *,
-    adjacency: Mapping[int, Sequence[int]] | None = None,
+    adjacency: CanonicalAdjacency | Mapping[int, Sequence[int]] | None = None,
 ) -> GateCheck:
     """Audit stratified coverage, true candidate validity, and repeat bias."""
 
     violations: list[str] = []
+    violation_count = 0
+
+    def add_violation(detail: str) -> None:
+        # A legacy index can contain tens of thousands of bad rows.  Preserve
+        # the exact count while bounding the human-readable payload.
+        nonlocal violation_count
+        violation_count += 1
+        if len(violations) < 50:
+            violations.append(detail)
+
     if len(rows) < policy.minimum_rows:
-        violations.append(f"hard-case rows {len(rows)} < required {policy.minimum_rows}")
-    if policy.require_graph_adjacency and adjacency is None:
-        violations.append("graph adjacency is required to prove true outgoing candidate validity")
+        add_violation(f"hard-case rows {len(rows)} < required {policy.minimum_rows}")
+    verified_adjacency = _verified_canonical_adjacency(adjacency)
+    if policy.require_graph_adjacency and verified_adjacency is None:
+        add_violation(
+            "canonical map2 adjacency with verified path and SHA-256 is required; "
+            "synthetic/direct mappings are not evidence"
+        )
 
     category_counts = Counter({"high_flow": 0, "fault": 0, "tail": 0})
     signatures: list[str] = []
     scenario_families: Counter[str] = Counter()
+    source_counts: Counter[str] = Counter()
+    goal_counts: Counter[str] = Counter()
     invalid_candidates = 0
     invalid_decision_semantics = 0
+    invalid_source_goal = 0
+    invalid_sampling_evidence = 0
 
     for index, row in enumerate(rows):
         reasons = _hard_reasons(row)
@@ -758,7 +844,9 @@ def audit_hard_case_coverage(
         if _is_tail(row, reasons):
             category_counts["tail"] += 1
 
-        candidates = _candidate_nodes(row, allow_graph_validated_alias=adjacency is not None)
+        candidates = _candidate_nodes(
+            row, allow_graph_validated_alias=verified_adjacency is not None
+        )
         selected = _selected_node(row)
         explicit_validity = row.get("candidate_validity")
         candidate_valid = (
@@ -768,14 +856,22 @@ def audit_hard_case_coverage(
             and selected in candidates
             and (explicit_validity is None or _truthy(explicit_validity))
         )
-        if adjacency is not None:
+        if verified_adjacency is not None:
             current_value = row.get("current_node", row.get("junction_node"))
             try:
                 current = int(current_value)
             except (TypeError, ValueError):
                 current = None
-            expected = () if current is None else tuple(str(node) for node in adjacency.get(current, ()))
-            if current is None or current not in adjacency or set(candidates) != set(expected):
+            expected = (
+                ()
+                if current is None
+                else tuple(str(node) for node in verified_adjacency.get(current, ()))
+            )
+            if (
+                current is None
+                or current not in verified_adjacency
+                or set(candidates) != set(expected)
+            ):
                 candidate_valid = False
         records = _parsed(row.get("candidate_records"))
         record_nodes: tuple[str, ...] = ()
@@ -803,8 +899,55 @@ def audit_hard_case_coverage(
             candidate_valid = False
         if not candidate_valid:
             invalid_candidates += 1
-            violations.append(
+            add_violation(
                 f"hard-case row {index} has invalid/missing true outgoing candidates or selection"
+            )
+
+        source_raw = row.get("source_node")
+        goal_raw = row.get("goal_node")
+        try:
+            source = int(source_raw)
+        except (TypeError, ValueError):
+            source = None
+        try:
+            goal = int(goal_raw)
+        except (TypeError, ValueError):
+            goal = None
+        source_valid = (
+            verified_adjacency is not None
+            and source is not None
+            and source in verified_adjacency.start_nodes
+        )
+        goal_valid = (
+            verified_adjacency is not None
+            and goal is not None
+            and goal in verified_adjacency.end_nodes
+        )
+        source_goal_valid = (
+            source_valid and goal_valid
+        )
+        if not source_goal_valid:
+            invalid_source_goal += 1
+            add_violation(
+                f"hard-case row {index} lacks canonical-map source/goal identity"
+            )
+        if source_valid:
+            source_counts[str(source)] += 1
+        if goal_valid:
+            goal_counts[str(goal)] += 1
+
+        sample_weight = _number_or_none(row.get("sample_weight"))
+        stratum_id = str(row.get("stratum_id") or "").strip()
+        sampling_valid = (
+            bool(stratum_id)
+            and sample_weight is not None
+            and math.isfinite(sample_weight)
+            and sample_weight > 0.0
+        )
+        if policy.require_sampling_evidence and not sampling_valid:
+            invalid_sampling_evidence += 1
+            add_violation(
+                f"hard-case row {index} lacks a positive sample_weight or stratum_id"
             )
 
         model_prediction = str(row.get("model_prediction", ""))
@@ -851,7 +994,7 @@ def audit_hard_case_coverage(
         )
         if not decision_semantics_valid:
             invalid_decision_semantics += 1
-            violations.append(
+            add_violation(
                 f"hard-case row {index} has invalid score direction/margin, disagreement, or full-A* evidence"
             )
         signatures.append(_decision_signature(row, candidate_nodes=candidates))
@@ -859,7 +1002,7 @@ def audit_hard_case_coverage(
 
     for category in ("high_flow", "fault", "tail"):
         if category_counts[category] < policy.minimum_per_required_category:
-            violations.append(
+            add_violation(
                 f"hard-case category {category} has {category_counts[category]} rows; "
                 f"requires {policy.minimum_per_required_category}"
             )
@@ -867,7 +1010,7 @@ def audit_hard_case_coverage(
     duplicate_count = len(signatures) - len(set(signatures))
     duplicate_fraction = duplicate_count / len(signatures) if signatures else 1.0
     if duplicate_fraction > policy.max_duplicate_fraction:
-        violations.append(
+        add_violation(
             f"decision duplicate fraction {duplicate_fraction:.6f} exceeds "
             f"{policy.max_duplicate_fraction:.6f}"
         )
@@ -876,9 +1019,26 @@ def audit_hard_case_coverage(
         max(scenario_families.values()) / len(rows) if rows and scenario_families else 1.0
     )
     if max_family_fraction > policy.max_single_scenario_family_fraction:
-        violations.append(
+        add_violation(
             f"single scenario-family fraction {max_family_fraction:.6f} exceeds "
             f"{policy.max_single_scenario_family_fraction:.6f}"
+        )
+
+    max_source_fraction = (
+        max(source_counts.values()) / len(rows) if rows and source_counts else 1.0
+    )
+    max_goal_fraction = (
+        max(goal_counts.values()) / len(rows) if rows and goal_counts else 1.0
+    )
+    if max_source_fraction > policy.max_single_source_fraction:
+        add_violation(
+            f"single source fraction {max_source_fraction:.6f} exceeds "
+            f"{policy.max_single_source_fraction:.6f}"
+        )
+    if max_goal_fraction > policy.max_single_goal_fraction:
+        add_violation(
+            f"single goal fraction {max_goal_fraction:.6f} exceeds "
+            f"{policy.max_single_goal_fraction:.6f}"
         )
 
     return _check(
@@ -891,9 +1051,16 @@ def audit_hard_case_coverage(
             "tail_count": category_counts["tail"],
             "invalid_candidate_count": invalid_candidates,
             "invalid_decision_semantics_count": invalid_decision_semantics,
+            "invalid_source_goal_count": invalid_source_goal,
+            "invalid_sampling_evidence_count": invalid_sampling_evidence,
             "duplicate_fraction": duplicate_fraction,
             "max_scenario_family_fraction": max_family_fraction,
+            "max_source_fraction": max_source_fraction,
+            "max_goal_fraction": max_goal_fraction,
             "graph_adjacency_supplied": adjacency is not None,
+            "canonical_map_adjacency_verified": verified_adjacency is not None,
+            "violation_count": violation_count,
+            "details_truncated": violation_count > len(violations),
         },
     )
 
@@ -1013,34 +1180,66 @@ def read_csv_rows(path: Path | str) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
-def read_graph_adjacency(path: Path | str) -> dict[int, tuple[int, ...]]:
-    """Read either map2.json or a direct ``node -> outgoing`` JSON mapping."""
+def read_graph_adjacency(path: Path | str) -> CanonicalAdjacency:
+    """Load adjacency only after canonical map2 path/hash/schema verification."""
 
-    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    resolved = assert_canonical_map(Path(path))
+    payload = canonical_map_data(resolved)
     adjacency: dict[int, tuple[int, ...]] = {}
-    if isinstance(payload, Mapping) and isinstance(payload.get("nodes"), list):
-        for row in payload["nodes"]:
-            if not isinstance(row, Mapping) or row.get("location") is None:
-                raise ValueError("map node lacks location/outgoing fields")
-            node = int(row["location"])
-            outgoing = tuple(sorted(int(value) for value in row.get("outgoing", [])))
-            if node in adjacency or len(outgoing) != len(set(outgoing)):
-                raise ValueError(f"invalid or duplicate adjacency entry for node {node}")
-            adjacency[node] = outgoing
-    elif isinstance(payload, Mapping):
-        for raw_node, raw_outgoing in payload.items():
-            if not isinstance(raw_outgoing, (list, tuple)):
-                raise ValueError(f"adjacency for node {raw_node} is not an array")
-            node = int(raw_node)
-            outgoing = tuple(sorted(int(value) for value in raw_outgoing))
-            if node in adjacency or len(outgoing) != len(set(outgoing)):
-                raise ValueError(f"invalid or duplicate adjacency entry for node {node}")
-            adjacency[node] = outgoing
-    else:
-        raise ValueError("adjacency JSON must be a map object")
+    for row in payload["nodes"]:
+        node = int(row["location"])
+        outgoing = tuple(sorted(int(value) for value in row.get("outgoing", [])))
+        if node in adjacency or len(outgoing) != len(set(outgoing)):
+            raise FixedRealMapError(f"invalid or duplicate adjacency entry for node {node}")
+        adjacency[node] = outgoing
     if not adjacency:
-        raise ValueError("adjacency is empty")
-    return adjacency
+        raise FixedRealMapError("canonical map adjacency is empty")
+    return CanonicalAdjacency(
+        adjacency=MappingProxyType(adjacency),
+        start_nodes=frozenset(int(value) for value in payload["start_nodes"]),
+        end_nodes=frozenset(int(value) for value in payload["end_nodes"]),
+        resolved_path=str(resolved),
+        sha256=CANONICAL_MAP_SHA256,
+    )
+
+
+def audit_fixed_real_map_binding(
+    identity: Mapping[str, Any],
+    *,
+    evidence_rows: Mapping[str, Sequence[Mapping[str, Any]]],
+) -> GateCheck:
+    """Bind all graph-bearing evidence to immutable canonical map2 provenance."""
+
+    violations: list[str] = []
+    if identity.get("fixed_real_map_only") is not True:
+        violations.append("fixed_real_map_only must be exactly true")
+    if str(identity.get("repo_relative_path") or "") != CANONICAL_MAP_RELATIVE_PATH.as_posix():
+        violations.append("fixed real map path is not canonical map2")
+    if str(identity.get("sha256") or "").lower() != CANONICAL_MAP_SHA256:
+        violations.append("fixed real map normalized SHA-256 is missing or mismatched")
+    if identity.get("topology_mutation_allowed") is not False:
+        violations.append("topology_mutation_allowed must be exactly false")
+    for section, rows in evidence_rows.items():
+        for index, row in enumerate(rows):
+            raw = row.get("topology_changed")
+            if isinstance(raw, bool):
+                unchanged = raw is False
+            else:
+                unchanged = str(raw).strip().lower() in {"false", "0"}
+            if not unchanged:
+                violations.append(
+                    f"{section} row {index} does not explicitly record topology_changed=false"
+                )
+    return _check(
+        "fixed_real_map_identity_and_topology",
+        violations,
+        metrics={
+            **dict(identity),
+            "paper_row_count": len(evidence_rows.get("paper", ())),
+            "optional_row_count": len(evidence_rows.get("optional", ())),
+            "violation_count": len(violations),
+        },
+    )
 
 
 def _evidence_path(repo: Path, value: Any, label: str) -> Path:
@@ -1067,11 +1266,25 @@ def evaluate_integrity_config(
 ) -> list[GateCheck]:
     """Evaluate all non-Git gates declared by a full integrity config.
 
-    All four sections are mandatory.  Missing evidence raises ``ValueError`` so
+    All five sections are mandatory.  Missing evidence raises ``ValueError`` so
     a caller cannot accidentally turn a partial evaluation into an overall PASS.
     """
 
     repo_path = Path(repo).resolve()
+
+    fixed_map_config = _mapping_section(config, "fixed_real_map")
+    if fixed_map_config.get("fixed_real_map_only") is not True:
+        raise ValueError("fixed_real_map.fixed_real_map_only must be exactly true")
+    fixed_map_path = _evidence_path(
+        repo_path, fixed_map_config.get("path"), "fixed real map"
+    )
+    assert_canonical_map(fixed_map_path)
+    declared_map_sha = str(fixed_map_config.get("sha256") or "").lower()
+    if declared_map_sha != CANONICAL_MAP_SHA256:
+        raise ValueError(
+            "fixed_real_map.sha256 must equal the frozen canonical map2 normalized digest"
+        )
+    map_identity = canonical_map_identity()
 
     paper_config = _mapping_section(config, "paper")
     paper_rows = read_csv_rows(_evidence_path(repo_path, paper_config.get("csv"), "paper CSV"))
@@ -1121,14 +1334,21 @@ def evaluate_integrity_config(
     if not DEFAULT_OPTIONAL_SCENARIOS.issubset(map(str, optional_names)):
         raise ValueError("optional scenario specification omits a frozen G4IRSF11 boundary")
     optional_check = audit_optional_scenarios(optional_rows, map(str, optional_names))
+    map_check = audit_fixed_real_map_binding(
+        map_identity,
+        evidence_rows={"paper": paper_rows, "optional": optional_rows},
+    )
 
     hard_config = _mapping_section(config, "hard_cases")
     hard_rows = read_csv_rows(
         _evidence_path(repo_path, hard_config.get("csv"), "hard-case CSV")
     )
-    adjacency = read_graph_adjacency(
-        _evidence_path(repo_path, hard_config.get("adjacency_json"), "adjacency JSON")
+    hard_map_path = _evidence_path(
+        repo_path, hard_config.get("adjacency_json"), "hard-case canonical map JSON"
     )
+    if hard_map_path != fixed_map_path:
+        raise ValueError("hard_cases.adjacency_json must be the fixed canonical map path")
+    adjacency = read_graph_adjacency(hard_map_path)
     raw_policy = hard_config.get("policy", {})
     if not isinstance(raw_policy, Mapping):
         raise ValueError("hard_cases.policy must be an object")
@@ -1137,7 +1357,10 @@ def evaluate_integrity_config(
         "minimum_per_required_category",
         "max_duplicate_fraction",
         "max_single_scenario_family_fraction",
+        "max_single_source_fraction",
+        "max_single_goal_fraction",
         "require_graph_adjacency",
+        "require_sampling_evidence",
     }
     unknown_policy = set(raw_policy) - allowed_policy_fields
     if unknown_policy:
@@ -1186,7 +1409,7 @@ def evaluate_integrity_config(
         runtime_state_fields=[str(item) for item in runtime_state_fields],
     )
 
-    return [paper_check, optional_check, hard_check, lineage_check]
+    return [map_check, paper_check, optional_check, hard_check, lineage_check]
 
 
 def write_integrity_report(
@@ -1198,6 +1421,7 @@ def write_integrity_report(
     payload = {
         "schema": "czr005.g4irsf11.gate_integrity.v1",
         "overall_status": overall.status,
+        "fixed_real_map": canonical_map_identity(),
         "checks": [check.to_dict() for check in checks],
         "commands": [record.to_dict() for record in commands],
     }
@@ -1218,7 +1442,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--config",
         type=Path,
-        help="Full gate config with paper, optional, hard_cases, and lineage sections.",
+        help=(
+            "Full gate config with fixed_real_map, paper, optional, hard_cases, "
+            "and lineage sections."
+        ),
     )
     parser.add_argument(
         "--provenance-only",

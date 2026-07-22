@@ -20,6 +20,12 @@ from typing import Any, Iterable, Mapping, Sequence
 import uuid
 
 from scripts.eval.g4irsf11_experiment_protocol import CAPACITY_SLO, FAULT_SLO
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_HASH_SEMANTICS,
+    CANONICAL_MAP_RELATIVE_PATH,
+    CANONICAL_MAP_SHA256,
+    canonical_map_identity,
+)
 
 
 RESULT_SCHEMA = "czr005.g4irsf11.event_runtime_result.v3"
@@ -37,6 +43,30 @@ JUNCTION_BOTTLENECK_SCORE_SEMANTICS = (
 )
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _NONFINITE_TOKENS = {"NAN", "INF", "+INF", "-INF", "INFINITY", "+INFINITY", "-INFINITY"}
+
+
+def _validate_fixed_map_identity(value: Any, label: str, errors: list[str]) -> None:
+    identity = _mapping(value, label, errors)
+    expected_identity = canonical_map_identity()
+    _add(errors, identity.get("fixed_real_map_only") is True, f"{label} fixed_real_map_only must be true")
+    _add(
+        errors,
+        identity.get("repo_relative_path") == CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+        f"{label} canonical path mismatch",
+    )
+    _add(errors, identity.get("sha256") == CANONICAL_MAP_SHA256, f"{label} canonical hash mismatch")
+    _add(
+        errors,
+        identity.get("sha256_semantics") == CANONICAL_MAP_HASH_SEMANTICS,
+        f"{label} hash semantics mismatch",
+    )
+    _validate_sha(identity.get("raw_bytes_sha256"), f"{label}.raw_bytes_sha256", errors)
+    _add(
+        errors,
+        identity.get("topology_mutation_allowed") is False,
+        f"{label} topology mutation must be false",
+    )
+    _add(errors, identity == expected_identity, f"{label} differs from recomputed canonical map identity")
 
 WORKER_RUNTIME_DEFAULTS: dict[str, Any] = {
     "retry_interval": 0.25,
@@ -737,6 +767,9 @@ def validate_event_result(
     except (ValueError, AttributeError):
         errors.append("result run_id must be a canonical UUIDv4")
     _add(errors, result.get("case") == dict(expectation.case), "result CaseSpec echo mismatch")
+    _add(errors, result.get("fixed_real_map_only") is True, "result fixed_real_map_only must be true")
+    _add(errors, expectation.map_sha256 == CANONICAL_MAP_SHA256, "expectation map hash is not canonical map2")
+    _validate_fixed_map_identity(result.get("map_identity"), "result.map_identity", errors)
     _add(errors, result.get("protocol_version") == expectation.protocol_version, "result protocol version mismatch")
     _add(
         errors,
@@ -1474,6 +1507,12 @@ def validate_event_result(
     _add(errors, trace_context.get("run_id") == expectation.run_id, "trace run_id mismatch")
     _add(errors, trace_context.get("scenario") == case.get("case_id"), "trace scenario mismatch")
     _add(errors, trace_context.get("fault_mode") == case.get("fault_profile"), "trace fault mode mismatch")
+    _add(errors, trace_context.get("fixed_real_map_only") is True, "trace fixed_real_map_only must be true")
+    _add(
+        errors,
+        trace_context.get("canonical_map_sha256") == CANONICAL_MAP_SHA256,
+        "trace canonical map hash mismatch",
+    )
     try:
         _add(errors, _finite_number(trace_context.get("scale"), "trace scale") == float(case.get("scale")), "trace scale mismatch")
         decision_rows = _integer(trace.get("decision_rows_stored"), "trace decision rows")
@@ -1527,6 +1566,8 @@ def validate_execution_descriptor(
     )
     _add(errors, descriptor.get("fault_artifact") == dict(expectation.fault_artifact), "descriptor fault artifact mismatch")
     _add(errors, descriptor.get("map_sha256") == expectation.map_sha256, "descriptor map hash mismatch")
+    _add(errors, descriptor.get("fixed_real_map_only") is True, "descriptor fixed_real_map_only must be true")
+    _validate_fixed_map_identity(descriptor.get("map_identity"), "descriptor.map_identity", errors)
     _add(errors, descriptor.get("source_sha256") == expectation.source_sha256, "descriptor source hash mismatch")
     _add(errors, descriptor.get("implementation_sha256") == expectation.implementation_sha256, "descriptor implementation hash mismatch")
     _add(errors, descriptor.get("config") == dict(expectation.config), "descriptor config mismatch")

@@ -1794,20 +1794,11 @@ class EventDrivenJunctionRuntime {
     if (node == goal) {
       return 0.0;
     }
-    try {
-      const double value = graph_.heuristic(node, goal);
-      if (std::isfinite(value)) {
-        return value;
-      }
-    } catch (const std::exception&) {
-      // A coordinate potential is still static metadata and performs no graph
-      // search.  It is used only for hand-built tests without a matrix.
+    const double value = graph_.heuristic(node, goal);
+    if (!std::isfinite(value)) {
+      throw std::logic_error("event runtime requires a finite canonical heuristic value");
     }
-    const auto& from = graph_.node(node);
-    const auto& to = graph_.node(goal);
-    const double dx = static_cast<double>(from.x - to.x);
-    const double dy = static_cast<double>(from.y - to.y);
-    return std::sqrt(dx * dx + dy * dy);
+    return value;
   }
 
   int recent_visit_count(const BagState& bag, int node) const {

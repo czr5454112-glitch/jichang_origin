@@ -5,6 +5,7 @@ import json
 
 import pytest
 
+from scripts.eval import run_g4irsf11_event_runtime_evaluation as runner_module
 from scripts.eval.g4irsf11_evaluation_reporting import case_row, gate_rows
 from scripts.eval.g4irsf11_experiment_protocol import formal_cases
 from scripts.eval.g4irsf11_experiment_protocol import PROTOCOL_VERSION, protocol_manifest
@@ -15,6 +16,7 @@ from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
     _trace_artifact_bindings,
     _trace_semantic_errors,
     _load_all_rows,
+    assert_implementation_unchanged,
     build_parser,
     timeline_spanning_sample,
 )
@@ -23,6 +25,14 @@ from scripts.eval.g4irsf11_result_validation import (
     atomic_write_json,
     atomic_write_jsonl,
     canonical_manifest_sha256,
+)
+from scripts.eval.g4irsf11_publication import (
+    artifact_bindings as publication_artifact_bindings,
+    begin_completion,
+    complete_publication,
+    completion_validation_errors,
+    create_staging_root,
+    promote_staged_artifacts,
 )
 from scripts.eval.run_g4irsf11_event_case import _outcomes
 
@@ -36,6 +46,288 @@ def _rows(count: int) -> list[dict[str, object]]:
         }
         for index in range(count)
     ]
+
+
+def test_implementation_mutation_is_fail_closed(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(
+        "scripts.eval.run_g4irsf11_event_runtime_evaluation.implementation_sha256",
+        lambda _search_path: "b" * 64,
+    )
+
+    with pytest.raises(RuntimeError, match="changed during the measurement cohort"):
+        assert_implementation_unchanged("a" * 64, tmp_path)
+
+
+def test_source_task_snapshot_detects_even_newline_only_runtime_mutation(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    source = tmp_path / "source.jsonl"
+    source.write_bytes(b'{"task_id":1}\n{"task_id":2}\n')
+    monkeypatch.setattr(runner_module, "SOURCE_TASK_PATH", source)
+    rows, frozen_source = runner_module.load_source_task_snapshot()
+    frozen_map = runner_module.canonical_map_identity()
+    assert len(rows) == 2
+
+    source.write_bytes(b'{"task_id":1}\r\n{"task_id":2}\r\n')
+    with pytest.raises(RuntimeError, match="source task changed"):
+        runner_module.assert_frozen_inputs_unchanged(frozen_source, frozen_map)
+
+
+def test_all_case_lock_acquisition_rolls_back_partial_snapshot(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    cases = formal_cases()[:2]
+    lock_paths = {case.case_id: tmp_path / f"{case.case_id}.lock" for case in cases}
+    monkeypatch.setattr(
+        runner_module,
+        "_case_paths",
+        lambda case: {"lock": lock_paths[case.case_id]},
+    )
+    held = runner_module._acquire_case_lock(
+        lock_paths[cases[1].case_id], "held", wait_seconds=0.0
+    )
+    assert held is not None
+    try:
+        acquired = runner_module._acquire_all_case_locks(
+            cases, scope="fixture", wait_seconds=0.0
+        )
+        assert acquired is None
+        assert not lock_paths[cases[0].case_id].exists()
+        assert lock_paths[cases[1].case_id].exists()
+    finally:
+        runner_module._release_case_lock(held)
+
+
+def test_all_case_lock_acquisition_rolls_back_on_lock_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    cases = formal_cases()[:2]
+    lock_paths = {case.case_id: tmp_path / f"{case.case_id}.lock" for case in cases}
+    monkeypatch.setattr(
+        runner_module,
+        "_case_paths",
+        lambda case: {"lock": lock_paths[case.case_id]},
+    )
+    real_acquire = runner_module._acquire_case_lock
+    calls = 0
+
+    def acquire_then_fail(path: Path, scope: str, *, wait_seconds: float):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("injected lock failure")
+        return real_acquire(path, scope, wait_seconds=wait_seconds)
+
+    monkeypatch.setattr(runner_module, "_acquire_case_lock", acquire_then_fail)
+    with pytest.raises(OSError, match="injected lock failure"):
+        runner_module._acquire_all_case_locks(
+            cases, scope="fixture", wait_seconds=0.0
+        )
+    assert not lock_paths[cases[0].case_id].exists()
+
+
+def test_case_lock_file_write_failure_closes_and_removes_lock(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    lock_path = tmp_path / "fault-injected.lock"
+    descriptors: list[int] = []
+
+    def fail_write(descriptor: int, _payload: object) -> int:
+        descriptors.append(descriptor)
+        raise OSError("injected lock write failure")
+
+    monkeypatch.setattr(runner_module.os, "write", fail_write)
+    with pytest.raises(OSError, match="injected lock write failure"):
+        runner_module._acquire_case_lock(
+            lock_path, "fault-injected", wait_seconds=0.0
+        )
+    assert descriptors
+    with pytest.raises(OSError):
+        runner_module.os.fstat(descriptors[0])
+    assert not lock_path.exists()
+
+
+def test_case_lock_unlink_failure_does_not_block_other_releases(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    first_path = tmp_path / "first.lock"
+    second_path = tmp_path / "second.lock"
+    first = runner_module._acquire_case_lock(
+        first_path, "first", wait_seconds=0.0
+    )
+    second = runner_module._acquire_case_lock(
+        second_path, "second", wait_seconds=0.0
+    )
+    assert first is not None and second is not None
+    real_unlink = Path.unlink
+    injected = False
+
+    def fail_first_once(path: Path, *args: object, **kwargs: object) -> None:
+        nonlocal injected
+        if path == first_path and not injected:
+            injected = True
+            raise OSError("injected unlink failure")
+        real_unlink(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "unlink", fail_first_once)
+    runner_module._release_case_lock(first)
+    runner_module._release_case_lock(second)
+    assert first_path.exists()
+    assert not first["released"]
+    assert not second_path.exists()
+    assert second["released"]
+
+    runner_module._release_case_lock(first)
+    assert not first_path.exists()
+    assert first["released"]
+
+
+def test_publication_commit_point_is_fail_closed_and_hash_bound(
+    tmp_path: Path,
+) -> None:
+    artifacts = ("outputs/a.txt", "outputs/b.txt")
+    final_a = tmp_path / artifacts[0]
+    final_b = tmp_path / artifacts[1]
+    final_a.parent.mkdir(parents=True, exist_ok=True)
+    final_a.write_text("old-a\n", encoding="utf-8")
+    final_b.write_text("old-b\n", encoding="utf-8")
+    completion = tmp_path / "artifacts/gates/completion.json"
+    metadata = {
+        "scope": "formal",
+        "implementation_source_bundle_sha256": "a" * 64,
+        "protocol_manifest_sha256": "b" * 64,
+    }
+
+    stage = create_staging_root(tmp_path, "formal")
+    for relative, value in zip(artifacts, ("new-a\n", "new-b\n")):
+        path = stage / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(value, encoding="utf-8")
+    bindings = publication_artifact_bindings(stage, artifacts)
+    transaction = begin_completion(
+        completion, metadata, expected_bindings=bindings
+    )
+
+    def fail_after_first(index: int, _relative: str) -> None:
+        if index == 1:
+            raise RuntimeError("injected promotion failure")
+
+    with pytest.raises(RuntimeError, match="injected promotion failure"):
+        promote_staged_artifacts(
+            stage,
+            tmp_path,
+            artifacts,
+            bindings,
+            after_replace=fail_after_first,
+        )
+    assert json.loads(completion.read_text(encoding="utf-8"))["status"] == "IN_PROGRESS"
+
+    retry_stage = create_staging_root(tmp_path, "formal")
+    for relative, value in zip(artifacts, ("new-a\n", "new-b\n")):
+        path = retry_stage / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(value, encoding="utf-8")
+    retry_bindings = publication_artifact_bindings(retry_stage, artifacts)
+    promote_staged_artifacts(retry_stage, tmp_path, artifacts, retry_bindings)
+    final_b.write_text("raced-tamper\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="differ from the validated staging"):
+        complete_publication(
+            completion,
+            metadata,
+            root=tmp_path,
+            artifact_paths=artifacts,
+            expected_bindings=retry_bindings,
+            publication_id=str(transaction["publication_id"]),
+        )
+    assert json.loads(completion.read_text(encoding="utf-8"))["status"] == "IN_PROGRESS"
+    final_b.write_text("new-b\n", encoding="utf-8")
+    complete_publication(
+        completion,
+        metadata,
+        root=tmp_path,
+        artifact_paths=artifacts,
+        expected_bindings=retry_bindings,
+        publication_id=str(transaction["publication_id"]),
+    )
+    assert completion_validation_errors(
+        tmp_path,
+        completion,
+        expected_scope="formal",
+        expected_source_bundle_sha256="a" * 64,
+        expected_protocol_manifest_sha256="b" * 64,
+        expected_artifact_paths=artifacts,
+    ) == []
+
+    final_b.write_text("tampered\n", encoding="utf-8")
+    assert any(
+        "SHA-256 mismatch" in error
+        for error in completion_validation_errors(
+            tmp_path,
+            completion,
+            expected_scope="formal",
+            expected_source_bundle_sha256="a" * 64,
+            expected_protocol_manifest_sha256="b" * 64,
+            expected_artifact_paths=artifacts,
+        )
+    )
+
+
+def test_execute_only_does_not_overwrite_published_protocol(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    protocol_path = tmp_path / "published-protocol.json"
+    protocol_path.write_text('{"old":true}\n', encoding="utf-8")
+    monkeypatch.setattr(runner_module, "PROTOCOL_PATH", protocol_path)
+    monkeypatch.setattr(runner_module, "assert_canonical_map", lambda _path: None)
+    monkeypatch.setattr(
+        runner_module,
+        "canonical_map_identity",
+        lambda: {"fixture": "map"},
+    )
+    monkeypatch.setattr(
+        runner_module,
+        "load_source_task_snapshot",
+        lambda: (
+            [{}] * 43_603,
+            {"raw_bytes_sha256": "c" * 64},
+        ),
+    )
+    monkeypatch.setattr(
+        runner_module,
+        "assert_frozen_inputs_unchanged",
+        lambda _source, _map: None,
+    )
+    monkeypatch.setattr(
+        runner_module, "implementation_sha256", lambda _search_path: "d" * 64
+    )
+    monkeypatch.setattr(
+        runner_module,
+        "assert_implementation_unchanged",
+        lambda _expected, _search_path: None,
+    )
+    monkeypatch.setattr(
+        runner_module,
+        "execute_case",
+        lambda *_args, **_kwargs: ({}, {"status": "EXECUTED"}),
+    )
+
+    case_id = formal_cases()[0].case_id
+    result = runner_module.main(
+        [
+            "--case",
+            case_id,
+            "--execute-only",
+            "--measurement-cohort",
+            "fixture",
+            "--concurrent-worker-target",
+            "1",
+        ]
+    )
+
+    assert result == 0
+    assert protocol_path.read_text(encoding="utf-8") == '{"old":true}\n'
 
 
 def test_timeline_sample_is_exact_deterministic_and_spans_both_ends() -> None:

@@ -9,22 +9,108 @@ import json
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from czr005.datasets.decision_trace import SCHEMA_ID, decision_trace_schema
+from scripts.eval.g4irsf11_experiment_protocol import formal_cases, protocol_manifest
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_HASH_SEMANTICS,
+    CANONICAL_MAP_RELATIVE_PATH,
+    CANONICAL_MAP_SHA256,
+    canonical_map_protocol_identity,
+)
+from scripts.eval.g4irsf11_result_validation import canonical_manifest_sha256
+
 
 GATE_SCHEMA = "czr005.g4irsf11.pretraining_gate.v1"
 PARTIAL = "PARTIAL_WITH_EXPLICIT_BLOCKER"
 SPLIT_READINESS_SCHEMA = "czr005.g4irsf11.v3_split_readiness.v1"
 SEMANTIC_TEXT_HASH = "sha256 of UTF-8 text after CRLF/CR newline normalization to LF"
+EXACT_BYTES_HASH = "sha256 of exact bytes"
+TEXT_ARTIFACT_SUFFIXES = {
+    ".csv", ".json", ".jsonl", ".md", ".py", ".txt", ".yaml", ".yml"
+}
 REQUIRED_SPLITS = (
     "grouped_random",
     "day_heldout",
+    "flight_bank_heldout",
     "time_heldout",
     "source_heldout",
     "od_heldout",
     "fault_heldout",
+    "fault_scenario_heldout",
+    "load_heldout",
 )
 
 
+def fixed_event_runtime_protocol_manifest() -> dict[str, Any]:
+    manifest = protocol_manifest()
+    manifest["fixed_real_map_only"] = True
+    manifest["canonical_map"] = canonical_map_protocol_identity()
+    return manifest
+
+
+def _decision_fixed_map_identity_passes(decision: Mapping[str, Any]) -> bool:
+    graph = decision.get("graph") if isinstance(decision.get("graph"), Mapping) else {}
+    validation = (
+        decision.get("validation")
+        if isinstance(decision.get("validation"), Mapping)
+        else {}
+    )
+    return (
+        decision.get("schema_id") == SCHEMA_ID
+        and decision.get("fixed_real_map_only") is True
+        and decision.get("canonical_map_sha256") == CANONICAL_MAP_SHA256
+        and graph.get("path") == CANONICAL_MAP_RELATIVE_PATH.as_posix()
+        and graph.get("sha256") == CANONICAL_MAP_SHA256
+        and graph.get("sha256_semantics") == CANONICAL_MAP_HASH_SEMANTICS
+        and graph.get("fixed_real_map_only") is True
+        and graph.get("topology_mutation_allowed") is False
+        and validation.get("fixed_real_map_identity") == "PASS"
+    )
+
+
+def _rows_bound_to_protocol(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    expected_case_ids: set[str],
+    protocol_digest: str,
+) -> bool:
+    return (
+        {str(row.get("case_id") or "") for row in rows} == expected_case_ids
+        and all(
+            row.get("protocol_manifest_sha256") == protocol_digest
+            and row.get("map_sha256") == CANONICAL_MAP_SHA256
+            for row in rows
+        )
+    )
+
+
+def _rows_bound_to_completion(
+    rows: Sequence[Mapping[str, Any]], completion: Mapping[str, Any]
+) -> bool:
+    producer = (
+        completion.get("producer")
+        if isinstance(completion.get("producer"), Mapping)
+        else {}
+    )
+    cohort = (
+        producer.get("measurement_cohort")
+        if isinstance(producer.get("measurement_cohort"), Mapping)
+        else {}
+    )
+    implementation = str(producer.get("implementation_sha256") or "")
+    cohort_name = str(cohort.get("name") or "")
+    worker_target = str(cohort.get("declared_concurrent_worker_target") or "")
+    return bool(rows) and bool(implementation) and bool(cohort_name) and all(
+        str(row.get("implementation_sha256") or "") == implementation
+        and str(row.get("measurement_cohort") or "") == cohort_name
+        and str(row.get("declared_concurrent_worker_target") or "") == worker_target
+        for row in rows
+    )
+
+
 def sha256_file(path: Path) -> str:
+    if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES:
+        return semantic_text_sha256(path)
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
@@ -63,7 +149,15 @@ def _relative(root: Path, path: Path) -> str:
 
 def _evidence(root: Path, paths: Sequence[Path]) -> list[dict[str, str]]:
     return [
-        {"path": _relative(root, path), "sha256": sha256_file(path)}
+        {
+            "path": _relative(root, path),
+            "sha256": sha256_file(path),
+            "hash_semantics": (
+                SEMANTIC_TEXT_HASH
+                if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES
+                else EXACT_BYTES_HASH
+            ),
+        }
         for path in paths
         if path.is_file()
     ]
@@ -79,8 +173,11 @@ def _gate(
 ) -> dict[str, Any]:
     evidence = _evidence(root, paths)
     actual_blockers = list(blockers)
-    if not evidence:
-        actual_blockers.append("no hashed evidence artifact exists")
+    for path in paths:
+        if not path.is_file():
+            actual_blockers.append(
+                f"required evidence artifact is missing: {_relative(root, path)}"
+            )
     return {
         "status": "PASS" if passed and evidence and not actual_blockers else PARTIAL,
         "evidence": evidence,
@@ -173,7 +270,7 @@ def _split_readiness_gate(
         ):
             blockers.append(f"split-readiness {name} row count binding is invalid")
     # Do not trust a self-reported PASS.  Re-run the exact, no-weights loader
-    # and all six grouped splits against the currently bound artifacts, then
+    # and all nine grouped/held-out splits against the currently bound artifacts, then
     # require the persisted audit to equal that recomputation.
     hard_descriptor = bindings.get("hard_case_index")
     outcome_descriptor = bindings.get("outcome_sample")
@@ -221,7 +318,7 @@ def _split_readiness_gate(
     return not blockers, sorted(set(blockers)), dict(metrics)
 
 
-def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
+def _evaluate_pretraining_gate_unlocked(root: Path) -> dict[str, Any]:
     table_dir = root / "outputs" / "tables"
     report_dir = root / "outputs" / "reports"
     artifact_dir = root / "artifacts" / "datasets"
@@ -237,8 +334,21 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
     hard_case_table = table_dir / "g4irsf11_stratified_hard_case_index.csv"
     lineage_table = table_dir / "g4irsf11_feature_lineage_audit.csv"
     decision_manifest_path = artifact_dir / "g4irsf11_decision_trace_manifest.json"
+    decision_schema_path = artifact_dir / "g4irsf11_decision_trace_schema.json"
     provenance_path = report_dir / "g4irsf11_gate_integrity_audit.json"
     split_readiness_path = report_dir / "g4irsf11_v3_split_readiness.json"
+
+    from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
+        FORMAL_COMPLETION_PATH,
+        formal_completion_validation_errors,
+    )
+
+    completion_path = root / FORMAL_COMPLETION_PATH.relative_to(
+        Path(__file__).resolve().parents[2]
+    )
+    completion_errors = formal_completion_validation_errors(root)
+    completion = _read_json(completion_path)
+    formal_publication_ok = not completion_errors
 
     decision = _read_json(decision_manifest_path)
     rows = _read_csv(case_table)
@@ -247,8 +357,30 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
     faults = _read_csv(fault_table)
     resources = _read_csv(resource_table)
     provenance = _read_json(provenance_path)
+    protocol_value = _read_json(protocol)
+    expected_protocol = fixed_event_runtime_protocol_manifest()
+    expected_protocol_digest = canonical_manifest_sha256(expected_protocol)
+    cases = formal_cases()
+    all_case_ids = {case.case_id for case in cases}
+    ablation_case_ids = {case.case_id for case in cases if case.category == "system_ablation"}
+    frontier_case_ids = {case.case_id for case in cases if case.category == "capacity_frontier"}
+    fault_case_ids = {case.case_id for case in cases if case.category == "temporal_fault"}
 
     remote_ci = provenance.get("remote_ci") if isinstance(provenance.get("remote_ci"), Mapping) else {}
+    provenance_map = (
+        provenance.get("fixed_real_map")
+        if isinstance(provenance.get("fixed_real_map"), Mapping)
+        else {}
+    )
+    provenance_map_ok = (
+        provenance.get("fixed_real_map_clean") is True
+        and provenance_map.get("fixed_real_map_only") is True
+        and provenance_map.get("topology_mutation_allowed") is False
+        and provenance_map.get("repo_relative_path")
+        == CANONICAL_MAP_RELATIVE_PATH.as_posix()
+        and provenance_map.get("sha256") == CANONICAL_MAP_SHA256
+    )
+    protocol_ok = protocol_value == expected_protocol
     a_ok = (
         provenance.get("schema") == "czr005.g4irsf11.provenance_ci_audit.v1"
         and provenance.get("overall_status") == "PASS"
@@ -263,6 +395,8 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
         and remote_ci.get("event") == "push"
         and str(remote_ci.get("conclusion", "")).lower() == "success"
         and bool(remote_ci.get("run_url"))
+        and provenance_map_ok
+        and protocol_ok
     )
     a_blockers: list[str] = []
     if provenance.get("overall_status") != "PASS":
@@ -275,11 +409,34 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
         a_blockers.append("remote CI head is not the exact audited Git head")
     if provenance.get("schema") != "czr005.g4irsf11.provenance_ci_audit.v1":
         a_blockers.append("provenance/CI audit schema is missing or unexpected")
+    if not provenance_map_ok:
+        a_blockers.append("provenance audit is not bound to canonical fixed map2")
+    if not protocol_ok:
+        a_blockers.append("event runtime protocol differs from the exact fixed-map protocol")
 
     validation = decision.get("validation") if isinstance(decision.get("validation"), Mapping) else {}
     completeness = decision.get("trace_completeness") if isinstance(decision.get("trace_completeness"), Mapping) else {}
-    b_ok = validation.get("status") == "PASS" and completeness.get("status") == "PASS"
-    b_blockers = [] if b_ok else ["decision validation and/or complete trace groups are not PASS"]
+    decision_map_ok = _decision_fixed_map_identity_passes(decision)
+    decision_schema_ok = (
+        decision_schema_path.is_file()
+        and _read_json(decision_schema_path) == decision_trace_schema()
+    )
+    decision_producer_ok = (
+        isinstance(decision.get("producer"), Mapping)
+        and decision.get("producer") == completion.get("producer")
+    )
+    b_ok = (
+        formal_publication_ok
+        and decision_producer_ok
+        and
+        validation.get("status") == "PASS"
+        and completeness.get("status") == "PASS"
+        and decision_map_ok
+        and decision_schema_ok
+    )
+    b_blockers = [] if b_ok else [
+        "decision validation, complete trace groups, fixed-map identity, producer, and/or atomic formal publication are not PASS"
+    ] + [f"formal publication: {error}" for error in completion_errors]
 
     coverage = decision.get("coverage") if isinstance(decision.get("coverage"), Mapping) else {}
     readiness_ok, readiness_blockers, readiness_metrics = _split_readiness_gate(
@@ -289,12 +446,16 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
         decision,
     )
     c_ok = (
+        formal_publication_ok
+        and decision_producer_ok
+        and
         coverage.get("status") == "PASS"
         and int(coverage.get("fault_local_active_decision_count_before_dedupe", 0)) > 0
         and decision.get("sampling_minimum_quota_status") == "PASS"
         and hard_case_table.is_file()
         and lineage_table.is_file()
         and readiness_ok
+        and decision_map_ok
     )
     c_blockers = [] if c_ok else [
         "stratified high-flow/active-fault/tail coverage, quota, hard-case, lineage, or split-readiness evidence is not PASS"
@@ -302,6 +463,15 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
 
     paper = next((row for row in rows if row.get("case_id") == "real_map_paper_full"), {})
     d_ok = (
+        formal_publication_ok
+        and _rows_bound_to_completion(rows, completion)
+        and
+        _rows_bound_to_protocol(
+            rows,
+            expected_case_ids=all_case_ids,
+            protocol_digest=expected_protocol_digest,
+        )
+        and
         paper.get("execution_status") == "EXECUTED"
         and _truth(paper.get("completion_pass"))
         and _truth(paper.get("event_runtime_invariant_pass"))
@@ -313,7 +483,15 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
     ]
 
     e_ok = (
+        formal_publication_ok
+        and _rows_bound_to_completion(ablations, completion)
+        and
         len(ablations) == 9
+        and _rows_bound_to_protocol(
+            ablations,
+            expected_case_ids=ablation_case_ids,
+            protocol_digest=expected_protocol_digest,
+        )
         and all(row.get("execution_status") == "EXECUTED" for row in ablations)
         and all(_truth(row.get("event_runtime_invariant_pass")) for row in ablations)
         and all(str(row.get("unresolved_deadlock_count")) == "0" for row in ablations)
@@ -324,7 +502,15 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
     ]
 
     f_ok = (
+        formal_publication_ok
+        and _rows_bound_to_completion(frontier, completion)
+        and
         len(frontier) == 63
+        and _rows_bound_to_protocol(
+            frontier,
+            expected_case_ids=frontier_case_ids,
+            protocol_digest=expected_protocol_digest,
+        )
         and all(row.get("execution_status") == "EXECUTED" for row in frontier)
         and all(str(row.get("safe_execution_pass")) in {"True", "False"} for row in frontier)
         and all(str(row.get("queue_stability_pass")) in {"True", "False"} for row in frontier)
@@ -336,7 +522,15 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
     ]
 
     g_ok = (
+        formal_publication_ok
+        and _rows_bound_to_completion(resources, completion)
+        and
         len(resources) == 84
+        and _rows_bound_to_protocol(
+            resources,
+            expected_case_ids=all_case_ids,
+            protocol_digest=expected_protocol_digest,
+        )
         and all(row.get("execution_status") == "EXECUTED" for row in resources)
         and all(int(float(row.get("peak_working_set_bytes") or 0)) > 0 for row in resources)
         and all(float(row.get("decision_latency_us_p99") or 0) >= 0.0 for row in resources)
@@ -346,7 +540,15 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
     ]
 
     h_ok = (
+        formal_publication_ok
+        and _rows_bound_to_completion(faults, completion)
+        and
         len(faults) == 5
+        and _rows_bound_to_protocol(
+            faults,
+            expected_case_ids=fault_case_ids,
+            protocol_digest=expected_protocol_digest,
+        )
         and all(row.get("execution_status") == "EXECUTED" for row in faults)
         and all(_truth(row.get("fault_recovery_pass")) for row in faults)
     )
@@ -359,7 +561,7 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
         "B": _gate(
             root,
             passed=b_ok,
-            paths=[decision_manifest_path, artifact_dir / "g4irsf11_decision_trace_schema.json"],
+            paths=[completion_path, decision_manifest_path, decision_schema_path],
             blockers=b_blockers,
             metrics={
                 "validated_decisions": validation.get("decision_count", 0),
@@ -405,13 +607,20 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
         decision_binding: dict[str, Any] = {
             "path": _relative(root, decision_manifest_path),
             "sha256": sha256_file(decision_manifest_path),
+            "hash_semantics": SEMANTIC_TEXT_HASH,
         }
     else:
-        decision_binding = {"path": _relative(root, decision_manifest_path), "sha256": ""}
+        decision_binding = {
+            "path": _relative(root, decision_manifest_path),
+            "sha256": "",
+            "hash_semantics": SEMANTIC_TEXT_HASH,
+        }
     overall = "PASS" if all(entry["status"] == "PASS" for entry in gates.values()) else PARTIAL
     return {
         "schema": GATE_SCHEMA,
         "generated_date": date.today().isoformat(),
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": CANONICAL_MAP_SHA256,
         "overall_status": overall,
         "gates": gates,
         "decision_manifest": decision_binding,
@@ -420,6 +629,30 @@ def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
             "capacity results, but v3 training remains blocked by any missing/partial gate."
         ),
     }
+
+
+def evaluate_pretraining_gate(root: Path) -> dict[str, Any]:
+    from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
+        CONSOLIDATION_LOCK,
+        ROOT as RUNNER_ROOT,
+        _acquire_case_lock,
+        _release_case_lock,
+    )
+
+    lock_path = root / CONSOLIDATION_LOCK.relative_to(RUNNER_ROOT)
+    token = _acquire_case_lock(
+        lock_path,
+        "pretraining_gate_reader_snapshot",
+        wait_seconds=60.0,
+    )
+    if token is None:
+        raise RuntimeError(
+            "formal publication is being consolidated; pretraining gate has no stable reader snapshot"
+        )
+    try:
+        return _evaluate_pretraining_gate_unlocked(root)
+    finally:
+        _release_case_lock(token)
 
 
 def write_gate_artifacts(root: Path, manifest: Mapping[str, Any]) -> tuple[Path, Path, Path]:

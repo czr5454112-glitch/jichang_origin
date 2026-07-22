@@ -24,6 +24,14 @@ for path in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(path))
 
 from czr005 import cpp_backend
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_PATH,
+    CANONICAL_MAP_SHA256,
+    assert_canonical_map,
+    canonical_graph_records,
+    canonical_map_identity,
+    normalised_text_sha256,
+)
 from scripts.eval.g4irsf11_capacity_metrics import (
     CapacityGateConfig,
     capacity_metrics,
@@ -58,24 +66,7 @@ from scripts.eval.g4irsf11_workloads import (
 
 
 def graph_records(map_path: Path) -> tuple[list[tuple[Any, ...]], list[tuple[Any, ...]], list[list[float]]]:
-    data = json.loads(map_path.read_text(encoding="utf-8"))
-    nodes = [
-        (
-            int(node["location"]),
-            int(node["node_type"]),
-            float(node.get("service_time", 0.0)),
-            int(node.get("x", 0)),
-            int(node.get("y", 0)),
-            [int(value) for value in node.get("outgoing", [])],
-        )
-        for node in data["nodes"]
-    ]
-    edges = [
-        (int(edge["start"]), int(edge["end"]), float(edge["length"]), float(edge["speed"]))
-        for edge in data["edges"]
-    ]
-    heuristic = [[float(value) for value in row] for row in data["heuristic_time"]]
-    return nodes, edges, heuristic
+    return canonical_graph_records(assert_canonical_map(map_path))
 
 
 def _fault_windows(path: Path | None) -> list[FaultWindow]:
@@ -204,6 +195,12 @@ def _outcomes(
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
+    canonical_path = assert_canonical_map(args.map_path)
+    if canonical_path != CANONICAL_MAP_PATH or args.map_sha256 != CANONICAL_MAP_SHA256:
+        raise ValueError(
+            "G4IRSF11 worker is fixed-real-map-only: "
+            f"path={canonical_path}, declared_sha256={args.map_sha256}"
+        )
     workload = load_jsonl(args.workload)
     case_spec = parse_json_object(args.case_spec_json, label="--case-spec-json")
     input_artifact = parse_json_object(
@@ -227,12 +224,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             f"fault artifact does not match parent declaration: "
             f"actual={actual_fault_artifact}, declared={fault_artifact}"
         )
-    actual_map_sha256 = sha256_file(args.map_path)
+    actual_map_sha256 = normalised_text_sha256(canonical_path)
     if actual_map_sha256 != args.map_sha256:
         raise ValueError(
             f"map sha256 mismatch: actual={actual_map_sha256}, declared={args.map_sha256}"
         )
-    nodes, edges, heuristic = graph_records(args.map_path)
+    nodes, edges, heuristic = graph_records(canonical_path)
     windows = _fault_windows(args.fault_windows)
     memory_before, peak_before = process_working_set_bytes()
     wall_started = time.perf_counter()
@@ -302,6 +299,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     trace_context["run_id"] = args.run_id
     trace_context["scenario"] = args.scenario
     trace_context["fault_mode"] = args.fault_mode
+    trace_context["fixed_real_map_only"] = True
+    trace_context["canonical_map_sha256"] = CANONICAL_MAP_SHA256
     if args.trace_output is not None:
         _write_json(
             args.trace_output,
@@ -383,6 +382,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "input_artifact": input_artifact,
         "fault_artifact": fault_artifact,
         "map_sha256": args.map_sha256,
+        "map_identity": canonical_map_identity(),
+        "fixed_real_map_only": True,
         "source_sha256": args.source_sha256,
         "implementation_sha256": args.implementation_sha256,
         "scenario": args.scenario,

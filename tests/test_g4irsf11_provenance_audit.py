@@ -3,6 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_RELATIVE_PATH,
+    CANONICAL_MAP_SHA256,
+)
 from scripts.eval.g4irsf11_provenance_audit import assemble_provenance_audit
 
 
@@ -15,6 +19,12 @@ def _local(path: Path, *, status: str = "PASS", remote: str = HEAD) -> None:
             {
                 "schema": "czr005.g4irsf11.gate_integrity.v1",
                 "overall_status": status,
+                "fixed_real_map": {
+                    "fixed_real_map_only": True,
+                    "repo_relative_path": CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+                    "sha256": CANONICAL_MAP_SHA256,
+                    "topology_mutation_allowed": False,
+                },
                 "checks": [
                     {
                         "name": "git_provenance_and_state_clean",
@@ -50,6 +60,7 @@ def test_audit_passes_only_for_exact_clean_head_and_successful_push_run(tmp_path
     )
     assert audit["overall_status"] == "PASS"
     assert audit["protected_inputs_clean"] is True
+    assert audit["fixed_real_map_clean"] is True
 
 
 def test_unrelated_nonempty_remote_head_cannot_pass(tmp_path: Path) -> None:
@@ -76,3 +87,22 @@ def test_remote_failure_or_head_mismatch_cannot_pass(tmp_path: Path) -> None:
     )
     assert audit["remote_ci_status"] != "PASS"
     assert any("conclusion" in blocker for blocker in audit["blockers"])
+
+
+def test_missing_fixed_real_map_identity_cannot_pass(tmp_path: Path) -> None:
+    local = tmp_path / "local.json"
+    _local(local)
+    payload = json.loads(local.read_text(encoding="utf-8"))
+    payload.pop("fixed_real_map")
+    local.write_text(json.dumps(payload), encoding="utf-8")
+
+    audit = assemble_provenance_audit(
+        local,
+        remote_head_sha=HEAD,
+        remote_run_url="https://github.com/czr5454112-glitch/jichang_origin/actions/runs/123",
+        remote_conclusion="success",
+    )
+
+    assert audit["overall_status"] != "PASS"
+    assert audit["fixed_real_map_clean"] is False
+    assert any("fixed-real-map" in blocker for blocker in audit["blockers"])

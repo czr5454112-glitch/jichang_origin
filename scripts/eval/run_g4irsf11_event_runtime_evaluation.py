@@ -29,6 +29,13 @@ for path in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(path))
 
 from czr005.datasets.decision_trace import SamplingConfig
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_PATH,
+    CANONICAL_MAP_SHA256,
+    assert_canonical_map,
+    canonical_map_identity,
+    canonical_map_protocol_identity,
+)
 from scripts.eval.g4irsf11_evaluation_reporting import (
     case_row,
     gate_rows,
@@ -70,10 +77,20 @@ from scripts.eval.g4irsf11_result_validation import (
     validate_execution_descriptor,
     workload_binding,
 )
+from scripts.eval.g4irsf11_publication import (
+    artifact_bindings as publication_artifact_bindings,
+    begin_completion,
+    complete_publication,
+    completion_validation_errors,
+    create_staging_root,
+    promote_staged_artifacts,
+    semantic_file_sha256,
+    source_bundle_sha256,
+)
 from scripts.eval.run_g4irsf11_decision_trace_sampling import write_artifacts
 
 
-MAP_PATH = ROOT / "data" / "processed" / "maps" / "map2.json"
+MAP_PATH = CANONICAL_MAP_PATH
 SOURCE_TASK_PATH = ROOT / "data" / "processed" / "tasks" / "inputdata.jsonl"
 RUNTIME_ROOT = ROOT / ".pytest_cache" / "g4irsf11" / "event_evaluation"
 WORKLOAD_DIR = RUNTIME_ROOT / "workloads"
@@ -82,25 +99,80 @@ TRACE_DIR = RUNTIME_ROOT / "traces"
 EXECUTION_DIR = RUNTIME_ROOT / "executions"
 FAULT_DIR = RUNTIME_ROOT / "faults"
 PROTOCOL_PATH = ROOT / "artifacts" / "gates" / "g4irsf11_event_runtime_protocol.json"
+FORMAL_COMPLETION_PATH = (
+    ROOT / "artifacts" / "gates" / "g4irsf11_event_runtime_completion.json"
+)
 CASE_TABLE = ROOT / "outputs" / "tables" / "g4irsf11_event_runtime_case_ledger.csv"
 PROTOCOL_LOCK = RUNTIME_ROOT / "shared_protocol.lock"
 CONSOLIDATION_LOCK = RUNTIME_ROOT / "shared_consolidation.lock"
 
-IMPLEMENTATION_FILES = (
-    ROOT / "cpp" / "ics_core" / "runtime" / "event_driven_junction.hpp",
-    ROOT / "cpp" / "ics_core" / "bindings" / "czr005_cpp.cpp",
-    ROOT / "src" / "czr005" / "cpp_backend.py",
-    ROOT / "scripts" / "eval" / "g4irsf11_workloads.py",
-    ROOT / "scripts" / "eval" / "g4irsf11_capacity_metrics.py",
-    ROOT / "scripts" / "eval" / "g4irsf11_fault_metrics.py",
-    ROOT / "scripts" / "eval" / "g4irsf11_continuity_metrics.py",
-    ROOT / "scripts" / "eval" / "g4irsf11_experiment_protocol.py",
-    ROOT / "scripts" / "eval" / "g4irsf11_evaluation_reporting.py",
-    ROOT / "scripts" / "eval" / "g4irsf11_result_validation.py",
-    ROOT / "scripts" / "eval" / "run_g4irsf11_event_case.py",
-    ROOT / "scripts" / "eval" / "run_g4irsf11_event_runtime_evaluation.py",
-    ROOT / "scripts" / "eval" / "run_g4irsf11_system_extensions.py",
+CPP_IMPLEMENTATION_FILES = tuple(
+    sorted(
+        path
+        for path in (ROOT / "cpp" / "ics_core").rglob("*")
+        if path.is_file() and path.suffix.lower() in {".c", ".cc", ".cpp", ".h", ".hpp"}
+    )
 )
+PYTHON_IMPLEMENTATION_FILES = tuple(
+    sorted(
+        {
+            *(ROOT / "src" / "czr005").rglob("*.py"),
+            *(ROOT / "scripts" / "eval").glob("g4irsf11*.py"),
+            *(ROOT / "scripts" / "eval").glob("run_g4irsf11*.py"),
+            ROOT / "scripts" / "eval" / "validate_g4irsf11_committed_artifacts.py",
+            ROOT / "scripts" / "eval" / "g4i_runtime.py",
+        }
+    )
+)
+IMPLEMENTATION_FILES = (
+    ROOT / "CMakeLists.txt",
+    *CPP_IMPLEMENTATION_FILES,
+    *PYTHON_IMPLEMENTATION_FILES,
+)
+
+FORMAL_PUBLICATION_ARTIFACTS = (
+    "artifacts/gates/g4irsf11_event_runtime_protocol.json",
+    "artifacts/datasets/g4irsf11_decision_trace_schema.json",
+    "artifacts/datasets/g4irsf11_decision_trace_manifest.json",
+    "artifacts/datasets/g4irsf11_decision_trace_sample.jsonl",
+    "artifacts/datasets/g4irsf11_decision_outcome_sample.jsonl",
+    "outputs/tables/g4irsf11_event_runtime_case_ledger.csv",
+    "outputs/tables/g4irsf11_event_runtime_size_ladder.csv",
+    "outputs/tables/g4irsf11_capacity_frontier.csv",
+    "outputs/tables/g4irsf11_system_ablation.csv",
+    "outputs/tables/g4irsf11_temporal_fault_repair.csv",
+    "outputs/tables/g4irsf11_resource_runtime.csv",
+    "outputs/tables/g4irsf11_event_runtime_gate.csv",
+    "outputs/tables/g4irsf11_event_runtime_negative_attempts.csv",
+    "outputs/tables/g4irsf11_stratified_hard_case_index.csv",
+    "outputs/tables/g4irsf11_sampling_balance.csv",
+    "outputs/tables/g4irsf11_feature_lineage_audit.csv",
+    "outputs/tables/g4irsf11_source_release_decision_mapping.csv",
+    "outputs/tables/g4irsf11_source_identity_audit.csv",
+    "outputs/reports/g4irsf11_event_runtime_correctness_report.md",
+    "outputs/reports/g4irsf11_capacity_frontier_report.md",
+    "outputs/reports/g4irsf11_system_ablation_report.md",
+    "outputs/reports/g4irsf11_temporal_fault_report.md",
+    "outputs/reports/g4irsf11_runtime_resource_report.md",
+    "outputs/reports/g4irsf11_claim_boundary_report.md",
+    "outputs/reports/g4irsf11_sampling_balance_report.md",
+    "outputs/reports/g4irsf11_feature_lineage_audit.md",
+    "outputs/reports/g4irsf11_source_identity_audit.md",
+)
+
+
+def _fixed_map_protocol_manifest(
+    base: Mapping[str, Any] | None = None,
+    *,
+    extension: bool = False,
+) -> dict[str, Any]:
+    manifest = dict(
+        base
+        or (system_extension_manifest() if extension else protocol_manifest())
+    )
+    manifest["fixed_real_map_only"] = True
+    manifest["canonical_map"] = canonical_map_protocol_identity()
+    return manifest
 
 
 def _write_json(path: Path, value: Mapping[str, Any]) -> None:
@@ -141,6 +213,55 @@ def _read_jsonl_objects(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def _source_identity_from_payload(payload: bytes) -> dict[str, Any]:
+    normalized = payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return {
+        "path": SOURCE_TASK_PATH.relative_to(ROOT).as_posix(),
+        "raw_bytes_sha256": hashlib.sha256(payload).hexdigest(),
+        "semantic_sha256": hashlib.sha256(normalized).hexdigest(),
+        "semantic_hash_semantics": (
+            "sha256 of text bytes after CRLF/CR newline normalization to LF"
+        ),
+        "row_count": sum(bool(line.strip()) for line in normalized.splitlines()),
+    }
+
+
+def load_source_task_snapshot() -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    payload = SOURCE_TASK_PATH.read_bytes()
+    identity = _source_identity_from_payload(payload)
+    rows: list[dict[str, Any]] = []
+    for line_number, line in enumerate(payload.decode("utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        rows.append(
+            parse_json_object(line, label=f"{SOURCE_TASK_PATH}:{line_number}")
+        )
+    if len(rows) != identity["row_count"]:
+        raise ValueError("source task snapshot row count changed during parsing")
+    return rows, identity
+
+
+def source_task_identity() -> dict[str, Any]:
+    return _source_identity_from_payload(SOURCE_TASK_PATH.read_bytes())
+
+
+def assert_frozen_inputs_unchanged(
+    expected_source: Mapping[str, Any], expected_map: Mapping[str, Any]
+) -> None:
+    actual_source = source_task_identity()
+    if actual_source != dict(expected_source):
+        raise RuntimeError(
+            "G4IRSF11 source task changed during the measurement cohort; "
+            "all affected cases must be rerun"
+        )
+    actual_map = canonical_map_identity()
+    if actual_map != dict(expected_map):
+        raise RuntimeError(
+            "G4IRSF11 canonical map changed during the measurement cohort; "
+            "all affected cases must be rerun"
+        )
+
+
 def implementation_sha256(search_path: Path) -> str:
     candidates = list(IMPLEMENTATION_FILES)
     binaries = sorted(search_path.glob("czr005_cpp*.pyd")) + sorted(
@@ -161,6 +282,211 @@ def implementation_sha256(search_path: Path) -> str:
         digest.update(sha256_file(path).encode("ascii"))
         digest.update(b"\n")
     return digest.hexdigest()
+
+
+def implementation_source_sha256() -> str:
+    return source_bundle_sha256(IMPLEMENTATION_FILES, ROOT)
+
+
+def _formal_case_set_sha256() -> str:
+    return canonical_manifest_sha256(
+        {"case_ids": [case.case_id for case in formal_cases()]}
+    )
+
+
+def _formal_producer(
+    args: argparse.Namespace,
+    *,
+    implementation_digest: str,
+    frozen_source_identity: Mapping[str, Any] | None = None,
+    frozen_map_identity: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    source_identity_value = dict(frozen_source_identity or source_task_identity())
+    map_identity_value = dict(frozen_map_identity or canonical_map_identity())
+    return {
+        "schema": "czr005.g4irsf11.evidence_producer.v1",
+        "scope": "formal",
+        "protocol_version": PROTOCOL_VERSION,
+        "protocol_manifest_sha256": canonical_manifest_sha256(
+            _fixed_map_protocol_manifest()
+        ),
+        "fixed_real_map_only": True,
+        "canonical_map_path": map_identity_value["repo_relative_path"],
+        "canonical_map_sha256": map_identity_value["sha256"],
+        "canonical_map_raw_bytes_sha256": map_identity_value["raw_bytes_sha256"],
+        "topology_mutation_allowed": map_identity_value["topology_mutation_allowed"],
+        "source_task_path": source_identity_value["path"],
+        "source_task_raw_bytes_sha256": source_identity_value["raw_bytes_sha256"],
+        "source_task_semantic_sha256": source_identity_value["semantic_sha256"],
+        "source_task_row_count": source_identity_value["row_count"],
+        "implementation_sha256": implementation_digest,
+        "implementation_source_bundle_sha256": implementation_source_sha256(),
+        "measurement_cohort": _measurement_cohort(args),
+        "formal_case_set_sha256": _formal_case_set_sha256(),
+        "expected_case_count": len(formal_cases()),
+    }
+
+
+def _formal_completion_metadata(
+    args: argparse.Namespace,
+    *,
+    implementation_digest: str,
+    executed_case_count: int,
+    decision_artifacts_ready: bool,
+    no_smoke_substitution_pass: bool,
+    frozen_source_identity: Mapping[str, Any] | None = None,
+    frozen_map_identity: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    source_identity_value = dict(frozen_source_identity or source_task_identity())
+    map_identity_value = dict(frozen_map_identity or canonical_map_identity())
+    producer = _formal_producer(
+        args,
+        implementation_digest=implementation_digest,
+        frozen_source_identity=source_identity_value,
+        frozen_map_identity=map_identity_value,
+    )
+    return {
+        "scope": "formal",
+        "protocol_version": PROTOCOL_VERSION,
+        "protocol_manifest_sha256": canonical_manifest_sha256(
+            _fixed_map_protocol_manifest()
+        ),
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": map_identity_value["sha256"],
+        "canonical_map_path": map_identity_value["repo_relative_path"],
+        "canonical_map_raw_bytes_sha256": map_identity_value["raw_bytes_sha256"],
+        "topology_mutation_allowed": map_identity_value["topology_mutation_allowed"],
+        "source_task_path": source_identity_value["path"],
+        "source_task_raw_bytes_sha256": source_identity_value["raw_bytes_sha256"],
+        "source_task_semantic_sha256": source_identity_value["semantic_sha256"],
+        "source_task_row_count": source_identity_value["row_count"],
+        "implementation_sha256": implementation_digest,
+        "implementation_source_bundle_sha256": implementation_source_sha256(),
+        "measurement_cohort": _measurement_cohort(args),
+        "concurrent_worker_target": int(args.concurrent_worker_target),
+        "expected_case_count": len(formal_cases()),
+        "executed_case_count": int(executed_case_count),
+        "formal_case_set_sha256": _formal_case_set_sha256(),
+        "decision_artifacts_ready": bool(decision_artifacts_ready),
+        "no_smoke_substitution_pass": bool(no_smoke_substitution_pass),
+        "producer": producer,
+        "producer_sha256": canonical_manifest_sha256(producer),
+    }
+
+
+def formal_completion_validation_errors(root: Path = ROOT) -> list[str]:
+    current_source_identity = source_task_identity()
+    current_map_identity = canonical_map_identity()
+    expected_metadata = {
+        "protocol_version": PROTOCOL_VERSION,
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": current_map_identity["sha256"],
+        "canonical_map_path": current_map_identity["repo_relative_path"],
+        "topology_mutation_allowed": current_map_identity["topology_mutation_allowed"],
+        "source_task_path": current_source_identity["path"],
+        "source_task_semantic_sha256": current_source_identity["semantic_sha256"],
+        "source_task_row_count": current_source_identity["row_count"],
+        "expected_case_count": len(formal_cases()),
+        "executed_case_count": len(formal_cases()),
+        "formal_case_set_sha256": _formal_case_set_sha256(),
+        "decision_artifacts_ready": True,
+        "no_smoke_substitution_pass": True,
+    }
+    completion_path = root / FORMAL_COMPLETION_PATH.relative_to(ROOT)
+    errors = completion_validation_errors(
+        root,
+        completion_path,
+        expected_scope="formal",
+        expected_source_bundle_sha256=implementation_source_sha256(),
+        expected_protocol_manifest_sha256=canonical_manifest_sha256(
+            _fixed_map_protocol_manifest()
+        ),
+        expected_artifact_paths=FORMAL_PUBLICATION_ARTIFACTS,
+        expected_metadata=expected_metadata,
+    )
+    protocol_path = root / PROTOCOL_PATH.relative_to(ROOT)
+    try:
+        published_protocol = read_json_object(protocol_path)
+    except (FileNotFoundError, OSError, TypeError, ValueError) as exc:
+        errors.append(
+            f"published formal protocol cannot be decoded: {type(exc).__name__}: {exc}"
+        )
+    else:
+        if published_protocol != _fixed_map_protocol_manifest():
+            errors.append("published formal protocol differs from the exact protocol")
+    if completion_path.is_file():
+        try:
+            completion = read_json_object(completion_path)
+        except (OSError, TypeError, ValueError):
+            completion = {}
+        runtime_digest = str(completion.get("implementation_sha256") or "")
+        if len(runtime_digest) != 64 or any(
+            character not in "0123456789abcdef" for character in runtime_digest
+        ):
+            errors.append("completion runtime implementation SHA-256 is invalid")
+        for raw_key in (
+            "canonical_map_raw_bytes_sha256",
+            "source_task_raw_bytes_sha256",
+        ):
+            raw_digest = str(completion.get(raw_key) or "")
+            if len(raw_digest) != 64 or any(
+                character not in "0123456789abcdef" for character in raw_digest
+            ):
+                errors.append(f"completion {raw_key} is invalid")
+        producer = (
+            completion.get("producer")
+            if isinstance(completion.get("producer"), Mapping)
+            else {}
+        )
+        if producer.get("scope") != "formal":
+            errors.append("completion producer scope is not formal")
+        if completion.get("producer_sha256") != canonical_manifest_sha256(producer):
+            errors.append("completion producer SHA-256 binding differs")
+        for key in (
+            "protocol_version",
+            "protocol_manifest_sha256",
+            "fixed_real_map_only",
+            "canonical_map_path",
+            "canonical_map_sha256",
+            "canonical_map_raw_bytes_sha256",
+            "topology_mutation_allowed",
+            "source_task_path",
+            "source_task_raw_bytes_sha256",
+            "source_task_semantic_sha256",
+            "source_task_row_count",
+            "implementation_sha256",
+            "implementation_source_bundle_sha256",
+            "measurement_cohort",
+            "formal_case_set_sha256",
+            "expected_case_count",
+        ):
+            if producer.get(key) != completion.get(key):
+                errors.append(f"completion producer field differs: {key}")
+        cohort = completion.get("measurement_cohort")
+        if not isinstance(cohort, Mapping) or not str(cohort.get("name") or "").strip():
+            errors.append("completion measurement cohort is empty")
+        try:
+            worker_target = int(
+                cohort.get("declared_concurrent_worker_target")
+                if isinstance(cohort, Mapping)
+                else 0
+            )
+        except (TypeError, ValueError):
+            worker_target = 0
+        if worker_target <= 0:
+            errors.append("completion concurrent worker target is invalid")
+        if completion.get("concurrent_worker_target") != worker_target:
+            errors.append("completion top-level worker target differs from cohort")
+    return errors
+
+
+def assert_implementation_unchanged(expected: str, search_path: Path) -> None:
+    actual = implementation_sha256(search_path)
+    if actual != expected:
+        raise RuntimeError(
+            "G4IRSF11 implementation changed during the measurement cohort; "
+            f"expected={expected}, actual={actual}. All affected cases must be rerun."
+        )
 
 
 def timeline_spanning_sample(
@@ -216,13 +542,25 @@ def _release_case_lock(token: dict[str, Any]) -> None:
     path = Path(token["path"])
     try:
         current = read_json_object(path)
-    except (FileNotFoundError, OSError, ValueError, json.JSONDecodeError):
-        current = {}
+    except FileNotFoundError:
+        token["released"] = True
+        return
+    except (OSError, ValueError, json.JSONDecodeError):
+        # Keep the token live so atexit (or an explicit retry) can try again.
+        return
     if (
         current.get("pid") == token.get("pid")
         and current.get("nonce") == token.get("nonce")
     ):
-        path.unlink(missing_ok=True)
+        try:
+            path.unlink(missing_ok=True)
+        except OSError:
+            # Do not let one cleanup failure prevent later case/consolidation
+            # locks from being released; retain this token for a retry.
+            return
+        token["released"] = True
+        return
+    # The path no longer names our lease.  Never unlink another owner.
     token["released"] = True
 
 
@@ -259,8 +597,6 @@ def _acquire_case_lock(
         },
         sort_keys=True,
     ).encode("utf-8")
-    os.write(descriptor, payload)
-    os.fsync(descriptor)
     token: dict[str, Any] = {
         "descriptor": descriptor,
         "path": path,
@@ -268,8 +604,54 @@ def _acquire_case_lock(
         "nonce": nonce,
         "released": False,
     }
-    atexit.register(_release_case_lock, token)
+    try:
+        remaining = memoryview(payload)
+        while remaining:
+            written = os.write(descriptor, remaining)
+            if written <= 0:
+                raise OSError("short write while creating case lock")
+            remaining = remaining[written:]
+        os.fsync(descriptor)
+        atexit.register(_release_case_lock, token)
+    except BaseException:
+        try:
+            os.close(descriptor)
+        except OSError:
+            pass
+        try:
+            path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        token["released"] = True
+        raise
     return token
+
+
+def _acquire_all_case_locks(
+    cases: Sequence[CaseSpec], *, scope: str, wait_seconds: float
+) -> list[dict[str, Any]] | None:
+    """Hold a stable snapshot boundary against every execute-only writer."""
+
+    deadline = time.monotonic() + max(0.0, wait_seconds)
+    tokens: list[dict[str, Any]] = []
+    try:
+        for case in sorted(cases, key=lambda value: value.case_id):
+            remaining = max(0.0, deadline - time.monotonic())
+            token = _acquire_case_lock(
+                _case_paths(case)["lock"],
+                f"{scope}:{case.case_id}",
+                wait_seconds=remaining,
+            )
+            if token is None:
+                for acquired in reversed(tokens):
+                    _release_case_lock(acquired)
+                return None
+            tokens.append(token)
+    except BaseException:
+        for acquired in reversed(tokens):
+            _release_case_lock(acquired)
+        raise
+    return tokens
 
 
 def _archive_existing_attempt(
@@ -442,13 +824,9 @@ def _descriptor_matches(
     expected_workload_rows: Sequence[Mapping[str, Any]] | None = None,
     expected_fault_rows: Sequence[Mapping[str, Any]] | None = None,
 ) -> bool:
-    manifest = dict(
-        protocol_manifest_value
-        or (
-            system_extension_manifest()
-            if protocol_version == EXTENSION_PROTOCOL_VERSION
-            else protocol_manifest()
-        )
+    manifest = _fixed_map_protocol_manifest(
+        protocol_manifest_value,
+        extension=protocol_version == EXTENSION_PROTOCOL_VERSION,
     )
     identity_matches = (
         descriptor.get("schema") == EXECUTION_DESCRIPTOR_SCHEMA
@@ -458,6 +836,9 @@ def _descriptor_matches(
         and descriptor.get("case") == case.as_dict()
         and descriptor.get("source_sha256") == source_sha256
         and descriptor.get("map_sha256") == map_sha256
+        and descriptor.get("fixed_real_map_only") is True
+        and (descriptor.get("map_identity") or {}).get("sha256")
+        == CANONICAL_MAP_SHA256
         and descriptor.get("implementation_sha256") == implementation_digest
         and descriptor.get("status") == "EXECUTED"
         and descriptor.get("return_code") == 0
@@ -965,7 +1346,7 @@ def execute_case(
         return None, blocked
     descriptor: dict[str, Any] = {}
     try:
-        manifest = dict(protocol_manifest_value or protocol_manifest())
+        manifest = _fixed_map_protocol_manifest(protocol_manifest_value)
         protocol_manifest_digest = canonical_manifest_sha256(manifest)
         workload, windows = _canonical_case_inputs(case, base_rows)
         input_artifact = workload_binding(paths["workload"], workload)
@@ -1083,6 +1464,8 @@ def execute_case(
             "config": _worker_config(case, args),
             "source_sha256": source_sha256,
             "map_sha256": map_sha256,
+            "map_identity": canonical_map_identity(),
+            "fixed_real_map_only": True,
             "implementation_sha256": implementation_digest,
             "input_sha256": input_artifact["sha256"],
             "input_artifact": input_artifact,
@@ -1273,9 +1656,11 @@ def _load_all_rows(
     return rows
 
 
-def _write_tables_and_reports(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    write_csv(CASE_TABLE, rows)
-    table_dir = ROOT / "outputs" / "tables"
+def _write_tables_and_reports(
+    rows: Sequence[Mapping[str, Any]], *, output_root: Path = ROOT
+) -> list[dict[str, Any]]:
+    write_csv(output_root / CASE_TABLE.relative_to(ROOT), rows)
+    table_dir = output_root / "outputs" / "tables"
     categories = {
         "size_ladder": "g4irsf11_event_runtime_size_ladder.csv",
         "capacity_frontier": "g4irsf11_capacity_frontier.csv",
@@ -1287,6 +1672,7 @@ def _write_tables_and_reports(rows: Sequence[Mapping[str, Any]]) -> list[dict[st
         write_csv(table_dir / filename, category_rows)
     resource_fields = (
         "case_id", "category", "workload_mode", "scale", "execution_status",
+        "protocol_manifest_sha256", "map_sha256",
         "workload_segment_count", "raw_bag_count", "junction_count",
         "peak_active_bag_count", "runtime_thread_count", "peak_working_set_bytes",
         "cpp_internal_accounted_bytes", "peak_junction_local_state_accounted_bytes",
@@ -1311,10 +1697,14 @@ def _write_tables_and_reports(rows: Sequence[Mapping[str, Any]]) -> list[dict[st
             item["attempt_ordinal"] = ordinal
             if item.get("execution_status") != "EXECUTED" or not item.get("completion_pass"):
                 history_rows.append(item)
-    if history_rows:
-        write_csv(table_dir / "g4irsf11_event_runtime_negative_attempts.csv", history_rows)
-    write_reports(ROOT, rows)
-    write_claim_boundary(ROOT, rows, gates)
+    negative_fields = None if history_rows else [*rows[0], "attempt_ordinal"]
+    write_csv(
+        table_dir / "g4irsf11_event_runtime_negative_attempts.csv",
+        history_rows,
+        fieldnames=negative_fields,
+    )
+    write_reports(output_root, rows)
+    write_claim_boundary(output_root, rows, gates)
     return gates
 
 
@@ -1342,6 +1732,8 @@ def _build_decision_artifacts(
     implementation_digest: str,
     expected_args: argparse.Namespace | None = None,
     base_rows: Sequence[Mapping[str, Any]] | None = None,
+    output_root: Path = ROOT,
+    producer: Mapping[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     trace_cases = [case for case in cases if case.category == "decision_trace"]
     if not trace_cases:
@@ -1410,7 +1802,71 @@ def _build_decision_artifacts(
             seed="czr005-g4irsf11-stratified-reservoir-v1",
         ),
         include_routine=False,
+        output_root=output_root,
+        publication_root=ROOT,
+        producer=producer,
     )
+
+
+def _formal_stage_validation_errors(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    args: argparse.Namespace,
+    implementation_digest: str,
+    decision_manifest: Mapping[str, Any] | None,
+    producer: Mapping[str, Any],
+    stage_root: Path,
+) -> list[str]:
+    errors: list[str] = []
+    cases = formal_cases()
+    expected_ids = [case.case_id for case in cases]
+    actual_ids = [str(row.get("case_id") or "") for row in rows]
+    if actual_ids != expected_ids or len(set(actual_ids)) != len(actual_ids):
+        errors.append("formal staged ledger case set/order is not exact")
+    protocol_digest = canonical_manifest_sha256(_fixed_map_protocol_manifest())
+    expected_cohort = _measurement_cohort(args)
+    for row in rows:
+        case_id = str(row.get("case_id") or "<missing>")
+        if row.get("execution_status") != "EXECUTED":
+            errors.append(f"formal staged case is not EXECUTED: {case_id}")
+        if row.get("protocol_manifest_sha256") != protocol_digest:
+            errors.append(f"formal staged case protocol differs: {case_id}")
+        if row.get("map_sha256") != CANONICAL_MAP_SHA256:
+            errors.append(f"formal staged case map differs: {case_id}")
+        if row.get("implementation_sha256") != implementation_digest:
+            errors.append(f"formal staged case implementation differs: {case_id}")
+        if row.get("measurement_cohort") != expected_cohort["name"]:
+            errors.append(f"formal staged case cohort differs: {case_id}")
+        if row.get("declared_concurrent_worker_target") != expected_cohort[
+            "declared_concurrent_worker_target"
+        ]:
+            errors.append(f"formal staged case worker target differs: {case_id}")
+    if decision_manifest is None:
+        errors.append("formal staged decision artifacts are not ready")
+    elif decision_manifest.get("producer") != dict(producer):
+        errors.append("formal staged decision manifest producer differs")
+    try:
+        from scripts.eval.validate_g4irsf11_committed_artifacts import (
+            validate_committed_artifacts,
+        )
+
+        committed = validate_committed_artifacts(
+            stage_root,
+            canonical_map_path=MAP_PATH,
+            require_completion=False,
+        )
+    except (OSError, TypeError, ValueError) as exc:
+        errors.append(
+            "formal staged committed-artifact validation raised: "
+            f"{type(exc).__name__}: {exc}"
+        )
+    else:
+        if committed.get("status") != "PASS":
+            errors.extend(
+                f"formal staged committed artifact: {failure}"
+                for failure in committed.get("failures", [])
+            )
+    return errors
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1474,29 +1930,27 @@ def main(argv: Sequence[str] | None = None) -> int:
                 f"no cases matched categories={args.category} workload_modes={args.workload_mode}"
             )
 
-    manifest = protocol_manifest()
-    protocol_lock = _acquire_case_lock(
-        PROTOCOL_LOCK,
-        "shared_protocol_manifest",
-        wait_seconds=args.shared_lock_timeout_seconds,
-    )
-    if protocol_lock is None:
-        raise SystemExit(
-            f"could not acquire shared protocol lock {PROTOCOL_LOCK}; prove its owner stopped before removal"
-        )
-    try:
-        _write_json(PROTOCOL_PATH, manifest)
-    finally:
-        _release_case_lock(protocol_lock)
-    base_rows = load_jsonl(SOURCE_TASK_PATH)
+    assert_canonical_map(MAP_PATH)
+    frozen_map_identity = canonical_map_identity()
+    manifest = _fixed_map_protocol_manifest()
+    base_rows, frozen_source_identity = load_source_task_snapshot()
     if len(base_rows) != 43_603:
         raise SystemExit(f"formal source task count must be 43603, got {len(base_rows)}")
-    source_sha256 = sha256_file(SOURCE_TASK_PATH)
-    map_sha256 = sha256_file(MAP_PATH)
+    source_sha256 = str(frozen_source_identity["raw_bytes_sha256"])
+    map_sha256 = CANONICAL_MAP_SHA256
     implementation_digest = implementation_sha256(args.search_path)
+
+    def assert_measurement_identity_unchanged() -> None:
+        assert_implementation_unchanged(implementation_digest, args.search_path)
+        assert_frozen_inputs_unchanged(
+            frozen_source_identity, frozen_map_identity
+        )
+
+    assert_measurement_identity_unchanged()
 
     failures = 0
     for index, case in enumerate(selected, start=1):
+        assert_measurement_identity_unchanged()
         print(f"[g4irsf11-event] {index}/{len(selected)} START {case.case_id}", flush=True)
         _, execution = execute_case(
             case,
@@ -1507,6 +1961,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             implementation_digest=implementation_digest,
             protocol_manifest_value=manifest,
         )
+        assert_measurement_identity_unchanged()
         if execution.get("status") != "EXECUTED":
             failures += 1
         print(
@@ -1515,6 +1970,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
 
     if args.execute_only:
+        assert_measurement_identity_unchanged()
         print(
             "[g4irsf11-event] execute-only summary",
             f"selected={len(selected)}",
@@ -1533,7 +1989,23 @@ def main(argv: Sequence[str] | None = None) -> int:
             f"could not acquire shared consolidation lock {CONSOLIDATION_LOCK}; "
             "no shared report was rewritten"
         )
+    case_snapshot_locks: list[dict[str, Any]] = []
+    stage_errors: list[str] = []
     try:
+        acquired_case_locks = _acquire_all_case_locks(
+            cases,
+            scope="formal_consolidation_snapshot",
+            wait_seconds=args.shared_lock_timeout_seconds,
+        )
+        if acquired_case_locks is None:
+            raise SystemExit(
+                "could not acquire every formal case lock within the shared timeout; "
+                "no staged or published report was rewritten"
+            )
+        case_snapshot_locks = acquired_case_locks
+        stage_root = create_staging_root(ROOT, "formal")
+        assert_measurement_identity_unchanged()
+        _write_json(stage_root / PROTOCOL_PATH.relative_to(ROOT), manifest)
         rows = _load_all_rows(
             cases,
             source_sha256=source_sha256,
@@ -1542,7 +2014,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             expected_args=args,
             base_rows=base_rows,
         )
-        gates = _write_tables_and_reports(rows)
+        gates = _write_tables_and_reports(rows, output_root=stage_root)
+        producer = _formal_producer(
+            args,
+            implementation_digest=implementation_digest,
+            frozen_source_identity=frozen_source_identity,
+            frozen_map_identity=frozen_map_identity,
+        )
         decision_manifest = _build_decision_artifacts(
             cases,
             source_sha256=source_sha256,
@@ -1550,10 +2028,83 @@ def main(argv: Sequence[str] | None = None) -> int:
             implementation_digest=implementation_digest,
             expected_args=args,
             base_rows=base_rows,
+            output_root=stage_root,
+            producer=producer,
         )
+        assert_measurement_identity_unchanged()
+        executed_case_count = sum(
+            row["execution_status"] == "EXECUTED" for row in rows
+        )
+        stage_errors.extend(
+            _formal_stage_validation_errors(
+                rows,
+                args=args,
+                implementation_digest=implementation_digest,
+                decision_manifest=decision_manifest,
+                producer=producer,
+                stage_root=stage_root,
+            )
+        )
+        try:
+            staged_bindings = publication_artifact_bindings(
+                stage_root, FORMAL_PUBLICATION_ARTIFACTS
+            )
+        except (FileNotFoundError, OSError, TypeError, ValueError) as exc:
+            stage_errors.append(
+                "formal staged publication binding failed: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            staged_bindings = {}
+        complete = (
+            not failures
+            and not stage_errors
+            and executed_case_count == len(rows) == len(cases)
+            and decision_manifest is not None
+        )
+        final_metadata = _formal_completion_metadata(
+            args,
+            implementation_digest=implementation_digest,
+            executed_case_count=executed_case_count,
+            decision_artifacts_ready=decision_manifest is not None,
+            no_smoke_substitution_pass=complete,
+            frozen_source_identity=frozen_source_identity,
+            frozen_map_identity=frozen_map_identity,
+        )
+        if complete:
+            assert_measurement_identity_unchanged()
+            transaction = begin_completion(
+                FORMAL_COMPLETION_PATH,
+                final_metadata,
+                expected_bindings=staged_bindings,
+            )
+            promote_staged_artifacts(
+                stage_root,
+                ROOT,
+                FORMAL_PUBLICATION_ARTIFACTS,
+                staged_bindings,
+            )
+            assert_measurement_identity_unchanged()
+            complete_publication(
+                FORMAL_COMPLETION_PATH,
+                final_metadata,
+                root=ROOT,
+                artifact_paths=FORMAL_PUBLICATION_ARTIFACTS,
+                expected_bindings=staged_bindings,
+                publication_id=str(transaction["publication_id"]),
+            )
+            try:
+                assert_measurement_identity_unchanged()
+            except Exception:
+                begin_completion(
+                    FORMAL_COMPLETION_PATH,
+                    final_metadata,
+                    expected_bindings=staged_bindings,
+                )
+                raise
     finally:
+        for case_lock in reversed(case_snapshot_locks):
+            _release_case_lock(case_lock)
         _release_case_lock(consolidation_lock)
-    complete = all(row["execution_status"] == "EXECUTED" for row in rows)
     print(
         "[g4irsf11-event] summary",
         f"selected={len(selected)}",
@@ -1563,6 +2114,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         f"decision_manifest={'written' if decision_manifest else 'not_ready'}",
         flush=True,
     )
+    for blocker in stage_errors:
+        print(f"[g4irsf11-event] publication blocker: {blocker}", flush=True)
     if failures:
         return 2
     if not complete:

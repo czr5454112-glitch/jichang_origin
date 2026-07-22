@@ -81,4 +81,8 @@ def test_hard_case_audit_detects_duplicates_and_missing_families() -> None:
     assert summary["covers_fault"] is False
     assert summary["covers_tail"] is False
     assert summary["required_family_gate"] is False
+    assert summary["source_node_evidence_count"] == 0
+    assert summary["source_goal_distribution_status"] == "UNVERIFIED_MISSING_SOURCE_OR_GOAL"
+    assert summary["sampling_bias_status"] == "UNVERIFIED_NO_STRATUM_WEIGHT_EVIDENCE"
+    assert summary["legacy_hardcase_gate_status"] == "FAIL"
     assert any(row["dimension"] == "scenario" for row in distributions)

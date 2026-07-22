@@ -73,6 +73,8 @@ def case_row(
         "run_id": execution.get("run_id", ""),
         "protocol_version": execution.get("protocol_version", ""),
         "protocol_manifest_sha256": execution.get("protocol_manifest_sha256", ""),
+        "implementation_sha256": execution.get("implementation_sha256", ""),
+        "map_sha256": execution.get("map_sha256", ""),
         "input_sha256": execution.get("input_sha256", ""),
         "result_sha256": _value(execution, "result_artifact", "sha256", default=""),
         "measurement_cohort": _value(execution, "measurement_cohort", "name", default=""),
@@ -173,17 +175,22 @@ def case_row(
     }
 
 
-def write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+def write_csv(
+    path: Path,
+    rows: Sequence[Mapping[str, Any]],
+    fieldnames: Sequence[str] | None = None,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    if not rows:
+    if not rows and not fieldnames:
         raise ValueError(f"refusing to write empty CSV: {path}")
-    fieldnames: list[str] = []
-    for row in rows:
-        for key in row:
-            if key not in fieldnames:
-                fieldnames.append(str(key))
+    output_fields: list[str] = list(fieldnames or ())
+    if not output_fields:
+        for row in rows:
+            for key in row:
+                if key not in output_fields:
+                    output_fields.append(str(key))
     handle = io.StringIO(newline="")
-    writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+    writer = csv.DictWriter(handle, fieldnames=output_fields, extrasaction="ignore")
     writer.writeheader()
     writer.writerows(rows)
     atomic_write_text(path, handle.getvalue())

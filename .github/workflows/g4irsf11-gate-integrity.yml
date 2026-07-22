@@ -34,7 +34,9 @@ jobs:
           PYTHONPATH: build-ci/python
         run: >-
           python -m pytest -q
+          tests/test_g4irsf11_fixed_map.py
           tests/test_g4irsf11_gate_integrity.py
+          tests/test_g4irsf11_g4irsf10_audit.py
           tests/test_g4irsf11_decision_trace_sampling.py
           tests/test_g4irsf11_capacity_metrics.py
           tests/test_g4irsf11_fault_metrics.py

@@ -17,7 +17,15 @@ from typing import Any, Iterable
 
 
 ROOT = Path(__file__).resolve().parents[2]
-MAP_PATH = ROOT / "data" / "processed" / "maps" / "map2.json"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.eval.g4irsf11_fixed_map import (  # noqa: E402
+    CANONICAL_MAP_PATH,
+    canonical_graph_records,
+)
+
+MAP_PATH = CANONICAL_MAP_PATH
 LEGACY_MAP_PATH = ROOT / "legacy" / "jichang_origin_readonly" / "map2.txt"
 TASK_PATH = ROOT / "data" / "processed" / "tasks" / "inputdata.jsonl"
 MODEL_PATH = ROOT / "artifacts" / "models" / "g4e_risk_calibrated_policy.json"
@@ -161,24 +169,7 @@ def _official_mode() -> PolicyMode:
 
 
 def _graph_records() -> tuple[list[Any], list[Any], list[list[float]]]:
-    data = json.loads(MAP_PATH.read_text(encoding="utf-8"))
-    nodes = [
-        (
-            int(node["location"]),
-            int(node["node_type"]),
-            float(node["service_time"]),
-            int(node["x"]),
-            int(node["y"]),
-            [int(value) for value in node["outgoing"]],
-        )
-        for node in data["nodes"]
-    ]
-    edges = [
-        (int(edge["start"]), int(edge["end"]), float(edge["length"]), float(edge["speed"]))
-        for edge in data["edges"]
-    ]
-    heuristic = [[float(value) for value in row] for row in data["heuristic_time"]]
-    return nodes, edges, heuristic
+    return canonical_graph_records(MAP_PATH)
 
 
 def _task_lookup() -> dict[tuple[int, str], dict[str, Any]]:

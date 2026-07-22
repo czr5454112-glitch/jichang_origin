@@ -33,6 +33,13 @@ from typing import Any, Iterable, Mapping, Sequence
 import numpy as np
 
 from czr005.datasets.decision_trace import EVENT_RUNTIME_FEATURE_SOURCES, SCHEMA_ID
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_HASH_SEMANTICS,
+    CANONICAL_MAP_RELATIVE_PATH,
+    CANONICAL_MAP_SHA256,
+    FixedRealMapError,
+    canonical_map_identity,
+)
 
 
 PRETRAINING_GATE_SCHEMA = "czr005.g4irsf11.pretraining_gate.v1"
@@ -72,6 +79,7 @@ PRUNED_FEATURE_NAMES = (
     "two_hop_queue_pressure",
 )
 REQUIRED_DECISION_VALIDATIONS = (
+    "fixed_real_map_identity",
     "candidate_graph_membership",
     "candidate_equals_true_outgoing_set",
     "selected_in_candidates",
@@ -95,10 +103,13 @@ REQUIRED_DATA_ARTIFACTS = (
 SPLIT_NAMES = (
     "grouped_random",
     "day_heldout",
+    "flight_bank_heldout",
     "time_heldout",
     "source_heldout",
     "od_heldout",
     "fault_heldout",
+    "fault_scenario_heldout",
+    "load_heldout",
 )
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -122,6 +133,8 @@ class PretrainingApproval:
     decision_manifest_sha256: str
     artifacts: Mapping[str, Path]
     gate_statuses: Mapping[str, str]
+    fixed_real_map_only: bool
+    canonical_map_sha256: str
 
 
 @dataclass(frozen=True)
@@ -132,12 +145,20 @@ class DecisionExample:
     source: str
     goal: str
     fault: str
+    scenario: str
+    scenario_observed: str
+    scale: str
+    flight_bank: str
+    load_level: str
+    fault_scenario: str
     day: int
     event_time: float
     candidate_nodes: tuple[int, ...]
     candidate_features: np.ndarray
     target_index: int | None
     risk_label: int
+    fixed_real_map_only: bool
+    canonical_map_sha256: str
 
     @property
     def od(self) -> str:
@@ -152,6 +173,8 @@ class DatasetSplit:
     train_groups: tuple[str, ...]
     test_groups: tuple[str, ...]
     heldout: Mapping[str, Any]
+    fixed_real_map_only: bool
+    canonical_map_sha256: str
 
 
 @dataclass(frozen=True)
@@ -160,6 +183,8 @@ class PreparedDataset:
     group_ids: tuple[str, ...]
     splits: Mapping[str, DatasetSplit]
     dataset_sha256: str
+    fixed_real_map_only: bool
+    canonical_map_sha256: str
 
 
 @dataclass(frozen=True)
@@ -364,6 +389,11 @@ def preflight_training(
     gate_statuses: dict[str, str] = {}
     gate_digest = ""
     decision_digest = ""
+    map_identity: dict[str, Any] = {}
+    try:
+        map_identity = canonical_map_identity()
+    except (OSError, ValueError, FixedRealMapError) as exc:
+        blockers.append(f"canonical fixed real map: {exc}")
 
     for path, label in ((gate_path, "gate manifest"), (decision_path, "decision manifest")):
         if not path.is_relative_to(repo_path):
@@ -391,6 +421,14 @@ def preflight_training(
             blockers.append(
                 f"gate manifest: schema must be {PRETRAINING_GATE_SCHEMA!r}"
             )
+        if gate.get("fixed_real_map_only") is not True:
+            blockers.append("gate manifest: fixed_real_map_only must be true")
+        if gate.get("canonical_map_sha256") != CANONICAL_MAP_SHA256:
+            blockers.append(
+                "gate manifest: canonical_map_sha256 does not match immutable map2"
+            )
+        if gate.get("overall_status") != "PASS":
+            blockers.append("gate manifest: overall_status is not PASS")
         gates = gate.get("gates")
         if not isinstance(gates, Mapping):
             blockers.append("gate manifest: gates must be an A-H object")
@@ -424,9 +462,67 @@ def preflight_training(
                 "gate decision_manifest binding: path does not match requested decision manifest"
             )
 
+        try:
+            from scripts.eval.g4irsf11_pretraining_gate import evaluate_pretraining_gate
+
+            recomputed_gate = evaluate_pretraining_gate(repo_path)
+            if recomputed_gate.get("overall_status") != "PASS":
+                blockers.append(
+                    "gate manifest: exact A-H recomputation is not PASS"
+                )
+            if recomputed_gate.get("fixed_real_map_only") is not True or (
+                recomputed_gate.get("canonical_map_sha256") != CANONICAL_MAP_SHA256
+            ):
+                blockers.append(
+                    "gate manifest: exact recomputation lacks canonical fixed-map identity"
+                )
+            if recomputed_gate.get("gates") != gate.get("gates"):
+                blockers.append(
+                    "gate manifest: persisted A-H gates differ from exact recomputation"
+                )
+            if recomputed_gate.get("decision_manifest") != gate.get("decision_manifest"):
+                blockers.append(
+                    "gate manifest: persisted decision binding differs from exact recomputation"
+                )
+        except (OSError, ValueError, TypeError, KeyError, ImportError) as exc:
+            blockers.append(f"gate manifest: exact A-H recomputation failed: {exc}")
+
     if decision:
         if decision.get("schema_id") != SCHEMA_ID:
             blockers.append(f"decision manifest: schema_id must be {SCHEMA_ID!r}")
+        if decision.get("fixed_real_map_only") is not True:
+            blockers.append(
+                "decision manifest: fixed_real_map_only must be true"
+            )
+        if decision.get("canonical_map_sha256") != CANONICAL_MAP_SHA256:
+            blockers.append(
+                "decision manifest: canonical_map_sha256 does not match immutable map2"
+            )
+        graph = decision.get("graph")
+        if not isinstance(graph, Mapping):
+            blockers.append("decision manifest: graph identity object is missing")
+            graph = {}
+        expected_graph_values = {
+            "path": CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+            "sha256": CANONICAL_MAP_SHA256,
+            "sha256_semantics": CANONICAL_MAP_HASH_SEMANTICS,
+            "fixed_real_map_only": True,
+            "topology_mutation_allowed": False,
+        }
+        for name, expected_value in expected_graph_values.items():
+            if graph.get(name) != expected_value:
+                blockers.append(
+                    f"decision manifest: graph.{name} must be {expected_value!r}"
+                )
+        raw_map_sha = str(graph.get("raw_bytes_sha256") or "").lower()
+        if not _SHA256_RE.fullmatch(raw_map_sha):
+            blockers.append(
+                "decision manifest: graph.raw_bytes_sha256 must be a SHA-256 provenance value"
+            )
+        if map_identity and map_identity.get("sha256") != graph.get("sha256"):
+            blockers.append(
+                "decision manifest: graph SHA does not match the recomputed canonical map"
+            )
         decision_hash_semantics = decision.get("artifact_hash_semantics")
         if decision_hash_semantics != SEMANTIC_TEXT_HASH:
             blockers.append(
@@ -481,6 +577,16 @@ def preflight_training(
         decision_manifest_sha256=decision_digest,
         artifacts=dict(sorted(artifacts.items())),
         gate_statuses={stage: gate_statuses.get(stage, "MISSING") for stage in REQUIRED_STAGE_GATES},
+        fixed_real_map_only=(
+            decision.get("fixed_real_map_only") is True
+            and decision.get("canonical_map_sha256") == CANONICAL_MAP_SHA256
+            and bool(map_identity)
+        ),
+        canonical_map_sha256=(
+            str(map_identity.get("sha256") or "")
+            if map_identity
+            else ""
+        ),
     )
 
 
@@ -555,6 +661,10 @@ def load_training_examples(
     their selected edge is never treated as a positive imitation target.
     """
 
+    try:
+        map_identity = canonical_map_identity()
+    except (OSError, ValueError, FixedRealMapError) as exc:
+        raise V3TrainingError(f"canonical fixed real map is invalid: {exc}") from exc
     hard_path = Path(hard_case_path)
     outcomes = _load_outcomes(Path(outcome_path))
     examples: list[DecisionExample] = []
@@ -656,9 +766,47 @@ def load_training_examples(
                 else None
             )
             task_id = str(row.get("task_id") or "").strip()
-            scenario = _strip_repeat(str(row.get("scenario_observed") or row.get("scenario") or ""))
-            if not task_id or not scenario:
-                raise V3TrainingError(f"{hard_path}:{row_number}: task/scenario is missing")
+            scenario_observed = str(row.get("scenario_observed") or "").strip()
+            scenario = str(row.get("scenario") or "").strip()
+            scale = str(row.get("scale") or "").strip()
+            flight_bank = str(row.get("flight_bank") or "").strip()
+            load_level = str(row.get("load_level") or "").strip()
+            fault_scenario = str(row.get("fault_scenario") or "").strip()
+            required_context = {
+                "task_id": task_id,
+                "scenario": scenario,
+                "scenario_observed": scenario_observed,
+                "scale": scale,
+                "flight_bank": flight_bank,
+                "load_level": load_level,
+                "fault_scenario": fault_scenario,
+            }
+            missing_context = sorted(
+                name for name, value in required_context.items() if not value
+            )
+            if missing_context:
+                raise V3TrainingError(
+                    f"{hard_path}:{row_number}: split metadata is missing {missing_context}"
+                )
+            if scenario != _strip_repeat(scenario_observed):
+                raise V3TrainingError(
+                    f"{hard_path}:{row_number}: scenario is not the canonical observed scenario family"
+                )
+            fixed_real_map_only = _truth_bool(
+                row.get("fixed_real_map_only"),
+                f"{hard_path}:{row_number}:fixed_real_map_only",
+            )
+            if not fixed_real_map_only:
+                raise V3TrainingError(
+                    f"{hard_path}:{row_number}: fixed_real_map_only must be true"
+                )
+            canonical_map_sha256 = str(
+                row.get("canonical_map_sha256") or ""
+            ).strip().lower()
+            if canonical_map_sha256 != map_identity["sha256"]:
+                raise V3TrainingError(
+                    f"{hard_path}:{row_number}: canonical_map_sha256 does not match immutable map2"
+                )
             # The same source task may be replayed in several scenarios.  The
             # scenario is a held-out evaluation dimension, never part of task
             # identity, otherwise cross-scenario copies could leak across a
@@ -689,12 +837,20 @@ def load_training_examples(
                     source=source,
                     goal=goal,
                     fault=fault,
+                    scenario=scenario,
+                    scenario_observed=scenario_observed,
+                    scale=scale,
+                    flight_bank=flight_bank,
+                    load_level=load_level,
+                    fault_scenario=fault_scenario,
                     day=math.floor(arrival / 86_400.0),
                     event_time=event_time,
                     candidate_nodes=tuple(nodes),
                     candidate_features=np.asarray(matrix, dtype=np.float64),
                     target_index=target_index,
                     risk_label=risk_label,
+                    fixed_real_map_only=True,
+                    canonical_map_sha256=canonical_map_sha256,
                 )
             )
     if not examples:
@@ -718,6 +874,27 @@ class _DisjointSet:
         a, b = self.find(left), self.find(right)
         if a != b:
             self.parent[max(a, b)] = min(a, b)
+
+
+def _fixed_map_identity_for_examples(
+    examples: Sequence[DecisionExample],
+) -> str:
+    """Recompute and enforce the single-map contract before any split work."""
+
+    try:
+        identity = canonical_map_identity()
+    except (OSError, ValueError, FixedRealMapError) as exc:
+        raise V3TrainingError(f"canonical fixed real map is invalid: {exc}") from exc
+    for index, example in enumerate(examples):
+        if example.fixed_real_map_only is not True:
+            raise V3TrainingError(
+                f"decision example {index} does not declare fixed_real_map_only=true"
+            )
+        if example.canonical_map_sha256 != identity["sha256"]:
+            raise V3TrainingError(
+                f"decision example {index} canonical map identity is stale or mixed"
+            )
+    return str(identity["sha256"])
 
 
 def connected_group_ids(examples: Sequence[DecisionExample]) -> tuple[str, ...]:
@@ -763,13 +940,20 @@ def _make_split(
         raise V3TrainingError(f"{name}: both train and test groups are required")
     train_indices = tuple(sorted(index for group in train for index in groups[group]))
     test_indices = tuple(sorted(index for group in test for index in groups[group]))
+    map_sha256 = str(canonical_map_identity()["sha256"])
     return DatasetSplit(
         name=name,
         train_indices=train_indices,
         test_indices=test_indices,
         train_groups=tuple(sorted(train)),
         test_groups=tuple(sorted(test)),
-        heldout=dict(heldout),
+        heldout={
+            **dict(heldout),
+            "fixed_real_map_only": True,
+            "canonical_map_sha256": map_sha256,
+        },
+        fixed_real_map_only=True,
+        canonical_map_sha256=map_sha256,
     )
 
 
@@ -857,6 +1041,7 @@ def build_grouped_splits(
 ) -> tuple[tuple[str, ...], dict[str, DatasetSplit]]:
     """Build all mandatory grouped, day/time/source/OD/fault held-outs."""
 
+    _fixed_map_identity_for_examples(examples)
     if len(examples) < 4:
         raise V3TrainingError("at least four decision rows are required for grouped evaluation")
     group_ids = connected_group_ids(examples)
@@ -892,6 +1077,10 @@ def build_grouped_splits(
             if any(examples[index].day == latest_day for index in indices)
         },
         {"day": latest_day},
+    )
+
+    splits["flight_bank_heldout"] = _value_heldout_split(
+        "flight_bank_heldout", examples, groups, "flight_bank"
     )
 
     time_test_groups, train_max_event_time, test_min_event_time = (
@@ -949,8 +1138,23 @@ def build_grouped_splits(
             "policy": "all connected groups containing an active-fault decision",
         },
     )
+    splits["fault_scenario_heldout"] = _value_heldout_split(
+        "fault_scenario_heldout",
+        examples,
+        groups,
+        "fault_scenario",
+        prefer_fault=True,
+    )
+    splits["load_heldout"] = _value_heldout_split(
+        "load_heldout", examples, groups, "load_level"
+    )
 
     for split in splits.values():
+        if (
+            split.fixed_real_map_only is not True
+            or split.canonical_map_sha256 != CANONICAL_MAP_SHA256
+        ):
+            raise AssertionError(f"{split.name}: fixed real map identity is absent or stale")
         if set(split.train_groups) & set(split.test_groups):
             raise AssertionError(f"{split.name}: connected group leakage")
         train_tasks = {examples[index].task_family for index in split.train_indices}
@@ -974,6 +1178,23 @@ def build_grouped_splits(
             examples[index].fault == "fault_local_active" for index in split.train_indices
         ):
             raise AssertionError("fault_heldout: active-fault decision leaked into training")
+        heldout_attribute = {
+            "day_heldout": "day",
+            "flight_bank_heldout": "flight_bank",
+            "source_heldout": "source",
+            "od_heldout": "od",
+            "fault_scenario_heldout": "fault_scenario",
+            "load_heldout": "load_level",
+        }.get(split.name)
+        if heldout_attribute is not None:
+            heldout_value = str(split.heldout[heldout_attribute])
+            if any(
+                str(getattr(examples[index], heldout_attribute)) == heldout_value
+                for index in split.train_indices
+            ):
+                raise AssertionError(
+                    f"{split.name}: held-out {heldout_attribute} leaked into training"
+                )
         if not any(examples[index].target_index is not None for index in split.train_indices):
             raise V3TrainingError(f"{split.name}: training side has no successful rank labels")
         if not any(examples[index].target_index is not None for index in split.test_indices):
@@ -987,6 +1208,7 @@ def prepare_dataset(
     *,
     seed: int = 11,
 ) -> PreparedDataset:
+    map_sha256 = _fixed_map_identity_for_examples(examples)
     group_ids, splits = build_grouped_splits(examples, seed=seed)
     digest_rows = [
         {
@@ -996,12 +1218,20 @@ def prepare_dataset(
             "source": example.source,
             "goal": example.goal,
             "fault": example.fault,
+            "scenario": example.scenario,
+            "scenario_observed": example.scenario_observed,
+            "scale": example.scale,
+            "flight_bank": example.flight_bank,
+            "load_level": example.load_level,
+            "fault_scenario": example.fault_scenario,
             "day": example.day,
             "event_time": example.event_time,
             "candidate_nodes": example.candidate_nodes,
             "candidate_features": example.candidate_features.tolist(),
             "target_index": example.target_index,
             "risk_label": example.risk_label,
+            "fixed_real_map_only": example.fixed_real_map_only,
+            "canonical_map_sha256": example.canonical_map_sha256,
             "group_id": group_ids[index],
         }
         for index, example in enumerate(examples)
@@ -1011,6 +1241,8 @@ def prepare_dataset(
         group_ids=group_ids,
         splits=splits,
         dataset_sha256=_sha256_bytes(_canonical_json(digest_rows).encode("utf-8")),
+        fixed_real_map_only=True,
+        canonical_map_sha256=map_sha256,
     )
 
 
@@ -1032,8 +1264,19 @@ def build_split_readiness_audit(
     hard_path = Path(hard_case_path).resolve()
     outcomes_path = Path(outcome_path).resolve()
     blockers: list[str] = []
+    map_identity: dict[str, Any] = {}
+    try:
+        map_identity = canonical_map_identity()
+    except (OSError, ValueError, FixedRealMapError) as exc:
+        blockers.append(f"canonical fixed real map: {exc}")
     bindings: dict[str, Any] = {
         "decision_manifest_sha256": str(decision_manifest_sha256).lower(),
+        "fixed_real_map_only": bool(map_identity),
+        "canonical_map": {
+            "path": CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+            "sha256": str(map_identity.get("sha256") or ""),
+            "sha256_semantics": CANONICAL_MAP_HASH_SEMANTICS,
+        },
     }
     bound_paths: dict[str, Path] = {}
     for name, path, suffix in (
@@ -1064,6 +1307,11 @@ def build_split_readiness_audit(
         "actual_day_buckets": [],
         "active_fault_decision_count": 0,
         "task_family_count": 0,
+        "scenario_count": 0,
+        "scale_count": 0,
+        "flight_bank_count": 0,
+        "load_level_count": 0,
+        "fault_scenario_count": 0,
     }
     dataset: PreparedDataset | None = None
     split_rows: list[dict[str, Any]] = []
@@ -1091,6 +1339,17 @@ def build_split_readiness_audit(
                         example.fault == "fault_local_active" for example in examples
                     ),
                     "task_family_count": len({example.task_family for example in examples}),
+                    "scenario_count": len({example.scenario for example in examples}),
+                    "scale_count": len({example.scale for example in examples}),
+                    "flight_bank_count": len(
+                        {example.flight_bank for example in examples}
+                    ),
+                    "load_level_count": len(
+                        {example.load_level for example in examples}
+                    ),
+                    "fault_scenario_count": len(
+                        {example.fault_scenario for example in examples}
+                    ),
                 }
             )
             dataset = prepare_dataset(examples, seed=seed)
@@ -1115,6 +1374,8 @@ def build_split_readiness_audit(
     audit = {
         "schema": SPLIT_READINESS_SCHEMA,
         "status": status,
+        "fixed_real_map_only": bool(map_identity),
+        "canonical_map_sha256": str(map_identity.get("sha256") or ""),
         "model_weights_initialised": False,
         "bindings": bindings,
         "metrics": metrics,
@@ -1448,11 +1709,19 @@ def validate_model_payload(
 
     if not isinstance(payload, Mapping):
         raise V3TrainingError("model payload must be an object")
+    try:
+        map_identity = canonical_map_identity()
+    except (OSError, ValueError, FixedRealMapError) as exc:
+        raise V3TrainingError(f"canonical fixed real map is invalid: {exc}") from exc
     _reject_nonfinite_payload_numbers(payload)
     if payload.get("schema") != MODEL_SCHEMA:
         raise V3TrainingError(f"model schema must be {MODEL_SCHEMA!r}")
     if payload.get("model_name") not in MODEL_NAMES:
         raise V3TrainingError("unknown v3 model_name")
+    if payload.get("fixed_real_map_only") is not True:
+        raise V3TrainingError("model fixed_real_map_only must be true")
+    if payload.get("canonical_map_sha256") != map_identity["sha256"]:
+        raise V3TrainingError("model canonical_map_sha256 is stale or non-canonical")
     if payload.get("absolute_node_id_features") is not False:
         raise V3TrainingError("absolute node ID features must remain disabled")
     if payload.get("model_score_semantics") != "higher_is_preferred":
@@ -1520,6 +1789,10 @@ def validate_model_payload(
     training = payload.get("training")
     if not isinstance(training, Mapping):
         raise V3TrainingError("model training provenance is missing")
+    if training.get("fixed_real_map_only") is not True:
+        raise V3TrainingError("model training fixed_real_map_only must be true")
+    if training.get("canonical_map_sha256") != map_identity["sha256"]:
+        raise V3TrainingError("model training canonical_map_sha256 is stale")
     for digest_name in ("dataset_sha256", "train_group_digest", "test_group_digest"):
         if not _SHA256_RE.fullmatch(str(training.get(digest_name) or "").lower()):
             raise V3TrainingError(f"model training.{digest_name} is invalid")
@@ -1606,6 +1879,11 @@ def load_active_v3_model(
             "current gate/decision preflight is not PASS: "
             + "; ".join(current_approval.blockers)
         )
+    if (
+        current_approval.fixed_real_map_only is not True
+        or current_approval.canonical_map_sha256 != CANONICAL_MAP_SHA256
+    ):
+        raise V3TrainingError("current pretraining approval is not fixed-real-map-only")
     status_path = _required_bound_artifact(
         repo_path, active.get("training_status"), "active training status"
     )
@@ -1654,6 +1932,8 @@ def load_active_v3_model(
     if (
         readiness.get("schema") != SPLIT_READINESS_SCHEMA
         or readiness.get("status") != "PASS"
+        or readiness.get("fixed_real_map_only") is not True
+        or readiness.get("canonical_map_sha256") != CANONICAL_MAP_SHA256
         or readiness.get("model_weights_initialised") is not False
         or readiness.get("dataset_sha256") != binding["dataset_sha256"]
         or readiness.get("required_splits") != list(SPLIT_NAMES)
@@ -1668,6 +1948,31 @@ def load_active_v3_model(
         != binding["decision_manifest_sha256"]
     ):
         raise V3TrainingError("split readiness is not bound to the current decision manifest")
+    expected_map_binding = {
+        "path": CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+        "sha256": CANONICAL_MAP_SHA256,
+        "sha256_semantics": CANONICAL_MAP_HASH_SEMANTICS,
+    }
+    if (
+        readiness_bindings.get("fixed_real_map_only") is not True
+        or readiness_bindings.get("canonical_map") != expected_map_binding
+    ):
+        raise V3TrainingError("split readiness map binding is absent or stale")
+    split_rows = readiness.get("split_audit")
+    if (
+        not isinstance(split_rows, list)
+        or {str(row.get("split")) for row in split_rows if isinstance(row, Mapping)}
+        != set(SPLIT_NAMES)
+        or any(
+            not isinstance(row, Mapping)
+            or not isinstance(row.get("heldout"), Mapping)
+            or row["heldout"].get("fixed_real_map_only") is not True
+            or row["heldout"].get("canonical_map_sha256")
+            != CANONICAL_MAP_SHA256
+            for row in split_rows
+        )
+    ):
+        raise V3TrainingError("release split audit is not fixed-real-map-only")
     for name in ("hard_case_index", "outcome_sample"):
         descriptor = readiness_bindings.get(name)
         bound_path = _required_bound_artifact(
@@ -1905,6 +2210,8 @@ def fit_model_for_split(
     payload = {
         "schema": MODEL_SCHEMA,
         "model_name": model_name,
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": dataset.canonical_map_sha256,
         "split": split_name,
         "feature_names": list(names),
         "absolute_node_id_features": False,
@@ -1917,6 +2224,8 @@ def fit_model_for_split(
         "risk_head": risk_head,
         "training": {
             "dataset_sha256": dataset.dataset_sha256,
+            "fixed_real_map_only": True,
+            "canonical_map_sha256": dataset.canonical_map_sha256,
             "epochs": epochs,
             "learning_rate": learning_rate,
             "seed": seed,
@@ -1969,6 +2278,14 @@ def split_audit_rows(dataset: PreparedDataset) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for name in SPLIT_NAMES:
         split = dataset.splits[name]
+        if (
+            split.fixed_real_map_only is not True
+            or split.canonical_map_sha256 != dataset.canonical_map_sha256
+            or split.heldout.get("fixed_real_map_only") is not True
+            or split.heldout.get("canonical_map_sha256")
+            != dataset.canonical_map_sha256
+        ):
+            raise V3TrainingError(f"{name}: split audit has no canonical map binding")
         train_tasks = {dataset.examples[index].task_family for index in split.train_indices}
         test_tasks = {dataset.examples[index].task_family for index in split.test_indices}
         train_fingerprints = {
@@ -1991,6 +2308,33 @@ def split_audit_rows(dataset: PreparedDataset) -> list[dict[str, Any]]:
             dataset.examples[index].fault == "fault_local_active"
             for index in split.test_indices
         )
+        dimension_audit: dict[str, Any] = {}
+        for attribute in (
+            "scenario",
+            "scale",
+            "flight_bank",
+            "load_level",
+            "fault_scenario",
+        ):
+            train_values = sorted(
+                {str(getattr(dataset.examples[index], attribute)) for index in split.train_indices}
+            )
+            test_values = sorted(
+                {str(getattr(dataset.examples[index], attribute)) for index in split.test_indices}
+            )
+            dimension_audit[attribute] = {
+                "train_value_count": len(train_values),
+                "test_value_count": len(test_values),
+                "overlap_count": len(set(train_values) & set(test_values)),
+                "train_values_sha256": _sha256_bytes(
+                    _canonical_json(train_values).encode("utf-8")
+                ),
+                "test_values_sha256": _sha256_bytes(
+                    _canonical_json(test_values).encode("utf-8")
+                ),
+            }
+        heldout_audit = dict(split.heldout)
+        heldout_audit["metadata_dimension_audit"] = dimension_audit
         rows.append(
             {
                 "split": name,
@@ -2009,7 +2353,7 @@ def split_audit_rows(dataset: PreparedDataset) -> list[dict[str, Any]]:
                 ),
                 "active_fault_train_decisions": active_fault_train,
                 "active_fault_test_decisions": active_fault_test,
-                "heldout": dict(split.heldout),
+                "heldout": heldout_audit,
                 "status": "PASS",
             }
         )

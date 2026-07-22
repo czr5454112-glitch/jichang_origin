@@ -12,6 +12,10 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from czr005.datasets import decision_trace as dt
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_PATH,
+    CANONICAL_MAP_SHA256,
+)
 from scripts.eval import run_g4irsf11_decision_trace_sampling as runner
 from scripts.eval.run_g4irsf11_event_case import _outcomes
 
@@ -21,8 +25,8 @@ def _raw_decision(
     *,
     task_id: int = 1,
     segment_id: str = "1:direct",
-    fallback: int | None = 2,
-    selected: int = 2,
+    fallback: int | None = 12,
+    selected: int = 12,
     scenario: str = "paper_repeat_01",
     source_queue: int = 1,
     runtime_bag_id: int | None = None,
@@ -33,27 +37,27 @@ def _raw_decision(
         "task_id": task_id,
         "segment_id": segment_id,
         "event_time": 12.0,
-        "current_node": 0,
+        "current_node": 6,
         "goal_node": 3,
         # Deliberately reversed; canonical ordering must keep features/scores
         # paired with the corresponding node.
         "candidate_records": [
             {
-                "next_node": 2,
+                "next_node": 12,
                 "features": {"target_queue_length": 2, "static_potential": 0.2},
                 "model_score": 1.5,
                 "shield_allowed": True,
                 "shield_reason": "",
             },
             {
-                "next_node": 1,
+                "next_node": 8,
                 "features": {"target_queue_length": 1, "static_potential": 0.8},
                 "model_score": 0.5,
                 "shield_allowed": True,
                 "shield_reason": "",
             },
         ],
-        "model_prediction": 1,
+        "model_prediction": 8,
         "model_margin": 1.0,
         "risk_gate_triggered": fallback is not None,
         "fallback_selected_next": fallback,
@@ -67,12 +71,14 @@ def _raw_decision(
             "message_age_seconds": 0.25,
             "downstream_pressure": 1.0,
         },
-        "short_history": [4, 0],
+        "short_history": [4, 6],
         "full_astar_used": False,
         "metadata": {
             "scenario": scenario,
             "scale": "2x",
             "fault_mode": fault_mode,
+            "fixed_real_map_only": True,
+            "canonical_map_sha256": CANONICAL_MAP_SHA256,
             "model_score_semantics": "lower_is_better_cost",
             "runtime_bag_id": task_id if runtime_bag_id is None else runtime_bag_id,
         },
@@ -103,10 +109,12 @@ def _mapping_rows() -> list[dict[str, object]]:
 
 
 def test_true_outgoing_candidates_are_canonical_and_actions_are_valid() -> None:
-    row = dt.validate_decision_rows([_raw_decision()], {0: [2, 1]})[0]
+    row = dt.validate_decision_rows(
+        [_raw_decision()], dt.load_adjacency(CANONICAL_MAP_PATH)
+    )[0]
 
-    assert row["candidate_next_nodes"] == [1, 2]
-    assert [record["next_node"] for record in row["candidate_records"]] == [1, 2]
+    assert row["candidate_next_nodes"] == [8, 12]
+    assert [record["next_node"] for record in row["candidate_records"]] == [8, 12]
     assert row["candidate_records"][0]["features"]["target_queue_length"] == 1
     assert row["selected_next"] in row["candidate_next_nodes"]
     assert row["model_prediction"] in row["candidate_next_nodes"]
@@ -116,13 +124,13 @@ def test_true_outgoing_candidates_are_canonical_and_actions_are_valid() -> None:
 def test_candidate_set_must_equal_graph_outgoing_neighbors() -> None:
     raw = _raw_decision()
     raw["candidate_records"] = [raw["candidate_records"][0]]  # type: ignore[index]
-    raw["model_prediction"] = 2
-    raw["selected_next"] = 2
-    raw["fallback_selected_next"] = 2
+    raw["model_prediction"] = 12
+    raw["selected_next"] = 12
+    raw["fallback_selected_next"] = 12
     raw["model_margin"] = 999.0
 
     with pytest.raises(dt.DecisionTraceValidationError, match="true outgoing neighbors"):
-        dt.validate_decision_rows([raw], {0: [1, 2]})
+        dt.validate_decision_rows([raw], dt.load_adjacency(CANONICAL_MAP_PATH))
 
 
 def test_selected_action_must_belong_to_candidates() -> None:
@@ -133,13 +141,13 @@ def test_selected_action_must_belong_to_candidates() -> None:
 
 
 def test_disagreement_is_true_only_when_model_and_fallback_actions_differ() -> None:
-    same = dt.canonicalise_decision_row(_raw_decision(fallback=1, selected=1))
-    different = dt.canonicalise_decision_row(_raw_decision(fallback=2, selected=2))
+    same = dt.canonicalise_decision_row(_raw_decision(fallback=8, selected=8))
+    different = dt.canonicalise_decision_row(_raw_decision(fallback=12, selected=12))
 
     assert same["model_fallback_disagreement"] is False
     assert different["model_fallback_disagreement"] is True
 
-    inconsistent = _raw_decision(fallback=1, selected=1)
+    inconsistent = _raw_decision(fallback=8, selected=8)
     inconsistent["model_fallback_disagreement"] = True
     with pytest.raises(dt.DecisionTraceValidationError, match="exactly when"):
         dt.canonicalise_decision_row(inconsistent)
@@ -161,7 +169,7 @@ def test_lower_is_better_score_contract_is_explicit_and_verified() -> None:
     row = dt.canonicalise_decision_row(_raw_decision())
 
     assert row["model_score_semantics"] == dt.MODEL_SCORE_SEMANTICS
-    assert row["model_prediction"] == 1
+    assert row["model_prediction"] == 8
     assert row["model_margin"] == 1.0
 
     missing = _raw_decision()
@@ -170,7 +178,7 @@ def test_lower_is_better_score_contract_is_explicit_and_verified() -> None:
         dt.canonicalise_decision_row(missing)
 
     wrong_prediction = _raw_decision()
-    wrong_prediction["model_prediction"] = 2
+    wrong_prediction["model_prediction"] = 12
     with pytest.raises(dt.DecisionTraceValidationError, match="minimum-cost"):
         dt.canonicalise_decision_row(wrong_prediction)
 
@@ -225,7 +233,9 @@ def test_unknown_candidate_feature_without_lineage_fails_closed() -> None:
 
 
 def test_original_arrival_release_mapping_is_linked_to_every_decision() -> None:
-    decisions = dt.validate_decision_rows([_raw_decision()], {0: [1, 2]})
+    decisions = dt.validate_decision_rows(
+        [_raw_decision()], dt.load_adjacency(CANONICAL_MAP_PATH)
+    )
     mappings = dt.source_release_mapping(_mapping_rows())
     links = dt.decision_source_links(decisions, mappings)
 
@@ -311,28 +321,119 @@ def test_complete_java_source_queue_identity_counts_are_locked() -> None:
 
 def test_stratified_reservoir_deduplicates_repeats_and_is_order_independent() -> None:
     raw_rows = [
-        _raw_decision("run-1-d", scenario="paper_repeat_01"),
-        _raw_decision("run-2-d", scenario="paper_repeat_02"),
-        _raw_decision("other", task_id=2, segment_id="2:direct", scenario="high_flow_2x"),
+        _raw_decision(
+            f"run-{repeat}-d",
+            segment_id=f"1:direct:paper_repeat_{repeat:02d}",
+            scenario=f"paper_repeat_{repeat:02d}",
+        )
+        for repeat in range(1, 6)
     ]
-    decisions = dt.validate_decision_rows(raw_rows, {0: [1, 2]})
-    mappings = dt.source_release_mapping(_mapping_rows())
+    raw_rows.append(
+        _raw_decision(
+            "other", task_id=2, segment_id="2:direct", scenario="high_flow_2x"
+        )
+    )
+    decisions = dt.validate_decision_rows(
+        raw_rows, dt.load_adjacency(CANONICAL_MAP_PATH)
+    )
+    mapping_rows = [
+        {
+            **_mapping_rows()[0],
+            "segment_id": f"1:direct:paper_repeat_{repeat:02d}",
+        }
+        for repeat in range(1, 6)
+    ]
+    mapping_rows.append(_mapping_rows()[1])
+    mappings = dt.source_release_mapping(mapping_rows)
     links = dt.decision_source_links(decisions, mappings)
     config = dt.SamplingConfig(limit=10, minimum_per_stratum=1, maximum_per_stratum=4, seed="fixed")
 
     forward = dt.stratified_reservoir_sample(decisions, links, config=config)
     reverse = dt.stratified_reservoir_sample(list(reversed(decisions)), list(reversed(links)), config=config)
 
-    assert forward.statistics["eligible_hard_case_count_before_dedupe"] == 3
+    assert forward.statistics["eligible_hard_case_count_before_dedupe"] == 6
     assert forward.statistics["unique_hard_case_count_after_dedupe"] == 2
-    assert forward.statistics["deterministic_repeat_count_removed"] == 1
+    assert forward.statistics["deterministic_repeat_count_removed"] == 4
     assert [row["semantic_fingerprint"] for row in forward.rows] == [
         row["semantic_fingerprint"] for row in reverse.rows
     ]
-    repeated = next(row for row in forward.rows if row["deterministic_repeat_count"] == 2)
+    repeated = next(row for row in forward.rows if row["deterministic_repeat_count"] == 5)
     assert repeated["scenario"] == "paper"
     assert repeated["sample_weight"] == 1.0
     assert "source_queue_delay" in repeated["why_hard"]
+
+
+def test_multi_shard_context_derives_distinct_load_and_fault_dimensions() -> None:
+    defaults = {
+        "scenario": "g4irsf11_multi_trace",
+        "scale": "mixed",
+        "fault_mode": "mixed",
+        "load_level": "mixed",
+        "fault_scenario": "mixed",
+    }
+    no_fault = runner._merge_metadata(
+        {"metadata": {}},
+        defaults,
+        {
+            "scenario": "trace_highflow_2p5",
+            "scale": "2.5x",
+            "fault_mode": "no_fault",
+        },
+        "trace_highflow_2p5",
+    )["metadata"]
+    delayed_fault = runner._merge_metadata(
+        {"metadata": {}},
+        defaults,
+        {
+            "scenario": "trace_fault_4p0",
+            "scale": "4.0x",
+            "fault_mode": "single_delayed_30s",
+        },
+        "trace_fault_4p0",
+    )["metadata"]
+
+    assert {no_fault["load_level"], delayed_fault["load_level"]} == {
+        "2.5x",
+        "4.0x",
+    }
+    assert {no_fault["fault_scenario"], delayed_fault["fault_scenario"]} == {
+        "no_fault",
+        "single_delayed_30s",
+    }
+    assert "mixed" not in {
+        no_fault["load_level"],
+        delayed_fault["load_level"],
+        no_fault["fault_scenario"],
+        delayed_fault["fault_scenario"],
+    }
+
+
+@pytest.mark.parametrize("identity", [{}, {"fixed_real_map_only": True, "canonical_map_sha256": "0" * 64}])
+def test_runtime_payload_shard_must_natively_bind_canonical_map(
+    tmp_path: Path, identity: dict[str, object]
+) -> None:
+    trace_path = tmp_path / "runtime-result.json"
+    trace_path.write_text(
+        json.dumps(
+            {
+                "decisions": [_raw_decision()],
+                "trace_context": {
+                    "scenario": "trace_highflow_2p5",
+                    "scale": "2.5x",
+                    "fault_mode": "no_fault",
+                    **identity,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="trace_context is not bound"):
+        runner._read_all_traces(
+            [trace_path],
+            {"scenario": "mixed", "scale": "mixed", "fault_mode": "mixed"},
+            expected_map_sha256=CANONICAL_MAP_SHA256,
+        )
 
 
 def test_quota_shortfall_is_explicit_when_global_limit_cannot_cover_minima() -> None:
@@ -341,7 +442,7 @@ def test_quota_shortfall_is_explicit_when_global_limit_cannot_cover_minima() -> 
             _raw_decision("a", scenario="scenario_a"),
             _raw_decision("b", task_id=2, segment_id="2:direct", scenario="scenario_b"),
         ],
-        {0: [1, 2]},
+        dt.load_adjacency(CANONICAL_MAP_PATH),
     )
     links = dt.decision_source_links(decisions, dt.source_release_mapping(_mapping_rows()))
     sample = dt.stratified_reservoir_sample(
@@ -378,7 +479,9 @@ def test_reservoir_retains_only_bounded_rows_per_stratum() -> None:
                 "pass_time": 12.0,
             }
         )
-    decisions = dt.validate_decision_rows(raw_rows, {0: [1, 2]})
+    decisions = dt.validate_decision_rows(
+        raw_rows, dt.load_adjacency(CANONICAL_MAP_PATH)
+    )
     links = dt.decision_source_links(decisions, dt.source_release_mapping(task_rows))
     sample = dt.stratified_reservoir_sample(
         decisions,
@@ -416,12 +519,23 @@ def test_feature_lineage_recursively_rejects_label_derived_runtime_feature() -> 
 
 
 def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
 ) -> None:
     trace_path = tmp_path / "trace.jsonl"
     task_path = tmp_path / "tasks.jsonl"
     outcome_path = tmp_path / "outcomes.jsonl"
-    map_path = tmp_path / "map.json"
+    output_root = tmp_path / "stage"
+    publication_root = tmp_path / "published"
+    producer = {
+        "scope": "formal",
+        "cohort_id": "fixed-real-map-test-cohort",
+        "implementation_sha256": "a" * 64,
+    }
+    location_options = {
+        "output_root": output_root,
+        "publication_root": publication_root,
+    }
+    map_path = CANONICAL_MAP_PATH
     decision = _raw_decision(fault_mode="single_delayed_30s")
     trace_path.write_text(json.dumps(decision) + "\n", encoding="utf-8")
     task_path.write_text(json.dumps(_mapping_rows()[0]) + "\n", encoding="utf-8")
@@ -444,31 +558,6 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
         fault_mode="single_delayed_30s",
     )
     outcome_path.write_text(json.dumps(outcome_rows[0]) + "\n", encoding="utf-8")
-    map_path.write_text(
-        json.dumps({"nodes": [{"location": 0, "outgoing": [1, 2]}]}),
-        encoding="utf-8",
-    )
-
-    for name in (
-        "TRACE_SCHEMA",
-        "TRACE_MANIFEST",
-        "TRACE_SAMPLE",
-        "OUTCOME_SAMPLE",
-        "HARD_CASE_INDEX",
-        "SAMPLING_BALANCE",
-        "SAMPLING_REPORT",
-        "LINEAGE_TABLE",
-        "LINEAGE_REPORT",
-        "SOURCE_RELEASE_TABLE",
-        "SOURCE_IDENTITY_TABLE",
-        "SOURCE_IDENTITY_REPORT",
-    ):
-        original = getattr(runner, name)
-        monkeypatch.setattr(runner, name, tmp_path / original.name)
-    monkeypatch.setattr(runner, "DATASET_DIR", tmp_path)
-    monkeypatch.setattr(runner, "TABLE_DIR", tmp_path)
-    monkeypatch.setattr(runner, "REPORT_DIR", tmp_path)
-
     manifest = runner.write_artifacts(
         trace_paths=[trace_path],
         task_path=task_path,
@@ -478,10 +567,15 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
         scale="2x",
         fault_mode="single_delayed_30s",
         config=dt.SamplingConfig(limit=10, minimum_per_stratum=1, maximum_per_stratum=2),
+        producer=producer,
+        **location_options,
     )
 
-    runtime_row = json.loads((tmp_path / runner.TRACE_SAMPLE.name).read_text(encoding="utf-8"))
-    outcome_row = json.loads((tmp_path / runner.OUTCOME_SAMPLE.name).read_text(encoding="utf-8"))
+    runtime_path = output_root / runner.TRACE_SAMPLE.relative_to(ROOT)
+    outcome_sample_path = output_root / runner.OUTCOME_SAMPLE.relative_to(ROOT)
+    manifest_path = output_root / runner.TRACE_MANIFEST.relative_to(ROOT)
+    runtime_row = json.loads(runtime_path.read_text(encoding="utf-8"))
+    outcome_row = json.loads(outcome_sample_path.read_text(encoding="utf-8"))
     assert "reached_goal" not in runtime_row
     assert "tail_bucket" not in runtime_row
     assert outcome_row["reached_goal"] is True
@@ -489,6 +583,29 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
     assert outcome_row["segment_id"] == "1:direct"
     assert outcome_row["runtime_bag_id"] == 1
     assert manifest["validation"]["candidate_equals_true_outgoing_set"] == "PASS"
+    assert manifest["validation"]["fixed_real_map_identity"] == "PASS"
+    assert manifest["fixed_real_map_only"] is True
+    assert manifest["canonical_map_sha256"] == CANONICAL_MAP_SHA256
+    assert manifest["graph"]["path"] == "data/processed/maps/map2.json"
+    assert manifest["graph"]["sha256"] == CANONICAL_MAP_SHA256
+    assert manifest["graph"]["fixed_real_map_only"] is True
+    assert manifest["producer"] == producer
+    persisted_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert persisted_manifest["producer"] == producer
+    assert manifest["artifacts"]["trace_sample"]["path"] == (
+        "artifacts/datasets/g4irsf11_decision_trace_sample.jsonl"
+    )
+    assert manifest["manifest"]["path"] == (
+        "artifacts/datasets/g4irsf11_decision_trace_manifest.json"
+    )
+    for descriptor in [manifest["manifest"], *manifest["artifacts"].values()]:
+        relative = Path(descriptor["path"])
+        staged_path = output_root / relative
+        assert staged_path.is_file()
+        assert runner._sha256(staged_path) == descriptor["sha256"]
+        assert not (publication_root / relative).exists()
+    assert runtime_row["metadata"]["fixed_real_map_only"] is True
+    assert runtime_row["metadata"]["canonical_map_sha256"] == CANONICAL_MAP_SHA256
     assert manifest["validation"]["runtime_bag_identity"]["status"] == "PASS"
     assert manifest["source_task"]["identity_audit"]["original_task_ids_rewritten"] is False
     assert manifest["sampling"]["sample_count"] == 1
@@ -502,6 +619,21 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
         "fault_scenario_inactive_here": 1
     }
     assert "missing_fault_decisions" in manifest["coverage"]["blockers"]
+
+    with pytest.raises(ValueError, match="only data/processed/maps/map2.json"):
+        runner.write_artifacts(
+            trace_paths=[trace_path],
+            task_path=task_path,
+            map_path=task_path,
+            outcome_path=outcome_path,
+            scenario="paper_repeat_01",
+            scale="2x",
+            fault_mode="single_delayed_30s",
+            config=dt.SamplingConfig(
+                limit=10, minimum_per_stratum=1, maximum_per_stratum=2
+            ),
+            **location_options,
+        )
 
     outcome_path.write_text(
         json.dumps(dict(outcome_rows[0], task_id=999)) + "\n", encoding="utf-8"
@@ -518,6 +650,7 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
             config=dt.SamplingConfig(
                 limit=10, minimum_per_stratum=1, maximum_per_stratum=2
             ),
+            **location_options,
         )
     outcome_path.write_text(json.dumps(outcome_rows[0]) + "\n", encoding="utf-8")
 
@@ -534,7 +667,9 @@ def test_artifact_writer_keeps_runtime_trace_and_outcome_table_separate(
         scale="2x",
         fault_mode="single_delayed_30s",
         config=dt.SamplingConfig(limit=10, minimum_per_stratum=1, maximum_per_stratum=2),
+        **location_options,
     )
+    assert active_manifest["producer"] == {"scope": "standalone_unpromoted"}
     assert active_manifest["coverage"]["fault_covered"] is True
     assert active_manifest["coverage"]["fault_local_active_decision_count_before_dedupe"] == 1
     assert active_manifest["coverage"]["dimension_counts_before_dedupe"]["fault"] == {

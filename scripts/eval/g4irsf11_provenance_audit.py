@@ -6,7 +6,18 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
+import sys
 from typing import Any, Mapping
+
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.eval.g4irsf11_fixed_map import (  # noqa: E402
+    CANONICAL_MAP_RELATIVE_PATH,
+    CANONICAL_MAP_SHA256,
+)
 
 
 SCHEMA = "czr005.g4irsf11.provenance_ci_audit.v1"
@@ -56,6 +67,18 @@ def assemble_provenance_audit(
         ),
         {},
     )
+    fixed_map = (
+        local.get("fixed_real_map")
+        if isinstance(local.get("fixed_real_map"), Mapping)
+        else {}
+    )
+    fixed_map_clean = (
+        fixed_map.get("fixed_real_map_only") is True
+        and fixed_map.get("topology_mutation_allowed") is False
+        and str(fixed_map.get("repo_relative_path") or "")
+        == CANONICAL_MAP_RELATIVE_PATH.as_posix()
+        and str(fixed_map.get("sha256") or "").lower() == CANONICAL_MAP_SHA256
+    )
     blockers: list[str] = []
     if local.get("schema") != "czr005.g4irsf11.gate_integrity.v1":
         blockers.append("local gate-integrity schema is missing or unexpected")
@@ -65,6 +88,8 @@ def assemble_provenance_audit(
         blockers.append("audited local HEAD does not exactly equal audited upstream HEAD")
     if protected_command.get("return_code") != 0 or str(protected_command.get("stdout") or "").strip():
         blockers.append("legacy/map/inputdata protected-path status is not clean")
+    if not fixed_map_clean:
+        blockers.append("local audit is not bound to the canonical fixed-real-map path and SHA-256")
     if remote_head_sha != audited_head:
         blockers.append("remote workflow head SHA does not bind the audited local HEAD")
     if remote_workflow != WORKFLOW:
@@ -89,6 +114,8 @@ def assemble_provenance_audit(
             protected_command.get("return_code") == 0
             and not str(protected_command.get("stdout") or "").strip()
         ),
+        "fixed_real_map_clean": fixed_map_clean,
+        "fixed_real_map": dict(fixed_map),
         "local_audit": {
             "path": local_audit_path.as_posix(),
             "schema": local.get("schema", ""),

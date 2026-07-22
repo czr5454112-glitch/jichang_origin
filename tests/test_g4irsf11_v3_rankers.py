@@ -11,6 +11,12 @@ import numpy as np
 import pytest
 
 from scripts.train import train_g4irsf11_v3_rankers as v3_trainer
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_HASH_SEMANTICS,
+    CANONICAL_MAP_RELATIVE_PATH,
+    CANONICAL_MAP_SHA256,
+    canonical_map_identity,
+)
 
 from czr005.models.g4irsf11_v3 import (
     ACTIVE_RELEASE_SCHEMA,
@@ -80,6 +86,16 @@ def _write_preflight_fixture(root: Path) -> tuple[Path, Path, dict[str, object]]
     source.write_text("decision_id\nd-1\n", encoding="utf-8")
     decision = {
         "schema_id": "czr005.g4irsf11.decision_trace.v1",
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": CANONICAL_MAP_SHA256,
+        "graph": {
+            "path": CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+            "sha256": CANONICAL_MAP_SHA256,
+            "sha256_semantics": CANONICAL_MAP_HASH_SEMANTICS,
+            "raw_bytes_sha256": canonical_map_identity()["raw_bytes_sha256"],
+            "fixed_real_map_only": True,
+            "topology_mutation_allowed": False,
+        },
         "artifact_hash_semantics": SEMANTIC_TEXT_HASH,
         "validation": {
             "status": "PASS",
@@ -106,6 +122,9 @@ def _write_preflight_fixture(root: Path) -> tuple[Path, Path, dict[str, object]]
         gates[stage] = {"status": "PASS", "evidence": [_descriptor(root, evidence)]}
     gate = {
         "schema": PRETRAINING_GATE_SCHEMA,
+        "overall_status": "PASS",
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": CANONICAL_MAP_SHA256,
         "gates": gates,
         "decision_manifest": _descriptor(root, decision_path),
     }
@@ -115,11 +134,28 @@ def _write_preflight_fixture(root: Path) -> tuple[Path, Path, dict[str, object]]
     return gate_path, decision_path, gate
 
 
-def test_preflight_requires_hashed_a_through_h_and_exact_decision_binding(tmp_path: Path) -> None:
+def _patch_exact_gate_recomputation(
+    monkeypatch: pytest.MonkeyPatch, gate_path: Path
+) -> None:
+    from scripts.eval import g4irsf11_pretraining_gate as gate_module
+
+    monkeypatch.setattr(
+        gate_module,
+        "evaluate_pretraining_gate",
+        lambda ignored_root: json.loads(gate_path.read_text(encoding="utf-8")),
+    )
+
+
+def test_preflight_requires_hashed_a_through_h_and_exact_decision_binding(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     gate_path, decision_path, _ = _write_preflight_fixture(tmp_path)
+    _patch_exact_gate_recomputation(monkeypatch, gate_path)
     approval = preflight_training(tmp_path, gate_path, decision_path)
     assert approval.allowed
     assert approval.blockers == ()
+    assert approval.fixed_real_map_only is True
+    assert approval.canonical_map_sha256 == CANONICAL_MAP_SHA256
     assert approval.gate_statuses == {stage: "PASS" for stage in REQUIRED_STAGE_GATES}
     assert set(approval.artifacts) == {
         "hard_case_index",
@@ -129,10 +165,42 @@ def test_preflight_requires_hashed_a_through_h_and_exact_decision_binding(tmp_pa
     }
 
 
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        (lambda value: value.update(fixed_real_map_only=False), "fixed_real_map_only"),
+        (
+            lambda value: value["graph"].update(path="artifacts/synthetic-map.json"),
+            "graph.path",
+        ),
+        (
+            lambda value: value["graph"].update(sha256="0" * 64),
+            "graph.sha256",
+        ),
+    ),
+)
+def test_preflight_rejects_every_noncanonical_map_contract(
+    tmp_path: Path, mutation: object, message: str
+) -> None:
+    gate_path, decision_path, gate = _write_preflight_fixture(tmp_path)
+    decision = json.loads(decision_path.read_text(encoding="utf-8"))
+    assert callable(mutation)
+    mutation(decision)
+    decision_path.write_text(json.dumps(decision, sort_keys=True), encoding="utf-8")
+    gate["decision_manifest"] = _descriptor(tmp_path, decision_path)
+    gate_path.write_text(json.dumps(gate, sort_keys=True), encoding="utf-8")
+
+    approval = preflight_training(tmp_path, gate_path, decision_path)
+
+    assert not approval.allowed
+    assert any(message in blocker for blocker in approval.blockers)
+
+
 def test_preflight_treats_lf_and_crlf_text_as_the_same_manifest_artifact(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     gate_path, decision_path, _ = _write_preflight_fixture(tmp_path)
+    _patch_exact_gate_recomputation(monkeypatch, gate_path)
     hard = tmp_path / "artifacts" / "hard.csv"
     lf = b"decision_id\nd-1\n"
     crlf = b"decision_id\r\nd-1\r\n"
@@ -166,6 +234,15 @@ def test_preflight_fails_closed_for_partial_stage_or_stale_evidence(tmp_path: Pa
     assert any("gate H evidence[0]: sha256 mismatch" in blocker for blocker in approval.blockers)
 
 
+def test_handcrafted_pass_gate_cannot_bypass_exact_recomputation(tmp_path: Path) -> None:
+    gate_path, decision_path, _ = _write_preflight_fixture(tmp_path)
+
+    approval = preflight_training(tmp_path, gate_path, decision_path)
+
+    assert not approval.allowed
+    assert any("exact A-H recomputation" in blocker for blocker in approval.blockers)
+
+
 def test_preflight_rejects_partial_decision_coverage_even_when_a_h_say_pass(tmp_path: Path) -> None:
     gate_path, decision_path, gate = _write_preflight_fixture(tmp_path)
     decision = json.loads(decision_path.read_text(encoding="utf-8"))
@@ -194,9 +271,17 @@ def test_passed_gate_c_seed_mismatch_never_overwrites_trains_or_publishes(
     approved_readiness = {
         "schema": SPLIT_READINESS_SCHEMA,
         "status": "PASS",
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": CANONICAL_MAP_SHA256,
         "model_weights_initialised": False,
         "bindings": {
             "decision_manifest_sha256": _sha(decision_path),
+            "fixed_real_map_only": True,
+            "canonical_map": {
+                "path": CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+                "sha256": CANONICAL_MAP_SHA256,
+                "sha256_semantics": CANONICAL_MAP_HASH_SEMANTICS,
+            },
             "hard_case_index": artifacts["hard_case_index"],
             "outcome_sample": artifacts["outcome_sample"],
         },
@@ -219,6 +304,7 @@ def test_passed_gate_c_seed_mismatch_never_overwrites_trains_or_publishes(
     assert isinstance(gate_c, dict)
     gate_c["evidence"].append(_descriptor(tmp_path, readiness_path))
     gate_path.write_text(json.dumps(gate, sort_keys=True), encoding="utf-8")
+    _patch_exact_gate_recomputation(monkeypatch, gate_path)
 
     recomputed_readiness = copy.deepcopy(approved_readiness)
     recomputed_readiness["metrics"]["seed"] = 29
@@ -293,6 +379,8 @@ def _example(
     source = str(100 + (index % 4))
     goal = str(200 + (index % 5))
     fault_name = "fault_local_active" if index % 3 == 0 else "no_fault"
+    fault_scenario = "single_delayed_30s" if index % 3 == 0 else "no_fault"
+    load_level = "4.0x" if index % 2 else "2.5x"
     digest = fingerprint or hashlib.sha256(f"semantic-{index}".encode()).hexdigest()
     return DecisionExample(
         decision_id=f"decision-{index}",
@@ -301,12 +389,20 @@ def _example(
         source=source,
         goal=goal,
         fault=fault_name,
+        scenario="paper" if index % 3 else "fault",
+        scenario_observed="paper" if index % 3 else "fault",
+        scale=load_level,
+        flight_bank=f"release_15m_{index % 5}",
+        load_level=load_level,
+        fault_scenario=fault_scenario,
         day=day,
         event_time=day * 100_000.0 + index * 100.0,
         candidate_nodes=(10, 11, 12),
         candidate_features=features,
         target_index=1,
         risk_label=risk,
+        fixed_real_map_only=True,
+        canonical_map_sha256=CANONICAL_MAP_SHA256,
     )
 
 
@@ -332,6 +428,14 @@ def test_all_required_splits_have_zero_task_and_duplicate_overlap() -> None:
     assert all(row["status"] == "PASS" for row in rows)
     assert all(row["task_repeat_overlap"] == 0 for row in rows)
     assert all(row["semantic_duplicate_overlap"] == 0 for row in rows)
+    assert dataset.fixed_real_map_only is True
+    assert dataset.canonical_map_sha256 == CANONICAL_MAP_SHA256
+    assert all(split.fixed_real_map_only is True for split in dataset.splits.values())
+    assert all(
+        row["heldout"]["fixed_real_map_only"] is True
+        and row["heldout"]["canonical_map_sha256"] == CANONICAL_MAP_SHA256
+        for row in rows
+    )
     by_name = {row["split"]: row for row in rows}
     assert by_name["time_heldout"]["train_max_event_time"] < by_name["time_heldout"][
         "test_min_event_time"
@@ -339,6 +443,15 @@ def test_all_required_splits_have_zero_task_and_duplicate_overlap() -> None:
     assert by_name["time_heldout"]["chronological_overlap"] is False
     assert by_name["fault_heldout"]["active_fault_train_decisions"] == 0
     assert by_name["fault_heldout"]["active_fault_test_decisions"] > 0
+    assert "load_level" in by_name["load_heldout"]["heldout"]
+    assert (
+        by_name["load_heldout"]["heldout"]["metadata_dimension_audit"][
+            "load_level"
+        ]["overlap_count"]
+        == 0
+    )
+    assert "flight_bank" in by_name["flight_bank_heldout"]["heldout"]
+    assert "fault_scenario" in by_name["fault_scenario_heldout"]["heldout"]
 
 
 def test_split_builder_refuses_missing_fault_dimension() -> None:
@@ -394,6 +507,12 @@ def test_loader_uses_failed_rows_only_for_risk_and_rejects_unapproved_feature(tm
         "task_id",
         "scenario",
         "scenario_observed",
+        "scale",
+        "flight_bank",
+        "load_level",
+        "fault_scenario",
+        "fixed_real_map_only",
+        "canonical_map_sha256",
         "source_node",
         "goal_node",
         "fault_bucket",
@@ -414,7 +533,13 @@ def test_loader_uses_failed_rows_only_for_risk_and_rejects_unapproved_feature(tm
                 "decision_id": f"d-{index}",
                 "task_id": f"shared-task_repeat_{index + 1}",
                 "scenario": "paper",
-                "scenario_observed": "paper" if index == 0 else "fault",
+                "scenario_observed": f"paper_repeat_{index + 1:02d}",
+                "scale": "2.5x" if index == 0 else "4.0x",
+                "flight_bank": f"release_15m_{index}",
+                "load_level": "2.5x" if index == 0 else "4.0x",
+                "fault_scenario": "no_fault",
+                "fixed_real_map_only": True,
+                "canonical_map_sha256": CANONICAL_MAP_SHA256,
                 "source_node": 1,
                 "goal_node": 9,
                 "fault_bucket": "no_fault",
@@ -445,6 +570,14 @@ def test_loader_uses_failed_rows_only_for_risk_and_rejects_unapproved_feature(tm
     assert loaded[1].target_index is None
     assert loaded[1].risk_label == 1
     assert loaded[0].task_family == loaded[1].task_family == "shared-task"
+    assert loaded[0].scenario == "paper"
+    assert loaded[0].scenario_observed == "paper_repeat_01"
+    assert loaded[0].flight_bank == "release_15m_0"
+    assert loaded[1].load_level == "4.0x"
+    assert all(example.fixed_real_map_only for example in loaded)
+    assert {example.canonical_map_sha256 for example in loaded} == {
+        CANONICAL_MAP_SHA256
+    }
 
     rows[0]["candidate_records"] = json.dumps(
         [
@@ -459,6 +592,15 @@ def test_loader_uses_failed_rows_only_for_risk_and_rejects_unapproved_feature(tm
     with pytest.raises(V3TrainingError, match="unapproved candidate features"):
         load_training_examples(hard, outcomes)
 
+    rows[0]["candidate_records"] = json.dumps(candidates)
+    rows[0]["canonical_map_sha256"] = "0" * 64
+    with hard.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    with pytest.raises(V3TrainingError, match="canonical_map_sha256"):
+        load_training_examples(hard, outcomes)
+
 
 def test_loader_retains_single_candidate_only_for_risk_supervision(tmp_path: Path) -> None:
     hard = tmp_path / "hard.csv"
@@ -468,6 +610,12 @@ def test_loader_retains_single_candidate_only_for_risk_supervision(tmp_path: Pat
         "task_id": "task-1",
         "scenario": "fault",
         "scenario_observed": "fault",
+        "scale": "2.5x",
+        "flight_bank": "release_15m_0",
+        "load_level": "2.5x",
+        "fault_scenario": "single_delayed_30s",
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": CANONICAL_MAP_SHA256,
         "source_node": 1,
         "goal_node": 9,
         "fault_bucket": "advertised_fault",
@@ -548,6 +696,14 @@ def test_payload_validation_rejects_nonfinite_and_wrong_dimensions() -> None:
     invalid["ranker"]["b2"] = True
     with pytest.raises(V3TrainingError, match="JSON number"):
         validate_model_payload(invalid)
+    invalid = copy.deepcopy(linear)
+    invalid["fixed_real_map_only"] = False
+    with pytest.raises(V3TrainingError, match="fixed_real_map_only"):
+        validate_model_payload(invalid)
+    invalid = copy.deepcopy(linear)
+    invalid["training"]["canonical_map_sha256"] = "0" * 64
+    with pytest.raises(V3TrainingError, match="canonical_map_sha256"):
+        validate_model_payload(invalid)
 
 
 def test_candidate_order_and_lowest_node_tie_break_are_explicit(tmp_path: Path) -> None:
@@ -587,8 +743,11 @@ def test_candidate_order_and_lowest_node_tie_break_are_explicit(tmp_path: Path) 
         load_v3_model(path)
 
 
-def test_active_release_is_hash_bound_and_revocation_blocks_old_models(tmp_path: Path) -> None:
+def test_active_release_is_hash_bound_and_revocation_blocks_old_models(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     gate_path, decision_path, _ = _write_preflight_fixture(tmp_path)
+    _patch_exact_gate_recomputation(monkeypatch, gate_path)
     dataset = prepare_dataset(tuple(_example(index, risk=index % 7 == 0) for index in range(30)))
     models, _ = train_all_models(dataset, epochs=1, learning_rate=0.01, seed=13)
     release_id = "a" * 32
@@ -600,15 +759,24 @@ def test_active_release_is_hash_bound_and_revocation_blocks_old_models(tmp_path:
     readiness = {
         "schema": SPLIT_READINESS_SCHEMA,
         "status": "PASS",
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": CANONICAL_MAP_SHA256,
         "model_weights_initialised": False,
         "bindings": {
             "decision_manifest_sha256": _sha(decision_path),
+            "fixed_real_map_only": True,
+            "canonical_map": {
+                "path": CANONICAL_MAP_RELATIVE_PATH.as_posix(),
+                "sha256": CANONICAL_MAP_SHA256,
+                "sha256_semantics": CANONICAL_MAP_HASH_SEMANTICS,
+            },
             "hard_case_index": _descriptor(tmp_path, hard, rows=1),
             "outcome_sample": _descriptor(tmp_path, outcomes, rows=1),
         },
         "dataset_sha256": dataset.dataset_sha256,
         "required_splits": list(SPLIT_NAMES),
         "split_statuses": {name: "PASS" for name in SPLIT_NAMES},
+        "split_audit": split_audit_rows(dataset),
         "blockers": [],
     }
     readiness_path.write_text(json.dumps(readiness, sort_keys=True), encoding="utf-8")

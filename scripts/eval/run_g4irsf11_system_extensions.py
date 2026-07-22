@@ -16,31 +16,64 @@ for path in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(path))
 
 from scripts.eval.g4irsf11_evaluation_reporting import case_row, sha256_file, write_csv  # noqa: E402
+from scripts.eval.g4irsf11_fixed_map import (  # noqa: E402
+    CANONICAL_MAP_SHA256,
+    assert_canonical_map,
+    canonical_map_identity,
+)
 from scripts.eval.g4irsf11_experiment_protocol import (  # noqa: E402
     EXTENSION_PROTOCOL_VERSION,
     system_extension_cases,
     system_extension_manifest,
 )
 from scripts.eval.g4irsf11_workloads import load_jsonl  # noqa: E402
-from scripts.eval.g4irsf11_result_validation import atomic_write_text  # noqa: E402
+from scripts.eval.g4irsf11_result_validation import (  # noqa: E402
+    atomic_write_text,
+    canonical_manifest_sha256,
+    read_json_object,
+)
+from scripts.eval.g4irsf11_publication import (  # noqa: E402
+    artifact_bindings as publication_artifact_bindings,
+    begin_completion,
+    complete_publication,
+    completion_validation_errors,
+    create_staging_root,
+    promote_staged_artifacts,
+    semantic_file_sha256,
+)
 from scripts.eval.run_g4irsf11_event_runtime_evaluation import (  # noqa: E402
     MAP_PATH,
     SOURCE_TASK_PATH,
     _case_paths,
     _canonical_case_inputs,
     _descriptor_matches,
+    _fixed_map_protocol_manifest,
     _acquire_case_lock,
+    _acquire_all_case_locks,
+    assert_implementation_unchanged,
     _release_case_lock,
     _read_json,
     _write_json,
     execute_case,
+    assert_frozen_inputs_unchanged,
     implementation_sha256,
+    implementation_source_sha256,
+    load_source_task_snapshot,
+    source_task_identity,
 )
 
 
 PROTOCOL_PATH = ROOT / "artifacts" / "gates" / "g4irsf11_system_extension_protocol.json"
+EXTENSION_COMPLETION_PATH = (
+    ROOT / "artifacts" / "gates" / "g4irsf11_system_extension_completion.json"
+)
 TABLE_PATH = ROOT / "outputs" / "tables" / "g4irsf11_system_extension_matrix.csv"
 REPORT_PATH = ROOT / "outputs" / "reports" / "g4irsf11_system_extension_report.md"
+EXTENSION_PUBLICATION_ARTIFACTS = (
+    "artifacts/gates/g4irsf11_system_extension_protocol.json",
+    "outputs/tables/g4irsf11_system_extension_matrix.csv",
+    "outputs/reports/g4irsf11_system_extension_report.md",
+)
 PROTOCOL_LOCK = ROOT / ".pytest_cache" / "g4irsf11" / "event_evaluation" / "system_extension_protocol.lock"
 CONSOLIDATION_LOCK = (
     ROOT
@@ -49,6 +82,204 @@ CONSOLIDATION_LOCK = (
     / "event_evaluation"
     / "system_extension_consolidation.lock"
 )
+
+
+def extension_protocol_manifest() -> dict[str, Any]:
+    """Return the fixed-map-bound, checkout-independent extension protocol."""
+
+    return _fixed_map_protocol_manifest(system_extension_manifest(), extension=True)
+
+
+def _extension_case_set_sha256() -> str:
+    return canonical_manifest_sha256(
+        {"case_ids": [case.case_id for case in system_extension_cases()]}
+    )
+
+
+def _extension_producer(
+    args: argparse.Namespace,
+    *,
+    implementation_digest: str,
+    frozen_source_identity: Mapping[str, Any] | None = None,
+    frozen_map_identity: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    source_identity_value = dict(frozen_source_identity or source_task_identity())
+    map_identity_value = dict(frozen_map_identity or canonical_map_identity())
+    return {
+        "schema": "czr005.g4irsf11.evidence_producer.v1",
+        "scope": "system_extension",
+        "protocol_version": EXTENSION_PROTOCOL_VERSION,
+        "protocol_manifest_sha256": canonical_manifest_sha256(
+            extension_protocol_manifest()
+        ),
+        "fixed_real_map_only": True,
+        "canonical_map_path": map_identity_value["repo_relative_path"],
+        "canonical_map_sha256": map_identity_value["sha256"],
+        "canonical_map_raw_bytes_sha256": map_identity_value["raw_bytes_sha256"],
+        "topology_mutation_allowed": map_identity_value["topology_mutation_allowed"],
+        "source_task_path": source_identity_value["path"],
+        "source_task_raw_bytes_sha256": source_identity_value["raw_bytes_sha256"],
+        "source_task_semantic_sha256": source_identity_value["semantic_sha256"],
+        "source_task_row_count": source_identity_value["row_count"],
+        "implementation_sha256": implementation_digest,
+        "implementation_source_bundle_sha256": implementation_source_sha256(),
+        "measurement_cohort": {
+            "name": str(args.measurement_cohort),
+            "declared_concurrent_worker_target": int(args.concurrent_worker_target),
+        },
+        "extension_case_set_sha256": _extension_case_set_sha256(),
+        "expected_case_count": len(system_extension_cases()),
+    }
+
+
+def _extension_completion_metadata(
+    args: argparse.Namespace,
+    *,
+    implementation_digest: str,
+    executed_case_count: int,
+    no_smoke_substitution_pass: bool,
+    frozen_source_identity: Mapping[str, Any] | None = None,
+    frozen_map_identity: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    source_identity_value = dict(frozen_source_identity or source_task_identity())
+    map_identity_value = dict(frozen_map_identity or canonical_map_identity())
+    producer = _extension_producer(
+        args,
+        implementation_digest=implementation_digest,
+        frozen_source_identity=source_identity_value,
+        frozen_map_identity=map_identity_value,
+    )
+    return {
+        "scope": "system_extension",
+        "protocol_version": EXTENSION_PROTOCOL_VERSION,
+        "protocol_manifest_sha256": canonical_manifest_sha256(
+            extension_protocol_manifest()
+        ),
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": map_identity_value["sha256"],
+        "canonical_map_path": map_identity_value["repo_relative_path"],
+        "canonical_map_raw_bytes_sha256": map_identity_value["raw_bytes_sha256"],
+        "topology_mutation_allowed": map_identity_value["topology_mutation_allowed"],
+        "source_task_path": source_identity_value["path"],
+        "source_task_raw_bytes_sha256": source_identity_value["raw_bytes_sha256"],
+        "source_task_semantic_sha256": source_identity_value["semantic_sha256"],
+        "source_task_row_count": source_identity_value["row_count"],
+        "implementation_sha256": implementation_digest,
+        "implementation_source_bundle_sha256": implementation_source_sha256(),
+        "measurement_cohort": producer["measurement_cohort"],
+        "concurrent_worker_target": int(args.concurrent_worker_target),
+        "expected_case_count": len(system_extension_cases()),
+        "executed_case_count": int(executed_case_count),
+        "extension_case_set_sha256": _extension_case_set_sha256(),
+        "no_smoke_substitution_pass": bool(no_smoke_substitution_pass),
+        "producer": producer,
+        "producer_sha256": canonical_manifest_sha256(producer),
+    }
+
+
+def extension_completion_validation_errors(root: Path = ROOT) -> list[str]:
+    current_source_identity = source_task_identity()
+    current_map_identity = canonical_map_identity()
+    expected_metadata = {
+        "protocol_version": EXTENSION_PROTOCOL_VERSION,
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": current_map_identity["sha256"],
+        "canonical_map_path": current_map_identity["repo_relative_path"],
+        "topology_mutation_allowed": current_map_identity["topology_mutation_allowed"],
+        "source_task_path": current_source_identity["path"],
+        "source_task_semantic_sha256": current_source_identity["semantic_sha256"],
+        "source_task_row_count": current_source_identity["row_count"],
+        "expected_case_count": len(system_extension_cases()),
+        "executed_case_count": len(system_extension_cases()),
+        "extension_case_set_sha256": _extension_case_set_sha256(),
+        "no_smoke_substitution_pass": True,
+    }
+    completion_path = root / EXTENSION_COMPLETION_PATH.relative_to(ROOT)
+    errors = completion_validation_errors(
+        root,
+        completion_path,
+        expected_scope="system_extension",
+        expected_source_bundle_sha256=implementation_source_sha256(),
+        expected_protocol_manifest_sha256=canonical_manifest_sha256(
+            extension_protocol_manifest()
+        ),
+        expected_artifact_paths=EXTENSION_PUBLICATION_ARTIFACTS,
+        expected_metadata=expected_metadata,
+    )
+    protocol_path = root / PROTOCOL_PATH.relative_to(ROOT)
+    try:
+        published_protocol = read_json_object(protocol_path)
+    except (FileNotFoundError, OSError, TypeError, ValueError) as exc:
+        errors.append(
+            f"published extension protocol cannot be decoded: {type(exc).__name__}: {exc}"
+        )
+    else:
+        if published_protocol != extension_protocol_manifest():
+            errors.append("published extension protocol differs from the exact protocol")
+    if completion_path.is_file():
+        try:
+            completion = read_json_object(completion_path)
+        except (OSError, TypeError, ValueError):
+            completion = {}
+        runtime_digest = str(completion.get("implementation_sha256") or "")
+        if len(runtime_digest) != 64 or any(
+            character not in "0123456789abcdef" for character in runtime_digest
+        ):
+            errors.append("extension completion runtime implementation SHA-256 is invalid")
+        for raw_key in (
+            "canonical_map_raw_bytes_sha256",
+            "source_task_raw_bytes_sha256",
+        ):
+            raw_digest = str(completion.get(raw_key) or "")
+            if len(raw_digest) != 64 or any(
+                character not in "0123456789abcdef" for character in raw_digest
+            ):
+                errors.append(f"extension completion {raw_key} is invalid")
+        producer = (
+            completion.get("producer")
+            if isinstance(completion.get("producer"), Mapping)
+            else {}
+        )
+        if producer.get("scope") != "system_extension":
+            errors.append("extension completion producer scope is unexpected")
+        if completion.get("producer_sha256") != canonical_manifest_sha256(producer):
+            errors.append("extension completion producer SHA-256 binding differs")
+        for key in (
+            "protocol_version",
+            "protocol_manifest_sha256",
+            "fixed_real_map_only",
+            "canonical_map_path",
+            "canonical_map_sha256",
+            "canonical_map_raw_bytes_sha256",
+            "topology_mutation_allowed",
+            "source_task_path",
+            "source_task_raw_bytes_sha256",
+            "source_task_semantic_sha256",
+            "source_task_row_count",
+            "implementation_sha256",
+            "implementation_source_bundle_sha256",
+            "measurement_cohort",
+            "extension_case_set_sha256",
+            "expected_case_count",
+        ):
+            if producer.get(key) != completion.get(key):
+                errors.append(f"extension completion producer field differs: {key}")
+        cohort = completion.get("measurement_cohort")
+        if not isinstance(cohort, Mapping) or not str(cohort.get("name") or "").strip():
+            errors.append("extension completion measurement cohort is empty")
+        try:
+            worker_target = int(
+                cohort.get("declared_concurrent_worker_target")
+                if isinstance(cohort, Mapping)
+                else 0
+            )
+        except (TypeError, ValueError):
+            worker_target = 0
+        if worker_target <= 0:
+            errors.append("extension completion concurrent worker target is invalid")
+        if completion.get("concurrent_worker_target") != worker_target:
+            errors.append("extension top-level worker target differs from cohort")
+    return errors
 
 
 def _continuity_audit(
@@ -249,8 +480,10 @@ def _load_rows(
     return rows
 
 
-def _write_report(rows: Sequence[Mapping[str, Any]]) -> None:
-    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+def _write_report(
+    rows: Sequence[Mapping[str, Any]], *, report_path: Path = REPORT_PATH
+) -> None:
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         "# G4IRSF11 Exact Continuity and Extreme-Stress Extensions",
         "",
@@ -277,7 +510,7 @@ def _write_report(rows: Sequence[Mapping[str, Any]]) -> None:
             "",
         ]
     )
-    atomic_write_text(REPORT_PATH, "\n".join(lines))
+    atomic_write_text(report_path, "\n".join(lines))
 
 
 def _consolidation_complete(rows: Sequence[Mapping[str, Any]]) -> bool:
@@ -288,6 +521,39 @@ def _consolidation_complete(rows: Sequence[Mapping[str, Any]]) -> bool:
         and row.get("no_smoke_substitution_pass") is True
         for row in rows
     )
+
+
+def _extension_stage_validation_errors(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    args: argparse.Namespace,
+    implementation_digest: str,
+) -> list[str]:
+    errors: list[str] = []
+    expected_ids = [case.case_id for case in system_extension_cases()]
+    actual_ids = [str(row.get("case_id") or "") for row in rows]
+    if actual_ids != expected_ids or len(set(actual_ids)) != len(actual_ids):
+        errors.append("extension staged ledger case set/order is not exact")
+    protocol_digest = canonical_manifest_sha256(extension_protocol_manifest())
+    for row in rows:
+        case_id = str(row.get("case_id") or "<missing>")
+        if row.get("execution_status") != "EXECUTED":
+            errors.append(f"extension staged case is not EXECUTED: {case_id}")
+        if row.get("no_smoke_substitution_pass") is not True:
+            errors.append(f"extension staged case exact-input audit failed: {case_id}")
+        if row.get("protocol_manifest_sha256") != protocol_digest:
+            errors.append(f"extension staged case protocol differs: {case_id}")
+        if row.get("map_sha256") != CANONICAL_MAP_SHA256:
+            errors.append(f"extension staged case map differs: {case_id}")
+        if row.get("implementation_sha256") != implementation_digest:
+            errors.append(f"extension staged case implementation differs: {case_id}")
+        if row.get("measurement_cohort") != str(args.measurement_cohort):
+            errors.append(f"extension staged case cohort differs: {case_id}")
+        if row.get("declared_concurrent_worker_target") != int(
+            args.concurrent_worker_target
+        ):
+            errors.append(f"extension staged case worker target differs: {case_id}")
+    return errors
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -331,22 +597,26 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         selected = list(cases)
 
-    manifest = system_extension_manifest()
-    protocol_lock = _acquire_case_lock(PROTOCOL_LOCK, "system_extension_protocol", wait_seconds=60.0)
-    if protocol_lock is None:
-        raise SystemExit(f"could not acquire system extension protocol lock {PROTOCOL_LOCK}")
-    try:
-        _write_json(PROTOCOL_PATH, manifest)
-    finally:
-        _release_case_lock(protocol_lock)
-    base_rows = load_jsonl(SOURCE_TASK_PATH)
+    assert_canonical_map(MAP_PATH)
+    frozen_map_identity = canonical_map_identity()
+    manifest = extension_protocol_manifest()
+    base_rows, frozen_source_identity = load_source_task_snapshot()
     if len(base_rows) != 43_603:
         raise SystemExit(f"formal source task count must be 43603, got {len(base_rows)}")
-    source_sha256 = sha256_file(SOURCE_TASK_PATH)
-    map_sha256 = sha256_file(MAP_PATH)
+    source_sha256 = str(frozen_source_identity["raw_bytes_sha256"])
+    map_sha256 = CANONICAL_MAP_SHA256
     implementation_digest = implementation_sha256(args.search_path)
+
+    def assert_measurement_identity_unchanged() -> None:
+        assert_implementation_unchanged(implementation_digest, args.search_path)
+        assert_frozen_inputs_unchanged(
+            frozen_source_identity, frozen_map_identity
+        )
+
+    assert_measurement_identity_unchanged()
     failures = 0
     for index, case in enumerate(selected, start=1):
+        assert_measurement_identity_unchanged()
         print(f"[g4irsf11-extension] {index}/{len(selected)} START {case.case_id}", flush=True)
         _, execution = execute_case(
             case,
@@ -358,12 +628,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             protocol_version=EXTENSION_PROTOCOL_VERSION,
             protocol_manifest_value=manifest,
         )
+        assert_measurement_identity_unchanged()
         failures += execution.get("status") != "EXECUTED"
         print(
             f"[g4irsf11-extension] {index}/{len(selected)} {execution.get('status')} {case.case_id}",
             flush=True,
         )
     if args.execute_only:
+        assert_measurement_identity_unchanged()
         return 2 if failures else 0
     consolidation_lock = _acquire_case_lock(
         CONSOLIDATION_LOCK,
@@ -374,7 +646,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise SystemExit(
             f"could not acquire system extension consolidation lock {CONSOLIDATION_LOCK}"
         )
+    case_snapshot_locks: list[dict[str, Any]] = []
+    stage_errors: list[str] = []
     try:
+        acquired_case_locks = _acquire_all_case_locks(
+            cases,
+            scope="extension_consolidation_snapshot",
+            wait_seconds=60.0,
+        )
+        if acquired_case_locks is None:
+            raise SystemExit(
+                "could not acquire every extension case lock within 60 seconds; "
+                "no staged or published extension report was rewritten"
+            )
+        case_snapshot_locks = acquired_case_locks
+        stage_root = create_staging_root(ROOT, "system_extension")
+        assert_measurement_identity_unchanged()
+        _write_json(stage_root / PROTOCOL_PATH.relative_to(ROOT), manifest)
         rows = _load_rows(
             source_sha256=source_sha256,
             map_sha256=map_sha256,
@@ -382,9 +670,79 @@ def main(argv: Sequence[str] | None = None) -> int:
             expected_args=args,
             base_rows=base_rows,
         )
-        write_csv(TABLE_PATH, rows)
-        _write_report(rows)
+        write_csv(stage_root / TABLE_PATH.relative_to(ROOT), rows)
+        _write_report(
+            rows, report_path=stage_root / REPORT_PATH.relative_to(ROOT)
+        )
+        assert_measurement_identity_unchanged()
+        stage_errors.extend(
+            _extension_stage_validation_errors(
+                rows,
+                args=args,
+                implementation_digest=implementation_digest,
+            )
+        )
+        try:
+            staged_bindings = publication_artifact_bindings(
+                stage_root, EXTENSION_PUBLICATION_ARTIFACTS
+            )
+        except (FileNotFoundError, OSError, TypeError, ValueError) as exc:
+            stage_errors.append(
+                "extension staged publication binding failed: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            staged_bindings = {}
+        executed_case_count = sum(
+            row["execution_status"] == "EXECUTED" for row in rows
+        )
+        complete = (
+            not failures
+            and not stage_errors
+            and _consolidation_complete(rows)
+            and executed_case_count == len(rows) == len(cases)
+        )
+        final_metadata = _extension_completion_metadata(
+            args,
+            implementation_digest=implementation_digest,
+            executed_case_count=executed_case_count,
+            no_smoke_substitution_pass=complete,
+            frozen_source_identity=frozen_source_identity,
+            frozen_map_identity=frozen_map_identity,
+        )
+        if complete:
+            assert_measurement_identity_unchanged()
+            transaction = begin_completion(
+                EXTENSION_COMPLETION_PATH,
+                final_metadata,
+                expected_bindings=staged_bindings,
+            )
+            promote_staged_artifacts(
+                stage_root,
+                ROOT,
+                EXTENSION_PUBLICATION_ARTIFACTS,
+                staged_bindings,
+            )
+            assert_measurement_identity_unchanged()
+            complete_publication(
+                EXTENSION_COMPLETION_PATH,
+                final_metadata,
+                root=ROOT,
+                artifact_paths=EXTENSION_PUBLICATION_ARTIFACTS,
+                expected_bindings=staged_bindings,
+                publication_id=str(transaction["publication_id"]),
+            )
+            try:
+                assert_measurement_identity_unchanged()
+            except Exception:
+                begin_completion(
+                    EXTENSION_COMPLETION_PATH,
+                    final_metadata,
+                    expected_bindings=staged_bindings,
+                )
+                raise
     finally:
+        for case_lock in reversed(case_snapshot_locks):
+            _release_case_lock(case_lock)
         _release_case_lock(consolidation_lock)
     print(
         json.dumps(
@@ -398,7 +756,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
         flush=True,
     )
-    complete = _consolidation_complete(rows)
+    for blocker in stage_errors:
+        print(f"[g4irsf11-extension] publication blocker: {blocker}", flush=True)
     return 2 if failures or not complete else 0
 
 

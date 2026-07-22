@@ -578,12 +578,20 @@ def canonicalise_decision_row(
 
 
 def load_adjacency(map_path: Path) -> dict[int, tuple[int, ...]]:
-    """Load canonical outgoing-neighbor sets from a processed map JSON."""
+    """Load outgoing-neighbor sets from the one immutable canonical map.
 
-    payload = json.loads(map_path.read_text(encoding="utf-8"))
+    Decision validation is graph-bearing evidence, so accepting an arbitrary
+    self-consistent JSON path here would make downstream tests and manifests
+    fail open.  Path and normalised-text SHA are checked before parsing.
+    """
+
+    from scripts.eval.g4irsf11_fixed_map import assert_canonical_map
+
+    canonical_path = assert_canonical_map(map_path)
+    payload = json.loads(canonical_path.read_text(encoding="utf-8"))
     nodes = payload.get("nodes")
     if not isinstance(nodes, list):
-        raise ValueError(f"map has no nodes array: {map_path}")
+        raise ValueError(f"canonical map has no nodes array: {canonical_path}")
     adjacency: dict[int, tuple[int, ...]] = {}
     for row in nodes:
         location = int(row["location"])
@@ -897,6 +905,11 @@ def feature_lineage_rows() -> list[dict[str, Any]]:
 
     add("metadata.scenario", "metadata", "experiment_context", "experiment_manifest", "pre_run")
     add("metadata.scale", "metadata", "experiment_context", "experiment_manifest", "pre_run")
+    add("metadata.flight_bank", "metadata", "experiment_context", "experiment_manifest_or_release_time_bucket", "pre_run")
+    add("metadata.load_level", "metadata", "experiment_context", "experiment_manifest_or_scale", "pre_run")
+    add("metadata.fault_scenario", "metadata", "experiment_context", "experiment_manifest_or_fault_mode", "pre_run")
+    add("metadata.fixed_real_map_only", "metadata", "topology_contract", "canonical_map_identity", "static", derivation="must be true for trainable artifacts")
+    add("metadata.canonical_map_sha256", "metadata", "topology_contract", "canonical_map_identity", "static", derivation="normalised-LF SHA-256 of immutable map2.json")
     add("metadata.run_id", "metadata", "experiment_context", "experiment_manifest", "pre_run", derivation="excluded from semantic repeat fingerprint")
     add("metadata.trace_shard", "metadata", "shard_context", "trace_input_manifest", "pre_run")
     add("metadata.trace_shard_count", "metadata", "shard_context", "event_runtime_trace_context", "pre_run")
@@ -1168,6 +1181,91 @@ def scenario_family(scenario: str) -> str:
     return result.rstrip("_-") or _required_text(scenario, "scenario")
 
 
+def _original_segment_identity(decision: Mapping[str, Any]) -> str:
+    """Return the immutable segment identity below an experiment namespace.
+
+    ``namespace_workload`` deliberately appends ``:<scenario>`` to segment IDs
+    so runtime identities remain unique when several scenarios are combined.
+    That suffix is experiment metadata, not source-task identity.  Keeping it
+    in the semantic fingerprint would make the five deterministic paper
+    repeats look different even after their scenario names are normalised.
+    Only the exact observed scenario suffix is removed; arbitrary colon-delimited
+    source segment IDs are otherwise preserved byte-for-byte.
+    """
+
+    segment_id = _required_text(decision.get("segment_id"), "segment_id")
+    metadata = decision.get("metadata") or {}
+    if not isinstance(metadata, Mapping):
+        raise DecisionTraceValidationError("metadata must be an object")
+    scenario = _required_text(metadata.get("scenario", "unspecified"), "metadata.scenario")
+    suffix = ":" + scenario
+    if segment_id.endswith(suffix) and len(segment_id) > len(suffix):
+        return segment_id[: -len(suffix)]
+    return segment_id
+
+
+def _flight_bank(decision: Mapping[str, Any], source_link: Mapping[str, Any]) -> str:
+    """Return an explicit flight-bank label, preserving one when supplied.
+
+    G4IRSF11's flight-bank workload uses deterministic fifteen-minute windows.
+    Older trace payloads do not carry a label, so the exact release timestamp
+    is mapped to the same 900-second bucket instead of inventing topology or
+    consulting any future outcome.
+    """
+
+    metadata = decision.get("metadata") or {}
+    if not isinstance(metadata, Mapping):
+        raise DecisionTraceValidationError("metadata must be an object")
+    supplied = metadata.get("flight_bank")
+    if supplied not in (None, ""):
+        return _required_text(supplied, "metadata.flight_bank")
+    release_time = _finite_number(source_link.get("release_time"), "source_link.release_time")
+    return f"release_15m_{math.floor(release_time / 900.0)}"
+
+
+def _decision_split_metadata(
+    decision: Mapping[str, Any], source_link: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Canonical experiment dimensions retained for leakage-free v3 splits."""
+
+    metadata = decision.get("metadata") or {}
+    if not isinstance(metadata, Mapping):
+        raise DecisionTraceValidationError("metadata must be an object")
+    scenario_observed = _required_text(
+        metadata.get("scenario", "unspecified"), "metadata.scenario"
+    )
+    scale = _required_text(metadata.get("scale", "unspecified"), "metadata.scale")
+    load_level = _required_text(
+        metadata.get("load_level", scale), "metadata.load_level"
+    )
+    fault_scenario = _required_text(
+        metadata.get("fault_scenario", metadata.get("fault_mode", "no_fault")),
+        "metadata.fault_scenario",
+    )
+    result: dict[str, Any] = {
+        "scenario": scenario_family(scenario_observed),
+        "scenario_observed": scenario_observed,
+        "scale": scale,
+        "flight_bank": _flight_bank(decision, source_link),
+        "load_level": load_level,
+        "fault_scenario": fault_scenario,
+    }
+    if "fixed_real_map_only" in metadata:
+        result["fixed_real_map_only"] = _required_bool(
+            metadata["fixed_real_map_only"], "metadata.fixed_real_map_only"
+        )
+    if "canonical_map_sha256" in metadata:
+        map_sha = _required_text(
+            metadata["canonical_map_sha256"], "metadata.canonical_map_sha256"
+        ).lower()
+        if not re.fullmatch(r"[0-9a-f]{64}", map_sha):
+            raise DecisionTraceValidationError(
+                "metadata.canonical_map_sha256 must be a lowercase SHA-256"
+            )
+        result["canonical_map_sha256"] = map_sha
+    return result
+
+
 def _tail_bucket(outcome: Mapping[str, Any] | None) -> str:
     if not outcome:
         return "body_or_unlabeled"
@@ -1285,7 +1383,7 @@ def _semantic_fingerprint(
         "scenario_family": stratum["scenario"],
         "scale": stratum["scale"],
         "task_id": decision["task_id"],
-        "segment_id": decision["segment_id"],
+        "segment_id": _original_segment_identity(decision),
         "event_time": decision["event_time"],
         "current_node": decision["current_node"],
         "goal_node": decision["goal_node"],
@@ -1490,6 +1588,7 @@ def stratified_reservoir_sample(
             link = candidate["source_link"]
             outcome = candidate["outcome"]
             fingerprint = candidate["fingerprint"]
+            split_metadata = _decision_split_metadata(decision, link)
             sample_rows.append(
                 {
                     "case_id": "g4irsf11-" + fingerprint[:20],
@@ -1498,9 +1597,7 @@ def stratified_reservoir_sample(
                     "task_id": decision["task_id"],
                     "segment_id": decision["segment_id"],
                     "event_time": decision["event_time"],
-                    "scenario": candidate["stratum"]["scenario"],
-                    "scenario_observed": (decision.get("metadata") or {}).get("scenario", "unspecified"),
-                    "scale": candidate["stratum"]["scale"],
+                    **split_metadata,
                     "source_node": link["source_node"],
                     "goal_node": decision["goal_node"],
                     "junction_node": decision["current_node"],

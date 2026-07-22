@@ -4,6 +4,7 @@ import argparse
 import csv
 from datetime import date
 import hashlib
+import io
 import json
 from pathlib import Path
 import sys
@@ -33,6 +34,16 @@ from czr005.datasets.decision_trace import (
     validate_outcome_decision_identities,
     validate_runtime_bag_identity,
 )
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_HASH_SEMANTICS,
+    CANONICAL_MAP_PATH,
+    assert_canonical_map,
+    canonical_map_identity,
+)
+from scripts.eval.g4irsf11_result_validation import (
+    atomic_write_jsonl,
+    atomic_write_text,
+)
 
 
 DATASET_DIR = ROOT / "artifacts" / "datasets"
@@ -52,6 +63,21 @@ SOURCE_RELEASE_TABLE = TABLE_DIR / "g4irsf11_source_release_decision_mapping.csv
 SOURCE_IDENTITY_TABLE = TABLE_DIR / "g4irsf11_source_identity_audit.csv"
 SOURCE_IDENTITY_REPORT = REPORT_DIR / "g4irsf11_source_identity_audit.md"
 
+_OUTPUT_PATHS = {
+    "trace_schema": TRACE_SCHEMA.relative_to(ROOT),
+    "trace_manifest": TRACE_MANIFEST.relative_to(ROOT),
+    "trace_sample": TRACE_SAMPLE.relative_to(ROOT),
+    "outcome_sample": OUTCOME_SAMPLE.relative_to(ROOT),
+    "hard_case_index": HARD_CASE_INDEX.relative_to(ROOT),
+    "sampling_balance": SAMPLING_BALANCE.relative_to(ROOT),
+    "sampling_report": SAMPLING_REPORT.relative_to(ROOT),
+    "lineage_table": LINEAGE_TABLE.relative_to(ROOT),
+    "lineage_report": LINEAGE_REPORT.relative_to(ROOT),
+    "source_release_table": SOURCE_RELEASE_TABLE.relative_to(ROOT),
+    "source_identity_table": SOURCE_IDENTITY_TABLE.relative_to(ROOT),
+    "source_identity_report": SOURCE_IDENTITY_REPORT.relative_to(ROOT),
+}
+
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -65,11 +91,26 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _relative(path: Path) -> str:
+def _relative(path: Path, *, root: Path = ROOT) -> str:
     try:
-        return path.resolve().relative_to(ROOT.resolve()).as_posix()
+        return path.resolve().relative_to(root.resolve()).as_posix()
     except ValueError:
         return str(path.resolve())
+
+
+def _paths_at(root: Path) -> dict[str, Path]:
+    resolved = root.resolve()
+    return {name: resolved / relative for name, relative in _OUTPUT_PATHS.items()}
+
+
+def _published_relative(path: Path, publication_root: Path) -> str:
+    resolved_root = publication_root.resolve()
+    resolved = path.resolve()
+    if not resolved.is_relative_to(resolved_root):
+        raise ValueError(
+            f"published artifact path escapes publication root: {resolved}"
+        )
+    return resolved.relative_to(resolved_root).as_posix()
 
 
 def _json_scalar(value: Any) -> Any:
@@ -83,22 +124,16 @@ def _json_scalar(value: Any) -> Any:
 
 
 def _write_csv(path: Path, rows: Iterable[Mapping[str, Any]], fieldnames: list[str]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({name: _json_scalar(row.get(name)) for name in fieldnames})
+    handle = io.StringIO(newline="")
+    writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+    writer.writeheader()
+    for row in rows:
+        writer.writerow({name: _json_scalar(row.get(name)) for name in fieldnames})
+    atomic_write_text(path, handle.getvalue())
 
 
 def _write_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> int:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    count = 0
-    with path.open("w", encoding="utf-8", newline="\n") as handle:
-        for row in rows:
-            handle.write(json.dumps(dict(row), ensure_ascii=False, sort_keys=True, allow_nan=False) + "\n")
-            count += 1
-    return count
+    return atomic_write_jsonl(path, rows)
 
 
 def _markdown_table(headers: list[str], rows: list[list[Any]]) -> str:
@@ -153,6 +188,11 @@ def _merge_metadata(
         "scenario",
         "scale",
         "fault_mode",
+        "flight_bank",
+        "load_level",
+        "fault_scenario",
+        "fixed_real_map_only",
+        "canonical_map_sha256",
         "run_id",
         "model_score_semantics",
         "candidate_ordering",
@@ -161,11 +201,22 @@ def _merge_metadata(
         "trace_shard_count",
         "trace_shard_index",
     }
-    merged.update({key: value for key, value in payload_context.items() if key in row_context_keys})
+    context_metadata = {
+        key: value for key, value in payload_context.items() if key in row_context_keys
+    }
+    merged.update(context_metadata)
+    if "scale" in context_metadata and "load_level" not in context_metadata:
+        merged["load_level"] = context_metadata["scale"]
+    if "fault_mode" in context_metadata and "fault_scenario" not in context_metadata:
+        merged["fault_scenario"] = context_metadata["fault_mode"]
     row_metadata = row.get("metadata") or {}
     if not isinstance(row_metadata, Mapping):
         raise ValueError("decision metadata must be an object")
     merged.update(row_metadata)
+    if "scale" in row_metadata and "load_level" not in row_metadata:
+        merged["load_level"] = row_metadata["scale"]
+    if "fault_mode" in row_metadata and "fault_scenario" not in row_metadata:
+        merged["fault_scenario"] = row_metadata["fault_mode"]
     merged.setdefault("trace_shard", shard_id)
     result = dict(row)
     result["metadata"] = merged
@@ -173,17 +224,46 @@ def _merge_metadata(
 
 
 def _read_all_traces(
-    paths: list[Path], defaults: Mapping[str, Any]
+    paths: list[Path],
+    defaults: Mapping[str, Any],
+    *,
+    expected_map_sha256: str,
+    path_root: Path = ROOT,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     rows: list[dict[str, Any]] = []
     shards: list[dict[str, Any]] = []
     for path in paths:
         shard_rows, context = _read_trace(path)
+        if path.suffix.lower() == ".jsonl":
+            identities = [
+                (
+                    (row.get("metadata") or {}).get("fixed_real_map_only"),
+                    (row.get("metadata") or {}).get("canonical_map_sha256"),
+                )
+                for row in shard_rows
+                if isinstance(row.get("metadata") or {}, Mapping)
+            ]
+            if len(identities) != len(shard_rows) or not identities or any(
+                fixed is not True or digest != expected_map_sha256
+                for fixed, digest in identities
+            ):
+                raise ValueError(
+                    f"{path}: every JSONL decision must carry the canonical fixed-map identity"
+                )
+            context["fixed_real_map_only"] = True
+            context["canonical_map_sha256"] = expected_map_sha256
+        elif (
+            context.get("fixed_real_map_only") is not True
+            or context.get("canonical_map_sha256") != expected_map_sha256
+        ):
+            raise ValueError(
+                f"{path}: trace_context is not bound to the canonical fixed real map"
+            )
         rows.extend(_merge_metadata(row, defaults, context, path.stem) for row in shard_rows)
         runtime_summary = context.pop("_runtime_summary", {})
         shards.append(
             {
-                "path": _relative(path),
+                "path": _relative(path, root=path_root),
                 "sha256": _sha256(path),
                 "decision_count": len(shard_rows),
                 "context": context,
@@ -358,6 +438,11 @@ def _hard_case_fieldnames() -> list[str]:
         "scenario",
         "scenario_observed",
         "scale",
+        "flight_bank",
+        "load_level",
+        "fault_scenario",
+        "fixed_real_map_only",
+        "canonical_map_sha256",
         "source_node",
         "goal_node",
         "junction_node",
@@ -474,8 +559,17 @@ def _outcome_sample_rows(
     return result
 
 
-def _artifact_entry(path: Path, row_count: int | None = None) -> dict[str, Any]:
-    result: dict[str, Any] = {"path": _relative(path), "sha256": _sha256(path)}
+def _artifact_entry(
+    path: Path,
+    *,
+    published_path: Path,
+    publication_root: Path,
+    row_count: int | None = None,
+) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "path": _published_relative(published_path, publication_root),
+        "sha256": _sha256(path),
+    }
     if row_count is not None:
         result["row_count"] = row_count
     return result
@@ -492,16 +586,55 @@ def write_artifacts(
     fault_mode: str,
     config: SamplingConfig,
     include_routine: bool = False,
+    output_root: Path = ROOT,
+    publication_root: Path = ROOT,
+    producer: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Validate source data and write all G4IRSF11-B artifacts."""
+    """Validate source data and write all G4IRSF11-B artifacts.
 
-    defaults = {"scenario": scenario, "scale": scale, "fault_mode": fault_mode}
-    raw_rows, trace_shards = _read_all_traces(trace_paths, defaults)
+    ``output_root`` is the physical destination, which may be a private staging
+    tree.  ``publication_root`` names the final repository tree whose relative
+    paths are recorded in the manifest.  The two roots intentionally default to
+    :data:`ROOT` so the standalone CLI retains its historical behaviour.
+    """
+
+    output_paths = _paths_at(output_root)
+    publication_paths = _paths_at(publication_root)
+    producer_identity = dict(
+        producer if producer is not None else {"scope": "standalone_unpromoted"}
+    )
+    if not str(producer_identity.get("scope") or "").strip():
+        raise ValueError("producer.scope must be non-empty")
+    canonical_path = assert_canonical_map(map_path)
+    map_identity = canonical_map_identity()
+    defaults = {
+        "scenario": scenario,
+        "scale": scale,
+        "fault_mode": fault_mode,
+        "load_level": scale,
+        "fault_scenario": fault_mode,
+    }
+    raw_rows, trace_shards = _read_all_traces(
+        trace_paths,
+        defaults,
+        expected_map_sha256=str(map_identity["sha256"]),
+        path_root=publication_root,
+    )
     trace_completeness = _trace_completeness(trace_shards)
     if not raw_rows:
         raise ValueError("decision trace is empty; an empty trace cannot satisfy the G4IRSF11 data gate")
-    adjacency = load_adjacency(map_path)
+    adjacency = load_adjacency(canonical_path)
     decisions = validate_decision_rows(raw_rows, adjacency)
+    for index, decision in enumerate(decisions):
+        metadata = decision.get("metadata") or {}
+        if metadata.get("fixed_real_map_only") is not True:
+            raise ValueError(
+                f"decision row {index} does not declare fixed_real_map_only=true"
+            )
+        if metadata.get("canonical_map_sha256") != map_identity["sha256"]:
+            raise ValueError(
+                f"decision row {index} canonical_map_sha256 does not match immutable map2"
+            )
     task_rows = _read_task_rows(task_path)
     source_identity = source_identity_audit(task_rows)
     runtime_identity = validate_runtime_bag_identity(decisions)
@@ -528,18 +661,20 @@ def write_artifacts(
     lineage = feature_lineage_rows()
     validate_feature_lineage(lineage)
 
-    for path in (DATASET_DIR, TABLE_DIR, REPORT_DIR):
-        path.mkdir(parents=True, exist_ok=True)
-    TRACE_SCHEMA.write_text(
+    atomic_write_text(
+        output_paths["trace_schema"],
         json.dumps(decision_trace_schema(), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
     )
-    _write_csv(LINEAGE_TABLE, lineage, list(lineage[0]))
-    _write_csv(HARD_CASE_INDEX, sample.rows, _hard_case_fieldnames())
-    _write_csv(SAMPLING_BALANCE, sample.balance_rows, _balance_fieldnames())
-    _write_csv(SOURCE_RELEASE_TABLE, source_links, _source_fieldnames())
+    _write_csv(output_paths["lineage_table"], lineage, list(lineage[0]))
+    _write_csv(output_paths["hard_case_index"], sample.rows, _hard_case_fieldnames())
+    _write_csv(
+        output_paths["sampling_balance"], sample.balance_rows, _balance_fieldnames()
+    )
+    _write_csv(
+        output_paths["source_release_table"], source_links, _source_fieldnames()
+    )
     source_identity_row = {
-        "source_task_path": _relative(task_path),
+        "source_task_path": _relative(task_path, root=publication_root),
         **source_identity,
         "runtime_validation_status": runtime_identity["status"],
         "observed_decision_count": runtime_identity["decision_count"],
@@ -549,11 +684,17 @@ def write_artifacts(
         ],
         "runtime_identity_alias_count": runtime_identity["runtime_identity_alias_count"],
     }
-    _write_csv(SOURCE_IDENTITY_TABLE, [source_identity_row], _source_identity_fieldnames())
+    _write_csv(
+        output_paths["source_identity_table"],
+        [source_identity_row],
+        _source_identity_fieldnames(),
+    )
     runtime_sample = _runtime_sample_rows(decisions, sample.rows)
-    runtime_sample_count = _write_jsonl(TRACE_SAMPLE, runtime_sample)
+    runtime_sample_count = _write_jsonl(output_paths["trace_sample"], runtime_sample)
     outcome_sample = _outcome_sample_rows(sample.rows, outcomes)
-    outcome_sample_count = _write_jsonl(OUTCOME_SAMPLE, outcome_sample)
+    outcome_sample_count = _write_jsonl(
+        output_paths["outcome_sample"], outcome_sample
+    )
 
     stats = sample.statistics
     minimum_status = "PASS" if int(stats["strata_below_requested_minimum"]) == 0 else "EXPLICIT_SHORTFALL"
@@ -586,7 +727,8 @@ def write_artifacts(
         sample.balance_rows,
         key=lambda row: (-int(row["total_count_before_dedupe"]), str(row["stratum_id"])),
     )[:20]
-    SAMPLING_REPORT.write_text(
+    atomic_write_text(
+        output_paths["sampling_report"],
         "\n".join(
             [
                 "# G4IRSF11 Decision-Level Stratified Sampling Balance",
@@ -645,13 +787,13 @@ def write_artifacts(
                 "",
             ]
         ),
-        encoding="utf-8",
     )
 
     by_lineage: dict[str, int] = {}
     for row in lineage:
         by_lineage[str(row["lineage"])] = by_lineage.get(str(row["lineage"]), 0) + 1
-    LINEAGE_REPORT.write_text(
+    atomic_write_text(
+        output_paths["lineage_report"],
         "\n".join(
             [
                 "# G4IRSF11 Feature Lineage Audit",
@@ -668,10 +810,10 @@ def write_artifacts(
                 "",
             ]
         ),
-        encoding="utf-8",
     )
 
-    SOURCE_IDENTITY_REPORT.write_text(
+    atomic_write_text(
+        output_paths["source_identity_report"],
         "\n".join(
             [
                 "# G4IRSF11 Source and Runtime Identity Audit",
@@ -705,42 +847,68 @@ def write_artifacts(
                 "",
             ]
         ),
-        encoding="utf-8",
     )
 
+    def artifact(name: str, row_count: int | None = None) -> dict[str, Any]:
+        return _artifact_entry(
+            output_paths[name],
+            published_path=publication_paths[name],
+            publication_root=publication_root,
+            row_count=row_count,
+        )
+
     artifacts = {
-        "schema": _artifact_entry(TRACE_SCHEMA),
-        "trace_sample": _artifact_entry(TRACE_SAMPLE, runtime_sample_count),
-        "outcome_sample": _artifact_entry(OUTCOME_SAMPLE, outcome_sample_count),
-        "hard_case_index": _artifact_entry(HARD_CASE_INDEX, len(sample.rows)),
-        "sampling_balance": _artifact_entry(SAMPLING_BALANCE, len(sample.balance_rows)),
-        "sampling_report": _artifact_entry(SAMPLING_REPORT),
-        "feature_lineage_table": _artifact_entry(LINEAGE_TABLE, len(lineage)),
-        "feature_lineage_report": _artifact_entry(LINEAGE_REPORT),
-        "source_release_mapping": _artifact_entry(SOURCE_RELEASE_TABLE, len(source_links)),
-        "source_identity_table": _artifact_entry(SOURCE_IDENTITY_TABLE, 1),
-        "source_identity_report": _artifact_entry(SOURCE_IDENTITY_REPORT),
+        "schema": artifact("trace_schema"),
+        "trace_sample": artifact("trace_sample", runtime_sample_count),
+        "outcome_sample": artifact("outcome_sample", outcome_sample_count),
+        "hard_case_index": artifact("hard_case_index", len(sample.rows)),
+        "sampling_balance": artifact(
+            "sampling_balance", len(sample.balance_rows)
+        ),
+        "sampling_report": artifact("sampling_report"),
+        "feature_lineage_table": artifact("lineage_table", len(lineage)),
+        "feature_lineage_report": artifact("lineage_report"),
+        "source_release_mapping": artifact(
+            "source_release_table", len(source_links)
+        ),
+        "source_identity_table": artifact("source_identity_table", 1),
+        "source_identity_report": artifact("source_identity_report"),
     }
     manifest = {
         "schema_id": SCHEMA_ID,
+        "producer": producer_identity,
+        "fixed_real_map_only": True,
+        "canonical_map_sha256": map_identity["sha256"],
         "artifact_hash_semantics": "sha256 of UTF-8 text after CRLF/CR newline normalization to LF",
         "generated_date": date.today().isoformat(),
         "trace_shards": trace_shards,
         "source_task": {
-            "path": _relative(task_path),
+            "path": _relative(task_path, root=publication_root),
             "sha256": _sha256(task_path),
             "task_segment_count": len(source_mappings),
             "identity_audit": source_identity,
         },
-        "graph": {"path": _relative(map_path), "sha256": _sha256(map_path)},
+        "graph": {
+            "path": map_identity["repo_relative_path"],
+            "sha256": map_identity["sha256"],
+            "sha256_semantics": CANONICAL_MAP_HASH_SEMANTICS,
+            "raw_bytes_sha256": map_identity["raw_bytes_sha256"],
+            "fixed_real_map_only": True,
+            "topology_mutation_allowed": False,
+        },
         "outcome_source": (
-            {"path": _relative(outcome_path), "sha256": _sha256(outcome_path), "row_count": len(outcomes)}
+            {
+                "path": _relative(outcome_path, root=publication_root),
+                "sha256": _sha256(outcome_path),
+                "row_count": len(outcomes),
+            }
             if outcome_path
             else None
         ),
         "validation": {
             "status": "PASS",
             "decision_count": len(decisions),
+            "fixed_real_map_identity": "PASS",
             "candidate_graph_membership": "PASS",
             "candidate_equals_true_outgoing_set": "PASS",
             "selected_in_candidates": "PASS",
@@ -787,11 +955,11 @@ def write_artifacts(
             "fault recovery, paper-full runtime, or G4J."
         ),
     }
-    TRACE_MANIFEST.write_text(
+    atomic_write_text(
+        output_paths["trace_manifest"],
         json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
     )
-    manifest["manifest"] = _artifact_entry(TRACE_MANIFEST)
+    manifest["manifest"] = artifact("trace_manifest")
     return manifest
 
 
@@ -801,7 +969,13 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--trace", type=Path, action="append", required=True, help="Decision trace JSON/JSONL; repeat for shards")
     parser.add_argument("--tasks", type=Path, required=True, help="Source-release task JSONL")
-    parser.add_argument("--map", dest="map_path", type=Path, default=ROOT / "data" / "processed" / "maps" / "map2.json")
+    parser.add_argument(
+        "--map",
+        dest="map_path",
+        type=Path,
+        default=CANONICAL_MAP_PATH,
+        help="Canonical data/processed/maps/map2.json only; every other path is rejected.",
+    )
     parser.add_argument("--outcomes", type=Path, help="Separate post-hoc decision outcome JSONL")
     parser.add_argument("--scenario", default="g4irsf11_event_runtime")
     parser.add_argument("--scale", default="1x")

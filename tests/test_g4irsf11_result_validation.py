@@ -16,6 +16,10 @@ from scripts.eval.g4irsf11_experiment_protocol import (
     protocol_manifest,
 )
 from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metrics
+from scripts.eval.g4irsf11_fixed_map import (
+    CANONICAL_MAP_SHA256,
+    canonical_map_identity,
+)
 from scripts.eval.g4irsf11_result_validation import (
     EXECUTION_DESCRIPTOR_SCHEMA,
     JUNCTION_BOTTLENECK_SCORE_SEMANTICS,
@@ -37,6 +41,7 @@ from scripts.eval.g4irsf11_result_validation import (
 from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
     _command_text,
     _descriptor_matches,
+    _fixed_map_protocol_manifest,
     _measurement_cohort,
     _worker_command,
     _worker_config,
@@ -76,7 +81,7 @@ def _valid_bundle(tmp_path: Path) -> tuple[
     atomic_write_json(fault_path, [])
     input_artifact = workload_binding(workload_path, rows)
     fault_artifact = fault_binding(fault_path, [])
-    manifest_digest = canonical_manifest_sha256(protocol_manifest())
+    manifest_digest = canonical_manifest_sha256(_fixed_map_protocol_manifest())
     args = SimpleNamespace(
         max_events=20_000_000,
         measurement_cohort="pytest_sequential1",
@@ -178,7 +183,9 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         "protocol_manifest_sha256": manifest_digest,
         "input_artifact": input_artifact,
         "fault_artifact": fault_artifact,
-        "map_sha256": "a" * 64,
+        "map_sha256": CANONICAL_MAP_SHA256,
+        "map_identity": canonical_map_identity(),
+        "fixed_real_map_only": True,
         "source_sha256": "b" * 64,
         "implementation_sha256": "c" * 64,
         "scenario": case.case_id,
@@ -232,6 +239,8 @@ def _valid_bundle(tmp_path: Path) -> tuple[
                 "scenario": case.case_id,
                 "scale": case.scale,
                 "fault_mode": case.fault_profile,
+                "fixed_real_map_only": True,
+                "canonical_map_sha256": CANONICAL_MAP_SHA256,
             },
         },
         "event_sample": [],
@@ -250,7 +259,7 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         input_artifact=input_artifact,
         fault_artifact=fault_artifact,
         fault_rows=[],
-        map_sha256="a" * 64,
+        map_sha256=CANONICAL_MAP_SHA256,
         source_sha256="b" * 64,
         implementation_sha256="c" * 64,
         config=config,
@@ -269,7 +278,9 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         "case": case.as_dict(),
         "config": config,
         "source_sha256": "b" * 64,
-        "map_sha256": "a" * 64,
+        "map_sha256": CANONICAL_MAP_SHA256,
+        "map_identity": canonical_map_identity(),
+        "fixed_real_map_only": True,
         "implementation_sha256": "c" * 64,
         "input_sha256": input_artifact["sha256"],
         "input_artifact": input_artifact,
@@ -305,6 +316,29 @@ def test_valid_v3_result_and_descriptor_bundle_passes(tmp_path: Path) -> None:
     ) == []
 
 
+def test_result_and_descriptor_reject_altered_raw_map_identity(tmp_path: Path) -> None:
+    descriptor, result, expectation, argv, result_path, traces, rows = _valid_bundle(tmp_path)
+    result["map_identity"]["raw_bytes_sha256"] = "0" * 64
+    descriptor["map_identity"]["raw_bytes_sha256"] = "0" * 64
+
+    assert any(
+        "recomputed canonical map identity" in error
+        for error in validate_event_result(result, expectation, workload_rows=rows)
+    )
+    errors = validate_execution_descriptor(
+        descriptor,
+        result,
+        expectation,
+        normalized_argv=argv,
+        normalized_command_text="worker",
+        parent_timeout_seconds=60.0,
+        result_artifact=artifact_binding(result_path),
+        trace_artifacts=traces,
+        workload_rows=rows,
+    )
+    assert any("recomputed canonical map identity" in error for error in errors)
+
+
 def test_current_cohort_descriptor_validation_rebuilds_canonical_inputs(
     tmp_path: Path,
 ) -> None:
@@ -332,11 +366,11 @@ def test_current_cohort_descriptor_validation_rebuilds_canonical_inputs(
         args,
         run_id=str(descriptor["run_id"]),
         protocol_version=PROTOCOL_VERSION,
-        protocol_manifest_digest=canonical_manifest_sha256(protocol_manifest()),
+        protocol_manifest_digest=canonical_manifest_sha256(_fixed_map_protocol_manifest()),
         input_artifact=expectation.input_artifact,
         fault_artifact=expectation.fault_artifact,
         source_sha256="b" * 64,
-        map_sha256="a" * 64,
+        map_sha256=CANONICAL_MAP_SHA256,
         implementation_digest="c" * 64,
     )
     descriptor["normalized_argv"] = command
@@ -347,7 +381,7 @@ def test_current_cohort_descriptor_validation_rebuilds_canonical_inputs(
         descriptor,
         case,
         source_sha256="b" * 64,
-        map_sha256="a" * 64,
+        map_sha256=CANONICAL_MAP_SHA256,
         implementation_digest="c" * 64,
         paths=paths,
         expected_args=args,
@@ -360,7 +394,7 @@ def test_current_cohort_descriptor_validation_rebuilds_canonical_inputs(
         descriptor,
         case,
         source_sha256="b" * 64,
-        map_sha256="a" * 64,
+        map_sha256=CANONICAL_MAP_SHA256,
         implementation_digest="c" * 64,
         paths=paths,
         expected_args=args,
