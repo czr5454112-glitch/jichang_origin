@@ -366,6 +366,26 @@ def test_missing_formal_cases_are_explicit_blockers() -> None:
     assert all(row["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER" for row in gates)
 
 
+def test_temporal_gate_counts_unrecovered_windows_as_explicit_negative_evidence() -> None:
+    temporal = [case for case in formal_cases() if case.category == "temporal_fault"]
+    rows = [
+        {
+            "case_id": case.case_id,
+            "execution_status": "EXECUTED",
+            "fault_recovery_pass": case.case_id != "fault_fault_policy_off",
+            "fault_recovery_unobserved_count": (
+                1 if case.case_id == "fault_fault_policy_off" else 0
+            ),
+        }
+        for case in temporal
+    ]
+
+    gate = next(row for row in gate_rows(rows) if row["gate"] == "temporal_fault_recovery")
+    assert gate["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    assert f"executed={len(temporal)}/{len(temporal)}" in gate["evidence"]
+    assert "unrecovered_windows=1" in gate["evidence"]
+
+
 def test_parser_rejects_incomplete_protocol_success_bypass() -> None:
     with pytest.raises(SystemExit):
         build_parser().parse_args(

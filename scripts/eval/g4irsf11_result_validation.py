@@ -1,4 +1,4 @@
-"""Strict v3 result and execution-descriptor validation for G4IRSF11.
+"""Strict result and execution-descriptor validation for G4IRSF11.
 
 The event runtime produces scientific evidence, not a best-effort cache.  This
 module therefore keeps serialization, hashing, and semantic validation in one
@@ -28,7 +28,7 @@ from scripts.eval.g4irsf11_fixed_map import (
 )
 
 
-RESULT_SCHEMA = "czr005.g4irsf11.event_runtime_result.v3"
+RESULT_SCHEMA = "czr005.g4irsf11.event_runtime_result.v4"
 EXECUTION_DESCRIPTOR_SCHEMA = "czr005.g4irsf11.event_runtime_execution_descriptor.v3"
 JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS = (
     "cpp_object_plus_live_deque_payload_plus_calendar_capacity_lower_bound"
@@ -862,7 +862,7 @@ def validate_event_result(
     *,
     workload_rows: Sequence[Mapping[str, Any]] | None = None,
 ) -> list[str]:
-    """Return every v3 schema/semantic error; an empty list means reusable."""
+    """Return every current schema/semantic error; an empty list means reusable."""
 
     errors: list[str] = []
     _walk_finite(result, "result", errors)
@@ -1446,7 +1446,30 @@ def validate_event_result(
         for key, expected in expected_echo.items():
             _add(errors, metric.get(key) == expected, f"fault metric {index} {key} mismatch")
         try:
-            recovery = _finite_number(metric.get("recovery_time_seconds"), f"fault metric {index} recovery")
+            recovery_observed = metric.get("recovery_observed")
+            _add(
+                errors,
+                isinstance(recovery_observed, bool),
+                f"fault metric {index} recovery_observed must be a boolean",
+            )
+            recovery_value = metric.get("recovery_time_seconds")
+            recovery: float | None
+            if recovery_observed is True:
+                recovery = _finite_number(
+                    recovery_value, f"fault metric {index} recovery"
+                )
+                _add(
+                    errors,
+                    recovery >= 0.0,
+                    f"fault metric {index} recovery must be non-negative",
+                )
+            else:
+                recovery = None
+                _add(
+                    errors,
+                    recovery_value is None,
+                    f"fault metric {index} unrecovered time must be null",
+                )
             maximum = _finite_number(metric.get("max_recovery_seconds"), f"fault metric {index} maximum")
             _add(errors, maximum == float(FAULT_SLO["max_fault_recovery_seconds"]), f"fault metric {index} SLO mismatch")
             dropped = bool(window.get("drop_notification", False))
@@ -1560,7 +1583,11 @@ def validate_event_result(
                 "policy_action_evidence_pass": policy_action_evidence,
                 "sensor_loss_interlock_boundary_pass": sensor_boundary,
                 "safety_boundary_pass": safety_boundary,
-                "recovery_time_pass": recovery <= maximum,
+                "recovery_time_pass": (
+                    recovery_observed is True
+                    and recovery is not None
+                    and 0.0 <= recovery <= maximum
+                ),
             }
             for gate_name in (
                 "real_exposure_pass",
@@ -1568,6 +1595,7 @@ def validate_event_result(
                 "policy_action_evidence_pass",
                 "sensor_loss_interlock_boundary_pass",
                 "safety_boundary_pass",
+                "recovery_time_pass",
             ):
                 _add(
                     errors,

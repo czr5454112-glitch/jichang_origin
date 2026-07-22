@@ -265,6 +265,47 @@ def test_fault_policy_off_disables_advertised_actions_but_not_physical_interlock
     assert off_gate["fault_recovery_pass"] is True
 
 
+def test_policy_off_unrecovered_fault_is_finite_json_negative_evidence() -> None:
+    from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metrics
+
+    payload = _run(
+        bags=[
+            (
+                "fault-policy-unrecovered",
+                352,
+                0.0,
+                10_000.0,
+                6,
+                47,
+                "source-6",
+            )
+        ],
+        faults=[(6, 12, 0.0, 3_600.0, 0.0)],
+        retry_interval=0.25,
+        max_decisions_per_bag=8,
+        enable_fault_policy=False,
+        scenario="fault_policy_off_unrecovered_map2",
+    )
+    summary = payload["summary"]
+    assert summary["completed_count"] == 0
+    assert summary["failed_count"] == 1
+    assert payload["bags"][0]["completed"] is False
+    assert payload["bags"][0]["finish_time"] == -1.0
+
+    gate = fault_window_metrics(
+        payload["bags"],
+        payload["fault_events"],
+        summary,
+        [FaultWindow(6, 12, 0.0, 3_600.0, 0.0)],
+        max_recovery_seconds=1_800.0,
+    )[0]
+    assert gate["recovery_observed"] is False
+    assert gate["recovery_time_seconds"] is None
+    assert gate["recovery_time_pass"] is False
+    assert "recovery_time_pass" in gate["fault_recovery_gate_failures"]
+    assert gate["fault_recovery_pass"] is False
+
+
 def test_fault_during_real_edge_traversal_does_not_retroactively_replan() -> None:
     payload = _run(
         bags=[("in-flight", 401, 0.0, 1_000.0, 3, 17, "source-3")],

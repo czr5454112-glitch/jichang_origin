@@ -489,23 +489,61 @@ def _write_report(
         "",
         "These cases supplement the frozen 84-case matrix. They do not replace it and use no first-N segment limit.",
         "",
-        "| Case | Execution | Exact input | Continuity evidence | Carry-over observed | Day boundary | Completed / requested | Capacity | Blocker |",
-        "| --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
+        "| Case | Execution | Exact input | Continuity evidence | Carry-over observed | Day boundary | Completed / requested | Capacity | Fault recovery | Unrecovered windows | Blocker |",
+        "| --- | --- | --- | --- | --- | --- | ---: | --- | --- | ---: | --- |",
     ]
     for row in rows:
         completed = f"{row.get('completed_segment_count', 0)} / {row.get('workload_segment_count', 0)}"
+        fault_window_count = int(row.get("fault_window_count") or 0)
+        fault_recovery = (
+            row.get("fault_recovery_pass", False)
+            if fault_window_count > 0
+            else "N/A"
+        )
+        unrecovered_windows = (
+            row.get("fault_recovery_unobserved_count", 0)
+            if fault_window_count > 0
+            else "N/A"
+        )
         lines.append(
             "| {case_id} | {execution_status} | {exact_segment_count_pass} | "
             "{continuity_evidence_pass} | {carry_over_observed} | {day_boundary_pass} | "
-            "{completed} | {capacity_pass} | {blocker} |".format(
+            "{completed} | {capacity_pass} | {fault_recovery} | "
+            "{unrecovered_windows} | {blocker} |".format(
                 completed=completed,
+                fault_recovery=fault_recovery,
+                unrecovered_windows=unrecovered_windows,
                 **row,
             )
         )
+    fault_detail_rows = [
+        row for row in rows if int(row.get("fault_window_count") or 0) > 0
+    ]
+    if fault_detail_rows:
+        lines.extend(
+            [
+                "",
+                "## Temporal Fault Detail",
+                "",
+                "| Case | Recovery times s | Backlog before fault | Backlog at repair | Fault gate failures |",
+                "| --- | --- | --- | --- | --- |",
+            ]
+        )
+        for row in fault_detail_rows:
+            lines.append(
+                "| {case_id} | {times} | {before} | {repair} | {failures} |".format(
+                    case_id=row.get("case_id", ""),
+                    times=row.get("fault_recovery_times_seconds_json", "[]"),
+                    before=row.get("fault_backlog_before_fault_json", "[]"),
+                    repair=row.get("fault_backlog_at_repair_json", "[]"),
+                    failures=row.get("fault_recovery_gate_failures", ""),
+                )
+            )
     lines.extend(
         [
             "",
             "Safe execution and capacity are independent. An 8x/16x run is never promoted merely because it avoids conflicts.",
+            "Publication COMPLETE means exact evidence is complete, not that fault recovery passed. Null recovery time is NOT_RECOVERED_BY_RUN_END negative evidence.",
             "For rolling cases, carry-over is reported as an observed fact separate from continuity validity; a false value is never described as observed carry-over.",
             "",
         ]

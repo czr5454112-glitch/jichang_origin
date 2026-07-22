@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from bisect import bisect_right
 import math
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Sequence
@@ -72,20 +73,50 @@ def _backlog_at(bags: Sequence[Mapping[str, Any]], time: float) -> int:
 
 def _recovery_time(
     bags: Sequence[Mapping[str, Any]], window: FaultWindow
-) -> float:
-    baseline = _backlog_at(bags, math.nextafter(window.fault_time, -math.inf))
-    completion_times = sorted(
-        _number(row.get("finish_time"))
-        for row in bags
-        if row.get("finish_time") not in (None, "", -1, -1.0)
-        and _number(row.get("finish_time")) >= window.repair_time
-    )
-    for time in completion_times:
-        if _backlog_at(bags, time) <= baseline:
-            return time - window.repair_time
-    if _backlog_at(bags, window.repair_time) <= baseline:
+) -> float | None:
+    release_times: list[float] = []
+    finish_times: list[float] = []
+    for row in bags:
+        release_times.append(
+            _number(row.get("release_time", row.get("arrival_time")))
+        )
+        finish_value = row.get("finish_time")
+        if finish_value not in (None, "", -1, -1.0):
+            finish_times.append(_number(finish_value))
+    release_times.sort()
+    finish_times.sort()
+
+    def backlog_at(time: float) -> int:
+        return max(
+            0,
+            bisect_right(release_times, time)
+            - bisect_right(finish_times, time),
+        )
+
+    baseline = backlog_at(math.nextafter(window.fault_time, -math.inf))
+    if backlog_at(window.repair_time) <= baseline:
         return 0.0
-    return math.inf
+
+    # Sweep each post-repair release/finish at most once. This preserves the
+    # exact <= timestamp semantics of _backlog_at while avoiding an O(n^2)
+    # rescan for long exact workloads.
+    release_index = bisect_right(release_times, window.repair_time)
+    finish_index = bisect_right(finish_times, window.repair_time)
+    while finish_index < len(finish_times):
+        time = finish_times[finish_index]
+        while (
+            release_index < len(release_times)
+            and release_times[release_index] <= time
+        ):
+            release_index += 1
+        while finish_index < len(finish_times) and finish_times[finish_index] <= time:
+            finish_index += 1
+        if max(0, release_index - finish_index) <= baseline:
+            return time - window.repair_time
+    # A missing recovery is a valid negative experimental outcome, not a
+    # non-finite number.  Keep the result strict-JSON-compatible and let the
+    # explicit recovery gate fail closed.
+    return None
 
 
 def fault_window_metrics(
@@ -266,6 +297,7 @@ def fault_window_metrics(
             for row in affected_bags
         )
         recovery = _recovery_time(bags, window)
+        recovery_observed = recovery is not None
         trace_complete = bool(physical_fault_events) and bool(physical_repair_events)
         if window.drop_notification:
             message_complete = len(dropped_events) == 2 and not message_events
@@ -353,7 +385,9 @@ def fault_window_metrics(
             "policy_action_evidence_pass": policy_action_evidence_pass,
             "sensor_loss_interlock_boundary_pass": sensor_loss_interlock_boundary_pass,
             "safety_boundary_pass": safety_boundary_pass,
-            "recovery_time_pass": recovery <= max_recovery_seconds,
+            "recovery_time_pass": (
+                recovery_observed and recovery <= max_recovery_seconds
+            ),
         }
         pass_gate = all(gate_checks.values())
         gate_failures = [name for name, passed in gate_checks.items() if not passed]
@@ -405,6 +439,7 @@ def fault_window_metrics(
                     bags, math.nextafter(window.fault_time, -math.inf)
                 ),
                 "backlog_at_repair": _backlog_at(bags, window.repair_time),
+                "recovery_observed": recovery_observed,
                 "recovery_time_seconds": recovery,
                 "max_recovery_seconds": max_recovery_seconds,
                 "summary_contract_complete": summary_contract_complete,
@@ -416,6 +451,7 @@ def fault_window_metrics(
                 "policy_action_evidence_pass": policy_action_evidence_pass,
                 "sensor_loss_interlock_boundary_pass": sensor_loss_interlock_boundary_pass,
                 "safety_boundary_pass": safety_boundary_pass,
+                "recovery_time_pass": gate_checks["recovery_time_pass"],
                 "fault_recovery_gate_failures": gate_failures,
                 "stale_fault_shield_rejection_count": (
                     int(summary["stale_fault_shield_rejection_count"])

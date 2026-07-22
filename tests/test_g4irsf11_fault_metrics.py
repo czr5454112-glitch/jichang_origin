@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import math
 
-from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metrics
+from scripts.eval.g4irsf11_fault_metrics import (
+    FaultWindow,
+    _recovery_time,
+    fault_window_metrics,
+)
 
 
 def _summary(**overrides: object) -> dict[str, object]:
@@ -157,7 +161,9 @@ def test_temporal_fault_requires_non_vacuous_policy_exposure() -> None:
     assert row["affected_cohort_count"] == 1
     assert row["affected_cohort_complete_count"] == 1
     assert row["local_fault_policy_reroute_count"] == 1
+    assert row["recovery_observed"] is True
     assert row["recovery_time_seconds"] == 2.0
+    assert row["recovery_time_pass"] is True
     assert row["fault_recovery_gate_failures"] == []
     assert row["fault_recovery_pass"] is True
 
@@ -209,6 +215,119 @@ def test_zero_bag_or_zero_exposure_can_never_pass() -> None:
     assert row["real_exposure_pass"] is False
     assert "real_exposure_pass" in row["fault_recovery_gate_failures"]
     assert row["fault_recovery_pass"] is False
+
+
+def test_unrecovered_backlog_is_nullable_fail_closed_negative_evidence() -> None:
+    window = FaultWindow(0, 1, 10.0, 20.0, 2.0)
+    bags = _bags()
+    # Keep the actually exposed bag complete so this isolates recovery-time
+    # evidence from affected-cohort completion evidence.
+    bags.append(
+        {
+            "runtime_bag_id": 8,
+            "release_time": 13.0,
+            "finish_time": None,
+            "completed": False,
+        }
+    )
+
+    row = fault_window_metrics(
+        bags,
+        _control_events() + _exposure_events(),
+        _summary(),
+        [window],
+        max_recovery_seconds=5.0,
+    )[0]
+
+    assert row["recovery_observed"] is False
+    assert row["recovery_time_seconds"] is None
+    assert row["recovery_time_pass"] is False
+    assert row["affected_completion_pass"] is True
+    assert row["fault_recovery_gate_failures"] == ["recovery_time_pass"]
+    assert row["fault_recovery_pass"] is False
+
+
+def test_backlog_already_recovered_at_repair_reports_zero_seconds() -> None:
+    window = FaultWindow(0, 1, 10.0, 20.0, 2.0)
+    bags = [
+        {
+            "runtime_bag_id": 6,
+            "release_time": 0.0,
+            "finish_time": 15.0,
+            "completed": True,
+        },
+        {
+            "runtime_bag_id": 7,
+            "release_time": 12.0,
+            "finish_time": 22.0,
+            "completed": True,
+        },
+    ]
+
+    row = fault_window_metrics(
+        bags,
+        _control_events() + _exposure_events(),
+        _summary(),
+        [window],
+        max_recovery_seconds=5.0,
+    )[0]
+
+    assert row["backlog_before_fault"] == 1
+    assert row["backlog_at_repair"] == 1
+    assert row["recovery_observed"] is True
+    assert row["recovery_time_seconds"] == 0.0
+    assert row["recovery_time_pass"] is True
+
+
+def test_finite_recovery_over_slo_is_distinct_from_unobserved_recovery() -> None:
+    window = FaultWindow(0, 1, 10.0, 20.0, 2.0)
+    bags = _bags()
+    bags[1]["finish_time"] = 27.0
+
+    row = fault_window_metrics(
+        bags,
+        _control_events() + _exposure_events(),
+        _summary(),
+        [window],
+        max_recovery_seconds=5.0,
+    )[0]
+
+    assert row["recovery_observed"] is True
+    assert row["recovery_time_seconds"] == 7.0
+    assert row["recovery_time_pass"] is False
+    assert row["fault_recovery_gate_failures"] == ["recovery_time_pass"]
+
+
+def test_recovery_sweep_scans_large_bag_sequence_only_once() -> None:
+    class CountingRows(list[dict[str, object]]):
+        iteration_count = 0
+
+        def __iter__(self):  # type: ignore[no-untyped-def]
+            self.iteration_count += 1
+            return super().__iter__()
+
+    bags = CountingRows(
+        [
+            {
+                "runtime_bag_id": index,
+                "release_time": 12.0,
+                "finish_time": 21.0 + index,
+                "completed": True,
+            }
+            for index in range(500)
+        ]
+        + [
+            {
+                "runtime_bag_id": 500,
+                "release_time": 12.0,
+                "finish_time": None,
+                "completed": False,
+            }
+        ]
+    )
+
+    assert _recovery_time(bags, FaultWindow(0, 1, 10.0, 20.0)) is None
+    assert bags.iteration_count == 1
 
 
 def test_missing_critical_summary_fields_fail_closed() -> None:

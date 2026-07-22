@@ -13,6 +13,7 @@ from scripts.eval.run_g4irsf11_system_extensions import (
     _consolidation_complete,
     _continuity_audit,
     _load_rows,
+    _write_report,
     extension_protocol_manifest,
 )
 from scripts.eval.g4irsf11_fixed_map import (
@@ -39,9 +40,42 @@ class _ReleaseRows(Sequence[dict[str, Any]]):
 
 def test_extension_protocol_is_exact_and_never_smoke_limited() -> None:
     cases = system_extension_cases()
-    assert len(cases) == 5
+    assert [
+        (case.case_id, case.workload_mode, case.scale, case.fault_profile)
+        for case in cases
+    ] == [
+        (
+            "extension_rolling_2day_full",
+            "rolling_multiday_carryover",
+            2.0,
+            "no_fault",
+        ),
+        (
+            "extension_rolling_7day_full",
+            "rolling_multiday_carryover",
+            7.0,
+            "no_fault",
+        ),
+        (
+            "extension_synchronized_8x_full",
+            "synchronized_replica_worst_case",
+            8.0,
+            "no_fault",
+        ),
+        (
+            "extension_synchronized_16x_full",
+            "synchronized_replica_worst_case",
+            16.0,
+            "no_fault",
+        ),
+        (
+            "extension_fault_delayed_16x_full",
+            "empirical_interarrival_jitter",
+            16.0,
+            "single_delayed_30s",
+        ),
+    ]
     assert all(case.segment_limit is None for case in cases)
-    assert {case.scale for case in cases} >= {2.0, 7.0, 8.0, 16.0}
     manifest = system_extension_manifest()
     assert manifest["protocol_version"] == EXTENSION_PROTOCOL_VERSION
     assert manifest["case_count"] == 5
@@ -194,3 +228,56 @@ def test_extension_consolidation_reports_semantically_corrupt_workload_as_failed
     assert "workload could not be decoded" in rows[0]["blocker"]
     assert rows[0]["retained_workload_row_count"] == 0
     assert rows[0]["no_smoke_substitution_pass"] is False
+
+
+def test_extension_report_keeps_unrecovered_fault_as_negative_evidence(
+    tmp_path: Path,
+) -> None:
+    report_path = tmp_path / "extension-report.md"
+    _write_report(
+        [
+            {
+                "case_id": "extension_rolling_2day_full",
+                "execution_status": "EXECUTED",
+                "exact_segment_count_pass": True,
+                "continuity_evidence_pass": True,
+                "carry_over_observed": True,
+                "day_boundary_pass": True,
+                "completed_segment_count": 87_206,
+                "workload_segment_count": 87_206,
+                "capacity_pass": True,
+                "fault_window_count": 0,
+                "fault_recovery_pass": True,
+                "fault_recovery_unobserved_count": 0,
+                "blocker": "",
+            },
+            {
+                "case_id": "extension_fault_delayed_16x_full",
+                "execution_status": "EXECUTED",
+                "exact_segment_count_pass": True,
+                "continuity_evidence_pass": True,
+                "carry_over_observed": False,
+                "day_boundary_pass": True,
+                "completed_segment_count": 697_647,
+                "workload_segment_count": 697_648,
+                "capacity_pass": False,
+                "fault_window_count": 1,
+                "fault_recovery_pass": False,
+                "fault_recovery_unobserved_count": 1,
+                "fault_recovery_times_seconds_json": "[null]",
+                "fault_backlog_before_fault_json": "[17]",
+                "fault_backlog_at_repair_json": "[23]",
+                "fault_recovery_gate_failures": "window_0:recovery_time_pass",
+                "blocker": "",
+            }
+        ],
+        report_path=report_path,
+    )
+
+    text = report_path.read_text(encoding="utf-8")
+    assert "Fault recovery" in text
+    assert "NOT_RECOVERED_BY_RUN_END" in text
+    assert "| N/A | N/A |" in text
+    assert "| False | 1 |" in text
+    assert "Temporal Fault Detail" in text
+    assert "| [null] | [17] | [23] | window_0:recovery_time_pass |" in text

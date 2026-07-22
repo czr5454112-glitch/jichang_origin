@@ -57,11 +57,31 @@ def case_row(
         continuity_input = {}
     if not isinstance(fault_rows, list):
         fault_rows = []
-    fault_pass = bool(fault_rows) and all(
-        bool(row.get("fault_recovery_pass")) for row in fault_rows if isinstance(row, Mapping)
+    typed_fault_rows = [row for row in fault_rows if isinstance(row, Mapping)]
+    fault_pass = (
+        bool(typed_fault_rows)
+        and len(typed_fault_rows) == len(fault_rows)
+        and all(
+            row.get("fault_recovery_pass") is True for row in typed_fault_rows
+        )
     )
     if case.fault_profile == "no_fault":
         fault_pass = True
+    observed_recovery_times = [
+        float(row["recovery_time_seconds"])
+        for row in typed_fault_rows
+        if row.get("recovery_observed") is True
+        and isinstance(row.get("recovery_time_seconds"), (int, float))
+        and not isinstance(row.get("recovery_time_seconds"), bool)
+        and math.isfinite(float(row["recovery_time_seconds"]))
+    ]
+    fault_gate_failures = []
+    for index, row in enumerate(typed_fault_rows):
+        failures = row.get("fault_recovery_gate_failures")
+        if isinstance(failures, list) and failures:
+            fault_gate_failures.append(
+                f"window_{index}:" + ",".join(str(value) for value in failures)
+            )
     return {
         "case_id": case.case_id,
         "category": case.category,
@@ -96,6 +116,35 @@ def case_row(
         "service_level_pass": bag.get("service_level_pass", False),
         "capacity_pass": bag.get("capacity_pass", False),
         "fault_recovery_pass": fault_pass,
+        "fault_window_count": len(typed_fault_rows),
+        "fault_recovery_observed_count": sum(
+            row.get("recovery_observed") is True for row in typed_fault_rows
+        ),
+        "fault_recovery_unobserved_count": sum(
+            row.get("recovery_observed") is False for row in typed_fault_rows
+        ),
+        "fault_recovery_time_seconds_max": (
+            max(observed_recovery_times) if observed_recovery_times else ""
+        ),
+        "fault_recovery_times_seconds_json": json.dumps(
+            [row.get("recovery_time_seconds") for row in typed_fault_rows],
+            ensure_ascii=False,
+            separators=(",", ":"),
+            allow_nan=False,
+        ),
+        "fault_backlog_before_fault_json": json.dumps(
+            [row.get("backlog_before_fault") for row in typed_fault_rows],
+            ensure_ascii=False,
+            separators=(",", ":"),
+            allow_nan=False,
+        ),
+        "fault_backlog_at_repair_json": json.dumps(
+            [row.get("backlog_at_repair") for row in typed_fault_rows],
+            ensure_ascii=False,
+            separators=(",", ":"),
+            allow_nan=False,
+        ),
+        "fault_recovery_gate_failures": "; ".join(fault_gate_failures),
         "continuity_status": continuity.get("status", ""),
         "continuity_single_runtime_invocation_pass": continuity.get(
             "single_runtime_invocation_pass", ""
@@ -244,26 +293,63 @@ def write_reports(root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str, Pa
     for category, (filename, title, boundary) in specs.items():
         category_rows = sorted(by_category.get(category, []), key=lambda row: str(row["case_id"]))
         path = report_dir / filename
+        common_table = _table(
+            [
+                "Case", "Mode", "Scale", "Exec", "Safe", "Queue", "Service",
+                "Capacity", "p99 s", "End backlog", "Blocker",
+            ],
+            (
+                (
+                    row["case_id"], row["workload_mode"], row["scale"],
+                    row["execution_status"], row["safe_execution_pass"],
+                    row["queue_stability_pass"], row["service_level_pass"],
+                    row["capacity_pass"], row["java_release_tth_p99_seconds"],
+                    row["end_backlog"], row["blocker"],
+                )
+                for row in category_rows
+            ),
+        )
+        report_tables = [common_table]
+        if category == "temporal_fault":
+            report_tables.append(
+                _table(
+                    [
+                        "Case", "Fault recovery", "Recovered windows",
+                        "Unrecovered windows", "Recovery times s",
+                        "Backlog before fault", "Backlog at repair",
+                        "Fault gate failures",
+                    ],
+                    (
+                        (
+                            row["case_id"], row["fault_recovery_pass"],
+                            row["fault_recovery_observed_count"],
+                            row["fault_recovery_unobserved_count"],
+                            row["fault_recovery_times_seconds_json"],
+                            row["fault_backlog_before_fault_json"],
+                            row["fault_backlog_at_repair_json"],
+                            row["fault_recovery_gate_failures"],
+                        )
+                        for row in category_rows
+                    ),
+                )
+            )
         content = [
             f"# {title}",
             "",
             f"Generated: `{date.today().isoformat()}`.",
             "",
-            boundary,
+            (
+                boundary
+                + (
+                    " A null recovery time means NOT_RECOVERED_BY_RUN_END; it is explicit negative evidence and fails the recovery gate."
+                    if category == "temporal_fault"
+                    else ""
+                )
+            ),
             "",
             f"Execution status counts: `{json.dumps(_status_counts(category_rows), sort_keys=True)}`.",
             "",
-            _table(
-                ["Case", "Mode", "Scale", "Exec", "Safe", "Queue", "Service", "Capacity", "p99 s", "End backlog", "Blocker"],
-                (
-                    (
-                        row["case_id"], row["workload_mode"], row["scale"], row["execution_status"],
-                        row["safe_execution_pass"], row["queue_stability_pass"], row["service_level_pass"],
-                        row["capacity_pass"], row["java_release_tth_p99_seconds"], row["end_backlog"], row["blocker"],
-                    )
-                    for row in category_rows
-                ),
-            ),
+            "\n\n".join(report_tables),
             "",
         ]
         atomic_write_text(path, "\n".join(content))
@@ -340,7 +426,12 @@ def gate_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
         {
             "gate": "temporal_fault_recovery",
             "status": "PASS" if all_executed(faults) and all(row.get("fault_recovery_pass") for row in faults) else "PARTIAL_WITH_EXPLICIT_BLOCKER",
-            "evidence": f"executed={sum(row.get('execution_status') == 'EXECUTED' for row in faults)}/{len(faults)}",
+            "evidence": (
+                f"executed={sum(row.get('execution_status') == 'EXECUTED' for row in faults)}/{len(faults)}; "
+                f"recovery_pass={sum(bool(row.get('fault_recovery_pass')) for row in faults)}/{len(faults)}; "
+                "unrecovered_windows="
+                f"{sum(int(row.get('fault_recovery_unobserved_count') or 0) for row in faults)}"
+            ),
         },
         {
             "gate": "real_resource_instrumentation",

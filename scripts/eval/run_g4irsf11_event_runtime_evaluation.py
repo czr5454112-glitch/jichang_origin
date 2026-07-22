@@ -1417,7 +1417,7 @@ def execute_case(
             _archive_existing_attempt(
                 case,
                 paths,
-                reason="exact rerun requested without a reusable complete v3 bundle",
+                reason="exact rerun requested without a reusable complete current bundle",
             )
 
         atomic_write_jsonl(paths["workload"], workload)
@@ -1519,7 +1519,7 @@ def execute_case(
                 if validation_errors:
                     descriptor["status"] = "FAILED"
                     descriptor["blocker"] = (
-                        "strict v3 result/descriptor validation failed: "
+                        "strict result/descriptor validation failed: "
                         + "; ".join(validation_errors)
                     )
                     result = None
@@ -1647,7 +1647,7 @@ def _load_all_rows(
                     execution["claimed_execution_status"] = "EXECUTED"
                     execution["status"] = "FAILED"
                     execution["blocker"] = (
-                        "descriptor claimed EXECUTED but strict v3 identity/artifact/semantic "
+                        "descriptor claimed EXECUTED but strict identity/artifact/semantic "
                         "bundle validation failed; result is not reusable or reportable as executed"
                     )
                 else:
@@ -1883,7 +1883,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--keep-workloads",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Strict v3 requires retained exact inputs for resume revalidation.",
+        help="Strict evaluation requires retained exact inputs for resume revalidation.",
     )
     parser.add_argument(
         "--execute-only",
@@ -1903,7 +1903,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if not args.keep_workloads:
-        raise SystemExit("strict v3 forbids --no-keep-workloads because resume must rehash exact inputs")
+        raise SystemExit(
+            "strict evaluation forbids --no-keep-workloads because resume must "
+            "rehash exact inputs"
+        )
     if not str(args.measurement_cohort).strip():
         raise SystemExit("--measurement-cohort must be non-empty")
     if args.concurrent_worker_target <= 0:

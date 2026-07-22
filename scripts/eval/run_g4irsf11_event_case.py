@@ -45,6 +45,7 @@ from scripts.eval.g4irsf11_result_validation import (
     JUNCTION_BOTTLENECK_SCORE_SEMANTICS,
     JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS,
     JUNCTION_SERVICE_UTILIZATION_SEMANTICS,
+    RESULT_SCHEMA,
     ResultExpectation,
     WORKER_RUNTIME_DEFAULTS,
     atomic_write_json,
@@ -374,7 +375,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         bottleneck_node = -1
         bottleneck_score = 0.0
     result: dict[str, Any] = {
-        "schema": "czr005.g4irsf11.event_runtime_result.v3",
+        "schema": RESULT_SCHEMA,
         "run_id": args.run_id,
         "case": case_spec,
         "protocol_version": args.protocol_version,
@@ -481,7 +482,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         workload_rows=workload,
     )
     if validation_errors:
-        raise ValueError("strict v3 result validation failed: " + "; ".join(validation_errors))
+        raise ValueError(
+            "strict result validation failed: " + "; ".join(validation_errors)
+        )
     return result
 
 

@@ -303,7 +303,7 @@ def _valid_bundle(tmp_path: Path) -> tuple[
     return descriptor, result, expectation, argv, result_path, trace_artifacts, rows
 
 
-def test_valid_v3_result_and_descriptor_bundle_passes(tmp_path: Path) -> None:
+def test_valid_current_result_and_v3_descriptor_bundle_passes(tmp_path: Path) -> None:
     descriptor, result, expectation, argv, result_path, traces, rows = _valid_bundle(tmp_path)
     assert validate_event_result(result, expectation, workload_rows=rows) == []
     assert validate_execution_descriptor(
@@ -317,6 +317,12 @@ def test_valid_v3_result_and_descriptor_bundle_passes(tmp_path: Path) -> None:
         trace_artifacts=traces,
         workload_rows=rows,
     ) == []
+
+    legacy_result = deepcopy(result)
+    legacy_result["schema"] = "czr005.g4irsf11.event_runtime_result.v3"
+    assert "result schema mismatch" in validate_event_result(
+        legacy_result, expectation, workload_rows=rows
+    )
 
 
 @pytest.mark.parametrize("copies", (2, 7))
@@ -893,6 +899,8 @@ def test_fault_validator_requires_real_exposure_and_policy_evidence(
         max_recovery_seconds=1800.0,
     )
     assert metrics[0]["fault_recovery_pass"] is True
+    assert metrics[0]["recovery_observed"] is True
+    assert metrics[0]["recovery_time_pass"] is True
     result.update(
         {
             "case": case.as_dict(),
@@ -926,6 +934,81 @@ def test_fault_validator_requires_real_exposure_and_policy_evidence(
         measurement_cohort=base_expectation.measurement_cohort,
     )
     assert validate_event_result(result, expectation, workload_rows=workload_rows) == []
+
+    unrecovered = deepcopy(result)
+    unrecovered_metric = unrecovered["fault_window_metrics"][0]
+    unrecovered_metric["recovery_observed"] = False
+    unrecovered_metric["recovery_time_seconds"] = None
+    unrecovered_metric["recovery_time_pass"] = False
+    unrecovered_metric["fault_recovery_gate_failures"] = ["recovery_time_pass"]
+    unrecovered_metric["fault_recovery_pass"] = False
+    assert (
+        validate_event_result(
+            unrecovered, expectation, workload_rows=workload_rows
+        )
+        == []
+    )
+    unrecovered_path = tmp_path / f"unrecovered-{policy_enabled}.json"
+    atomic_write_json(unrecovered_path, unrecovered)
+    serialized = unrecovered_path.read_text(encoding="utf-8")
+    assert "Infinity" not in serialized
+    assert "NaN" not in serialized
+    assert read_json_object(unrecovered_path)["fault_window_metrics"][0][
+        "recovery_time_seconds"
+    ] is None
+
+    inconsistent_unrecovered = deepcopy(unrecovered)
+    inconsistent_unrecovered["fault_window_metrics"][0][
+        "recovery_time_seconds"
+    ] = 1.0
+    errors = validate_event_result(
+        inconsistent_unrecovered, expectation, workload_rows=workload_rows
+    )
+    assert any("unrecovered time must be null" in error for error in errors)
+
+    inconsistent_gate = deepcopy(unrecovered)
+    inconsistent_gate["fault_window_metrics"][0]["recovery_time_pass"] = True
+    errors = validate_event_result(
+        inconsistent_gate, expectation, workload_rows=workload_rows
+    )
+    assert any("recovery_time_pass inconsistent" in error for error in errors)
+
+    missing_recovery = deepcopy(result)
+    missing_recovery["fault_window_metrics"][0]["recovery_time_seconds"] = None
+    errors = validate_event_result(
+        missing_recovery, expectation, workload_rows=workload_rows
+    )
+    assert any("recovery must be numeric" in error for error in errors)
+
+    negative_recovery = deepcopy(result)
+    negative_metric = negative_recovery["fault_window_metrics"][0]
+    negative_metric["recovery_time_seconds"] = -1.0
+    negative_metric["recovery_time_pass"] = False
+    negative_metric["fault_recovery_gate_failures"] = ["recovery_time_pass"]
+    negative_metric["fault_recovery_pass"] = False
+    errors = validate_event_result(
+        negative_recovery, expectation, workload_rows=workload_rows
+    )
+    assert any("recovery must be non-negative" in error for error in errors)
+    assert not any("recovery_time_pass inconsistent" in error for error in errors)
+    assert not any("gate failure list inconsistent" in error for error in errors)
+
+    for non_finite in (float("inf"), "INF"):
+        non_finite_recovery = deepcopy(result)
+        non_finite_recovery["fault_window_metrics"][0][
+            "recovery_time_seconds"
+        ] = non_finite
+        errors = validate_event_result(
+            non_finite_recovery, expectation, workload_rows=workload_rows
+        )
+        assert any("recovery must be finite" in error for error in errors)
+
+    missing_observation = deepcopy(result)
+    del missing_observation["fault_window_metrics"][0]["recovery_observed"]
+    errors = validate_event_result(
+        missing_observation, expectation, workload_rows=workload_rows
+    )
+    assert any("recovery_observed must be a boolean" in error for error in errors)
 
     no_exposure = deepcopy(result)
     no_exposure["fault_window_metrics"][0]["target_edge_candidate_exposure_count"] = 0

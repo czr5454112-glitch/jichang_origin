@@ -10,6 +10,7 @@ from scripts.eval.g4irsf11_system_ab import (
     VARIANTS,
     _bound_protocol_digest,
     build_system_ab_matrix,
+    write_system_ab_artifacts,
 )
 from scripts.eval.g4irsf11_fixed_map import CANONICAL_MAP_SHA256
 
@@ -118,3 +119,82 @@ def test_extension_without_exact_input_audit_is_not_counted_as_executed(
     )
     assert row["execution_status"] == PARTIAL
     assert "exact full-input" in row["blocker"]
+
+
+def test_unrecovered_exact_fault_extension_is_negative_evidence_not_success(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    implementation = "a" * 64
+    cohort = "fixture-extension-serial1"
+    worker_target = 1
+    _csv(
+        tmp_path / "outputs" / "tables" / "g4irsf11_system_extension_matrix.csv",
+        [
+            {
+                "case_id": "extension_fault_delayed_16x_full",
+                "execution_status": "EXECUTED",
+                "no_smoke_substitution_pass": True,
+                "safe_execution_pass": True,
+                "queue_stability_pass": False,
+                "service_level_pass": False,
+                "capacity_pass": False,
+                "fault_recovery_pass": False,
+                "fault_recovery_unobserved_count": 1,
+                "fault_recovery_times_seconds_json": "[null]",
+                "fault_backlog_before_fault_json": "[17]",
+                "fault_backlog_at_repair_json": "[23]",
+                "fault_recovery_gate_failures": "window_0:recovery_time_pass",
+                "map_sha256": CANONICAL_MAP_SHA256,
+                "protocol_manifest_sha256": _bound_protocol_digest(extension=True),
+                "implementation_sha256": implementation,
+                "measurement_cohort": cohort,
+                "declared_concurrent_worker_target": worker_target,
+            }
+        ],
+    )
+    completion = (
+        tmp_path
+        / "artifacts"
+        / "gates"
+        / "g4irsf11_system_extension_completion.json"
+    )
+    completion.parent.mkdir(parents=True, exist_ok=True)
+    completion.write_text(
+        json.dumps(
+            {
+                "producer": {
+                    "implementation_sha256": implementation,
+                    "measurement_cohort": {
+                        "name": cohort,
+                        "declared_concurrent_worker_target": worker_target,
+                    },
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(  # type: ignore[attr-defined]
+        "scripts.eval.run_g4irsf11_system_extensions.extension_completion_validation_errors",
+        lambda _root: [],
+    )
+
+    rows = build_system_ab_matrix(tmp_path)
+    row = next(
+        row
+        for row in rows
+        if row["variant"] == "event_fault_policy" and row["scenario"] == "fault_16"
+    )
+    assert row["execution_status"] == "EXECUTED_WITH_NEGATIVE_EVIDENCE"
+    assert "did not recover by run end" in row["blocker"]
+    metrics = json.loads(row["metrics"])
+    assert metrics["fault_recovery_pass"] == "False"
+    assert metrics["fault_recovery_unobserved_count"] == "1"
+    assert metrics["fault_recovery_times_seconds_json"] == "[null]"
+    assert metrics["fault_backlog_before_fault_json"] == "[17]"
+    assert metrics["fault_backlog_at_repair_json"] == "[23]"
+
+    _, report_path = write_system_ab_artifacts(tmp_path, rows)
+    report = report_path.read_text(encoding="utf-8")
+    assert "Exact executed cells: **1/70**" in report
+    assert "negative-evidence outcomes: **1**" in report
+    assert "Positive/qualified cells: **0/70**" in report

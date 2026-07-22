@@ -403,18 +403,55 @@ def _build_system_ab_matrix_unlocked(root: Path) -> list[dict[str, Any]]:
             fault16.get("execution_status") == "EXECUTED"
             and _truth(fault16.get("no_smoke_substitution_pass"))
         )
+        recovery_pass = _truth(fault16.get("fault_recovery_pass"))
+        negative_recovery = qualified and not recovery_pass
+        unrecovered_count = int(
+            fault16.get("fault_recovery_unobserved_count") or 0
+        )
+        negative_recovery_blocker = (
+            "temporal fault did not recover by run end; exact negative evidence retained"
+            if unrecovered_count > 0
+            else "temporal fault recovery gate failed; exact negative evidence retained"
+        )
         _set(
             index,
             "event_fault_policy",
             "fault_16",
-            status="EXECUTED" if qualified else PARTIAL,
+            status=(
+                "EXECUTED_WITH_NEGATIVE_EVIDENCE"
+                if negative_recovery
+                else "EXECUTED" if qualified else PARTIAL
+            ),
             evidence=[extension_path.relative_to(root).as_posix()],
-            blocker="" if _truth(fault16.get("no_smoke_substitution_pass")) else "exact 16x temporal-fault input audit did not pass",
+            blocker=(
+                negative_recovery_blocker
+                if negative_recovery
+                else ""
+                if _truth(fault16.get("no_smoke_substitution_pass"))
+                else "exact 16x temporal-fault input audit did not pass"
+            ),
             safe=fault16.get("safe_execution_pass", ""),
             queue=fault16.get("queue_stability_pass", ""),
             service=fault16.get("service_level_pass", ""),
             capacity=fault16.get("capacity_pass", ""),
-            metrics={"fault_recovery_pass": fault16.get("fault_recovery_pass", "")},
+            metrics={
+                "fault_recovery_pass": fault16.get("fault_recovery_pass", ""),
+                "fault_recovery_unobserved_count": fault16.get(
+                    "fault_recovery_unobserved_count", ""
+                ),
+                "fault_recovery_times_seconds_json": fault16.get(
+                    "fault_recovery_times_seconds_json", ""
+                ),
+                "fault_backlog_before_fault_json": fault16.get(
+                    "fault_backlog_before_fault_json", ""
+                ),
+                "fault_backlog_at_repair_json": fault16.get(
+                    "fault_backlog_at_repair_json", ""
+                ),
+                "fault_recovery_gate_failures": fault16.get(
+                    "fault_recovery_gate_failures", ""
+                ),
+            },
             protocol_digest=extension_protocol_digest,
         )
     elif fault16:
@@ -514,7 +551,14 @@ def write_system_ab_artifacts(root: Path, rows: list[Mapping[str, Any]]) -> tupl
         writer.writeheader()
         writer.writerows(rows)
     executed = sum(
-        str(row["execution_status"]).startswith("EXECUTED") and not row["blocker"]
+        str(row["execution_status"]).startswith("EXECUTED") for row in rows
+    )
+    negative = sum(
+        row["execution_status"] == "EXECUTED_WITH_NEGATIVE_EVIDENCE"
+        for row in rows
+    )
+    qualified = sum(
+        row["execution_status"] == "EXECUTED" and not row["blocker"]
         for row in rows
     )
     report.write_text(
@@ -522,7 +566,8 @@ def write_system_ab_artifacts(root: Path, rows: list[Mapping[str, Any]]) -> tupl
             [
                 "# G4IRSF11 System A/B Boundary",
                 "",
-                f"Exact/qualified executed cells: **{executed}/{len(rows)}**. Every other cell retains an explicit blocker.",
+                f"Exact executed cells: **{executed}/{len(rows)}** (negative-evidence outcomes: **{negative}**).",
+                f"Positive/qualified cells: **{qualified}/{len(rows)}**. Every non-executed cell retains an explicit blocker; executed negative-evidence cells retain an outcome explanation.",
                 "",
                 "This matrix never borrows a heuristic result for rule-only or v3, never treats a prefix as full continuity, and never treats safe completion as capacity success.",
                 "",
