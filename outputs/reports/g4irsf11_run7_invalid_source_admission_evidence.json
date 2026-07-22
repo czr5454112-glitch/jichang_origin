@@ -1,0 +1,65 @@
+{
+  "canonical_map_raw_bytes_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+  "canonical_map_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63",
+  "comparison": {
+    "aging_full": {
+      "case_id": "ablation_aging_full",
+      "enable_source_admission": true,
+      "input_sha256": "88a5c5bcf43ed38214c9c03ad24376a623e4f924a7cb1d5e246dd252762da508",
+      "result_sha256": "2bed1677f37ba5fc464767e9cba3afc278caa48a8374dd87fc4357c83465a9b3",
+      "run_id": "ca6451eb-0854-47cf-a0b4-6b2f838d802d"
+    },
+    "source_admission_off": {
+      "case_id": "ablation_source_admission_off",
+      "enable_source_admission": false,
+      "input_sha256": "8a3df87e8ed64feff323445f6def402d0de039e8ff6b00f0dc67fb0a66c66e93",
+      "result_sha256": "f7ed7b4bd2206a111d083db1fb8a70b58e83e5aa42fa3c6c06a79e665c35b64b",
+      "run_id": "86099fd1-7dcb-4c67-bd8e-1842e5fc97d6"
+    },
+    "equal_exact_sections": {
+      "event_sample_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "fault_event_sample_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "fault_window_metrics_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "junction_state_sha256": "7586a06850fa9dc46211b4540ce647b963bdfdca93d188fc4732d583dd6f143e"
+    },
+    "equal_substantive_outcomes": {
+      "completed_count": 13554,
+      "deadlock_count": 96628,
+      "decision_count": 1575630,
+      "end_time": 168351.15423488166,
+      "event_count": 8111237,
+      "failed_count": 95179,
+      "global_reservation_scan_count": 0,
+      "max_junction_queue_length": 36315,
+      "max_source_queue_delay": 48.40370229266773,
+      "max_source_queue_length": 221,
+      "requested_count": 108733,
+      "reservation_conflicts": 0,
+      "resolved_deadlock_count": 96626,
+      "runtime_full_astar_calls": 0,
+      "starvation_count": 108277,
+      "time_limit_reached": true,
+      "unresolved_deadlock_count": 2
+    },
+    "equal_substantive_outcomes_sha256": "0c8aa0d21011d4758191d2dbf2fa210fb8e153ce4d3f72fe251c3ea052deb679",
+    "non_substantive_difference_scope": [
+      "decision latency and derived throughput",
+      "worker wall-clock time",
+      "worker RSS observations",
+      "case/config/provenance identity"
+    ]
+  },
+  "disposition": {
+    "promoted_as_formal_evidence": false,
+    "raw_cache_commit_allowed": false,
+    "required_remediation": "Implement a bounded-local downstream source-admission decision, add a behavioral toggle regression, rebuild, and rerun the complete homogeneous formal and extension cohorts under a new implementation SHA-256."
+  },
+  "finding": "FAIL_WITH_NEGATIVE_EVIDENCE",
+  "finding_reason": "The pre-fix C++ runtime stored enable_source_admission in its config but never read it. The enabled and disabled ablation cases therefore produced identical deterministic simulation outcomes; only resource/timing noise and identity fields differed.",
+  "fixed_real_map_only": true,
+  "implementation_sha256": "d86c63255dc88ff8b33b2a8d56da61aa71499caba57ed312db89250609a1fc81",
+  "implementation_source_bundle_sha256": "ab062f4b1d684fb28429e51432007993037357669e639efcdcce81695ca1459d",
+  "measurement_cohort": "g4irsf11_fixed_real_map_parallel8_d86c63255dc8_run7",
+  "schema": "czr005.g4irsf11.invalidated_measurement_evidence.v1",
+  "source_task_raw_bytes_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+}

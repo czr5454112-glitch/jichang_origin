@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from scripts.eval.g4irsf11_system_ab import (
+    FIXED_MAP_ENGINEERING_SCENARIOS,
     PARTIAL,
     SCENARIOS,
     VARIANTS,
@@ -25,11 +26,37 @@ def _csv(path: Path, rows: list[dict[str, object]]) -> None:
 
 def test_matrix_is_complete_and_fails_closed_when_evidence_is_absent(tmp_path: Path) -> None:
     rows = build_system_ab_matrix(tmp_path)
-    assert len(rows) == len(VARIANTS) * len(SCENARIOS) == 70
+    assert len(rows) == len(VARIANTS) * len(SCENARIOS) == 84
+    assert "topology_generalization_engineering" not in SCENARIOS
+    assert set(FIXED_MAP_ENGINEERING_SCENARIOS) == {
+        "fixed_map_load_heldout",
+        "fixed_map_peak_pattern",
+        "fixed_map_fault_recovery",
+    }
     assert all(row["execution_status"] == PARTIAL for row in rows)
     assert all(row["blocker"] for row in rows)
     assert all(row["fixed_real_map_only"] is True for row in rows)
     assert {row["canonical_map_sha256"] for row in rows} == {CANONICAL_MAP_SHA256}
+
+
+def test_fixed_map_engineering_cells_never_borrow_adjacent_evidence(
+    tmp_path: Path,
+) -> None:
+    training_status = (
+        tmp_path / "outputs" / "reports" / "g4irsf11_v3_training_status.json"
+    )
+    training_status.parent.mkdir(parents=True, exist_ok=True)
+    training_status.write_text(
+        json.dumps({"status": "PASS", "trained_model_count": 4}),
+        encoding="utf-8",
+    )
+    rows = build_system_ab_matrix(tmp_path)
+    engineering_rows = [
+        row for row in rows if row["scenario"] in FIXED_MAP_ENGINEERING_SCENARIOS
+    ]
+    assert len(engineering_rows) == len(VARIANTS) * 3
+    assert all(row["execution_status"] == PARTIAL for row in engineering_rows)
+    assert all("exact fixed-map" in row["blocker"] for row in engineering_rows)
 
 
 def test_legacy_smoke_is_never_promoted_to_rolling_seven_day_full(tmp_path: Path) -> None:
@@ -195,6 +222,7 @@ def test_unrecovered_exact_fault_extension_is_negative_evidence_not_success(
 
     _, report_path = write_system_ab_artifacts(tmp_path, rows)
     report = report_path.read_text(encoding="utf-8")
-    assert "Exact executed cells: **1/70**" in report
+    assert "Exact executed cells: **1/84**" in report
     assert "negative-evidence outcomes: **1**" in report
-    assert "Positive/qualified cells: **0/70**" in report
+    assert "Positive/qualified cells: **0/84**" in report
+    assert "No topology-generalization claim is made" in report

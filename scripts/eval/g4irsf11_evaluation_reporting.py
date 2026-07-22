@@ -38,6 +38,49 @@ def _finite(value: Any) -> Any:
     return value
 
 
+def _boolean(value: Any) -> bool | None:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes", "pass"}:
+            return True
+        if normalized in {"false", "0", "no", "fail"}:
+            return False
+    return None
+
+
+def _nonnegative_int(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value if value >= 0 else None
+    if isinstance(value, float):
+        return int(value) if math.isfinite(value) and value >= 0 and value.is_integer() else None
+    if isinstance(value, str):
+        normalized = value.strip()
+        if normalized.isdigit():
+            return int(normalized)
+    return None
+
+
+def _comparable(value: Any) -> tuple[str, Any] | None:
+    if value is None or value == "":
+        return None
+    boolean = _boolean(value)
+    if boolean is not None and (isinstance(value, bool) or str(value).strip().lower() in {"true", "false"}):
+        return ("bool", boolean)
+    if not isinstance(value, bool):
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            pass
+        else:
+            if math.isfinite(number):
+                return ("number", number)
+    return ("text", str(value).strip())
+
+
 def case_row(
     case: CaseSpec,
     result: Mapping[str, Any] | None,
@@ -171,10 +214,21 @@ def case_row(
         ),
         "backlog_slope_fraction": _finite(bag.get("backlog_slope_fraction_of_arrival_rate", "")),
         "end_backlog": bag.get("end_backlog", ""),
+        "peak_backlog": bag.get("peak_backlog", ""),
         "drain_time_seconds": _finite(bag.get("drain_time_seconds", "")),
         "backlog_area_seconds": _finite(bag.get("backlog_area_seconds", "")),
+        "source_peak_backlog": bag.get("source_peak_backlog", ""),
+        "source_end_backlog": bag.get("source_end_backlog", ""),
+        "source_backlog_area_seconds": _finite(
+            bag.get("source_backlog_area_seconds", "")
+        ),
+        "network_peak_backlog": bag.get("network_peak_backlog", ""),
+        "network_end_backlog": bag.get("network_end_backlog", ""),
         "original_entry_p95_seconds": _finite(bag.get("total_time_p95_seconds", "")),
         "original_entry_p99_seconds": _finite(bag.get("total_time_p99_seconds", "")),
+        "source_delay_p95_seconds": _finite(bag.get("source_delay_p95_seconds", "")),
+        "source_delay_p99_seconds": _finite(bag.get("source_delay_p99_seconds", "")),
+        "network_time_p95_seconds": _finite(bag.get("network_time_p95_seconds", "")),
         "java_release_tth_p95_seconds": _finite(bag.get("java_release_tth_p95_seconds", "")),
         "java_release_tth_p99_seconds": _finite(bag.get("java_release_tth_p99_seconds", "")),
         "deadline_miss_rate": _finite(bag.get("deadline_miss_rate", "")),
@@ -186,6 +240,25 @@ def case_row(
         "resolved_deadlock_count": summary.get("resolved_deadlock_count", ""),
         "unresolved_deadlock_count": summary.get("unresolved_deadlock_count", ""),
         "loop_count": summary.get("loop_count", ""),
+        "source_admission_enabled": summary.get("source_admission_enabled", ""),
+        "source_admission_attempt_count": summary.get(
+            "source_admission_attempt_count", ""
+        ),
+        "source_admission_admitted_count": summary.get(
+            "source_admission_admitted_count", ""
+        ),
+        "source_admission_local_resource_hold_count": summary.get(
+            "source_admission_local_resource_hold_count", ""
+        ),
+        "source_admission_downstream_pressure_hold_count": summary.get(
+            "source_admission_downstream_pressure_hold_count", ""
+        ),
+        "source_admission_beacon_read_count": summary.get(
+            "source_admission_beacon_read_count", ""
+        ),
+        "source_admission_max_observed_downstream_pressure": _finite(
+            summary.get("source_admission_max_observed_downstream_pressure", "")
+        ),
         "runtime_full_astar_calls": summary.get("runtime_full_astar_calls", ""),
         "global_reservation_scan_count": summary.get("global_reservation_scan_count", ""),
         "decision_count": summary.get("decision_count", ""),
@@ -403,9 +476,137 @@ def gate_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     frontier = [observed.get(case.case_id, {}) for case in expected.values() if case.category == "capacity_frontier"]
     ablations = [observed.get(case.case_id, {}) for case in expected.values() if case.category == "system_ablation"]
     faults = [observed.get(case.case_id, {}) for case in expected.values() if case.category == "temporal_fault"]
+    aging_baseline = observed.get("ablation_aging_full", {})
+    source_admission_off = observed.get("ablation_source_admission_off", {})
 
     def all_executed(items: Sequence[Mapping[str, Any]]) -> bool:
         return bool(items) and all(item.get("execution_status") == "EXECUTED" for item in items)
+
+    invariant_pass_count = sum(
+        _boolean(row.get("event_runtime_invariant_pass")) is True for row in ablations
+    )
+    unresolved_deadlocks = [
+        _nonnegative_int(row.get("unresolved_deadlock_count")) for row in ablations
+    ]
+    starvation_counts = [
+        _nonnegative_int(row.get("starvation_count")) for row in ablations
+    ]
+    zero_unresolved_deadlock_count = sum(value == 0 for value in unresolved_deadlocks)
+    zero_starvation_count = sum(value == 0 for value in starvation_counts)
+    local_safety_pass = (
+        all_executed(ablations)
+        and invariant_pass_count == len(ablations)
+        and zero_unresolved_deadlock_count == len(ablations)
+        and zero_starvation_count == len(ablations)
+    )
+
+    source_counter_fields = (
+        "source_admission_attempt_count",
+        "source_admission_admitted_count",
+        "source_admission_local_resource_hold_count",
+        "source_admission_downstream_pressure_hold_count",
+    )
+
+    def source_counter_partition_pass(row: Mapping[str, Any]) -> bool:
+        attempt, admitted, local_hold, pressure_hold = (
+            _nonnegative_int(row.get(field)) for field in source_counter_fields
+        )
+        return (
+            attempt is not None
+            and admitted is not None
+            and local_hold is not None
+            and pressure_hold is not None
+            and attempt == admitted + local_hold + pressure_hold
+        )
+
+    baseline_attempts = _nonnegative_int(
+        aging_baseline.get("source_admission_attempt_count")
+    )
+    baseline_pressure_holds = _nonnegative_int(
+        aging_baseline.get("source_admission_downstream_pressure_hold_count")
+    )
+    baseline_beacon_reads = _nonnegative_int(
+        aging_baseline.get("source_admission_beacon_read_count")
+    )
+    baseline_max_pressure = _nonnegative_int(
+        aging_baseline.get("source_admission_max_observed_downstream_pressure")
+    )
+    off_attempts = _nonnegative_int(
+        source_admission_off.get("source_admission_attempt_count")
+    )
+    off_pressure_holds = _nonnegative_int(
+        source_admission_off.get("source_admission_downstream_pressure_hold_count")
+    )
+    off_beacon_reads = _nonnegative_int(
+        source_admission_off.get("source_admission_beacon_read_count")
+    )
+    off_max_pressure = _nonnegative_int(
+        source_admission_off.get("source_admission_max_observed_downstream_pressure")
+    )
+    substantive_outcome_fields = (
+        "completed_segment_count",
+        "failed_segment_count",
+        "completion_pass",
+        "safe_execution_pass",
+        "queue_stability_pass",
+        "service_level_pass",
+        "capacity_pass",
+        "end_backlog",
+        "peak_backlog",
+        "backlog_area_seconds",
+        "source_peak_backlog",
+        "source_end_backlog",
+        "source_backlog_area_seconds",
+        "network_peak_backlog",
+        "network_end_backlog",
+        "original_entry_p95_seconds",
+        "original_entry_p99_seconds",
+        "source_delay_p95_seconds",
+        "source_delay_p99_seconds",
+        "network_time_p95_seconds",
+        "deadline_miss_rate",
+        "starvation_count",
+        "max_wait_seconds",
+        "wait_fairness_jain",
+        "unresolved_deadlock_count",
+        "loop_count",
+    )
+    substantive_differences = [
+        field
+        for field in substantive_outcome_fields
+        if _comparable(aging_baseline.get(field)) is not None
+        and _comparable(source_admission_off.get(field)) is not None
+        and _comparable(aging_baseline.get(field))
+        != _comparable(source_admission_off.get(field))
+    ]
+    source_partition_pass_count = sum(
+        source_counter_partition_pass(row)
+        for row in (aging_baseline, source_admission_off)
+    )
+    source_admission_operational = (
+        aging_baseline.get("execution_status") == "EXECUTED"
+        and source_admission_off.get("execution_status") == "EXECUTED"
+        and _boolean(aging_baseline.get("source_admission_enabled")) is True
+        and _boolean(source_admission_off.get("source_admission_enabled")) is False
+        and baseline_attempts is not None
+        and baseline_attempts > 0
+        and baseline_pressure_holds is not None
+        and baseline_pressure_holds > 0
+        and baseline_beacon_reads is not None
+        and baseline_beacon_reads > 0
+        and baseline_max_pressure is not None
+        and baseline_max_pressure > 0
+        and off_attempts is not None
+        and off_attempts > 0
+        and off_pressure_holds == 0
+        and off_beacon_reads == 0
+        and off_max_pressure == 0
+        and source_partition_pass_count == 2
+        and bool(substantive_differences)
+    )
+
+    def count_evidence(value: int | None) -> str:
+        return "MISSING" if value is None else str(value)
 
     gates = [
         {
@@ -420,8 +621,42 @@ def gate_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
         },
         {
             "gate": "local_safety_ablation",
-            "status": "PASS" if all_executed(ablations) and all(row.get("event_runtime_invariant_pass") for row in ablations) else "PARTIAL_WITH_EXPLICIT_BLOCKER",
-            "evidence": f"executed={sum(row.get('execution_status') == 'EXECUTED' for row in ablations)}/{len(ablations)}",
+            "status": "PASS" if local_safety_pass else "PARTIAL_WITH_EXPLICIT_BLOCKER",
+            "evidence": (
+                f"executed={sum(row.get('execution_status') == 'EXECUTED' for row in ablations)}/{len(ablations)}; "
+                f"runtime_invariant_pass={invariant_pass_count}/{len(ablations)}; "
+                f"zero_unresolved_deadlock={zero_unresolved_deadlock_count}/{len(ablations)}; "
+                f"zero_starvation={zero_starvation_count}/{len(ablations)}; "
+                "unresolved_deadlock_total="
+                f"{sum(value for value in unresolved_deadlocks if value is not None) if all(value is not None for value in unresolved_deadlocks) else 'INCOMPLETE'}; "
+                "starvation_total="
+                f"{sum(value for value in starvation_counts if value is not None) if all(value is not None for value in starvation_counts) else 'INCOMPLETE'}"
+            ),
+        },
+        {
+            "gate": "source_admission_ablation_operational",
+            "status": (
+                "PASS"
+                if source_admission_operational
+                else "PARTIAL_WITH_EXPLICIT_BLOCKER"
+            ),
+            "evidence": (
+                "aging_enabled="
+                f"{_boolean(aging_baseline.get('source_admission_enabled'))}; "
+                f"aging_attempts={count_evidence(baseline_attempts)}; "
+                f"aging_pressure_holds={count_evidence(baseline_pressure_holds)}; "
+                f"aging_beacon_reads={count_evidence(baseline_beacon_reads)}; "
+                f"aging_max_pressure={count_evidence(baseline_max_pressure)}; "
+                "off_enabled="
+                f"{_boolean(source_admission_off.get('source_admission_enabled'))}; "
+                f"off_attempts={count_evidence(off_attempts)}; "
+                f"off_pressure_holds={count_evidence(off_pressure_holds)}; "
+                f"off_beacon_reads={count_evidence(off_beacon_reads)}; "
+                f"off_max_pressure={count_evidence(off_max_pressure)}; "
+                f"counter_partition_pass={source_partition_pass_count}/2; "
+                "substantive_outcome_differences="
+                f"{','.join(substantive_differences) if substantive_differences else 'NONE'}"
+            ),
         },
         {
             "gate": "temporal_fault_recovery",

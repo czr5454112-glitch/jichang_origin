@@ -215,8 +215,13 @@ def _read_jsonl_objects(path: Path) -> list[dict[str, Any]]:
 
 def _source_identity_from_payload(payload: bytes) -> dict[str, Any]:
     normalized = payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    resolved_source = SOURCE_TASK_PATH.resolve()
+    try:
+        identity_path = resolved_source.relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        identity_path = resolved_source.as_posix()
     return {
-        "path": SOURCE_TASK_PATH.relative_to(ROOT).as_posix(),
+        "path": identity_path,
         "raw_bytes_sha256": hashlib.sha256(payload).hexdigest(),
         "semantic_sha256": hashlib.sha256(normalized).hexdigest(),
         "semantic_hash_semantics": (
@@ -1817,7 +1822,7 @@ def _formal_stage_validation_errors(
     producer: Mapping[str, Any],
     stage_root: Path,
 ) -> list[str]:
-    errors: list[str] = []
+    errors = _formal_gate_validation_errors(rows)
     cases = formal_cases()
     expected_ids = [case.case_id for case in cases]
     actual_ids = [str(row.get("case_id") or "") for row in rows]
@@ -1867,6 +1872,26 @@ def _formal_stage_validation_errors(
                 for failure in committed.get("failures", [])
             )
     return errors
+
+
+def _formal_gate_validation_errors(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    required_gate = "source_admission_ablation_operational"
+    matching = [row for row in gate_rows(rows) if row.get("gate") == required_gate]
+    if len(matching) != 1:
+        return [
+            "formal staged source_admission_ablation_operational gate is missing "
+            "or non-unique"
+        ]
+    gate = matching[0]
+    if gate.get("status") != "PASS":
+        return [
+            "formal staged source_admission_ablation_operational gate must PASS; "
+            f"status={gate.get('status', '<missing>')}; "
+            f"evidence={gate.get('evidence', '<missing>')}"
+        ]
+    return []
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -108,6 +108,13 @@ def _valid_bundle(tmp_path: Path) -> tuple[
         "full_future_routes_stored": 0,
         "event_count": 4,
         "bag_release_event_count": 2,
+        "source_admission_enabled": True,
+        "source_admission_attempt_count": 2,
+        "source_admission_admitted_count": 2,
+        "source_admission_local_resource_hold_count": 0,
+        "source_admission_downstream_pressure_hold_count": 0,
+        "source_admission_beacon_read_count": 2,
+        "source_admission_max_observed_downstream_pressure": 0,
         "decision_count": 2,
         "runtime_seconds": 1.0,
         "decision_latency_us_p50": 1.0,
@@ -530,6 +537,37 @@ def test_current_cohort_descriptor_validation_rebuilds_canonical_inputs(
             "peak_active_bag_count",
         ),
         (
+            lambda result: result["summary"].__setitem__(
+                "source_admission_local_resource_hold_count", 1
+            ),
+            "attempts do not partition",
+        ),
+        (
+            lambda result: result["summary"].pop("source_admission_enabled"),
+            "source_admission_enabled must be bool",
+        ),
+        (
+            lambda result: result["summary"].__setitem__(
+                "source_admission_beacon_read_count", -1
+            ),
+            "counters must be non-negative",
+        ),
+        (
+            lambda result: result["summary"].__setitem__(
+                "source_admission_enabled", False
+            ),
+            "source_admission_enabled != CaseSpec",
+        ),
+        (
+            lambda result: result["summary"].update(
+                {
+                    "source_admission_attempt_count": 0,
+                    "source_admission_admitted_count": 0,
+                }
+            ),
+            "below completed_count",
+        ),
+        (
             lambda result: result["summary"].__setitem__("final_active_bag_count", 1),
             "final_active_bag_count",
         ),
@@ -699,6 +737,12 @@ def test_pre_release_time_limit_accepts_exact_empty_junction_evidence(
             "event_count": 0,
             "bag_release_event_count": 0,
             "decision_count": 0,
+            "source_admission_attempt_count": 0,
+            "source_admission_admitted_count": 0,
+            "source_admission_local_resource_hold_count": 0,
+            "source_admission_downstream_pressure_hold_count": 0,
+            "source_admission_beacon_read_count": 0,
+            "source_admission_max_observed_downstream_pressure": 0,
             "event_limit_reached": False,
             "time_limit_reached": True,
         }

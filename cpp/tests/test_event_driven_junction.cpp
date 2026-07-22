@@ -7,6 +7,7 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "ics_core/io/canonical_map2_reader.hpp"
@@ -287,6 +288,135 @@ void test_burst_sizes(Checks& checks) {
   }
 }
 
+void test_source_admission_toggle_uses_one_hop_beacon_pressure(Checks& checks) {
+  const auto& graph = canonical_graph();
+  checks.require(graph.outgoing(1) == std::vector<int>({7}) &&
+                     graph.outgoing(9) == std::vector<int>({7, 10}),
+                 "source admission test must use real map2 merge 1/9->7");
+  checks.require(graph.has_edge(9, 10),
+                 "source admission test must retain the real alternate 9->10 edge");
+
+  const std::vector<EventRuntimeBagRequest> bags{
+      {"admission-leading", 701, 0.0, 10000.0, 1, 47, "canonical-map2"},
+      {"admission-metered", 702, 1.1, 10000.0, 9, 47, "canonical-map2"},
+      {"admission-local-calendar", 703, 1.1, 10000.0, 9, 47, "canonical-map2"},
+  };
+  const std::vector<EventRuntimeFaultWindow> faults{{9, 10, 0.0, 8.0, 0.0}};
+
+  auto enabled_config = test_config();
+  enabled_config.minimum_service_seconds = 1.0;
+  enabled_config.enable_source_admission = true;
+  EventDrivenJunctionRuntime enabled_runtime(graph, enabled_config);
+  const auto enabled = enabled_runtime.run(bags, faults);
+  check_core_invariants(checks, enabled, 3);
+
+  auto disabled_config = enabled_config;
+  disabled_config.enable_source_admission = false;
+  EventDrivenJunctionRuntime disabled_runtime(graph, disabled_config);
+  const auto disabled = disabled_runtime.run(bags, faults);
+  check_core_invariants(checks, disabled, 3);
+
+  const auto partitioned = [](const auto& summary) {
+    return summary.source_admission_attempt_count ==
+           summary.source_admission_admitted_count +
+               summary.source_admission_local_resource_hold_count +
+               summary.source_admission_downstream_pressure_hold_count;
+  };
+  checks.require(enabled.summary.source_admission_enabled &&
+                     !disabled.summary.source_admission_enabled,
+                 "runtime summary must echo the C++ source-admission configuration");
+  checks.require(partitioned(enabled.summary) && partitioned(disabled.summary),
+                 "source admission attempts must have one auditable terminal outcome");
+  checks.require(enabled.summary.source_admission_admitted_count == 3 &&
+                     disabled.summary.source_admission_admitted_count == 3,
+                 "both policies must admit each real-map test bag exactly once");
+  checks.require(enabled.summary.source_admission_downstream_pressure_hold_count > 0 &&
+                     enabled.summary.source_admission_beacon_read_count > 0 &&
+                     enabled.summary.source_admission_max_observed_downstream_pressure > 0,
+                 "enabled admission must meter the real merge from a one-hop beacon");
+  checks.require(disabled.summary.source_admission_downstream_pressure_hold_count == 0 &&
+                     disabled.summary.source_admission_beacon_read_count == 0 &&
+                     disabled.summary.source_admission_max_observed_downstream_pressure == 0,
+                 "disabled admission must bypass downstream state without bypassing source service");
+
+  const auto enabled_metered = std::find_if(
+      enabled.bags.begin(), enabled.bags.end(), [](const auto& row) { return row.task_id == 702; });
+  const auto disabled_metered = std::find_if(
+      disabled.bags.begin(), disabled.bags.end(), [](const auto& row) { return row.task_id == 702; });
+  checks.require(enabled_metered != enabled.bags.end() &&
+                     disabled_metered != disabled.bags.end() &&
+                     enabled_metered->admitted_time > disabled_metered->admitted_time,
+                 "enabled admission must delay the metered bag until the advertised calendar is ready");
+  checks.require(disabled.summary.source_admission_local_resource_hold_count > 0,
+                 "admission-off must still retain source-local calendar holds");
+}
+
+void test_source_admission_same_time_event_order(Checks& checks) {
+  using czr005::ics::JunctionEventType;
+  using czr005::ics::event_runtime_detail::RuntimeEvent;
+  using czr005::ics::event_runtime_detail::event_priority;
+
+  RuntimeEvent service;
+  service.type = JunctionEventType::kJunctionServiceComplete;
+  RuntimeEvent arrival;
+  arrival.type = JunctionEventType::kArriveJunction;
+  RuntimeEvent beacon;
+  beacon.type = JunctionEventType::kCongestionBeaconUpdate;
+  RuntimeEvent release;
+  release.type = JunctionEventType::kBagRelease;
+
+  checks.require(event_priority(service) < event_priority(arrival) &&
+                     event_priority(arrival) < event_priority(beacon) &&
+                     event_priority(beacon) < event_priority(release),
+                 "same-time source retry must observe completed service, arrival, and beacon state");
+}
+
+void test_diagnostic_hops_are_read_only(Checks& checks) {
+  const auto& graph = canonical_graph();
+  auto one_hop_config = test_config();
+  one_hop_config.minimum_service_seconds = 1.0;
+  one_hop_config.diagnostic_hops = 1;
+  EventDrivenJunctionRuntime one_hop_runtime(graph, one_hop_config);
+  const auto one_hop = one_hop_runtime.run(burst(16));
+  check_core_invariants(checks, one_hop, 16);
+
+  auto two_hop_config = one_hop_config;
+  two_hop_config.diagnostic_hops = 2;
+  EventDrivenJunctionRuntime two_hop_runtime(graph, two_hop_config);
+  const auto two_hop = two_hop_runtime.run(burst(16));
+  check_core_invariants(checks, two_hop, 16);
+
+  std::vector<std::tuple<int, int, int>> one_hop_actions;
+  std::vector<std::tuple<int, int, int>> two_hop_actions;
+  int one_hop_max_pressure = 0;
+  int two_hop_max_pressure = 0;
+  for (const auto& decision : one_hop.decisions) {
+    one_hop_actions.emplace_back(decision.task_id,
+                                 decision.current_node,
+                                 decision.selected_next);
+    for (const auto& candidate : decision.candidates) {
+      one_hop_max_pressure =
+          std::max(one_hop_max_pressure, candidate.two_hop_queue_pressure);
+    }
+  }
+  for (const auto& decision : two_hop.decisions) {
+    two_hop_actions.emplace_back(decision.task_id,
+                                 decision.current_node,
+                                 decision.selected_next);
+    for (const auto& candidate : decision.candidates) {
+      two_hop_max_pressure =
+          std::max(two_hop_max_pressure, candidate.two_hop_queue_pressure);
+    }
+  }
+  checks.require(one_hop.summary.two_step_reservation_count == 0 &&
+                     two_hop.summary.two_step_reservation_count == 0,
+                 "one/two-hop diagnostics must never reserve a second edge");
+  checks.require(one_hop_max_pressure == 0 && two_hop_max_pressure > 0,
+                 "two-hop mode must expose a real bounded pressure summary only when enabled");
+  checks.require(one_hop_actions == two_hop_actions,
+                 "read-only two-hop diagnostics must not change committed actions");
+}
+
 void test_real_directed_corridor_competition(Checks& checks) {
   const auto& graph = canonical_graph();
   checks.require(graph.outgoing(3) == std::vector<int>({16}) && graph.has_edge(3, 16) &&
@@ -380,6 +510,7 @@ void test_fault_repair_delay_and_escape(Checks& checks) {
   auto config = test_config();
   config.retry_interval = 0.1;
   config.deadlock_retry_threshold = 2;
+  config.enable_source_admission = false;
   EventDrivenJunctionRuntime runtime(graph, config);
   const std::vector<EventRuntimeFaultWindow> faults{{0, 6, 0.0, 1.0, 0.25}};
   const auto result = runtime.run(
@@ -535,6 +666,7 @@ void test_explicit_sensor_loss_keeps_physical_shield(Checks& checks) {
                  "sensor-loss test must use the real single-exit corridor 0->6");
   auto config = test_config();
   config.retry_interval = 0.1;
+  config.enable_source_admission = false;
   EventDrivenJunctionRuntime runtime(graph, config);
   const auto result = runtime.run(
       {{"real-sensor-loss", 601, 0.0, 10000.0, 0, 47, "canonical-map2"}},
@@ -569,6 +701,9 @@ int main() {
     test_canonical_map2_fixture(checks);
     test_local_calendar_dynamic_accounting(checks);
     test_burst_sizes(checks);
+    test_source_admission_toggle_uses_one_hop_beacon_pressure(checks);
+    test_source_admission_same_time_event_order(checks);
+    test_diagnostic_hops_are_read_only(checks);
     test_real_directed_corridor_competition(checks);
     test_loop_tabu_on_real_cycle(checks);
     test_non_goal_terminal_sink_is_locally_shielded(checks);

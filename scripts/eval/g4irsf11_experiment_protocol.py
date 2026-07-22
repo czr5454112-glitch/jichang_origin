@@ -12,10 +12,10 @@ from typing import Any, Mapping
 from scripts.eval.g4irsf11_workloads import FORMAL_WORKLOAD_MODES, FRONTIER_SCALES
 
 
-PROTOCOL_SCHEMA = "czr005.g4irsf11.event_runtime_protocol.v3"
-PROTOCOL_VERSION = "g4irsf11-formal-2026-07-21-v3"
-EXTENSION_PROTOCOL_SCHEMA = "czr005.g4irsf11.system_extension_protocol.v2"
-EXTENSION_PROTOCOL_VERSION = "g4irsf11-system-extension-2026-07-21-v2"
+PROTOCOL_SCHEMA = "czr005.g4irsf11.event_runtime_protocol.v4"
+PROTOCOL_VERSION = "g4irsf11-formal-2026-07-22-v4"
+EXTENSION_PROTOCOL_SCHEMA = "czr005.g4irsf11.system_extension_protocol.v3"
+EXTENSION_PROTOCOL_VERSION = "g4irsf11-system-extension-2026-07-22-v3"
 
 # These thresholds are declared before looking at G4IRSF11 outcomes.  They are
 # engineering SLOs, not a claim that they reproduce an unstated paper SLO.
@@ -304,6 +304,18 @@ def protocol_manifest() -> dict[str, Any]:
         "frontier_scales": list(FRONTIER_SCALES),
         "case_count": len(cases),
         "cases": [case.as_dict() for case in cases],
+        "runtime_contract": {
+            "reservation_depth": 1,
+            "diagnostic_hops_maximum": 2,
+            "diagnostic_hops_are_read_only": True,
+            "source_admission": (
+                "enabled policy reads only bounded one-hop congestion beacons and "
+                "local physical edge state before source service; disabled policy "
+                "bypasses the downstream gate but retains source-local service safety"
+            ),
+            "source_wait_in_total_system_time": True,
+            "runtime_full_astar_allowed": False,
+        },
         "claim_boundaries": {
             "size_samples": "never substitute for real_map_paper_full",
             "trace_samples": "decision-data collection only; never capacity evidence",
@@ -322,6 +334,18 @@ def system_extension_manifest() -> dict[str, Any]:
         "fault_slo": dict(FAULT_SLO),
         "case_count": len(cases),
         "cases": [case.as_dict() for case in cases],
+        "runtime_contract": {
+            "reservation_depth": 1,
+            "diagnostic_hops_maximum": 2,
+            "diagnostic_hops_are_read_only": True,
+            "source_admission": (
+                "enabled policy reads only bounded one-hop congestion beacons and "
+                "local physical edge state before source service; disabled policy "
+                "bypasses the downstream gate but retains source-local service safety"
+            ),
+            "source_wait_in_total_system_time": True,
+            "runtime_full_astar_allowed": False,
+        },
         "claim_boundaries": {
             "independence": "supplements rather than rewrites the frozen 84-case formal matrix",
             "continuity": "full generated workload, no first-N truncation, no runtime reset at day boundaries",

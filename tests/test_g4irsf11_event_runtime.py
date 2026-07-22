@@ -84,6 +84,23 @@ def _assert_invariants(payload: dict[str, object], completed: int) -> None:
     assert summary["cpp_internal_accounted_bytes"] > 0
     assert 0 <= summary["peak_active_bag_count"] <= summary["requested_count"]
     assert summary["final_active_bag_count"] == 0
+    assert isinstance(summary["source_admission_enabled"], bool)
+    admission_attempts = summary["source_admission_attempt_count"]
+    admission_admitted = summary["source_admission_admitted_count"]
+    admission_local_holds = summary["source_admission_local_resource_hold_count"]
+    admission_pressure_holds = summary[
+        "source_admission_downstream_pressure_hold_count"
+    ]
+    assert admission_attempts == (
+        admission_admitted + admission_local_holds + admission_pressure_holds
+    )
+    assert completed <= admission_admitted <= summary["requested_count"]
+    if summary["source_admission_enabled"]:
+        assert summary["source_admission_beacon_read_count"] > 0
+    else:
+        assert admission_pressure_holds == 0
+        assert summary["source_admission_beacon_read_count"] == 0
+        assert summary["source_admission_max_observed_downstream_pressure"] == 0
 
     junction_state = payload["junction_state"]
     assert isinstance(junction_state, list) and junction_state
@@ -218,6 +235,7 @@ def test_fault_message_delay_is_shielded_and_repair_resumes_without_astar() -> N
         faults=[(3, 16, 0.0, 1.0, 0.25)],
         retry_interval=0.1,
         deadlock_retry_threshold=2,
+        enable_source_admission=False,
     )
     _assert_invariants(payload, 1)
     summary = payload["summary"]
@@ -379,6 +397,7 @@ def test_dropped_fault_notifications_rely_on_physical_interlock_only() -> None:
         bags=[("sensor-loss", 601, 0.0, 1_000.0, 3, 47, "source-3")],
         faults=[(3, 16, 0.0, 1.0, 0.25, True)],
         retry_interval=0.1,
+        enable_source_admission=False,
     )
     _assert_invariants(payload, 1)
     summary = payload["summary"]

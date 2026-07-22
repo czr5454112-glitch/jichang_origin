@@ -3069,6 +3069,19 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["repair_event_count"] = summary.repair_event_count;
   row["local_queue_update_event_count"] = summary.local_queue_update_event_count;
   row["congestion_beacon_update_event_count"] = summary.congestion_beacon_update_event_count;
+  row["source_admission_enabled"] = summary.source_admission_enabled;
+  row["source_admission_attempt_count"] =
+      py::int_(summary.source_admission_attempt_count);
+  row["source_admission_admitted_count"] =
+      py::int_(summary.source_admission_admitted_count);
+  row["source_admission_local_resource_hold_count"] =
+      py::int_(summary.source_admission_local_resource_hold_count);
+  row["source_admission_downstream_pressure_hold_count"] =
+      py::int_(summary.source_admission_downstream_pressure_hold_count);
+  row["source_admission_beacon_read_count"] =
+      py::int_(summary.source_admission_beacon_read_count);
+  row["source_admission_max_observed_downstream_pressure"] =
+      summary.source_admission_max_observed_downstream_pressure;
   row["fault_notification_drop_count"] = summary.fault_notification_drop_count;
   row["physical_fault_window_traversal_count"] =
       summary.physical_fault_window_traversal_count;
@@ -3459,6 +3472,9 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["runtime_bag_identity"] = "input_record_ordinal";
   trace_context["original_task_id_rewritten"] = false;
   trace_context["sensor_loss_supported"] = true;
+  trace_context["enable_source_admission"] = enable_source_admission;
+  trace_context["source_admission_snapshot_scope"] =
+      "outgoing_neighbour_beacon_plus_local_physical_edge";
   trace_context["enable_fault_policy"] = enable_fault_policy;
   trace_context["physical_fault_interlock_always_enabled"] = true;
   trace_context["fault_policy_off_semantics"] =

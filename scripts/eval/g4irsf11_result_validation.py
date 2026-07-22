@@ -28,7 +28,7 @@ from scripts.eval.g4irsf11_fixed_map import (
 )
 
 
-RESULT_SCHEMA = "czr005.g4irsf11.event_runtime_result.v4"
+RESULT_SCHEMA = "czr005.g4irsf11.event_runtime_result.v5"
 EXECUTION_DESCRIPTOR_SCHEMA = "czr005.g4irsf11.event_runtime_execution_descriptor.v3"
 JUNCTION_LOCAL_STATE_ACCOUNTING_SEMANTICS = (
     "cpp_object_plus_live_deque_payload_plus_calendar_capacity_lower_bound"
@@ -1093,6 +1093,88 @@ def validate_event_result(
             summary.get("bag_release_event_count"),
             "summary.bag_release_event_count",
         )
+        _add(
+            errors,
+            isinstance(summary.get("source_admission_enabled"), bool),
+            "summary.source_admission_enabled must be bool",
+        )
+        _add(
+            errors,
+            summary.get("source_admission_enabled")
+            is bool(case.get("enable_source_admission")),
+            "summary source_admission_enabled != CaseSpec",
+        )
+        source_admission_counts = {
+            key: _integer(summary.get(key), f"summary.{key}")
+            for key in (
+                "source_admission_attempt_count",
+                "source_admission_admitted_count",
+                "source_admission_local_resource_hold_count",
+                "source_admission_downstream_pressure_hold_count",
+                "source_admission_beacon_read_count",
+                "source_admission_max_observed_downstream_pressure",
+            )
+        }
+        _add(
+            errors,
+            all(value >= 0 for value in source_admission_counts.values()),
+            "source-admission summary counters must be non-negative",
+        )
+        _add(
+            errors,
+            source_admission_counts["source_admission_attempt_count"]
+            == source_admission_counts["source_admission_admitted_count"]
+            + source_admission_counts["source_admission_local_resource_hold_count"]
+            + source_admission_counts[
+                "source_admission_downstream_pressure_hold_count"
+            ],
+            "source-admission attempts do not partition into admitted/local/downstream",
+        )
+        _add(
+            errors,
+            source_admission_counts["source_admission_admitted_count"] <= requested,
+            "source-admission admitted count exceeds requested_count",
+        )
+        _add(
+            errors,
+            source_admission_counts["source_admission_admitted_count"] >= completed,
+            "source-admission admitted count is below completed_count",
+        )
+        if successful_completion_flag:
+            _add(
+                errors,
+                source_admission_counts["source_admission_admitted_count"]
+                == requested,
+                "successful completion requires every request to be source-admitted",
+            )
+        _add(
+            errors,
+            source_admission_counts["source_admission_attempt_count"]
+            <= bag_release_event_count,
+            "source-admission attempts exceed processed BAG_RELEASE events",
+        )
+        if not bool(case.get("enable_source_admission")):
+            _add(
+                errors,
+                source_admission_counts[
+                    "source_admission_downstream_pressure_hold_count"
+                ]
+                == 0,
+                "source-admission-off case recorded downstream pressure holds",
+            )
+            _add(
+                errors,
+                source_admission_counts["source_admission_beacon_read_count"] == 0,
+                "source-admission-off case read downstream beacons",
+            )
+            _add(
+                errors,
+                source_admission_counts[
+                    "source_admission_max_observed_downstream_pressure"
+                ]
+                == 0,
+                "source-admission-off case observed downstream pressure",
+            )
         if all(key in summary for key in ("deadlock_count", "resolved_deadlock_count", "unresolved_deadlock_count")):
             _add(
                 errors,

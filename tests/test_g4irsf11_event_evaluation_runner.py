@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import json
+from types import SimpleNamespace
 
 import pytest
 
@@ -12,6 +13,8 @@ from scripts.eval.g4irsf11_experiment_protocol import PROTOCOL_VERSION, protocol
 from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
     _descriptor_matches,
     _acquire_case_lock,
+    _formal_gate_validation_errors,
+    _formal_stage_validation_errors,
     _release_case_lock,
     _trace_artifact_bindings,
     _trace_semantic_errors,
@@ -48,6 +51,35 @@ def _rows(count: int) -> list[dict[str, object]]:
     ]
 
 
+def _operational_source_admission_rows() -> list[dict[str, object]]:
+    return [
+        {
+            "case_id": "ablation_aging_full",
+            "execution_status": "EXECUTED",
+            "source_admission_enabled": True,
+            "source_admission_attempt_count": 10,
+            "source_admission_admitted_count": 6,
+            "source_admission_local_resource_hold_count": 1,
+            "source_admission_downstream_pressure_hold_count": 3,
+            "source_admission_beacon_read_count": 8,
+            "source_admission_max_observed_downstream_pressure": 4,
+            "completed_segment_count": 9,
+        },
+        {
+            "case_id": "ablation_source_admission_off",
+            "execution_status": "EXECUTED",
+            "source_admission_enabled": False,
+            "source_admission_attempt_count": 10,
+            "source_admission_admitted_count": 9,
+            "source_admission_local_resource_hold_count": 1,
+            "source_admission_downstream_pressure_hold_count": 0,
+            "source_admission_beacon_read_count": 0,
+            "source_admission_max_observed_downstream_pressure": 0,
+            "completed_segment_count": 10,
+        },
+    ]
+
+
 def test_implementation_mutation_is_fail_closed(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -69,6 +101,14 @@ def test_source_task_snapshot_detects_even_newline_only_runtime_mutation(
     rows, frozen_source = runner_module.load_source_task_snapshot()
     frozen_map = runner_module.canonical_map_identity()
     assert len(rows) == 2
+    resolved_source = source.resolve()
+    try:
+        expected_identity_path = resolved_source.relative_to(
+            runner_module.ROOT.resolve()
+        ).as_posix()
+    except ValueError:
+        expected_identity_path = resolved_source.as_posix()
+    assert frozen_source["path"] == expected_identity_path
 
     source.write_bytes(b'{"task_id":1}\r\n{"task_id":2}\r\n')
     with pytest.raises(RuntimeError, match="source task changed"):
@@ -360,10 +400,138 @@ def test_case_row_never_equates_completion_with_capacity() -> None:
     assert row["capacity_pass"] is False
 
 
+def test_case_row_exposes_source_admission_operational_counters() -> None:
+    case = formal_cases()[0]
+    summary = {
+        "source_admission_enabled": True,
+        "source_admission_attempt_count": 17,
+        "source_admission_admitted_count": 9,
+        "source_admission_local_resource_hold_count": 3,
+        "source_admission_downstream_pressure_hold_count": 5,
+        "source_admission_beacon_read_count": 23,
+        "source_admission_max_observed_downstream_pressure": 7,
+    }
+    row = case_row(
+        case,
+        {
+            "summary": summary,
+            "raw_bag_capacity_metrics": {
+                "source_peak_backlog": 11,
+                "network_peak_backlog": 6,
+                "source_delay_p99_seconds": 4.5,
+            },
+        },
+        {"status": "EXECUTED"},
+    )
+    for field, value in summary.items():
+        assert row[field] == value
+    assert row["source_peak_backlog"] == 11
+    assert row["network_peak_backlog"] == 6
+    assert row["source_delay_p99_seconds"] == 4.5
+
+
 def test_missing_formal_cases_are_explicit_blockers() -> None:
     gates = gate_rows([])
     assert gates
     assert all(row["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER" for row in gates)
+
+
+def test_local_safety_ablation_requires_zero_unresolved_deadlock_and_starvation() -> None:
+    ablations = [
+        case for case in formal_cases() if case.category == "system_ablation"
+    ]
+    rows = [
+        {
+            "case_id": case.case_id,
+            "execution_status": "EXECUTED",
+            "event_runtime_invariant_pass": True,
+            "unresolved_deadlock_count": 0,
+            "starvation_count": 0,
+        }
+        for case in ablations
+    ]
+    gate = next(row for row in gate_rows(rows) if row["gate"] == "local_safety_ablation")
+    assert gate["status"] == "PASS"
+    assert f"zero_unresolved_deadlock={len(ablations)}/{len(ablations)}" in gate["evidence"]
+    assert f"zero_starvation={len(ablations)}/{len(ablations)}" in gate["evidence"]
+
+    rows[0]["unresolved_deadlock_count"] = 1
+    rows[1]["starvation_count"] = 3
+    gate = next(row for row in gate_rows(rows) if row["gate"] == "local_safety_ablation")
+    assert gate["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    assert f"zero_unresolved_deadlock={len(ablations) - 1}/{len(ablations)}" in gate["evidence"]
+    assert f"zero_starvation={len(ablations) - 1}/{len(ablations)}" in gate["evidence"]
+    assert "unresolved_deadlock_total=1" in gate["evidence"]
+    assert "starvation_total=3" in gate["evidence"]
+
+    rows[0].pop("unresolved_deadlock_count")
+    gate = next(row for row in gate_rows(rows) if row["gate"] == "local_safety_ablation")
+    assert gate["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    assert "unresolved_deadlock_total=INCOMPLETE" in gate["evidence"]
+
+
+def test_source_admission_ablation_requires_operational_and_outcome_evidence() -> None:
+    aging, disabled = _operational_source_admission_rows()
+    gate = next(
+        row
+        for row in gate_rows([aging, disabled])
+        if row["gate"] == "source_admission_ablation_operational"
+    )
+    assert gate["status"] == "PASS"
+    assert "counter_partition_pass=2/2" in gate["evidence"]
+    assert "substantive_outcome_differences=completed_segment_count" in gate["evidence"]
+
+    disabled["completed_segment_count"] = aging["completed_segment_count"]
+    gate = next(
+        row
+        for row in gate_rows([aging, disabled])
+        if row["gate"] == "source_admission_ablation_operational"
+    )
+    assert gate["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    assert "substantive_outcome_differences=NONE" in gate["evidence"]
+
+    disabled["completed_segment_count"] = 10
+    disabled["source_admission_beacon_read_count"] = 1
+    gate = next(
+        row
+        for row in gate_rows([aging, disabled])
+        if row["gate"] == "source_admission_ablation_operational"
+    )
+    assert gate["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    assert "off_beacon_reads=1" in gate["evidence"]
+
+
+def test_formal_stage_rejects_non_operational_source_admission_ablation() -> None:
+    rows = _operational_source_admission_rows()
+    assert _formal_gate_validation_errors(rows) == []
+
+    rows[1]["source_admission_beacon_read_count"] = 1
+    errors = _formal_gate_validation_errors(rows)
+    assert len(errors) == 1
+    assert "source_admission_ablation_operational gate must PASS" in errors[0]
+    assert "off_beacon_reads=1" in errors[0]
+
+
+def test_formal_stage_validation_propagates_source_admission_gate_blocker(
+    tmp_path: Path,
+) -> None:
+    rows = _operational_source_admission_rows()
+    rows[1]["source_admission_downstream_pressure_hold_count"] = 1
+    errors = _formal_stage_validation_errors(
+        rows,
+        args=SimpleNamespace(
+            measurement_cohort="fixture",
+            concurrent_worker_target=8,
+        ),
+        implementation_digest="a" * 64,
+        decision_manifest=None,
+        producer={},
+        stage_root=tmp_path,
+    )
+    assert any(
+        "source_admission_ablation_operational gate must PASS" in error
+        for error in errors
+    )
 
 
 def test_temporal_gate_counts_unrecovered_windows_as_explicit_negative_evidence() -> None:

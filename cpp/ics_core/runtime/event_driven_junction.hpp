@@ -210,6 +210,12 @@ struct EventRuntimeSummary {
   int repair_event_count = 0;
   int local_queue_update_event_count = 0;
   int congestion_beacon_update_event_count = 0;
+  std::uint64_t source_admission_attempt_count = 0;
+  std::uint64_t source_admission_admitted_count = 0;
+  std::uint64_t source_admission_local_resource_hold_count = 0;
+  std::uint64_t source_admission_downstream_pressure_hold_count = 0;
+  std::uint64_t source_admission_beacon_read_count = 0;
+  int source_admission_max_observed_downstream_pressure = 0;
   int fault_notification_drop_count = 0;
   // Bags already inside an edge when a fault activates are grandfathered:
   // they are audited, but are not an unsafe-entry violation.
@@ -269,6 +275,7 @@ struct EventRuntimeSummary {
   bool event_limit_reached = false;
   bool time_limit_reached = false;
   bool sensor_loss_mode_used = false;
+  bool source_admission_enabled = true;
   bool fault_policy_enabled = true;
   bool decision_trace_truncated = false;
   bool event_trace_truncated = false;
@@ -381,6 +388,14 @@ class LocalCalendar {
       }
     }
     return candidate;
+  }
+
+  [[nodiscard]] double reserved_until(double now) const noexcept {
+    double value = now;
+    for (const auto& item : intervals_) {
+      value = std::max(value, item.end);
+    }
+    return value;
   }
 
   void reserve(int task_id, double start, double end) {
@@ -505,6 +520,18 @@ struct AdvertisedFaultState {
   double received_at = 0.0;
 };
 
+// A bounded, one-hop congestion advertisement.  Source admission never reads
+// a downstream JunctionState or LocalCalendar directly: it consumes only this
+// scalar snapshot for each real outgoing neighbour plus the physical state of
+// its own outgoing edges.
+struct CongestionBeaconState {
+  int queue_length = 0;
+  int scheduled_incoming = 0;
+  double service_calendar_reserved_until = 0.0;
+  double received_at = 0.0;
+  std::uint64_t generation = 0;
+};
+
 struct RuntimeEvent {
   JunctionEventType type = JunctionEventType::kBagRelease;
   double time = 0.0;
@@ -537,19 +564,19 @@ inline int event_priority(const RuntimeEvent& event) {
   if (event.type == JunctionEventType::kJunctionServiceComplete) {
     return 3;
   }
-  if (event.type == JunctionEventType::kBagRelease) {
+  if (event.type == JunctionEventType::kArriveJunction) {
     return 4;
   }
-  if (event.type == JunctionEventType::kArriveJunction) {
+  if (event.type == JunctionEventType::kCongestionBeaconUpdate) {
     return 5;
   }
-  if (event.type == JunctionEventType::kEdgeEnter) {
+  if (event.type == JunctionEventType::kBagRelease) {
     return 6;
   }
-  if (event.type == JunctionEventType::kLocalQueueUpdate) {
+  if (event.type == JunctionEventType::kEdgeEnter) {
     return 7;
   }
-  return 8;
+  return 8;  // LOCAL_QUEUE_UPDATE
 }
 
 struct RuntimeEventLater {
@@ -584,10 +611,12 @@ class EventDrivenJunctionRuntime {
     result_.summary.trace_limit = config_.trace_limit;
     result_.summary.trace_shard_count = config_.trace_shard_count;
     result_.summary.trace_shard_index = config_.trace_shard_index;
+    result_.summary.source_admission_enabled = config_.enable_source_admission;
     result_.summary.fault_policy_enabled = config_.enable_fault_policy;
 
     double latest_release = 0.0;
     int next_runtime_bag_id = 0;
+    std::unordered_map<int, double> initial_beacon_times;
     for (const auto& request : requests) {
       validate_request(request);
       if (segment_runtime_ids_.find(request.segment_id) != segment_runtime_ids_.end()) {
@@ -605,8 +634,30 @@ class EventDrivenJunctionRuntime {
                request.start,
                -1,
                -1);
+      for (const int downstream : graph_.outgoing(request.start)) {
+        const auto inserted = initial_beacon_times.emplace(downstream, request.release_time);
+        if (!inserted.second) {
+          inserted.first->second = std::min(inserted.first->second, request.release_time);
+        }
+      }
       ++next_runtime_bag_id;
       latest_release = std::max(latest_release, request.release_time);
+    }
+
+    std::vector<int> ordered_initial_beacons;
+    ordered_initial_beacons.reserve(initial_beacon_times.size());
+    for (const auto& entry : initial_beacon_times) {
+      ordered_initial_beacons.push_back(entry.first);
+    }
+    std::sort(ordered_initial_beacons.begin(), ordered_initial_beacons.end());
+    for (const int node : ordered_initial_beacons) {
+      schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                       initial_beacon_times.at(node),
+                       -1,
+                       node,
+                       -1,
+                       node,
+                       "initial_one_hop_snapshot");
     }
 
     for (const auto& window : fault_windows) {
@@ -723,6 +774,7 @@ class EventDrivenJunctionRuntime {
     corridors_.clear();
     physical_faults_.clear();
     advertised_faults_.clear();
+    congestion_beacons_.clear();
     fault_affected_bags_.clear();
     events_ = {};
     next_event_seq_ = 1;
@@ -796,7 +848,7 @@ class EventDrivenJunctionRuntime {
         break;
       case JunctionEventType::kCongestionBeaconUpdate:
         ++result_.summary.congestion_beacon_update_event_count;
-        process_passive_event(event, "bounded_local_congestion_summary");
+        process_congestion_beacon_update(event);
         break;
     }
   }
@@ -859,9 +911,16 @@ class EventDrivenJunctionRuntime {
     const int task_id = controller.source_queue[queue_index];
     auto& bag = bags_.at(task_id);
     const double duration = service_duration(node);
+    ++result_.summary.source_admission_attempt_count;
     const bool queue_has_room = config_.local_queue_capacity <= 0 ||
                                 static_cast<int>(controller.queue.size()) < config_.local_queue_capacity;
     if (!queue_has_room || !controller.service_calendar.available(time, time + duration, task_id)) {
+      ++result_.summary.source_admission_local_resource_hold_count;
+      return -1;
+    }
+    if (config_.enable_source_admission &&
+        !downstream_admission_ready(bag, node, time, duration)) {
+      ++result_.summary.source_admission_downstream_pressure_hold_count;
       return -1;
     }
 
@@ -887,7 +946,66 @@ class EventDrivenJunctionRuntime {
                      -1,
                      node,
                      "source_dequeue");
+    schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                     time,
+                     task_id,
+                     node,
+                     node,
+                     node,
+                     "source_service_reservation_snapshot");
+    ++result_.summary.source_admission_admitted_count;
     return task_id;
+  }
+
+  bool downstream_admission_ready(const BagState& bag,
+                                  int node,
+                                  double time,
+                                  double source_service_duration) {
+    if (node == bag.request.goal) {
+      return true;
+    }
+    const auto& outgoing = graph_.outgoing(node);
+    bool ready = false;
+    for (const int downstream : outgoing) {
+      ++result_.summary.source_admission_beacon_read_count;
+      const auto snapshot = congestion_beacons_.find(downstream);
+      if (snapshot == congestion_beacons_.end()) {
+        continue;
+      }
+      const int pressure = snapshot->second.queue_length +
+                           snapshot->second.scheduled_incoming;
+      result_.summary.source_admission_max_observed_downstream_pressure =
+          std::max(result_.summary.source_admission_max_observed_downstream_pressure,
+                   pressure);
+
+      const long long directed = event_runtime_detail::directed_key(node, downstream);
+      const auto physical = physical_faults_.find(directed);
+      const bool physical_edge_ready =
+          physical == physical_faults_.end() || physical->second.active_count == 0;
+      const double projected_departure = time + source_service_duration;
+      const double travel =
+          std::max(graph_.edge(node, downstream).travel_time(),
+                   config_.minimum_service_seconds);
+      const double projected_arrival = projected_departure + travel;
+      auto& corridor =
+          corridors_[event_runtime_detail::corridor_key(node, downstream)];
+      corridor.purge(time);
+      const bool local_corridor_ready = corridor.available(
+          projected_departure,
+          projected_arrival,
+          bag.request.runtime_bag_id);
+      const bool downstream_calendar_ready =
+          snapshot->second.service_calendar_reserved_until <=
+          projected_arrival + event_runtime_detail::kEpsilon;
+      const bool downstream_queue_ready =
+          config_.local_queue_capacity <= 0 ||
+          pressure < config_.local_queue_capacity;
+      ready = ready ||
+              (physical_edge_ready && local_corridor_ready &&
+               downstream_calendar_ready &&
+               downstream_queue_ready);
+    }
+    return ready;
   }
 
   void process_service_complete(const RuntimeEvent& event) {
@@ -901,6 +1019,13 @@ class EventDrivenJunctionRuntime {
              event.node,
              event.from_node,
              event.to_node);
+    schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                     event.time,
+                     event.task_id,
+                     event.node,
+                     event.from_node,
+                     event.to_node,
+                     "service_completion_snapshot");
     append_event_trace(event,
                        event.task_id,
                        event.node,
@@ -931,6 +1056,13 @@ class EventDrivenJunctionRuntime {
       remember_node(bag, event.node);
       if (event.node == bag.request.goal) {
         complete_bag(bag, event.time);
+        schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                         event.time,
+                         event.task_id,
+                         event.node,
+                         event.from_node,
+                         event.node,
+                         "goal_service_release_snapshot");
         append_event_trace(event,
                            bag.request.runtime_bag_id,
                            event.node,
@@ -957,6 +1089,13 @@ class EventDrivenJunctionRuntime {
     }
 
     const DispatchResult dispatch = try_dispatch_one(event.node, event.time, event.seq);
+    schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                     event.time,
+                     dispatch.task_id >= 0 ? dispatch.task_id : event.task_id,
+                     event.node,
+                     event.from_node,
+                     dispatch.selected_next,
+                     "junction_dispatch_snapshot");
     result_.summary.max_edges_selected_per_arrive =
         std::max(result_.summary.max_edges_selected_per_arrive, dispatch.selected_edge_count);
     append_event_trace(event,
@@ -1436,6 +1575,13 @@ class EventDrivenJunctionRuntime {
     target.record_service_reservation(exit_time, service_end);
     ++target.scheduled_incoming;
     update_calendar_maxima(target, &corridor);
+    schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                     time,
+                     bag.request.runtime_bag_id,
+                     selected,
+                     current,
+                     selected,
+                     "incoming_reservation_snapshot");
 
     bag.total_wait += std::max(0.0, time - bag.junction_enqueued_at);
     bag.status = BagStatus::kInTransit;
@@ -1523,6 +1669,27 @@ class EventDrivenJunctionRuntime {
                      event.from_node,
                      event.to_node,
                      "queue_change_beacon");
+  }
+
+  void process_congestion_beacon_update(const RuntimeEvent& event) {
+    auto& controller = junctions_[event.node];
+    controller.service_calendar.purge(event.time);
+    controller.observe_local_state();
+    auto& beacon = congestion_beacons_[event.node];
+    beacon.queue_length = static_cast<int>(controller.queue.size());
+    beacon.scheduled_incoming = controller.scheduled_incoming;
+    beacon.service_calendar_reserved_until =
+        controller.service_calendar.reserved_until(event.time);
+    beacon.received_at = event.time;
+    ++beacon.generation;
+    append_event_trace(event,
+                       event.task_id,
+                       event.node,
+                       event.from_node,
+                       event.to_node,
+                       event.reason.empty() ? "bounded_local_congestion_summary"
+                                            : event.reason,
+                       0);
   }
 
   void process_passive_event(const RuntimeEvent& event, const std::string& default_reason) {
@@ -1992,6 +2159,8 @@ class EventDrivenJunctionRuntime {
     }
     accounted += physical_faults_.size() * sizeof(event_runtime_detail::FaultState);
     accounted += advertised_faults_.size() * sizeof(event_runtime_detail::AdvertisedFaultState);
+    accounted += congestion_beacons_.size() *
+                 sizeof(event_runtime_detail::CongestionBeaconState);
     accounted += fault_affected_bags_.size() * sizeof(int);
     accounted += result_.bags.capacity() * sizeof(EventRuntimeBagResult);
     accounted += result_.events.capacity() * sizeof(EventRuntimeTraceRow);
@@ -2105,6 +2274,7 @@ class EventDrivenJunctionRuntime {
   std::unordered_map<long long, LocalCalendar> corridors_;
   std::unordered_map<long long, event_runtime_detail::FaultState> physical_faults_;
   std::unordered_map<long long, event_runtime_detail::AdvertisedFaultState> advertised_faults_;
+  std::unordered_map<int, event_runtime_detail::CongestionBeaconState> congestion_beacons_;
   std::unordered_set<int> fault_affected_bags_;
   std::priority_queue<RuntimeEvent,
                       std::vector<RuntimeEvent>,

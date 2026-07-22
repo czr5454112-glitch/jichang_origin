@@ -34,6 +34,11 @@ VARIANTS = (
     "event_v3_plus_local_shield_plus_source_admission",
     "event_fault_policy",
 )
+FIXED_MAP_ENGINEERING_SCENARIOS = (
+    "fixed_map_load_heldout",
+    "fixed_map_peak_pattern",
+    "fixed_map_fault_recovery",
+)
 SCENARIOS = (
     "paper_main_2_5",
     "speed_sweep",
@@ -44,7 +49,7 @@ SCENARIOS = (
     "extreme_16x_full",
     "rolling_2day_full",
     "rolling_7day_full",
-    "topology_generalization_engineering",
+    *FIXED_MAP_ENGINEERING_SCENARIOS,
 )
 
 
@@ -497,9 +502,25 @@ def _build_system_ab_matrix_unlocked(root: Path) -> list[dict[str, Any]]:
             row = index[(variant, scenario)]
             row["evidence_paths"] = json.dumps([v3_path.relative_to(root).as_posix()] if v3_path.is_file() else [])
             row["blocker"] = f"v3 training gate status={gate_status}; trained_model_count={model_count}"
+    engineering_blockers = {
+        "fixed_map_load_heldout": (
+            "the exact fixed-map held-out-load engineering cell has not been "
+            "executed for this variant; paper/frontier evidence is not reused"
+        ),
+        "fixed_map_peak_pattern": (
+            "the exact fixed-map peak-pattern engineering cell has not been "
+            "executed for this variant; aggregate-load evidence is not reused"
+        ),
+        "fixed_map_fault_recovery": (
+            "the exact fixed-map fault-recovery engineering cell has not been "
+            "executed for this variant; another fault profile is not reused"
+        ),
+    }
     for variant in VARIANTS:
-        row = index[(variant, "topology_generalization_engineering")]
-        row["blocker"] = "no second accepted real-airport map exists; fixed-map evidence is not topology generalization"
+        for scenario, blocker in engineering_blockers.items():
+            row = index[(variant, scenario)]
+            row["execution_status"] = PARTIAL
+            row["blocker"] = blocker
 
     return [index[(variant, scenario)] for variant in VARIANTS for scenario in SCENARIOS]
 
@@ -570,6 +591,8 @@ def write_system_ab_artifacts(root: Path, rows: list[Mapping[str, Any]]) -> tupl
                 f"Positive/qualified cells: **{qualified}/{len(rows)}**. Every non-executed cell retains an explicit blocker; executed negative-evidence cells retain an outcome explanation.",
                 "",
                 "This matrix never borrows a heuristic result for rule-only or v3, never treats a prefix as full continuity, and never treats safe completion as capacity success.",
+                "",
+                "Engineering cells are restricted to held-out load, peak-pattern, and fault-recovery tests on the canonical fixed map. No topology-generalization claim is made.",
                 "",
                 "G4J remains closed: the Java/CIE track is reported separately and is not promoted by Python/C++ evidence.",
                 "",

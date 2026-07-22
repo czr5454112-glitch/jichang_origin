@@ -58,7 +58,7 @@ def test_protocol_freezes_independent_safety_queue_and_service_thresholds() -> N
     assert manifest["capacity_slo"] == CAPACITY_SLO
     assert "no pooled" in manifest["claim_boundaries"]["load_modes"]
     assert CAPACITY_SLO["max_p99_service_seconds"] >= CAPACITY_SLO["max_p95_service_seconds"]
-    assert PROTOCOL_SCHEMA.endswith(".v3")
-    assert PROTOCOL_VERSION.endswith("-v3")
-    assert EXTENSION_PROTOCOL_SCHEMA.endswith(".v2")
-    assert EXTENSION_PROTOCOL_VERSION.endswith("-v2")
+    assert PROTOCOL_SCHEMA.endswith(".v4")
+    assert PROTOCOL_VERSION.endswith("-v4")
+    assert EXTENSION_PROTOCOL_SCHEMA.endswith(".v3")
+    assert EXTENSION_PROTOCOL_VERSION.endswith("-v3")
