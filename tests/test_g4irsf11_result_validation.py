@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from pathlib import Path
 from types import SimpleNamespace
 import uuid
@@ -8,6 +9,7 @@ import uuid
 import pytest
 
 from scripts.eval.g4irsf11_capacity_metrics import CapacityGateConfig, capacity_metrics
+from scripts.eval.g4irsf11_continuity_metrics import rolling_continuity_metrics
 from scripts.eval.g4irsf11_experiment_protocol import (
     CAPACITY_SLO,
     PROTOCOL_VERSION,
@@ -27,6 +29,7 @@ from scripts.eval.g4irsf11_result_validation import (
     JUNCTION_SERVICE_UTILIZATION_SEMANTICS,
     RESULT_SCHEMA,
     ResultExpectation,
+    _validate_continuity,
     artifact_binding,
     atomic_write_json,
     atomic_write_jsonl,
@@ -314,6 +317,85 @@ def test_valid_v3_result_and_descriptor_bundle_passes(tmp_path: Path) -> None:
         trace_artifacts=traces,
         workload_rows=rows,
     ) == []
+
+
+@pytest.mark.parametrize("copies", (2, 7))
+def test_persisted_rolling_continuity_recomputes_strictly_and_detects_tamper(
+    copies: int,
+) -> None:
+    run_id = f"rolling-parent-roundtrip-{copies}"
+    workload_rows = [
+        {
+            "segment_id": f"segment-{base}:g4irsf11_c{copy_index}:fixture",
+            "generation_copy_index": copy_index,
+            "release_time": float(base + copy_index * 86_400),
+        }
+        for copy_index in range(copies)
+        for base in range(2)
+    ]
+    segment_rows = [
+        {
+            "segment_id": row["segment_id"],
+            "completed": True,
+            "finish_time": float(row["release_time"]) + 1.0,
+        }
+        for row in workload_rows
+    ]
+    persisted_result = json.loads(
+        json.dumps(
+            {
+                "continuity_metrics": rolling_continuity_metrics(
+                    workload_rows,
+                    segment_rows,
+                    expected_copies=copies,
+                    runtime_instance_id=run_id,
+                )
+            },
+            allow_nan=False,
+        )
+    )
+    expectation = ResultExpectation(
+        run_id=run_id,
+        case={
+            "workload_mode": "rolling_multiday_carryover",
+            "scale": float(copies),
+        },
+        protocol_version="fixture",
+        protocol_manifest_sha256="a" * 64,
+        input_artifact={"row_count": len(workload_rows)},
+        fault_artifact={},
+        fault_rows=[],
+        map_sha256=CANONICAL_MAP_SHA256,
+        source_sha256="b" * 64,
+        implementation_sha256="c" * 64,
+        config={},
+        measurement_cohort={},
+    )
+    errors: list[str] = []
+    _validate_continuity(persisted_result, expectation, workload_rows, errors)
+    assert errors == []
+
+    audit_tamper = deepcopy(persisted_result)
+    audit_tamper["continuity_metrics"]["input_audit"]["coverage_sha256"] = "0" * 64
+    tamper_errors: list[str] = []
+    _validate_continuity(
+        audit_tamper, expectation, workload_rows, tamper_errors
+    )
+    assert "continuity input audit does not recompute from workload" in tamper_errors
+
+    boundary_tamper = deepcopy(persisted_result)
+    boundary_tamper["continuity_metrics"]["boundaries"][0][
+        "boundary_copy_index"
+    ] = 99
+    boundary_tamper["continuity_metrics"]["boundaries"][0][
+        "pending_before_boundary"
+    ] = -1
+    boundary_errors: list[str] = []
+    _validate_continuity(
+        boundary_tamper, expectation, workload_rows, boundary_errors
+    )
+    assert "continuity boundary copy index mismatch:c1" in boundary_errors
+    assert "continuity pending-before count is out of range:c1" in boundary_errors
 
 
 def test_result_and_descriptor_reject_altered_raw_map_identity(tmp_path: Path) -> None:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from scripts.eval.g4irsf11_continuity_metrics import (
     rolling_continuity_metrics,
     rolling_input_audit,
@@ -28,6 +30,8 @@ def test_input_audit_requires_every_base_copy_and_fixed_day_offset() -> None:
     assert audit["observed_copy_indices"] == [0, 1, 2]
     assert audit["day_stride_seconds"] == 86_400.0
     assert len(audit["coverage_sha256"]) == 64
+    assert sorted(audit["copy_release_ranges"]) == ["0", "1", "2"]
+    assert json.loads(json.dumps(audit, allow_nan=False)) == audit
 
     missing = rows[:-1]
     assert rolling_input_audit(missing, expected_copies=3)["status"] == "FAIL"
@@ -44,6 +48,16 @@ def test_input_audit_requires_every_base_copy_and_fixed_day_offset() -> None:
     overlap_audit = rolling_input_audit(overlapping, expected_copies=2)
     assert overlap_audit["status"] == "FAIL"
     assert overlap_audit["overlapping_copy_boundary_indices"] == [1]
+
+
+def test_input_audit_is_json_stable_for_formal_and_extension_copy_counts() -> None:
+    for copies in (2, 7):
+        audit = rolling_input_audit(_rolling_rows(copies), expected_copies=copies)
+        assert audit["status"] == "PASS"
+        assert sorted(audit["copy_release_ranges"]) == [
+            str(index) for index in range(copies)
+        ]
+        assert json.loads(json.dumps(audit, allow_nan=False)) == audit
 
 
 def test_runtime_audit_records_pending_and_cross_boundary_completion() -> None:

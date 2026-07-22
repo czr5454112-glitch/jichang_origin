@@ -716,9 +716,13 @@ def _validate_continuity(
     _add(errors, metrics.get("single_runtime_invocation_pass") is True, "continuity single runtime invocation not proven")
     try:
         boundary_count = _integer(metrics.get("boundary_count"), "continuity_metrics.boundary_count")
-        boundaries = metrics.get("boundaries")
-        _add(errors, isinstance(boundaries, list), "continuity_metrics.boundaries must be an array")
-        boundaries = boundaries if isinstance(boundaries, list) else []
+        boundary_values = metrics.get("boundaries")
+        _add(errors, isinstance(boundary_values, list), "continuity_metrics.boundaries must be an array")
+        boundary_values = boundary_values if isinstance(boundary_values, list) else []
+        boundaries = [
+            _mapping(value, f"continuity_metrics.boundaries[{index}]", errors)
+            for index, value in enumerate(boundary_values)
+        ]
         _add(errors, boundary_count == expected_copies - 1 == len(boundaries), "continuity boundary count mismatch")
         _add(
             errors,
@@ -739,11 +743,115 @@ def _validate_continuity(
         if workload_rows is not None:
             from scripts.eval.g4irsf11_continuity_metrics import rolling_input_audit
 
+            recomputed_audit = rolling_input_audit(
+                workload_rows, expected_copies=expected_copies
+            )
             _add(
                 errors,
-                dict(audit) == rolling_input_audit(workload_rows, expected_copies=expected_copies),
+                dict(audit) == recomputed_audit,
                 "continuity input audit does not recompute from workload",
             )
+            release_rows: list[tuple[int, float]] = []
+            for row_index, row in enumerate(workload_rows):
+                release_rows.append(
+                    (
+                        _integer(
+                            row.get("generation_copy_index"),
+                            f"workload[{row_index}].generation_copy_index",
+                        ),
+                        _finite_number(
+                            row.get("release_time"),
+                            f"workload[{row_index}].release_time",
+                        ),
+                    )
+                )
+            for expected_index, boundary_row in enumerate(boundaries, start=1):
+                copy_releases = [
+                    release
+                    for copy_index, release in release_rows
+                    if copy_index == expected_index
+                ]
+                _add(
+                    errors,
+                    bool(copy_releases),
+                    f"continuity boundary c{expected_index} has no workload releases",
+                )
+                if not copy_releases:
+                    continue
+                expected_time = min(copy_releases)
+                expected_prior = sum(
+                    release < expected_time for _, release in release_rows
+                )
+                expected_through = sum(
+                    release <= expected_time for _, release in release_rows
+                )
+                _add(
+                    errors,
+                    _integer(
+                        boundary_row.get("boundary_copy_index"),
+                        "continuity boundary copy index",
+                    )
+                    == expected_index,
+                    f"continuity boundary copy index mismatch:c{expected_index}",
+                )
+                _add(
+                    errors,
+                    math.isclose(
+                        _finite_number(
+                            boundary_row.get("boundary_time"),
+                            "continuity boundary time",
+                        ),
+                        expected_time,
+                        rel_tol=0.0,
+                        abs_tol=1.0e-9,
+                    ),
+                    f"continuity boundary time does not recompute:c{expected_index}",
+                )
+                prior = _integer(
+                    boundary_row.get("prior_released_count"),
+                    "continuity prior released count",
+                )
+                through = _integer(
+                    boundary_row.get("released_through_boundary_count"),
+                    "continuity released-through count",
+                )
+                pending_before = _integer(
+                    boundary_row.get("pending_before_boundary"),
+                    "continuity pending-before count",
+                )
+                pending_after = _integer(
+                    boundary_row.get("pending_after_boundary"),
+                    "continuity pending-after count",
+                )
+                cross = _integer(
+                    boundary_row.get("cross_boundary_completion_count"),
+                    "continuity boundary cross count",
+                )
+                _add(
+                    errors,
+                    prior == expected_prior,
+                    f"continuity prior released count does not recompute:c{expected_index}",
+                )
+                _add(
+                    errors,
+                    through == expected_through,
+                    f"continuity released-through count does not recompute:c{expected_index}",
+                )
+                _add(
+                    errors,
+                    0 <= pending_before <= prior,
+                    f"continuity pending-before count is out of range:c{expected_index}",
+                )
+                _add(
+                    errors,
+                    pending_before <= pending_after <= through,
+                    f"continuity pending-after count is out of range:c{expected_index}",
+                )
+                _add(
+                    errors,
+                    0 <= cross <= pending_before,
+                    f"continuity cross-boundary count is out of range:c{expected_index}",
+                )
     except ValueError as exc:
         errors.append(str(exc))
 

@@ -114,8 +114,11 @@ def rolling_input_audit(
         blockers.append(f"unexpected base/copy pairs:{extra_pairs}")
     if offset_mismatches:
         blockers.append(f"nonlinear copy offsets:{offset_mismatches}")
+    # JSON object keys are strings.  Emit the persisted representation from
+    # the start so worker-side validation and parent-side validation after a
+    # JSON round trip compare the same semantic object.
     copy_release_ranges = {
-        copy_index: {
+        str(copy_index): {
             "minimum_release_time": min(copies[copy_index] for copies in by_base.values() if copy_index in copies),
             "maximum_release_time": max(copies[copy_index] for copies in by_base.values() if copy_index in copies),
         }
@@ -124,8 +127,8 @@ def rolling_input_audit(
     }
     overlapping_boundaries = []
     for copy_index in range(expected_copies - 1):
-        left = copy_release_ranges.get(copy_index)
-        right = copy_release_ranges.get(copy_index + 1)
+        left = copy_release_ranges.get(str(copy_index))
+        right = copy_release_ranges.get(str(copy_index + 1))
         if left is None or right is None:
             continue
         if float(left["maximum_release_time"]) >= float(right["minimum_release_time"]):
