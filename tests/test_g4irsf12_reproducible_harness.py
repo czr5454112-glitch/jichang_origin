@@ -486,7 +486,21 @@ def test_plan_outputs_are_pending_and_complete(tmp_path: Path) -> None:
         harness.OUTPUT_PATHS["scorer_closed_loop_csv"]
         != "outputs/tables/g4irsf12_scorer_isolation_ab.csv"
     )
-    for key in ("pibt_depth_csv", "pibt_wait_for_csv", "pibt_atomic_csv"):
+    assert (
+        harness.OUTPUT_PATHS["pibt_wait_for_motifs_csv"]
+        == "outputs/tables/g4irsf12_wait_for_cycle_motifs.csv"
+    )
+    assert (
+        harness.OUTPUT_PATHS["pibt_atomic_commit_rollback_csv"]
+        == "outputs/tables/g4irsf12_atomic_commit_rollback.csv"
+    )
+    for key in (
+        "pibt_depth_csv",
+        "pibt_wait_for_csv",
+        "pibt_wait_for_motifs_csv",
+        "pibt_atomic_csv",
+        "pibt_atomic_commit_rollback_csv",
+    ):
         with (tmp_path / harness.OUTPUT_PATHS[key]).open(
             "r",
             encoding="utf-8",
@@ -496,6 +510,16 @@ def test_plan_outputs_are_pending_and_complete(tmp_path: Path) -> None:
         assert rows
         assert {row["execution_status"] for row in rows} == {"NOT_RUN"}
         assert {row["gate_status"] for row in rows} == {"PENDING"}
+    assert (
+        tmp_path / harness.OUTPUT_PATHS["pibt_wait_for_csv"]
+    ).read_bytes() == (
+        tmp_path / harness.OUTPUT_PATHS["pibt_wait_for_motifs_csv"]
+    ).read_bytes()
+    assert (
+        tmp_path / harness.OUTPUT_PATHS["pibt_atomic_csv"]
+    ).read_bytes() == (
+        tmp_path / harness.OUTPUT_PATHS["pibt_atomic_commit_rollback_csv"]
+    ).read_bytes()
 
 
 def test_authorization_guards_large_and_fault_tiers() -> None:

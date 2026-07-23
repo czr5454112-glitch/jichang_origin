@@ -135,7 +135,9 @@ OUTPUT_PATHS = {
     "scorer_closed_loop_report": "outputs/reports/g4irsf12_scorer_closed_loop_plan.md",
     "pibt_depth_csv": "outputs/tables/g4irsf12_pibt_depth_ablation.csv",
     "pibt_wait_for_csv": "outputs/tables/g4irsf12_wait_for_cycle_audit.csv",
+    "pibt_wait_for_motifs_csv": "outputs/tables/g4irsf12_wait_for_cycle_motifs.csv",
     "pibt_atomic_csv": "outputs/tables/g4irsf12_atomic_coordination_audit.csv",
+    "pibt_atomic_commit_rollback_csv": "outputs/tables/g4irsf12_atomic_commit_rollback.csv",
     "pibt_runtime_report": "outputs/reports/g4irsf12_bounded_local_pibt_runtime_plan.md",
     "pressure_csv": "outputs/tables/g4irsf12_pressure_mode_ablation.csv",
     "credit_csv": "outputs/tables/g4irsf12_credit_lifecycle.csv",
@@ -3758,14 +3760,12 @@ def write_harness_outputs(
         paths["pibt_depth_csv"],
         _csv_bytes(RESULT_COLUMNS, by_phase["F"]),
     )
-    _atomic_write(
-        paths["pibt_wait_for_csv"],
-        _csv_bytes(PIBT_WAIT_FOR_COLUMNS, by_phase["F"]),
-    )
-    _atomic_write(
-        paths["pibt_atomic_csv"],
-        _csv_bytes(PIBT_ATOMIC_COLUMNS, by_phase["F"]),
-    )
+    pibt_wait_for_bytes = _csv_bytes(PIBT_WAIT_FOR_COLUMNS, by_phase["F"])
+    for key in ("pibt_wait_for_csv", "pibt_wait_for_motifs_csv"):
+        _atomic_write(paths[key], pibt_wait_for_bytes)
+    pibt_atomic_bytes = _csv_bytes(PIBT_ATOMIC_COLUMNS, by_phase["F"])
+    for key in ("pibt_atomic_csv", "pibt_atomic_commit_rollback_csv"):
+        _atomic_write(paths[key], pibt_atomic_bytes)
     _atomic_write(
         paths["pibt_runtime_report"],
         _phase_report(
