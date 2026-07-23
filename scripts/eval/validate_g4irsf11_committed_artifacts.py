@@ -95,16 +95,16 @@ def _validate_committed_artifacts_unlocked(
     failures: list[str] = []
     completion: dict[str, Any] = {}
     if require_completion:
-        from scripts.eval.run_g4irsf11_event_runtime_evaluation import (
-            FORMAL_COMPLETION_PATH,
-            formal_completion_validation_errors,
+        from scripts.eval.g4irsf11_historical_evidence import (
+            historical_formal_completion_validation_errors,
+            trusted_baseline,
         )
 
         failures.extend(
-            f"formal completion: {failure}"
-            for failure in formal_completion_validation_errors(root)
+            f"historical formal completion: {failure}"
+            for failure in historical_formal_completion_validation_errors(root)
         )
-        completion_path = root / FORMAL_COMPLETION_PATH.relative_to(ROOT)
+        completion_path = root / trusted_baseline()["completion_manifest_path"]
         if completion_path.is_file():
             try:
                 completion = _object(completion_path)

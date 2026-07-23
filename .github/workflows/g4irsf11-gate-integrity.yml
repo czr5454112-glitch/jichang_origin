@@ -29,7 +29,7 @@ jobs:
         run: cmake --build build-ci --config Release --parallel 2
       - name: Run native event-runtime regressions
         run: ctest --test-dir build-ci -C Release --output-on-failure
-      - name: Run fail-closed G4IRSF11 regressions
+      - name: Run fail-closed G4IRSF11 and G4IRSF12 regressions
         env:
           PYTHONPATH: build-ci/python
         run: >-
@@ -56,5 +56,6 @@ jobs:
           tests/test_g4irsf11_continuity_metrics.py
           tests/test_g4irsf11_v3_rankers.py
           tests/test_g4irsf11_committed_artifacts.py
+          tests/test_g4irsf12_*.py
       - name: Validate committed decision schema and artifact hashes
         run: python scripts/eval/validate_g4irsf11_committed_artifacts.py

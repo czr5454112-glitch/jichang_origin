@@ -1,0 +1,26 @@
+scope,check,status,observed,expected,evidence,notes
+git,phase_start_head,PASS,259608cd536f8ca2f6651a01b7d842675f63a9f7,259608cd536f8ca2f6651a01b7d842675f63a9f7,git rev-parse HEAD,captured before Phase-A writes
+git,phase_start_branch,PASS,codex/czr005-rewrite,codex/czr005-rewrite,git branch --show-current,
+git,phase_start_upstream,PASS,origin/codex/czr005-rewrite,origin/codex/czr005-rewrite,git rev-parse --abbrev-ref --symbolic-full-name @{u},
+git,phase_start_upstream_head,PASS,259608cd536f8ca2f6651a01b7d842675f63a9f7,259608cd536f8ca2f6651a01b7d842675f63a9f7,git rev-parse @{u},
+git,phase_start_worktree_clean,PASS,true,true,git status --short,empty before Phase-A writes
+git,start_commit_is_ancestor,PASS,true,true,git merge-base --is-ancestor,
+protection,legacy_unchanged,PASS,True,True,git diff --name-only -- legacy,
+protection,map_unchanged,PASS,True,True,git diff --name-only -- data/processed/maps/map2.json,
+protection,source_unchanged,PASS,True,True,git diff --name-only -- data/processed/tasks/inputdata.jsonl,
+protection,protected_status_clean,PASS,True,True,git status --short -- legacy map input,also catches staged and untracked protected changes
+map,raw_sha256,PASS,9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4,9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4,data/processed/maps/map2.json,
+map,semantic_sha256,PASS,67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63,67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63,data/processed/maps/map2.json,CRLF/CR normalized to LF
+map,dimensions,PASS,54 nodes / 69 edges / 54x54 heuristic,54 nodes / 69 edges / 54x54 heuristic,data/processed/maps/map2.json,
+source,raw_sha256,PASS,968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f,968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f,data/processed/tasks/inputdata.jsonl,
+source,semantic_sha256,PASS,968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f,968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f,data/processed/tasks/inputdata.jsonl,CRLF/CR normalized to LF
+source,segment_count,PASS,43603,43603,data/processed/tasks/inputdata.jsonl,
+source,raw_bag_count,PASS,28506,28506,data/processed/tasks/inputdata.jsonl,unique original task_id
+formal,executed_cases,PASS,84/84,84/84,artifacts/gates/g4irsf11_event_runtime_completion.json,"COMPLETE is evidence-cohort completion, not algorithm PASS"
+formal,gate_distribution,PASS,3 PASS / 3 PARTIAL_WITH_EXPLICIT_BLOCKER,3 PASS / 3 PARTIAL_WITH_EXPLICIT_BLOCKER,outputs/tables/g4irsf11_event_runtime_gate.csv,
+paper_full,complete_raw_bags,PASS,3114,3114,outputs/tables/g4irsf11_event_runtime_case_ledger.csv,
+paper_full,completed_segments,PASS,12125,12125,outputs/tables/g4irsf11_event_runtime_case_ledger.csv,"authoritative value is 12,125; 2,125 is incorrect"
+historical_hca,processed_segment_attempt_mean_minutes,PASS,3.967122711008,3.967122711 (processed-segment-attempt only),outputs/tables/g4irsf8_tth_denominator_comparison.csv,not original-entry
+historical_hca,original_entry_recomputed_mean_minutes,PASS,5.764936746096,5.764936746 (recomputed historical evidence),outputs/tables/g4irsf8_tth_denominator_comparison.csv,not a fresh Java/HCA* rerun
+v2_safe,java_release_mean_minutes,PASS,3.556593852974,3.556593853,outputs/tables/g4irsf8_tth_denominator_comparison.csv,
+v2_safe,original_entry_mean_minutes,PASS,4.124305453487,4.124305453,outputs/tables/g4irsf8_tth_denominator_comparison.csv,
