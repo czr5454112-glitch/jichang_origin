@@ -1,11 +1,11 @@
 # G4IRSF11 Feature Lineage Audit
 
-Generated: `2026-07-21`.
+Generated: `2026-07-23`.
 
 | Lineage | Field declarations |
 | --- | --- |
 | label | 7 |
-| metadata | 16 |
+| metadata | 21 |
 | runtime | 63 |
 
 Status: `PASS`.

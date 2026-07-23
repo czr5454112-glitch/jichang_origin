@@ -67,6 +67,11 @@ short_history,runtime,model_feature,bag_agent,decision_time,"[""bag.bounded_hist
 full_astar_used,runtime,invariant,event_runtime,decision_time,"[""runtime.full_astar_counter""]",true,false,,false,PASS,decision_trace
 metadata.scenario,metadata,experiment_context,experiment_manifest,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
 metadata.scale,metadata,experiment_context,experiment_manifest,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.flight_bank,metadata,experiment_context,experiment_manifest_or_release_time_bucket,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.load_level,metadata,experiment_context,experiment_manifest_or_scale,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.fault_scenario,metadata,experiment_context,experiment_manifest_or_fault_mode,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
+metadata.fixed_real_map_only,metadata,topology_contract,canonical_map_identity,static,[],true,false,must be true for trainable artifacts,false,PASS,trace_or_sample_metadata
+metadata.canonical_map_sha256,metadata,topology_contract,canonical_map_identity,static,[],true,false,normalised-LF SHA-256 of immutable map2.json,false,PASS,trace_or_sample_metadata
 metadata.run_id,metadata,experiment_context,experiment_manifest,pre_run,[],true,false,excluded from semantic repeat fingerprint,false,PASS,trace_or_sample_metadata
 metadata.trace_shard,metadata,shard_context,trace_input_manifest,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
 metadata.trace_shard_count,metadata,shard_context,event_runtime_trace_context,pre_run,[],true,false,,false,PASS,trace_or_sample_metadata
