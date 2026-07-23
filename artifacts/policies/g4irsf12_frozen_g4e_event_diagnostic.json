@@ -1,0 +1,398 @@
+{
+  "canonical_map": {
+    "directed_edge_count": 69,
+    "node_count": 54,
+    "path": "data/processed/maps/map2.json",
+    "raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+    "semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63"
+  },
+  "claim_boundary": {
+    "allowed_claim": "same-observation scorer action agreement only",
+    "closed_loop_validated": false,
+    "diagnostic_scope": "strict_same_observation_offline_replay",
+    "forbidden_claims": [
+      "counterfactual completion rate",
+      "counterfactual throughput",
+      "counterfactual THT",
+      "policy regression attribution",
+      "production or final-model promotion"
+    ],
+    "promotion_eligible": false
+  },
+  "evidence_paths": {
+    "feature_lineage": "outputs/tables/g4irsf12_feature_lineage_event_adapter.csv",
+    "report": "outputs/reports/g4irsf12_frozen_scorer_event_adapter.md",
+    "scorer_isolation": "outputs/tables/g4irsf12_scorer_isolation_ab.csv"
+  },
+  "feature_lineage": [
+    {
+      "feature_index": "0",
+      "feature_name": "candidate_shortest_time_to_goal_scaled",
+      "s1_adapter_source": "candidate_records[].features.static_potential",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC",
+      "s2_adapter_source": "candidate_records[].features.static_potential",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC"
+    },
+    {
+      "feature_index": "1",
+      "feature_name": "candidate_travel_time_scaled",
+      "s1_adapter_source": "candidate_records[].features.travel_time",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC",
+      "s2_adapter_source": "candidate_records[].features.travel_time",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC"
+    },
+    {
+      "feature_index": "2",
+      "feature_name": "candidate_service_time_scaled",
+      "s1_adapter_source": "canonical_map.nodes[candidate].service_time",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC",
+      "s2_adapter_source": "canonical_map.nodes[candidate].service_time",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC"
+    },
+    {
+      "feature_index": "3",
+      "feature_name": "candidate_node_type_scaled",
+      "s1_adapter_source": "canonical_map.nodes[candidate].node_type",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC",
+      "s2_adapter_source": "canonical_map.nodes[candidate].node_type",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC"
+    },
+    {
+      "feature_index": "4",
+      "feature_name": "candidate_faulted",
+      "s1_adapter_source": "candidate_records[].features.advertised_fault",
+      "s1_default_value": "",
+      "s1_resolution": "LEGAL_EVENT_OBSERVATION",
+      "s2_adapter_source": "candidate_records[].features.advertised_fault",
+      "s2_default_value": "",
+      "s2_resolution": "LEGAL_EVENT_OBSERVATION"
+    },
+    {
+      "feature_index": "5",
+      "feature_name": "candidate_is_goal",
+      "s1_adapter_source": "candidate_records[].next_node == goal_node",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC",
+      "s2_adapter_source": "candidate_records[].next_node == goal_node",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC"
+    },
+    {
+      "feature_index": "6",
+      "feature_name": "time_slack_scaled",
+      "s1_adapter_source": "explicit_default",
+      "s1_default_value": "0.0",
+      "s1_resolution": "EXPLICIT_DEFAULT_MISSING",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_MISSING"
+    },
+    {
+      "feature_index": "7",
+      "feature_name": "current_node_scaled",
+      "s1_adapter_source": "current_node",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_EVENT_STATE",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_ID_ABLATION"
+    },
+    {
+      "feature_index": "8",
+      "feature_name": "goal_node_scaled",
+      "s1_adapter_source": "goal_node",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_ID_ABLATION"
+    },
+    {
+      "feature_index": "9",
+      "feature_name": "out_degree_scaled",
+      "s1_adapter_source": "len(candidate_next_nodes)",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC",
+      "s2_adapter_source": "len(candidate_next_nodes)",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC"
+    },
+    {
+      "feature_index": "10",
+      "feature_name": "is_branch_node",
+      "s1_adapter_source": "len(candidate_next_nodes) > 1",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC",
+      "s2_adapter_source": "len(candidate_next_nodes) > 1",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC"
+    },
+    {
+      "feature_index": "11",
+      "feature_name": "local_node_pressure_scaled",
+      "s1_adapter_source": "explicit_default",
+      "s1_default_value": "0.0",
+      "s1_resolution": "EXPLICIT_DEFAULT_NON_EQUIVALENT",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_NON_EQUIVALENT"
+    },
+    {
+      "feature_index": "12",
+      "feature_name": "candidate_node_pressure_scaled",
+      "s1_adapter_source": "explicit_default",
+      "s1_default_value": "0.0",
+      "s1_resolution": "EXPLICIT_DEFAULT_NON_EQUIVALENT",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_NON_EQUIVALENT"
+    },
+    {
+      "feature_index": "13",
+      "feature_name": "candidate_downstream_node_pressure_2hop_scaled",
+      "s1_adapter_source": "explicit_default",
+      "s1_default_value": "0.0",
+      "s1_resolution": "EXPLICIT_DEFAULT_NON_EQUIVALENT",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_NON_EQUIVALENT"
+    },
+    {
+      "feature_index": "14",
+      "feature_name": "candidate_downstream_node_pressure_3hop_scaled",
+      "s1_adapter_source": "explicit_default",
+      "s1_default_value": "0.0",
+      "s1_resolution": "EXPLICIT_DEFAULT_MISSING",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_MISSING"
+    },
+    {
+      "feature_index": "15",
+      "feature_name": "candidate_static_remaining_hops_to_goal_scaled",
+      "s1_adapter_source": "canonical_map directed adjacency BFS",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC_RECONSTRUCTION",
+      "s2_adapter_source": "canonical_map directed adjacency BFS",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC_RECONSTRUCTION"
+    },
+    {
+      "feature_index": "16",
+      "feature_name": "candidate_static_second_best_gap_scaled",
+      "s1_adapter_source": "(travel_time + static_potential) - minimum candidate value",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC_RECONSTRUCTION",
+      "s2_adapter_source": "(travel_time + static_potential) - minimum candidate value",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC_RECONSTRUCTION"
+    },
+    {
+      "feature_index": "17",
+      "feature_name": "candidate_bottleneck_score_scaled",
+      "s1_adapter_source": "canonical candidate out-degree + advertised_fault",
+      "s1_default_value": "",
+      "s1_resolution": "LEGAL_LOCAL_RECONSTRUCTION",
+      "s2_adapter_source": "canonical candidate out-degree + advertised_fault",
+      "s2_default_value": "",
+      "s2_resolution": "LEGAL_LOCAL_RECONSTRUCTION"
+    },
+    {
+      "feature_index": "18",
+      "feature_name": "candidate_goal_direction_score_scaled",
+      "s1_adapter_source": "canonical current potential - candidate static_potential",
+      "s1_default_value": "",
+      "s1_resolution": "EXACT_LEGAL_STATIC_RECONSTRUCTION",
+      "s2_adapter_source": "canonical current potential - candidate static_potential",
+      "s2_default_value": "",
+      "s2_resolution": "EXACT_LEGAL_STATIC_RECONSTRUCTION"
+    },
+    {
+      "feature_index": "19",
+      "feature_name": "candidate_historical_risk_from_training_only_scaled",
+      "s1_adapter_source": "explicit_default",
+      "s1_default_value": "0.0",
+      "s1_resolution": "EXPLICIT_DEFAULT_TRAINING_ONLY",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_TRAINING_ONLY"
+    },
+    {
+      "feature_index": "20",
+      "feature_name": "source_retry_pressure_scaled",
+      "s1_adapter_source": "explicit_default",
+      "s1_default_value": "0.0",
+      "s1_resolution": "EXPLICIT_DEFAULT_MISSING",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_MISSING"
+    },
+    {
+      "feature_index": "21",
+      "feature_name": "unfinished_task_queue_size_near_current_source_scaled",
+      "s1_adapter_source": "explicit_default",
+      "s1_default_value": "0.0",
+      "s1_resolution": "EXPLICIT_DEFAULT_MISSING",
+      "s2_adapter_source": "explicit_default",
+      "s2_default_value": "0.0",
+      "s2_resolution": "EXPLICIT_DEFAULT_MISSING"
+    }
+  ],
+  "feature_names": [
+    "candidate_shortest_time_to_goal_scaled",
+    "candidate_travel_time_scaled",
+    "candidate_service_time_scaled",
+    "candidate_node_type_scaled",
+    "candidate_faulted",
+    "candidate_is_goal",
+    "time_slack_scaled",
+    "current_node_scaled",
+    "goal_node_scaled",
+    "out_degree_scaled",
+    "is_branch_node",
+    "local_node_pressure_scaled",
+    "candidate_node_pressure_scaled",
+    "candidate_downstream_node_pressure_2hop_scaled",
+    "candidate_downstream_node_pressure_3hop_scaled",
+    "candidate_static_remaining_hops_to_goal_scaled",
+    "candidate_static_second_best_gap_scaled",
+    "candidate_bottleneck_score_scaled",
+    "candidate_goal_direction_score_scaled",
+    "candidate_historical_risk_from_training_only_scaled",
+    "source_retry_pressure_scaled",
+    "unfinished_task_queue_size_near_current_source_scaled"
+  ],
+  "input_contract": {
+    "approved_candidate_feature_names": [
+      "advertised_fault",
+      "corridor_next_available",
+      "fault_message_age_seconds",
+      "recent_visit_count",
+      "static_potential",
+      "target_next_available",
+      "target_queue_length",
+      "target_scheduled_incoming",
+      "travel_time",
+      "two_hop_queue_pressure"
+    ],
+    "future_teacher_posthoc_inputs_allowed": false,
+    "metadata_is_model_input": false,
+    "model_visible_top_level": [
+      "event_time",
+      "current_node",
+      "goal_node",
+      "candidate_next_nodes",
+      "candidate_records[].next_node",
+      "candidate_records[].features"
+    ],
+    "recorded_model_outputs_are_model_inputs": false,
+    "recorded_selected_action_is_model_input": false,
+    "safety_shield_is_external_to_raw_scorer": true
+  },
+  "offline_replay": {
+    "isolation_table": "outputs/tables/g4irsf12_scorer_isolation_ab.csv",
+    "s1_s2_disagreement_count": 0,
+    "s1_s2_disagreement_rate": 0.0
+  },
+  "offline_trace": {
+    "candidate_score_count": 14544,
+    "coverage": "committed G4IRSF11 diagnostic decision sample only; not all 43,603 original input segments",
+    "decision_count": 9397,
+    "outcome_table_read": false,
+    "path": "artifacts/datasets/g4irsf11_decision_trace_sample.jsonl",
+    "raw_sha256": "bc22ae4d618eb193c3a7342eba04315a85d5940833ba91df95a3b90da432ca4f"
+  },
+  "phase_date": "2026-07-23",
+  "schema": "czr005.g4irsf12.frozen_g4e_event_diagnostic.v1",
+  "scorers": {
+    "S0_current_handwritten_static_score": {
+      "execution": "not re-executed",
+      "type": "recorded_reference"
+    },
+    "S1_frozen_g4e_legal_local_adapter": {
+      "explicit_default_features": [
+        "time_slack_scaled",
+        "local_node_pressure_scaled",
+        "candidate_node_pressure_scaled",
+        "candidate_downstream_node_pressure_2hop_scaled",
+        "candidate_downstream_node_pressure_3hop_scaled",
+        "candidate_historical_risk_from_training_only_scaled",
+        "source_retry_pressure_scaled",
+        "unfinished_task_queue_size_near_current_source_scaled"
+      ],
+      "risk_head": "frozen margin threshold plus legal-local bottleneck; historical lookup and hardcase rules disabled",
+      "score_direction": "higher_is_better",
+      "type": "frozen_mlp"
+    },
+    "S2_frozen_g4e_without_absolute_node_ids": {
+      "explicit_default_features": [
+        "time_slack_scaled",
+        "current_node_scaled",
+        "goal_node_scaled",
+        "local_node_pressure_scaled",
+        "candidate_node_pressure_scaled",
+        "candidate_downstream_node_pressure_2hop_scaled",
+        "candidate_downstream_node_pressure_3hop_scaled",
+        "candidate_historical_risk_from_training_only_scaled",
+        "source_retry_pressure_scaled",
+        "unfinished_task_queue_size_near_current_source_scaled"
+      ],
+      "risk_head": "same portable risk head as S1; all absolute-tuple rules disabled",
+      "score_direction": "higher_is_better",
+      "type": "frozen_mlp_id_ablation"
+    },
+    "S3_shortest_potential_only": {
+      "formula": "travel_time + static_potential",
+      "score_direction": "lower_is_better",
+      "tie_break": "ascending_next_node",
+      "type": "deterministic_rule"
+    },
+    "S4_queue_aware_rule_only": {
+      "formula": "travel_time + static_potential + target_queue_length + target_scheduled_incoming + max(0,corridor_next_available-event_time) + max(0,target_next_available-(event_time+travel_time))",
+      "score_direction": "lower_is_better",
+      "tie_break": "ascending_next_node",
+      "type": "deterministic_rule"
+    }
+  },
+  "source_model": {
+    "feature_count": 22,
+    "frozen_components": [
+      "w1",
+      "b1",
+      "w2",
+      "b2"
+    ],
+    "hidden_dimension": 22,
+    "model_type": "g4e_risk_calibrated_policy",
+    "path": "artifacts/models/g4e_risk_calibrated_policy.json",
+    "quarantined_components": [
+      {
+        "component": "g4e_learned_risk_rules",
+        "reason": "training-derived absolute current/goal/candidate tuple lookup has no portable 22-feature event lineage"
+      },
+      {
+        "component": "candidate_historical_risk_from_training_only_scaled",
+        "explicit_default": 0.0,
+        "reason": "training-only lookup is unavailable at event time"
+      }
+    ],
+    "quarantined_learned_rule_count": 16,
+    "raw_sha256": "4a058dee0bdd17e15f67d1943a551822847d0c066ac3cf03a5da71a07731bbca",
+    "risk_thresholds": {
+      "bottleneck": 5.0,
+      "historical": 0.5,
+      "margin": 1.0
+    },
+    "selected_candidate_in_source_bundle": "hardcase_rules"
+  },
+  "stage": "G4IRSF12-E",
+  "status": "OOD_DIAGNOSTIC_ONLY_NOT_CLOSED_LOOP"
+}
