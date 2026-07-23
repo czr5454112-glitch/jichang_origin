@@ -1,0 +1,191 @@
+{
+  "baseline": {
+    "bag_count": 28506,
+    "duration_seconds": 86400,
+    "early_threshold_seconds": 4800.0,
+    "ebs_release_lead_seconds": 2700.0,
+    "quantile_method": "R-7 linear interpolation at (n-1)*p after ascending sort",
+    "rolling_window_definition": "[observed_entry_time, observed_entry_time + window)",
+    "segment_count": 43603
+  },
+  "calibration": {
+    "calibrated_multiplier": null,
+    "calibrated_multiplier_status": "UNKNOWN_NOT_COMPUTABLE",
+    "composition_constraints": "EBS/early-bag share and flight-bank profile calibrate demand composition and time shape; they are not arbitrary scalar factors.",
+    "final_multiplier_formula": "represented_system_design_day_checked_bags / 28506",
+    "finite_uncertainty_interval": null,
+    "phase_k_status": "PARTIAL_WITH_EXPLICIT_BLOCKER",
+    "represented_bags_component_formula": "(annual_passenger_movements / 365) * design_day_factor * departing_passenger_share * terminal_allocation_share * (local_departure_share * local_checked_bags_per_departing_passenger + transfer_departure_share * transfer_checked_bags_per_transfer_passenger) * represented_subsystem_share * (1 - parallel_diversion_share)",
+    "required_unknown_inputs": {
+      "annual_passenger_movements_for_case_period": null,
+      "departing_passenger_share": null,
+      "design_day_ebs_share": null,
+      "design_day_factor": null,
+      "design_day_flight_bank_profile": null,
+      "local_checked_bags_per_departing_passenger": null,
+      "local_departure_share": null,
+      "parallel_diversion_share": null,
+      "represented_subsystem_share": null,
+      "terminal_allocation_share": null,
+      "transfer_checked_bags_per_transfer_passenger": null,
+      "transfer_departure_share": null
+    },
+    "uncertainty_status": "UNBOUNDED_MISSING_SCOPE_AND_DESIGN_DAY_INPUTS"
+  },
+  "candidate_scales": [
+    {
+      "classification": "historical_observed_day_reference",
+      "nominal_multiplier": "1.0",
+      "scale_id": "1p0"
+    },
+    {
+      "classification": "mild_growth_sensitivity",
+      "nominal_multiplier": "1.1",
+      "scale_id": "1p1"
+    },
+    {
+      "classification": "busy_day_sensitivity_not_calibrated",
+      "nominal_multiplier": "1.25",
+      "scale_id": "1p25"
+    },
+    {
+      "classification": "engineering_reserve_sensitivity",
+      "nominal_multiplier": "1.5",
+      "scale_id": "1p5"
+    },
+    {
+      "classification": "extreme_stress_sensitivity",
+      "nominal_multiplier": "2.0",
+      "scale_id": "2p0"
+    }
+  ],
+  "capacity_measurement_contract": {
+    "baseline_active_agent_density": null,
+    "current_runtime_values": {
+      "critical_utilization": null,
+      "deadline_miss_rate": null,
+      "post_peak_backlog_clearance": null,
+      "service_level": null,
+      "tail_latency": null
+    },
+    "mapf_agent_density_role": "AUXILIARY_ONLY; active agents per node/edge may diagnose a specific closed-loop run but cannot calibrate airport demand.",
+    "required_capacity_metrics": [
+      "critical directed-edge/corridor/merge busy-time utilization",
+      "original-entry total-system-time p50/p95/p99/max",
+      "Java-release network-time p50/p95/p99/max",
+      "source wait and deadline-miss rate",
+      "source backlog and in-network backlog reported separately",
+      "post-peak backlog drain-to-zero time",
+      "completed bags per hour and unresolved-deadlock count"
+    ],
+    "required_injection_metrics": [
+      "bag injections per second and per 5/15/60-minute window",
+      "injections per physical source and business loading station",
+      "flight-bank/hour shares and deadline-lead composition"
+    ]
+  },
+  "execution_policy": "DESCRIPTORS_ONLY_NO_SCALING_RUN",
+  "external_sources": [
+    {
+      "authority": "Civil Aviation Administration of China",
+      "claim": "Official 2019 whole-airport passenger-throughput context; it does not identify the thesis airport or represented BHS share.",
+      "source_id": "caac_2019_airport_statistics",
+      "url": "https://www.caac.gov.cn/XXGK/XXGK/TJSJ/202003/t20200309_201358.html"
+    },
+    {
+      "authority": "National Academies / Airport Cooperative Research Program",
+      "claim": "Design-day demand should use flight-by-flight schedules and airport-specific time-of-day/facility profiles; generic annual averages do not establish a baggage subsystem peak.",
+      "source_id": "acrp_report_163",
+      "url": "https://nap.nationalacademies.org/read/23692/chapter/9"
+    },
+    {
+      "authority": "International Air Transport Association",
+      "claim": "Official airport-planning guidance covers peak forecasting, design-day schedules, demand-capacity calculations, and BHS.",
+      "source_id": "iata_adrm",
+      "url": "https://www.iata.org/en/publications/manuals/airport-development-reference-manual/"
+    },
+    {
+      "authority": "International Air Transport Association",
+      "claim": "Capacity assessment should be subsystem-specific and driven by peak/design demand and the constraining process.",
+      "source_id": "iata_demand_triggers",
+      "url": "https://www.iata.org/contentassets/d1d4d535bf1c4ba695f43e9beff8294f/demand-triggers-for-airport-investments.pdf"
+    },
+    {
+      "authority": "International Foundation for Autonomous Agents and Multiagent Systems",
+      "claim": "MAPD models online exogenous task arrival; one-shot agent count is not a substitute for an arrival-process calibration.",
+      "source_id": "mapd_aamas_2017",
+      "url": "https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p837.pdf"
+    },
+    {
+      "authority": "Association for the Advancement of Artificial Intelligence",
+      "claim": "Lifelong MAPF throughput is a time-based completed-goal measure; map-specific agent-density examples are auxiliary diagnostics.",
+      "source_id": "lifelong_mapf_aaai_2021",
+      "url": "https://ojs.aaai.org/index.php/AAAI/article/view/17344"
+    }
+  ],
+  "future_generation_protocol": {
+    "additional_bag_selection": "deterministic stratified resampling with largest-remainder integer allocation and SHA-256 ordering within strata",
+    "allowed_label_if_materialized_and_audited": "original_rule_replay_scaled_input",
+    "current_state": "DESCRIPTOR_ONLY_NOT_EXECUTED",
+    "drift_threshold_policy": "Thresholds must be declared before materialization and remain engineering tolerances, not evidence of real-world demand.",
+    "fixed_seed": 20260723,
+    "forbidden_label": "original_project_generated",
+    "java_split_rules_reapplied": true,
+    "new_ids_required": true,
+    "preserve_original_24h_clock_profile": true,
+    "required_drift_audits": [
+      "hourly/5-minute/15-minute/60-minute arrival shape",
+      "loading-station, unloader, source-node, goal-node, and OD shares",
+      "early-split share and EBS planned-dwell distribution",
+      "deadline-lead distribution",
+      "static directed route-lower-bound distribution"
+    ],
+    "retain_each_baseline_bag_once": true,
+    "stratification_fields": [
+      "clock_hour",
+      "loader_label",
+      "unloader_label",
+      "original_start",
+      "original_goal",
+      "early_split",
+      "deadline_lead_bin"
+    ],
+    "time_compression": false
+  },
+  "phase": "G4IRSF12-K",
+  "phase_l_gates": {
+    "all_gates_pass": false,
+    "blockers": [
+      "No G4IRSF12-J full 1x formal PASS artifact exists.",
+      "No verified original-entry mean target PASS exists for G4IRSF12-J.",
+      "Airport/terminal/subsystem and design-day demand inputs are unknown.",
+      "The 1.1 descriptor is not a materialized, traceable workload."
+    ],
+    "gate_rule": "all gates must be true simultaneously before any scale run",
+    "numeric_real_demand_calibration_complete": false,
+    "original_1x_full_formal_pass": false,
+    "original_entry_mean_meets_historical_hca_target": false,
+    "original_task_generation_audit_pass": true,
+    "protected_map_identity_matches": true,
+    "status": "BLOCKED_NOT_RUN",
+    "traceable_1p1_workload_artifact_exists": false
+  },
+  "protected_identity": {
+    "java_main_path": "legacy/jichang_origin_readonly/src/RUN/Main.java",
+    "java_main_sha256": "af7ba8f8224a480f61e4d4b010d0c6fcf5e8798cccfdf6f298d786ac053bf5af",
+    "java_tasks_path": "legacy/jichang_origin_readonly/src/App/Tasks.java",
+    "java_tasks_sha256": "dd4505e495fd3c0fa737923dca83c9d404fc3b1e3a7ce979e7dd384a57d0948b",
+    "map_path": "data/processed/maps/map2.json",
+    "map_raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+    "map_semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63",
+    "processed_input_path": "data/processed/tasks/inputdata.jsonl",
+    "processed_input_raw_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+    "processed_input_semantic_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+    "raw_input_path": "legacy/jichang_origin_readonly/inputdata.txt",
+    "raw_input_sha256": "0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87",
+    "source_bundle_sha256": "cb87b54ccaf3f401cb7f86bbb5315799fa3b19a0904629919c485925a686bc2b"
+  },
+  "published_date": "2026-07-23",
+  "purpose": "Reproduce historical-day demand evidence and fail closed on real-demand scaling until scope/design-day inputs are established.",
+  "schema": "czr005.g4irsf12.demand_calibration_protocol.v1"
+}
