@@ -33,7 +33,6 @@ for _path in (ROOT, SRC):
         sys.path.insert(0, str(_path))
 
 from czr005.datasets.decision_trace import (  # noqa: E402
-    EVENT_RUNTIME_FEATURE_SOURCES,
     assert_no_future_or_label_leakage,
     validate_decision_rows,
 )
@@ -52,6 +51,25 @@ MAP_SEMANTIC_SHA256 = "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93
 TRACE_PATH = Path("artifacts/datasets/g4irsf11_decision_trace_sample.jsonl")
 TRACE_RAW_SHA256 = "bc22ae4d618eb193c3a7342eba04315a85d5940833ba91df95a3b90da432ca4f"
 TRACE_EXPECTED_ROWS = 9_397
+
+# The committed G4IRSF11 sample predates the G4IRSF12 pressure/credit feature
+# expansion.  Its exact feature contract is evidence, not a view of the live
+# runtime allowlist: adding a legal new runtime feature must never rewrite or
+# invalidate this frozen input retrospectively.
+FROZEN_TRACE_FEATURE_NAMES = frozenset(
+    {
+        "advertised_fault",
+        "corridor_next_available",
+        "fault_message_age_seconds",
+        "recent_visit_count",
+        "static_potential",
+        "target_next_available",
+        "target_queue_length",
+        "target_scheduled_incoming",
+        "travel_time",
+        "two_hop_queue_pressure",
+    }
+)
 
 REPORT_PATH = Path("outputs/reports/g4irsf12_frozen_scorer_event_adapter.md")
 ISOLATION_TABLE_PATH = Path("outputs/tables/g4irsf12_scorer_isolation_ab.csv")
@@ -706,7 +724,7 @@ def _validate_adapter_row(
     if not isinstance(records, Sequence) or len(records) != len(candidates):
         raise ValueError("candidate_records must align with candidate_next_nodes")
 
-    expected_feature_names = set(EVENT_RUNTIME_FEATURE_SOURCES)
+    expected_feature_names = set(FROZEN_TRACE_FEATURE_NAMES)
     for index, (candidate, raw_record) in enumerate(zip(candidates, records)):
         if int(raw_record["next_node"]) != candidate:
             raise ValueError(f"candidate record {index} is misaligned")
@@ -1309,7 +1327,7 @@ def _bundle(evidence: Mapping[str, Any]) -> dict[str, Any]:
                 "candidate_records[].features",
             ],
             "approved_candidate_feature_names": sorted(
-                EVENT_RUNTIME_FEATURE_SOURCES
+                FROZEN_TRACE_FEATURE_NAMES
             ),
             "metadata_is_model_input": False,
             "recorded_model_outputs_are_model_inputs": False,
