@@ -11,7 +11,7 @@ phase_l_status: `BLOCKED_NOT_RUN`
 
 The immutable input is a validated 28,506-bag historical clock-day with a strong banked arrival profile. It is not proven to be an ordinary day, design day, or peak day. No primary evidence located identifies Chengdu versus Chongqing, the terminal, the local/transfer scope, the represented BHS fraction, or parallel-system diversion. The only defensible numeric multiplier is therefore **not yet computable**.
 
-The 1.1/1.25/1.5/2.0 entries published here are non-executable sensitivity descriptors. They are not airport forecasts, task artifacts, runtime results, or demonstrated capacity.
+The 1.1/1.2/1.3/1.5/2.0 entries published here are non-executable sensitivity descriptors. They are not airport forecasts, task artifacts, runtime results, or demonstrated capacity.
 
 ## What the historical input establishes
 
@@ -122,11 +122,12 @@ ACRP's official design-day guidance uses flight-by-flight schedules and airport-
 | --- | --- | --- | --- | --- |
 | 1.0 | historical_observed_day_reference | 28506 | HISTORICAL_OBSERVED_DAY_REFERENCE | BLOCKED_NOT_RUN |
 | 1.1 | mild_growth_sensitivity | 31357 | UNCALIBRATED_SENSITIVITY_ONLY | BLOCKED_NOT_RUN |
-| 1.25 | busy_day_sensitivity_not_calibrated | 35633 | UNCALIBRATED_SENSITIVITY_ONLY | BLOCKED_NOT_RUN |
+| 1.2 | busy_day_candidate_not_calibrated | 34207 | UNCALIBRATED_SENSITIVITY_ONLY | BLOCKED_NOT_RUN |
+| 1.3 | provisional_peak_envelope_not_calibrated | 37058 | UNCALIBRATED_SENSITIVITY_ONLY | BLOCKED_NOT_RUN |
 | 1.5 | engineering_reserve_sensitivity | 42759 | UNCALIBRATED_SENSITIVITY_ONLY | BLOCKED_NOT_RUN |
 | 2.0 | extreme_stress_sensitivity | 57012 | UNCALIBRATED_SENSITIVITY_ONLY | BLOCKED_NOT_RUN |
 
-1.25x is not asserted to be a standard design-day factor or a realistic peak. It is a requested provisional sensitivity between mild growth and engineering reserve. All descriptor counts use decimal `ROUND_HALF_UP`; no workload was generated.
+Neither 1.2x nor 1.3x is asserted to be a standard design-day factor or a realistic peak. They are provisional sensitivities between mild growth and engineering reserve. All descriptor counts use decimal `ROUND_HALF_UP`; no workload was generated.
 
 ## Capacity protocol
 

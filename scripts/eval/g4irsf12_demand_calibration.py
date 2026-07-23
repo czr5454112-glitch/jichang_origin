@@ -71,7 +71,8 @@ GENERATION_AUDIT_PATH = Path(
 SCALE_CANDIDATES: tuple[tuple[str, Decimal, str], ...] = (
     ("1p0", Decimal("1.0"), "historical_observed_day_reference"),
     ("1p1", Decimal("1.1"), "mild_growth_sensitivity"),
-    ("1p25", Decimal("1.25"), "busy_day_sensitivity_not_calibrated"),
+    ("1p2", Decimal("1.2"), "busy_day_candidate_not_calibrated"),
+    ("1p3", Decimal("1.3"), "provisional_peak_envelope_not_calibrated"),
     ("1p5", Decimal("1.5"), "engineering_reserve_sensitivity"),
     ("2p0", Decimal("2.0"), "extreme_stress_sensitivity"),
 )
@@ -1355,7 +1356,7 @@ def build_airport_report(
         ),
         "",
         (
-            "The 1.1/1.25/1.5/2.0 entries published here are non-executable "
+            "The 1.1/1.2/1.3/1.5/2.0 entries published here are non-executable "
             "sensitivity descriptors. They are not airport forecasts, task "
             "artifacts, runtime results, or demonstrated capacity."
         ),
@@ -1546,9 +1547,9 @@ def build_airport_report(
         ),
         "",
         (
-            "1.25x is not asserted to be a standard design-day factor or a "
-            "realistic peak. It is a requested provisional sensitivity between "
-            "mild growth and engineering reserve. All descriptor counts use "
+            "Neither 1.2x nor 1.3x is asserted to be a standard design-day "
+            "factor or a realistic peak. They are provisional sensitivities "
+            "between mild growth and engineering reserve. All descriptor counts use "
             "decimal `ROUND_HALF_UP`; no workload was generated."
         ),
         "",

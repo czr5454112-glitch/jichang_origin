@@ -132,13 +132,14 @@ def test_candidate_envelope_is_arithmetic_only_and_never_authorizes_execution(
     assert [row["target_bag_count_arithmetic_only"] for row in rows] == [
         28506,
         31357,
-        35633,
+        34207,
+        37058,
         42759,
         57012,
     ]
     assert [
         row["estimated_segment_count_if_baseline_mix_preserved"] for row in rows
-    ] == [43603, 47963, 54504, 65405, 87206]
+    ] == [43603, 47963, 52324, 56684, 65405, 87206]
     assert all(not row["calibrated_real_demand_claim"] for row in rows)
     assert all(not row["candidate_workload_materialized"] for row in rows)
     assert all(not row["runtime_executed"] for row in rows)
@@ -175,7 +176,8 @@ def test_protocol_and_manifests_preserve_generation_and_phase_l_boundaries(
     for scale_id, kind in (
         ("1p0", "baseline"),
         ("1p1", "candidate"),
-        ("1p25", "candidate"),
+        ("1p2", "candidate"),
+        ("1p3", "candidate"),
         ("1p5", "candidate"),
         ("2p0", "candidate"),
     ):
@@ -217,7 +219,7 @@ def test_committed_bundle_is_complete_deterministic_and_explicit(
     demand_evidence: dict[str, Any],
 ) -> None:
     outputs = render_bundle(demand_evidence)
-    assert len(outputs) == 10
+    assert len(outputs) == 11
     check_bundle(ROOT, outputs)
 
     assert (ROOT / CONFIG_PATH).exists()
@@ -229,7 +231,7 @@ def test_committed_bundle_is_complete_deterministic_and_explicit(
     assert multiplier["value"] == ""
 
     scale_rows = _read_csv(ROOT / SCALE_ENVELOPE_PATH)
-    assert len(scale_rows) == 5
+    assert len(scale_rows) == 6
     assert all(row["phase_l_status"] == "BLOCKED_NOT_RUN" for row in scale_rows)
     assert all(row["runtime_executed"] == "false" for row in scale_rows)
 
@@ -237,7 +239,7 @@ def test_committed_bundle_is_complete_deterministic_and_explicit(
     generation_report = (ROOT / GENERATION_AUDIT_PATH).read_text(encoding="utf-8")
     assert "`UNKNOWN_NOT_COMPUTABLE`" in airport_report
     assert "No scale runtime was started." in airport_report
-    assert "not asserted to be a standard design-day factor" in airport_report
+    assert "standard design-day" in airport_report
     assert "`PASS_WITH_NEGATIVE_GENERATOR_FINDING`" in generation_report
     assert "`original_project_generated`" in generation_report
     assert "does **not** contain an active larger-day demand generator" in (
