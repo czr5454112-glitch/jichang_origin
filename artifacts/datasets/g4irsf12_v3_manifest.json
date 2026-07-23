@@ -1,0 +1,55 @@
+{
+  "blockers": [
+    "G4IRSF12 v3 source manifest is missing: artifacts/datasets/g4irsf12_v3_source_manifest.json",
+    "pre-training gate manifest is missing: artifacts/gates/g4irsf12_v3_pretraining_gate_manifest.json"
+  ],
+  "claim_boundary": "No runtime policy is published. A missing/partial gate, data mismatch, split leakage, offline failure, or absent closed-loop result fails closed.",
+  "data_audit": {
+    "easy_rows": 0,
+    "hard_category_counts": {
+      "active_fault": 0,
+      "credit_invalid_or_mismatch": 0,
+      "frozen_scorer_disagreement": 0,
+      "loop_or_dead_end": 0,
+      "pibt_takeover": 0,
+      "shield_rejection": 0,
+      "tail_wait": 0
+    },
+    "hard_rows": 0,
+    "outcome_rows": 0,
+    "rank_eligible_rows": 0,
+    "risk_positive_rows": 0,
+    "source_manifest": "artifacts/datasets/g4irsf12_v3_source_manifest.json",
+    "trace_rows": 0
+  },
+  "protected_inputs": {
+    "map": {
+      "path": "data/processed/maps/map2.json",
+      "raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+      "semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63",
+      "topology_mutation_allowed": false
+    },
+    "tasks": {
+      "mutation_allowed": false,
+      "path": "data/processed/tasks/inputdata.jsonl",
+      "raw_bag_count": 28506,
+      "raw_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+      "segment_count": 43603,
+      "semantic_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+    }
+  },
+  "protocol": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "artifacts/configs/g4irsf12_v3_training_protocol.json",
+    "sha256": "903c45fb782d2cd30c5aaaae626d8f55bcb33abb307d54e2f879ac1fb4255081"
+  },
+  "runtime_eligible": false,
+  "schema": "czr005.g4irsf12.v3_decision_dataset.v1",
+  "source_manifest": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "artifacts/datasets/g4irsf12_v3_source_manifest.json",
+    "sha256": ""
+  },
+  "status": "BLOCKED_NOT_RUN",
+  "weights_initialised": false
+}

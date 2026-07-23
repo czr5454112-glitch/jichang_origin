@@ -1,0 +1,62 @@
+{
+  "G4J_status": "CLOSED",
+  "blockers": [
+    "G4IRSF12 v3 source manifest is missing: artifacts/datasets/g4irsf12_v3_source_manifest.json",
+    "pre-training gate manifest is missing: artifacts/gates/g4irsf12_v3_pretraining_gate_manifest.json"
+  ],
+  "candidate_model": {},
+  "claim_boundary": "No runtime policy is published. A missing/partial gate, data mismatch, split leakage, offline failure, or absent closed-loop result fails closed.",
+  "data_audit": {
+    "easy_rows": 0,
+    "hard_category_counts": {
+      "active_fault": 0,
+      "credit_invalid_or_mismatch": 0,
+      "frozen_scorer_disagreement": 0,
+      "loop_or_dead_end": 0,
+      "pibt_takeover": 0,
+      "shield_rejection": 0,
+      "tail_wait": 0
+    },
+    "hard_rows": 0,
+    "outcome_rows": 0,
+    "rank_eligible_rows": 0,
+    "risk_positive_rows": 0,
+    "source_manifest": "artifacts/datasets/g4irsf12_v3_source_manifest.json",
+    "trace_rows": 0
+  },
+  "gate_statuses": {
+    "bounded_local_pibt_invariants": "MISSING",
+    "decision_trace_actual_candidates_actions": "MISSING",
+    "frozen_scorer_diagnostic_complete": "MISSING",
+    "hard_negative_easy_stratification": "MISSING",
+    "no_leakage": "MISSING",
+    "pressure_credit_frozen": "MISSING",
+    "resource_semantics_frozen": "MISSING",
+    "size_ladder_8192_stable": "MISSING"
+  },
+  "protocol": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "artifacts/configs/g4irsf12_v3_training_protocol.json",
+    "sha256": "903c45fb782d2cd30c5aaaae626d8f55bcb33abb307d54e2f879ac1fb4255081"
+  },
+  "reproduce_command": "\"C:\\\\Users\\\\38908\\\\.conda\\\\envs\\\\czr005\\\\python.exe\" \"C:\\\\PROGRAMING\\\\czr005\\\\scripts\\\\train\\\\g4irsf12_v3_training.py\" \"--root\" \"C:\\\\PROGRAMING\\\\czr005\" \"--gate-manifest\" \"artifacts\\\\gates\\\\g4irsf12_v3_pretraining_gate_manifest.json\" \"--source-manifest\" \"artifacts\\\\datasets\\\\g4irsf12_v3_source_manifest.json\" \"--epochs\" \"120\" \"--learning-rate\" \"0.04\"",
+  "required_gates": [
+    "resource_semantics_frozen",
+    "size_ladder_8192_stable",
+    "bounded_local_pibt_invariants",
+    "pressure_credit_frozen",
+    "decision_trace_actual_candidates_actions",
+    "no_leakage",
+    "hard_negative_easy_stratification",
+    "frozen_scorer_diagnostic_complete"
+  ],
+  "runtime_eligible": false,
+  "schema": "czr005.g4irsf12.v3_training_status.v1",
+  "source_manifest": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "artifacts/datasets/g4irsf12_v3_source_manifest.json",
+    "sha256": ""
+  },
+  "status": "BLOCKED_NOT_RUN",
+  "trained": false
+}

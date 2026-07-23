@@ -1,0 +1,312 @@
+{
+  "allowed_models": [
+    "v3_linear_ranker",
+    "v3_pairwise_ranker",
+    "v3_listwise_ranker",
+    "v3_tiny_mlp",
+    "v3_feature_pruned_mlp",
+    "v3_ranker_plus_calibrated_risk_head"
+  ],
+  "closed_loop_gates": {
+    "completed_bags": 28506,
+    "completed_segments": 43603,
+    "failed_bags": 0,
+    "future_routes_read": 0,
+    "global_reservation_scans": 0,
+    "matched_original_entry_denominator_required": true,
+    "node_or_resource_conflicts": 0,
+    "physical_fault_interlock_always_enabled": true,
+    "repeat_count_minimum": 5,
+    "runtime_full_astar_calls": 0,
+    "time_or_event_limit_hit": false,
+    "unresolved_deadlocks": 0
+  },
+  "feature_contract": {
+    "absolute_node_id_model_inputs_allowed": false,
+    "allowed": [
+      "static_potential",
+      "travel_time",
+      "target_queue_length",
+      "target_scheduled_incoming",
+      "corridor_next_available",
+      "target_next_available",
+      "advertised_fault",
+      "fault_message_age_seconds",
+      "recent_visit_count",
+      "two_hop_queue_pressure",
+      "current_goal_queue_length",
+      "target_goal_queue_length",
+      "target_goal_scheduled_incoming",
+      "current_goal_max_wait",
+      "goal_conditioned_differential",
+      "estimated_service_rate",
+      "service_weighted_pressure",
+      "first_edge_credit_required",
+      "first_edge_credit_matches",
+      "first_edge_credit_valid",
+      "first_edge_credit_slack_seconds",
+      "candidate_node_type_code",
+      "local_calendar_wait_seconds",
+      "deadline_slack_seconds",
+      "waiting_age_seconds",
+      "recent_edge_service_rate",
+      "local_cycle_motif_code",
+      "pibt_is_local_owner",
+      "pibt_local_blocker_depth",
+      "pibt_inherited_priority",
+      "merge_incoming_ready_count",
+      "merge_service_slack_seconds"
+    ],
+    "bounded_local_state_only": true,
+    "future_route_inputs_allowed": false,
+    "lineage_sources": {
+      "advertised_fault": [
+        "congestion_beacon.advertised_fault"
+      ],
+      "candidate_node_type_code": [
+        "graph.node_type",
+        "candidate_records[].next_node"
+      ],
+      "corridor_next_available": [
+        "local_edge.next_available_time",
+        "event_time"
+      ],
+      "current_goal_max_wait": [
+        "local_current.goal_conditioned_max_wait",
+        "event_time"
+      ],
+      "current_goal_queue_length": [
+        "local_current.goal_conditioned_queue_length"
+      ],
+      "deadline_slack_seconds": [
+        "bag.deadline",
+        "event_time"
+      ],
+      "estimated_service_rate": [
+        "local_edge.service_duration",
+        "local_neighbor.service_duration"
+      ],
+      "fault_message_age_seconds": [
+        "event_time",
+        "congestion_beacon.fault_message_timestamp"
+      ],
+      "first_edge_credit_matches": [
+        "active_first_edge_credit.to_node",
+        "candidate_records[].next_node"
+      ],
+      "first_edge_credit_required": [
+        "runtime.admission_mode",
+        "bag.first_edge_credit_consumed"
+      ],
+      "first_edge_credit_slack_seconds": [
+        "active_first_edge_credit.latest",
+        "active_first_edge_credit.expiry",
+        "event_time"
+      ],
+      "first_edge_credit_valid": [
+        "active_first_edge_credit.validation_state",
+        "event_time"
+      ],
+      "goal_conditioned_differential": [
+        "local_current.goal_conditioned_queue_length",
+        "local_neighbor.goal_conditioned_queue_length",
+        "local_neighbor.goal_conditioned_scheduled_incoming"
+      ],
+      "local_calendar_wait_seconds": [
+        "event_time",
+        "local_edge.next_available_time",
+        "local_neighbor.next_available_time"
+      ],
+      "local_cycle_motif_code": [
+        "short_history",
+        "graph.bounded_local_adjacency",
+        "candidate_records[].next_node"
+      ],
+      "merge_incoming_ready_count": [
+        "local_merge.ready_owner_count"
+      ],
+      "merge_service_slack_seconds": [
+        "event_time",
+        "local_merge.next_available_time"
+      ],
+      "pibt_inherited_priority": [
+        "local_pibt_slice.inherited_priority"
+      ],
+      "pibt_is_local_owner": [
+        "local_pibt_slice.resource_owner",
+        "bag.runtime_identity"
+      ],
+      "pibt_local_blocker_depth": [
+        "local_pibt_slice.bounded_blocker_chain"
+      ],
+      "recent_edge_service_rate": [
+        "local_edge.bounded_recent_departures"
+      ],
+      "recent_visit_count": [
+        "short_history",
+        "candidate_records[].next_node"
+      ],
+      "service_weighted_pressure": [
+        "candidate_records[].features.goal_conditioned_differential",
+        "candidate_records[].features.estimated_service_rate"
+      ],
+      "static_potential": [
+        "graph.static_potential",
+        "goal_node",
+        "candidate_records[].next_node"
+      ],
+      "target_goal_queue_length": [
+        "local_neighbor.goal_conditioned_queue_length"
+      ],
+      "target_goal_scheduled_incoming": [
+        "local_neighbor.goal_conditioned_scheduled_incoming"
+      ],
+      "target_next_available": [
+        "local_neighbor.next_available_time",
+        "event_time"
+      ],
+      "target_queue_length": [
+        "local_neighbor.queue_length"
+      ],
+      "target_scheduled_incoming": [
+        "local_neighbor.scheduled_incoming"
+      ],
+      "travel_time": [
+        "graph.edge_travel_time",
+        "current_node",
+        "candidate_records[].next_node"
+      ],
+      "two_hop_queue_pressure": [
+        "bounded_two_hop.queue_summary"
+      ],
+      "waiting_age_seconds": [
+        "bag.ready_time",
+        "event_time"
+      ]
+    },
+    "post_hoc_inputs_allowed": false,
+    "reservation_depth": 1
+  },
+  "forbidden_models": [
+    "PPO",
+    "MAPPO",
+    "full_RL",
+    "Transformer",
+    "large_GNN"
+  ],
+  "generated_date": "2026-07-23",
+  "hard_negative_contract": {
+    "categories": [
+      "frozen_scorer_disagreement",
+      "shield_rejection",
+      "pibt_takeover",
+      "active_fault",
+      "tail_wait",
+      "loop_or_dead_end",
+      "credit_invalid_or_mismatch"
+    ],
+    "easy_examples_required": true,
+    "failures_retained_even_when_rank_ineligible": true,
+    "hard_examples_required": true,
+    "maximum_rank_weight": 4.0
+  },
+  "implemented_models": [
+    "v3_linear_ranker"
+  ],
+  "label_contract": {
+    "candidate_negative": "other true outgoing candidates; shield-disallowed actions are explicit hard negatives, not positive counterfactual labels",
+    "failed_or_looping_action": "retained for risk/weight audit; never inverted into an unobserved correct action",
+    "outcomes_storage": "separate_hash_bound_jsonl",
+    "rank_positive": "actual committed selected_next only when the separate outcome is successful, non-looping, and the action was shield-allowed",
+    "teacher_route_suffix_allowed": false
+  },
+  "model_responsibility": "rank_current_true_outgoing_neighbors_only",
+  "offline_gates": {
+    "all_seed_and_heldout_splits_must_pass": true,
+    "candidate_recall": 1.0,
+    "feature_ablation_required": true,
+    "maximum_ece": 0.15,
+    "maximum_high_confidence_wrong_rate": 0.02,
+    "minimum_pairwise_accuracy": 0.55,
+    "minimum_top1": 0.5
+  },
+  "pibt_responsibility": "bounded_local_multi_bag_coordination_and_atomic_action_set",
+  "protected_inputs": {
+    "map": {
+      "path": "data/processed/maps/map2.json",
+      "raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+      "semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63",
+      "topology_mutation_allowed": false
+    },
+    "tasks": {
+      "mutation_allowed": false,
+      "path": "data/processed/tasks/inputdata.jsonl",
+      "raw_bag_count": 28506,
+      "raw_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+      "segment_count": 43603,
+      "semantic_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+    }
+  },
+  "publication_contract": {
+    "G4J_status": "CLOSED",
+    "active_pointer_written_by_this_tool": false,
+    "candidate_export_is_immutable": true,
+    "candidate_runtime_eligible": false,
+    "closed_loop_manifest_must_bind_candidate_sha256": true
+  },
+  "required_pretraining_gates": [
+    "resource_semantics_frozen",
+    "size_ladder_8192_stable",
+    "bounded_local_pibt_invariants",
+    "pressure_credit_frozen",
+    "decision_trace_actual_candidates_actions",
+    "no_leakage",
+    "hard_negative_easy_stratification",
+    "frozen_scorer_diagnostic_complete"
+  ],
+  "schema": "czr005.g4irsf12.v3_training_protocol.v1",
+  "shield_responsibility": "physical_fault_resource_dead_end_queue_and_credit_legality",
+  "split_contract": {
+    "audit_dimensions": [
+      "task_or_bag",
+      "time_block",
+      "source",
+      "goal",
+      "junction",
+      "congestion",
+      "fault",
+      "decision_motif"
+    ],
+    "bag_or_semantic_duplicate_overlap_allowed": false,
+    "component_links": [
+      "bag_family",
+      "semantic_fingerprint"
+    ],
+    "seeds": [
+      11,
+      29,
+      47
+    ],
+    "splits": [
+      "grouped_random",
+      "time_block_heldout",
+      "source_heldout",
+      "goal_heldout",
+      "junction_heldout",
+      "congestion_heldout",
+      "fault_heldout",
+      "decision_motif_heldout"
+    ],
+    "train_validation_test_fraction": [
+      0.7,
+      0.15,
+      0.15
+    ]
+  },
+  "stage": "G4IRSF12-I",
+  "status_semantics": {
+    "BLOCKED_NOT_RUN": "No model weights are initialised and no model artifact is written.",
+    "OFFLINE_VALIDATED_CLOSED_LOOP_REQUIRED": "An immutable offline candidate exists, but runtime activation remains forbidden until a separately bound closed-loop PASS.",
+    "READY_NOT_TRAINED": "Inputs pass preparation but training was not explicitly authorised."
+  }
+}

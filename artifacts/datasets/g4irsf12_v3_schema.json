@@ -1,0 +1,240 @@
+{
+  "$id": "czr005.g4irsf12.v3_decision_dataset.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "absolute_node_id_model_inputs_allowed": false,
+  "allowed_model_features": [
+    "static_potential",
+    "travel_time",
+    "target_queue_length",
+    "target_scheduled_incoming",
+    "corridor_next_available",
+    "target_next_available",
+    "advertised_fault",
+    "fault_message_age_seconds",
+    "recent_visit_count",
+    "two_hop_queue_pressure",
+    "current_goal_queue_length",
+    "target_goal_queue_length",
+    "target_goal_scheduled_incoming",
+    "current_goal_max_wait",
+    "goal_conditioned_differential",
+    "estimated_service_rate",
+    "service_weighted_pressure",
+    "first_edge_credit_required",
+    "first_edge_credit_matches",
+    "first_edge_credit_valid",
+    "first_edge_credit_slack_seconds",
+    "candidate_node_type_code",
+    "local_calendar_wait_seconds",
+    "deadline_slack_seconds",
+    "waiting_age_seconds",
+    "recent_edge_service_rate",
+    "local_cycle_motif_code",
+    "pibt_is_local_owner",
+    "pibt_local_blocker_depth",
+    "pibt_inherited_priority",
+    "merge_incoming_ready_count",
+    "merge_service_slack_seconds"
+  ],
+  "candidate_ordering": "next_node_ascending",
+  "candidate_set_semantics": "exact_true_outgoing_neighbors",
+  "decision_required_fields": [
+    "decision_id",
+    "task_id",
+    "segment_id",
+    "event_time",
+    "current_node",
+    "goal_node",
+    "candidate_next_nodes",
+    "candidate_records",
+    "selected_next",
+    "model_prediction",
+    "decision_source",
+    "full_astar_used",
+    "metadata"
+  ],
+  "description": "The source manifest binds three separate artifacts: legal decision rows, post-hoc outcomes, and executable feature lineage.",
+  "feature_lineage_required_columns": [
+    "field_path",
+    "lineage",
+    "role",
+    "origin",
+    "availability",
+    "sources",
+    "available_at_decision",
+    "model_input_allowed",
+    "prohibited_as_runtime_feature",
+    "lineage_status"
+  ],
+  "feature_lineage_sources": {
+    "advertised_fault": [
+      "congestion_beacon.advertised_fault"
+    ],
+    "candidate_node_type_code": [
+      "graph.node_type",
+      "candidate_records[].next_node"
+    ],
+    "corridor_next_available": [
+      "local_edge.next_available_time",
+      "event_time"
+    ],
+    "current_goal_max_wait": [
+      "local_current.goal_conditioned_max_wait",
+      "event_time"
+    ],
+    "current_goal_queue_length": [
+      "local_current.goal_conditioned_queue_length"
+    ],
+    "deadline_slack_seconds": [
+      "bag.deadline",
+      "event_time"
+    ],
+    "estimated_service_rate": [
+      "local_edge.service_duration",
+      "local_neighbor.service_duration"
+    ],
+    "fault_message_age_seconds": [
+      "event_time",
+      "congestion_beacon.fault_message_timestamp"
+    ],
+    "first_edge_credit_matches": [
+      "active_first_edge_credit.to_node",
+      "candidate_records[].next_node"
+    ],
+    "first_edge_credit_required": [
+      "runtime.admission_mode",
+      "bag.first_edge_credit_consumed"
+    ],
+    "first_edge_credit_slack_seconds": [
+      "active_first_edge_credit.latest",
+      "active_first_edge_credit.expiry",
+      "event_time"
+    ],
+    "first_edge_credit_valid": [
+      "active_first_edge_credit.validation_state",
+      "event_time"
+    ],
+    "goal_conditioned_differential": [
+      "local_current.goal_conditioned_queue_length",
+      "local_neighbor.goal_conditioned_queue_length",
+      "local_neighbor.goal_conditioned_scheduled_incoming"
+    ],
+    "local_calendar_wait_seconds": [
+      "event_time",
+      "local_edge.next_available_time",
+      "local_neighbor.next_available_time"
+    ],
+    "local_cycle_motif_code": [
+      "short_history",
+      "graph.bounded_local_adjacency",
+      "candidate_records[].next_node"
+    ],
+    "merge_incoming_ready_count": [
+      "local_merge.ready_owner_count"
+    ],
+    "merge_service_slack_seconds": [
+      "event_time",
+      "local_merge.next_available_time"
+    ],
+    "pibt_inherited_priority": [
+      "local_pibt_slice.inherited_priority"
+    ],
+    "pibt_is_local_owner": [
+      "local_pibt_slice.resource_owner",
+      "bag.runtime_identity"
+    ],
+    "pibt_local_blocker_depth": [
+      "local_pibt_slice.bounded_blocker_chain"
+    ],
+    "recent_edge_service_rate": [
+      "local_edge.bounded_recent_departures"
+    ],
+    "recent_visit_count": [
+      "short_history",
+      "candidate_records[].next_node"
+    ],
+    "service_weighted_pressure": [
+      "candidate_records[].features.goal_conditioned_differential",
+      "candidate_records[].features.estimated_service_rate"
+    ],
+    "static_potential": [
+      "graph.static_potential",
+      "goal_node",
+      "candidate_records[].next_node"
+    ],
+    "target_goal_queue_length": [
+      "local_neighbor.goal_conditioned_queue_length"
+    ],
+    "target_goal_scheduled_incoming": [
+      "local_neighbor.goal_conditioned_scheduled_incoming"
+    ],
+    "target_next_available": [
+      "local_neighbor.next_available_time",
+      "event_time"
+    ],
+    "target_queue_length": [
+      "local_neighbor.queue_length"
+    ],
+    "target_scheduled_incoming": [
+      "local_neighbor.scheduled_incoming"
+    ],
+    "travel_time": [
+      "graph.edge_travel_time",
+      "current_node",
+      "candidate_records[].next_node"
+    ],
+    "two_hop_queue_pressure": [
+      "bounded_two_hop.queue_summary"
+    ],
+    "waiting_age_seconds": [
+      "bag.ready_time",
+      "event_time"
+    ]
+  },
+  "forbidden_key_tokens": [
+    "teacher",
+    "future_",
+    "post_hoc",
+    "posthoc",
+    "route_suffix",
+    "path_suffix",
+    "full_route",
+    "full_path",
+    "complete_path",
+    "reached_goal",
+    "goal_reached",
+    "finish_time",
+    "bag_tth",
+    "total_tth",
+    "outcome",
+    "label_source"
+  ],
+  "full_astar_used": false,
+  "future_route_input_allowed": false,
+  "global_reservation_scan_used": false,
+  "labels_in_decision_trace_allowed": false,
+  "outcome_required_fields": [
+    "decision_id",
+    "reached_goal",
+    "loop_or_dead_end"
+  ],
+  "outcomes_must_be_separate": true,
+  "required_artifacts": [
+    "decision_trace",
+    "outcomes",
+    "feature_lineage"
+  ],
+  "required_manifest_fields": [
+    "schema",
+    "status",
+    "fixed_real_map_only",
+    "map",
+    "tasks",
+    "generation",
+    "model_feature_names",
+    "validation",
+    "artifacts"
+  ],
+  "source_manifest_schema": "czr005.g4irsf12.v3_source_manifest.v1",
+  "title": "G4IRSF12 v3 decision-time training source"
+}
