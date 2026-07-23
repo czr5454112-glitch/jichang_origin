@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 from pathlib import Path
 import sys
@@ -151,6 +152,60 @@ def test_disagreement_is_true_only_when_model_and_fallback_actions_differ() -> N
     inconsistent["model_fallback_disagreement"] = True
     with pytest.raises(dt.DecisionTraceValidationError, match="exactly when"):
         dt.canonicalise_decision_row(inconsistent)
+
+
+def test_raw_scorer_diagnostics_are_paired_and_post_gate_disagreement_is_exact() -> None:
+    raw = _raw_decision(fallback=8, selected=8)
+    for index, record in enumerate(raw["candidate_records"]):  # type: ignore[union-attr]
+        record["scorer_raw_score"] = 3.0 - index
+        record["scorer_raw_bottleneck"] = 0.1 + index
+    raw["metadata"]["scorer_raw_prediction"] = 12  # type: ignore[index]
+    raw["metadata"]["scorer_raw_margin"] = 1.0  # type: ignore[index]
+    raw["metadata"]["scorer_raw_score_semantics"] = "higher_is_better_frozen_adapter_score"  # type: ignore[index]
+    raw["metadata"]["scorer_risk_abstain"] = True  # type: ignore[index]
+    raw["metadata"]["scorer_id"] = "S1_frozen_g4e_legal_local_adapter"  # type: ignore[index]
+    raw["metadata"]["scorer_effective_id"] = "S0_current_handwritten_static_score"  # type: ignore[index]
+    raw["scorer_raw_fallback_disagreement"] = True
+
+    row = dt.canonicalise_decision_row(raw)
+    assert row["scorer_raw_fallback_disagreement"] is True
+    assert all(
+        "scorer_raw_score" in record
+        and "scorer_raw_bottleneck" in record
+        for record in row["candidate_records"]
+    )
+
+    wrong_prediction = copy.deepcopy(raw)
+    wrong_prediction["metadata"]["scorer_raw_prediction"] = 8  # type: ignore[index]
+    with pytest.raises(dt.DecisionTraceValidationError, match="raw candidate scores"):
+        dt.canonicalise_decision_row(wrong_prediction)
+
+    wrong_margin = copy.deepcopy(raw)
+    wrong_margin["metadata"]["scorer_raw_margin"] = 0.25  # type: ignore[index]
+    with pytest.raises(dt.DecisionTraceValidationError, match="raw candidate scores"):
+        dt.canonicalise_decision_row(wrong_margin)
+
+    wrong_score = copy.deepcopy(raw)
+    wrong_score["candidate_records"][1]["scorer_raw_score"] = 4.0  # type: ignore[index]
+    with pytest.raises(dt.DecisionTraceValidationError, match="raw candidate scores"):
+        dt.canonicalise_decision_row(wrong_score)
+
+    inconsistent = _raw_decision(fallback=8, selected=8)
+    inconsistent["metadata"]["scorer_raw_prediction"] = 12  # type: ignore[index]
+    inconsistent["metadata"]["scorer_risk_abstain"] = True  # type: ignore[index]
+    inconsistent["scorer_raw_fallback_disagreement"] = False
+    with pytest.raises(dt.DecisionTraceValidationError, match="raw scorer"):
+        dt.canonicalise_decision_row(inconsistent)
+
+    no_gate = _raw_decision(fallback=None, selected=8)
+    no_gate["metadata"]["scorer_risk_abstain"] = True  # type: ignore[index]
+    with pytest.raises(dt.DecisionTraceValidationError, match="requires risk_gate"):
+        dt.canonicalise_decision_row(no_gate)
+
+    partial = _raw_decision()
+    partial["candidate_records"][0]["scorer_raw_score"] = 1.0  # type: ignore[index]
+    with pytest.raises(dt.DecisionTraceValidationError, match="must include both"):
+        dt.canonicalise_decision_row(partial)
 
 
 def test_margin_is_required_finite_and_non_null() -> None:

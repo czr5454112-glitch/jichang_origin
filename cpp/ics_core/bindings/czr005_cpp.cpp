@@ -3053,6 +3053,81 @@ py::dict g4irsf11_event_runtime_summary_row(
   py::dict row;
   row["runtime_name"] = "event_driven_local_decision_runtime";
   row["runtime_loop_owner"] = "cpp_event_scheduler";
+  row["resource_semantics_id"] = summary.resource_semantics_id;
+  row["resource_semantics_echo"] =
+      summary.resource_semantics_echo;
+  row["pressure_mode"] = summary.pressure_mode;
+  row["pressure_mode_echo"] = summary.pressure_mode_echo;
+  row["admission_mode"] = summary.admission_mode;
+  row["admission_mode_echo"] = summary.admission_mode_echo;
+  row["framework_mode"] = summary.framework_mode;
+  row["framework_mode_echo"] = summary.framework_mode_echo;
+  row["pibt_mode"] = summary.pibt_mode;
+  row["pibt_mode_echo"] = summary.pibt_mode_echo;
+  row["scorer_mode"] = summary.scorer_mode;
+  row["scorer_mode_echo"] = summary.scorer_mode_echo;
+  row["scorer_id"] = summary.scorer_id;
+  row["scorer_model_sha256"] =
+      summary.scorer_model_sha256;
+  row["scorer_score_direction"] =
+      summary.scorer_score_direction;
+  row["scorer_claim_boundary"] =
+      summary.scorer_claim_boundary;
+  row["scorer_out_of_distribution_diagnostic"] =
+      summary.scorer_out_of_distribution_diagnostic;
+  row["scorer_promotion_eligible"] =
+      summary.scorer_promotion_eligible;
+  row["scorer_absolute_node_ids_enabled"] =
+      summary.scorer_absolute_node_ids_enabled;
+  row["scorer_static_precompute_only"] =
+      summary.scorer_static_precompute_only;
+  row["scorer_feature_dim"] = summary.scorer_feature_dim;
+  row["scorer_explicit_default_feature_count"] =
+      summary.scorer_explicit_default_feature_count;
+  row["scorer_decision_evaluation_count"] =
+      py::int_(summary.scorer_decision_evaluation_count);
+  row["scorer_candidate_evaluation_count"] =
+      py::int_(summary.scorer_candidate_evaluation_count);
+  row["scorer_risk_abstain_count"] =
+      py::int_(summary.scorer_risk_abstain_count);
+  row["scorer_teacher_input_count"] =
+      summary.scorer_teacher_input_count;
+  row["scorer_future_route_input_count"] =
+      summary.scorer_future_route_input_count;
+  row["scorer_future_schedule_input_count"] =
+      summary.scorer_future_schedule_input_count;
+  row["scorer_posthoc_input_count"] =
+      summary.scorer_posthoc_input_count;
+  row["scorer_runtime_global_scan_count"] =
+      summary.scorer_runtime_global_scan_count;
+  row["pibt_max_depth"] = summary.pibt_max_depth;
+  row["bounded_local_pibt_claim_boundary"] =
+      summary.bounded_local_pibt_claim_boundary;
+  row["first_edge_credit_claim_boundary"] =
+      summary.first_edge_credit_claim_boundary;
+  row["entry_headway_seconds"] = summary.entry_headway_seconds;
+  row["pressure_weight"] = summary.pressure_weight;
+  row["pressure_age_weight"] = summary.pressure_age_weight;
+  row["pressure_distance_bias"] =
+      summary.pressure_distance_bias;
+  row["credit_validity_seconds"] =
+      summary.credit_validity_seconds;
+  row["credit_snapshot_max_age_seconds"] =
+      summary.credit_snapshot_max_age_seconds;
+  row["credit_capacity_per_edge"] =
+      summary.credit_capacity_per_edge;
+  row["credit_lifecycle_limit"] =
+      summary.credit_lifecycle_limit;
+  row["declared_max_events"] = summary.declared_max_events;
+  row["max_events"] = summary.declared_max_events;
+  row["declared_max_simulation_time"] =
+      summary.declared_max_simulation_time;
+  row["local_queue_capacity"] = summary.local_queue_capacity;
+  row["pibt_max_ready_bags"] = summary.pibt_max_ready_bags;
+  row["pibt_max_local_resources"] =
+      summary.pibt_max_local_resources;
+  row["pibt_max_candidates_per_bag"] =
+      summary.pibt_max_candidates_per_bag;
   row["requested_count"] = summary.requested_count;
   row["completed_count"] = summary.completed_count;
   row["failed_count"] = summary.failed_count;
@@ -3082,6 +3157,66 @@ py::dict g4irsf11_event_runtime_summary_row(
       py::int_(summary.source_admission_beacon_read_count);
   row["source_admission_max_observed_downstream_pressure"] =
       summary.source_admission_max_observed_downstream_pressure;
+  row["first_edge_credit_issue_attempt_count"] =
+      py::int_(summary.first_edge_credit_issue_attempt_count);
+  row["first_edge_credit_issued_count"] =
+      py::int_(summary.first_edge_credit_issued_count);
+  row["first_edge_credit_validation_attempt_count"] =
+      py::int_(summary.first_edge_credit_validation_attempt_count);
+  row["first_edge_credit_validation_success_count"] =
+      py::int_(summary.first_edge_credit_validation_success_count);
+  row["first_edge_credit_bind_attempt_count"] =
+      py::int_(summary.first_edge_credit_bind_attempt_count);
+  row["first_edge_credit_bound_count"] =
+      py::int_(summary.first_edge_credit_bound_count);
+  row["first_edge_credit_consume_attempt_count"] =
+      py::int_(summary.first_edge_credit_consume_attempt_count);
+  row["first_edge_credit_consumed_count"] =
+      py::int_(summary.first_edge_credit_consumed_count);
+  row["first_edge_credit_expired_count"] =
+      py::int_(summary.first_edge_credit_expired_count);
+  row["first_edge_credit_fault_revocation_count"] =
+      py::int_(summary.first_edge_credit_fault_revocation_count);
+  row["first_edge_credit_generation_revocation_count"] =
+      py::int_(summary.first_edge_credit_generation_revocation_count);
+  row["first_edge_credit_invalid_revocation_count"] =
+      py::int_(summary.first_edge_credit_invalid_revocation_count);
+  row["first_edge_credit_duplicate_rejection_count"] =
+      py::int_(summary.first_edge_credit_duplicate_rejection_count);
+  row["first_edge_credit_capacity_rejection_count"] =
+      py::int_(summary.first_edge_credit_capacity_rejection_count);
+  row["first_edge_credit_stale_snapshot_rejection_count"] =
+      py::int_(summary.first_edge_credit_stale_snapshot_rejection_count);
+  row["first_edge_credit_physical_fault_rejection_count"] =
+      py::int_(summary.first_edge_credit_physical_fault_rejection_count);
+  row["first_edge_credit_too_early_rejection_count"] =
+      py::int_(summary.first_edge_credit_too_early_rejection_count);
+  row["first_edge_credit_unknown_rejection_count"] =
+      py::int_(summary.first_edge_credit_unknown_rejection_count);
+  row["first_edge_credit_invalid_request_rejection_count"] =
+      py::int_(summary.first_edge_credit_invalid_request_rejection_count);
+  row["first_edge_credit_lifecycle_dropped_count"] =
+      py::int_(summary.first_edge_credit_lifecycle_dropped_count);
+  row["first_edge_credit_local_hold_count"] =
+      py::int_(summary.first_edge_credit_local_hold_count);
+  row["first_edge_credit_reissue_count"] =
+      py::int_(summary.first_edge_credit_reissue_count);
+  row["first_edge_credit_active_count"] =
+      summary.first_edge_credit_active_count;
+  row["first_edge_credit_peak_active_count"] =
+      summary.first_edge_credit_peak_active_count;
+  row["first_edge_credit_stored_active_count"] =
+      summary.first_edge_credit_stored_active_count;
+  row["first_edge_credit_stored_lifecycle_count"] =
+      summary.first_edge_credit_stored_lifecycle_count;
+  row["first_edge_credit_lifecycle_limit"] =
+      summary.first_edge_credit_lifecycle_limit;
+  row["first_edge_credit_future_route_count"] =
+      summary.first_edge_credit_future_route_count;
+  row["first_edge_credit_global_scan_count"] =
+      summary.first_edge_credit_global_scan_count;
+  row["first_edge_credit_physical_interlock_bypass"] =
+      summary.first_edge_credit_physical_interlock_bypass;
   row["fault_notification_drop_count"] = summary.fault_notification_drop_count;
   row["physical_fault_window_traversal_count"] =
       summary.physical_fault_window_traversal_count;
@@ -3101,6 +3236,23 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["local_fault_policy_action_count"] = summary.local_fault_policy_action_count;
   row["local_fault_policy_hold_count"] = summary.local_fault_policy_hold_count;
   row["local_fault_policy_reroute_count"] = summary.local_fault_policy_reroute_count;
+  row["fault_affected_completed_count"] =
+      summary.fault_affected_completed_count;
+  row["fault_recovery_seconds_available"] =
+      summary.fault_recovery_seconds_available;
+  if (summary.fault_recovery_seconds_available) {
+    row["fault_recovery_seconds"] =
+        summary.fault_recovery_seconds;
+  }
+  row["repair_backlog_slope_available"] =
+      summary.repair_backlog_slope_available;
+  if (summary.repair_backlog_slope_available) {
+    row["repair_backlog_slope"] = summary.repair_backlog_slope;
+  }
+  row["fault_recovery_metric_semantics"] =
+      summary.fault_recovery_metric_semantics;
+  row["repair_backlog_slope_semantics"] =
+      summary.repair_backlog_slope_semantics;
   row["sensor_loss_mode_used"] = summary.sensor_loss_mode_used;
   row["sensor_loss_supported"] = true;
   row["reservation_conflicts"] = summary.reservation_conflicts;
@@ -3108,6 +3260,91 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["shield_rejection_count"] = summary.shield_rejection_count;
   row["stale_fault_shield_rejection_count"] = summary.stale_fault_shield_rejection_count;
   row["pibt_lite_handoff_count"] = summary.pibt_lite_handoff_count;
+  row["same_bag_alternative_edge_scan_handoff_count"] =
+      summary.same_bag_alternative_edge_scan_handoff_count;
+  row["bounded_local_pibt_activation_count"] =
+      py::int_(summary.bounded_local_pibt_activation_count);
+  row["bounded_local_pibt_applicability_count"] =
+      py::int_(summary.bounded_local_pibt_activation_count);
+  row["pibt_applicability_count"] =
+      py::int_(summary.bounded_local_pibt_activation_count);
+  row["bounded_local_pibt_attempt_count"] =
+      py::int_(summary.bounded_local_pibt_attempt_count);
+  row["pibt_attempt_count"] =
+      py::int_(summary.bounded_local_pibt_attempt_count);
+  row["bounded_local_pibt_prepare_count"] =
+      py::int_(summary.bounded_local_pibt_prepare_count);
+  row["pibt_prepare_count"] =
+      py::int_(summary.bounded_local_pibt_prepare_count);
+  row["bounded_local_pibt_validate_count"] =
+      py::int_(summary.bounded_local_pibt_validate_count);
+  row["pibt_validate_count"] =
+      py::int_(summary.bounded_local_pibt_validate_count);
+  row["bounded_local_pibt_commit_count"] =
+      py::int_(summary.bounded_local_pibt_commit_count);
+  row["pibt_commit_count"] =
+      py::int_(summary.bounded_local_pibt_commit_count);
+  row["bounded_local_pibt_wait_for_cycle_count"] =
+      py::int_(summary.bounded_local_pibt_wait_for_cycle_count);
+  row["pibt_wait_for_cycle_count"] =
+      py::int_(summary.bounded_local_pibt_wait_for_cycle_count);
+  row["bounded_local_pibt_handoff_count"] =
+      py::int_(summary.bounded_local_pibt_handoff_count);
+  row["pibt_handoff_count"] =
+      py::int_(summary.bounded_local_pibt_handoff_count);
+  row["bounded_local_pibt_candidate_bound_rejection_count"] =
+      py::int_(
+          summary
+              .bounded_local_pibt_candidate_bound_rejection_count);
+  row["bounded_local_pibt_candidate_materialization_count"] =
+      py::int_(
+          summary
+              .bounded_local_pibt_candidate_materialization_count);
+  row["bounded_local_pibt_not_applicable_count"] =
+      py::int_(summary.bounded_local_pibt_not_applicable_count);
+  row["bounded_local_pibt_proposal_batch_count"] =
+      py::int_(summary.bounded_local_pibt_proposal_batch_count);
+  row["bounded_local_pibt_proposed_action_count"] =
+      py::int_(summary.bounded_local_pibt_proposed_action_count);
+  row["bounded_local_pibt_committed_batch_count"] =
+      py::int_(summary.bounded_local_pibt_committed_batch_count);
+  row["bounded_local_pibt_committed_action_count"] =
+      py::int_(summary.bounded_local_pibt_committed_action_count);
+  row["bounded_local_pibt_inherited_action_count"] =
+      py::int_(summary.bounded_local_pibt_inherited_action_count);
+  row["bounded_local_pibt_blocker_move_attempt_count"] =
+      py::int_(summary.bounded_local_pibt_blocker_move_attempt_count);
+  row["bounded_local_pibt_backtrack_count"] =
+      py::int_(summary.bounded_local_pibt_backtrack_count);
+  row["bounded_local_pibt_cycle_guard_count"] =
+      py::int_(summary.bounded_local_pibt_cycle_guard_count);
+  row["bounded_local_pibt_rollback_count"] =
+      py::int_(summary.bounded_local_pibt_rollback_count);
+  row["bounded_local_pibt_fault_rejection_count"] =
+      py::int_(summary.bounded_local_pibt_fault_rejection_count);
+  row["bounded_local_pibt_prepare_rejection_count"] =
+      py::int_(summary.bounded_local_pibt_prepare_rejection_count);
+  row["bounded_local_pibt_commit_rejection_count"] =
+      py::int_(summary.bounded_local_pibt_commit_rejection_count);
+  row["bounded_local_pibt_max_inheritance_depth"] =
+      summary.bounded_local_pibt_max_inheritance_depth;
+  row["bounded_local_pibt_max_slice_bags"] =
+      summary.bounded_local_pibt_max_slice_bags;
+  row["bounded_local_pibt_max_slice_resources"] =
+      summary.bounded_local_pibt_max_slice_resources;
+  row["bounded_local_pibt_max_candidates_per_bag"] =
+      summary.bounded_local_pibt_max_candidates_per_bag;
+  row["bounded_local_pibt_max_transaction_credit_entries"] =
+      summary.bounded_local_pibt_max_transaction_credit_entries;
+  row["bounded_local_pibt_max_transaction_bag_entries"] =
+      summary.bounded_local_pibt_max_transaction_bag_entries;
+  row["bounded_local_pibt_max_transaction_junction_scalar_entries"] =
+      summary
+          .bounded_local_pibt_max_transaction_junction_scalar_entries;
+  row["bounded_local_pibt_max_transaction_action_deltas"] =
+      summary.bounded_local_pibt_max_transaction_action_deltas;
+  row["bounded_local_pibt_classical_completeness_claimed"] =
+      summary.bounded_local_pibt_classical_completeness_claimed;
   row["deadlock_count"] = summary.deadlock_count;
   row["resolved_deadlock_count"] = summary.resolved_deadlock_count;
   row["unresolved_deadlock_count"] = summary.unresolved_deadlock_count;
@@ -3118,6 +3355,10 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["full_cie_astar_runtime_fallback"] = false;
   row["global_reservation_scan_count"] = summary.global_reservation_scan_count;
   row["max_edges_selected_per_arrive"] = summary.max_edges_selected_per_arrive;
+  row["max_edges_selected_per_bag_per_decision"] =
+      summary.max_edges_selected_per_bag_per_decision;
+  row["max_actions_committed_per_pibt_batch"] =
+      summary.max_actions_committed_per_pibt_batch;
   row["release_selected_edge_count"] = summary.release_selected_edge_count;
   row["reservation_depth"] = 1;
   row["diagnostic_hops"] = summary.diagnostic_hops;
@@ -3138,6 +3379,8 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["max_source_queue_length"] = summary.max_source_queue_length;
   row["max_local_calendar_intervals"] = summary.max_local_calendar_intervals;
   row["max_corridor_calendar_intervals"] = summary.max_corridor_calendar_intervals;
+  row["max_same_directed_edge_inflight"] =
+      summary.max_same_directed_edge_inflight;
   row["max_candidate_count"] = summary.max_candidate_count;
   row["max_individual_wait"] = summary.max_individual_wait;
   row["max_source_queue_delay"] = summary.max_source_queue_delay;
@@ -3227,11 +3470,36 @@ py::list g4irsf11_event_candidate_rows(
     features["fault_message_age_seconds"] = candidate.fault_message_age_seconds;
     features["recent_visit_count"] = candidate.recent_visit_count;
     features["two_hop_queue_pressure"] = candidate.two_hop_queue_pressure;
+    features["current_goal_queue_length"] =
+        candidate.current_goal_queue_length;
+    features["target_goal_queue_length"] =
+        candidate.target_goal_queue_length;
+    features["target_goal_scheduled_incoming"] =
+        candidate.target_goal_scheduled_incoming;
+    features["current_goal_max_wait"] = candidate.current_goal_max_wait;
+    features["goal_conditioned_differential"] =
+        candidate.goal_conditioned_differential;
+    features["estimated_service_rate"] = candidate.estimated_service_rate;
+    features["service_weighted_pressure"] =
+        candidate.service_weighted_pressure;
+    features["first_edge_credit_required"] =
+        candidate.first_edge_credit_required;
+    features["first_edge_credit_matches"] =
+        candidate.first_edge_credit_matches;
+    features["first_edge_credit_valid"] =
+        candidate.first_edge_credit_valid;
+    features["first_edge_credit_slack_seconds"] =
+        candidate.first_edge_credit_slack_seconds;
 
     py::dict row;
     row["next_node"] = candidate.next_node;
     row["features"] = std::move(features);
     row["model_score"] = candidate.model_score;
+    // These are scorer outputs, not candidate input features. Keeping them
+    // outside features prevents accidental feedback into later training.
+    row["scorer_raw_score"] = candidate.scorer_raw_score;
+    row["scorer_raw_bottleneck"] =
+        candidate.scorer_raw_bottleneck;
     row["shield_allowed"] = candidate.shield_allowed;
     row["shield_reason"] = candidate.shield_reason;
     rows.append(std::move(row));
@@ -3268,6 +3536,41 @@ py::list g4irsf11_event_decision_rows(
     metadata["runtime_bag_id"] = decision.runtime_bag_id;
     metadata["model_score_semantics"] = "lower_is_better_cost";
     metadata["trace_kind"] = hold_attempts ? "hold_attempt" : "committed_edge_action";
+    metadata["scorer_id"] = decision.scorer_id;
+    // Requested and effective IDs differ only when the frozen scorer's risk
+    // gate abstains to the exact historical S0 score.
+    metadata["scorer_effective_id"] =
+        decision.scorer_effective_id;
+    metadata["scorer_risk_abstain"] =
+        decision.scorer_risk_abstain;
+    std::string scorer_risk_reasons;
+    for (const auto& reason : decision.scorer_risk_reasons) {
+      if (!scorer_risk_reasons.empty()) {
+        scorer_risk_reasons += ";";
+      }
+      scorer_risk_reasons += reason;
+    }
+    metadata["scorer_risk_reasons"] =
+        scorer_risk_reasons;
+    metadata["scorer_raw_prediction"] =
+        decision.scorer_raw_prediction;
+    metadata["scorer_raw_margin"] =
+        decision.scorer_raw_prediction >= 0
+            ? py::cast(decision.scorer_raw_margin)
+            : py::none();
+    const bool scorer_raw_fallback_disagreement =
+        decision.scorer_risk_abstain &&
+        decision.scorer_raw_prediction >= 0 &&
+        decision.model_prediction >= 0 &&
+        decision.scorer_raw_prediction !=
+            decision.model_prediction;
+    metadata["scorer_raw_fallback_disagreement"] =
+        scorer_raw_fallback_disagreement;
+    metadata["scorer_raw_score_semantics"] =
+        decision.scorer_id.rfind("S1_", 0) == 0 ||
+                decision.scorer_id.rfind("S2_", 0) == 0
+            ? "higher_is_better_frozen_adapter_score"
+            : "lower_is_better_cost";
 
     py::dict row;
     row["schema_id"] = "czr005.g4irsf11.decision_trace.v1";
@@ -3306,6 +3609,8 @@ py::list g4irsf11_event_decision_rows(
     row["model_fallback_disagreement"] =
         decision.fallback_selected_next >= 0 &&
         decision.fallback_selected_next != decision.model_prediction;
+    row["scorer_raw_fallback_disagreement"] =
+        scorer_raw_fallback_disagreement;
     row["candidate_ordering"] = "next_node_ascending";
     row["metadata"] = std::move(metadata);
     rows.append(std::move(row));
@@ -3372,6 +3677,88 @@ py::list g4irsf11_event_runtime_fault_rows(
   return rows;
 }
 
+py::list g4irsf12_event_runtime_credit_rows(
+    const std::vector<czr005::ics::EventRuntimeCreditAuditRow>& credit_events) {
+  py::list rows;
+  for (const auto& event : credit_events) {
+    py::dict row;
+    row["time"] = event.time;
+    row["action"] = event.action;
+    row["reason"] = event.reason;
+    row["credit_id"] = py::int_(event.credit_id);
+    row["from"] = event.from_node;
+    row["to"] = event.to_node;
+    row["goal"] = event.goal;
+    row["from_node"] = event.from_node;
+    row["to_node"] = event.to_node;
+    row["earliest"] = event.earliest;
+    row["latest"] = event.latest;
+    row["generation"] = py::int_(event.generation);
+    row["expiry"] = event.expiry;
+    row["capacity"] = event.capacity;
+    row["owner_or_unbound"] = event.owner_or_unbound;
+    row["fault_generation"] = event.fault_generation;
+    row["state"] = event.state;
+    row["task_id"] = event.task_id;
+    row["segment_id"] = event.segment_id;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf12_event_runtime_pibt_rows(
+    const std::vector<czr005::ics::EventRuntimePIBTAuditRow>& pibt_events) {
+  py::list rows;
+  for (const auto& event : pibt_events) {
+    py::dict row;
+    row["activation_id"] = py::int_(event.activation_id);
+    row["time"] = event.time;
+    row["trigger_node"] = event.trigger_node;
+    row["trigger_runtime_bag_id"] = event.trigger_runtime_bag_id;
+    row["mode"] = event.mode;
+    row["outcome"] = event.outcome;
+    row["blocker"] = event.blocker;
+    row["local_slice_bag_count"] = event.local_slice_bag_count;
+    row["local_slice_resource_count"] =
+        event.local_slice_resource_count;
+    row["local_slice_candidate_count"] =
+        event.local_slice_candidate_count;
+    row["proposed_action_count"] = event.proposed_action_count;
+    row["committed_action_count"] = event.committed_action_count;
+    row["inherited_action_count"] = event.inherited_action_count;
+    row["max_inheritance_depth"] = event.max_inheritance_depth;
+    row["backtrack_count"] = event.backtrack_count;
+    row["cycle_guard_count"] = event.cycle_guard_count;
+    row["rollback_count"] = event.rollback_count;
+    row["transaction_credit_entry_count"] =
+        event.transaction_credit_entry_count;
+    row["transaction_bag_entry_count"] =
+        event.transaction_bag_entry_count;
+    row["transaction_junction_scalar_entry_count"] =
+        event.transaction_junction_scalar_entry_count;
+    row["transaction_action_delta_count"] =
+        event.transaction_action_delta_count;
+    py::list actions;
+    for (const auto& action : event.actions) {
+      py::dict action_row;
+      action_row["runtime_bag_id"] = action.bag_id;
+      action_row["from_node"] = action.from_node;
+      action_row["next_node"] = action.next_node;
+      action_row["priority_rank"] = action.priority_rank;
+      action_row["inheritance_depth"] = action.inheritance_depth;
+      action_row["inherited"] = action.inherited;
+      action_row["expected_fault_generation"] =
+          py::int_(action.expected_fault_generation);
+      action_row["claimed_resource_count"] =
+          static_cast<int>(action.claimed_resources.size());
+      actions.append(std::move(action_row));
+    }
+    row["actions"] = std::move(actions);
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
 py::dict g4irsf11_event_runtime_from_records(
     const std::vector<NodeRecordTuple>& node_records,
     const std::vector<EdgeRecordTuple>& edge_records,
@@ -3398,7 +3785,31 @@ py::dict g4irsf11_event_runtime_from_records(
     bool enable_deadlock_escape,
     bool enable_fault_policy,
     const std::string& scenario,
-    double scale) {
+    double scale,
+    const std::string& resource_semantics,
+    double entry_headway_seconds,
+    const std::string& pressure_mode,
+    double pressure_weight,
+    double pressure_age_weight,
+    double pressure_distance_bias,
+    const std::string& admission_mode,
+    double credit_validity_seconds,
+    double credit_snapshot_max_age_seconds,
+    int credit_capacity_per_edge,
+    int credit_lifecycle_limit,
+    const std::string& pibt_mode,
+    int pibt_max_ready_bags,
+    int pibt_max_local_resources,
+    int pibt_max_candidates_per_bag,
+    const std::string& scorer_mode,
+    const std::vector<std::vector<double>>& scorer_w1,
+    const std::vector<double>& scorer_b1,
+    const std::vector<double>& scorer_w2,
+    double scorer_b2,
+    double scorer_risk_margin_threshold,
+    double scorer_risk_bottleneck_threshold,
+    const std::string& scorer_model_sha256,
+    const std::string& framework_mode) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   std::vector<czr005::ics::EventRuntimeBagRequest> requests;
   requests.reserve(bag_records.size());
@@ -3450,6 +3861,34 @@ py::dict g4irsf11_event_runtime_from_records(
   config.enable_pibt_lite = enable_pibt_lite;
   config.enable_deadlock_escape = enable_deadlock_escape;
   config.enable_fault_policy = enable_fault_policy;
+  config.resource_semantics = resource_semantics;
+  config.entry_headway_seconds = entry_headway_seconds;
+  config.pressure_mode = pressure_mode;
+  config.pressure_weight = pressure_weight;
+  config.pressure_age_weight = pressure_age_weight;
+  config.pressure_distance_bias = pressure_distance_bias;
+  config.admission_mode = admission_mode;
+  config.credit_validity_seconds = credit_validity_seconds;
+  config.credit_snapshot_max_age_seconds =
+      credit_snapshot_max_age_seconds;
+  config.credit_capacity_per_edge = credit_capacity_per_edge;
+  config.credit_lifecycle_limit = credit_lifecycle_limit;
+  config.pibt_mode = pibt_mode;
+  config.pibt_max_ready_bags = pibt_max_ready_bags;
+  config.pibt_max_local_resources = pibt_max_local_resources;
+  config.pibt_max_candidates_per_bag =
+      pibt_max_candidates_per_bag;
+  config.scorer_mode = scorer_mode;
+  config.scorer_w1 = scorer_w1;
+  config.scorer_b1 = scorer_b1;
+  config.scorer_w2 = scorer_w2;
+  config.scorer_b2 = scorer_b2;
+  config.scorer_risk_margin_threshold =
+      scorer_risk_margin_threshold;
+  config.scorer_risk_bottleneck_threshold =
+      scorer_risk_bottleneck_threshold;
+  config.scorer_model_sha256 = scorer_model_sha256;
+  config.framework_mode = framework_mode;
 
   czr005::ics::EventDrivenJunctionRuntime runtime(graph, config);
   const auto result = runtime.run(requests, faults);
@@ -3459,6 +3898,21 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["scale"] = scale;
   trace_context["candidate_ordering"] = "next_node_ascending";
   trace_context["model_score_semantics"] = "lower_is_better_cost";
+  trace_context["scorer_id"] = result.summary.scorer_id;
+  trace_context["scorer_model_sha256"] =
+      result.summary.scorer_model_sha256;
+  trace_context["scorer_score_direction"] =
+      result.summary.scorer_score_direction;
+  trace_context["scorer_claim_boundary"] =
+      result.summary.scorer_claim_boundary;
+  trace_context["scorer_out_of_distribution_diagnostic"] =
+      result.summary.scorer_out_of_distribution_diagnostic;
+  trace_context["scorer_promotion_eligible"] = false;
+  trace_context["scorer_teacher_input_count"] = 0;
+  trace_context["scorer_future_route_input_count"] = 0;
+  trace_context["scorer_future_schedule_input_count"] = 0;
+  trace_context["scorer_posthoc_input_count"] = 0;
+  trace_context["scorer_runtime_global_scan_count"] = 0;
   trace_context["reservation_depth"] = 1;
   trace_context["diagnostic_hops"] = diagnostic_hops;
   trace_context["trace_limit"] = trace_limit;
@@ -3473,9 +3927,66 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["original_task_id_rewritten"] = false;
   trace_context["sensor_loss_supported"] = true;
   trace_context["enable_source_admission"] = enable_source_admission;
+  trace_context["admission_mode"] = result.summary.admission_mode;
+  trace_context["admission_mode_echo"] =
+      result.summary.admission_mode_echo;
   trace_context["source_admission_snapshot_scope"] =
       "outgoing_neighbour_beacon_plus_local_physical_edge";
+  trace_context["first_edge_credit_claim_boundary"] =
+      result.summary.first_edge_credit_claim_boundary;
+  trace_context["first_edge_credit_fields"] =
+      "credit_id,from,to,goal,earliest,latest,generation,expiry,capacity,"
+      "owner_or_unbound,fault_generation";
+  trace_context["first_edge_credit_physical_interlock_bypass"] = false;
+  trace_context["first_edge_credit_future_route_count"] = 0;
+  trace_context["first_edge_credit_global_scan_count"] = 0;
+  trace_context["credit_validity_seconds"] = credit_validity_seconds;
+  trace_context["credit_snapshot_max_age_seconds"] =
+      credit_snapshot_max_age_seconds;
+  trace_context["credit_capacity_per_edge"] = credit_capacity_per_edge;
+  trace_context["credit_lifecycle_limit"] = credit_lifecycle_limit;
+  trace_context["credit_lifecycle_storage"] =
+      "active_only_ledger_plus_bounded_recent_ring_with_total_counters";
   trace_context["enable_fault_policy"] = enable_fault_policy;
+  trace_context["resource_semantics_id"] =
+      result.summary.resource_semantics_id;
+  trace_context["resource_semantics_echo"] =
+      result.summary.resource_semantics_echo;
+  trace_context["entry_headway_seconds"] = entry_headway_seconds;
+  trace_context["entry_headway_claim_boundary"] =
+      "sensitivity_only_until_authoritative_physical_evidence";
+  trace_context["pressure_mode"] = result.summary.pressure_mode;
+  trace_context["pressure_mode_echo"] =
+      result.summary.pressure_mode_echo;
+  trace_context["pibt_mode"] = result.summary.pibt_mode;
+  trace_context["pibt_mode_echo"] =
+      result.summary.pibt_mode_echo;
+  trace_context["scorer_mode_echo"] =
+      result.summary.scorer_mode_echo;
+  trace_context["framework_mode_echo"] =
+      result.summary.framework_mode_echo;
+  trace_context["pibt_max_depth"] =
+      result.summary.pibt_max_depth;
+  trace_context["declared_max_events"] =
+      result.summary.declared_max_events;
+  trace_context["local_queue_capacity"] =
+      result.summary.local_queue_capacity;
+  trace_context["pibt_max_ready_bags"] =
+      result.summary.pibt_max_ready_bags;
+  trace_context["pibt_max_local_resources"] =
+      result.summary.pibt_max_local_resources;
+  trace_context["pibt_max_candidates_per_bag"] =
+      result.summary.pibt_max_candidates_per_bag;
+  trace_context["bounded_local_pibt_claim_boundary"] =
+      result.summary.bounded_local_pibt_claim_boundary;
+  trace_context["bounded_local_pibt_classical_completeness_claimed"] =
+      false;
+  trace_context["bounded_local_pibt_transaction_credit_scope"] =
+      "selected_action_credit_ids_only_bounded_by_pibt_max_ready_bags";
+  trace_context["bounded_local_pibt_transaction_state_scope"] =
+      "scalar_and_interval_deltas_O_selected_actions_no_full_queue_calendar_or_ledger_copy";
+  trace_context["enable_pibt_lite_semantics"] =
+      "same_bag_alternative_edge_scan_only";
   trace_context["physical_fault_interlock_always_enabled"] = true;
   trace_context["fault_policy_off_semantics"] =
       "ignore_advertised_fault_and_disable_fault_driven_reroute_while_interlock_holds";
@@ -3484,7 +3995,7 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["fault_target_edge_attempt_semantics"] =
       "pre_advertised-policy_argmin_targets_physically_faulted_edge";
   trace_context["fault_audit_trace_cap"] =
-      "uncapped_fault_control_and_exposure_events";
+      "shared_trace_limit;zero_means_summary_only_no_fault_rows";
   trace_context["fault_audit_global_scan_used_for_action_selection"] = false;
   trace_context["inflight_at_fault_semantics"] =
       "grandfathered_audit_not_unsafe_entry";
@@ -3502,6 +4013,10 @@ py::dict g4irsf11_event_runtime_from_records(
       g4irsf11_event_decision_rows(result.hold_attempts, scenario, scale, true);
   payload["junction_state"] = g4irsf11_event_runtime_junction_rows(result.junctions);
   payload["fault_events"] = g4irsf11_event_runtime_fault_rows(result.fault_events);
+  payload["credit_events"] =
+      g4irsf12_event_runtime_credit_rows(result.credit_events);
+  payload["pibt_events"] =
+      g4irsf12_event_runtime_pibt_rows(result.pibt_events);
   payload["trace_context"] = std::move(trace_context);
   return payload;
 }
@@ -3700,7 +4215,37 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("enable_deadlock_escape") = true,
              py::arg("enable_fault_policy") = true,
              py::arg("scenario") = std::string("manual"),
-             py::arg("scale") = 1.0);
+             py::arg("scale") = 1.0,
+             py::arg("resource_semantics") =
+                 std::string("R0_current_undirected_full_travel_exclusive"),
+             py::arg("entry_headway_seconds") = 1.0e-3,
+             py::arg("pressure_mode") =
+                 std::string("absolute_downstream_queue_penalty"),
+             py::arg("pressure_weight") = 2.0,
+             py::arg("pressure_age_weight") = 0.05,
+             py::arg("pressure_distance_bias") = 0.25,
+             py::arg("admission_mode") = std::string("legacy_unbound"),
+             py::arg("credit_validity_seconds") = 1.0,
+             py::arg("credit_snapshot_max_age_seconds") = 1.0,
+             py::arg("credit_capacity_per_edge") = 1,
+             py::arg("credit_lifecycle_limit") = 512,
+             py::arg("pibt_mode") = std::string("P0"),
+             py::arg("pibt_max_ready_bags") = 8,
+             py::arg("pibt_max_local_resources") = 32,
+             py::arg("pibt_max_candidates_per_bag") = 8,
+             py::arg("scorer_mode") =
+                 std::string("S0_current_handwritten_static_score"),
+             py::arg("scorer_w1") =
+                 std::vector<std::vector<double>>{},
+             py::arg("scorer_b1") = std::vector<double>{},
+             py::arg("scorer_w2") = std::vector<double>{},
+             py::arg("scorer_b2") = 0.0,
+             py::arg("scorer_risk_margin_threshold") = 1.0,
+             py::arg("scorer_risk_bottleneck_threshold") = 5.0,
+             py::arg("scorer_model_sha256") =
+                 std::string(),
+             py::arg("framework_mode") =
+                 std::string("event_loop_one_step"));
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,

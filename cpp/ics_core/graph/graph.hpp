@@ -28,11 +28,27 @@ struct Edge {
 
 class Graph {
  public:
-  void add_node(Node node) { nodes_.emplace(node.location, std::move(node)); }
+  void add_node(Node node) {
+    const int location = node.location;
+    const auto inserted =
+        nodes_.emplace(location, std::move(node));
+    if (inserted.second) {
+      incoming_degrees_.emplace(location, 0);
+    }
+  }
 
   void add_edge(Edge edge) {
+    // Validate both endpoints before publishing any part of the edge so a
+    // malformed insertion cannot leave the authoritative edge table and the
+    // cached incoming-degree index out of sync.
+    (void)node(edge.start);
+    (void)node(edge.end);
     const auto key = edge_key(edge.start, edge.end);
-    edges_.emplace(key, edge);
+    const auto inserted = edges_.emplace(key, edge);
+    if (!inserted.second) {
+      return;
+    }
+    ++incoming_degrees_.at(edge.end);
     auto& outgoing = node(edge.start).outgoing;
     if (std::find(outgoing.begin(), outgoing.end(), edge.end) == outgoing.end()) {
       outgoing.push_back(edge.end);
@@ -86,6 +102,21 @@ class Graph {
   [[nodiscard]] std::size_t node_count() const { return nodes_.size(); }
   [[nodiscard]] std::size_t edge_count() const { return edges_.size(); }
 
+  [[nodiscard]] std::vector<int> node_locations() const {
+    std::vector<int> locations;
+    locations.reserve(nodes_.size());
+    for (const auto& entry : nodes_) {
+      locations.push_back(entry.first);
+    }
+    std::sort(locations.begin(), locations.end());
+    return locations;
+  }
+
+  [[nodiscard]] int incoming_degree(int location) const {
+    (void)node(location);
+    return incoming_degrees_.at(location);
+  }
+
   [[nodiscard]] int node_type_count(int node_type) const {
     int count = 0;
     for (const auto& entry : nodes_) {
@@ -103,6 +134,7 @@ class Graph {
 
   std::unordered_map<int, Node> nodes_;
   std::unordered_map<long long, Edge> edges_;
+  std::unordered_map<int, int> incoming_degrees_;
   std::vector<std::vector<double>> heuristic_;
 };
 

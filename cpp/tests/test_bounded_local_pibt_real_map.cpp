@@ -6,6 +6,7 @@
 #include <limits>
 #include <map>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -109,6 +110,9 @@ struct CallbackState {
   std::vector<BoundedLocalPIBTAction> published;
   bool prepare_accept = true;
   bool commit_accept = true;
+  bool throw_prepare = false;
+  bool throw_commit = false;
+  bool throw_rollback = false;
   bool mutate_fault_after_prepare = false;
   LocalPIBTResourceKey mutate_resource = 0;
   int prepare_calls = 0;
@@ -128,10 +132,16 @@ BoundedLocalPIBTCallbacks callbacks(CallbackState& state) {
     if (state.mutate_fault_after_prepare) {
       ++state.faults[state.mutate_resource].generation;
     }
+    if (state.throw_prepare) {
+      throw std::runtime_error("prepare callback failure");
+    }
     return state.prepare_accept;
   };
   value.commit = [&](const std::vector<BoundedLocalPIBTAction>& actions) {
     ++state.commit_calls;
+    if (state.throw_commit) {
+      throw std::runtime_error("commit callback failure");
+    }
     if (!state.commit_accept) {
       return false;
     }
@@ -141,6 +151,9 @@ BoundedLocalPIBTCallbacks callbacks(CallbackState& state) {
   };
   value.rollback = [&](const std::vector<BoundedLocalPIBTAction>&) {
     ++state.rollback_calls;
+    if (state.throw_rollback) {
+      throw std::runtime_error("rollback callback failure");
+    }
     state.staged.clear();
   };
   return value;
@@ -202,7 +215,8 @@ void test_p0_to_p4_depth_ladder(Checks& checks) {
                    "bounded local resolver must never claim classical PIBT completeness");
     checks.require(result.prepare_call_count == 1 &&
                        result.commit_call_count == 1 &&
-                       result.rollback_call_count == 0,
+                       result.rollback_call_count == 0 &&
+                       result.proposal_validation_count == 1,
                    "successful chain must use one batch prepare and one atomic commit");
     checks.require(state.published.size() == result.actions.size(),
                    "callback must publish the same complete action batch");
@@ -388,6 +402,107 @@ void test_two_phase_rollback_and_fault_revalidation(Checks& checks) {
   checks.require(stale.fault_state_read_count >= 3 &&
                      stale.fault_revalidation_count == 2,
                  "selected edge must be read during propose and both validation barriers");
+}
+
+void test_callback_exceptions_fail_stop(Checks& checks) {
+  const auto move = candidate(550, 551, 0.0, 9);
+  const std::vector<BoundedLocalPIBTReadyBag> bags{
+      ready_bag(1, 550, 999, 100.0, {move}),
+  };
+
+  CallbackState prepare_throw;
+  prepare_throw.faults[move.edge_resource] = {9, false};
+  prepare_throw.throw_prepare = true;
+  bool saw_prepare_exception = false;
+  try {
+    (void)BoundedLocalPIBTResolver().resolve(
+        bags,
+        {},
+        config(BoundedLocalPIBTMode::kP0),
+        callbacks(prepare_throw));
+  } catch (const std::runtime_error& error) {
+    saw_prepare_exception =
+        std::string(error.what()) == "prepare callback failure";
+  }
+  checks.require(
+      saw_prepare_exception && prepare_throw.prepare_calls == 1 &&
+          prepare_throw.commit_calls == 0 &&
+          prepare_throw.rollback_calls == 1 &&
+          prepare_throw.staged.empty() &&
+          prepare_throw.published.empty(),
+      "a prepare exception must roll back exactly once and propagate to the caller");
+
+  CallbackState commit_throw;
+  commit_throw.faults[move.edge_resource] = {9, false};
+  commit_throw.throw_commit = true;
+  bool saw_commit_exception = false;
+  try {
+    (void)BoundedLocalPIBTResolver().resolve(
+        bags,
+        {},
+        config(BoundedLocalPIBTMode::kP0),
+        callbacks(commit_throw));
+  } catch (const std::runtime_error& error) {
+    saw_commit_exception =
+        std::string(error.what()) == "commit callback failure";
+  }
+  checks.require(
+      saw_commit_exception && commit_throw.prepare_calls == 1 &&
+          commit_throw.commit_calls == 1 &&
+          commit_throw.rollback_calls == 1 &&
+          commit_throw.staged.empty() &&
+          commit_throw.published.empty(),
+      "a commit exception must roll back exactly once and propagate to the caller");
+
+  CallbackState rejected_prepare_rollback_throw;
+  rejected_prepare_rollback_throw.faults[move.edge_resource] =
+      {9, false};
+  rejected_prepare_rollback_throw.prepare_accept = false;
+  rejected_prepare_rollback_throw.throw_rollback = true;
+  bool saw_prepare_rollback_exception = false;
+  try {
+    (void)BoundedLocalPIBTResolver().resolve(
+        bags,
+        {},
+        config(BoundedLocalPIBTMode::kP0),
+        callbacks(rejected_prepare_rollback_throw));
+  } catch (const std::runtime_error& error) {
+    saw_prepare_rollback_exception =
+        std::string(error.what()) == "rollback callback failure";
+  }
+  checks.require(
+      saw_prepare_rollback_exception &&
+          rejected_prepare_rollback_throw.prepare_calls == 1 &&
+          rejected_prepare_rollback_throw.commit_calls == 0 &&
+          rejected_prepare_rollback_throw.rollback_calls == 1 &&
+          !rejected_prepare_rollback_throw.staged.empty() &&
+          rejected_prepare_rollback_throw.published.empty(),
+      "rollback failure after prepare rejection must propagate instead of returning a normal result");
+
+  CallbackState rejected_commit_rollback_throw;
+  rejected_commit_rollback_throw.faults[move.edge_resource] =
+      {9, false};
+  rejected_commit_rollback_throw.commit_accept = false;
+  rejected_commit_rollback_throw.throw_rollback = true;
+  bool saw_commit_rollback_exception = false;
+  try {
+    (void)BoundedLocalPIBTResolver().resolve(
+        bags,
+        {},
+        config(BoundedLocalPIBTMode::kP0),
+        callbacks(rejected_commit_rollback_throw));
+  } catch (const std::runtime_error& error) {
+    saw_commit_rollback_exception =
+        std::string(error.what()) == "rollback callback failure";
+  }
+  checks.require(
+      saw_commit_rollback_exception &&
+          rejected_commit_rollback_throw.prepare_calls == 1 &&
+          rejected_commit_rollback_throw.commit_calls == 1 &&
+          rejected_commit_rollback_throw.rollback_calls == 1 &&
+          !rejected_commit_rollback_throw.staged.empty() &&
+          rejected_commit_rollback_throw.published.empty(),
+      "rollback failure after commit rejection must propagate instead of returning a normal result");
 }
 
 std::vector<int> canonical_node_locations(const Graph& graph) {
@@ -651,6 +766,7 @@ int main() {
   test_visiting_guard_and_candidate_backtracking(checks);
   test_cross_blocker_combination_backtracking(checks);
   test_two_phase_rollback_and_fault_revalidation(checks);
+  test_callback_exceptions_fail_stop(checks);
   test_real_map_merge_split_and_bridge_motifs(checks);
   test_fail_closed_slice_contract(checks);
   if (checks.failures != 0) {

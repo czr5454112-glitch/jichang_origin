@@ -136,6 +136,7 @@ CANONICAL_TRACE_TOP_LEVEL = frozenset(
         "short_history",
         "full_astar_used",
         "model_fallback_disagreement",
+        "scorer_raw_fallback_disagreement",
         "candidate_ordering",
         "candidate_order_digest",
         "metadata",

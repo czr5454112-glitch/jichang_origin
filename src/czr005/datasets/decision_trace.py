@@ -45,6 +45,42 @@ EVENT_RUNTIME_FEATURE_SOURCES: dict[str, tuple[str, ...]] = {
     ),
     "recent_visit_count": ("short_history", "candidate_records[].next_node"),
     "two_hop_queue_pressure": ("bounded_two_hop.queue_summary",),
+    "current_goal_queue_length": ("local_current.goal_conditioned_queue_length",),
+    "target_goal_queue_length": ("local_neighbor.goal_conditioned_queue_length",),
+    "target_goal_scheduled_incoming": (
+        "local_neighbor.goal_conditioned_scheduled_incoming",
+    ),
+    "current_goal_max_wait": ("local_current.goal_conditioned_max_wait", "event_time"),
+    "goal_conditioned_differential": (
+        "local_current.goal_conditioned_queue_length",
+        "local_neighbor.goal_conditioned_queue_length",
+        "local_neighbor.goal_conditioned_scheduled_incoming",
+    ),
+    "estimated_service_rate": (
+        "local_edge.service_duration",
+        "local_neighbor.service_duration",
+    ),
+    "service_weighted_pressure": (
+        "candidate_records[].features.goal_conditioned_differential",
+        "candidate_records[].features.estimated_service_rate",
+    ),
+    "first_edge_credit_required": (
+        "runtime.admission_mode",
+        "bag.first_edge_credit_consumed",
+    ),
+    "first_edge_credit_matches": (
+        "active_first_edge_credit.to_node",
+        "candidate_records[].next_node",
+    ),
+    "first_edge_credit_valid": (
+        "active_first_edge_credit.validation_state",
+        "event_time",
+    ),
+    "first_edge_credit_slack_seconds": (
+        "active_first_edge_credit.latest",
+        "active_first_edge_credit.expiry",
+        "event_time",
+    ),
 }
 
 # These fields must never appear in a runtime decision row, even if nested.
@@ -134,6 +170,7 @@ _ALLOWED_TOP_LEVEL = frozenset(
         "short_history",
         "full_astar_used",
         "model_fallback_disagreement",
+        "scorer_raw_fallback_disagreement",
         "candidate_ordering",
         "candidate_order_digest",
         "metadata",
@@ -299,6 +336,8 @@ def _candidate_records_from_row(row: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "next_node",
                 "features",
                 "model_score",
+                "scorer_raw_score",
+                "scorer_raw_bottleneck",
                 "shield_allowed",
                 "shield_reason",
             }
@@ -313,6 +352,30 @@ def _candidate_records_from_row(row: Mapping[str, Any]) -> list[dict[str, Any]]:
                     raw_record.get("model_score"), f"candidate_records[{index}].model_score"
                 ),
             }
+            raw_diagnostic_fields = {
+                "scorer_raw_score",
+                "scorer_raw_bottleneck",
+            }
+            present_raw_diagnostics = raw_diagnostic_fields & set(raw_record)
+            if present_raw_diagnostics and present_raw_diagnostics != raw_diagnostic_fields:
+                raise DecisionTraceValidationError(
+                    f"candidate_records[{index}] raw scorer diagnostics must include "
+                    "both scorer_raw_score and scorer_raw_bottleneck"
+                )
+            if present_raw_diagnostics:
+                record["scorer_raw_score"] = _finite_number(
+                    raw_record["scorer_raw_score"],
+                    f"candidate_records[{index}].scorer_raw_score",
+                )
+                raw_bottleneck = _finite_number(
+                    raw_record["scorer_raw_bottleneck"],
+                    f"candidate_records[{index}].scorer_raw_bottleneck",
+                )
+                if raw_bottleneck < 0.0:
+                    raise DecisionTraceValidationError(
+                        f"candidate_records[{index}].scorer_raw_bottleneck cannot be negative"
+                    )
+                record["scorer_raw_bottleneck"] = raw_bottleneck
             if "shield_allowed" in raw_record:
                 record["shield_allowed"] = _required_bool(
                     raw_record["shield_allowed"], f"candidate_records[{index}].shield_allowed"
@@ -522,6 +585,151 @@ def canonicalise_decision_row(
             "model_fallback_disagreement must be true exactly when model and fallback actions differ"
         )
 
+    raw_prediction_value = merged_metadata.get("scorer_raw_prediction")
+    raw_prediction: int | None
+    if raw_prediction_value is None:
+        raw_prediction = None
+    else:
+        raw_prediction = _required_int(
+            raw_prediction_value, "metadata.scorer_raw_prediction"
+        )
+        if raw_prediction < 0:
+            raw_prediction = None
+        elif raw_prediction not in candidate_nodes:
+            raise DecisionTraceValidationError(
+                "metadata.scorer_raw_prediction must belong to candidate_next_nodes"
+            )
+    raw_record_presence = [
+        "scorer_raw_score" in record for record in candidate_records
+    ]
+    if any(raw_record_presence) and not all(raw_record_presence):
+        raise DecisionTraceValidationError(
+            "raw scorer diagnostics must be present on every candidate or none"
+        )
+    if all(raw_record_presence):
+        raw_semantics = _required_text(
+            merged_metadata.get("scorer_raw_score_semantics"),
+            "metadata.scorer_raw_score_semantics",
+        )
+        if raw_semantics not in {
+            "higher_is_better_frozen_adapter_score",
+            "lower_is_better_cost",
+        }:
+            raise DecisionTraceValidationError(
+                "metadata.scorer_raw_score_semantics is unsupported"
+            )
+        if raw_prediction is None:
+            raise DecisionTraceValidationError(
+                "metadata.scorer_raw_prediction is required with raw scorer diagnostics"
+            )
+        raw_margin = _finite_number(
+            merged_metadata.get("scorer_raw_margin"),
+            "metadata.scorer_raw_margin",
+        )
+        if raw_margin < 0.0:
+            raise DecisionTraceValidationError(
+                "metadata.scorer_raw_margin cannot be negative"
+            )
+        if raw_semantics == "higher_is_better_frozen_adapter_score":
+            raw_ranking = sorted(
+                candidate_records,
+                key=lambda record: (
+                    -float(record["scorer_raw_score"]),
+                    int(record["next_node"]),
+                ),
+            )
+            expected_raw_margin = (
+                float(raw_ranking[0]["scorer_raw_score"])
+                - float(raw_ranking[1]["scorer_raw_score"])
+                if len(raw_ranking) > 1
+                else 999.0
+            )
+        else:
+            raw_ranking = sorted(
+                candidate_records,
+                key=lambda record: (
+                    float(record["scorer_raw_score"]),
+                    int(record["next_node"]),
+                ),
+            )
+            expected_raw_margin = (
+                float(raw_ranking[1]["scorer_raw_score"])
+                - float(raw_ranking[0]["scorer_raw_score"])
+                if len(raw_ranking) > 1
+                else 999.0
+            )
+        expected_raw_prediction = int(raw_ranking[0]["next_node"])
+        if raw_prediction != expected_raw_prediction:
+            raise DecisionTraceValidationError(
+                "metadata.scorer_raw_prediction does not match raw candidate scores"
+            )
+        if not math.isclose(
+            raw_margin,
+            expected_raw_margin,
+            rel_tol=1.0e-10,
+            abs_tol=1.0e-10,
+        ):
+            raise DecisionTraceValidationError(
+                "metadata.scorer_raw_margin does not match raw candidate scores"
+            )
+    risk_abstain_value = merged_metadata.get("scorer_risk_abstain", False)
+    risk_abstain = _required_bool(
+        risk_abstain_value, "metadata.scorer_risk_abstain"
+    )
+    raw_fallback_disagreement = (
+        risk_abstain
+        and raw_prediction is not None
+        and raw_prediction != model_prediction
+    )
+    provided_raw_disagreement = adapted.get(
+        "scorer_raw_fallback_disagreement"
+    )
+    if provided_raw_disagreement is not None and _required_bool(
+        provided_raw_disagreement,
+        "scorer_raw_fallback_disagreement",
+    ) != raw_fallback_disagreement:
+        raise DecisionTraceValidationError(
+            "scorer_raw_fallback_disagreement must be true exactly when "
+            "the raw scorer and post-risk prediction differ"
+        )
+    metadata_raw_disagreement = merged_metadata.get(
+        "scorer_raw_fallback_disagreement"
+    )
+    if metadata_raw_disagreement is not None and _required_bool(
+        metadata_raw_disagreement,
+        "metadata.scorer_raw_fallback_disagreement",
+    ) != raw_fallback_disagreement:
+        raise DecisionTraceValidationError(
+            "metadata.scorer_raw_fallback_disagreement does not match "
+            "the raw/post-risk prediction audit"
+        )
+    risk_gate_triggered = _required_bool(
+        adapted.get("risk_gate_triggered"), "risk_gate_triggered"
+    )
+    if risk_abstain and not risk_gate_triggered:
+        raise DecisionTraceValidationError(
+            "scorer risk abstention requires risk_gate_triggered"
+        )
+    requested_scorer = merged_metadata.get("scorer_id")
+    effective_scorer = merged_metadata.get("scorer_effective_id")
+    if requested_scorer is not None and effective_scorer is not None:
+        requested_scorer = _required_text(
+            requested_scorer, "metadata.scorer_id"
+        )
+        effective_scorer = _required_text(
+            effective_scorer, "metadata.scorer_effective_id"
+        )
+        expected_effective = (
+            "S0_current_handwritten_static_score"
+            if risk_abstain
+            else requested_scorer
+        )
+        if effective_scorer != expected_effective:
+            raise DecisionTraceValidationError(
+                "metadata.scorer_effective_id does not match requested/risk "
+                "fallback semantics"
+            )
+
     history_raw = adapted.get("short_history", [])
     if not isinstance(history_raw, Sequence) or isinstance(history_raw, (str, bytes, bytearray)):
         raise DecisionTraceValidationError("short_history must be an array")
@@ -560,7 +768,7 @@ def canonicalise_decision_row(
         "model_prediction": model_prediction,
         "model_score_semantics": MODEL_SCORE_SEMANTICS,
         "model_margin": model_margin,
-        "risk_gate_triggered": _required_bool(adapted.get("risk_gate_triggered"), "risk_gate_triggered"),
+        "risk_gate_triggered": risk_gate_triggered,
         "fallback_selected_next": fallback_selected_next,
         "selected_next": selected_next,
         "decision_source": _required_text(adapted.get("decision_source"), "decision_source"),
@@ -569,6 +777,7 @@ def canonicalise_decision_row(
         "short_history": short_history,
         "full_astar_used": False,
         "model_fallback_disagreement": disagreement,
+        "scorer_raw_fallback_disagreement": raw_fallback_disagreement,
         "candidate_ordering": CANDIDATE_ORDERING,
         "candidate_order_digest": candidate_digest,
         "metadata": _canonical_metadata(merged_metadata),
@@ -689,6 +898,11 @@ def decision_trace_schema() -> dict[str, Any]:
                             "additionalProperties": {"type": ["number", "integer", "boolean"]},
                         },
                         "model_score": finite_number,
+                        "scorer_raw_score": finite_number,
+                        "scorer_raw_bottleneck": {
+                            "type": "number",
+                            "minimum": 0,
+                        },
                         "shield_allowed": {"type": "boolean"},
                         "shield_reason": {"type": "string"},
                     },
@@ -725,6 +939,7 @@ def decision_trace_schema() -> dict[str, Any]:
             "short_history": {"type": "array", "maxItems": 8, "items": {"type": "integer"}},
             "full_astar_used": {"const": False},
             "model_fallback_disagreement": {"type": "boolean"},
+            "scorer_raw_fallback_disagreement": {"type": "boolean"},
             "candidate_ordering": {"const": CANDIDATE_ORDERING},
             "candidate_order_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
             "metadata": {
@@ -810,6 +1025,51 @@ def feature_lineage_rows() -> list[dict[str, Any]]:
         "congestion_beacon.advertised_fault": ("bounded_neighbor_beacon", "decision_time"),
         "congestion_beacon.fault_message_timestamp": ("bounded_neighbor_beacon", "decision_time"),
         "bounded_two_hop.queue_summary": ("bounded_two_hop_beacon", "decision_time"),
+        "local_current.goal_conditioned_queue_length": (
+            "junction_controller_local_state",
+            "decision_time",
+        ),
+        "local_current.goal_conditioned_max_wait": (
+            "junction_controller_local_state",
+            "decision_time",
+        ),
+        "local_neighbor.goal_conditioned_queue_length": (
+            "bounded_neighbor_state",
+            "decision_time",
+        ),
+        "local_neighbor.goal_conditioned_scheduled_incoming": (
+            "bounded_neighbor_state",
+            "decision_time",
+        ),
+        "local_edge.service_duration": (
+            "official_map_directed_edge",
+            "static",
+        ),
+        "local_neighbor.service_duration": (
+            "official_map_local_node",
+            "static",
+        ),
+        "runtime.admission_mode": ("frozen_runtime_config", "pre_run"),
+        "bag.first_edge_credit_consumed": (
+            "bag_agent_local_state",
+            "decision_time",
+        ),
+        "active_first_edge_credit.to_node": (
+            "source_local_credit_ledger",
+            "decision_time",
+        ),
+        "active_first_edge_credit.validation_state": (
+            "source_local_credit_ledger",
+            "decision_time",
+        ),
+        "active_first_edge_credit.latest": (
+            "source_local_credit_ledger",
+            "decision_time",
+        ),
+        "active_first_edge_credit.expiry": (
+            "source_local_credit_ledger",
+            "decision_time",
+        ),
         "local_junction.queue_length": ("junction_controller_local_state", "decision_time"),
         "local_junction.next_available_time": ("junction_controller_local_state", "decision_time"),
         "local_junction.faulted_outgoing_count": ("junction_controller_local_state", "decision_time"),
@@ -873,12 +1133,53 @@ def feature_lineage_rows() -> list[dict[str, Any]]:
         [*feature_paths, "runtime.model_parameters"],
         derivation="cost/score under trace metadata score semantics",
     )
+    add(
+        "candidate_records[].scorer_raw_score",
+        "runtime",
+        "model_diagnostic_output",
+        "requested_local_scorer",
+        "decision_time",
+        [*feature_paths, "runtime.model_parameters"],
+        derivation=(
+            "raw requested-scorer output retained for audit; never a model input"
+        ),
+    )
+    add(
+        "candidate_records[].scorer_raw_bottleneck",
+        "runtime",
+        "risk_diagnostic_output",
+        "requested_local_scorer",
+        "decision_time",
+        [
+            "candidate_records[].next_node",
+            "congestion_beacon.advertised_fault",
+            "graph.outgoing_adjacency",
+        ],
+        derivation=(
+            "non-negative local bottleneck diagnostic retained outside features"
+        ),
+    )
     add("candidate_records[].shield_allowed", "runtime", "shield_output", "local_safety_shield", "decision_time", ["local_safety_shield.state", "candidate_records[].next_node"])
     add("candidate_records[].shield_reason", "runtime", "shield_diagnostic", "local_safety_shield", "decision_time", ["candidate_records[].shield_allowed"])
     add("model_score_semantics", "runtime", "model_contract", "event_runtime", "static", derivation="lower_is_better_cost")
     add("model_prediction", "runtime", "model_output", "local_scorer", "decision_time", ["candidate_records[].model_score", "candidate_records[].next_node", "model_score_semantics"], derivation="minimum cost; ties by ascending next_node")
     add("model_margin", "runtime", "model_output", "local_scorer", "decision_time", ["candidate_records[].model_score", "model_score_semantics"], derivation="second minimum cost minus minimum cost; 999 for one candidate")
     add("risk_gate_triggered", "runtime", "shield_output", "local_safety_shield", "decision_time", ["model_prediction", "candidate_records[].shield_allowed"])
+    add(
+        "scorer_raw_fallback_disagreement",
+        "runtime",
+        "risk_diagnostic_output",
+        "local_scorer_risk_gate",
+        "decision_time",
+        [
+            "metadata.scorer_raw_prediction",
+            "model_prediction",
+            "risk_gate_triggered",
+        ],
+        derivation=(
+            "true only when the raw requested scorer and post-risk S0 fallback disagree"
+        ),
+    )
     add("fallback_selected_next", "runtime", "action_diagnostic", "local_pibt_lite_shield", "decision_time", ["candidate_records[].shield_allowed", "candidate_records[].model_score"])
     add("selected_next", "runtime", "committed_action", "junction_controller", "decision_time", ["model_prediction", "fallback_selected_next", "candidate_records[].shield_allowed"])
     add("decision_source", "runtime", "action_diagnostic", "junction_controller", "decision_time", ["selected_next", "model_prediction", "fallback_selected_next"])

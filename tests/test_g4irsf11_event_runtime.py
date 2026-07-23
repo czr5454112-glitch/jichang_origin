@@ -328,11 +328,11 @@ def test_fault_during_real_edge_traversal_does_not_retroactively_replan() -> Non
     payload = _run(
         bags=[("in-flight", 401, 0.0, 1_000.0, 3, 17, "source-3")],
         faults=[(3, 16, 0.5, 1.5, 0.2)],
-        trace_limit=0,
+        trace_limit=1_000,
     )
     _assert_invariants(payload, 1)
-    assert payload["decisions"] == []
-    assert payload["events"] == []
+    assert payload["decisions"]
+    assert payload["events"]
     assert payload["summary"]["physical_fault_window_traversal_count"] == 1
     assert payload["summary"]["physical_fault_edge_entry_violation_count"] == 0
     assert {row["phase"] for row in payload["fault_events"]} >= {
@@ -354,6 +354,45 @@ def test_real_map_cycle_region_uses_only_bounded_past_history() -> None:
 def test_history_limit_above_trace_contract_fails_closed() -> None:
     with pytest.raises(ValueError, match="history_limit"):
         _run(bags=_bags(1), history_limit=9)
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "field"),
+    [
+        ({"max_events": True}, "max_events"),
+        ({"max_events": 10.5}, "max_events"),
+        ({"enable_source_admission": 1}, "enable_source_admission"),
+        ({"max_simulation_time": float("nan")}, "max_simulation_time"),
+    ],
+)
+def test_runtime_python_boundary_rejects_implicit_numeric_coercion(
+    kwargs: dict[str, object],
+    field: str,
+) -> None:
+    with pytest.raises((TypeError, ValueError), match=field):
+        _run(bags=_bags(1), **kwargs)
+
+
+def test_runtime_python_boundary_rejects_nonfinite_records_and_truthy_fault_flag() -> None:
+    with pytest.raises(ValueError, match="release_time"):
+        _run(
+            bags=[
+                (
+                    "nan-release",
+                    1201,
+                    float("nan"),
+                    1_000.0,
+                    3,
+                    47,
+                    "source-3",
+                )
+            ]
+        )
+    with pytest.raises(TypeError, match="drop_notification"):
+        _run(
+            bags=_bags(1),
+            faults=[(3, 16, 0.0, 1.0, 0.0, 1)],  # type: ignore[list-item]
+        )
 
 
 def test_deterministic_trace_shards_are_disjoint_and_cover_all_tasks() -> None:

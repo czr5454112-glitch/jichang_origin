@@ -195,6 +195,7 @@ struct BoundedLocalPIBTResult {
   int immovable_blocker_count = 0;
   int stale_fault_candidate_count = 0;
   int fault_revalidation_count = 0;
+  int proposal_validation_count = 0;
   int fault_state_read_count = 0;
   int local_owner_read_count = 0;
   int local_message_count = 0;
@@ -434,6 +435,9 @@ inline void rollback_batch(const std::vector<BoundedLocalPIBTAction>& actions,
     result.rollback_failed = true;
     result.blocker +=
         result.blocker.empty() ? "rollback_callback_failed" : ";rollback_callback_failed";
+    // Continuing after an unknown rollback state would turn a failed atomic
+    // transaction into silent partial publication.
+    throw;
   }
 }
 
@@ -718,6 +722,7 @@ class BoundedLocalPIBTResolver {
       return result;
     }
 
+    ++result.proposal_validation_count;
     if (!validate_proposal(result.actions, bags_by_id, result.blocker)) {
       result.outcome = BoundedLocalPIBTOutcome::kPrepareRejected;
       return result;
@@ -733,6 +738,8 @@ class BoundedLocalPIBTResolver {
       prepared = callbacks.prepare(result.actions);
     } catch (...) {
       result.blocker = "prepare_callback_threw";
+      rollback_batch(result.actions, callbacks, result);
+      throw;
     }
     if (!prepared) {
       if (result.blocker.empty()) {
@@ -759,6 +766,12 @@ class BoundedLocalPIBTResolver {
       committed = callbacks.commit(result.actions);
     } catch (...) {
       result.blocker = "commit_callback_threw";
+      rollback_batch(result.actions, callbacks, result);
+      // A commit exception is materially different from an explicit logical
+      // rejection.  Roll back the prepared batch, then preserve the exception
+      // for the caller instead of silently converting it into continued
+      // resolver execution.
+      throw;
     }
     if (!committed) {
       if (result.blocker.empty()) {

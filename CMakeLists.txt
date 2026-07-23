@@ -22,6 +22,13 @@ target_link_libraries(test_event_driven_junction PRIVATE ics_core)
 target_compile_definitions(test_event_driven_junction PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME event_driven_junction COMMAND test_event_driven_junction)
 
+add_executable(test_g4irsf12_runtime_controls cpp/tests/test_g4irsf12_runtime_controls.cpp)
+target_link_libraries(test_g4irsf12_runtime_controls PRIVATE ics_core)
+target_compile_definitions(
+  test_g4irsf12_runtime_controls
+  PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(NAME g4irsf12_runtime_controls COMMAND test_g4irsf12_runtime_controls)
+
 add_executable(
   test_bounded_local_pibt_real_map
   cpp/tests/test_bounded_local_pibt_real_map.cpp)
@@ -30,6 +37,28 @@ target_compile_definitions(
   test_bounded_local_pibt_real_map
   PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME bounded_local_pibt_real_map COMMAND test_bounded_local_pibt_real_map)
+
+add_executable(
+  test_event_runtime_bounded_local_pibt
+  cpp/tests/test_event_runtime_bounded_local_pibt.cpp)
+target_link_libraries(test_event_runtime_bounded_local_pibt PRIVATE ics_core)
+target_compile_definitions(
+  test_event_runtime_bounded_local_pibt
+  PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(
+  NAME event_runtime_bounded_local_pibt
+  COMMAND test_event_runtime_bounded_local_pibt)
+
+add_executable(
+  test_expiring_first_edge_credit_real_map
+  cpp/tests/test_expiring_first_edge_credit_real_map.cpp)
+target_link_libraries(test_expiring_first_edge_credit_real_map PRIVATE ics_core)
+target_compile_definitions(
+  test_expiring_first_edge_credit_real_map
+  PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(
+  NAME expiring_first_edge_credit_real_map
+  COMMAND test_expiring_first_edge_credit_real_map)
 
 if(CZR005_BUILD_PYBIND)
   find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)

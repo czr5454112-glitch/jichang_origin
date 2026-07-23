@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 import importlib
+import hashlib
+import json
+import math
+from numbers import Real
+import operator
 import os
 from pathlib import Path
 import sys
@@ -572,6 +577,27 @@ def g4irsf11_event_runtime_from_records(
     enable_fault_policy: bool = True,
     scenario: str = "manual",
     scale: float = 1.0,
+    resource_semantics: str = "R0_current_undirected_full_travel_exclusive",
+    entry_headway_seconds: float = 1.0e-3,
+    pressure_mode: str = "absolute_downstream_queue_penalty",
+    pressure_weight: float = 2.0,
+    pressure_age_weight: float = 0.05,
+    pressure_distance_bias: float = 0.25,
+    admission_mode: str = "legacy_unbound",
+    credit_validity_seconds: float = 1.0,
+    credit_snapshot_max_age_seconds: float = 1.0,
+    credit_capacity_per_edge: int = 1,
+    credit_lifecycle_limit: int = 512,
+    pibt_mode: str = "P0",
+    pibt_max_depth: int | None = None,
+    pibt_max_ready_bags: int = 8,
+    pibt_max_local_resources: int = 32,
+    pibt_max_candidates_per_bag: int = 8,
+    scorer_mode: str = "S0_current_handwritten",
+    scorer_model_path: PathLike | None = None,
+    framework_mode: str = "event_loop_one_step",
+    summary_only: bool = False,
+    expected_binary_path: PathLike | None = None,
     search_path: PathLike | None = None,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
@@ -580,51 +606,462 @@ def g4irsf11_event_runtime_from_records(
     final goal.  There is intentionally no future-route argument.
     """
 
+    def strict_integer(value: Any, name: str) -> int:
+        if isinstance(value, bool):
+            raise TypeError(f"{name} must be an integer, not bool")
+        try:
+            return int(operator.index(value))
+        except TypeError as exc:
+            raise TypeError(f"{name} must be an integer") from exc
+
+    def strict_bool(value: Any, name: str) -> bool:
+        if not isinstance(value, bool):
+            raise TypeError(f"{name} must be a bool")
+        return value
+
+    def strict_finite_number(value: Any, name: str) -> float:
+        if isinstance(value, bool) or not isinstance(value, Real):
+            raise TypeError(f"{name} must be a numeric scalar, not bool")
+        result = float(value)
+        if not math.isfinite(result):
+            raise ValueError(f"{name} must be finite")
+        return result
+
+    history_limit = strict_integer(history_limit, "history_limit")
+    max_decisions_per_bag = strict_integer(
+        max_decisions_per_bag, "max_decisions_per_bag"
+    )
+    max_events = strict_integer(max_events, "max_events")
+    trace_limit = strict_integer(trace_limit, "trace_limit")
+    trace_shard_count = strict_integer(
+        trace_shard_count, "trace_shard_count"
+    )
+    trace_shard_index = strict_integer(
+        trace_shard_index, "trace_shard_index"
+    )
+    local_queue_capacity = strict_integer(
+        local_queue_capacity, "local_queue_capacity"
+    )
+    deadlock_retry_threshold = strict_integer(
+        deadlock_retry_threshold, "deadlock_retry_threshold"
+    )
+    diagnostic_hops = strict_integer(
+        diagnostic_hops, "diagnostic_hops"
+    )
+    credit_capacity_per_edge = strict_integer(
+        credit_capacity_per_edge, "credit_capacity_per_edge"
+    )
+    credit_lifecycle_limit = strict_integer(
+        credit_lifecycle_limit, "credit_lifecycle_limit"
+    )
+    pibt_max_ready_bags = strict_integer(
+        pibt_max_ready_bags, "pibt_max_ready_bags"
+    )
+    pibt_max_local_resources = strict_integer(
+        pibt_max_local_resources, "pibt_max_local_resources"
+    )
+    pibt_max_candidates_per_bag = strict_integer(
+        pibt_max_candidates_per_bag,
+        "pibt_max_candidates_per_bag",
+    )
+
+    enable_source_admission = strict_bool(
+        enable_source_admission, "enable_source_admission"
+    )
+    enable_backpressure = strict_bool(
+        enable_backpressure, "enable_backpressure"
+    )
+    enable_pibt_lite = strict_bool(
+        enable_pibt_lite, "enable_pibt_lite"
+    )
+    enable_deadlock_escape = strict_bool(
+        enable_deadlock_escape, "enable_deadlock_escape"
+    )
+    enable_fault_policy = strict_bool(
+        enable_fault_policy, "enable_fault_policy"
+    )
+    summary_only = strict_bool(summary_only, "summary_only")
+
+    retry_interval = strict_finite_number(
+        retry_interval, "retry_interval"
+    )
+    minimum_service_seconds = strict_finite_number(
+        minimum_service_seconds, "minimum_service_seconds"
+    )
+    dispatch_headway_seconds = strict_finite_number(
+        dispatch_headway_seconds, "dispatch_headway_seconds"
+    )
+    max_simulation_time = strict_finite_number(
+        max_simulation_time, "max_simulation_time"
+    )
+    scale = strict_finite_number(scale, "scale")
+    entry_headway_seconds = strict_finite_number(
+        entry_headway_seconds, "entry_headway_seconds"
+    )
+    pressure_weight = strict_finite_number(
+        pressure_weight, "pressure_weight"
+    )
+    pressure_age_weight = strict_finite_number(
+        pressure_age_weight, "pressure_age_weight"
+    )
+    pressure_distance_bias = strict_finite_number(
+        pressure_distance_bias, "pressure_distance_bias"
+    )
+    credit_validity_seconds = strict_finite_number(
+        credit_validity_seconds, "credit_validity_seconds"
+    )
+    credit_snapshot_max_age_seconds = strict_finite_number(
+        credit_snapshot_max_age_seconds,
+        "credit_snapshot_max_age_seconds",
+    )
+
+    canonical_pibt_depths = {
+        "P0": 0,
+        "P1": 1,
+        "P2": 2,
+        "P3": 3,
+        "P4": 4,
+    }
+    if pibt_mode not in canonical_pibt_depths:
+        raise ValueError("pibt_mode must be one of P0, P1, P2, P3, P4")
+    actual_pibt_depth = canonical_pibt_depths[pibt_mode]
+    if pibt_max_depth is not None:
+        pibt_max_depth = strict_integer(
+            pibt_max_depth, "pibt_max_depth"
+        )
+        if pibt_max_depth != actual_pibt_depth:
+            raise ValueError(
+                "pibt_max_depth must equal the depth encoded by pibt_mode "
+                f"({pibt_mode} requires {actual_pibt_depth})"
+            )
+    if framework_mode != "event_loop_one_step":
+        raise ValueError(
+            "unsupported framework_mode: the event runtime implements only "
+            "event_loop_one_step"
+        )
+
+    scorer_modes = {
+        "S0",
+        "S0_current_handwritten",
+        "S0_current_handwritten_static_score",
+        "S1",
+        "S1_frozen_g4e_legal_local_adapter",
+        "S2",
+        "S2_frozen_g4e_without_absolute_node_ids",
+        "S3",
+        "S3_shortest_potential_only",
+        "S4",
+        "S4_queue_aware_rule_only",
+    }
+    if scorer_mode not in scorer_modes:
+        raise ValueError("scorer_mode must be one of S0, S1, S2, S3, S4")
+    frozen_mode = scorer_mode in {
+        "S1",
+        "S1_frozen_g4e_legal_local_adapter",
+        "S2",
+        "S2_frozen_g4e_without_absolute_node_ids",
+    }
+    scorer_w1: list[list[float]] = []
+    scorer_b1: list[float] = []
+    scorer_w2: list[float] = []
+    scorer_b2 = 0.0
+    scorer_risk_margin_threshold = 1.0
+    scorer_risk_bottleneck_threshold = 5.0
+    scorer_model_sha256 = ""
+    if frozen_mode:
+        model_path = (
+            Path(scorer_model_path)
+            if scorer_model_path is not None
+            else ROOT
+            / "artifacts"
+            / "models"
+            / "g4e_risk_calibrated_policy.json"
+        )
+        raw_model = model_path.read_bytes()
+        scorer_model_sha256 = hashlib.sha256(raw_model).hexdigest()
+        expected_sha256 = (
+            "4a058dee0bdd17e15f67d1943a551822847d0c066ac3cf03a5da71a07731bbca"
+        )
+        if scorer_model_sha256 != expected_sha256:
+            raise ValueError(
+                "frozen G4E model SHA256 mismatch: "
+                f"expected {expected_sha256}, got {scorer_model_sha256}"
+            )
+        model_payload = json.loads(raw_model)
+        if not isinstance(model_payload, dict):
+            raise ValueError("frozen G4E model root must be an object")
+        expected_feature_names = [
+            "candidate_shortest_time_to_goal_scaled",
+            "candidate_travel_time_scaled",
+            "candidate_service_time_scaled",
+            "candidate_node_type_scaled",
+            "candidate_faulted",
+            "candidate_is_goal",
+            "time_slack_scaled",
+            "current_node_scaled",
+            "goal_node_scaled",
+            "out_degree_scaled",
+            "is_branch_node",
+            "local_node_pressure_scaled",
+            "candidate_node_pressure_scaled",
+            "candidate_downstream_node_pressure_2hop_scaled",
+            "candidate_downstream_node_pressure_3hop_scaled",
+            "candidate_static_remaining_hops_to_goal_scaled",
+            "candidate_static_second_best_gap_scaled",
+            "candidate_bottleneck_score_scaled",
+            "candidate_goal_direction_score_scaled",
+            "candidate_historical_risk_from_training_only_scaled",
+            "source_retry_pressure_scaled",
+            "unfinished_task_queue_size_near_current_source_scaled",
+        ]
+        if model_payload.get("model_type") != "g4e_risk_calibrated_policy":
+            raise ValueError("unexpected frozen G4E model_type")
+        if model_payload.get("feature_names") != expected_feature_names:
+            raise ValueError(
+                "frozen G4E feature_names/order does not match the audited adapter"
+            )
+
+        def finite_float(value: Any, name: str) -> float:
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError(f"{name} must be a finite numeric scalar")
+            result = float(value)
+            if not math.isfinite(result):
+                raise ValueError(f"{name} must be finite")
+            return result
+
+        raw_w1 = model_payload.get("w1")
+        raw_b1 = model_payload.get("b1")
+        raw_w2 = model_payload.get("w2")
+        if (
+            not isinstance(raw_w1, list)
+            or len(raw_w1) != 22
+            or any(not isinstance(row, list) or len(row) != 22 for row in raw_w1)
+            or not isinstance(raw_b1, list)
+            or len(raw_b1) != 22
+            or not isinstance(raw_w2, list)
+            or len(raw_w2) != 22
+        ):
+            raise ValueError(
+                "frozen G4E dimensions must be w1=22x22, b1=22, w2=22"
+            )
+        scorer_w1 = [
+            [
+                finite_float(value, f"w1[{row_index}][{column_index}]")
+                for column_index, value in enumerate(row)
+            ]
+            for row_index, row in enumerate(raw_w1)
+        ]
+        scorer_b1 = [
+            finite_float(value, f"b1[{index}]")
+            for index, value in enumerate(raw_b1)
+        ]
+        scorer_w2 = [
+            finite_float(value, f"w2[{index}]")
+            for index, value in enumerate(raw_w2)
+        ]
+        scorer_b2 = finite_float(model_payload.get("b2"), "b2")
+        scorer_risk_margin_threshold = finite_float(
+            model_payload.get("risk_margin_threshold"),
+            "risk_margin_threshold",
+        )
+        scorer_risk_bottleneck_threshold = finite_float(
+            model_payload.get("risk_bottleneck_threshold"),
+            "risk_bottleneck_threshold",
+        )
+        if (
+            scorer_risk_margin_threshold != 1.0
+            or scorer_risk_bottleneck_threshold != 5.0
+        ):
+            raise ValueError(
+                "frozen G4E risk thresholds do not match the audited artifact"
+            )
+    elif scorer_model_path is not None:
+        raise ValueError(
+            "scorer_model_path is only valid for S1/S2 frozen modes"
+        )
+
+    normalized_node_records: list[
+        tuple[int, int, float, int, int, list[int]]
+    ] = []
+    for record_index, record in enumerate(node_records):
+        if len(record) != 6:
+            raise ValueError(
+                f"node_records[{record_index}] must contain 6 fields"
+            )
+        location, node_type, service_time, x, y, outgoing = record
+        normalized_node_records.append(
+            (
+                strict_integer(
+                    location, f"node_records[{record_index}].location"
+                ),
+                strict_integer(
+                    node_type,
+                    f"node_records[{record_index}].node_type",
+                ),
+                strict_finite_number(
+                    service_time,
+                    f"node_records[{record_index}].service_time",
+                ),
+                strict_integer(x, f"node_records[{record_index}].x"),
+                strict_integer(y, f"node_records[{record_index}].y"),
+                [
+                    strict_integer(
+                        value,
+                        f"node_records[{record_index}].outgoing"
+                        f"[{outgoing_index}]",
+                    )
+                    for outgoing_index, value in enumerate(outgoing)
+                ],
+            )
+        )
+
+    normalized_edge_records: list[
+        tuple[int, int, float, float]
+    ] = []
+    for record_index, record in enumerate(edge_records):
+        if len(record) != 4:
+            raise ValueError(
+                f"edge_records[{record_index}] must contain 4 fields"
+            )
+        start, end, length, speed = record
+        normalized_edge_records.append(
+            (
+                strict_integer(
+                    start, f"edge_records[{record_index}].start"
+                ),
+                strict_integer(
+                    end, f"edge_records[{record_index}].end"
+                ),
+                strict_finite_number(
+                    length, f"edge_records[{record_index}].length"
+                ),
+                strict_finite_number(
+                    speed, f"edge_records[{record_index}].speed"
+                ),
+            )
+        )
+
+    normalized_heuristic_time = [
+        [
+            strict_finite_number(
+                value,
+                f"heuristic_time[{row_index}][{column_index}]",
+            )
+            for column_index, value in enumerate(row)
+        ]
+        for row_index, row in enumerate(heuristic_time)
+    ]
+
+    normalized_bag_records: list[
+        tuple[str, int, float, float, int, int, str]
+    ] = []
+    for record_index, record in enumerate(bag_records):
+        if len(record) != 7:
+            raise ValueError(
+                f"bag_records[{record_index}] must contain 7 fields"
+            )
+        (
+            segment_id,
+            task_id,
+            release_time,
+            deadline,
+            start,
+            goal,
+            source,
+        ) = record
+        if not isinstance(segment_id, str) or not isinstance(source, str):
+            raise TypeError(
+                f"bag_records[{record_index}] segment_id/source must be strings"
+            )
+        normalized_bag_records.append(
+            (
+                segment_id,
+                strict_integer(
+                    task_id, f"bag_records[{record_index}].task_id"
+                ),
+                strict_finite_number(
+                    release_time,
+                    f"bag_records[{record_index}].release_time",
+                ),
+                strict_finite_number(
+                    deadline,
+                    f"bag_records[{record_index}].deadline",
+                ),
+                strict_integer(
+                    start, f"bag_records[{record_index}].start"
+                ),
+                strict_integer(
+                    goal, f"bag_records[{record_index}].goal"
+                ),
+                source,
+            )
+        )
+
     module = load_cpp_module(search_path)
-    normalized_fault_windows: list[tuple[int, int, float, float, float] | tuple[int, int, float, float, float, bool]] = []
-    for record in fault_windows:
+    module_file = getattr(module, "__file__", None)
+    if not module_file:
+        raise CppBackendUnavailable(
+            "loaded C++ module does not expose an on-disk __file__"
+        )
+    loaded_binary_path = Path(module_file).resolve()
+    if expected_binary_path is not None:
+        expected_path = Path(expected_binary_path).resolve()
+        if os.path.normcase(str(loaded_binary_path)) != os.path.normcase(
+            str(expected_path)
+        ):
+            raise CppBackendUnavailable(
+                "loaded C++ binary path does not match expected_binary_path: "
+                f"loaded={loaded_binary_path}, expected={expected_path}"
+            )
+    loaded_binary_sha256 = hashlib.sha256(
+        loaded_binary_path.read_bytes()
+    ).hexdigest()
+    normalized_fault_windows: list[
+        tuple[int, int, float, float, float]
+        | tuple[int, int, float, float, float, bool]
+    ] = []
+    for record_index, record in enumerate(fault_windows):
         if len(record) not in (5, 6):
             raise ValueError(
                 "fault window must be (start,end,fault_time,repair_time,message_delay[,drop_notification])"
             )
         base = (
-            int(record[0]),
-            int(record[1]),
-            float(record[2]),
-            float(record[3]),
-            float(record[4]),
+            strict_integer(
+                record[0], f"fault_windows[{record_index}].start"
+            ),
+            strict_integer(
+                record[1], f"fault_windows[{record_index}].end"
+            ),
+            strict_finite_number(
+                record[2],
+                f"fault_windows[{record_index}].fault_time",
+            ),
+            strict_finite_number(
+                record[3],
+                f"fault_windows[{record_index}].repair_time",
+            ),
+            strict_finite_number(
+                record[4],
+                f"fault_windows[{record_index}].message_delay",
+            ),
         )
-        normalized_fault_windows.append(base if len(record) == 5 else (*base, bool(record[5])))
-    return dict(
+        normalized_fault_windows.append(
+            base
+            if len(record) == 5
+            else (
+                *base,
+                strict_bool(
+                    record[5],
+                    f"fault_windows[{record_index}].drop_notification",
+                ),
+            )
+        )
+    payload = dict(
         module.g4irsf11_event_runtime_from_records(
-            [
-                (
-                    int(location),
-                    int(node_type),
-                    float(service_time),
-                    int(x),
-                    int(y),
-                    [int(value) for value in outgoing],
-                )
-                for location, node_type, service_time, x, y, outgoing in node_records
-            ],
-            [
-                (int(start), int(end), float(length), float(speed))
-                for start, end, length, speed in edge_records
-            ],
-            [[float(value) for value in row] for row in heuristic_time],
-            [
-                (
-                    str(segment_id),
-                    int(task_id),
-                    float(release_time),
-                    float(deadline),
-                    int(start),
-                    int(goal),
-                    str(source),
-                )
-                for segment_id, task_id, release_time, deadline, start, goal, source in bag_records
-            ],
+            normalized_node_records,
+            normalized_edge_records,
+            normalized_heuristic_time,
+            normalized_bag_records,
             normalized_fault_windows,
             str(queue_discipline),
             float(retry_interval),
@@ -634,7 +1071,7 @@ def g4irsf11_event_runtime_from_records(
             int(max_decisions_per_bag),
             int(max_events),
             float(max_simulation_time),
-            int(trace_limit),
+            0 if summary_only else int(trace_limit),
             int(trace_shard_count),
             int(trace_shard_index),
             int(local_queue_capacity),
@@ -647,5 +1084,38 @@ def g4irsf11_event_runtime_from_records(
             bool(enable_fault_policy),
             str(scenario),
             float(scale),
+            str(resource_semantics),
+            float(entry_headway_seconds),
+            str(pressure_mode),
+            float(pressure_weight),
+            float(pressure_age_weight),
+            float(pressure_distance_bias),
+            str(admission_mode),
+            float(credit_validity_seconds),
+            float(credit_snapshot_max_age_seconds),
+            int(credit_capacity_per_edge),
+            int(credit_lifecycle_limit),
+            str(pibt_mode),
+            int(pibt_max_ready_bags),
+            int(pibt_max_local_resources),
+            int(pibt_max_candidates_per_bag),
+            str(scorer_mode),
+            scorer_w1,
+            scorer_b1,
+            scorer_w2,
+            float(scorer_b2),
+            float(scorer_risk_margin_threshold),
+            float(scorer_risk_bottleneck_threshold),
+            scorer_model_sha256,
+            str(framework_mode),
         )
     )
+    summary = payload.get("summary")
+    if not isinstance(summary, dict):
+        raise RuntimeError("C++ event runtime payload.summary must be a dict")
+    binary_path_text = str(loaded_binary_path)
+    summary["loaded_cpp_binary_path"] = binary_path_text
+    summary["loaded_cpp_binary_sha256"] = loaded_binary_sha256
+    payload["loaded_cpp_binary_path"] = binary_path_text
+    payload["loaded_cpp_binary_sha256"] = loaded_binary_sha256
+    return payload
