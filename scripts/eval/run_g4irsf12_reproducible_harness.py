@@ -28,14 +28,19 @@ from scripts.eval.g4irsf11_fixed_map import (  # noqa: E402
 )
 from scripts.eval.g4irsf12_reproducible_harness import (  # noqa: E402
     FULL_SIZE_SEGMENTS,
+    FORMAL_EXECUTOR_ID,
+    FORMAL_SOURCE_PATHS,
+    FORMAL_SOURCE_PATH_MANIFEST_SHA256,
     RESOURCE_LABELS,
     RESULT_SCHEMA,
     SIZE_LADDER,
     CaseSpec,
+    ExecutionProvenance,
     all_cases,
     apply_repeat_consistency,
     authorization_blockers,
     execute_case,
+    execution_provenance_matches,
     file_sha256,
     inspect_executor,
     load_control_evidence,
@@ -46,20 +51,7 @@ from scripts.eval.g4irsf12_reproducible_harness import (  # noqa: E402
 )
 
 
-DEFAULT_SOURCE_PATHS = (
-    Path("scripts/eval/g4irsf12_reproducible_harness.py"),
-    Path("scripts/eval/run_g4irsf12_reproducible_harness.py"),
-    Path("scripts/eval/g4irsf12_size_ladder.py"),
-    Path("scripts/eval/g4irsf11_experiment_protocol.py"),
-    Path("src/czr005/cpp_backend.py"),
-    Path("src/czr005/datasets/decision_trace.py"),
-    Path("cpp/ics_core/runtime/bounded_local_pibt.hpp"),
-    Path("cpp/ics_core/runtime/expiring_first_edge_credit.hpp"),
-    Path("cpp/ics_core/runtime/event_driven_junction.hpp"),
-    Path("cpp/ics_core/graph/graph.hpp"),
-    Path("cpp/ics_core/bindings/czr005_cpp.cpp"),
-    Path("artifacts/models/g4e_risk_calibrated_policy.json"),
-)
+DEFAULT_SOURCE_PATHS = FORMAL_SOURCE_PATHS
 ALL_PHASES = frozenset({"B", "C", "E", "F", "G", "H", "J"})
 FROZEN_CONTROL_EVIDENCE_STATUSES = frozenset(
     {
@@ -98,7 +90,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--executor",
-        default="czr005.cpp_backend:g4irsf11_event_runtime_from_records",
+        default=FORMAL_EXECUTOR_ID,
     )
     parser.add_argument(
         "--binary",
@@ -223,17 +215,23 @@ def _merge_evidence_rows(
 def _matches_current_provenance(
     row: Mapping[str, Any],
     *,
+    binary_path: Path,
     binary_sha256: str,
     source_bundle_sha256_value: str,
     executor_source_sha256: str,
 ) -> bool:
-    return (
-        row.get("execution_status") != "NOT_RUN"
-        and str(row.get("binary_sha256", "")) == binary_sha256
-        and str(row.get("source_bundle_sha256", ""))
-        == source_bundle_sha256_value
-        and str(row.get("executor_source_sha256", ""))
-        == executor_source_sha256
+    return execution_provenance_matches(
+        row,
+        ExecutionProvenance(
+            binary_path=str(binary_path.resolve(strict=True)),
+            binary_sha256=binary_sha256,
+            source_bundle_sha256=source_bundle_sha256_value,
+            source_path_manifest_sha256=(
+                FORMAL_SOURCE_PATH_MANIFEST_SHA256
+            ),
+            executor_id=FORMAL_EXECUTOR_ID,
+            executor_source_sha256=executor_source_sha256,
+        ),
     )
 
 
@@ -296,8 +294,23 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if args.execute:
         if args.binary is None:
             raise ValueError("--binary is required with --execute")
+        if args.executor != FORMAL_EXECUTOR_ID:
+            raise PermissionError(
+                "formal execution requires the frozen executor; custom "
+                "executors are diagnostic-only and cannot use this promotion CLI"
+            )
+        if args.source_path:
+            raise PermissionError(
+                "formal execution requires the exact frozen source bundle; "
+                "--source-path overrides are diagnostic-only"
+            )
+        if args.with_trace:
+            raise PermissionError(
+                "formal promotion execution requires summary-only evidence; "
+                "--with-trace is diagnostic-only"
+            )
         executor = _executor(args.executor)
-        source_paths = tuple(args.source_path) or DEFAULT_SOURCE_PATHS
+        source_paths = DEFAULT_SOURCE_PATHS
         current_binary_sha256 = file_sha256(args.binary)
         current_source_bundle_sha256 = source_bundle_sha256(
             source_paths,
@@ -310,11 +323,22 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             raise ValueError(
                 "current executor source is not hashable; execution is blocked"
             )
+        current_provenance = ExecutionProvenance(
+            binary_path=str(args.binary.resolve(strict=True)),
+            binary_sha256=current_binary_sha256,
+            source_bundle_sha256=current_source_bundle_sha256,
+            source_path_manifest_sha256=(
+                FORMAL_SOURCE_PATH_MANIFEST_SHA256
+            ),
+            executor_id=FORMAL_EXECUTOR_ID,
+            executor_source_sha256=current_executor_source_sha256,
+        )
         authorization_prior_rows = [
             row
             for row in accepted_rows
             if _matches_current_provenance(
                 row,
+                binary_path=args.binary,
                 binary_sha256=current_binary_sha256,
                 source_bundle_sha256_value=current_source_bundle_sha256,
                 executor_source_sha256=current_executor_source_sha256,
@@ -339,6 +363,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     row
                     for row in executed_rows
                     if row.get("execution_status") != "NOT_RUN"
+                    and execution_provenance_matches(
+                        row,
+                        current_provenance,
+                    )
                 ]
                 authorization_rows = _replace_tiers(
                     authorization_prior_rows,
@@ -376,20 +404,46 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                         source_paths=source_paths,
                         base_runtime_kwargs=base_kwargs,
                         root=ROOT,
-                        summary_only=not args.with_trace,
+                        summary_only=True,
+                        executor_id=FORMAL_EXECUTOR_ID,
                     )
                     result["repeat_index"] = _repeat_index + 1
+                    # The repeat index is assigned by this orchestrator, so
+                    # the compact evidence binding must be sealed only after
+                    # that assignment, never trusted from the executor path.
+                    result["evidence_row_binding_sha256"] = ""
                     executed_rows.append(result)
                 tier_start = len(executed_rows) - args.repeat
                 executed_rows[tier_start:] = apply_repeat_consistency(
                     executed_rows[tier_start:]
                 )
+                for result in executed_rows[tier_start:]:
+                    if (
+                        result.get("execution_status") != "NOT_RUN"
+                        and not execution_provenance_matches(
+                            result,
+                            current_provenance,
+                        )
+                    ):
+                        result["gate_status"] = "FAIL"
+                        result["evidence_status"] = (
+                            "RUN_PROVENANCE_DRIFT_REJECTED"
+                        )
+                        result["blocker"] = " | ".join(
+                            part
+                            for part in (
+                                str(result.get("blocker", "")),
+                                "RUN_PROVENANCE_DRIFT",
+                            )
+                            if part
+                        )
         replacement_rows = [
             row
             for row in executed_rows
             if row.get("execution_status") != "NOT_RUN"
+            and execution_provenance_matches(row, current_provenance)
         ]
-        prior_keys = {_tier_key(row) for row in accepted_rows}
+        prior_keys = {_tier_key(row) for row in authorization_prior_rows}
         new_pending_rows = [
             row
             for row in executed_rows
@@ -398,7 +452,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         ]
         evidence_rows = _merge_evidence_rows(
             planned,
-            accepted_rows,
+            authorization_prior_rows,
             replacement_rows,
         )
         evidence_rows = _replace_tiers(evidence_rows, new_pending_rows)
@@ -416,6 +470,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         rows,
         root=args.output_root,
         identity_root=ROOT,
+        current_provenance=(
+            current_provenance if args.execute else None
+        ),
     )
     return {
         "schema": RESULT_SCHEMA,

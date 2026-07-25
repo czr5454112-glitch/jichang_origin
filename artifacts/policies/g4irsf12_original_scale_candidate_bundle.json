@@ -1,39 +1,50 @@
 {
-  "bundle_sha256": "9940245c02fe370dec554e25f0f6b158ba72a379f0f10eea071dc976cceef73a",
+  "bundle_sha256": "f60f90080ee4355e4f0b4a0f0c4bec24178ad727d827765e42025740e0620bcd",
   "corrected_hca_original_entry_target_minutes": 5.764936746,
+  "current_provenance": {
+    "binary_path": "C:\\PROGRAMING\\czr005\\build_g4irsf12\\python\\czr005_cpp.cp311-win_amd64.pyd",
+    "binary_sha256": "82f15f08a8cff0e887447f017f0aa03fffabe9bfb3a79a563b16d779219d8222",
+    "executor_id": "czr005.cpp_backend:g4irsf11_event_runtime_from_records",
+    "executor_source_sha256": "e1b59eecded76f59991a9276f614aea747a573dbaffdf2139cfd9b6096b69971",
+    "source_bundle_sha256": "eca01993a9094c8e86558d15246628acd3162d5d769916ded6365ec6437f0df7",
+    "source_path_manifest_sha256": "720843eb169dc451d8949c4d6b4d8dec8f3d43a6288492c5d23ef8321a712c3b"
+  },
+  "current_provenance_status": "VERIFIED",
   "finalists": [
     {
-      "blocker": "requires at least five executed full repeats",
+      "blocker": "matched original-entry mean does not meet frozen v2-safe target | matched original-entry mean does not meet corrected HCA target | one or more full repeats failed completion, safety, or performance gates",
       "candidate_id": "J_F1",
       "case_id": "J_F1_best_rule_bounded_pibt",
       "config_sha256": "dbb5a620d5e3c0963e9211bd6cb9a836506bb016db3de6cf51a986c85bff7e02",
-      "corrected_hca_original_entry_gate": "PENDING",
-      "deterministic_result_sha256": "",
-      "executed_full_repeat_count": 0,
-      "maximum_executed_original_entry_mean_minutes": "",
+      "corrected_hca_original_entry_gate": "FAIL",
+      "deterministic_result_sha256": "383491673f81a4a5f22ff78705c4f43c50870108b59e0b4ab29bfacce444ada0",
+      "executed_full_repeat_count": 5,
+      "maximum_executed_original_entry_mean_minutes": 41.544748409137824,
       "promotion_status": "PENDING",
-      "repeat_gate": "PENDING",
+      "repeat_gate": "PASS",
       "role": "F1 best rule + bounded PIBT",
-      "v2_safe_original_entry_gate": "PENDING",
-      "validated_full_gate": "PENDING"
+      "stale_or_unverified_full_repeat_count": 0,
+      "v2_safe_original_entry_gate": "FAIL",
+      "validated_full_gate": "FAIL"
     },
     {
-      "blocker": "requires at least five executed full repeats",
+      "blocker": "matched original-entry mean does not meet frozen v2-safe target | matched original-entry mean does not meet corrected HCA target | one or more full repeats failed completion, safety, or performance gates",
       "candidate_id": "J_F2",
       "case_id": "J_F2_frozen_scorer_bounded_pibt",
       "config_sha256": "60c91e937f3c8f14ff4a80f685ec3294da6e22196cdf254eea998acb677becf1",
-      "corrected_hca_original_entry_gate": "PENDING",
-      "deterministic_result_sha256": "",
-      "executed_full_repeat_count": 0,
-      "maximum_executed_original_entry_mean_minutes": "",
+      "corrected_hca_original_entry_gate": "FAIL",
+      "deterministic_result_sha256": "23c52e4412eb2359f907ed145f3cc0b6de8392af1dff184b8324b19b0b7c05f0",
+      "executed_full_repeat_count": 5,
+      "maximum_executed_original_entry_mean_minutes": 41.514218717973414,
       "promotion_status": "PENDING",
-      "repeat_gate": "PENDING",
+      "repeat_gate": "PASS",
       "role": "F2 frozen scorer diagnostic + bounded PIBT",
-      "v2_safe_original_entry_gate": "PENDING",
-      "validated_full_gate": "PENDING"
+      "stale_or_unverified_full_repeat_count": 0,
+      "v2_safe_original_entry_gate": "FAIL",
+      "validated_full_gate": "FAIL"
     },
     {
-      "blocker": "J_F3 is reserved until a trained and gated G4IRSF12 v3 artifact replaces the S4 queue-aware rule placeholder | requires at least five executed full repeats",
+      "blocker": "J_F3 is reserved until a trained and gated G4IRSF12 v3 artifact replaces the S4 queue-aware rule placeholder | requires exactly five current-provenance full repeats",
       "candidate_id": "J_F3_RESERVED_NO_V3",
       "case_id": "J_F3_reserved_no_v3",
       "config_sha256": "dd7b048b40e4df335d9e95d3d01b0cde7da59cae1d1cb43c40a0f4506d8aec0d",
@@ -44,6 +55,7 @@
       "promotion_status": "PENDING",
       "repeat_gate": "PENDING",
       "role": "F3 reserved slot; no trained G4IRSF12 v3 candidate configured",
+      "stale_or_unverified_full_repeat_count": 0,
       "v2_safe_original_entry_gate": "PENDING",
       "validated_full_gate": "PENDING"
     }
@@ -57,5 +69,5 @@
   "primary_denominator": "original_entry_time_tth",
   "processed_attempt_reference_warning": "3.967122711 is processed-segment-attempt evidence and is not comparable to original_entry_time_tth",
   "promotion_status": "PENDING",
-  "schema": "czr005.g4irsf12.original_scale_candidate_bundle.v2"
+  "schema": "czr005.g4irsf12.original_scale_candidate_bundle.v4"
 }

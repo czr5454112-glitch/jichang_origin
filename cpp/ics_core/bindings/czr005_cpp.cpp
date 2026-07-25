@@ -3223,10 +3223,14 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["physical_fault_edge_entry_violation_count"] =
       summary.physical_fault_edge_entry_violation_count;
   row["fault_policy_enabled"] = summary.fault_policy_enabled;
+  row["legacy_pibt_lite_enabled"] =
+      summary.legacy_pibt_lite_enabled;
   row["fault_affected_bag_count"] = summary.fault_affected_bag_count;
   row["fault_target_edge_candidate_exposure_count"] =
       summary.fault_target_edge_candidate_exposure_count;
   row["fault_target_edge_attempt_count"] = summary.fault_target_edge_attempt_count;
+  // Keep physical-interlock recovery separate from advertised-fault policy
+  // actions so the G4IRSF12 H ledger can audit lost notifications honestly.
   row["physical_fault_interlock_rejection_count"] =
       summary.physical_fault_interlock_rejection_count;
   row["physical_fault_interlock_hold_count"] =
@@ -3302,6 +3306,8 @@ py::dict g4irsf11_event_runtime_summary_row(
               .bounded_local_pibt_candidate_materialization_count);
   row["bounded_local_pibt_not_applicable_count"] =
       py::int_(summary.bounded_local_pibt_not_applicable_count);
+  row["bounded_local_pibt_same_bag_fallback_count"] =
+      py::int_(summary.bounded_local_pibt_same_bag_fallback_count);
   row["bounded_local_pibt_proposal_batch_count"] =
       py::int_(summary.bounded_local_pibt_proposal_batch_count);
   row["bounded_local_pibt_proposed_action_count"] =
@@ -3987,6 +3993,12 @@ py::dict g4irsf11_event_runtime_from_records(
       "scalar_and_interval_deltas_O_selected_actions_no_full_queue_calendar_or_ledger_copy";
   trace_context["enable_pibt_lite_semantics"] =
       "same_bag_alternative_edge_scan_only";
+  trace_context["bounded_local_pibt_same_bag_fallback_semantics"] =
+      "root_only_safe_alternative_after_true_pibt_prepare_rejection;"
+      "revalidated_by_ordinary_one_bag_dispatch;not_a_pibt_commit";
+  trace_context["bounded_local_pibt_handoff_semantics"] =
+      "committed_inherited_actions_only;rejected_proposal_inherited_actions_"
+      "remain_only_in_bounded_local_pibt_inherited_action_count";
   trace_context["physical_fault_interlock_always_enabled"] = true;
   trace_context["fault_policy_off_semantics"] =
       "ignore_advertised_fault_and_disable_fault_driven_reroute_while_interlock_holds";

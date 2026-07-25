@@ -1,16 +1,76 @@
-case_id,size_segments,fault_profile,execution_status,gate_status,pibt_label,pibt_handoff_count,fault_local_hold_count,fault_reroute_count,blocker
-H_stable_no_fault,2048,no_fault,NOT_RUN,PENDING,P2,,,,requires a stable no-fault real-input candidate before fault injection
-H_stable_no_fault,8192,no_fault,NOT_RUN,PENDING,P2,,,,requires accepted prior tier and explicit 8192 authorization
-H_stable_no_fault,43603,no_fault,NOT_RUN,PENDING,P2,,,,requires accepted 8192 evidence and explicit full-run authorization
-H_immediate,2048,single_immediate,NOT_RUN,PENDING,P2,,,,requires a stable no-fault real-input candidate before fault injection
-H_immediate,8192,single_immediate,NOT_RUN,PENDING,P2,,,,requires accepted prior tier and explicit 8192 authorization
-H_immediate,43603,single_immediate,NOT_RUN,PENDING,P2,,,,requires accepted 8192 evidence and explicit full-run authorization
-H_delayed_30s,2048,single_delayed_30s,NOT_RUN,PENDING,P2,,,,requires a stable no-fault real-input candidate before fault injection
-H_delayed_30s,8192,single_delayed_30s,NOT_RUN,PENDING,P2,,,,requires accepted prior tier and explicit 8192 authorization
-H_delayed_30s,43603,single_delayed_30s,NOT_RUN,PENDING,P2,,,,requires accepted 8192 evidence and explicit full-run authorization
-H_notification_drop,2048,sensor_loss,NOT_RUN,PENDING,P2,,,,requires a stable no-fault real-input candidate before fault injection
-H_notification_drop,8192,sensor_loss,NOT_RUN,PENDING,P2,,,,requires accepted prior tier and explicit 8192 authorization
-H_notification_drop,43603,sensor_loss,NOT_RUN,PENDING,P2,,,,requires accepted 8192 evidence and explicit full-run authorization
-H_fault_policy_off,2048,fault_policy_off,NOT_RUN,PENDING,P2,,,,requires a stable no-fault real-input candidate before fault injection
-H_fault_policy_off,8192,fault_policy_off,NOT_RUN,PENDING,P2,,,,requires accepted prior tier and explicit 8192 authorization
-H_fault_policy_off,43603,fault_policy_off,NOT_RUN,PENDING,P2,,,,requires accepted 8192 evidence and explicit full-run authorization
+case_id,size_segments,fault_profile,execution_status,gate_status,pibt_label,pibt_handoff_count,pibt_same_bag_fallback_count,fault_policy_enabled_echo,sensor_loss_mode_used,fault_notification_drop_count,fault_physical_interlock_rejection_count,fault_physical_interlock_hold_count,fault_physical_interlock_reroute_count,fault_local_action_count,fault_local_hold_count,fault_reroute_count,blocker
+H_stable_no_fault,2048,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,2048,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,2048,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,2048,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,2048,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,8192,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,8192,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,8192,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,8192,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,8192,no_fault,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,43603,no_fault,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,43603,no_fault,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,43603,no_fault,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,43603,no_fault,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,0,0,0,
+H_stable_no_fault,43603,no_fault,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,0,0,0,
+H_immediate,2048,single_immediate,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,117,0,117,
+H_immediate,2048,single_immediate,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,117,0,117,
+H_immediate,2048,single_immediate,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,117,0,117,
+H_immediate,2048,single_immediate,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,117,0,117,
+H_immediate,2048,single_immediate,EXECUTED,PASS,P2,0,0,True,False,0,0,0,0,117,0,117,
+H_immediate,8192,single_immediate,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1345,0,1345,
+H_immediate,8192,single_immediate,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1345,0,1345,
+H_immediate,8192,single_immediate,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1345,0,1345,
+H_immediate,8192,single_immediate,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1345,0,1345,
+H_immediate,8192,single_immediate,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1345,0,1345,
+H_immediate,43603,single_immediate,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,743,0,743,
+H_immediate,43603,single_immediate,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,743,0,743,
+H_immediate,43603,single_immediate,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,743,0,743,
+H_immediate,43603,single_immediate,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,743,0,743,
+H_immediate,43603,single_immediate,EXECUTED,PASS,P2,73,0,True,False,0,0,0,0,743,0,743,
+H_delayed_30s,2048,single_delayed_30s,EXECUTED,PASS,P2,0,0,True,False,0,4,0,4,113,0,113,
+H_delayed_30s,2048,single_delayed_30s,EXECUTED,PASS,P2,0,0,True,False,0,4,0,4,113,0,113,
+H_delayed_30s,2048,single_delayed_30s,EXECUTED,PASS,P2,0,0,True,False,0,4,0,4,113,0,113,
+H_delayed_30s,2048,single_delayed_30s,EXECUTED,PASS,P2,0,0,True,False,0,4,0,4,113,0,113,
+H_delayed_30s,2048,single_delayed_30s,EXECUTED,PASS,P2,0,0,True,False,0,4,0,4,113,0,113,
+H_delayed_30s,8192,single_delayed_30s,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1353,0,1353,
+H_delayed_30s,8192,single_delayed_30s,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1353,0,1353,
+H_delayed_30s,8192,single_delayed_30s,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1353,0,1353,
+H_delayed_30s,8192,single_delayed_30s,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1353,0,1353,
+H_delayed_30s,8192,single_delayed_30s,EXECUTED,PASS,P2,5,0,True,False,0,0,0,0,1353,0,1353,
+H_delayed_30s,43603,single_delayed_30s,EXECUTED,PASS,P2,73,0,True,False,0,8,0,8,747,0,747,
+H_delayed_30s,43603,single_delayed_30s,EXECUTED,PASS,P2,73,0,True,False,0,8,0,8,747,0,747,
+H_delayed_30s,43603,single_delayed_30s,EXECUTED,PASS,P2,73,0,True,False,0,8,0,8,747,0,747,
+H_delayed_30s,43603,single_delayed_30s,EXECUTED,PASS,P2,73,0,True,False,0,8,0,8,747,0,747,
+H_delayed_30s,43603,single_delayed_30s,EXECUTED,PASS,P2,73,0,True,False,0,8,0,8,747,0,747,
+H_notification_drop,2048,sensor_loss,EXECUTED,PASS,P2,0,0,True,True,2,117,0,117,0,0,0,
+H_notification_drop,2048,sensor_loss,EXECUTED,PASS,P2,0,0,True,True,2,117,0,117,0,0,0,
+H_notification_drop,2048,sensor_loss,EXECUTED,PASS,P2,0,0,True,True,2,117,0,117,0,0,0,
+H_notification_drop,2048,sensor_loss,EXECUTED,PASS,P2,0,0,True,True,2,117,0,117,0,0,0,
+H_notification_drop,2048,sensor_loss,EXECUTED,PASS,P2,0,0,True,True,2,117,0,117,0,0,0,
+H_notification_drop,8192,sensor_loss,EXECUTED,PASS,P2,5,0,True,True,2,1345,0,1345,0,0,0,
+H_notification_drop,8192,sensor_loss,EXECUTED,PASS,P2,5,0,True,True,2,1345,0,1345,0,0,0,
+H_notification_drop,8192,sensor_loss,EXECUTED,PASS,P2,5,0,True,True,2,1345,0,1345,0,0,0,
+H_notification_drop,8192,sensor_loss,EXECUTED,PASS,P2,5,0,True,True,2,1345,0,1345,0,0,0,
+H_notification_drop,8192,sensor_loss,EXECUTED,PASS,P2,5,0,True,True,2,1345,0,1345,0,0,0,
+H_notification_drop,43603,sensor_loss,EXECUTED,PASS,P2,73,0,True,True,2,743,0,743,0,0,0,
+H_notification_drop,43603,sensor_loss,EXECUTED,PASS,P2,73,0,True,True,2,743,0,743,0,0,0,
+H_notification_drop,43603,sensor_loss,EXECUTED,PASS,P2,73,0,True,True,2,743,0,743,0,0,0,
+H_notification_drop,43603,sensor_loss,EXECUTED,PASS,P2,73,0,True,True,2,743,0,743,0,0,0,
+H_notification_drop,43603,sensor_loss,EXECUTED,PASS,P2,73,0,True,True,2,743,0,743,0,0,0,
+H_fault_policy_off,2048,fault_policy_off,EXECUTED,PASS,P2,25,0,False,False,0,14361,14276,85,0,0,0,
+H_fault_policy_off,2048,fault_policy_off,EXECUTED,PASS,P2,25,0,False,False,0,14361,14276,85,0,0,0,
+H_fault_policy_off,2048,fault_policy_off,EXECUTED,PASS,P2,25,0,False,False,0,14361,14276,85,0,0,0,
+H_fault_policy_off,2048,fault_policy_off,EXECUTED,PASS,P2,25,0,False,False,0,14361,14276,85,0,0,0,
+H_fault_policy_off,2048,fault_policy_off,EXECUTED,PASS,P2,25,0,False,False,0,14361,14276,85,0,0,0,
+H_fault_policy_off,8192,fault_policy_off,EXECUTED,PASS,P2,545,0,False,False,0,13743,12430,1313,0,0,0,
+H_fault_policy_off,8192,fault_policy_off,EXECUTED,PASS,P2,545,0,False,False,0,13743,12430,1313,0,0,0,
+H_fault_policy_off,8192,fault_policy_off,EXECUTED,PASS,P2,545,0,False,False,0,13743,12430,1313,0,0,0,
+H_fault_policy_off,8192,fault_policy_off,EXECUTED,PASS,P2,545,0,False,False,0,13743,12430,1313,0,0,0,
+H_fault_policy_off,8192,fault_policy_off,EXECUTED,PASS,P2,545,0,False,False,0,13743,12430,1313,0,0,0,
+H_fault_policy_off,43603,fault_policy_off,EXECUTED,PASS,P2,355,0,False,False,0,14182,13465,717,0,0,0,
+H_fault_policy_off,43603,fault_policy_off,EXECUTED,PASS,P2,355,0,False,False,0,14182,13465,717,0,0,0,
+H_fault_policy_off,43603,fault_policy_off,EXECUTED,PASS,P2,355,0,False,False,0,14182,13465,717,0,0,0,
+H_fault_policy_off,43603,fault_policy_off,EXECUTED,PASS,P2,355,0,False,False,0,14182,13465,717,0,0,0,
+H_fault_policy_off,43603,fault_policy_off,EXECUTED,PASS,P2,355,0,False,False,0,14182,13465,717,0,0,0,

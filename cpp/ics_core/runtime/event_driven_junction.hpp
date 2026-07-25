@@ -402,6 +402,7 @@ struct EventRuntimeSummary {
   std::uint64_t bounded_local_pibt_candidate_bound_rejection_count = 0;
   std::uint64_t bounded_local_pibt_candidate_materialization_count = 0;
   std::uint64_t bounded_local_pibt_not_applicable_count = 0;
+  std::uint64_t bounded_local_pibt_same_bag_fallback_count = 0;
   std::uint64_t bounded_local_pibt_proposal_batch_count = 0;
   std::uint64_t bounded_local_pibt_proposed_action_count = 0;
   std::uint64_t bounded_local_pibt_committed_batch_count = 0;
@@ -467,6 +468,7 @@ struct EventRuntimeSummary {
   bool sensor_loss_mode_used = false;
   bool source_admission_enabled = true;
   bool fault_policy_enabled = true;
+  bool legacy_pibt_lite_enabled = true;
   bool decision_trace_truncated = false;
   bool event_trace_truncated = false;
 };
@@ -945,6 +947,8 @@ class EventDrivenJunctionRuntime {
         "active_only_ledger;bounded_recent_lifecycle;no_future_route;"
         "no_global_scan;physical_interlock_not_bypassable";
     result_.summary.fault_policy_enabled = config_.enable_fault_policy;
+    result_.summary.legacy_pibt_lite_enabled =
+        config_.enable_pibt_lite;
     result_.summary.resource_semantics_id = canonical_resource_semantics();
     result_.summary.resource_semantics_echo =
         config_.resource_semantics;
@@ -2164,12 +2168,19 @@ class EventDrivenJunctionRuntime {
     }
 
     DispatchResult dispatch;
+    int bounded_local_same_bag_fallback_next = -1;
     if (canonical_pibt_mode() != BoundedLocalPIBTMode::kP0) {
       dispatch =
           try_dispatch_bounded_local_pibt(event.node, event.time, event.seq);
+      bounded_local_same_bag_fallback_next =
+          dispatch.same_bag_fallback_next;
     }
     if (!dispatch.handled) {
-      dispatch = try_dispatch_one(event.node, event.time, event.seq);
+      dispatch = try_dispatch_one(
+          event.node,
+          event.time,
+          event.seq,
+          bounded_local_same_bag_fallback_next);
     }
     schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
                      event.time,
@@ -2201,6 +2212,7 @@ class EventDrivenJunctionRuntime {
     int selected_next = -1;
     int selected_edge_count = 0;
     bool handled = false;
+    int same_bag_fallback_next = -1;
   };
 
   struct PIBTCreditView {
@@ -3747,6 +3759,14 @@ class EventDrivenJunctionRuntime {
     result_.summary.bounded_local_pibt_max_slice_resources =
         std::max(result_.summary.bounded_local_pibt_max_slice_resources,
                  slice.resource_count);
+    std::map<LocalPIBTResourceKey, int>
+        real_blocker_owner_by_resource;
+    for (const auto& owner : slice.owners) {
+      if (owner.bag_id != trigger_runtime_bag_id) {
+        real_blocker_owner_by_resource[owner.resource] =
+            owner.bag_id;
+      }
+    }
     for (const auto& ready : slice.ready_bags) {
       result_.summary.bounded_local_pibt_max_candidates_per_bag =
           std::max(
@@ -3758,6 +3778,28 @@ class EventDrivenJunctionRuntime {
     PIBTTransactionSnapshot transaction;
     std::string callback_blocker;
     BoundedLocalPIBTCallbacks callbacks;
+    const auto required_trigger_blocker_bag_ids =
+        [&](const std::vector<BoundedLocalPIBTAction>& actions) {
+          std::set<int> required;
+          const auto trigger_action = std::find_if(
+              actions.begin(),
+              actions.end(),
+              [&](const BoundedLocalPIBTAction& action) {
+                return action.bag_id == trigger_runtime_bag_id;
+              });
+          if (trigger_action == actions.end()) {
+            return required;
+          }
+          for (const auto resource :
+               trigger_action->claimed_resources) {
+            const auto owner =
+                real_blocker_owner_by_resource.find(resource);
+            if (owner != real_blocker_owner_by_resource.end()) {
+              required.insert(owner->second);
+            }
+          }
+          return required;
+        };
     callbacks.read_fault =
         [&](LocalPIBTResourceKey edge_resource) {
           const auto edge = slice.edge_by_resource.find(edge_resource);
@@ -3778,21 +3820,32 @@ class EventDrivenJunctionRuntime {
         };
     callbacks.prepare =
         [&](const std::vector<BoundedLocalPIBTAction>& actions) {
-          const bool includes_trigger = std::any_of(
+          const auto trigger_action = std::find_if(
               actions.begin(),
               actions.end(),
               [&](const BoundedLocalPIBTAction& action) {
                 return action.bag_id == trigger_runtime_bag_id;
               });
-          const bool includes_real_blocker_move = std::any_of(
-              actions.begin(),
-              actions.end(),
-              [](const BoundedLocalPIBTAction& action) {
-                return action.inherited;
-              });
+          const auto required_blocker_bag_ids =
+              required_trigger_blocker_bag_ids(actions);
+          const bool includes_real_blocker_move =
+              !required_blocker_bag_ids.empty() &&
+              std::all_of(
+                  required_blocker_bag_ids.begin(),
+                  required_blocker_bag_ids.end(),
+                  [&](int blocker_bag_id) {
+                    return std::any_of(
+                        actions.begin(),
+                        actions.end(),
+                        [&](const BoundedLocalPIBTAction& action) {
+                          return action.bag_id == blocker_bag_id;
+                        });
+                  });
+          const bool includes_trigger =
+              trigger_action != actions.end();
           if (!includes_trigger || !includes_real_blocker_move) {
             callback_blocker =
-                "proposal_lacks_trigger_or_real_inherited_blocker_move";
+                "proposal_lacks_trigger_or_real_blocker_owner_move";
             return false;
           }
           return prevalidate_pibt_batch(
@@ -3848,8 +3901,6 @@ class EventDrivenJunctionRuntime {
         resolved.commit_call_count;
     result_.summary.bounded_local_pibt_wait_for_cycle_count +=
         resolved.visiting_cycle_guard_count;
-    result_.summary.bounded_local_pibt_handoff_count +=
-        resolved.inherited_action_count;
     result_.summary.bounded_local_pibt_blocker_move_attempt_count +=
         resolved.blocker_move_attempt_count;
     result_.summary.bounded_local_pibt_backtrack_count +=
@@ -3914,11 +3965,38 @@ class EventDrivenJunctionRuntime {
 
     if (!resolved.committed) {
       ++result_.summary.bounded_local_pibt_not_applicable_count;
+      int same_bag_fallback_next = -1;
+      if (resolved.outcome ==
+              BoundedLocalPIBTOutcome::kPrepareRejected &&
+          callback_blocker ==
+              "proposal_lacks_trigger_or_real_blocker_owner_move" &&
+          resolved.inherited_action_count == 0 &&
+          resolved.actions.size() == 1) {
+        const auto& action = resolved.actions.front();
+        if (action.bag_id == trigger_runtime_bag_id &&
+            action.from_node == node && !action.inherited &&
+            graph_.has_edge(action.from_node, action.next_node)) {
+          // This root-only proposal is not a true PIBT commit because no
+          // blocker moved.  Preserve its already-materialized adjacent edge
+          // only as a candidate for the ordinary one-bag dispatch path,
+          // which revalidates the current shield/credit state before commit.
+          same_bag_fallback_next = action.next_node;
+        }
+      }
       record_decision_latency(decision_started);
-      return {};
+      return DispatchResult{
+          trigger_runtime_bag_id,
+          -1,
+          0,
+          false,
+          same_bag_fallback_next};
     }
 
+    const auto selected_trigger_blocker_bag_ids =
+        required_trigger_blocker_bag_ids(resolved.actions);
     ++result_.summary.bounded_local_pibt_committed_batch_count;
+    result_.summary.bounded_local_pibt_handoff_count +=
+        resolved.inherited_action_count;
     result_.summary.bounded_local_pibt_committed_action_count +=
         resolved.actions.size();
     result_.summary.max_edges_selected_per_bag_per_decision =
@@ -3938,9 +4016,14 @@ class EventDrivenJunctionRuntime {
       trace.fallback_selected_next =
           action.inherited ? action.next_node : -1;
       trace.decision_source =
-          action.inherited
+          action.bag_id == trigger_runtime_bag_id
+              ? "bounded_local_pibt_trigger_action"
+          : action.inherited
               ? "bounded_local_pibt_inherited_action"
-              : "bounded_local_pibt_trigger_action";
+          : selected_trigger_blocker_bag_ids.find(action.bag_id) !=
+                    selected_trigger_blocker_bag_ids.end()
+              ? "bounded_local_pibt_blocker_owner_action"
+              : "bounded_local_pibt_independent_ready_action";
       trace.rule_reason =
           (trace.scorer_risk_abstain
                ? "frozen_scorer_risk_abstain_exact_s0_fallback;"
@@ -3957,7 +4040,11 @@ class EventDrivenJunctionRuntime {
         trigger_runtime_bag_id, trigger_next, 1, true};
   }
 
-  DispatchResult try_dispatch_one(int node, double time, std::uint64_t arrive_event_seq) {
+  DispatchResult try_dispatch_one(
+      int node,
+      double time,
+      std::uint64_t arrive_event_seq,
+      int bounded_local_same_bag_fallback_next = -1) {
     auto& controller = junctions_[node];
     if (controller.queue.empty()) {
       return {};
@@ -4146,6 +4233,7 @@ class EventDrivenJunctionRuntime {
     bool physical_interlock_rejected = false;
     int physical_interlock_intended_next = -1;
     bool local_fault_policy_acted = false;
+    bool bounded_local_same_bag_fallback_selected = false;
     if (!ranking.empty()) {
       const auto& predicted = trace.candidates[ranking.front()];
       const bool advertised_policy_block =
@@ -4177,9 +4265,43 @@ class EventDrivenJunctionRuntime {
           selected_reason = advertised_policy_block ? "advertised_fault_hold"
                                                     : predicted.shield_reason;
         }
-        const bool may_reroute_fault =
-            !physical_interlock_rejected || config_.enable_fault_policy;
-        if (config_.enable_pibt_lite && may_reroute_fault) {
+        // The physical interlock owns safety even when the advertised fault
+        // message is lost.  If the recovery policy is enabled, let it choose
+        // one already-materialized local alternative after that interlock
+        // rejects the preferred edge.  This is deliberately independent of
+        // the legacy same-bag ``enable_pibt_lite`` switch: P1--P4 disable that
+        // legacy scan, but lost-notification recovery must still be able to
+        // re-arbitrate one next edge locally.  No future route or non-local
+        // state is inspected here.
+        const bool physical_fault_local_handoff =
+            physical_interlock_rejected && config_.enable_fault_policy;
+        const bool legacy_same_bag_handoff =
+            !physical_interlock_rejected && config_.enable_pibt_lite;
+        const bool bounded_local_same_bag_handoff =
+            !physical_interlock_rejected &&
+            predicted.shield_reason == "destination_queue_full" &&
+            canonical_pibt_mode() != BoundedLocalPIBTMode::kP0 &&
+            bounded_local_same_bag_fallback_next >= 0;
+        if (bounded_local_same_bag_handoff) {
+          for (std::size_t rank = 1; rank < ranking.size(); ++rank) {
+            const auto& alternative = trace.candidates[ranking[rank]];
+            const bool alternative_advertised_block =
+                config_.enable_fault_policy && alternative.advertised_fault;
+            if (alternative.next_node ==
+                    bounded_local_same_bag_fallback_next &&
+                alternative.shield_allowed &&
+                !alternative_advertised_block) {
+              selected = alternative.next_node;
+              trace.fallback_selected_next = selected;
+              selected_reason =
+                  "bounded_local_pibt_same_bag_safe_fallback";
+              bounded_local_same_bag_fallback_selected = true;
+              break;
+            }
+          }
+        }
+        if (selected < 0 &&
+            (physical_fault_local_handoff || legacy_same_bag_handoff)) {
           for (std::size_t rank = 1; rank < ranking.size(); ++rank) {
             const auto& alternative = trace.candidates[ranking[rank]];
             const bool alternative_advertised_block =
@@ -4188,10 +4310,13 @@ class EventDrivenJunctionRuntime {
               selected = alternative.next_node;
               trace.fallback_selected_next = selected;
               selected_reason = physical_interlock_rejected
-                                    ? "physical_fault_interlock_pibt_handoff"
+                                    ? "physical_fault_interlock_local_handoff"
                                     : "same_bag_alternative_edge_scan_handoff";
-              ++result_.summary.pibt_lite_handoff_count;
-              ++result_.summary.same_bag_alternative_edge_scan_handoff_count;
+              if (config_.enable_pibt_lite) {
+                ++result_.summary.pibt_lite_handoff_count;
+                ++result_.summary
+                      .same_bag_alternative_edge_scan_handoff_count;
+              }
               break;
             }
           }
@@ -4249,8 +4374,6 @@ class EventDrivenJunctionRuntime {
       }
     }
 
-    ++bag.decision_count;
-    ++result_.summary.decision_count;
     bool first_edge_credit_bound = false;
     if (selected >= 0 && first_edge_credit_required) {
       const auto bound = credit_ledger_.bind(
@@ -4271,6 +4394,8 @@ class EventDrivenJunctionRuntime {
                                   ? "local_fault_policy"
                               : physical_interlock_rejected
                                   ? "physical_fault_interlock"
+                              : bounded_local_same_bag_fallback_selected
+                                  ? "bounded_local_pibt_same_bag_safe_fallback"
                               : first_edge_credit_bound
                                   ? "expiring_first_edge_credit"
                               : escape_active
@@ -4300,6 +4425,18 @@ class EventDrivenJunctionRuntime {
         bag.first_edge_credit_id = 0;
         bag.first_edge_credit_consumed = true;
       }
+      if (bounded_local_same_bag_fallback_selected) {
+        ++result_.summary
+              .bounded_local_pibt_same_bag_fallback_count;
+      }
+      // A blocked local retry is a wait, not a route decision.  Counting
+      // holds against max_decisions_per_bag used to fail healthy bags after
+      // 512 quarter-second congestion retries at original scale.  The
+      // retry/deadlock counters and global event/time ceilings already bound
+      // liveness; this counter bounds only committed one-next-edge actions,
+      // matching the atomic PIBT commit path above.
+      ++bag.decision_count;
+      ++result_.summary.decision_count;
       controller.queue.erase(controller.queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
       controller.observe_local_state();
       schedule_passive(JunctionEventType::kLocalQueueUpdate,

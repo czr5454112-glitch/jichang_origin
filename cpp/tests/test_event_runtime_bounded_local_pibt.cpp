@@ -82,12 +82,273 @@ EventDrivenJunctionResult run_motif(EventDrivenJunctionConfig config) {
       .run(inheritance_motif(), inheritance_fault());
 }
 
+void require_safe_boundary(
+    Checks& checks,
+    const EventDrivenJunctionResult& result,
+    const std::string& label,
+    int expected_completed_count = 2);
+
+void test_root_only_safe_alternative_is_not_mislabeled_as_pibt(
+    Checks& checks) {
+  // The owner fills preferred node 12 but cannot leave while 12->13 is
+  // physically faulted.  The trigger at node 6 has an already-materialized
+  // safe alternative 6->8.  Moving only the trigger is not true PIBT because
+  // no blocker moves, but discarding that local alternative creates a retry
+  // storm at original scale.
+  auto config = pibt_config("P2");
+  const auto result =
+      EventDrivenJunctionRuntime(canonical_graph(), std::move(config))
+          .run(
+              {
+                  EventRuntimeBagRequest{
+                      "blocked-owner",
+                      11,
+                      0.0,
+                      100.0,
+                      12,
+                      47,
+                      "canonical-map2"},
+                  EventRuntimeBagRequest{
+                      "safe-alternative-trigger",
+                      12,
+                      0.55,
+                      100.0,
+                      6,
+                      47,
+                      "canonical-map2"},
+              },
+              {EventRuntimeFaultWindow{
+                  12, 13, 0.0, 10.0, 0.0, false}});
+  require_safe_boundary(checks, result, "P2 same-bag safe fallback");
+  checks.require(
+      result.summary.bounded_local_pibt_prepare_rejection_count > 0 &&
+          result.summary.bounded_local_pibt_same_bag_fallback_count > 0,
+      "root-only proposal must remain a rejected PIBT batch but commit via "
+      "the separately counted one-bag fallback");
+  checks.require(
+      result.summary.pibt_lite_handoff_count == 0 &&
+          result.summary.same_bag_alternative_edge_scan_handoff_count == 0,
+      "bounded P2 fallback must not masquerade as legacy pibt-lite");
+  checks.require(
+      result.summary.bounded_local_pibt_commit_count == 0 &&
+          result.summary.bounded_local_pibt_committed_batch_count == 0 &&
+          result.summary.bounded_local_pibt_committed_action_count == 0 &&
+          result.summary.max_actions_committed_per_pibt_batch == 0 &&
+          result.summary.bounded_local_pibt_inherited_action_count == 0 &&
+          result.summary.bounded_local_pibt_handoff_count == 0,
+      "root-only fallback must not increment any true PIBT commit or "
+      "inheritance counter");
+  bool saw_fallback = false;
+  for (const auto& decision : result.decisions) {
+    saw_fallback =
+        saw_fallback ||
+        (decision.task_id == 12 && decision.current_node == 6 &&
+         decision.selected_next == 8 &&
+         decision.fallback_selected_next == 8 &&
+         decision.decision_source ==
+             "bounded_local_pibt_same_bag_safe_fallback");
+  }
+  checks.require(
+      saw_fallback,
+      "decision audit must name the bounded one-bag fallback explicitly");
+}
+
+void test_same_bag_fallback_revalidates_physical_fault_shield(
+    Checks& checks) {
+  auto config = pibt_config("P2");
+  const auto result =
+      EventDrivenJunctionRuntime(canonical_graph(), std::move(config))
+          .run(
+              {
+                  EventRuntimeBagRequest{
+                      "blocked-owner",
+                      11,
+                      0.0,
+                      100.0,
+                      12,
+                      47,
+                      "canonical-map2"},
+                  EventRuntimeBagRequest{
+                      "faulted-alternative-trigger",
+                      12,
+                      0.55,
+                      100.0,
+                      6,
+                      47,
+                      "canonical-map2"},
+              },
+              {
+                  EventRuntimeFaultWindow{
+                      12, 13, 0.0, 10.0, 0.0, false},
+                  EventRuntimeFaultWindow{
+                      6, 8, 0.0, 10.0, 0.0, false},
+              });
+  require_safe_boundary(
+      checks, result, "P2 physically blocked same-bag fallback");
+  bool selected_faulted_fallback = false;
+  for (const auto& decision : result.decisions) {
+    selected_faulted_fallback =
+        selected_faulted_fallback ||
+        (decision.task_id == 12 && decision.current_node == 6 &&
+         decision.event_time < 10.0 &&
+         decision.fallback_selected_next == 8);
+  }
+  checks.require(
+      !selected_faulted_fallback &&
+          result.summary.physical_fault_edge_entry_violation_count == 0,
+      "same-bag fallback must revalidate and reject a physically faulted "
+      "alternative edge");
+}
+
+void test_higher_priority_blocker_owner_move_is_a_real_atomic_batch(
+    Checks& checks) {
+  // The owner has higher priority than the trigger, so the resolver selects
+  // its move before visiting the trigger rather than marking it as an
+  // inherited action.  It still vacates the exact node resource claimed by
+  // the trigger in the same prevalidated atomic transaction.
+  auto config = pibt_config("P2");
+  const auto result =
+      EventDrivenJunctionRuntime(canonical_graph(), std::move(config))
+          .run(
+              {
+                  EventRuntimeBagRequest{
+                      "higher-priority-owner",
+                      1,
+                      0.0,
+                      50.0,
+                      8,
+                      11,
+                      "canonical-map2"},
+                  EventRuntimeBagRequest{
+                      "lower-priority-trigger",
+                      2,
+                      0.55,
+                      100.0,
+                      6,
+                      11,
+                      "canonical-map2"},
+              },
+              inheritance_fault());
+  require_safe_boundary(
+      checks, result, "P2 higher-priority blocker-owner batch");
+  checks.require(
+      result.summary.bounded_local_pibt_commit_count > 0 &&
+          result.summary.bounded_local_pibt_rollback_count == 0 &&
+          result.summary.bounded_local_pibt_committed_action_count >= 2 &&
+          result.summary.max_actions_committed_per_pibt_batch == 2 &&
+          result.summary.bounded_local_pibt_inherited_action_count == 0 &&
+          result.summary.bounded_local_pibt_handoff_count == 0,
+      "a higher-priority owner-first move must commit atomically without "
+      "being mislabeled as inherited priority");
+  bool saw_owner_action = false;
+  bool saw_trigger_action = false;
+  for (const auto& decision : result.decisions) {
+    saw_owner_action =
+        saw_owner_action ||
+        (decision.task_id == 1 && decision.current_node == 8 &&
+         decision.selected_next == 11 &&
+         decision.decision_source ==
+             "bounded_local_pibt_blocker_owner_action");
+    saw_trigger_action =
+        saw_trigger_action ||
+        (decision.task_id == 2 && decision.current_node == 6 &&
+         decision.selected_next == 8 &&
+         decision.decision_source ==
+             "bounded_local_pibt_trigger_action");
+  }
+  checks.require(
+      saw_owner_action && saw_trigger_action,
+      "decision audit must distinguish blocker-owner and trigger actions");
+}
+
+void test_blocker_owner_label_uses_only_the_selected_trigger_resource(
+    Checks& checks) {
+  auto config = pibt_config("P2");
+  const auto result =
+      EventDrivenJunctionRuntime(canonical_graph(), std::move(config))
+          .run(
+              {
+                  EventRuntimeBagRequest{
+                      "owner8",
+                      1,
+                      0.0,
+                      50.0,
+                      8,
+                      11,
+                      "canonical-map2"},
+                  EventRuntimeBagRequest{
+                      "owner12",
+                      3,
+                      0.0,
+                      60.0,
+                      12,
+                      13,
+                      "canonical-map2"},
+                  EventRuntimeBagRequest{
+                      "trigger",
+                      2,
+                      0.55,
+                      100.0,
+                      6,
+                      47,
+                      "canonical-map2"},
+              },
+              {
+                  EventRuntimeFaultWindow{
+                      8, 11, 0.0, 1.55, 0.0, false},
+                  EventRuntimeFaultWindow{
+                      12, 13, 0.0, 1.55, 0.0, false},
+              });
+  require_safe_boundary(
+      checks,
+      result,
+      "P2 selected-resource blocker-owner labels",
+      3);
+  checks.require(
+      result.summary.bounded_local_pibt_commit_count == 1 &&
+          result.summary.bounded_local_pibt_committed_action_count == 3 &&
+          result.summary.bounded_local_pibt_rollback_count == 0 &&
+          result.summary.bounded_local_pibt_inherited_action_count == 0 &&
+          result.summary.bounded_local_pibt_handoff_count == 0,
+      "three-action owner-first transaction must commit once without "
+      "inventing inherited handoffs");
+  bool saw_trigger = false;
+  bool saw_direct_owner = false;
+  bool saw_independent_owner = false;
+  for (const auto& decision : result.decisions) {
+    saw_trigger =
+        saw_trigger ||
+        (decision.task_id == 2 && decision.current_node == 6 &&
+         decision.selected_next == 12 &&
+         decision.decision_source ==
+             "bounded_local_pibt_trigger_action");
+    saw_direct_owner =
+        saw_direct_owner ||
+        (decision.task_id == 3 && decision.current_node == 12 &&
+         decision.selected_next == 13 &&
+         decision.decision_source ==
+             "bounded_local_pibt_blocker_owner_action");
+    saw_independent_owner =
+        saw_independent_owner ||
+        (decision.task_id == 1 && decision.current_node == 8 &&
+         decision.selected_next == 11 &&
+         decision.decision_source ==
+             "bounded_local_pibt_independent_ready_action");
+  }
+  checks.require(
+      saw_trigger && saw_direct_owner && saw_independent_owner,
+      "only the owner of the trigger's selected resource may receive the "
+      "blocker-owner audit label");
+}
+
 void require_safe_boundary(Checks& checks,
                            const EventDrivenJunctionResult& result,
-                           const std::string& label) {
-  checks.require(result.summary.completed_count == 2 &&
+                           const std::string& label,
+                           int expected_completed_count) {
+  checks.require(result.summary.completed_count ==
+                         expected_completed_count &&
                      result.summary.failed_count == 0,
-                 label + " must complete both real-map bags");
+                 label + " must complete every real-map bag");
   checks.require(result.summary.reservation_conflicts == 0,
                  label + " must retain zero reservation conflicts");
   checks.require(result.summary.runtime_full_astar_calls == 0 &&
@@ -529,6 +790,10 @@ void test_invalid_configuration_rejected(Checks& checks) {
 int main() {
   Checks checks;
   test_p0_is_an_actual_bypass(checks);
+  test_root_only_safe_alternative_is_not_mislabeled_as_pibt(checks);
+  test_same_bag_fallback_revalidates_physical_fault_shield(checks);
+  test_higher_priority_blocker_owner_move_is_a_real_atomic_batch(checks);
+  test_blocker_owner_label_uses_only_the_selected_trigger_resource(checks);
   test_real_map_inheritance_for_p1_through_p4(checks);
   test_capacity_and_slice_bounds_fail_closed(checks);
   test_trace_limit_and_honest_fault_metrics(checks);

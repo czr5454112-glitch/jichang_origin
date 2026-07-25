@@ -29,6 +29,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import statistics
 import tempfile
 from typing import Any, Callable, Iterable, Mapping, MutableMapping, Sequence
@@ -53,17 +54,38 @@ from scripts.eval.g4irsf12_size_ladder import (
 
 ROOT = Path(__file__).resolve().parents[2]
 
-HARNESS_SCHEMA = "czr005.g4irsf12.reproducible_harness.v2"
+HARNESS_SCHEMA = "czr005.g4irsf12.reproducible_harness.v4"
 CASE_SCHEMA = "czr005.g4irsf12.experiment_case.v2"
-RESULT_SCHEMA = "czr005.g4irsf12.experiment_result.v2"
-CANDIDATE_BUNDLE_SCHEMA = "czr005.g4irsf12.original_scale_candidate_bundle.v2"
+RESULT_SCHEMA = "czr005.g4irsf12.experiment_result.v4"
+CANDIDATE_BUNDLE_SCHEMA = "czr005.g4irsf12.original_scale_candidate_bundle.v4"
 G4J_STATUS = "CLOSED"
+FORMAL_EXECUTOR_ID = (
+    "czr005.cpp_backend:g4irsf11_event_runtime_from_records"
+)
+FORMAL_SOURCE_PATHS = (
+    Path("scripts/eval/g4irsf12_reproducible_harness.py"),
+    Path("scripts/eval/run_g4irsf12_reproducible_harness.py"),
+    Path("scripts/eval/g4irsf12_size_ladder.py"),
+    Path("scripts/eval/g4irsf11_experiment_protocol.py"),
+    Path("src/czr005/cpp_backend.py"),
+    Path("src/czr005/datasets/decision_trace.py"),
+    Path("cpp/ics_core/runtime/bounded_local_pibt.hpp"),
+    Path("cpp/ics_core/runtime/expiring_first_edge_credit.hpp"),
+    Path("cpp/ics_core/runtime/event_driven_junction.hpp"),
+    Path("cpp/ics_core/graph/graph.hpp"),
+    Path("cpp/ics_core/bindings/czr005_cpp.cpp"),
+    Path("artifacts/models/g4e_risk_calibrated_policy.json"),
+)
 HISTORICAL_HCA_PROCESSED_ATTEMPT_MINUTES = 3.967122711
 FROZEN_V2_SAFE_ORIGINAL_ENTRY_MINUTES = 4.124305453
 CORRECTED_HCA_ORIGINAL_ENTRY_MINUTES = 5.764936746
 PROCESSED_ATTEMPT_WARNING = (
     "3.967122711 is processed-segment-attempt evidence and is not comparable "
     "to original_entry_time_tth"
+)
+DENOMINATOR_SCOPE = (
+    "selected raw task_id population; every selected protected segment; "
+    "primary metrics require complete selected-prefix drainage"
 )
 PREFIX_HASH_SEMANTICS = (
     "sha256_of_selected_nonempty_original_utf8_jsonl_lines_normalized_to_lf"
@@ -179,6 +201,7 @@ TRACE_KEYS = {
     "trace",
     "decisions",
     "decision_trace",
+    "hold_attempts",
     "events",
     "event_trace",
     "fault_events",
@@ -289,6 +312,16 @@ class ExecutorCapabilities:
         )
 
 
+@dataclass(frozen=True)
+class ExecutionProvenance:
+    binary_path: str
+    binary_sha256: str
+    source_bundle_sha256: str
+    source_path_manifest_sha256: str
+    executor_id: str
+    executor_source_sha256: str
+
+
 def _canonical_json_bytes(value: Any) -> bytes:
     return json.dumps(
         value,
@@ -301,6 +334,11 @@ def _canonical_json_bytes(value: Any) -> bytes:
 
 def canonical_sha256(value: Any) -> str:
     return hashlib.sha256(_canonical_json_bytes(value)).hexdigest()
+
+
+FORMAL_SOURCE_PATH_MANIFEST_SHA256 = canonical_sha256(
+    [path.as_posix() for path in FORMAL_SOURCE_PATHS]
+)
 
 
 def file_sha256(path: Path) -> str:
@@ -463,7 +501,7 @@ def _control_controls(control_label: str) -> dict[str, Any]:
 
 
 def framework_delta_cases() -> tuple[CaseSpec, ...]:
-    """Return executable B2--B6 cases; B0/B1 are parsed controls."""
+    """Return executable B3--B6 plus an honestly blocked B2 declaration."""
 
     common_sizes = (144, 512, 2_048, 8_192)
     return (
@@ -487,7 +525,13 @@ def framework_delta_cases() -> tuple[CaseSpec, ...]:
                 "reservation_depth": 1,
             },
             required_capabilities=("framework_mode", "scorer_mode", "pibt_mode"),
-            notes="old ordering with one-step reservation; no full future route",
+            notes=(
+                "declared old-order one-step diagnostic; the current executor "
+                "does not implement those scheduling semantics"
+            ),
+            execution_blocker=(
+                "OLD_SCHEDULING_ORDER_ONE_STEP_EXECUTOR_NOT_IMPLEMENTED"
+            ),
         ),
         CaseSpec(
             case_id="B3_event_java_window_frozen",
@@ -937,6 +981,13 @@ def protocol_manifest() -> dict[str, Any]:
         "prefix_hash_semantics": PREFIX_HASH_SEMANTICS,
         "result_hash_semantics": RESULT_HASH_SEMANTICS,
         "summary_only_default": True,
+        "formal_executor_id": FORMAL_EXECUTOR_ID,
+        "formal_source_paths": [
+            path.as_posix() for path in FORMAL_SOURCE_PATHS
+        ],
+        "formal_source_path_manifest_sha256": (
+            FORMAL_SOURCE_PATH_MANIFEST_SHA256
+        ),
         "g4j_status": G4J_STATUS,
         "large_run_default_maximum": 2_048,
         "frozen_numeric_runtime_controls": dict(
@@ -973,12 +1024,27 @@ def protocol_manifest() -> dict[str, Any]:
 
 
 def _finite_number(value: Any, label: str) -> float:
+    """Parse one finite scalar at the serialized CSV boundary."""
+
     if isinstance(value, bool):
         raise HarnessValidationError(f"{label} must be numeric")
     try:
         result = float(value)
     except (TypeError, ValueError) as exc:
         raise HarnessValidationError(f"{label} must be numeric") from exc
+    if not math.isfinite(result):
+        raise HarnessValidationError(f"{label} must be finite")
+    return result
+
+
+def _live_finite_number(value: Any, label: str) -> float:
+    """Accept only a native finite numeric scalar from a live executor."""
+
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise HarnessValidationError(
+            f"{label} must be a native numeric scalar"
+        )
+    result = float(value)
     if not math.isfinite(result):
         raise HarnessValidationError(f"{label} must be finite")
     return result
@@ -1007,7 +1073,7 @@ def evaluate_original_entry_performance(
     }
     if mean_minutes in (None, ""):
         return result
-    mean = _finite_number(mean_minutes, "original-entry mean")
+    mean = _live_finite_number(mean_minutes, "original-entry mean")
     v2_pass = mean <= FROZEN_V2_SAFE_ORIGINAL_ENTRY_MINUTES
     hca_pass = mean <= CORRECTED_HCA_ORIGINAL_ENTRY_MINUTES
     result.update(
@@ -1102,22 +1168,25 @@ def aggregate_raw_bag_timings(
             if not _completed(result):
                 continue
             completed += 1
-            finish = _finite_number(
+            finish = _live_finite_number(
                 result.get("finish_time"), f"{segment_id}.finish_time"
             )
-            admitted = _finite_number(
+            admitted = _live_finite_number(
                 result.get("admitted_time"), f"{segment_id}.admitted_time"
             )
-            raw_pass = _finite_number(
+            raw_pass = _live_finite_number(
                 input_row.get("original_entry_time"),
                 f"{segment_id}.original_entry_time",
             )
-            java_release = _finite_number(
+            java_release = _live_finite_number(
                 input_row.get("pass_time"), f"{segment_id}.pass_time"
             )
             runtime_release = result.get("release_time")
             if runtime_release not in (None, "") and not math.isclose(
-                _finite_number(runtime_release, f"{segment_id}.release_time"),
+                _live_finite_number(
+                    runtime_release,
+                    f"{segment_id}.release_time",
+                ),
                 java_release,
                 rel_tol=0.0,
                 abs_tol=1.0e-9,
@@ -1242,10 +1311,7 @@ def summarize_raw_bag_timings(
         "completion_rate": len(completed_rows) / len(raw_bags),
         "comparison_eligible": full_completion,
         "primary_denominator": "original_entry_time_tth",
-        "denominator_scope": (
-            "selected raw task_id population; every selected protected segment; "
-            "primary metrics require complete selected-prefix drainage"
-        ),
+        "denominator_scope": DENOMINATOR_SCOPE,
         "original_entry_mean_minutes": primary_mean(original),
         "original_entry_p95_seconds": (
             _quantile(original, 0.95) if full_completion else None
@@ -1269,6 +1335,7 @@ CAPABILITY_ALIASES: Mapping[str, tuple[str, ...]] = {
     "scorer_mode": ("scorer_mode", "scorer_id"),
     "pibt_mode": ("pibt_mode", "bounded_local_pibt_mode"),
     "pibt_max_depth": ("pibt_max_depth", "bounded_local_pibt_depth"),
+    "enable_pibt_lite": ("enable_pibt_lite",),
     "pressure_mode": ("pressure_mode",),
     "admission_mode": ("admission_mode",),
     "framework_mode": ("framework_mode",),
@@ -1368,6 +1435,10 @@ def bind_executor_request(
     blockers: list[str] = []
     required_capabilities = set(case.required_capabilities)
     required_capabilities.add("max_events")
+    required_capabilities.add("expected_binary_path")
+    # This recovered architecture freezes the legacy PIBT-lite path off.
+    # Silently dropping the negative-control switch is not admissible.
+    required_capabilities.add("enable_pibt_lite")
     required_capabilities.update(FROZEN_NUMERIC_RUNTIME_CONTROLS)
     if "local_queue_capacity" in case.runtime_controls:
         required_capabilities.add("local_queue_capacity")
@@ -1419,17 +1490,38 @@ def deterministic_result_sha256(payload: Mapping[str, Any]) -> str:
 
 def _summary_only_errors(payload: Mapping[str, Any]) -> list[str]:
     errors: list[str] = []
-    for key in TRACE_KEYS:
-        if key in payload and payload[key] not in (None, [], {}, ""):
-            errors.append(f"SUMMARY_ONLY_PAYLOAD_CONTAINS:{key}")
     summary = payload.get("summary")
+    sources: tuple[tuple[str, Mapping[str, Any]], ...] = (
+        ("PAYLOAD", payload),
+        *(
+            (("SUMMARY", summary),)
+            if isinstance(summary, Mapping)
+            else ()
+        ),
+    )
+    for owner, source in sources:
+        for key in TRACE_KEYS:
+            if key in source and source[key] not in (None, [], {}, ""):
+                errors.append(f"SUMMARY_ONLY_{owner}_CONTAINS:{key}")
     if isinstance(summary, Mapping):
-        trace_count = summary.get(
-            "decision_trace_stored_count",
-            summary.get("trace_stored_count", 0),
-        )
-        if trace_count not in (None, "", 0, 0.0):
+        if "decision_trace_stored_count" not in summary:
+            errors.append(
+                "SUMMARY_ONLY_MISSING_DECISION_TRACE_STORED_COUNT"
+            )
+        elif type(summary["decision_trace_stored_count"]) is not int:
+            errors.append(
+                "SUMMARY_ONLY_INVALID_DECISION_TRACE_STORED_COUNT"
+            )
+        elif summary["decision_trace_stored_count"] != 0:
             errors.append("SUMMARY_ONLY_REPORTED_NONZERO_TRACE_COUNT")
+        if "hold_trace_stored_count" not in summary:
+            errors.append("SUMMARY_ONLY_MISSING_HOLD_TRACE_STORED_COUNT")
+        elif type(summary["hold_trace_stored_count"]) is not int:
+            errors.append(
+                "SUMMARY_ONLY_INVALID_HOLD_TRACE_STORED_COUNT"
+            )
+        elif summary["hold_trace_stored_count"] != 0:
+            errors.append("SUMMARY_ONLY_REPORTED_NONZERO_HOLD_TRACE_COUNT")
     return errors
 
 
@@ -1462,6 +1554,7 @@ RESULT_COLUMNS = (
     "pibt_max_ready_bags_echo",
     "pibt_max_local_resources_echo",
     "pibt_max_candidates_per_bag_echo",
+    "legacy_pibt_lite_enabled_echo",
     "fault_profile",
     "size_segments",
     "repeat_index",
@@ -1472,6 +1565,9 @@ RESULT_COLUMNS = (
     "early_abort_status",
     "blocker",
     "summary_only",
+    "summary_only_contract_pass",
+    "decision_trace_stored_count",
+    "hold_trace_stored_count",
     "input_order",
     "prefix_selection",
     "map_raw_sha256",
@@ -1481,9 +1577,15 @@ RESULT_COLUMNS = (
     "input_prefix_sha256",
     "case_config_sha256",
     "source_bundle_sha256",
+    "source_path_manifest_sha256",
     "binary_sha256",
+    "loaded_cpp_binary_path",
+    "loaded_cpp_binary_sha256",
+    "binary_provenance_pass",
+    "executor_id",
     "executor_source_sha256",
     "deterministic_result_sha256",
+    "evidence_row_binding_sha256",
     "repeat_consistency",
     "primary_denominator",
     "reported_mean_minutes",
@@ -1503,6 +1605,7 @@ RESULT_COLUMNS = (
     "network_time_mean_minutes",
     "total_system_time_mean_minutes",
     "survivor_original_entry_mean_minutes",
+    "survivor_metric_comparison_allowed",
     "v2_safe_original_entry_target_minutes",
     "v2_safe_original_entry_gate",
     "corrected_hca_original_entry_target_minutes",
@@ -1522,12 +1625,21 @@ RESULT_COLUMNS = (
     "reservation_depth",
     "local_queue_capacity",
     "declared_max_events",
+    "max_edges_selected_per_bag_per_decision",
     "max_edges_selected_per_arrive",
+    "max_actions_committed_per_pibt_batch",
     "event_count",
     "wall_seconds",
     "peak_working_set_bytes",
     "fault_affected_bag_count",
     "fault_affected_completed_count",
+    "fault_policy_enabled_echo",
+    "sensor_loss_mode_used",
+    "fault_notification_drop_count",
+    "fault_physical_interlock_rejection_count",
+    "fault_physical_interlock_hold_count",
+    "fault_physical_interlock_reroute_count",
+    "fault_local_action_count",
     "fault_local_hold_count",
     "fault_reroute_count",
     "fault_recovery_seconds_available",
@@ -1552,9 +1664,118 @@ RESULT_COLUMNS = (
     "pibt_backtrack_count",
     "pibt_wait_for_cycle_count",
     "pibt_handoff_count",
+    "pibt_same_bag_fallback_count",
     "route_change_count",
     "route_oscillation_count",
     "notes",
+)
+
+LEDGER_INTEGER_COLUMNS = frozenset(
+    {
+        "pibt_max_depth_echo",
+        "max_events_echo",
+        "credit_capacity_per_edge_echo",
+        "credit_lifecycle_limit_echo",
+        "pibt_max_ready_bags_echo",
+        "pibt_max_local_resources_echo",
+        "pibt_max_candidates_per_bag_echo",
+        "size_segments",
+        "repeat_index",
+        "selected_segment_count",
+        "selected_raw_bag_count",
+        "completed_segment_count",
+        "complete_raw_bag_count",
+        "failed_segment_count",
+        "conflict_count",
+        "unsafe_entry_count",
+        "runtime_full_astar_calls",
+        "global_reservation_scan_count",
+        "future_routes_stored",
+        "unresolved_deadlock_count",
+        "reservation_depth",
+        "local_queue_capacity",
+        "declared_max_events",
+        "max_edges_selected_per_bag_per_decision",
+        "max_edges_selected_per_arrive",
+        "max_actions_committed_per_pibt_batch",
+        "event_count",
+        "peak_working_set_bytes",
+        "decision_trace_stored_count",
+        "hold_trace_stored_count",
+        "fault_affected_bag_count",
+        "fault_affected_completed_count",
+        "fault_notification_drop_count",
+        "fault_physical_interlock_rejection_count",
+        "fault_physical_interlock_hold_count",
+        "fault_physical_interlock_reroute_count",
+        "fault_local_action_count",
+        "fault_local_hold_count",
+        "fault_reroute_count",
+        "credit_issued_count",
+        "credit_consumed_count",
+        "credit_expired_count",
+        "credit_fault_revocation_count",
+        "credit_generation_revocation_count",
+        "credit_local_hold_count",
+        "pibt_applicability_count",
+        "pibt_attempt_count",
+        "pibt_prepare_count",
+        "pibt_validate_count",
+        "pibt_commit_count",
+        "pibt_rollback_count",
+        "pibt_backtrack_count",
+        "pibt_wait_for_cycle_count",
+        "pibt_handoff_count",
+        "pibt_same_bag_fallback_count",
+        "route_change_count",
+        "route_oscillation_count",
+    }
+)
+LEDGER_FLOAT_COLUMNS = frozenset(
+    {
+        "entry_headway_seconds_echo",
+        "pressure_weight_echo",
+        "pressure_age_weight_echo",
+        "pressure_distance_bias_echo",
+        "credit_validity_seconds_echo",
+        "credit_snapshot_max_age_seconds_echo",
+        "reported_mean_minutes",
+        "completion_rate",
+        "original_entry_mean_minutes",
+        "original_entry_p95_seconds",
+        "original_entry_p99_seconds",
+        "java_release_mean_minutes",
+        "source_wait_mean_minutes",
+        "network_time_mean_minutes",
+        "total_system_time_mean_minutes",
+        "survivor_original_entry_mean_minutes",
+        "v2_safe_original_entry_target_minutes",
+        "corrected_hca_original_entry_target_minutes",
+        "processed_attempt_reference_minutes",
+        "wall_seconds",
+        "fault_recovery_seconds",
+        "repair_backlog_slope",
+        "unrecovered_window_seconds",
+        "fault_p95_delta_seconds",
+        "fault_p99_delta_seconds",
+    }
+)
+LEDGER_BOOLEAN_COLUMNS = frozenset(
+    {
+        "summary_only",
+        "summary_only_contract_pass",
+        "binary_provenance_pass",
+        "comparison_eligible",
+        "survivor_metric_comparison_allowed",
+        "processed_attempt_reference_comparable",
+        "event_limit_reached",
+        "time_limit_reached",
+        "fault_policy_enabled_echo",
+        "legacy_pibt_lite_enabled_echo",
+        "sensor_loss_mode_used",
+        "fault_recovery_seconds_available",
+        "repair_backlog_slope_available",
+    }
 )
 
 
@@ -1616,13 +1837,14 @@ def _int_metric(
     if value in (None, ""):
         return default
     if isinstance(value, bool):
-        return int(value)
-    try:
-        return int(value)
-    except (TypeError, ValueError) as exc:
         raise HarnessValidationError(
-            f"metric {names[0]} must be an integer, got {value!r}"
-        ) from exc
+            f"metric {names[0]} must be an integer, got boolean {value!r}"
+        )
+    if isinstance(value, int):
+        return value
+    raise HarnessValidationError(
+        f"metric {names[0]} must be an exact integer, got {value!r}"
+    )
 
 
 def _bool_metric(
@@ -1634,10 +1856,6 @@ def _bool_metric(
     value = _metric(payload, summary, *names, default=default)
     if isinstance(value, bool):
         return value
-    if value in (0, 0.0, "0", "false", "False", "", None):
-        return False
-    if value in (1, 1.0, "1", "true", "True"):
-        return True
     raise HarnessValidationError(
         f"metric {names[0]} must be boolean, got {value!r}"
     )
@@ -1646,7 +1864,7 @@ def _bool_metric(
 def _float_or_blank(value: Any) -> float | str:
     if value in (None, ""):
         return ""
-    return _finite_number(value, "result metric")
+    return _live_finite_number(value, "result metric")
 
 
 def _finite_float_or_blank(value: Any) -> float | str:
@@ -1656,6 +1874,98 @@ def _finite_float_or_blank(value: Any) -> float | str:
         return _float_or_blank(value)
     except HarnessValidationError:
         return ""
+
+
+def _binary_provenance_blockers(
+    payload: Mapping[str, Any],
+    summary: Mapping[str, Any],
+    *,
+    expected_path: Path,
+    expected_sha256: str,
+) -> tuple[list[str], str, str]:
+    """Validate both independent echoes of the artifact actually loaded."""
+
+    blockers: list[str] = []
+    expected_resolved = expected_path.resolve(strict=True)
+
+    def checked_path(
+        owner: str,
+        source: Mapping[str, Any],
+    ) -> Path | None:
+        value = source.get("loaded_cpp_binary_path")
+        if value in (None, ""):
+            blockers.append(f"MISSING_{owner}_LOADED_CPP_BINARY_PATH")
+            return None
+        try:
+            resolved = Path(str(value)).resolve(strict=True)
+        except (OSError, RuntimeError, ValueError) as exc:
+            blockers.append(
+                f"INVALID_{owner}_LOADED_CPP_BINARY_PATH:{exc}"
+            )
+            return None
+        if os.path.normcase(str(resolved)) != os.path.normcase(
+            str(expected_resolved)
+        ):
+            blockers.append(
+                f"{owner}_LOADED_CPP_BINARY_PATH_MISMATCH:"
+                f"loaded={resolved}, expected={expected_resolved}"
+            )
+        return resolved
+
+    def checked_sha256(
+        owner: str,
+        source: Mapping[str, Any],
+    ) -> str:
+        value = source.get("loaded_cpp_binary_sha256")
+        if value in (None, ""):
+            blockers.append(f"MISSING_{owner}_LOADED_CPP_BINARY_SHA256")
+            return ""
+        digest = str(value).lower()
+        if not re.fullmatch(r"[0-9a-f]{64}", digest):
+            blockers.append(f"INVALID_{owner}_LOADED_CPP_BINARY_SHA256")
+            return digest
+        if digest != expected_sha256.lower():
+            blockers.append(
+                f"{owner}_LOADED_CPP_BINARY_SHA256_MISMATCH:"
+                f"loaded={digest}, expected={expected_sha256.lower()}"
+            )
+        return digest
+
+    payload_path = checked_path("PAYLOAD", payload)
+    summary_path = checked_path("SUMMARY", summary)
+    if payload_path is None and summary_path is None:
+        blockers.append("MISSING_LOADED_CPP_BINARY_PATH")
+    elif (
+        payload_path is not None
+        and summary_path is not None
+        and os.path.normcase(str(payload_path))
+        != os.path.normcase(str(summary_path))
+    ):
+        blockers.append(
+            "LOADED_CPP_BINARY_PATH_ECHO_CONFLICT:"
+            f"payload={payload_path}, summary={summary_path}"
+        )
+
+    payload_sha256 = checked_sha256("PAYLOAD", payload)
+    summary_sha256 = checked_sha256("SUMMARY", summary)
+    if not payload_sha256 and not summary_sha256:
+        blockers.append("MISSING_OR_INVALID_LOADED_CPP_BINARY_SHA256")
+    elif (
+        re.fullmatch(r"[0-9a-f]{64}", payload_sha256)
+        and re.fullmatch(r"[0-9a-f]{64}", summary_sha256)
+        and payload_sha256 != summary_sha256
+    ):
+        blockers.append(
+            "LOADED_CPP_BINARY_SHA256_ECHO_CONFLICT:"
+            f"payload={payload_sha256}, summary={summary_sha256}"
+        )
+    loaded_path = summary_path or payload_path
+    loaded_sha256 = summary_sha256 or payload_sha256
+    return (
+        blockers,
+        loaded_path.as_posix() if loaded_path is not None else "",
+        loaded_sha256,
+    )
 
 
 def _planned_blocker(case: CaseSpec, size: int) -> str:
@@ -1780,6 +2090,15 @@ def _safety_blockers(
     timing: Mapping[str, Any],
 ) -> list[str]:
     blockers: list[str] = []
+    survivor_allowed = timing.get("survivor_metric_comparison_allowed")
+    if not isinstance(survivor_allowed, bool):
+        blockers.append(
+            "survivor_metric_comparison_allowed must be a boolean"
+        )
+    elif survivor_allowed:
+        blockers.append(
+            "survivor_metric_comparison_allowed must remain false"
+        )
     required_zero_aliases = {
         "conflict_count": (
             "conflict_count",
@@ -1840,62 +2159,248 @@ def _safety_blockers(
     )
     if reservation_depth != 1:
         blockers.append(f"reservation_depth={reservation_depth}, expected 1")
+    if not _has_metric(
+        payload,
+        summary,
+        "max_edges_selected_per_bag_per_decision",
+    ):
+        blockers.append(
+            "missing required safety metric: "
+            "max_edges_selected_per_bag_per_decision"
+        )
+    max_edges = _int_metric(
+        payload,
+        summary,
+        "max_edges_selected_per_bag_per_decision",
+        default=1,
+    )
+    if max_edges > 1:
+        blockers.append(
+            "max_edges_selected_per_bag_per_decision="
+            f"{max_edges}, expected <=1"
+        )
+    elif max_edges < 0:
+        blockers.append(
+            "max_edges_selected_per_bag_per_decision="
+            f"{max_edges}, expected >=0"
+        )
     if not _has_metric(payload, summary, "max_edges_selected_per_arrive"):
         blockers.append(
             "missing required safety metric: max_edges_selected_per_arrive"
         )
-    max_edges = _int_metric(
-        payload, summary, "max_edges_selected_per_arrive", default=1
-    )
-    if max_edges > 1:
-        blockers.append(
-            f"max_edges_selected_per_arrive={max_edges}, expected <=1"
+    else:
+        max_arrive_edges = _int_metric(
+            payload, summary, "max_edges_selected_per_arrive"
         )
+        if max_arrive_edges < 0:
+            blockers.append(
+                "max_edges_selected_per_arrive="
+                f"{max_arrive_edges}, expected >=0"
+            )
+    max_batch_actions: int | None = None
+    if not _has_metric(
+        payload,
+        summary,
+        "max_actions_committed_per_pibt_batch",
+    ):
+        blockers.append(
+            "missing required PIBT batch metric: "
+            "max_actions_committed_per_pibt_batch"
+        )
+    else:
+        max_batch_actions = _int_metric(
+            payload,
+            summary,
+            "max_actions_committed_per_pibt_batch",
+        )
+        if case.pibt_label == "P0" and max_batch_actions != 0:
+            blockers.append(
+                "P0 max_actions_committed_per_pibt_batch must be 0"
+            )
+        elif case.pibt_label != "P0" and (
+            max_batch_actions < 0
+            or max_batch_actions
+            > int(case.runtime_controls["pibt_max_ready_bags"])
+        ):
+            blockers.append(
+                "max_actions_committed_per_pibt_batch exceeds the "
+                "configured bounded-ready-bag limit"
+            )
     if not bool(timing["comparison_eligible"]):
         blockers.append("selected prefix did not complete; survivor metrics excluded")
-    if case.phase == "F" and case.pibt_label != "P0":
-        for name, aliases in {
-            "pibt_applicability_count": (
-                "pibt_applicability_count",
-                "bounded_local_pibt_applicability_count",
-            ),
-            "pibt_attempt_count": (
-                "pibt_attempt_count",
-                "bounded_local_pibt_attempt_count",
-            ),
-            "pibt_prepare_count": (
-                "pibt_prepare_count",
-                "bounded_local_pibt_prepare_count",
-            ),
-            "pibt_validate_count": (
-                "pibt_validate_count",
-                "bounded_local_pibt_validate_count",
-            ),
-            "pibt_commit_count": (
-                "pibt_commit_count",
-                "bounded_local_pibt_commit_count",
-            ),
-            "pibt_rollback_count": (
-                "pibt_rollback_count",
-                "bounded_local_pibt_rollback_count",
-            ),
-            "pibt_backtrack_count": (
-                "pibt_backtrack_count",
-                "bounded_local_pibt_backtrack_count",
-            ),
-            "pibt_wait_for_cycle_count": (
-                "pibt_wait_for_cycle_count",
-                "bounded_local_pibt_wait_for_cycle_count",
-            ),
-            "pibt_handoff_count": (
-                "pibt_handoff_count",
-                "bounded_local_pibt_handoff_count",
-            ),
-        }.items():
-            if not _has_metric(payload, summary, *aliases):
-                blockers.append(f"missing required F runtime audit metric: {name}")
-            elif _int_metric(payload, summary, *aliases) < 0:
-                blockers.append(f"{name} must be >=0")
+    same_bag_fallback_count: int | None = None
+    if not _has_metric(
+        payload,
+        summary,
+        "pibt_same_bag_fallback_count",
+        "bounded_local_pibt_same_bag_fallback_count",
+    ):
+        blockers.append(
+            "missing required bounded same-bag fallback audit metric: "
+            "pibt_same_bag_fallback_count"
+        )
+    else:
+        same_bag_fallback_count = _int_metric(
+            payload,
+            summary,
+            "pibt_same_bag_fallback_count",
+            "bounded_local_pibt_same_bag_fallback_count",
+        )
+        if same_bag_fallback_count < 0:
+            blockers.append("pibt_same_bag_fallback_count must be >=0")
+        elif case.pibt_label == "P0" and same_bag_fallback_count != 0:
+            blockers.append(
+                "P0 pibt_same_bag_fallback_count must be 0"
+            )
+    pibt_audit_aliases = {
+        "pibt_applicability_count": (
+            "pibt_applicability_count",
+            "bounded_local_pibt_applicability_count",
+        ),
+        "pibt_attempt_count": (
+            "pibt_attempt_count",
+            "bounded_local_pibt_attempt_count",
+        ),
+        "pibt_prepare_count": (
+            "pibt_prepare_count",
+            "bounded_local_pibt_prepare_count",
+        ),
+        "pibt_validate_count": (
+            "pibt_validate_count",
+            "bounded_local_pibt_validate_count",
+        ),
+        "pibt_commit_count": (
+            "pibt_commit_count",
+            "bounded_local_pibt_commit_count",
+        ),
+        "pibt_rollback_count": (
+            "pibt_rollback_count",
+            "bounded_local_pibt_rollback_count",
+        ),
+        "pibt_backtrack_count": (
+            "pibt_backtrack_count",
+            "bounded_local_pibt_backtrack_count",
+        ),
+        "pibt_wait_for_cycle_count": (
+            "pibt_wait_for_cycle_count",
+            "bounded_local_pibt_wait_for_cycle_count",
+        ),
+        "pibt_handoff_count": (
+            "pibt_handoff_count",
+            "bounded_local_pibt_handoff_count",
+        ),
+    }
+    pibt_audit_values: dict[str, int] = {}
+    for name, aliases in pibt_audit_aliases.items():
+        if not _has_metric(payload, summary, *aliases):
+            prefix = (
+                "missing required F runtime audit metric"
+                if case.phase == "F" and case.pibt_label != "P0"
+                else "missing required PIBT runtime audit metric"
+            )
+            blockers.append(f"{prefix}: {name}")
+            continue
+        value = _int_metric(payload, summary, *aliases)
+        pibt_audit_values[name] = value
+        if value < 0:
+            blockers.append(f"{name} must be >=0")
+        elif case.pibt_label == "P0" and value != 0:
+            blockers.append(f"P0 {name} must be 0")
+
+    if (
+        case.pibt_label != "P0"
+        and len(pibt_audit_values) == len(pibt_audit_aliases)
+    ):
+        applicability = pibt_audit_values["pibt_applicability_count"]
+        attempt = pibt_audit_values["pibt_attempt_count"]
+        prepare = pibt_audit_values["pibt_prepare_count"]
+        validate = pibt_audit_values["pibt_validate_count"]
+        commit = pibt_audit_values["pibt_commit_count"]
+        rollback = pibt_audit_values["pibt_rollback_count"]
+        backtrack = pibt_audit_values["pibt_backtrack_count"]
+        handoff = pibt_audit_values["pibt_handoff_count"]
+        if prepare > applicability:
+            blockers.append(
+                "pibt_prepare_count cannot exceed pibt_applicability_count"
+            )
+        if prepare > attempt:
+            blockers.append(
+                "pibt_prepare_count cannot exceed pibt_attempt_count"
+            )
+        if prepare > validate:
+            blockers.append(
+                "pibt_prepare_count cannot exceed pibt_validate_count"
+            )
+        if commit > prepare:
+            blockers.append(
+                "pibt_commit_count cannot exceed pibt_prepare_count"
+            )
+        if rollback > prepare:
+            blockers.append(
+                "pibt_rollback_count cannot exceed pibt_prepare_count"
+            )
+        if backtrack > attempt:
+            blockers.append(
+                "pibt_backtrack_count cannot exceed pibt_attempt_count"
+            )
+        if handoff > attempt:
+            blockers.append(
+                "pibt_handoff_count cannot exceed pibt_attempt_count"
+            )
+        max_ready_bags = int(
+            case.runtime_controls["pibt_max_ready_bags"]
+        )
+        if handoff > commit * max_ready_bags:
+            blockers.append(
+                "pibt_handoff_count cannot exceed committed PIBT calls "
+                "times pibt_max_ready_bags"
+            )
+        if max_batch_actions is not None and max_batch_actions > 0:
+            if max_batch_actions < 2:
+                blockers.append(
+                    "max_actions_committed_per_pibt_batch must be 0 or >=2"
+                )
+            if commit == 0:
+                blockers.append(
+                    "max_actions_committed_per_pibt_batch >0 requires "
+                    "pibt_commit_count >0"
+                )
+            if max_batch_actions > attempt:
+                blockers.append(
+                    "max_actions_committed_per_pibt_batch cannot exceed "
+                    "pibt_attempt_count"
+                )
+            minimum_validation_count = 1 + 2 * max_batch_actions
+            if validate < minimum_validation_count:
+                blockers.append(
+                    "pibt_validate_count is too small for the observed "
+                    "successful PIBT batch"
+                )
+        if max_batch_actions is not None:
+            maximum_committed_handoffs = (
+                commit * max(0, max_batch_actions - 1)
+            )
+            if handoff > maximum_committed_handoffs:
+                blockers.append(
+                    "pibt_handoff_count cannot exceed committed PIBT calls "
+                    "times max_actions_committed_per_pibt_batch minus one"
+                )
+        if (
+            same_bag_fallback_count is not None
+            and same_bag_fallback_count > prepare
+        ):
+            blockers.append(
+                "pibt_same_bag_fallback_count cannot exceed "
+                "pibt_prepare_count"
+            )
+        if (
+            same_bag_fallback_count is not None
+            and same_bag_fallback_count > rollback
+        ):
+            blockers.append(
+                "pibt_same_bag_fallback_count cannot exceed "
+                "pibt_rollback_count"
+            )
     if case.phase == "J":
         if size != FULL_SIZE_SEGMENTS:
             blockers.append("J comparison must use exactly 43,603 segments")
@@ -1920,6 +2425,157 @@ def _safety_blockers(
             blockers.append(
                 "original_entry_mean_minutes does not meet corrected historical "
                 f"HCA original-entry target <= {CORRECTED_HCA_ORIGINAL_ENTRY_MINUTES}"
+            )
+    if case.phase == "H":
+        if not _has_metric(payload, summary, "sensor_loss_mode_used"):
+            blockers.append("missing sensor-loss mode audit")
+            sensor_loss_used = False
+        else:
+            sensor_loss_used = _bool_metric(
+                payload, summary, "sensor_loss_mode_used"
+            )
+        if not _has_metric(payload, summary, "fault_notification_drop_count"):
+            blockers.append("missing fault notification-drop audit")
+            notification_drop_count = 0
+        else:
+            notification_drop_count = _int_metric(
+                payload, summary, "fault_notification_drop_count"
+            )
+            if notification_drop_count < 0:
+                blockers.append("fault_notification_drop_count must be >=0")
+        physical_aliases = {
+            "fault_physical_interlock_rejection_count": (
+                "fault_physical_interlock_rejection_count",
+                "physical_fault_interlock_rejection_count",
+            ),
+            "fault_physical_interlock_hold_count": (
+                "fault_physical_interlock_hold_count",
+                "physical_fault_interlock_hold_count",
+            ),
+            "fault_physical_interlock_reroute_count": (
+                "fault_physical_interlock_reroute_count",
+                "physical_fault_interlock_reroute_count",
+            ),
+        }
+        physical_counts: dict[str, int] = {}
+        for name, aliases in physical_aliases.items():
+            if not _has_metric(payload, summary, *aliases):
+                blockers.append(f"missing physical interlock audit: {name}")
+                physical_counts[name] = 0
+            else:
+                value = _int_metric(payload, summary, *aliases)
+                physical_counts[name] = value
+                if value < 0:
+                    blockers.append(f"{name} must be >=0")
+        physical_rejections = physical_counts[
+            "fault_physical_interlock_rejection_count"
+        ]
+        physical_holds = physical_counts[
+            "fault_physical_interlock_hold_count"
+        ]
+        physical_reroutes = physical_counts[
+            "fault_physical_interlock_reroute_count"
+        ]
+        if physical_rejections != physical_holds + physical_reroutes:
+            blockers.append(
+                "physical interlock rejection count must equal hold plus reroute"
+            )
+        local_aliases = {
+            "fault_local_action_count": (
+                "fault_local_action_count",
+                "local_fault_policy_action_count",
+            ),
+            "fault_local_hold_count": (
+                "fault_local_hold_count",
+                "local_fault_policy_hold_count",
+            ),
+            "fault_reroute_count": (
+                "fault_reroute_count",
+                "local_fault_policy_reroute_count",
+            ),
+        }
+        local_counts: dict[str, int] = {}
+        for name, aliases in local_aliases.items():
+            if not _has_metric(payload, summary, *aliases):
+                blockers.append(f"missing local fault-policy audit: {name}")
+                local_counts[name] = 0
+            else:
+                value = _int_metric(payload, summary, *aliases)
+                local_counts[name] = value
+                if value < 0:
+                    blockers.append(f"{name} must be >=0")
+        local_actions = local_counts["fault_local_action_count"]
+        local_holds = local_counts["fault_local_hold_count"]
+        local_reroutes = local_counts["fault_reroute_count"]
+        if local_actions != local_holds + local_reroutes:
+            blockers.append(
+                "local fault-policy action count must equal hold plus reroute"
+            )
+        if not _has_metric(payload, summary, "fault_affected_bag_count"):
+            blockers.append("missing fault affected-bag audit")
+            profile_affected = 0
+        else:
+            profile_affected = _int_metric(
+                payload, summary, "fault_affected_bag_count"
+            )
+        if not _has_metric(
+            payload, summary, "fault_affected_completed_count"
+        ):
+            blockers.append("missing fault affected-completed audit")
+            profile_affected_completed = 0
+        else:
+            profile_affected_completed = _int_metric(
+                payload, summary, "fault_affected_completed_count"
+            )
+        if case.fault_profile == "no_fault":
+            if (
+                sensor_loss_used
+                or notification_drop_count != 0
+                or profile_affected != 0
+                or profile_affected_completed != 0
+                or physical_rejections != 0
+                or local_actions != 0
+            ):
+                blockers.append("no-fault profile contains fault-action evidence")
+        elif case.fault_profile in {
+            "single_immediate",
+            "single_delayed_30s",
+        }:
+            if local_actions <= 0:
+                blockers.append(
+                    "advertised-fault profile recorded no local policy action"
+                )
+        if case.fault_profile == "sensor_loss":
+            if not sensor_loss_used:
+                blockers.append("sensor-loss profile did not report sensor_loss_mode_used")
+            if notification_drop_count != 2:
+                blockers.append(
+                    "sensor-loss profile must retain exactly two dropped notifications"
+                )
+            if physical_rejections <= 0:
+                blockers.append(
+                    "sensor-loss profile did not exercise the physical interlock"
+                )
+            if physical_holds + physical_reroutes <= 0:
+                blockers.append(
+                    "sensor-loss profile recorded no physical hold or reroute action"
+                )
+            if local_actions != 0:
+                blockers.append(
+                    "sensor-loss profile fabricated advertised-fault policy actions"
+                )
+        elif case.fault_profile == "fault_policy_off":
+            if physical_rejections <= 0:
+                blockers.append(
+                    "fault-policy-off profile did not exercise the physical interlock"
+                )
+            if local_actions != 0:
+                blockers.append(
+                    "fault-policy-off profile recorded prohibited local policy actions"
+                )
+        elif sensor_loss_used or notification_drop_count != 0:
+            blockers.append(
+                "non-sensor-loss profile claims dropped-notification evidence"
             )
     if case.phase == "H" and case.fault_profile != "no_fault":
         affected = _int_metric(payload, summary, "fault_affected_bag_count")
@@ -1953,7 +2609,7 @@ def _safety_blockers(
             blockers.append("fault recovery window was not measured")
         else:
             try:
-                recovery_value = _finite_number(
+                recovery_value = _live_finite_number(
                     recovery,
                     "fault recovery seconds",
                 )
@@ -1976,7 +2632,7 @@ def _safety_blockers(
             blockers.append("post-repair backlog slope is missing")
         else:
             try:
-                slope_value = _finite_number(
+                slope_value = _live_finite_number(
                     slope,
                     "repair backlog slope",
                 )
@@ -2027,6 +2683,10 @@ def _not_applicable_reasons(
                 "pibt_validate_count",
                 "bounded_local_pibt_validate_count",
             ),
+            "commit": (
+                "pibt_commit_count",
+                "bounded_local_pibt_commit_count",
+            ),
         }
         if all(
             _has_metric(payload, summary, *aliases)
@@ -2043,7 +2703,122 @@ def _not_applicable_reasons(
                     f"{'/'.join(inactive)} audit counts; configuration is "
                     "NOT_APPLICABLE to the bounded-local PIBT depth comparison"
                 )
+            max_batch_actions = _int_metric(
+                payload,
+                summary,
+                "max_actions_committed_per_pibt_batch",
+                default=0,
+            )
+            if max_batch_actions < 2:
+                reasons.append(
+                    f"{case.pibt_label} did not execute a successful "
+                    "multi-bag atomic batch; configuration is NOT_APPLICABLE "
+                    "to the bounded-local PIBT depth comparison"
+                )
     return reasons
+
+
+CONTROL_ECHO_ALIASES: Mapping[str, tuple[str, ...]] = {
+    "resource_semantics": (
+        "resource_semantics_echo",
+        "resource_semantics_id",
+        "resource_semantics",
+    ),
+    "scorer_mode": ("scorer_mode_echo", "scorer_mode", "scorer_id"),
+    "pibt_mode": (
+        "pibt_mode_echo",
+        "pibt_mode",
+        "bounded_local_pibt_mode",
+    ),
+    "pressure_mode": ("pressure_mode_echo", "pressure_mode"),
+    "admission_mode": ("admission_mode_echo", "admission_mode"),
+    "framework_mode": ("framework_mode_echo", "framework_mode"),
+    "enable_fault_policy": (
+        "fault_policy_enabled_echo",
+        "fault_policy_enabled",
+    ),
+    "enable_pibt_lite": (
+        "legacy_pibt_lite_enabled_echo",
+        "legacy_pibt_lite_enabled",
+    ),
+    "pibt_max_depth": (
+        "pibt_max_depth_echo",
+        "pibt_max_depth",
+        "bounded_local_pibt_depth",
+    ),
+    "reservation_depth": ("reservation_depth",),
+    "local_queue_capacity": ("local_queue_capacity",),
+    "max_events": (
+        "max_events_echo",
+        "declared_max_events",
+        "max_events",
+    ),
+    "entry_headway_seconds": (
+        "entry_headway_seconds_echo",
+        "entry_headway_seconds",
+    ),
+    "pressure_weight": ("pressure_weight_echo", "pressure_weight"),
+    "pressure_age_weight": (
+        "pressure_age_weight_echo",
+        "pressure_age_weight",
+    ),
+    "pressure_distance_bias": (
+        "pressure_distance_bias_echo",
+        "pressure_distance_bias",
+    ),
+    "credit_validity_seconds": (
+        "credit_validity_seconds_echo",
+        "credit_validity_seconds",
+    ),
+    "credit_snapshot_max_age_seconds": (
+        "credit_snapshot_max_age_seconds_echo",
+        "credit_snapshot_max_age_seconds",
+    ),
+    "credit_capacity_per_edge": (
+        "credit_capacity_per_edge_echo",
+        "credit_capacity_per_edge",
+    ),
+    "credit_lifecycle_limit": (
+        "credit_lifecycle_limit_echo",
+        "credit_lifecycle_limit",
+    ),
+    "pibt_max_ready_bags": (
+        "pibt_max_ready_bags_echo",
+        "pibt_max_ready_bags",
+    ),
+    "pibt_max_local_resources": (
+        "pibt_max_local_resources_echo",
+        "pibt_max_local_resources",
+    ),
+    "pibt_max_candidates_per_bag": (
+        "pibt_max_candidates_per_bag_echo",
+        "pibt_max_candidates_per_bag",
+    ),
+}
+EXPLICIT_MODE_ECHO_CONTROLS = frozenset(
+    {
+        "resource_semantics",
+        "scorer_mode",
+        "pibt_mode",
+        "pressure_mode",
+        "admission_mode",
+        "framework_mode",
+    }
+)
+
+
+def _runtime_control_echo(
+    summary: Mapping[str, Any],
+    canonical_name: str,
+    *,
+    default: Any = "",
+) -> Any:
+    """Resolve one control exactly as both gating and ledger assembly do."""
+
+    for name in CONTROL_ECHO_ALIASES[canonical_name]:
+        if name in summary and summary[name] not in (None, ""):
+            return summary[name]
+    return default
 
 
 def _control_echo_blockers(
@@ -2051,75 +2826,6 @@ def _control_echo_blockers(
     summary: Mapping[str, Any],
 ) -> list[str]:
     blockers: list[str] = []
-    echo_aliases = {
-        "resource_semantics": (
-            "resource_semantics_echo",
-            "resource_semantics_id",
-            "resource_semantics",
-        ),
-        "scorer_mode": ("scorer_mode_echo", "scorer_mode", "scorer_id"),
-        "pibt_mode": (
-            "pibt_mode_echo",
-            "pibt_mode",
-            "bounded_local_pibt_mode",
-        ),
-        "pressure_mode": ("pressure_mode_echo", "pressure_mode"),
-        "admission_mode": ("admission_mode_echo", "admission_mode"),
-        "framework_mode": ("framework_mode_echo", "framework_mode"),
-        "pibt_max_depth": (
-            "pibt_max_depth_echo",
-            "pibt_max_depth",
-            "bounded_local_pibt_depth",
-        ),
-        "reservation_depth": ("reservation_depth",),
-        "local_queue_capacity": ("local_queue_capacity",),
-        "max_events": (
-            "max_events_echo",
-            "declared_max_events",
-            "max_events",
-        ),
-        "entry_headway_seconds": (
-            "entry_headway_seconds_echo",
-            "entry_headway_seconds",
-        ),
-        "pressure_weight": ("pressure_weight_echo", "pressure_weight"),
-        "pressure_age_weight": (
-            "pressure_age_weight_echo",
-            "pressure_age_weight",
-        ),
-        "pressure_distance_bias": (
-            "pressure_distance_bias_echo",
-            "pressure_distance_bias",
-        ),
-        "credit_validity_seconds": (
-            "credit_validity_seconds_echo",
-            "credit_validity_seconds",
-        ),
-        "credit_snapshot_max_age_seconds": (
-            "credit_snapshot_max_age_seconds_echo",
-            "credit_snapshot_max_age_seconds",
-        ),
-        "credit_capacity_per_edge": (
-            "credit_capacity_per_edge_echo",
-            "credit_capacity_per_edge",
-        ),
-        "credit_lifecycle_limit": (
-            "credit_lifecycle_limit_echo",
-            "credit_lifecycle_limit",
-        ),
-        "pibt_max_ready_bags": (
-            "pibt_max_ready_bags_echo",
-            "pibt_max_ready_bags",
-        ),
-        "pibt_max_local_resources": (
-            "pibt_max_local_resources_echo",
-            "pibt_max_local_resources",
-        ),
-        "pibt_max_candidates_per_bag": (
-            "pibt_max_candidates_per_bag_echo",
-            "pibt_max_candidates_per_bag",
-        ),
-    }
     required_echoes = {
         "resource_semantics",
         "scorer_mode",
@@ -2130,31 +2836,49 @@ def _control_echo_blockers(
     required_echoes.update(
         name
         for name in case.runtime_controls
-        if name in echo_aliases
+        if name in CONTROL_ECHO_ALIASES
     )
     required_echoes.update(
         name
         for name in case.required_capabilities
-        if name in echo_aliases
+        if name in CONTROL_ECHO_ALIASES
     )
     for canonical_name in sorted(required_echoes):
         if canonical_name not in case.runtime_controls:
             continue
-        aliases = echo_aliases[canonical_name]
-        found_name = next(
-            (
-                name
-                for name in aliases
-                if name in summary and summary[name] not in (None, "")
-            ),
-            None,
-        )
-        if found_name is None:
+        if canonical_name in EXPLICIT_MODE_ECHO_CONTROLS:
+            explicit_name = f"{canonical_name}_echo"
+            actual = summary.get(explicit_name)
+        else:
+            actual = _runtime_control_echo(
+                summary,
+                canonical_name,
+                default=None,
+            )
+        if actual is None:
             blockers.append(f"MISSING_RUNTIME_CONTROL_ECHO:{canonical_name}")
             continue
-        actual = summary[found_name]
         expected = case.runtime_controls[canonical_name]
-        if str(actual) != str(expected):
+        if isinstance(expected, str):
+            matches = isinstance(actual, str) and actual == expected
+        elif isinstance(expected, bool):
+            matches = isinstance(actual, bool) and actual is expected
+        elif isinstance(expected, int):
+            matches = (
+                isinstance(actual, int)
+                and not isinstance(actual, bool)
+                and actual == expected
+            )
+        elif isinstance(expected, float):
+            matches = (
+                isinstance(actual, (int, float))
+                and not isinstance(actual, bool)
+                and math.isfinite(float(actual))
+                and float(actual) == expected
+            )
+        else:
+            matches = type(actual) is type(expected) and actual == expected
+        if not matches:
             blockers.append(
                 f"RUNTIME_CONTROL_ECHO_MISMATCH:{canonical_name}="
                 f"{actual!r}, expected {expected!r}"
@@ -2172,6 +2896,7 @@ def execute_case(
     base_runtime_kwargs: Mapping[str, Any] | None = None,
     root: Path = ROOT,
     summary_only: bool = True,
+    executor_id: str | None = None,
 ) -> dict[str, Any]:
     """Execute one already-authorized tier and return one compact result row."""
 
@@ -2180,8 +2905,12 @@ def execute_case(
             f"{case.case_id} does not declare size {size_segments}"
         )
     prefix = load_input_prefix(size_segments, root=root)
-    binary_digest = file_sha256(executor_binary)
+    expected_binary_path = executor_binary.resolve(strict=True)
+    binary_digest = file_sha256(expected_binary_path)
     bundle_digest = source_bundle_sha256(source_paths, root=root)
+    source_path_manifest_digest = canonical_sha256(
+        [Path(path).as_posix() for path in source_paths]
+    )
     capabilities = inspect_executor(executor)
     row = _base_result_identity(
         case,
@@ -2191,6 +2920,11 @@ def execute_case(
         capabilities=capabilities,
         summary_only=summary_only,
     )
+    row["executor_id"] = executor_id or (
+        f"{getattr(executor, '__module__', '')}:"
+        f"{getattr(executor, '__qualname__', getattr(executor, '__name__', ''))}"
+    )
+    row["source_path_manifest_sha256"] = source_path_manifest_digest
 
     base: dict[str, Any] = dict(base_runtime_kwargs or {})
     base.update(
@@ -2200,6 +2934,7 @@ def execute_case(
             "fault_windows": _fault_records(case, prefix),
             "scenario": f"g4irsf12_{case.case_id}_{size_segments}",
             "scale": 1.0,
+            "expected_binary_path": str(expected_binary_path),
             "input_prefix_sha256": prefix.prefix_sha256,
             "case_config_sha256": row["case_config_sha256"],
         }
@@ -2253,7 +2988,28 @@ def execute_case(
             "executor payload must contain a bags/segment_results array"
         )
 
-    summary_errors = _summary_only_errors(payload) if summary_only else []
+    (
+        binary_provenance_errors,
+        loaded_cpp_binary_path,
+        loaded_cpp_binary_sha256,
+    ) = _binary_provenance_blockers(
+        payload,
+        summary,
+        expected_path=expected_binary_path,
+        expected_sha256=binary_digest,
+    )
+    summary_errors = (
+        _summary_only_errors(payload)
+        if summary_only
+        else ["FORMAL_PROMOTION_REQUIRES_SUMMARY_ONLY"]
+    )
+    summary_only_contract_pass = not summary_errors
+    binary_provenance_pass = not binary_provenance_errors
+    decision_trace_stored_count = summary.get(
+        "decision_trace_stored_count",
+        "",
+    )
+    hold_trace_stored_count = summary.get("hold_trace_stored_count", "")
     raw_bags = aggregate_raw_bag_timings(prefix.rows, bags)
     timing = summarize_raw_bag_timings(
         raw_bags,
@@ -2297,143 +3053,180 @@ def execute_case(
         payload=payload,
         summary=summary,
     )
+    control_echo_blockers = _control_echo_blockers(case, summary)
+    allow_unlimited_capacity_mismatch = (
+        case.pibt_label != "P0"
+        and _has_metric(payload, summary, "local_queue_capacity")
+        and _int_metric(
+            payload,
+            summary,
+            "local_queue_capacity",
+        )
+        == 0
+    )
+    hard_control_echo_blockers = [
+        blocker
+        for blocker in control_echo_blockers
+        if not (
+            allow_unlimited_capacity_mismatch
+            and blocker.startswith(
+                "RUNTIME_CONTROL_ECHO_MISMATCH:local_queue_capacity="
+            )
+        )
+    ]
     blockers = [
+        *binary_provenance_errors,
         *summary_errors,
-        *_control_echo_blockers(case, summary),
+        *control_echo_blockers,
         *safety_blockers,
         *not_applicable,
     ]
     if early_abort:
         blockers.append(EARLY_ABORT_STATUS)
 
+    evidence_integrity_failed = bool(
+        binary_provenance_errors or summary_errors
+    )
     execution_status = (
-        EARLY_ABORT_STATUS
-        if early_abort
-        else ("EXECUTED" if timing["comparison_eligible"] else "PARTIAL")
+        "FAILED"
+        if evidence_integrity_failed
+        else (
+            EARLY_ABORT_STATUS
+            if early_abort
+            else ("EXECUTED" if timing["comparison_eligible"] else "PARTIAL")
+        )
     )
     if execution_status != "EXECUTED":
+        gate_status = "FAIL"
+    elif (
+        binary_provenance_errors
+        or summary_errors
+        or hard_control_echo_blockers
+        or safety_blockers
+    ):
+        # NOT_APPLICABLE is a valid, fully audited execution that simply did
+        # not exercise the comparison mechanism.  It must never mask missing
+        # evidence, control drift, or a safety violation.
         gate_status = "FAIL"
     elif not_applicable:
         gate_status = "NOT_APPLICABLE"
     else:
-        gate_status = "PASS" if not blockers else "FAIL"
+        gate_status = "PASS"
     completed_segments = int(timing["completed_segment_count"])
     row.update(
         {
             "execution_status": execution_status,
             "gate_status": gate_status,
             "evidence_status": (
-                "EXECUTED_RESULT_VALIDATED"
-                if gate_status == "PASS"
+                "INVALID_EVIDENCE_REJECTED"
+                if evidence_integrity_failed
                 else (
-                    "EXECUTED_CONFIGURATION_NOT_APPLICABLE"
-                    if gate_status == "NOT_APPLICABLE"
-                    else "NEGATIVE_OR_PARTIAL_RESULT_RETAINED"
+                    "EXECUTED_RESULT_VALIDATED"
+                    if gate_status == "PASS"
+                    else (
+                        "EXECUTED_CONFIGURATION_NOT_APPLICABLE"
+                        if gate_status == "NOT_APPLICABLE"
+                        else "NEGATIVE_OR_PARTIAL_RESULT_RETAINED"
+                    )
                 )
             ),
-            "termination_reason": termination_reason,
+            "termination_reason": (
+                "INVALID_EVIDENCE"
+                if evidence_integrity_failed
+                else termination_reason
+            ),
             "early_abort_status": EARLY_ABORT_STATUS if early_abort else "",
             "blocker": " | ".join(blockers),
-            "resource_semantics_echo": _metric(
-                payload,
+            "summary_only_contract_pass": summary_only_contract_pass,
+            "decision_trace_stored_count": decision_trace_stored_count,
+            "hold_trace_stored_count": hold_trace_stored_count,
+            "resource_semantics_echo": _runtime_control_echo(
                 summary,
-                "resource_semantics_id",
                 "resource_semantics",
             ),
-            "scorer_mode_echo": _metric(
-                payload,
+            "scorer_mode_echo": _runtime_control_echo(
                 summary,
                 "scorer_mode",
-                "scorer_id",
             ),
-            "pibt_mode_echo": _metric(
-                payload,
+            "pibt_mode_echo": _runtime_control_echo(
                 summary,
                 "pibt_mode",
-                "bounded_local_pibt_mode",
             ),
-            "pressure_mode_echo": _metric(
-                payload,
+            "pressure_mode_echo": _runtime_control_echo(
                 summary,
                 "pressure_mode",
             ),
-            "admission_mode_echo": _metric(
-                payload,
+            "admission_mode_echo": _runtime_control_echo(
                 summary,
                 "admission_mode",
             ),
-            "framework_mode_echo": _metric(
-                payload,
+            "framework_mode_echo": _runtime_control_echo(
                 summary,
                 "framework_mode",
             ),
-            "pibt_max_depth_echo": _metric(
-                payload,
+            "pibt_max_depth_echo": _runtime_control_echo(
                 summary,
                 "pibt_max_depth",
-                "bounded_local_pibt_depth",
             ),
-            "max_events_echo": _metric(
-                payload,
+            "max_events_echo": _runtime_control_echo(
                 summary,
-                "declared_max_events",
                 "max_events",
             ),
-            "entry_headway_seconds_echo": _metric(
-                payload,
+            "entry_headway_seconds_echo": _runtime_control_echo(
                 summary,
                 "entry_headway_seconds",
             ),
-            "pressure_weight_echo": _metric(
-                payload,
+            "pressure_weight_echo": _runtime_control_echo(
                 summary,
                 "pressure_weight",
             ),
-            "pressure_age_weight_echo": _metric(
-                payload,
+            "pressure_age_weight_echo": _runtime_control_echo(
                 summary,
                 "pressure_age_weight",
             ),
-            "pressure_distance_bias_echo": _metric(
-                payload,
+            "pressure_distance_bias_echo": _runtime_control_echo(
                 summary,
                 "pressure_distance_bias",
             ),
-            "credit_validity_seconds_echo": _metric(
-                payload,
+            "credit_validity_seconds_echo": _runtime_control_echo(
                 summary,
                 "credit_validity_seconds",
             ),
-            "credit_snapshot_max_age_seconds_echo": _metric(
-                payload,
+            "credit_snapshot_max_age_seconds_echo": _runtime_control_echo(
                 summary,
                 "credit_snapshot_max_age_seconds",
             ),
-            "credit_capacity_per_edge_echo": _metric(
-                payload,
+            "credit_capacity_per_edge_echo": _runtime_control_echo(
                 summary,
                 "credit_capacity_per_edge",
             ),
-            "credit_lifecycle_limit_echo": _metric(
-                payload,
+            "credit_lifecycle_limit_echo": _runtime_control_echo(
                 summary,
                 "credit_lifecycle_limit",
             ),
-            "pibt_max_ready_bags_echo": _metric(
-                payload,
+            "pibt_max_ready_bags_echo": _runtime_control_echo(
                 summary,
                 "pibt_max_ready_bags",
             ),
-            "pibt_max_local_resources_echo": _metric(
-                payload,
+            "pibt_max_local_resources_echo": _runtime_control_echo(
                 summary,
                 "pibt_max_local_resources",
             ),
-            "pibt_max_candidates_per_bag_echo": _metric(
-                payload,
+            "pibt_max_candidates_per_bag_echo": _runtime_control_echo(
                 summary,
                 "pibt_max_candidates_per_bag",
             ),
+            "legacy_pibt_lite_enabled_echo": _runtime_control_echo(
+                summary,
+                "enable_pibt_lite",
+            ),
+            "fault_policy_enabled_echo": _runtime_control_echo(
+                summary,
+                "enable_fault_policy",
+            ),
+            "loaded_cpp_binary_path": loaded_cpp_binary_path,
+            "loaded_cpp_binary_sha256": loaded_cpp_binary_sha256,
+            "binary_provenance_pass": binary_provenance_pass,
             "deterministic_result_sha256": result_digest,
             "repeat_consistency": "SINGLE_RESULT",
             **timing,
@@ -2486,11 +3279,20 @@ def execute_case(
                 "local_queue_capacity",
                 default=int(case.runtime_controls.get("local_queue_capacity", 0)),
             ),
+            "max_edges_selected_per_bag_per_decision": _int_metric(
+                payload,
+                summary,
+                "max_edges_selected_per_bag_per_decision",
+            ),
             "max_edges_selected_per_arrive": _int_metric(
                 payload,
                 summary,
                 "max_edges_selected_per_arrive",
-                default=1,
+            ),
+            "max_actions_committed_per_pibt_batch": _int_metric(
+                payload,
+                summary,
+                "max_actions_committed_per_pibt_batch",
             ),
             "event_count": _int_metric(payload, summary, "event_count"),
             "wall_seconds": _float_or_blank(
@@ -2504,6 +3306,36 @@ def execute_case(
             ),
             "fault_affected_completed_count": _int_metric(
                 payload, summary, "fault_affected_completed_count"
+            ),
+            "sensor_loss_mode_used": _bool_metric(
+                payload, summary, "sensor_loss_mode_used"
+            ),
+            "fault_notification_drop_count": _int_metric(
+                payload, summary, "fault_notification_drop_count"
+            ),
+            "fault_physical_interlock_rejection_count": _int_metric(
+                payload,
+                summary,
+                "fault_physical_interlock_rejection_count",
+                "physical_fault_interlock_rejection_count",
+            ),
+            "fault_physical_interlock_hold_count": _int_metric(
+                payload,
+                summary,
+                "fault_physical_interlock_hold_count",
+                "physical_fault_interlock_hold_count",
+            ),
+            "fault_physical_interlock_reroute_count": _int_metric(
+                payload,
+                summary,
+                "fault_physical_interlock_reroute_count",
+                "physical_fault_interlock_reroute_count",
+            ),
+            "fault_local_action_count": _int_metric(
+                payload,
+                summary,
+                "fault_local_action_count",
+                "local_fault_policy_action_count",
             ),
             "fault_local_hold_count": _int_metric(
                 payload,
@@ -2638,6 +3470,12 @@ def execute_case(
                 "pibt_handoff_count",
                 "bounded_local_pibt_handoff_count",
             ),
+            "pibt_same_bag_fallback_count": _int_metric(
+                payload,
+                summary,
+                "pibt_same_bag_fallback_count",
+                "bounded_local_pibt_same_bag_fallback_count",
+            ),
             "route_change_count": _int_metric(
                 payload, summary, "route_change_count"
             ),
@@ -2658,7 +3496,14 @@ def apply_repeat_consistency(
     groups: dict[tuple[str, str, int, str], list[dict[str, Any]]] = {}
     for row in result:
         digest = str(row.get("deterministic_result_sha256", ""))
-        if row.get("execution_status") != "EXECUTED" or not digest:
+        execution_status = str(row.get("execution_status", ""))
+        is_fault_policy_attempt = (
+            str(row.get("case_id", "")) == "H_fault_policy_off"
+            and execution_status != "NOT_RUN"
+        )
+        if not is_fault_policy_attempt and (
+            execution_status != "EXECUTED" or not digest
+        ):
             continue
         key = (
             str(row.get("phase", "")),
@@ -2669,8 +3514,25 @@ def apply_repeat_consistency(
         groups.setdefault(key, []).append(row)
     for members in groups.values():
         digests = {str(row["deterministic_result_sha256"]) for row in members}
-        status = "MATCH" if len(digests) == 1 and len(members) > 1 else "SINGLE_RESULT"
-        if len(digests) > 1:
+        execution_statuses = {
+            str(row.get("execution_status", "")) for row in members
+        }
+        is_fault_policy_attempt = (
+            str(members[0].get("case_id", "")) == "H_fault_policy_off"
+        )
+        mismatch = len(digests) > 1
+        if is_fault_policy_attempt:
+            mismatch = mismatch or (
+                "" in digests
+                or len(execution_statuses) != 1
+                or not execution_statuses <= {"EXECUTED", "PARTIAL"}
+            )
+        status = (
+            "MATCH"
+            if not mismatch and len(members) > 1
+            else "SINGLE_RESULT"
+        )
+        if mismatch:
             status = "MISMATCH"
         for row in members:
             row["repeat_consistency"] = status
@@ -2683,6 +3545,13 @@ def apply_repeat_consistency(
                     for part in (str(row.get("blocker", "")), blocker)
                     if part
                 )
+    for index, row in enumerate(result):
+        if (
+            row.get("execution_status") not in {"", "NOT_RUN"}
+            and row.get("repeat_index") not in {None, ""}
+            and not row.get("evidence_row_binding_sha256")
+        ):
+            result[index] = seal_evidence_row(row)
     return result
 
 
@@ -2690,14 +3559,119 @@ def _serialized_cell(value: Any) -> str:
     return "" if value is None else str(value)
 
 
+EVIDENCE_BINDING_EXCLUDED_COLUMNS = frozenset(
+    {
+        "evidence_row_binding_sha256",
+        # These are derived after a repeat group is assembled.  The binding
+        # covers the underlying execution/provenance/metric evidence instead.
+        "repeat_consistency",
+        "gate_status",
+        "evidence_status",
+        "blocker",
+    }
+)
+
+
+def evidence_row_binding_sha256(row: Mapping[str, Any]) -> str:
+    projection = {
+        name: _serialized_cell(row.get(name, ""))
+        for name in RESULT_COLUMNS
+        if name not in EVIDENCE_BINDING_EXCLUDED_COLUMNS
+    }
+    return canonical_sha256(projection)
+
+
+def seal_evidence_row(row: Mapping[str, Any]) -> dict[str, Any]:
+    sealed = dict(row)
+    sealed["evidence_row_binding_sha256"] = evidence_row_binding_sha256(
+        sealed
+    )
+    return sealed
+
+
+def execution_provenance_matches(
+    row: Mapping[str, Any],
+    provenance: ExecutionProvenance,
+) -> bool:
+    """Match one sealed row to the single frozen formal execution identity."""
+
+    if (
+        row.get("execution_status") in {None, "", "NOT_RUN"}
+        or row.get("binary_provenance_pass") is not True
+        or row.get("summary_only") is not True
+        or row.get("summary_only_contract_pass") is not True
+        or str(row.get("executor_id", "")) != provenance.executor_id
+        or str(row.get("source_path_manifest_sha256", ""))
+        != provenance.source_path_manifest_sha256
+        or str(row.get("binary_sha256", "")).lower()
+        != provenance.binary_sha256.lower()
+        or str(row.get("loaded_cpp_binary_sha256", "")).lower()
+        != provenance.binary_sha256.lower()
+        or str(row.get("source_bundle_sha256", ""))
+        != provenance.source_bundle_sha256
+        or str(row.get("executor_source_sha256", ""))
+        != provenance.executor_source_sha256
+    ):
+        return False
+    binding = str(row.get("evidence_row_binding_sha256", ""))
+    if not binding or binding != evidence_row_binding_sha256(row):
+        return False
+    try:
+        expected_path = Path(provenance.binary_path).resolve(strict=True)
+        loaded_path = Path(
+            str(row.get("loaded_cpp_binary_path", ""))
+        ).resolve(strict=True)
+    except (OSError, RuntimeError, ValueError):
+        return False
+    return os.path.normcase(str(expected_path)) == os.path.normcase(
+        str(loaded_path)
+    )
+
+
+def _deserialize_result_row(
+    row: Mapping[str, str],
+    *,
+    context: str,
+) -> dict[str, Any]:
+    """Restore CSV scalar types before strict in-memory validation."""
+
+    result: dict[str, Any] = dict(row)
+    for name in LEDGER_INTEGER_COLUMNS:
+        value = result.get(name, "")
+        if value == "":
+            continue
+        if (
+            not isinstance(value, str)
+            or re.fullmatch(r"(?:0|-?[1-9][0-9]*)", value) is None
+        ):
+            raise HarnessValidationError(
+                f"{context}: {name} must be an exact serialized integer"
+            )
+        result[name] = int(value)
+    for name in LEDGER_FLOAT_COLUMNS:
+        value = result.get(name, "")
+        if value == "":
+            continue
+        result[name] = _finite_number(value, f"{context}: {name}")
+    for name in LEDGER_BOOLEAN_COLUMNS:
+        value = result.get(name, "")
+        if value == "":
+            continue
+        if value not in {"True", "False"}:
+            raise HarnessValidationError(
+                f"{context}: {name} must be serialized as True or False"
+            )
+        result[name] = value == "True"
+    return result
+
+
 def _required_row_int(row: Mapping[str, Any], name: str) -> int:
     value = row.get(name)
     if value in (None, "") or isinstance(value, bool):
         raise HarnessValidationError(f"{name} must be a present integer")
-    try:
-        return int(value)
-    except (TypeError, ValueError) as exc:
-        raise HarnessValidationError(f"{name} must be an integer") from exc
+    if isinstance(value, int):
+        return value
+    raise HarnessValidationError(f"{name} must be an exact integer")
 
 
 def _required_row_bool(row: Mapping[str, Any], name: str) -> bool:
@@ -2773,15 +3747,28 @@ def _validate_case_ledger_row(
         raise HarnessValidationError(
             f"{case.case_id}@{size}: declared_max_events drift"
         )
+    execution_status = str(row.get("execution_status", ""))
+    gate_status = str(row.get("gate_status", ""))
     expected_capacity = int(
         case.runtime_controls.get("local_queue_capacity", 0)
     )
-    if _required_row_int(row, "local_queue_capacity") != expected_capacity:
+    actual_capacity = _required_row_int(row, "local_queue_capacity")
+    capacity_not_applicable = (
+        execution_status == "EXECUTED"
+        and gate_status == "NOT_APPLICABLE"
+        and str(row.get("evidence_status", ""))
+        == "EXECUTED_CONFIGURATION_NOT_APPLICABLE"
+        and case.pibt_label != "P0"
+        and actual_capacity == 0
+    )
+    if (
+        actual_capacity != expected_capacity
+        and not capacity_not_applicable
+    ):
         raise HarnessValidationError(
             f"{case.case_id}@{size}: local_queue_capacity drift"
         )
 
-    execution_status = str(row.get("execution_status", ""))
     if execution_status == "NOT_RUN":
         return
     if execution_status not in {
@@ -2812,27 +3799,293 @@ def _validate_case_ledger_row(
         )
 
     if execution_status in {"EXECUTED", "PARTIAL", EARLY_ABORT_STATUS}:
-        echo_blockers = _control_echo_blockers(case, row)
-        if echo_blockers:
+        if not _required_row_bool(row, "summary_only"):
             raise HarnessValidationError(
-                f"{case.case_id}@{size}: " + " | ".join(echo_blockers)
+                f"{case.case_id}@{size}: promotion evidence must be summary-only"
+            )
+        if not _required_row_bool(row, "summary_only_contract_pass"):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: summary-only contract did not pass"
+            )
+        if _required_row_int(row, "decision_trace_stored_count") != 0:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: decision trace was stored"
+            )
+        if _required_row_int(row, "hold_trace_stored_count") != 0:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: hold trace was stored"
+            )
+        if not _required_row_bool(row, "binary_provenance_pass"):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: binary provenance did not pass"
+            )
+        if str(row.get("executor_id", "")) != FORMAL_EXECUTOR_ID:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: executor_id is not the frozen formal executor"
+            )
+        if str(row.get("source_path_manifest_sha256", "")) != (
+            FORMAL_SOURCE_PATH_MANIFEST_SHA256
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: formal source-path manifest drift"
+            )
+        if not _has_metric(
+            row,
+            {},
+            "survivor_metric_comparison_allowed",
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: "
+                "survivor_metric_comparison_allowed is missing"
+            )
+        if _required_row_bool(
+            row,
+            "survivor_metric_comparison_allowed",
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: "
+                "survivor_metric_comparison_allowed must remain false"
+            )
+        echo_blockers = _control_echo_blockers(case, row)
+        hard_echo_blockers = [
+            blocker
+            for blocker in echo_blockers
+            if not (
+                capacity_not_applicable
+                and blocker.startswith(
+                    "RUNTIME_CONTROL_ECHO_MISMATCH:"
+                    "local_queue_capacity="
+                )
+            )
+        ]
+        if hard_echo_blockers:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: "
+                + " | ".join(hard_echo_blockers)
+            )
+        for name in (
+            "binary_sha256",
+            "loaded_cpp_binary_sha256",
+            "source_bundle_sha256",
+            "source_path_manifest_sha256",
+            "executor_source_sha256",
+            "deterministic_result_sha256",
+            "evidence_row_binding_sha256",
+        ):
+            _required_sha256(row, name)
+        if str(row.get("loaded_cpp_binary_sha256", "")).lower() != str(
+            row.get("binary_sha256", "")
+        ).lower():
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: loaded C++ binary hash differs from "
+                "the expected binary hash"
+            )
+        if not str(row.get("loaded_cpp_binary_path", "")).strip():
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: loaded C++ binary path is missing"
+            )
+        if _required_row_int(row, "repeat_index") <= 0:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: repeat_index must be positive"
+            )
+        expected_binding = evidence_row_binding_sha256(row)
+        if str(row.get("evidence_row_binding_sha256", "")) != expected_binding:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: evidence row binding drift"
             )
 
-    gate_status = str(row.get("gate_status", ""))
+    if execution_status in {"EXECUTED", "PARTIAL"}:
+        completed_segments = _required_row_int(
+            row, "completed_segment_count"
+        )
+        failed_segments = _required_row_int(row, "failed_segment_count")
+        completed_raw_bags = _required_row_int(
+            row, "complete_raw_bag_count"
+        )
+        if (
+            completed_segments < 0
+            or completed_segments > size
+            or failed_segments != size - completed_segments
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: segment completion accounting drift"
+            )
+        if (
+            completed_raw_bags < 0
+            or completed_raw_bags > expected_raw_bags
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: raw bag completion accounting drift"
+            )
+        completion_rate = _live_finite_number(
+            row.get("completion_rate"),
+            "completion_rate",
+        )
+        expected_completion_rate = (
+            completed_raw_bags / expected_raw_bags
+        )
+        if not math.isclose(
+            completion_rate,
+            expected_completion_rate,
+            rel_tol=0.0,
+            abs_tol=1.0e-12,
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: completion_rate must use the raw "
+                "bag denominator"
+            )
+        expected_comparison_eligible = (
+            completed_segments == size
+            and failed_segments == 0
+            and completed_raw_bags == expected_raw_bags
+        )
+        if (
+            _required_row_bool(row, "comparison_eligible")
+            != expected_comparison_eligible
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: comparison_eligible drift"
+            )
+
     if gate_status == "PASS" and execution_status != "EXECUTED":
         raise HarnessValidationError(
             f"{case.case_id}@{size}: PASS requires EXECUTED"
         )
+    if gate_status == "NOT_APPLICABLE":
+        if execution_status != "EXECUTED":
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: NOT_APPLICABLE requires EXECUTED"
+            )
+        if str(row.get("termination_reason", "")) != "DRAINED":
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: NOT_APPLICABLE requires DRAINED"
+            )
+        if str(row.get("early_abort_status", "")).strip():
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: NOT_APPLICABLE cannot be early-aborted"
+            )
+        if str(row.get("evidence_status", "")) != (
+            "EXECUTED_CONFIGURATION_NOT_APPLICABLE"
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: NOT_APPLICABLE evidence_status is invalid"
+            )
+        not_applicable_timing = {
+            "comparison_eligible": _required_row_bool(
+                row, "comparison_eligible"
+            ),
+            "survivor_metric_comparison_allowed": _required_row_bool(
+                row, "survivor_metric_comparison_allowed"
+            ),
+            "selected_raw_bag_count": expected_raw_bags,
+            "complete_raw_bag_count": _required_row_int(
+                row, "complete_raw_bag_count"
+            ),
+            "original_entry_mean_minutes": row.get(
+                "original_entry_mean_minutes"
+            ),
+        }
+        serialized_safety_blockers = _safety_blockers(
+            case=case,
+            size=size,
+            payload={},
+            summary=row,
+            timing=not_applicable_timing,
+        )
+        serialized_not_applicable = _not_applicable_reasons(
+            case=case,
+            payload={},
+            summary=row,
+        )
+        serialized_control_blockers = _control_echo_blockers(
+            case, row
+        )
+        allowed_capacity_prefix = (
+            "RUNTIME_CONTROL_ECHO_MISMATCH:"
+            "local_queue_capacity="
+        )
+        hard_serialized_control_blockers = [
+            blocker
+            for blocker in serialized_control_blockers
+            if not (
+                capacity_not_applicable
+                and blocker.startswith(allowed_capacity_prefix)
+            )
+        ]
+        if (
+            serialized_safety_blockers
+            or hard_serialized_control_blockers
+            or not serialized_not_applicable
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: serialized NOT_APPLICABLE "
+                "no longer validates: "
+                + " | ".join(
+                    [
+                        *hard_serialized_control_blockers,
+                        *serialized_safety_blockers,
+                        *serialized_not_applicable,
+                    ]
+                )
+            )
+        expected_blocker = " | ".join(
+            [
+                *serialized_control_blockers,
+                *serialized_not_applicable,
+            ]
+        )
+        if str(row.get("blocker", "")) != expected_blocker:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: NOT_APPLICABLE blocker drift"
+            )
+        return
     if gate_status != "PASS":
         return
 
+    if str(row.get("termination_reason", "")) != "DRAINED":
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: PASS requires DRAINED termination"
+        )
+    if str(row.get("early_abort_status", "")).strip():
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: PASS cannot retain early-abort status"
+        )
+    if str(row.get("evidence_status", "")) != "EXECUTED_RESULT_VALIDATED":
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: PASS evidence_status is invalid"
+        )
+    if str(row.get("blocker", "")).strip():
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: PASS cannot retain blockers"
+        )
+    if str(row.get("repeat_consistency", "")) not in {
+        "SINGLE_RESULT",
+        "MATCH",
+    }:
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: PASS repeat consistency is invalid"
+        )
+
     for name in (
         "binary_sha256",
+        "loaded_cpp_binary_sha256",
         "source_bundle_sha256",
+        "source_path_manifest_sha256",
         "executor_source_sha256",
         "deterministic_result_sha256",
     ):
         _required_sha256(row, name)
+    if str(row.get("loaded_cpp_binary_sha256", "")).lower() != str(
+        row.get("binary_sha256", "")
+    ).lower():
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: loaded C++ binary hash differs from "
+            "the expected binary hash"
+        )
+    if not str(row.get("loaded_cpp_binary_path", "")).strip():
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: loaded C++ binary path is missing"
+        )
     if _required_row_int(row, "repeat_index") <= 0:
         raise HarnessValidationError(
             f"{case.case_id}@{size}: repeat_index must be positive"
@@ -2853,7 +4106,7 @@ def _validate_case_ledger_row(
         raise HarnessValidationError(
             f"{case.case_id}@{size}: comparison_eligible must be true"
         )
-    completion_rate = _finite_number(
+    completion_rate = _live_finite_number(
         row.get("completion_rate"),
         "completion_rate",
     )
@@ -2861,9 +4114,95 @@ def _validate_case_ledger_row(
         raise HarnessValidationError(
             f"{case.case_id}@{size}: completion_rate must be 1"
         )
+    if str(row.get("primary_denominator", "")) != "original_entry_time_tth":
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: primary denominator drift"
+        )
+    if str(row.get("denominator_scope", "")) != DENOMINATOR_SCOPE:
+        raise HarnessValidationError(
+            f"{case.case_id}@{size}: denominator scope drift"
+        )
+    if case.phase == "J":
+        original_mean = _live_finite_number(
+            row.get("original_entry_mean_minutes"),
+            "original_entry_mean_minutes",
+        )
+        java_mean = _live_finite_number(
+            row.get("java_release_mean_minutes"),
+            "java_release_mean_minutes",
+        )
+        source_wait_mean = _live_finite_number(
+            row.get("source_wait_mean_minutes"),
+            "source_wait_mean_minutes",
+        )
+        network_mean = _live_finite_number(
+            row.get("network_time_mean_minutes"),
+            "network_time_mean_minutes",
+        )
+        total_mean = _live_finite_number(
+            row.get("total_system_time_mean_minutes"),
+            "total_system_time_mean_minutes",
+        )
+        if not math.isclose(
+            original_mean,
+            total_mean,
+            rel_tol=0.0,
+            abs_tol=1.0e-12,
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: original/total timing mismatch"
+            )
+        if not math.isclose(
+            java_mean,
+            source_wait_mean + network_mean,
+            rel_tol=0.0,
+            abs_tol=1.0e-12,
+        ):
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: Java/source/network timing mismatch"
+            )
+        if original_mean < java_mean or min(
+            source_wait_mean,
+            network_mean,
+        ) < 0.0:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: invalid timing decomposition"
+            )
+        p95 = _live_finite_number(
+            row.get("original_entry_p95_seconds"),
+            "original_entry_p95_seconds",
+        )
+        p99 = _live_finite_number(
+            row.get("original_entry_p99_seconds"),
+            "original_entry_p99_seconds",
+        )
+        if p95 < 0.0 or p99 < p95:
+            raise HarnessValidationError(
+                f"{case.case_id}@{size}: invalid original-entry quantiles"
+            )
+        expected_performance = evaluate_original_entry_performance(
+            original_mean
+        )
+        for name, expected in expected_performance.items():
+            actual = row.get(name, "")
+            if isinstance(expected, float):
+                if not math.isclose(
+                    _live_finite_number(actual, name),
+                    expected,
+                    rel_tol=0.0,
+                    abs_tol=1.0e-12,
+                ):
+                    raise HarnessValidationError(
+                        f"{case.case_id}@{size}: {name} drift"
+                    )
+            elif type(actual) is not type(expected) or actual != expected:
+                raise HarnessValidationError(
+                    f"{case.case_id}@{size}: {name} drift"
+                )
 
     timing = {
         "comparison_eligible": True,
+        "survivor_metric_comparison_allowed": False,
         "selected_raw_bag_count": expected_raw_bags,
         "complete_raw_bag_count": expected_raw_bags,
         "original_entry_mean_minutes": row.get(
@@ -2913,7 +4252,7 @@ def _accepted_tier_passes(
         and str(row.get("size_segments", "")) == str(size_segments)
         and str(row.get("execution_status", "")) != "NOT_RUN"
     ]
-    if len(members) < required_repeat_count:
+    if len(members) != required_repeat_count:
         return False
     if any(
         str(row.get("execution_status", "")) != "EXECUTED"
@@ -2934,16 +4273,19 @@ def _accepted_tier_passes(
         ]
     except HarnessValidationError:
         return False
-    if (
-        any(index <= 0 for index in repeat_indexes)
-        or len(repeat_indexes) != len(set(repeat_indexes))
+    if sorted(repeat_indexes) != list(
+        range(1, required_repeat_count + 1)
     ):
         return False
     provenance_fields = (
         "case_config_sha256",
         "input_prefix_sha256",
         "binary_sha256",
+        "loaded_cpp_binary_path",
+        "loaded_cpp_binary_sha256",
         "source_bundle_sha256",
+        "source_path_manifest_sha256",
+        "executor_id",
         "executor_source_sha256",
     )
     if any(
@@ -2957,6 +4299,279 @@ def _accepted_tier_passes(
     if len(members) > 1 and len(result_hashes) != 1:
         return False
     return True
+
+
+def _accepted_tier_was_executed(
+    case_id: str,
+    size_segments: int,
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    root: Path = ROOT,
+    required_repeat_count: int = 1,
+) -> bool:
+    """Accept provenance-complete negative-control evidence without PASS."""
+
+    case = next(
+        (item for item in all_cases() if item.case_id == case_id),
+        None,
+    )
+    if case is None or required_repeat_count <= 0:
+        return False
+    members = [
+        row
+        for row in rows
+        if str(row.get("phase", "")) == case.phase
+        and str(row.get("case_id", "")) == case_id
+        and str(row.get("size_segments", "")) == str(size_segments)
+        and str(row.get("execution_status", "")) != "NOT_RUN"
+    ]
+    if len(members) != required_repeat_count:
+        return False
+    if any(
+        str(row.get("execution_status", "")) not in {"EXECUTED", "PARTIAL"}
+        for row in members
+    ):
+        return False
+    try:
+        for row in members:
+            _validate_case_ledger_row(row, case, root=root)
+            execution_status = str(row.get("execution_status", ""))
+            termination_reason = str(row.get("termination_reason", ""))
+            if execution_status == "EXECUTED":
+                if termination_reason != "DRAINED":
+                    return False
+                gate_status = str(row.get("gate_status", ""))
+                if gate_status not in {"PASS", "FAIL"}:
+                    return False
+                if gate_status == "FAIL":
+                    if (
+                        str(row.get("evidence_status", ""))
+                        != "NEGATIVE_OR_PARTIAL_RESULT_RETAINED"
+                        or not str(row.get("blocker", "")).strip()
+                    ):
+                        return False
+            elif (
+                termination_reason != "PARTIAL"
+                or str(row.get("gate_status", "")) != "FAIL"
+                or str(row.get("evidence_status", ""))
+                != "NEGATIVE_OR_PARTIAL_RESULT_RETAINED"
+                or not str(row.get("blocker", "")).strip()
+            ):
+                return False
+            for name in (
+                "binary_sha256",
+                "loaded_cpp_binary_sha256",
+                "source_bundle_sha256",
+                "executor_source_sha256",
+                "deterministic_result_sha256",
+            ):
+                _required_sha256(row, name)
+            if str(row.get("loaded_cpp_binary_sha256", "")).lower() != str(
+                row.get("binary_sha256", "")
+            ).lower():
+                return False
+            if not str(row.get("loaded_cpp_binary_path", "")).strip():
+                return False
+            if _required_row_bool(row, "event_limit_reached"):
+                return False
+            if _required_row_bool(row, "time_limit_reached"):
+                return False
+            if str(row.get("early_abort_status", "")).strip():
+                return False
+            if case.case_id == "H_fault_policy_off":
+                completed_segments = _required_row_int(
+                    row, "completed_segment_count"
+                )
+                failed_segments = _required_row_int(
+                    row, "failed_segment_count"
+                )
+                selected_raw_bags = _required_row_int(
+                    row, "selected_raw_bag_count"
+                )
+                completed_raw_bags = _required_row_int(
+                    row, "complete_raw_bag_count"
+                )
+                comparison_eligible = _required_row_bool(
+                    row, "comparison_eligible"
+                )
+                completion_rate = _live_finite_number(
+                    row.get("completion_rate"),
+                    "completion_rate",
+                )
+                if failed_segments != size_segments - completed_segments:
+                    return False
+                if not math.isclose(
+                    completion_rate,
+                    completed_raw_bags / selected_raw_bags,
+                    rel_tol=0.0,
+                    abs_tol=1.0e-12,
+                ):
+                    return False
+                if execution_status == "EXECUTED":
+                    if (
+                        completed_segments != size_segments
+                        or failed_segments != 0
+                        or completed_raw_bags != selected_raw_bags
+                        or not comparison_eligible
+                    ):
+                        return False
+                elif (
+                    completed_segments < 0
+                    or completed_segments >= size_segments
+                    or completed_raw_bags < 0
+                    or completed_raw_bags >= selected_raw_bags
+                    or comparison_eligible
+                ):
+                    return False
+                required_zero_metrics = (
+                    "conflict_count",
+                    "unsafe_entry_count",
+                    "runtime_full_astar_calls",
+                    "global_reservation_scan_count",
+                    "future_routes_stored",
+                )
+                if any(
+                    not _has_metric(row, {}, name)
+                    or _int_metric(row, {}, name) != 0
+                    for name in required_zero_metrics
+                ):
+                    return False
+                if (
+                    not _has_metric(row, {}, "reservation_depth")
+                    or _int_metric(row, {}, "reservation_depth") != 1
+                ):
+                    return False
+                if (
+                    not _has_metric(
+                        row,
+                        {},
+                        "max_edges_selected_per_bag_per_decision",
+                    )
+                    or not 0
+                    <= _int_metric(
+                        row,
+                        {},
+                        "max_edges_selected_per_bag_per_decision",
+                    )
+                    <= 1
+                ):
+                    return False
+                # This legacy arrive-level counter is retained for diagnosis,
+                # but only the new per-bag/per-decision counter proves the
+                # one-next-edge invariant.
+                if (
+                    not _has_metric(row, {}, "max_edges_selected_per_arrive")
+                    or _int_metric(
+                        row,
+                        {},
+                        "max_edges_selected_per_arrive",
+                    )
+                    < 0
+                ):
+                    return False
+                max_batch_actions = _required_row_int(
+                    row, "max_actions_committed_per_pibt_batch"
+                )
+                if not 0 <= max_batch_actions <= int(
+                    case.runtime_controls["pibt_max_ready_bags"]
+                ):
+                    return False
+                affected = _int_metric(
+                    row,
+                    {},
+                    "fault_affected_bag_count",
+                    default=-1,
+                )
+                affected_completed = _int_metric(
+                    row,
+                    {},
+                    "fault_affected_completed_count",
+                    default=-1,
+                )
+                if (
+                    affected <= 0
+                    or affected_completed < 0
+                    or affected_completed > affected
+                ):
+                    return False
+                if _required_row_bool(row, "sensor_loss_mode_used"):
+                    return False
+                if _required_row_int(
+                    row, "fault_notification_drop_count"
+                ) != 0:
+                    return False
+                physical_rejections = _required_row_int(
+                    row,
+                    "fault_physical_interlock_rejection_count",
+                )
+                physical_holds = _required_row_int(
+                    row,
+                    "fault_physical_interlock_hold_count",
+                )
+                physical_reroutes = _required_row_int(
+                    row,
+                    "fault_physical_interlock_reroute_count",
+                )
+                if (
+                    physical_rejections <= 0
+                    or physical_holds < 0
+                    or physical_reroutes < 0
+                    or physical_rejections
+                    != physical_holds + physical_reroutes
+                ):
+                    return False
+                if any(
+                    _required_row_int(row, name) != 0
+                    for name in (
+                        "fault_local_action_count",
+                        "fault_local_hold_count",
+                        "fault_reroute_count",
+                    )
+                ):
+                    return False
+                event_count = _required_row_int(row, "event_count")
+                declared_max_events = _required_row_int(
+                    row, "declared_max_events"
+                )
+                if (
+                    event_count < 0
+                    or declared_max_events <= 0
+                    or event_count > declared_max_events
+                ):
+                    return False
+        repeat_indexes = [
+            _required_row_int(row, "repeat_index") for row in members
+        ]
+    except (HarnessValidationError, TypeError, ValueError):
+        return False
+    provenance_fields = (
+        "case_config_sha256",
+        "input_prefix_sha256",
+        "binary_sha256",
+        "loaded_cpp_binary_path",
+        "loaded_cpp_binary_sha256",
+        "source_bundle_sha256",
+        "source_path_manifest_sha256",
+        "executor_id",
+        "executor_source_sha256",
+    )
+    if any(
+        len({str(row.get(name, "")) for row in members}) != 1
+        for name in provenance_fields
+    ):
+        return False
+    result_hashes = {
+        str(row.get("deterministic_result_sha256", "")) for row in members
+    }
+    execution_statuses = {
+        str(row.get("execution_status", "")) for row in members
+    }
+    return (
+        sorted(repeat_indexes)
+        == list(range(1, required_repeat_count + 1))
+        and len(execution_statuses) == 1
+        and (len(members) == 1 or len(result_hashes) == 1)
+    )
 
 
 def authorization_blockers(
@@ -3005,10 +4620,24 @@ def authorization_blockers(
             required_repeat_count=required_repeat_count,
         )
 
+    def executed(case_id: str, size: int) -> bool:
+        return _accepted_tier_was_executed(
+            case_id,
+            size,
+            accepted_rows,
+            root=identity_root,
+            required_repeat_count=required_repeat_count,
+        )
+
     index = case.sizes.index(size_segments)
     if index > 0:
         prior_size = case.sizes[index - 1]
-        if not passed(case.case_id, prior_size):
+        prior_accepted = (
+            executed(case.case_id, prior_size)
+            if case.case_id == "H_fault_policy_off"
+            else passed(case.case_id, prior_size)
+        )
+        if not prior_accepted:
             blockers.append(
                 f"missing accepted same-case prior tier {prior_size}"
             )
@@ -3047,6 +4676,23 @@ def authorization_blockers(
                 "fault injection requires accepted H_stable_no_fault at the same size"
             )
     if case.phase == "J":
+        for h_case_id in (
+            "H_stable_no_fault",
+            "H_immediate",
+            "H_delayed_30s",
+            "H_notification_drop",
+        ):
+            if not passed(h_case_id, FULL_SIZE_SEGMENTS):
+                blockers.append(
+                    "J original-1x execution requires positive H recovery "
+                    f"matrix PASS: {h_case_id} {FULL_SIZE_SEGMENTS}"
+                )
+        if not executed("H_fault_policy_off", FULL_SIZE_SEGMENTS):
+            blockers.append(
+                "J original-1x execution requires retained executed evidence "
+                f"for H_fault_policy_off {FULL_SIZE_SEGMENTS}; PASS is not "
+                "required for this negative control"
+            )
         matched_preflight = {
             "J_F1_best_rule_bounded_pibt": ("G_c6", 8_192),
             "J_F2_frozen_scorer_bounded_pibt": (
@@ -3077,7 +4723,7 @@ def load_result_ledger(
     overwrite the current planning matrix.
     """
 
-    rows = _read_csv(path)
+    rows = _read_csv(path, expected_columns=RESULT_COLUMNS)
     cases = all_cases()
     case_by_id = {case.case_id: case for case in cases}
     if len(case_by_id) != len(cases):
@@ -3091,7 +4737,8 @@ def load_result_ledger(
 
     admitted: list[dict[str, Any]] = []
     for row_index, row_raw in enumerate(rows, start=2):
-        row = dict(row_raw)
+        serialized_row = dict(row_raw)
+        row = serialized_row
         case_id = str(row.get("case_id", ""))
         context = f"{path}:{row_index}"
         if row.get("schema") != RESULT_SCHEMA:
@@ -3110,6 +4757,7 @@ def load_result_ledger(
                     )
             admitted.append(expected)
             continue
+        row = _deserialize_result_row(serialized_row, context=context)
         case = case_by_id.get(case_id)
         if case is None:
             raise HarnessValidationError(
@@ -3125,11 +4773,22 @@ def load_result_ledger(
     return apply_repeat_consistency(admitted)
 
 
-def _read_csv(path: Path) -> list[dict[str, str]]:
+def _read_csv(
+    path: Path,
+    *,
+    expected_columns: Sequence[str] | None = None,
+) -> list[dict[str, str]]:
     if not path.is_file():
         raise HarnessValidationError(f"missing control evidence: {path}")
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
-        return list(csv.DictReader(handle))
+        reader = csv.DictReader(handle)
+        if expected_columns is not None and reader.fieldnames != list(
+            expected_columns
+        ):
+            raise HarnessValidationError(
+                f"{path}: CSV header must exactly match the frozen result schema"
+            )
+        return list(reader)
 
 
 def _one_row(
@@ -3468,6 +5127,7 @@ PIBT_WAIT_FOR_COLUMNS = (
     "pibt_wait_for_cycle_count",
     "pibt_backtrack_count",
     "pibt_handoff_count",
+    "pibt_same_bag_fallback_count",
     "blocker",
 )
 PIBT_ATOMIC_COLUMNS = (
@@ -3484,6 +5144,7 @@ PIBT_ATOMIC_COLUMNS = (
     "pibt_validate_count",
     "pibt_commit_count",
     "pibt_rollback_count",
+    "pibt_same_bag_fallback_count",
     "blocker",
 )
 FAULT_CREDIT_COLUMNS = (
@@ -3505,6 +5166,14 @@ FAULT_PIBT_COLUMNS = (
     "gate_status",
     "pibt_label",
     "pibt_handoff_count",
+    "pibt_same_bag_fallback_count",
+    "fault_policy_enabled_echo",
+    "sensor_loss_mode_used",
+    "fault_notification_drop_count",
+    "fault_physical_interlock_rejection_count",
+    "fault_physical_interlock_hold_count",
+    "fault_physical_interlock_reroute_count",
+    "fault_local_action_count",
     "fault_local_hold_count",
     "fault_reroute_count",
     "blocker",
@@ -3513,18 +5182,30 @@ FAULT_PIBT_COLUMNS = (
 
 def candidate_bundle(
     rows: Sequence[Mapping[str, Any]],
+    *,
+    current_provenance: ExecutionProvenance | None = None,
 ) -> dict[str, Any]:
     finalists = [case for case in original_scale_cases() if case.finalist_role]
     if len(finalists) > 3:
         raise AssertionError("at most three original-scale finalists are allowed")
     entries: list[dict[str, Any]] = []
     for case in finalists:
-        evidence = [
+        all_evidence = [
             row
             for row in rows
             if row.get("case_id") == case.case_id
             and int(row.get("size_segments", 0)) == FULL_SIZE_SEGMENTS
+            and row.get("execution_status") != "NOT_RUN"
         ]
+        evidence = (
+            [
+                row
+                for row in all_evidence
+                if execution_provenance_matches(row, current_provenance)
+            ]
+            if current_provenance is not None
+            else []
+        )
         executed = [
             row
             for row in evidence
@@ -3535,8 +5216,12 @@ def candidate_bundle(
             for row in executed
             if row.get("deterministic_result_sha256")
         }
+        repeat_indexes = sorted(
+            int(row.get("repeat_index", 0)) for row in executed
+        )
         repeat_gate = (
-            len(executed) >= 5
+            len(executed) == 5
+            and repeat_indexes == [1, 2, 3, 4, 5]
             and len(hashes) == 1
             and all(row.get("deterministic_result_sha256") for row in executed)
         )
@@ -3546,16 +5231,19 @@ def candidate_bundle(
             )
             for row in executed
         ]
-        v2_gate = len(executed) >= 5 and all(
+        v2_gate = len(executed) == 5 and all(
             item["v2_safe_original_entry_gate"] == "PASS"
             for item in performance
         )
-        hca_gate = len(executed) >= 5 and all(
+        hca_gate = len(executed) == 5 and all(
             item["corrected_hca_original_entry_gate"] == "PASS"
             for item in performance
         )
-        validated_full_gate = len(executed) >= 5 and all(
-            row.get("gate_status") == "PASS" for row in executed
+        validated_full_gate = _accepted_tier_passes(
+            case.case_id,
+            FULL_SIZE_SEGMENTS,
+            evidence,
+            required_repeat_count=5,
         )
         promoted = bool(
             repeat_gate
@@ -3565,12 +5253,18 @@ def candidate_bundle(
             and not case.execution_blocker
         )
         blockers: list[str] = []
+        if current_provenance is None:
+            blockers.append(
+                "current formal execution provenance was not supplied"
+            )
         if case.execution_blocker:
             blockers.append(case.execution_blocker)
-        if len(executed) < 5:
-            blockers.append("requires at least five executed full repeats")
+        if len(executed) != 5:
+            blockers.append("requires exactly five current-provenance full repeats")
         elif not repeat_gate:
-            blockers.append("full-repeat deterministic hashes do not match")
+            blockers.append(
+                "full repeats require exact indexes 1..5 and one deterministic hash"
+            )
         if executed and not v2_gate:
             blockers.append(
                 "matched original-entry mean does not meet frozen v2-safe target"
@@ -3595,6 +5289,9 @@ def candidate_bundle(
                 "role": case.finalist_role,
                 "config_sha256": canonical_sha256(case.as_dict()),
                 "executed_full_repeat_count": len(executed),
+                "stale_or_unverified_full_repeat_count": (
+                    len(all_evidence) - len(evidence)
+                ),
                 "deterministic_result_sha256": (
                     next(iter(hashes)) if len(hashes) == 1 else ""
                 ),
@@ -3626,6 +5323,14 @@ def candidate_bundle(
             "READY"
             if any(row["promotion_status"] == "PROMOTED" for row in entries)
             else "PENDING"
+        ),
+        "current_provenance_status": (
+            "VERIFIED" if current_provenance is not None else "UNVERIFIED"
+        ),
+        "current_provenance": (
+            asdict(current_provenance)
+            if current_provenance is not None
+            else {}
         ),
         "maximum_finalists": 3,
         "primary_denominator": "original_entry_time_tth",
@@ -3681,6 +5386,7 @@ def write_harness_outputs(
     *,
     root: Path = ROOT,
     identity_root: Path | None = None,
+    current_provenance: ExecutionProvenance | None = None,
 ) -> tuple[Path, ...]:
     """Write every prescribed B/C/E/F/G/H/J output atomically."""
 
@@ -3715,8 +5421,9 @@ def write_harness_outputs(
             by_phase["B"],
             boundary=(
                 "B0/B1 are parsed controls and are never disguised as fresh reruns.",
-                "Each B2--B6 tier changes only its declared framework/resource/scorer/PIBT controls.",
-                "B2--B6 share local_queue_capacity=32 as sensitivity-only isolation, not as a physical-capacity claim.",
+                "B2 remains NOT_RUN because the old scheduling-order one-step executor is not implemented.",
+                "Each executable B3--B6 tier changes only its declared resource/scorer/PIBT controls.",
+                "B3--B6 share local_queue_capacity=32 as sensitivity-only isolation, not as a physical-capacity claim.",
                 "An 8,192 PASS authorizes only finalist review; it does not authorize full automatically.",
             ),
         ).encode("utf-8"),
@@ -3849,7 +5556,10 @@ def write_harness_outputs(
         ).encode("utf-8"),
     )
     _atomic_write(paths["denominator_report"], _denominator_report().encode("utf-8"))
-    bundle = candidate_bundle(by_phase["J"])
+    bundle = candidate_bundle(
+        by_phase["J"],
+        current_provenance=current_provenance,
+    )
     _atomic_write(
         paths["candidate_bundle"],
         (
@@ -3861,6 +5571,9 @@ def write_harness_outputs(
         "# G4IRSF12 Promotion Gate",
         "",
         f"Status: `{bundle['promotion_status']}`.",
+        "",
+        "Current formal provenance: "
+        f"`{bundle['current_provenance_status']}`.",
         "",
         f"G4J status: `{bundle['g4j_status']}` (independent of Phase-J promotion).",
         "",

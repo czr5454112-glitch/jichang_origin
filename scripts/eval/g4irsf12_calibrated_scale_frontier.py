@@ -26,7 +26,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[2]
 
 EVALUATOR_SCHEMA = "czr005.g4irsf12.calibrated_scale_frontier_gate.v1"
-J_BUNDLE_SCHEMA = "czr005.g4irsf12.original_scale_candidate_bundle.v2"
+J_BUNDLE_SCHEMA = "czr005.g4irsf12.original_scale_candidate_bundle.v4"
 K_PROTOCOL_SCHEMA = "czr005.g4irsf12.demand_calibration_protocol.v1"
 K_CANDIDATE_SCHEMA = "czr005.g4irsf12.demand_candidate_manifest.v1"
 

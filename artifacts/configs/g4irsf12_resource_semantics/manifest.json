@@ -39,7 +39,45 @@
     "topology_mutation_allowed": false
   },
   "protected_inputs_modified": false,
-  "runtime_ab_executed": false,
+  "runtime_ab_evidence": {
+    "case_results": [
+      {
+        "case_id": "C_r0",
+        "executed_size_segments": [144, 512, 2048],
+        "formal_gate_status": "PASS",
+        "formal_repeat_count_per_executed_size": 1
+      },
+      {
+        "case_id": "C_r1",
+        "executed_size_segments": [144, 512, 2048],
+        "formal_gate_status": "PASS",
+        "formal_repeat_count_per_executed_size": 1
+      },
+      {
+        "case_id": "C_r2",
+        "executed_size_segments": [144, 512, 2048],
+        "formal_gate_status": "PASS",
+        "formal_repeat_count_per_executed_size": 1
+      },
+      {
+        "case_id": "C_r3",
+        "executed_size_segments": [144, 512, 2048, 8192],
+        "formal_gate_status": "PASS",
+        "formal_repeat_count_per_executed_size": 1
+      },
+      {
+        "case_id": "C_r4",
+        "executed_size_segments": [144, 512, 2048, 8192],
+        "formal_gate_status": "PASS",
+        "formal_repeat_count_per_executed_size": 1
+      }
+    ],
+    "formal_ledger_path": "outputs/tables/g4irsf12_resource_semantics_runtime_plan.csv",
+    "ledger_schema": "czr005.g4irsf12.experiment_result.v4",
+    "note": "C_r0-C_r4 have executed and validated v4 PASS evidence at the listed sizes. This manifest does not claim unexecuted 8192 tiers for C_r0-C_r2.",
+    "status": "EXECUTED_AND_VALIDATED"
+  },
+  "runtime_ab_executed": true,
   "schema": "czr005.g4irsf12.resource_semantics_manifest.v1",
   "source_files": [
     {
@@ -75,5 +113,5 @@
     "artifacts/configs/g4irsf12_resource_semantics/r3_java_node_window_compatible.json",
     "artifacts/configs/g4irsf12_resource_semantics/r4_directed_headway_plus_merge_service_calendar.json"
   ],
-  "status": "STATIC_EVIDENCE_COMPLETE_RUNTIME_AB_NOT_EXECUTED"
+  "status": "STATIC_EVIDENCE_COMPLETE_RUNTIME_AB_EXECUTED_AND_VALIDATED"
 }

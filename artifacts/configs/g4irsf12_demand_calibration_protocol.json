@@ -158,11 +158,47 @@
     "time_compression": false
   },
   "phase": "G4IRSF12-K",
+  "phase_j_evidence": {
+    "blockers": [
+      "Phase-J full repeats are verified, but no candidate passes both matched original-entry performance gates"
+    ],
+    "bundle_file_sha256": "d886127f1a04def63e1bab54751385f088e68598500863c61c14a35368bd6756",
+    "bundle_path": "artifacts/policies/g4irsf12_original_scale_candidate_bundle.json",
+    "bundle_reconstructed_from_ledger": true,
+    "finalists": [
+      {
+        "candidate_id": "J_F1",
+        "completed_five_full_repeats": true,
+        "original_entry_performance_pass": false,
+        "promotion_status": "PENDING"
+      },
+      {
+        "candidate_id": "J_F2",
+        "completed_five_full_repeats": true,
+        "original_entry_performance_pass": false,
+        "promotion_status": "PENDING"
+      },
+      {
+        "candidate_id": "J_F3_RESERVED_NO_V3",
+        "completed_five_full_repeats": false,
+        "original_entry_performance_pass": false,
+        "promotion_status": "PENDING"
+      }
+    ],
+    "full_repeat_completed": true,
+    "g4j_enabled": false,
+    "g4j_status": "CLOSED",
+    "ledger_file_sha256": "0263e022a32936423023013d6eaaa2e3140e44757280ef84c67cf91b59986f0c",
+    "ledger_path": "outputs/tables/g4irsf12_original_scale_full_ab.csv",
+    "original_1x_full_formal_pass": false,
+    "original_entry_performance_pass": false,
+    "schema": "czr005.g4irsf12.phase_j_v4_ledger_binding.v1",
+    "verification_status": "VERIFIED_COMPLETE_PERFORMANCE_FAIL"
+  },
   "phase_l_gates": {
     "all_gates_pass": false,
     "blockers": [
-      "No G4IRSF12-J full 1x formal PASS artifact exists.",
-      "No verified original-entry mean target PASS exists for G4IRSF12-J.",
+      "Phase-J full repeats are verified, but no candidate passes both matched original-entry performance gates",
       "Airport/terminal/subsystem and design-day demand inputs are unknown.",
       "The 1.1 descriptor is not a materialized, traceable workload."
     ],
@@ -172,7 +208,7 @@
     "original_entry_mean_meets_historical_hca_target": false,
     "original_task_generation_audit_pass": true,
     "protected_map_identity_matches": true,
-    "status": "BLOCKED_NOT_RUN",
+    "status": "PARTIAL_WITH_EXPLICIT_BLOCKER",
     "traceable_1p1_workload_artifact_exists": false
   },
   "protected_identity": {
@@ -188,7 +224,7 @@
     "processed_input_semantic_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
     "raw_input_path": "legacy/jichang_origin_readonly/inputdata.txt",
     "raw_input_sha256": "0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87",
-    "source_bundle_sha256": "48d086681b1274a042d1ae82886bf5f0703ef498d36dc6bb02c587f8424a6c3d"
+    "source_bundle_sha256": "014c254d9ce11665e9c2098dcefd427576e614a8950f213089506e9b8239216c"
   },
   "published_date": "2026-07-23",
   "purpose": "Reproduce historical-day demand evidence and fail closed on real-demand scaling until scope/design-day inputs are established.",

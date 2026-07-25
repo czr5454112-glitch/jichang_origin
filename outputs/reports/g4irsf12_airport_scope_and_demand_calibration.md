@@ -6,6 +6,7 @@ status: `PARTIAL_WITH_EXPLICIT_BLOCKER`
 calibrated_multiplier: `UNKNOWN_NOT_COMPUTABLE`
 finite_uncertainty_interval: `UNBOUNDED_MISSING_SCOPE_AND_DESIGN_DAY_INPUTS`
 phase_l_status: `BLOCKED_NOT_RUN`
+phase_j_v4_ledger_status: `VERIFIED_COMPLETE_PERFORMANCE_FAIL`
 
 ## Decision
 
@@ -137,6 +138,6 @@ MAPF/MAPD literature is useful only for auxiliary diagnostics here. MAPD models 
 
 ## Phase-L gate
 
-`BLOCKED_NOT_RUN`: no G4IRSF12-J full 1x formal PASS/mean-target evidence exists; the numeric demand multiplier is unknown; and the 1.1 manifest is a descriptor rather than a materialized traceable workload. The protected map identity does pass.
+`BLOCKED_NOT_RUN`: Phase-J is checked by reconstructing its v4 candidate bundle from the admitted original-scale ledger. Its status is `VERIFIED_COMPLETE_PERFORMANCE_FAIL`; the numeric demand multiplier is unknown; and the 1.1 manifest is a descriptor rather than a materialized traceable workload. The protected map identity does pass.
 
 No scale runtime was started.

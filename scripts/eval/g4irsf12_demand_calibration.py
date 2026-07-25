@@ -15,11 +15,22 @@ import heapq
 import io
 import json
 import math
+import sys
 from collections import Counter, defaultdict
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
+_IMPORT_ROOT = Path(__file__).resolve().parents[2]
+if str(_IMPORT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_IMPORT_ROOT))
+
+from scripts.eval.g4irsf12_reproducible_harness import (
+    CANDIDATE_BUNDLE_SCHEMA,
+    ExecutionProvenance,
+    candidate_bundle as rebuild_phase_j_candidate_bundle,
+    load_result_ledger,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 PHASE_DATE = "2026-07-23"
@@ -67,6 +78,10 @@ SCALE_ENVELOPE_PATH = Path(
 GENERATION_AUDIT_PATH = Path(
     "outputs/reports/g4irsf12_original_task_generation_audit.md"
 )
+PHASE_J_BUNDLE_PATH = Path(
+    "artifacts/policies/g4irsf12_original_scale_candidate_bundle.json"
+)
+PHASE_J_LEDGER_PATH = Path("outputs/tables/g4irsf12_original_scale_full_ab.csv")
 
 SCALE_CANDIDATES: tuple[tuple[str, Decimal, str], ...] = (
     ("1p0", Decimal("1.0"), "historical_observed_day_reference"),
@@ -464,6 +479,163 @@ def _validate_java_rules(
     }
 
 
+def _valid_sha256(value: Any) -> bool:
+    text = str(value or "").lower()
+    return len(text) == 64 and all(character in "0123456789abcdef" for character in text)
+
+
+def _phase_j_evidence(root: Path) -> dict[str, Any]:
+    """Verify that Phase-K's J conclusion is backed by the v4 ledger.
+
+    Phase K deliberately does not trust a hand-written promotion bit.  It
+    re-admits the formal v4 ledger, reconstructs the candidate bundle from
+    those rows under the bundle's recorded execution provenance, and then
+    records whether a complete finalist actually met both original-entry
+    performance targets.  The result is evidence only: it never opens G4J or
+    authorises a scaled workload.
+    """
+
+    bundle_path = root / PHASE_J_BUNDLE_PATH
+    ledger_path = root / PHASE_J_LEDGER_PATH
+    result: dict[str, Any] = {
+        "schema": "czr005.g4irsf12.phase_j_v4_ledger_binding.v1",
+        "bundle_path": PHASE_J_BUNDLE_PATH.as_posix(),
+        "ledger_path": PHASE_J_LEDGER_PATH.as_posix(),
+        "bundle_file_sha256": _sha256(bundle_path.read_bytes()) if bundle_path.is_file() else "",
+        "ledger_file_sha256": _sha256(ledger_path.read_bytes()) if ledger_path.is_file() else "",
+        "verification_status": "UNVERIFIED",
+        "bundle_reconstructed_from_ledger": False,
+        "full_repeat_completed": False,
+        "original_1x_full_formal_pass": False,
+        "original_entry_performance_pass": False,
+        "g4j_status": "CLOSED",
+        "g4j_enabled": False,
+        "finalists": [],
+        "blockers": [],
+    }
+    blockers: list[str] = []
+    if not bundle_path.is_file():
+        blockers.append("Phase-J v4 candidate bundle is missing")
+    if not ledger_path.is_file():
+        blockers.append("Phase-J v4 original-scale ledger is missing")
+    if blockers:
+        result["blockers"] = blockers
+        return result
+
+    try:
+        bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        result["blockers"] = [f"Phase-J candidate bundle is not valid JSON: {exc}"]
+        return result
+    if not isinstance(bundle, dict):
+        result["blockers"] = ["Phase-J candidate bundle must be a JSON object"]
+        return result
+    if bundle.get("schema") != CANDIDATE_BUNDLE_SCHEMA:
+        blockers.append("Phase-J candidate bundle is not the required v4 schema")
+    recorded_sha = str(bundle.get("bundle_sha256") or "")
+    canonical_bundle = dict(bundle)
+    canonical_bundle.pop("bundle_sha256", None)
+    if not _valid_sha256(recorded_sha) or _canonical_sha256(canonical_bundle) != recorded_sha:
+        blockers.append("Phase-J candidate bundle self-hash is missing or stale")
+    if bundle.get("current_provenance_status") != "VERIFIED":
+        blockers.append("Phase-J bundle lacks verified current execution provenance")
+    if bundle.get("primary_denominator") != "original_entry_time_tth":
+        blockers.append("Phase-J bundle is not bound to original_entry_time_tth")
+    if bundle.get("g4j_enabled") is not False or bundle.get("g4j_status") != "CLOSED":
+        blockers.append("Phase-J evidence must not open G4J")
+
+    provenance_raw = bundle.get("current_provenance")
+    provenance: ExecutionProvenance | None = None
+    if isinstance(provenance_raw, Mapping):
+        try:
+            provenance = ExecutionProvenance(**dict(provenance_raw))
+        except (TypeError, ValueError):
+            blockers.append("Phase-J bundle current provenance has an invalid shape")
+    else:
+        blockers.append("Phase-J bundle current provenance is missing")
+
+    rows: list[dict[str, Any]] = []
+    try:
+        rows = load_result_ledger(ledger_path, root=root)
+    except Exception as exc:  # Formal ledger validation is intentionally fail-closed.
+        blockers.append(f"Phase-J v4 ledger failed formal admission: {exc}")
+
+    if provenance is not None and rows:
+        try:
+            rebuilt = rebuild_phase_j_candidate_bundle(
+                rows, current_provenance=provenance
+            )
+        except Exception as exc:  # A reconstruction failure cannot be promoted.
+            blockers.append(f"Phase-J bundle reconstruction failed: {exc}")
+        else:
+            if rebuilt != bundle:
+                blockers.append(
+                    "Phase-J candidate bundle does not exactly reconstruct from its v4 ledger"
+                )
+            else:
+                result["bundle_reconstructed_from_ledger"] = True
+
+    finalists = bundle.get("finalists")
+    if not isinstance(finalists, list) or not finalists:
+        blockers.append("Phase-J candidate bundle has no finalists")
+        finalists = []
+    normalized_finalists: list[dict[str, Any]] = []
+    for finalist in finalists:
+        if not isinstance(finalist, Mapping):
+            blockers.append("Phase-J finalist is not an object")
+            continue
+        completed = int(finalist.get("executed_full_repeat_count") or 0) == 5
+        repeat_pass = finalist.get("repeat_gate") == "PASS"
+        performance_pass = (
+            finalist.get("v2_safe_original_entry_gate") == "PASS"
+            and finalist.get("corrected_hca_original_entry_gate") == "PASS"
+            and finalist.get("validated_full_gate") == "PASS"
+        )
+        normalized_finalists.append(
+            {
+                "candidate_id": str(finalist.get("candidate_id") or ""),
+                "completed_five_full_repeats": completed and repeat_pass,
+                "original_entry_performance_pass": performance_pass,
+                "promotion_status": str(finalist.get("promotion_status") or ""),
+            }
+        )
+    result["finalists"] = normalized_finalists
+    result["full_repeat_completed"] = any(
+        item["completed_five_full_repeats"] for item in normalized_finalists
+    )
+    result["original_entry_performance_pass"] = any(
+        item["completed_five_full_repeats"]
+        and item["original_entry_performance_pass"]
+        for item in normalized_finalists
+    )
+    result["original_1x_full_formal_pass"] = any(
+        item["completed_five_full_repeats"]
+        and item["original_entry_performance_pass"]
+        and item["promotion_status"] == "PROMOTED"
+        for item in normalized_finalists
+    )
+    result["g4j_status"] = str(bundle.get("g4j_status") or "CLOSED")
+    result["g4j_enabled"] = bool(bundle.get("g4j_enabled"))
+    if not blockers and not result["original_1x_full_formal_pass"]:
+        if result["full_repeat_completed"]:
+            blockers.append(
+                "Phase-J full repeats are verified, but no candidate passes both matched original-entry performance gates"
+            )
+            result["verification_status"] = "VERIFIED_COMPLETE_PERFORMANCE_FAIL"
+        else:
+            blockers.append("Phase-J has no verified complete five-repeat original-1x finalist")
+            result["verification_status"] = "VERIFIED_INCOMPLETE"
+    elif not blockers:
+        result["verification_status"] = "VERIFIED_PROMOTED"
+    if blockers:
+        # Candidate fields are merely claims until the bundle is proven to be
+        # the exact projection of the admitted ledger.
+        result["original_entry_performance_pass"] = False
+        result["original_1x_full_formal_pass"] = False
+    result["blockers"] = sorted(set(blockers))
+    return result
+
+
 def collect_demand_evidence(root: Path = ROOT) -> dict[str, Any]:
     """Validate immutable inputs and collect the Phase-K baseline evidence."""
 
@@ -656,6 +828,7 @@ def collect_demand_evidence(root: Path = ROOT) -> dict[str, Any]:
         }
         for airport, annual in official_2019_airports.items()
     }
+    phase_j_evidence = _phase_j_evidence(root)
 
     return {
         "phase": "G4IRSF12-K",
@@ -756,6 +929,7 @@ def collect_demand_evidence(root: Path = ROOT) -> dict[str, Any]:
                 "service_level": None,
             },
         },
+        "phase_j_evidence": phase_j_evidence,
         "external_sources": list(EXTERNAL_SOURCES),
     }
 
@@ -802,10 +976,18 @@ def _candidate_rows(evidence: Mapping[str, Any]) -> list[dict[str, Any]]:
 
 
 def _phase_l_gates(evidence: Mapping[str, Any]) -> dict[str, Any]:
+    phase_j = evidence["phase_j_evidence"]
+    j_blockers = list(phase_j["blockers"])
+    if not j_blockers and not phase_j["original_1x_full_formal_pass"]:
+        j_blockers.append("Phase-J original-1x formal PASS is not established")
     return {
         "gate_rule": "all gates must be true simultaneously before any scale run",
-        "original_1x_full_formal_pass": False,
-        "original_entry_mean_meets_historical_hca_target": False,
+        "original_1x_full_formal_pass": bool(
+            phase_j["original_1x_full_formal_pass"]
+        ),
+        "original_entry_mean_meets_historical_hca_target": bool(
+            phase_j["original_entry_performance_pass"]
+        ),
         "numeric_real_demand_calibration_complete": False,
         "original_task_generation_audit_pass": True,
         "traceable_1p1_workload_artifact_exists": False,
@@ -814,10 +996,9 @@ def _phase_l_gates(evidence: Mapping[str, Any]) -> dict[str, Any]:
             and evidence["hashes"]["map_semantic_sha256"] == MAP_SEMANTIC_SHA256
         ),
         "all_gates_pass": False,
-        "status": "BLOCKED_NOT_RUN",
+        "status": "PARTIAL_WITH_EXPLICIT_BLOCKER",
         "blockers": [
-            "No G4IRSF12-J full 1x formal PASS artifact exists.",
-            "No verified original-entry mean target PASS exists for G4IRSF12-J.",
+            *j_blockers,
             "Airport/terminal/subsystem and design-day demand inputs are unknown.",
             "The 1.1 descriptor is not a materialized, traceable workload.",
         ],
@@ -908,6 +1089,7 @@ def build_protocol_config(evidence: Mapping[str, Any]) -> dict[str, Any]:
             ),
         },
         "capacity_measurement_contract": evidence["capacity_measurement_contract"],
+        "phase_j_evidence": evidence["phase_j_evidence"],
         "phase_l_gates": _phase_l_gates(evidence),
         "execution_policy": "DESCRIPTORS_ONLY_NO_SCALING_RUN",
         "external_sources": evidence["external_sources"],
@@ -1299,6 +1481,7 @@ def build_airport_report(
     observed = evidence["observed"]
     conversion = evidence["conversion"]
     route = observed["static_directed_shortest_path_lower_bounds"]
+    phase_j = evidence["phase_j_evidence"]
     hourly_rows = [
         (row["clock_hour"], row["bag_count"], f"{100 * row['share']:.3f}%")
         for row in observed["hourly_profile"]
@@ -1342,6 +1525,7 @@ def build_airport_report(
         "calibrated_multiplier: `UNKNOWN_NOT_COMPUTABLE`",
         "finite_uncertainty_interval: `UNBOUNDED_MISSING_SCOPE_AND_DESIGN_DAY_INPUTS`",
         "phase_l_status: `BLOCKED_NOT_RUN`",
+        f"phase_j_v4_ledger_status: `{phase_j['verification_status']}`",
         "",
         "## Decision",
         "",
@@ -1577,8 +1761,9 @@ def build_airport_report(
         "## Phase-L gate",
         "",
         (
-            "`BLOCKED_NOT_RUN`: no G4IRSF12-J full 1x formal PASS/mean-target "
-            "evidence exists; the numeric demand multiplier is unknown; and the "
+            "`BLOCKED_NOT_RUN`: Phase-J is checked by reconstructing its v4 "
+            "candidate bundle from the admitted original-scale ledger. Its status is "
+            f"`{phase_j['verification_status']}`; the numeric demand multiplier is unknown; and the "
             "1.1 manifest is a descriptor rather than a materialized traceable "
             "workload. The protected map identity does pass."
         ),

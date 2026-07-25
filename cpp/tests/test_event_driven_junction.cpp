@@ -535,6 +535,31 @@ void test_fault_repair_delay_and_escape(Checks& checks) {
                  "trace must retain physical fault, repair, and delayed message events");
 }
 
+void test_wait_retries_do_not_consume_route_decision_budget(Checks& checks) {
+  const auto& graph = canonical_graph();
+  checks.require(graph.outgoing(0) == std::vector<int>({6}) &&
+                     graph.has_edge(0, 6),
+                 "decision-budget wait test must use the real 0->6 edge");
+  auto config = test_config();
+  config.retry_interval = 0.05;
+  config.max_decisions_per_bag = 1;
+  config.enable_source_admission = false;
+  EventDrivenJunctionRuntime runtime(graph, config);
+  const auto result = runtime.run(
+      {{"real-wait-not-decision", 302, 0.0, 10000.0, 0, 6,
+        "canonical-map2"}},
+      {{0, 6, 0.0, 1.0, 0.0}});
+  check_core_invariants(checks, result, 1);
+  checks.require(result.bags.size() == 1 &&
+                     result.bags.front().decision_count == 1 &&
+                     result.summary.decision_count == 1,
+                 "only the committed 0->6 action may consume the one-decision budget");
+  checks.require(result.bags.front().retry_count > 1,
+                 "the bag must wait through several fault retries before repair");
+  checks.require(result.bags.front().failure_reason.empty(),
+                 "bounded waiting must not be misclassified as max_decisions_exceeded");
+}
+
 void test_delayed_fault_policy_handoff(Checks& checks) {
   const auto& graph = canonical_graph();
   checks.require(graph.outgoing(6) == std::vector<int>({8, 12}) &&
@@ -546,7 +571,7 @@ void test_delayed_fault_policy_handoff(Checks& checks) {
       {{6, 12, 0.0, 5.0, 2.0}});
   check_core_invariants(checks, result, 1);
   checks.require(result.summary.pibt_lite_handoff_count > 0,
-                 "PIBT-lite shield should hand off to the real safe alternate edge");
+                 "legacy PIBT-lite shield should hand off to the real safe alternate edge");
   checks.require(!result.decisions.empty() && result.decisions.front().current_node == 6 &&
                      result.decisions.front().model_prediction == 12 &&
                      result.decisions.front().selected_next == 8,
@@ -693,6 +718,69 @@ void test_explicit_sensor_loss_keeps_physical_shield(Checks& checks) {
   }
 }
 
+void test_bounded_pibt_sensor_loss_uses_local_fault_handoff(Checks& checks) {
+  const auto& graph = canonical_graph();
+  checks.require(graph.has_edge(22, 24) && graph.has_edge(22, 26),
+                 "sensor-loss handoff test requires the real 22 split");
+
+  auto recovery_config = test_config();
+  recovery_config.retry_interval = 0.001;
+  recovery_config.max_decisions_per_bag = 512;
+  recovery_config.enable_source_admission = false;
+  recovery_config.enable_pibt_lite = false;
+  recovery_config.pibt_mode = "P2";
+  recovery_config.local_queue_capacity = 32;
+  recovery_config.enable_fault_policy = true;
+  EventDrivenJunctionRuntime recovery_runtime(graph, recovery_config);
+  const auto recovered = recovery_runtime.run(
+      {{"real-p2-sensor-loss", 602, 0.0, 10000.0, 22, 47,
+        "canonical-map2"}},
+      {{22, 24, 0.0, 10.0, 0.0, true}});
+  check_core_invariants(checks, recovered, 1);
+  checks.require(recovered.summary.sensor_loss_mode_used &&
+                     recovered.summary.fault_notification_drop_count == 2,
+                 "P2 recovery must retain explicit dropped-notification evidence");
+  checks.require(
+      recovered.summary.physical_fault_interlock_rejection_count > 0 &&
+          recovered.summary.physical_fault_interlock_reroute_count > 0,
+      "enabled recovery must hand off to one local alternative after the physical interlock");
+  checks.require(recovered.summary.pibt_lite_handoff_count == 0,
+                 "physical fault recovery must not masquerade as legacy pibt_lite");
+  checks.require(!recovered.summary.legacy_pibt_lite_enabled,
+                 "P2 sensor-loss evidence must echo legacy pibt_lite as disabled");
+  checks.require(recovered.summary.local_fault_policy_action_count == 0,
+                 "dropped notifications must not fabricate advertised-fault actions");
+  checks.require(recovered.summary.physical_fault_edge_entry_violation_count == 0,
+                 "P2 sensor-loss recovery must never enter the faulted edge");
+  checks.require(recovered.summary.runtime_full_astar_calls == 0 &&
+                     recovered.summary.global_reservation_scan_count == 0 &&
+                     recovered.summary.first_edge_credit_future_route_count == 0 &&
+                     recovered.summary.scorer_future_route_input_count == 0,
+                 "sensor-loss handoff must remain one-step, local, and route-free");
+
+  auto disabled_config = recovery_config;
+  disabled_config.enable_fault_policy = false;
+  EventDrivenJunctionRuntime disabled_runtime(graph, disabled_config);
+  const auto disabled = disabled_runtime.run(
+      {{"real-p2-policy-off", 603, 0.0, 10000.0, 22, 47,
+        "canonical-map2"}},
+      {{22, 24, 0.0, 10.0, 0.0, false}});
+  checks.require(disabled.summary.completed_count == 1 &&
+                     disabled.summary.failed_count == 0 &&
+                     disabled.bags.size() == 1 &&
+                     disabled.bags.front().finish_time >= 10.0,
+                 "fault-policy-off control must wait for physical repair before completing");
+  checks.require(disabled.summary.physical_fault_interlock_rejection_count > 0 &&
+                     disabled.summary.physical_fault_interlock_reroute_count == 0,
+                 "fault-policy-off must preserve the shield and suppress pre-repair rerouting");
+  checks.require(disabled.summary.local_fault_policy_action_count == 0,
+                 "fault-policy-off must not advertise or commit a recovery action");
+  checks.require(!disabled.summary.legacy_pibt_lite_enabled,
+                 "P2 policy-off control must echo legacy pibt_lite as disabled");
+  checks.require(disabled.summary.physical_fault_edge_entry_violation_count == 0,
+                 "fault-policy-off must still retain the non-configurable physical interlock");
+}
+
 }  // namespace
 
 int main() {
@@ -709,11 +797,13 @@ int main() {
     test_non_goal_terminal_sink_is_locally_shielded(checks);
     test_non_goal_terminal_successor_trap_is_locally_shielded(checks);
     test_fault_repair_delay_and_escape(checks);
+    test_wait_retries_do_not_consume_route_decision_budget(checks);
     test_delayed_fault_policy_handoff(checks);
     test_fault_policy_toggle_keeps_physical_interlock_independent(checks);
     test_deterministic_trace_shards(checks);
     test_duplicate_original_task_segments_keep_internal_identity(checks);
     test_explicit_sensor_loss_keeps_physical_shield(checks);
+    test_bounded_pibt_sensor_loss_uses_local_fault_handoff(checks);
   } catch (const std::exception& error) {
     ++checks.failures;
     std::cerr << "FAIL: canonical map2 test setup/runtime exception: " << error.what() << '\n';

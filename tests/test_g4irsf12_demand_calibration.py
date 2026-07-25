@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 import pytest
 
+from scripts.eval import g4irsf12_demand_calibration as demand
 from scripts.eval.g4irsf12_demand_calibration import (
     AIRPORT_REPORT_PATH,
     CALIBRATION_INPUTS_PATH,
@@ -171,7 +172,16 @@ def test_protocol_and_manifests_preserve_generation_and_phase_l_boundaries(
     assert not gates["numeric_real_demand_calibration_complete"]
     assert not gates["traceable_1p1_workload_artifact_exists"]
     assert not gates["all_gates_pass"]
-    assert gates["status"] == "BLOCKED_NOT_RUN"
+    assert gates["status"] == "PARTIAL_WITH_EXPLICIT_BLOCKER"
+    phase_j = protocol["phase_j_evidence"]
+    assert phase_j["verification_status"] == "VERIFIED_COMPLETE_PERFORMANCE_FAIL"
+    assert phase_j["bundle_reconstructed_from_ledger"]
+    assert phase_j["full_repeat_completed"]
+    assert not phase_j["original_entry_performance_pass"]
+    assert not phase_j["original_1x_full_formal_pass"]
+    assert phase_j["g4j_status"] == "CLOSED"
+    assert not phase_j["g4j_enabled"]
+    assert any("performance gates" in blocker for blocker in gates["blockers"])
 
     for scale_id, kind in (
         ("1p0", "baseline"),
@@ -197,6 +207,74 @@ def test_protocol_and_manifests_preserve_generation_and_phase_l_boundaries(
         assert manifest["forbidden_label"] == "original_project_generated"
         assert not manifest["calibrated_real_demand_claim"]
         assert all(value is None for value in manifest["runtime_metrics"].values())
+
+
+def test_phase_j_binding_rejects_a_bundle_not_reconstructed_from_its_ledger(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    provenance = {
+        "binary_path": "C:/fixture/czr005_cpp.pyd",
+        "binary_sha256": "a" * 64,
+        "source_bundle_sha256": "b" * 64,
+        "source_path_manifest_sha256": "c" * 64,
+        "executor_id": "fixture:executor",
+        "executor_source_sha256": "d" * 64,
+    }
+    bundle: dict[str, Any] = {
+        "schema": demand.CANDIDATE_BUNDLE_SCHEMA,
+        "g4j_enabled": False,
+        "g4j_status": "CLOSED",
+        "primary_denominator": "original_entry_time_tth",
+        "current_provenance_status": "VERIFIED",
+        "current_provenance": provenance,
+        "finalists": [
+            {
+                "candidate_id": "J_F1",
+                "executed_full_repeat_count": 5,
+                "repeat_gate": "PASS",
+                "v2_safe_original_entry_gate": "FAIL",
+                "corrected_hca_original_entry_gate": "FAIL",
+                "validated_full_gate": "FAIL",
+                "promotion_status": "PENDING",
+            }
+        ],
+    }
+    bundle["bundle_sha256"] = demand._canonical_sha256(bundle)
+    bundle_path = tmp_path / demand.PHASE_J_BUNDLE_PATH
+    ledger_path = tmp_path / demand.PHASE_J_LEDGER_PATH
+    bundle_path.parent.mkdir(parents=True)
+    ledger_path.parent.mkdir(parents=True)
+    bundle_path.write_text(json.dumps(bundle), encoding="utf-8")
+    ledger_path.write_text("fixture-ledger\n", encoding="utf-8")
+    monkeypatch.setattr(demand, "load_result_ledger", lambda *args, **kwargs: [{}])
+    monkeypatch.setattr(
+        demand,
+        "rebuild_phase_j_candidate_bundle",
+        lambda *args, **kwargs: dict(bundle),
+    )
+
+    verified = demand._phase_j_evidence(tmp_path)
+
+    assert verified["verification_status"] == "VERIFIED_COMPLETE_PERFORMANCE_FAIL"
+    assert verified["bundle_reconstructed_from_ledger"]
+    assert verified["full_repeat_completed"]
+    assert not verified["original_entry_performance_pass"]
+    assert not verified["original_1x_full_formal_pass"]
+
+    tampered = dict(bundle)
+    tampered["finalists"] = [dict(bundle["finalists"][0], repeat_gate="PENDING")]
+    tampered["bundle_sha256"] = demand._canonical_sha256(
+        {key: value for key, value in tampered.items() if key != "bundle_sha256"}
+    )
+    bundle_path.write_text(json.dumps(tampered), encoding="utf-8")
+
+    rejected = demand._phase_j_evidence(tmp_path)
+
+    assert rejected["verification_status"] == "UNVERIFIED"
+    assert not rejected["bundle_reconstructed_from_ledger"]
+    assert not rejected["original_entry_performance_pass"]
+    assert not rejected["original_1x_full_formal_pass"]
+    assert any("does not exactly reconstruct" in blocker for blocker in rejected["blockers"])
 
 
 def test_external_method_sources_are_primary_or_official(
