@@ -1,0 +1,152 @@
+{
+  "corrected_targets": {
+    "historical_hca_raw_entry_target_minutes": 43.13593828041816,
+    "scheduled_pre_release_offset_minutes": 37.37100153432201,
+    "v2_safe_raw_entry_target_minutes": 41.49530698780892
+  },
+  "decision": {
+    "g4j_status": "CLOSED",
+    "historical_hca_claim_boundary": "parsed historical evidence; not a same-machine fresh rerun",
+    "new_framework_plus_decentralized_vs_frozen_v2_safe": "FAIL",
+    "new_framework_plus_decentralized_vs_historical_hca": "PASS",
+    "new_framework_plus_decentralized_vs_pibt_off_control": "PASS",
+    "phase_k_multiplier": "UNKNOWN_NOT_COMPUTABLE",
+    "phase_l_status": "BLOCKED_NOT_RUN",
+    "pibt_off_claim_boundary": "completion/deadlock only; control TTH is event-limit censored",
+    "repeat_claim_boundary": "five deterministic reproductions; not independent trials",
+    "strict_joint_promotion_gate": "FAIL"
+  },
+  "finalists": [
+    {
+      "candidate_id": "J_F1",
+      "corrected_hca_raw_entry_gate": "PASS",
+      "corrected_hca_raw_entry_target_minutes": 43.13593828041816,
+      "corrected_v2_safe_raw_entry_target_minutes": 41.49530698780892,
+      "delta_vs_hca_minutes": -1.591189871280335,
+      "delta_vs_v2_minutes": 0.04944142132890761,
+      "delta_vs_v2_seconds": 2.9664852797344565,
+      "deterministic_result_sha256": "383491673f81a4a5f22ff78705c4f43c50870108b59e0b4ab29bfacce444ada0",
+      "executed_full_repeat_count": 5,
+      "g4j_status": "CLOSED",
+      "hca_advantage_minutes": 1.591189871280335,
+      "original_entry_mean_minutes": 41.544748409137824,
+      "pass_time_anchored_mean_minutes": 4.173746874815814,
+      "safety_termination_gate": "PASS",
+      "scheduled_pre_release_offset_minutes": 37.37100153432201,
+      "schema": "czr005.g4irsf12.denominator_reconciliation.v1",
+      "status": "VERIFIED_DENOMINATOR_MISMATCH",
+      "strict_joint_promotion_gate": "FAIL",
+      "v2_safe_raw_entry_gate": "FAIL"
+    },
+    {
+      "candidate_id": "J_F2",
+      "corrected_hca_raw_entry_gate": "PASS",
+      "corrected_hca_raw_entry_target_minutes": 43.13593828041816,
+      "corrected_v2_safe_raw_entry_target_minutes": 41.49530698780892,
+      "delta_vs_hca_minutes": -1.6217195624447456,
+      "delta_vs_v2_minutes": 0.018911730164496987,
+      "delta_vs_v2_seconds": 1.1347038098698192,
+      "deterministic_result_sha256": "23c52e4412eb2359f907ed145f3cc0b6de8392af1dff184b8324b19b0b7c05f0",
+      "executed_full_repeat_count": 5,
+      "g4j_status": "CLOSED",
+      "hca_advantage_minutes": 1.6217195624447456,
+      "original_entry_mean_minutes": 41.514218717973414,
+      "pass_time_anchored_mean_minutes": 4.143217183651398,
+      "safety_termination_gate": "PASS",
+      "scheduled_pre_release_offset_minutes": 37.37100153432201,
+      "schema": "czr005.g4irsf12.denominator_reconciliation.v1",
+      "status": "VERIFIED_DENOMINATOR_MISMATCH",
+      "strict_joint_promotion_gate": "FAIL",
+      "v2_safe_raw_entry_gate": "FAIL"
+    }
+  ],
+  "formal_source_bundle_preserved": true,
+  "formula": "matched_raw_entry_target = legacy_pass_time_anchored_target + mean_task(sum_segment(pass_time-original_entry_time))/60",
+  "input_evidence": {
+    "file_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+    "leg_counts": {
+      "direct": 13409,
+      "storage_in": 15097,
+      "storage_out": 15097
+    },
+    "leg_pre_release_wait_seconds": {
+      "direct": 0.0,
+      "storage_in": 0.0,
+      "storage_out": 63917866.184243314
+    },
+    "path": "data/processed/tasks/inputdata.jsonl",
+    "raw_bag_count": 28506,
+    "scheduled_pre_release_offset_minutes": 37.37100153432201,
+    "segment_count": 43603
+  },
+  "legacy_comparator_evidence": {
+    "actual_start_field": "data/processed/tasks/inputdata.jsonl:pass_time",
+    "historical_hca_is_fresh_rerun": false,
+    "historical_hca_pass_time_anchored_minutes": 5.764936746096144,
+    "legacy_label": "original_entry_time_tth",
+    "recompute_source_file_sha256": "f4ccb6ef64451c4fa7f038f6b1260175674e4df8a866476c8abc7e7bd48a68f9",
+    "recompute_source_path": "scripts/eval/run_g4irsf8_source_release_denominator_validation.py",
+    "table_file_sha256": "d496e733c247092d03ed247ca524f1ec83a63cfab5d64adcd4c64fd2a7b653f6",
+    "table_path": "outputs/tables/g4irsf8_tth_denominator_comparison.csv",
+    "v2_safe_pass_time_anchored_minutes": 4.124305453486908
+  },
+  "legacy_gate_status": "SUPERSEDED_DENOMINATOR_MISMATCH",
+  "method": "append_only_algebraic_denominator_translation",
+  "preserved_evidence_fields": [
+    "runtime timing observations",
+    "completion and drainage counts",
+    "safety/conflict/deadlock counters",
+    "repeat indexes and deterministic result hashes",
+    "binary and formal execution provenance"
+  ],
+  "reconciliation_sha256": "d8a577bf1540236d90280440a2a92a01f38abf173fca1fbbffdac8289b544f17",
+  "runtime_rerun_required": false,
+  "schema": "czr005.g4irsf12.denominator_reconciliation.v1",
+  "sealed_execution_evidence_rewritten": false,
+  "sealed_phase_j_evidence": {
+    "admitted_row_count": 21,
+    "candidate_bundle_file_sha256": "d886127f1a04def63e1bab54751385f088e68598500863c61c14a35368bd6756",
+    "candidate_bundle_path": "artifacts/policies/g4irsf12_original_scale_candidate_bundle.json",
+    "candidate_bundle_self_sha256": "f60f90080ee4355e4f0b4a0f0c4bec24178ad727d827765e42025740e0620bcd",
+    "file_sha256": "0263e022a32936423023013d6eaaa2e3140e44757280ef84c67cf91b59986f0c",
+    "formal_source_bundle_sha256": "eca01993a9094c8e86558d15246628acd3162d5d769916ded6365ec6437f0df7",
+    "path": "outputs/tables/g4irsf12_original_scale_full_ab.csv",
+    "pibt_off_control": {
+      "candidate_id": "J_CTRL_PIBT_OFF",
+      "censored_deadlock_signature_gate": "PASS",
+      "complete_raw_bag_count": [
+        4189
+      ],
+      "completed_segment_count": [
+        7719
+      ],
+      "deterministic_result_sha256": "342a6dfb17311f6da2c449daa87bb71fbc28f27075aeee5b75ae3d1474942fc6",
+      "event_limit_reached": true,
+      "executed_repeat_count": 5,
+      "execution_statuses": [
+        "PARTIAL"
+      ],
+      "repeat_indexes": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "unresolved_deadlock_count": [
+        32
+      ]
+    }
+  },
+  "status": "VERIFIED_DENOMINATOR_MISMATCH",
+  "superseded_fields": [
+    "outputs/tables/g4irsf12_original_scale_full_ab.csv:v2_safe_original_entry_target_minutes",
+    "outputs/tables/g4irsf12_original_scale_full_ab.csv:v2_safe_original_entry_gate",
+    "outputs/tables/g4irsf12_original_scale_full_ab.csv:corrected_hca_original_entry_target_minutes",
+    "outputs/tables/g4irsf12_original_scale_full_ab.csv:corrected_hca_original_entry_gate",
+    "outputs/tables/g4irsf12_original_scale_full_ab.csv:matched_original_entry_performance_gate",
+    "artifacts/policies/g4irsf12_original_scale_candidate_bundle.json:performance targets, performance gates, and derived blockers",
+    "outputs/reports/g4irsf12_original_scale_full_ab.md:performance-target interpretation",
+    "outputs/reports/g4irsf12_promotion_gate.md:performance-target interpretation"
+  ]
+}

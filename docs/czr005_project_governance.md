@@ -74,7 +74,12 @@ Any experiment that changes task release time, pass_time, source queue order, so
 
 For paper-protocol comparisons, Codex must distinguish:
 
-- `original_entry_time_tth`: THT measured from the original inputdata EntryTime/pass_time.
+- `original_entry_time_tth` (G4IRSF12 raw-entry semantics): THT measured
+  from the raw task's `original_entry_time`, including scheduled dwell before
+  later split segments become eligible.
+- `legacy_segment_pass_time_tth`: THT measured from each processed segment's
+  `pass_time`; this is the actual denominator behind the legacy G4IRSF8 field
+  that was labelled `original_entry_time_tth`.
 - `java_release_time_tth`: THT measured from Java epoch release time / cur_time when the task actually enters path planning.
 - `processed_segment_attempt_time_tth`: THT measured from processed JSONL segment attempt_time.
 - `diagnostic_runtime_tth`: any engineering timing used only for diagnostics.
@@ -99,10 +104,24 @@ The parsed historical IoT-DRPA/HCA* value `3.967122711` minutes is the
 project output start time.  It is not an `original_entry_time_tth` value and
 must never be used as an original-entry target.  The same historical output
 recomputes to approximately `5.197225146` minutes under Java-release time and
-`5.764936746` minutes under original-entry time.  These recomputations remain
-historical parsed evidence, not a fresh Java/HCA* rerun.  A comparison must
-show all relevant denominators side by side and may claim a win only within a
-matched denominator.
+`5.764936746` minutes under the legacy pass-time-anchored field that was
+labelled original-entry.  Neither value uses the G4IRSF12 raw-task
+original-entry denominator.  These recomputations remain historical parsed
+evidence, not a fresh Java/HCA* rerun.  A comparison must show all relevant
+denominators side by side and may claim a win only within a matched
+denominator.
+
+The append-only G4IRSF12 denominator reconciliation discovered that the legacy
+G4IRSF8 field labelled `original_entry_time_tth` was actually anchored at each
+segment's `inputdata.jsonl:pass_time`.  It was not anchored at the later
+G4IRSF12 raw-task `original_entry_time`.  Legacy v2-safe/HCA values must
+therefore be translated by the protected-input scheduled pre-release offset
+before comparison with the G4IRSF12 raw-entry metric.  The authoritative
+correction is
+`outputs/reports/g4irsf12_denominator_reconciliation.md`; it supersedes only
+the old performance targets, gates, and derived blockers.  Sealed runtime
+timings, completion/safety counters, repeat hashes, and execution provenance
+remain immutable.
 
 ## Original-Scale-First Rule
 
