@@ -1,0 +1,90 @@
+{
+  "candidate_id": "G4IRSF13_F2_FROZEN",
+  "claim_boundary": "Frozen control only. It beats corrected historical HCA but remains 1.13470381 s/bag slower than frozen v2-safe.",
+  "configuration": {
+    "admission_mode": "off",
+    "control": "C0",
+    "framework": "event_loop_one_step",
+    "pibt": "P2",
+    "pressure_mode": "off",
+    "reservation_depth": 1,
+    "resource": "R3_java_node_window_compatible",
+    "scorer": "S1_frozen_g4e_legal_local_adapter"
+  },
+  "hard_gates": {
+    "complete_raw_bags": 28506,
+    "completed_segments": 43603,
+    "conflicts": 0,
+    "event_limit_reached": false,
+    "failed_segments": 0,
+    "future_routes_stored": 0,
+    "global_reservation_scans": 0,
+    "max_edges_selected_per_bag_per_decision": 1,
+    "runtime_full_astar_calls": 0,
+    "time_limit_reached": false,
+    "unresolved_deadlocks": 0,
+    "unsafe_entries": 0
+  },
+  "inherited_candidate_id": "J_F2",
+  "metrics": {
+    "decision_sensitive_mean_minutes": 4.143217183651398,
+    "delta_vs_v2_safe_seconds": 1.1347038098698192,
+    "network_time_mean_minutes": 3.7804989547405254,
+    "original_entry_mean_minutes": 41.514218717973414,
+    "original_entry_p95_seconds": 7349.348647499981,
+    "original_entry_p99_seconds": 10789.015762999989,
+    "scheduled_pre_release_offset_minutes": 37.37100153432201,
+    "source_wait_mean_minutes": 0.3627182289108726
+  },
+  "pibt_counters": {
+    "applicability": 191,
+    "attempt": 199,
+    "backtrack": 183,
+    "commit": 8,
+    "handoff": 1,
+    "prepare": 8,
+    "rollback": 0,
+    "validate": 40
+  },
+  "policy_sha256": "9c12b004fc1dc0fe19dfa3d014a1fcc51dcb5edb538c15bf01a3f6daf32333eb",
+  "protected_inputs": {
+    "map_path": "data/processed/maps/map2.json",
+    "map_raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+    "map_semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63",
+    "raw_bag_count": 28506,
+    "segment_count": 43603,
+    "task_path": "data/processed/tasks/inputdata.jsonl",
+    "task_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+  },
+  "provenance": {
+    "binary_sha256": "82f15f08a8cff0e887447f017f0aa03fffabe9bfb3a79a563b16d779219d8222",
+    "case_config_sha256": "60c91e937f3c8f14ff4a80f685ec3294da6e22196cdf254eea998acb677becf1",
+    "deterministic_result_sha256": "23c52e4412eb2359f907ed145f3cc0b6de8392af1dff184b8324b19b0b7c05f0",
+    "evidence_files": {
+      "artifacts/policies/g4irsf12_denominator_reconciliation.json": "618c040a5b5bd13ce81c502832575a7ea52bd8b82998ce481ffe79da9b8de4e6",
+      "artifacts/policies/g4irsf12_original_scale_candidate_bundle.json": "d886127f1a04def63e1bab54751385f088e68598500863c61c14a35368bd6756",
+      "outputs/tables/g4irsf12_original_scale_full_ab.csv": "0263e022a32936423023013d6eaaa2e3140e44757280ef84c67cf91b59986f0c"
+    },
+    "evidence_row_binding_sha256": [
+      "5b4ce5da1430c96b551933d87cd194ba6c9cdd9b0efe7cbc55b5abe6d8843bc2",
+      "da2d95d12fbb08534579191c0ab85f61bdfa65bd1127637efbb992a9ebae07cf",
+      "7d916fb6d258a90ca88713212b5d68f5d76619eaba75ee032f223768dc200d55",
+      "55f47dcda6ae0d97abc8c85b89eb8c47a7224bdfff365edb3387f7f9fe9a6362",
+      "242ec1226e9cf61278214fdf7b8ea353aca17b410b343e5feee24610a7fdee41"
+    ],
+    "executor_id": "czr005.cpp_backend:g4irsf11_event_runtime_from_records",
+    "executor_source_sha256": "e1b59eecded76f59991a9276f614aea747a573dbaffdf2139cfd9b6096b69971",
+    "phase_start_commit": "f05e5432c5faa85d8b11d2d153e7da96f340d34c",
+    "repeat_count": 5,
+    "repeat_indexes": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source_bundle_sha256": "eca01993a9094c8e86558d15246628acd3162d5d769916ded6365ec6437f0df7",
+    "source_path_manifest_sha256": "720843eb169dc451d8949c4d6b4d8dec8f3d43a6288492c5d23ef8321a712c3b"
+  },
+  "schema": "czr005.g4irsf13.f2_frozen_baseline.v1"
+}
