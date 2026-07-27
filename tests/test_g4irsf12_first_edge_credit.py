@@ -216,4 +216,7 @@ def test_legacy_positional_binding_contract_remains_aligned() -> None:
     assert summary["source_admission_enabled"] is True
     assert summary["completed_count"] == 1
     assert summary["first_edge_credit_issue_attempt_count"] == 0
+    assert summary["trace_limit"] == 100_000
+    assert summary["event_trace_limit"] == 100_000
+    assert summary["event_trace_limit_inherited"] is True
     assert payload["credit_events"] == []

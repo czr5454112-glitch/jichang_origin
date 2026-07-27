@@ -120,6 +120,10 @@ struct EventDrivenJunctionConfig {
   int max_events = 2000000;
   double max_simulation_time = -1.0;
   int trace_limit = 20000;
+  // When unset, event rows retain the historical shared trace_limit cap.
+  // Set independently (including zero) to suppress or bound only event rows
+  // while leaving decision/fault/credit/PIBT audit limits unchanged.
+  std::optional<int> event_trace_limit;
   int trace_shard_count = 1;
   int trace_shard_index = 0;
   int local_queue_capacity = 0;  // zero means no configured queue cap
@@ -255,6 +259,15 @@ struct EventRuntimeBagResult {
   double finish_time = -1.0;
   double source_queue_delay = 0.0;
   double total_local_wait = 0.0;
+  double junction_queue_wait_seconds = 0.0;
+  double edge_travel_time_seconds = 0.0;
+  double node_service_time_seconds = 0.0;
+  // Diagnostic subset of edge_travel_time_seconds: travel on a committed
+  // edge whose destination was already present in the bounded recent history.
+  double loop_extra_time_seconds = 0.0;
+  // Elapsed release-to-goal duration. It remains zero for an incomplete bag;
+  // completion/failure state is carried separately below.
+  double goal_completion_time_seconds = 0.0;
   int decision_count = 0;
   int retry_count = 0;
   int loop_count = 0;
@@ -450,6 +463,8 @@ struct EventRuntimeSummary {
   int decision_trace_stored_count = 0;
   int hold_trace_stored_count = 0;
   int trace_limit = 0;
+  int event_trace_limit = 0;
+  bool event_trace_limit_inherited = true;
   int trace_shard_count = 1;
   int trace_shard_index = 0;
   std::size_t cpp_internal_accounted_bytes = 0;
@@ -702,6 +717,11 @@ struct BagState {
   double source_enqueued_at = -1.0;
   double junction_enqueued_at = -1.0;
   double total_wait = 0.0;
+  double junction_queue_wait_seconds = 0.0;
+  double edge_travel_time_seconds = 0.0;
+  double node_service_time_seconds = 0.0;
+  double loop_extra_time_seconds = 0.0;
+  double goal_completion_time_seconds = 0.0;
   int decision_count = 0;
   int retry_count = 0;
   int loop_count = 0;
@@ -883,6 +903,9 @@ class EventDrivenJunctionRuntime {
     result_.summary.requested_count = static_cast<int>(requests.size());
     result_.summary.diagnostic_hops = config_.diagnostic_hops;
     result_.summary.trace_limit = config_.trace_limit;
+    result_.summary.event_trace_limit = effective_event_trace_limit();
+    result_.summary.event_trace_limit_inherited =
+        !config_.event_trace_limit.has_value();
     result_.summary.trace_shard_count = config_.trace_shard_count;
     result_.summary.trace_shard_index = config_.trace_shard_index;
     result_.summary.admission_mode = canonical_admission_mode();
@@ -2084,6 +2107,11 @@ class EventDrivenJunctionRuntime {
     if (found == bags_.end() || found->second.status != BagStatus::kInService) {
       return;
     }
+    // Count only service that reached its actual completion event. Merely
+    // reserving or preparing service (including a rolled-back PIBT batch)
+    // never contributes simulated service time.
+    found->second.node_service_time_seconds +=
+        service_duration(event.node);
     schedule(JunctionEventType::kArriveJunction,
              event.time,
              event.task_id,
@@ -2237,6 +2265,7 @@ class EventDrivenJunctionRuntime {
     int bag_id = -1;
     BagStatus status = BagStatus::kPendingRelease;
     double total_wait = 0.0;
+    double junction_queue_wait_seconds = 0.0;
     int transit_from = -1;
     int transit_to = -1;
     int decision_count = 0;
@@ -3419,6 +3448,7 @@ class EventDrivenJunctionRuntime {
               action.bag_id,
               bag.status,
               bag.total_wait,
+              bag.junction_queue_wait_seconds,
               bag.transit_from,
               bag.transit_to,
               bag.decision_count,
@@ -3548,6 +3578,8 @@ class EventDrivenJunctionRuntime {
       const auto& saved = entry.second;
       bag.status = saved.status;
       bag.total_wait = saved.total_wait;
+      bag.junction_queue_wait_seconds =
+          saved.junction_queue_wait_seconds;
       bag.transit_from = saved.transit_from;
       bag.transit_to = saved.transit_to;
       bag.decision_count = saved.decision_count;
@@ -4765,7 +4797,12 @@ class EventDrivenJunctionRuntime {
                      selected,
                      "incoming_reservation_snapshot");
 
+    // Keep the legacy total_wait update byte-for-byte equivalent because it
+    // is an existing PIBT-priority input. The new accumulator is observational
+    // only and repeats the same dequeue interval independently.
     bag.total_wait += std::max(0.0, time - bag.junction_enqueued_at);
+    bag.junction_queue_wait_seconds +=
+        std::max(0.0, time - bag.junction_enqueued_at);
     bag.status = BagStatus::kInTransit;
     bag.transit_from = current;
     bag.transit_to = selected;
@@ -4831,6 +4868,16 @@ class EventDrivenJunctionRuntime {
       }
     }
     bag.current = event.to_node;
+    const double executed_travel =
+        std::max(graph_.edge(event.from_node, event.to_node).travel_time(),
+                 config_.minimum_service_seconds);
+    bag.edge_travel_time_seconds += executed_travel;
+    if (recent_visit_count(bag, event.to_node) > 0) {
+      // This is deliberately a subset of travel rather than a second
+      // additive duration component. The destination must have been observed
+      // before this valid EDGE_EXIT in the bounded runtime history.
+      bag.loop_extra_time_seconds += executed_travel;
+    }
     bag.status = BagStatus::kInService;
     schedule(JunctionEventType::kJunctionServiceComplete,
              event.service_end,
@@ -5236,6 +5283,8 @@ class EventDrivenJunctionRuntime {
     deactivate_bag(bag);
     bag.status = BagStatus::kCompleted;
     bag.finish_time = time;
+    bag.goal_completion_time_seconds =
+        std::max(0.0, time - bag.request.release_time);
     record_wait_outcome(bag, time);
   }
 
@@ -5244,6 +5293,8 @@ class EventDrivenJunctionRuntime {
       bag.total_wait += std::max(0.0, time - bag.source_enqueued_at);
     } else if (bag.status == BagStatus::kJunctionQueue && bag.junction_enqueued_at >= 0.0) {
       bag.total_wait += std::max(0.0, time - bag.junction_enqueued_at);
+      bag.junction_queue_wait_seconds +=
+          std::max(0.0, time - bag.junction_enqueued_at);
     }
     deactivate_bag(bag);
     bag.status = BagStatus::kFailed;
@@ -5319,6 +5370,16 @@ class EventDrivenJunctionRuntime {
                                    ? bag.admitted_time - bag.request.release_time
                                    : std::max(0.0, now_ - bag.request.release_time);
       row.total_local_wait = bag.total_wait;
+      row.junction_queue_wait_seconds =
+          bag.junction_queue_wait_seconds;
+      row.edge_travel_time_seconds =
+          bag.edge_travel_time_seconds;
+      row.node_service_time_seconds =
+          bag.node_service_time_seconds;
+      row.loop_extra_time_seconds =
+          bag.loop_extra_time_seconds;
+      row.goal_completion_time_seconds =
+          bag.goal_completion_time_seconds;
       row.decision_count = bag.decision_count;
       row.retry_count = bag.retry_count;
       row.loop_count = bag.loop_count;
@@ -5609,7 +5670,7 @@ class EventDrivenJunctionRuntime {
                           int to,
                           const std::string& reason,
                           int selected_edges) {
-    if (!trace_available(result_.events.size())) {
+    if (!event_trace_available(result_.events.size())) {
       result_.summary.event_trace_truncated = true;
       return;
     }
@@ -5656,6 +5717,15 @@ class EventDrivenJunctionRuntime {
 
   bool trace_available(std::size_t current_size) const {
     return config_.trace_limit < 0 || static_cast<int>(current_size) < config_.trace_limit;
+  }
+
+  int effective_event_trace_limit() const {
+    return config_.event_trace_limit.value_or(config_.trace_limit);
+  }
+
+  bool event_trace_available(std::size_t current_size) const {
+    const int limit = effective_event_trace_limit();
+    return limit < 0 || static_cast<int>(current_size) < limit;
   }
 
   void update_queue_maxima(JunctionState& controller) {

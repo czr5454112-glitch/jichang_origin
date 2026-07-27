@@ -105,6 +105,46 @@ void check_core_invariants(Checks& checks,
   checks.require(result.summary.final_active_bag_count == 0,
                  "final active bag count must be fully drained");
 
+  for (const auto& bag : result.bags) {
+    checks.require(bag.source_queue_delay >= 0.0 &&
+                       bag.junction_queue_wait_seconds >= 0.0 &&
+                       bag.edge_travel_time_seconds >= 0.0 &&
+                       bag.node_service_time_seconds >= 0.0 &&
+                       bag.loop_extra_time_seconds >= 0.0 &&
+                       bag.goal_completion_time_seconds >= 0.0,
+                   "per-bag Stage-B timing components must be non-negative");
+    checks.require(bag.loop_extra_time_seconds <=
+                       bag.edge_travel_time_seconds + 1.0e-12,
+                   "loop-extra travel must remain a diagnostic subset of "
+                   "executed edge travel");
+    if (bag.loop_count == 0) {
+      checks.require(bag.loop_extra_time_seconds == 0.0,
+                     "a bag without an actual bounded-history revisit must "
+                     "not receive synthetic loop-extra time");
+    }
+    if (!bag.completed) {
+      continue;
+    }
+    const double elapsed = bag.finish_time - bag.release_time;
+    const double reconstructed =
+        bag.source_queue_delay +
+        bag.junction_queue_wait_seconds +
+        bag.edge_travel_time_seconds +
+        bag.node_service_time_seconds;
+    checks.require(std::abs(bag.total_local_wait -
+                            (bag.source_queue_delay +
+                             bag.junction_queue_wait_seconds)) <= 1.0e-7,
+                   "source and junction queue waits must reconstruct the "
+                   "legacy total-local-wait scalar");
+    checks.require(std::abs(reconstructed - elapsed) <= 1.0e-7,
+                   "source+junction+travel+service must reconstruct "
+                   "finish-release; fault, calendar, and retry holds remain "
+                   "inside their actual source/junction queue interval");
+    checks.require(std::abs(bag.goal_completion_time_seconds - elapsed) <=
+                       1.0e-7,
+                   "goal-completion duration must equal finish-release");
+  }
+
   std::size_t final_junction_accounted_bytes = 0;
   std::uint64_t service_reservation_count = 0;
   double cumulative_service_reserved_seconds = 0.0;

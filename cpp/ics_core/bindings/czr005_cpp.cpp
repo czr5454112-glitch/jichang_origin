@@ -3373,6 +3373,9 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["decision_trace_stored_count"] = summary.decision_trace_stored_count;
   row["hold_trace_stored_count"] = summary.hold_trace_stored_count;
   row["trace_limit"] = summary.trace_limit;
+  row["event_trace_limit"] = summary.event_trace_limit;
+  row["event_trace_limit_inherited"] =
+      summary.event_trace_limit_inherited;
   row["trace_shard_count"] = summary.trace_shard_count;
   row["trace_shard_index"] = summary.trace_shard_index;
   row["decision_trace_truncated"] = summary.decision_trace_truncated;
@@ -3428,6 +3431,16 @@ py::list g4irsf11_event_runtime_bag_rows(
     row["finish_time"] = bag.finish_time;
     row["source_queue_delay"] = bag.source_queue_delay;
     row["total_local_wait"] = bag.total_local_wait;
+    row["junction_queue_wait_seconds"] =
+        bag.junction_queue_wait_seconds;
+    row["edge_travel_time_seconds"] =
+        bag.edge_travel_time_seconds;
+    row["node_service_time_seconds"] =
+        bag.node_service_time_seconds;
+    row["loop_extra_time_seconds"] =
+        bag.loop_extra_time_seconds;
+    row["goal_completion_time_seconds"] =
+        bag.goal_completion_time_seconds;
     row["decision_count"] = bag.decision_count;
     row["retry_count"] = bag.retry_count;
     row["loop_count"] = bag.loop_count;
@@ -3815,7 +3828,8 @@ py::dict g4irsf11_event_runtime_from_records(
     double scorer_risk_margin_threshold,
     double scorer_risk_bottleneck_threshold,
     const std::string& scorer_model_sha256,
-    const std::string& framework_mode) {
+    const std::string& framework_mode,
+    const std::optional<int>& event_trace_limit) {
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   std::vector<czr005::ics::EventRuntimeBagRequest> requests;
   requests.reserve(bag_records.size());
@@ -3857,6 +3871,7 @@ py::dict g4irsf11_event_runtime_from_records(
   config.max_events = max_events;
   config.max_simulation_time = max_simulation_time;
   config.trace_limit = trace_limit;
+  config.event_trace_limit = event_trace_limit;
   config.trace_shard_count = trace_shard_count;
   config.trace_shard_index = trace_shard_index;
   config.local_queue_capacity = local_queue_capacity;
@@ -3922,6 +3937,10 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["reservation_depth"] = 1;
   trace_context["diagnostic_hops"] = diagnostic_hops;
   trace_context["trace_limit"] = trace_limit;
+  trace_context["event_trace_limit"] =
+      result.summary.event_trace_limit;
+  trace_context["event_trace_limit_inherited"] =
+      result.summary.event_trace_limit_inherited;
   trace_context["trace_shard_count"] = trace_shard_count;
   trace_context["trace_shard_index"] = trace_shard_index;
   trace_context["trace_sampling"] = "deterministic_task_id_modulo_shard_then_limit";
@@ -4257,7 +4276,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("scorer_model_sha256") =
                  std::string(),
              py::arg("framework_mode") =
-                 std::string("event_loop_one_step"));
+                 std::string("event_loop_one_step"),
+             py::arg("event_trace_limit") = py::none());
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,

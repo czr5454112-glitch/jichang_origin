@@ -1,4 +1,5 @@
 #include <array>
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <limits>
@@ -363,6 +364,35 @@ void require_safe_boundary(Checks& checks,
                               ? 0
                               : 1),
                  label + " must echo the actual event and queue configuration");
+  for (const auto& bag : result.bags) {
+    checks.require(
+        bag.source_queue_delay >= 0.0 &&
+            bag.junction_queue_wait_seconds >= 0.0 &&
+            bag.edge_travel_time_seconds >= 0.0 &&
+            bag.node_service_time_seconds >= 0.0 &&
+            bag.loop_extra_time_seconds >= 0.0 &&
+            bag.goal_completion_time_seconds >= 0.0,
+        label + " must expose non-negative Stage-B timing components");
+    if (!bag.completed) {
+      continue;
+    }
+    const double elapsed = bag.finish_time - bag.release_time;
+    const double reconstructed =
+        bag.source_queue_delay +
+        bag.junction_queue_wait_seconds +
+        bag.edge_travel_time_seconds +
+        bag.node_service_time_seconds;
+    checks.require(
+        std::abs(reconstructed - elapsed) <= 1.0e-7 &&
+            std::abs(bag.goal_completion_time_seconds - elapsed) <=
+                1.0e-7,
+        label + " atomic PIBT execution must preserve the exact "
+                "release-to-finish timing decomposition");
+    checks.require(
+        bag.loop_extra_time_seconds <=
+            bag.edge_travel_time_seconds + 1.0e-12,
+        label + " loop-extra travel must be a subset of committed travel");
+  }
 }
 
 void test_p0_is_an_actual_bypass(Checks& checks) {
@@ -504,6 +534,10 @@ void test_trace_limit_and_honest_fault_metrics(Checks& checks) {
   require_safe_boundary(checks, result, "P1 summary-only");
   checks.require(result.summary.bounded_local_pibt_committed_action_count == 2,
                  "trace suppression must not alter true PIBT execution counters");
+  checks.require(result.summary.trace_limit == 0 &&
+                     result.summary.event_trace_limit == 0 &&
+                     result.summary.event_trace_limit_inherited,
+                 "the default event trace cap must inherit trace_limit exactly");
   checks.require(result.events.empty() && result.decisions.empty() &&
                      result.hold_attempts.empty() &&
                      result.fault_events.empty() &&
@@ -525,6 +559,39 @@ void test_trace_limit_and_honest_fault_metrics(Checks& checks) {
   checks.require(result.summary.repair_backlog_slope_available &&
                      result.summary.repair_backlog_slope < 0.0,
                  "a positive post-repair observation window must expose measured drain slope");
+
+  auto decision_only_config = pibt_config("P1");
+  decision_only_config.trace_limit = -1;
+  decision_only_config.event_trace_limit = 0;
+  const auto decision_only = run_motif(decision_only_config);
+  require_safe_boundary(checks, decision_only, "P1 decision-only trace");
+  checks.require(
+      decision_only.events.empty() && !decision_only.decisions.empty() &&
+          !decision_only.fault_events.empty() &&
+          !decision_only.pibt_events.empty(),
+      "event_trace_limit=0 must suppress only event rows while the shared "
+      "trace_limit still retains decisions, fault audits, and PIBT audits");
+  checks.require(
+      static_cast<std::uint64_t>(decision_only.decisions.size()) ==
+              decision_only.summary.decision_count &&
+          static_cast<int>(decision_only.decisions.size()) ==
+              decision_only.summary.decision_trace_stored_count &&
+          decision_only.decisions.size() +
+                  decision_only.hold_attempts.size() ==
+              decision_only.summary.decision_trace_seen_count,
+      "an unlimited decision trace must contain every committed one-edge "
+      "action and every observed hold even when event rows are disabled");
+  checks.require(
+      decision_only.summary.trace_limit == -1 &&
+          decision_only.summary.event_trace_limit == 0 &&
+          !decision_only.summary.event_trace_limit_inherited &&
+          decision_only.summary.event_trace_truncated,
+      "an explicit independent event cap must be echoed and report event "
+      "suppression without truncating the other audit families");
+  checks.require(
+      decision_only.summary.bounded_local_pibt_committed_action_count ==
+          result.summary.bounded_local_pibt_committed_action_count,
+      "independent event trace suppression must not alter PIBT execution");
 
   auto no_fault_config = pibt_config("P0");
   const auto no_fault = EventDrivenJunctionRuntime(canonical_graph(), no_fault_config)

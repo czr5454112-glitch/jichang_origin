@@ -283,7 +283,12 @@ def test_fault_policy_off_disables_advertised_actions_but_not_physical_interlock
     assert off_gate["fault_recovery_pass"] is True
 
 
-def test_policy_off_unrecovered_fault_is_finite_json_negative_evidence() -> None:
+def test_policy_off_long_fault_is_safe_but_uninformative_for_policy_gain() -> None:
+    """The physical shield waits for repair even when advertised policy is off.
+
+    This historical case cannot be used as negative policy evidence: its
+    post-repair recovery gate passes without any advertised-policy action.
+    """
     from scripts.eval.g4irsf11_fault_metrics import FaultWindow, fault_window_metrics
 
     payload = _run(
@@ -305,10 +310,14 @@ def test_policy_off_unrecovered_fault_is_finite_json_negative_evidence() -> None
         scenario="fault_policy_off_unrecovered_map2",
     )
     summary = payload["summary"]
-    assert summary["completed_count"] == 0
-    assert summary["failed_count"] == 1
-    assert payload["bags"][0]["completed"] is False
-    assert payload["bags"][0]["finish_time"] == -1.0
+    assert summary["completed_count"] == 1
+    assert summary["failed_count"] == 0
+    assert summary["local_fault_policy_action_count"] == 0
+    assert summary["physical_fault_interlock_rejection_count"] > 0
+    assert summary["physical_fault_interlock_hold_count"] > 0
+    assert summary["physical_fault_edge_entry_violation_count"] == 0
+    assert payload["bags"][0]["completed"] is True
+    assert payload["bags"][0]["finish_time"] > 3_600.0
 
     gate = fault_window_metrics(
         payload["bags"],
@@ -317,11 +326,16 @@ def test_policy_off_unrecovered_fault_is_finite_json_negative_evidence() -> None
         [FaultWindow(6, 12, 0.0, 3_600.0, 0.0)],
         max_recovery_seconds=1_800.0,
     )[0]
-    assert gate["recovery_observed"] is False
-    assert gate["recovery_time_seconds"] is None
-    assert gate["recovery_time_pass"] is False
-    assert "recovery_time_pass" in gate["fault_recovery_gate_failures"]
-    assert gate["fault_recovery_pass"] is False
+    assert gate["fault_policy_enabled"] is False
+    assert gate["local_fault_policy_action_count"] == 0
+    assert gate["physical_interlock_hold_count"] > 0
+    assert gate["recovery_observed"] is True
+    assert gate["recovery_time_seconds"] == pytest.approx(
+        payload["bags"][0]["finish_time"] - 3_600.0
+    )
+    assert gate["recovery_time_pass"] is True
+    assert gate["fault_recovery_gate_failures"] == []
+    assert gate["fault_recovery_pass"] is True
 
 
 def test_fault_during_real_edge_traversal_does_not_retroactively_replan() -> None:
@@ -414,6 +428,88 @@ def test_trace_limit_reports_truncation_instead_of_silent_prefix_pass() -> None:
         "hold_trace_stored_count"
     ] == 1
     assert payload["summary"]["decision_trace_truncated"] is True
+    assert payload["summary"]["event_trace_limit"] == 1
+    assert payload["summary"]["event_trace_limit_inherited"] is True
+    assert len(payload["events"]) <= 1
+
+
+def test_independent_event_trace_limit_keeps_complete_decision_trace() -> None:
+    payload = _run(
+        bags=_bags(4),
+        trace_limit=-1,
+        event_trace_limit=0,
+        scenario="real_map_decision_only_trace",
+    )
+    assert payload["events"] == []
+    assert payload["decisions"]
+    assert len(payload["decisions"]) == payload["summary"]["decision_count"]
+    assert (
+        len(payload["decisions"])
+        == payload["summary"]["decision_trace_stored_count"]
+    )
+    assert (
+        len(payload["decisions"]) + len(payload["hold_attempts"])
+        == payload["summary"]["decision_trace_seen_count"]
+    )
+    assert payload["summary"]["trace_limit"] == -1
+    assert payload["summary"]["event_trace_limit"] == 0
+    assert payload["summary"]["event_trace_limit_inherited"] is False
+    assert payload["summary"]["event_trace_truncated"] is True
+    assert payload["summary"]["decision_trace_truncated"] is False
+    assert payload["trace_context"]["event_trace_limit"] == 0
+    assert payload["trace_context"]["event_trace_limit_inherited"] is False
+
+
+def test_omitted_event_trace_limit_preserves_shared_limit_behavior() -> None:
+    """The appended argument must not change any pre-existing runtime result."""
+
+    common = {
+        "bags": _bags(4),
+        "trace_limit": 200_000,
+        "scenario": "legacy_shared_trace_limit_equivalence",
+    }
+    inherited = _run(**common)
+    explicit = _run(**common, event_trace_limit=200_000)
+
+    for key in (
+        "bags",
+        "events",
+        "decisions",
+        "hold_attempts",
+        "junction_state",
+        "fault_events",
+        "credit_events",
+        "pibt_events",
+    ):
+        assert inherited[key] == explicit[key]
+
+    ignored_nondeterministic = {
+        "runtime_seconds",
+        "event_throughput_per_second",
+        "decision_latency_us_p50",
+        "decision_latency_us_p95",
+        "decision_latency_us_p99",
+        "event_trace_limit_inherited",
+    }
+    inherited_summary = {
+        key: value
+        for key, value in inherited["summary"].items()
+        if key not in ignored_nondeterministic
+    }
+    explicit_summary = {
+        key: value
+        for key, value in explicit["summary"].items()
+        if key not in ignored_nondeterministic
+    }
+    assert inherited_summary == explicit_summary
+    assert inherited["summary"]["event_trace_limit_inherited"] is True
+    assert explicit["summary"]["event_trace_limit_inherited"] is False
+
+    inherited_context = dict(inherited["trace_context"])
+    explicit_context = dict(explicit["trace_context"])
+    inherited_context.pop("event_trace_limit_inherited")
+    explicit_context.pop("event_trace_limit_inherited")
+    assert inherited_context == explicit_context
 
 
 def test_duplicate_original_task_id_segments_keep_unique_runtime_identity() -> None:

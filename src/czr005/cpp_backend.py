@@ -599,6 +599,7 @@ def g4irsf11_event_runtime_from_records(
     summary_only: bool = False,
     expected_binary_path: PathLike | None = None,
     search_path: PathLike | None = None,
+    event_trace_limit: int | None = None,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -633,6 +634,10 @@ def g4irsf11_event_runtime_from_records(
     )
     max_events = strict_integer(max_events, "max_events")
     trace_limit = strict_integer(trace_limit, "trace_limit")
+    if event_trace_limit is not None:
+        event_trace_limit = strict_integer(
+            event_trace_limit, "event_trace_limit"
+        )
     trace_shard_count = strict_integer(
         trace_shard_count, "trace_shard_count"
     )
@@ -1108,6 +1113,11 @@ def g4irsf11_event_runtime_from_records(
             float(scorer_risk_bottleneck_threshold),
             scorer_model_sha256,
             str(framework_mode),
+            (
+                None
+                if summary_only or event_trace_limit is None
+                else int(event_trace_limit)
+            ),
         )
     )
     summary = payload.get("summary")

@@ -1,0 +1,17 @@
+gate,status,actual,expected,evidence
+segment_alignment,PASS,43603,43603,exact task_id/pallet_id/segment_id/leg/start/goal/original_entry_time identity; no positional joins
+raw_bag_alignment,PASS,28506,28506,protected task_id groups; missing runtime rows fail before render
+storage_dwell_counted_once,PASS,2242.2600920593209,2242.2600920593209,one protected pass_time-original_entry_time term per segment
+f2_segment_component_reconstruction,PASS,3.6777692002942786e-11,<=1e-6 seconds,source+junction+resource+PIBT+fault+travel+service=goal completion
+v2_segment_component_reconstruction,PASS,1.0174971976084635e-11,<=1e-6 seconds,source+calendar+fault+travel+service=goal completion
+v2_reported_wait_epsilon_crosscheck,PASS,2.0000006770715117e-06,<=1.1e-6 * (path node count + 1) per segment,calendar wait is timestamp-derived; legacy wait_seconds is cross-checked per segment against the closed-boundary G4I_EPSILON filter
+no_fault_stage_b_scope,PASS,0,0,both frozen Stage-B collection requests contain no fault windows; fault_hold is an explicit observed zero
+complete_f2_decision_trace,PASS,340810,non-empty and not truncated,F2 committed-edge decision trace used for path reconstruction
+teacher_future_feature_leakage,PASS,0,0,runtime_features allowlist; v2 current action retained only under offline_labels; checked_rows=256
+f2_matched_raw_entry_mean,PASS,41.514218717973435,41.514218717973414,mean over protected raw task_id groups
+v2_matched_raw_entry_mean,PASS,41.495306987808938,41.495306987808917,frozen pass-anchored v2 runtime plus protected scheduled dwell
+f2_minus_v2_gap,PASS,1.134703809869734,1.1347038098698192,paired per-bag matched-denominator totals
+timing_reconstruction_coverage,PASS,0.99999999999954914,>=0.90,mechanical mutually-exclusive timing identity only; not interpreted as causal explanation
+bounded_responsibility_localization_coverage,PASS,0.99999999999997435,diagnostic target >=0.90 or explicit unresolved,1-|responsibility.other|/|observed gap|; responsibility categories remain hypotheses until matched A/B and this gate cannot promote causal/mechanistic status
+f2_archive_integrity,PASS,3fde48fe4d9974f43dde7971f3a0b9926f8f91090693b0e71584dddf8a496e0b,descriptor/hash validation completed,local ignored f2 archive
+v2_safe_archive_integrity,PASS,93e665c653639adaff221d27b9589afc05736e1112cf238b0fa43beeedaf9c1a,descriptor/hash validation completed,local ignored v2_safe archive

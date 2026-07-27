@@ -1,0 +1,22 @@
+ledger_type,component,additive,f2_mean_seconds_per_bag,v2_mean_seconds_per_bag,delta_contribution_seconds_per_bag,share_of_observed_gap,measurement_status,semantics
+timing_component,scheduled_ebs_dwell,True,2242.2600920593209,2242.2600920593209,0,0,MEASURED_ADDITIVE,Mutually exclusive additive timing component.
+timing_component,release_interface_alignment,True,0,34.062696030765458,-34.062696030765458,-30.019019707597455,MEASURED_ADDITIVE,Signed difference between the comparator's actual attempt and protected pass_time. It isolates Java one-per-epoch release semantics and is not labelled nonnegative queue wait.
+timing_component,source_queue_wait,True,21.763093734652355,0,21.763093734652355,19.179537025746654,MEASURED_ADDITIVE,Mutually exclusive additive timing component.
+timing_component,junction_queue_wait,True,17.79083653371357,0,17.79083653371357,15.678837401414903,MEASURED_ADDITIVE,Mutually exclusive additive timing component.
+timing_component,resource_calendar_wait,True,0,3.6458732327547487,-3.6458732327547487,-3.2130615946141061,MEASURED_ADDITIVE,F2 calendar/dispatch hold is assigned to junction queue; v2 node-window hold is measured here.
+timing_component,pibt_prepare_wait,True,0,0,0,0,MEASURED_ADDITIVE,"Current P2 prepare/rollback changes no simulation time; zero is a measured timing semantic, not an event-count proxy."
+timing_component,pibt_rollback_wait,True,0,0,0,0,MEASURED_ADDITIVE,"Current P2 prepare/rollback changes no simulation time; zero is a measured timing semantic, not an event-count proxy."
+timing_component,fault_hold,True,0,0,0,0,MEASURED_ADDITIVE,Frozen Stage-B comparators have no injected fault windows; the observed no-fault hold is therefore exactly zero.
+timing_component,edge_travel_time,True,198.60992071844527,199.30357117799764,-0.69365045955237292,-0.61130530585951348,MEASURED_ADDITIVE,Mutually exclusive additive timing component.
+timing_component,node_service_time,True,10.429180032273907,10.446186767698029,-0.017006735424121899,-0.014987819090934667,MEASURED_ADDITIVE,Mutually exclusive additive timing component.
+timing_component,detour_extra_time,False,0.013386655440959799,0.70703711499333377,-0.69365045955237392,-0.61130530585951437,DIAGNOSTIC_NON_ADDITIVE,Diagnostic subset/outcome; excluded from additive explanation.
+timing_component,loop_extra_time,False,0,0,0,0,DIAGNOSTIC_NON_ADDITIVE,Diagnostic subset/outcome; excluded from additive explanation.
+timing_component,goal_completion_time,False,248.5930310190839,247.4583272092145,1.1347038098693929,0.99999999999969946,DIAGNOSTIC_NON_ADDITIVE,Diagnostic subset/outcome; excluded from additive explanation.
+timing_component,timing_unresolved_residual,True,,,5.1159076974727213e-13,4.5085842252173605e-13,RESOLVED_WITHIN_TOLERANCE,Observed mean gap minus the sum of mutually exclusive additive component deltas.
+responsibility,source_service_ordering,True,,,-12.318138639339091,-10.855818524794797,OBSERVED_ASSOCIATIVE_HYPOTHESIS,"Observed signed Java-release interface shift plus source-wait and non-goal service delta; associative localization, not a matched causal intervention."
+responsibility,merge_ordering,True,,,14.144963300958819,12.465775806800796,OBSERVED_ASSOCIATIVE_HYPOTHESIS,Observed junction/calendar wait delta only for bags whose F2 path touches a real indegree>1 merge.
+responsibility,route_choice,True,,,-0.69365045955237403,-0.61130530585951448,MEASURED_EXECUTED_PATH_TIMING_ATTRIBUTION,Observed executed edge-travel delta from the two complete paths; v2 path remains offline metadata.
+responsibility,p2_arbitration,True,,,0,0,MEASURED_EXPLICIT_ZERO_UNMATCHED_QUEUE_EFFECT,Only explicit P2 simulation-time waits. Current prepare/rollback is instantaneous; queue effects require a matched P2 A/B.
+responsibility,goal_handling,True,,,0.0015296078018662738,0.0013480238530633607,MEASURED_SERVICE_SEMANTIC_ATTRIBUTION,Difference caused by F2 minimum 0.001s service at protected goal nodes versus v2 raw map service.
+responsibility,storage_leg_ordering,True,,,0,0,MEASURED_COMMON_DENOMINATOR_ATTRIBUTION,Matched protected scheduled-dwell delta for storage legs; common denominator construction makes it zero unless evidence drifts.
+responsibility,other,True,,,-2.9073347325970629e-14,-2.5621970308981602e-14,UNRESOLVED_CAUSAL_RESPONSIBILITY,"Unresolved responsibility, including non-merge queue ordering and interactions that cannot be assigned without matched A/B."
