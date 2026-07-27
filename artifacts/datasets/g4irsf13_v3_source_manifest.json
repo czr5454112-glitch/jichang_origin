@@ -1,0 +1,159 @@
+{
+  "artifacts": {
+    "decisions": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/datasets/g4irsf13_v3_decisions.jsonl",
+      "row_count": 3501,
+      "sha256": "3a416793c26e38761a2bd85622680c9502cd528d2014e8f9a8fa015d68c519e8",
+      "size_bytes": 7814614
+    },
+    "feature_lineage": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/datasets/g4irsf13_v3_feature_lineage.csv",
+      "row_count": 29,
+      "sha256": "c0193974f4b4ae7dc4990a2a48a0f880007ed37c44ea893a8f37195ff937147d",
+      "size_bytes": 2950
+    },
+    "labels": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/datasets/g4irsf13_v3_labels.jsonl",
+      "row_count": 3501,
+      "sha256": "0029117eef165acc94c0847204d8be430a4fd842efd76907990aeb0da378ec83",
+      "size_bytes": 7435857
+    },
+    "outcomes": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/datasets/g4irsf13_v3_outcomes.jsonl",
+      "row_count": 3501,
+      "sha256": "ca40cee44ef9ae1880811e913a8d10f83ed2e509f6945ee4a5868e67e7c6dfa5",
+      "size_bytes": 1093107
+    },
+    "splits": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/datasets/g4irsf13_v3_split_manifest.json",
+      "sha256": "06c23f84153f20ed14a64c5ea125729909e19b7a189126ed619b44e22606053b",
+      "size_bytes": 258172
+    },
+    "trace_schema": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/datasets/g4irsf13_v3_trace_schema.json",
+      "sha256": "4f697a9dfdc900cff41b0626ed87accb4166bfd84b16338ae2738c5e22619ea7",
+      "size_bytes": 5311
+    }
+  },
+  "claim_boundary": "Real candidate/action data support offline Level-A local corrective pretraining. Level-A is a deterministic one-step projection, not a matched full-state clone or causal TTH label; runtime promotion is not claimed.",
+  "fixed_real_map_only": true,
+  "generation": {
+    "extraction_sampling": "all Stage-B divergence rows plus deterministic sha256 bottom-256 sample per easy category plus 384 fresh raw-bag-isolated audit decisions",
+    "extractor_trainer_source_sha256": "5f14468a548cb165290bb27dc6e0e6952c3a1cf6a8ac146f2a60c0e7bb94bfed",
+    "f2_archive_canonical_json_sha256": "d6c81292f3ef9a238cce5c97c1fee959cbb76728fb3ffd437388e8705339bc54",
+    "f2_archive_descriptor_sha256": "d54768682d7f62a9f9cf8746891343ce936935f1126081187f6d2b24c1b9131b",
+    "f2_archive_payload_sha256": "3fde48fe4d9974f43dde7971f3a0b9926f8f91090693b0e71584dddf8a496e0b",
+    "f2_binary_sha256": "ba202ccc6c1e83fb159a9d662a07bd4610f8e3bed4681164fdc07adfbce0e52a",
+    "f2_decision_trace_count": 340810,
+    "full_astar_calls": 0,
+    "future_routes_used_as_features": 0,
+    "global_reservation_scans": 0,
+    "hyperparameters_frozen_before_fresh_audit_extraction": true,
+    "one_step_only": true,
+    "reservation_depth": 1,
+    "stage_b_divergence_sha256": "ced7e4471155cb9f7c35a926a009a8cdfe77276f04bdf1a63ab6edc2f8bfd601",
+    "stage_b_trace_sample_sha256": "7ca5f1cb11212eaededca2b2b8475160743a2d5633e028d39d6861702319907b",
+    "v2_archive_payload_sha256": "93e665c653639adaff221d27b9589afc05736e1112cf238b0fa43beeedaf9c1a"
+  },
+  "label_contract": {
+    "confidence_is_model_feature": false,
+    "future_coordination_dependency_is_model_feature": false,
+    "label_source_is_model_feature": false,
+    "level_a_corrective_label_count": 1363,
+    "level_a_formula_id": "g4irsf13_level_a_one_step_projection_v1",
+    "level_a_full_state_clone_used": false,
+    "level_a_future_route_used": false,
+    "level_b_full_counterfactual_label_count": 0,
+    "level_b_full_counterfactual_status": "NOT_RUN_NO_MATCHED_RUNTIME_STATE_CLONE",
+    "post_hoc_outcome_is_model_feature": false,
+    "rank_target": "authorised Level-A deterministic local one-step projection; observed F2 action on abstention",
+    "weak_teacher_disagreements_used_as_rank_target": 0
+  },
+  "manifest_sha256": "7876f3ebc158015adc6b79aa0561bd1c0bcc5c58a66e73f22605b37ce964cf23",
+  "map": {
+    "mutated": false,
+    "path": "data/processed/maps/map2.json",
+    "raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+    "semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63"
+  },
+  "model_feature_names": [
+    "static_potential",
+    "travel_time",
+    "candidate_service_time",
+    "target_queue_length",
+    "target_scheduled_incoming",
+    "target_goal_queue_length",
+    "target_goal_scheduled_incoming",
+    "goal_conditioned_differential",
+    "service_weighted_pressure",
+    "two_hop_queue_pressure",
+    "recent_visit_count",
+    "advertised_fault",
+    "fault_message_age_seconds",
+    "first_edge_credit_matches",
+    "first_edge_credit_required",
+    "first_edge_credit_valid",
+    "first_edge_credit_slack_seconds",
+    "local_calendar_wait_seconds",
+    "deadline_slack_seconds",
+    "waiting_age_seconds",
+    "candidate_node_type_code",
+    "candidate_in_degree",
+    "candidate_out_degree",
+    "merge_state",
+    "is_goal",
+    "local_queue_length",
+    "downstream_pressure",
+    "storage_out",
+    "goal_relative_progress"
+  ],
+  "schema": "czr005.g4irsf13.v3_source_manifest.v1",
+  "status": "PASS",
+  "tasks": {
+    "mutated": false,
+    "path": "data/processed/tasks/inputdata.jsonl",
+    "raw_bag_count": 28506,
+    "raw_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+    "segment_count": 43603
+  },
+  "validation": {
+    "candidate_completeness": 1.0,
+    "candidate_record_count": 6259,
+    "decision_count": 3501,
+    "easy_category_counts": {
+      "direct_goal": 395,
+      "f2_v2_current_action_agreement": 1660,
+      "high_margin_f2_choice": 891,
+      "no_contention": 636,
+      "unique_outgoing_edge": 743
+    },
+    "easy_decision_count": 1660,
+    "fresh_audit_holdout_count": 384,
+    "future_route_feature_count": 0,
+    "hard_category_counts": {
+      "detour": 761,
+      "f2_slower_than_v2": 232,
+      "first_divergence": 1841,
+      "high_wait": 450,
+      "merge_contention": 454,
+      "p2_involvement": 6,
+      "storage_out": 452
+    },
+    "hard_decision_count": 1841,
+    "label_count": 3501,
+    "label_feature_leakage_count": 0,
+    "level_a_abstention_count": 2,
+    "level_a_authorised_label_count": 3499,
+    "level_a_corrective_label_count": 1363,
+    "main_feature_absolute_node_id_count": 0,
+    "outcome_count": 3501,
+    "selected_action_coverage": 1.0,
+    "split_task_overlap_count": 0
+  }
+}

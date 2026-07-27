@@ -1,0 +1,30 @@
+feature_name,lineage,available_at_decision,local_only,model_input_allowed,absolute_node_id,label_or_outcome
+static_potential,candidate_records[].features.static_potential,True,True,True,False,False
+travel_time,candidate_records[].features.travel_time,True,True,True,False,False
+candidate_service_time,canonical map candidate service_time,True,True,True,False,False
+target_queue_length,candidate_records[].features.target_queue_length,True,True,True,False,False
+target_scheduled_incoming,candidate_records[].features.target_scheduled_incoming,True,True,True,False,False
+target_goal_queue_length,candidate_records[].features.target_goal_queue_length,True,True,True,False,False
+target_goal_scheduled_incoming,candidate_records[].features.target_goal_scheduled_incoming,True,True,True,False,False
+goal_conditioned_differential,candidate_records[].features.goal_conditioned_differential,True,True,True,False,False
+service_weighted_pressure,candidate_records[].features.service_weighted_pressure,True,True,True,False,False
+two_hop_queue_pressure,candidate_records[].features.two_hop_queue_pressure,True,True,True,False,False
+recent_visit_count,candidate_records[].features.recent_visit_count,True,True,True,False,False
+advertised_fault,candidate_records[].features.advertised_fault,True,True,True,False,False
+fault_message_age_seconds,candidate_records[].features.fault_message_age_seconds,True,True,True,False,False
+first_edge_credit_matches,candidate_records[].features.first_edge_credit_matches,True,True,True,False,False
+first_edge_credit_required,candidate_records[].features.first_edge_credit_required,True,True,True,False,False
+first_edge_credit_valid,candidate_records[].features.first_edge_credit_valid,True,True,True,False,False
+first_edge_credit_slack_seconds,candidate_records[].features.first_edge_credit_slack_seconds,True,True,True,False,False
+local_calendar_wait_seconds,"max(local edge/target next-available minus decision time, zero)",True,True,True,False,False
+deadline_slack_seconds,task.std minus decision event_time,True,True,True,False,False
+waiting_age_seconds,decision event_time minus task.pass_time,True,True,True,False,False
+candidate_node_type_code,canonical map candidate node_type,True,True,True,False,False
+candidate_in_degree,canonical map local candidate in-degree,True,True,True,False,False
+candidate_out_degree,canonical map local candidate out-degree,True,True,True,False,False
+merge_state,canonical map candidate in-degree greater than one,True,True,True,False,False
+is_goal,candidate next_node equals current bag goal,True,True,True,False,False
+local_queue_length,decision local_snapshot.junction_queue_length,True,True,True,False,False
+downstream_pressure,decision local_snapshot.downstream_pressure,True,True,True,False,False
+storage_out,current task leg equals storage_out,True,True,True,False,False
+goal_relative_progress,minimum local candidate static cost minus candidate static cost,True,True,True,False,False
