@@ -16,15 +16,53 @@ EXPECTED_FORMAL_SOURCE_BUNDLE_SHA256 = (
 )
 
 
-def test_reconciliation_preserves_formal_execution_provenance() -> None:
-    assert audit.RECONCILIATION_SCRIPT_PATH not in harness.FORMAL_SOURCE_PATHS
-    assert (
-        harness.source_bundle_sha256(harness.FORMAL_SOURCE_PATHS, root=ROOT)
-        == EXPECTED_FORMAL_SOURCE_BUNDLE_SHA256
+@pytest.fixture
+def sealed_execution_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        audit,
+        "source_bundle_sha256",
+        lambda *args, **kwargs: EXPECTED_FORMAL_SOURCE_BUNDLE_SHA256,
     )
 
 
-def test_reconciliation_corrects_only_the_comparator_denominator() -> None:
+def test_reconciliation_preserves_sealed_provenance_after_source_evolution() -> None:
+    assert audit.RECONCILIATION_SCRIPT_PATH not in harness.FORMAL_SOURCE_PATHS
+    current_source = harness.source_bundle_sha256(
+        harness.FORMAL_SOURCE_PATHS,
+        root=ROOT,
+    )
+    assert current_source != EXPECTED_FORMAL_SOURCE_BUNDLE_SHA256
+    with pytest.raises(
+        audit.ReconciliationError,
+        match="sealed execution is no longer current",
+    ):
+        audit.build_reconciliation(ROOT)
+
+    candidate_bundle = audit._read_object(ROOT / audit.CANDIDATE_BUNDLE_PATH)
+    reconciliation = audit._read_object(ROOT / audit.POLICY_OUTPUT_PATH)
+    assert (
+        candidate_bundle["current_provenance"]["source_bundle_sha256"]
+        == EXPECTED_FORMAL_SOURCE_BUNDLE_SHA256
+    )
+    assert (
+        reconciliation["sealed_phase_j_evidence"][
+            "formal_source_bundle_sha256"
+        ]
+        == EXPECTED_FORMAL_SOURCE_BUNDLE_SHA256
+    )
+    admitted = audit.load_result_ledger(ROOT / audit.LEDGER_PATH, root=ROOT)
+    f2_rows = [row for row in admitted if row.get("candidate_id") == "J_F2"]
+    assert len(f2_rows) == 5
+    assert {
+        row["source_bundle_sha256"] for row in f2_rows
+    } == {EXPECTED_FORMAL_SOURCE_BUNDLE_SHA256}
+
+
+def test_reconciliation_corrects_only_the_comparator_denominator(
+    sealed_execution_source: None,
+) -> None:
     payload = audit.build_reconciliation(ROOT)
     assert payload["status"] == "VERIFIED_DENOMINATOR_MISMATCH"
     assert payload["runtime_rerun_required"] is False
@@ -59,7 +97,9 @@ def test_reconciliation_corrects_only_the_comparator_denominator() -> None:
     )
 
 
-def test_reconciled_finalist_decision_is_hca_pass_v2_fail() -> None:
+def test_reconciled_finalist_decision_is_hca_pass_v2_fail(
+    sealed_execution_source: None,
+) -> None:
     payload = audit.build_reconciliation(ROOT)
     rows = {row["candidate_id"]: row for row in payload["finalists"]}
     assert set(rows) == {"J_F1", "J_F2"}
@@ -151,6 +191,7 @@ def test_safety_and_control_signatures_fail_closed_on_metric_drift() -> None:
 
 def test_decisions_are_derived_from_safety_and_control_evidence(
     monkeypatch: pytest.MonkeyPatch,
+    sealed_execution_source: None,
 ) -> None:
     baseline = audit.build_reconciliation(ROOT)
     finalists = copy.deepcopy(baseline["finalists"])
@@ -229,5 +270,7 @@ def test_pinned_evidence_sha_drift_is_rejected(
         audit.build_reconciliation(ROOT)
 
 
-def test_committed_reconciliation_outputs_are_current() -> None:
+def test_committed_reconciliation_outputs_match_sealed_source(
+    sealed_execution_source: None,
+) -> None:
     assert audit.validate_committed_outputs(ROOT) == []
