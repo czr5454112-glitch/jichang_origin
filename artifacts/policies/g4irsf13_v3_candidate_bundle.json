@@ -1,0 +1,118 @@
+{
+  "active_pointer_written": false,
+  "bundle_sha256": "54acbc51edd1595a09b260b6b58eab54c51c2f9aee52ebe6bcc96b42abd81897",
+  "closed_loop_status": "NOT_RUN",
+  "feature_ablation": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "outputs/tables/g4irsf13_v3_feature_ablation.csv",
+    "sha256": "9a1bc6f6696749a9417245e4131a6da662a3af7c156d65654dc2d834f40a9070",
+    "size_bytes": 2869
+  },
+  "full_outcome_learning_contribution": "NOT_DEMONSTRATED",
+  "hyperparameter_selection": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "outputs/tables/g4irsf13_v3_hyperparameter_selection.csv",
+    "sha256": "dfe300dccb9c1325d83b777f03c3ae68b69d8d5882c50622e948fd526b531e2f",
+    "size_bytes": 1710
+  },
+  "level_a_corrective_label_count": 1363,
+  "level_a_offline_contribution": "MEASURED_AGAINST_LOCAL_PROJECTION_ONLY",
+  "model_artifacts": {
+    "V0_residual_linear": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/models/g4irsf13_v3_v0_residual_linear.json",
+      "sha256": "65646f80e79486a0e8da6572dd3b0992d28cba94c1d89f214f803c19a44099d0",
+      "size_bytes": 5778
+    },
+    "V1_residual_pairwise_logistic": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/models/g4irsf13_v3_v1_residual_pairwise_logistic.json",
+      "sha256": "7f448da48401a034758906b81347c8cf382648b2c9d7cb5200e140fa8ea882d4",
+      "size_bytes": 5832
+    },
+    "V2_residual_listwise": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/models/g4irsf13_v3_v2_residual_listwise.json",
+      "sha256": "83caa22a71dcedd9cf27f69df8438281b7019957181f6ffb0d5058c3e1fd9afc",
+      "size_bytes": 5962
+    },
+    "V3_residual_tiny_mlp": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/models/g4irsf13_v3_v3_residual_tiny_mlp.json",
+      "sha256": "cd546979a5d06cffb61b10375724dab5d54df091c759ab6f11a2da2f3ed3eb5e",
+      "size_bytes": 12630
+    },
+    "V4_residual_feature_pruned_mlp": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/models/g4irsf13_v3_v4_residual_feature_pruned_mlp.json",
+      "sha256": "3d2590b201ed3f38b8e8056baf6d3aa119cc2a37c047ef594fbe48110b58faac",
+      "size_bytes": 6198
+    },
+    "V5_best_plus_calibrated_risk_head": {
+      "hash_semantics": "sha256_utf8_lf_normalized",
+      "path": "artifacts/models/g4irsf13_v3_v5_best_plus_calibrated_risk_head.json",
+      "sha256": "2318d5db5a3429fe93f44c0225ed2ccd67296d86881b4eacfce50588ed7f5acf",
+      "size_bytes": 20414
+    }
+  },
+  "offline_gate_status": "FAIL",
+  "offline_table": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "outputs/tables/g4irsf13_v3_offline_ab.csv",
+    "sha256": "f00e3a7585d6c41d52e4bd001b16cbd5bcf9655eb663ee4ce227aa57ecc97420",
+    "size_bytes": 3549
+  },
+  "pretraining_gate": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "artifacts/gates/g4irsf13_v3_pretraining_gate_manifest.json",
+    "sha256": "ff512417092b38c015991d7228c9712ff752e4ced15a8d9b28bfacf93b45fded",
+    "size_bytes": 6759
+  },
+  "promotion_blockers": [
+    "closed-loop 144/512/2048/8192/full ladder has not run",
+    "independent residual learning contribution is not demonstrated",
+    "strict F2 and v2-safe win is not demonstrated"
+  ],
+  "recommended_offline_candidate": "V5_best_plus_calibrated_risk_head",
+  "residual_clip": [
+    -4.0,
+    4.0
+  ],
+  "risk_fallback": "zero residual; use frozen scorer",
+  "risk_wrapped_candidate": "V5_best_plus_calibrated_risk_head",
+  "runtime_eligible": false,
+  "runtime_integration_contract": {
+    "canonical_opt_in_mode": "V3_g4irsf13_residual_risk_offline_candidate",
+    "default_s1_unchanged": true,
+    "required_experiment_flag": "diagnostic_allow_offline_candidate=true",
+    "required_file_hash_semantics": "sha256_utf8_lf_normalized",
+    "required_model_file_sha256": "2318d5db5a3429fe93f44c0225ed2ccd67296d86881b4eacfce50588ed7f5acf",
+    "required_model_self_hash": "bcb223c840f714c609d82a7b1c172ea4c381c5f70dc15ea58ceeb853f344cffd",
+    "required_summary_fields": [
+      "scorer_mode",
+      "model_file_sha256",
+      "model_self_sha256",
+      "model_inference_count",
+      "residual_applied_count",
+      "residual_clip_count",
+      "risk_fallback_count",
+      "shield_rejection_count",
+      "model_frozen_disagreement_count",
+      "runtime_full_astar_calls",
+      "global_reservation_scans",
+      "future_route_reads"
+    ],
+    "test_vector_absolute_tolerance": 1e-12
+  },
+  "schema": "czr005.g4irsf13.v3_candidate_bundle.v1",
+  "selected_offline_candidate": "V1_residual_pairwise_logistic",
+  "source_manifest": {
+    "hash_semantics": "sha256_utf8_lf_normalized",
+    "path": "artifacts/datasets/g4irsf13_v3_source_manifest.json",
+    "sha256": "508864f163de7d1171744515bf581e48e3871ea30127425740e78e54c0d04db1",
+    "size_bytes": 6469
+  },
+  "status": "OFFLINE_LEVEL_A_FAIL_CLOSED_LOOP_NOT_RUN",
+  "strict_win_vs_f2": "NOT_RUN",
+  "strict_win_vs_v2_safe": "NOT_RUN"
+}
