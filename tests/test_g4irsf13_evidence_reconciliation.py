@@ -36,6 +36,22 @@ def test_frozen_inputs_and_f2_repeats_are_admissible() -> None:
     assert len({row["evidence_row_binding_sha256"] for row in rows}) == 5
 
 
+def test_append_only_source_evolution_does_not_rebuild_sealed_predecessor(
+    monkeypatch,
+) -> None:
+    def reject_current_source_rebuild(*args, **kwargs):
+        raise AssertionError(
+            "sealed predecessor must not use current-source rebuild"
+        )
+
+    monkeypatch.setattr(
+        evidence.g12_denominator,
+        "validate_committed_outputs",
+        reject_current_source_rebuild,
+    )
+    assert evidence.validate_inputs(ROOT) == []
+
+
 def test_build_is_append_only_and_uses_corrected_denominator() -> None:
     payloads = evidence.build_payloads(ROOT)
     assert set(payloads) == {

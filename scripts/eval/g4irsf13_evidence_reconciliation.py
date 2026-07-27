@@ -164,6 +164,50 @@ def _f2_rows(root: Path) -> list[dict[str, str]]:
     return rows
 
 
+def _validate_sealed_denominator_outputs(
+    root: Path,
+    denominator: Mapping[str, Any],
+) -> list[str]:
+    """Validate the sealed predecessor without reinterpreting it as current.
+
+    G4IRSF12's original validator intentionally rebuilds its reconciliation
+    against the *current* formal source tree.  That is correct while G4IRSF12
+    is the active phase, but it becomes an invalid requirement once G4IRSF13
+    appends runtime sources to that tree.  Here the predecessor is immutable
+    evidence: validate its self-hash and byte-for-byte companion outputs while
+    the caller separately validates every referenced ledger and provenance
+    binding.
+    """
+
+    failures: list[str] = []
+    if denominator.get("schema") != g12_denominator.SCHEMA:
+        failures.append("sealed denominator reconciliation schema drift")
+    if denominator.get("status") != g12_denominator.STATUS:
+        failures.append("sealed denominator reconciliation status drift")
+
+    recorded_hash = denominator.get("reconciliation_sha256")
+    unhashed = dict(denominator)
+    unhashed.pop("reconciliation_sha256", None)
+    if (
+        not isinstance(recorded_hash, str)
+        or _canonical_sha256(unhashed) != recorded_hash
+    ):
+        failures.append("sealed denominator reconciliation self-hash drift")
+
+    try:
+        expected_outputs = g12_denominator.rendered_outputs(denominator)
+    except Exception as exc:  # noqa: BLE001 - malformed predecessor fails closed
+        failures.append(f"sealed denominator rendering failed: {exc}")
+        return failures
+    for relative_path, expected in expected_outputs.items():
+        path = root / relative_path
+        if not path.is_file():
+            failures.append(f"missing sealed denominator output: {relative_path}")
+        elif path.read_bytes() != expected:
+            failures.append(f"sealed denominator output drift: {relative_path}")
+    return failures
+
+
 def validate_inputs(root: Path = ROOT) -> list[str]:
     failures: list[str] = []
     if _file_sha256(root / MAP_PATH) != MAP_RAW_SHA256:
@@ -173,9 +217,13 @@ def validate_inputs(root: Path = ROOT) -> list[str]:
     if _file_sha256(root / TASK_PATH) != TASK_SHA256:
         failures.append("canonical task SHA-256 drift")
 
-    denominator_failures = g12_denominator.validate_committed_outputs(root)
+    denominator = _read_object(root / DENOMINATOR_POLICY)
+    denominator_failures = _validate_sealed_denominator_outputs(
+        root,
+        denominator,
+    )
     failures.extend(
-        f"G4IRSF12 denominator reconciliation: {failure}"
+        f"G4IRSF12 sealed denominator reconciliation: {failure}"
         for failure in denominator_failures
     )
     try:
@@ -186,7 +234,6 @@ def validate_inputs(root: Path = ROOT) -> list[str]:
     except Exception as exc:  # noqa: BLE001 - fail closed on inherited evidence
         failures.append(f"sealed Phase-J ledger validation failed: {exc}")
 
-    denominator = _read_object(root / DENOMINATOR_POLICY)
     targets = denominator.get("corrected_targets", {})
     if not _close(
         targets.get("v2_safe_raw_entry_target_minutes"),
