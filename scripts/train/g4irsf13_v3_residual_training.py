@@ -245,20 +245,20 @@ MODEL_IDS = (
     "V5_best_plus_calibrated_risk_head",
 )
 
-# These rows are the recorded train+validation-only probes performed before
-# the fresh audit cohort was selected from unused F2 decisions.  They are
-# emitted verbatim as provenance; the fresh audit partition is evaluated only
-# after the selected hyperparameters below are frozen.
+# These are the recorded train+validation-only probes under the same
+# shield-filtered model-input contract.  They are emitted verbatim as
+# provenance.  The deterministic selection rule never reads the audit
+# partition; audit metrics are evaluated only after model/risk selection.
 HYPERPARAMETER_PROBE_ROWS = (
-    ("pairwise_linear", 0.2, 120, 0.5991285403050110, 0.49171270718232046, 0.26243093922651933),
-    ("pairwise_linear", 0.5, 120, 0.7734204793028322, 0.7127071823204420, 0.26430517711171664),
-    ("pairwise_linear", 1.0, 120, 0.7777777777777778, 0.7182320441988951, 0.22278481012658227),
-    ("pairwise_linear", 0.5, 240, 0.7755991285403050, 0.7154696132596685, 0.2436548223350254),
-    ("pairwise_linear", 1.0, 240, 0.7407407407407407, 0.6712707182320442, 0.19946091644204852),
-    ("tiny_mlp", 0.5, 200, 0.6535947712418301, 0.5607734806629834, 0.25833333333333336),
-    ("tiny_mlp", 0.75, 200, 0.7712418300653595, 0.7099447513812155, 0.26430517711171664),
-    ("tiny_mlp", 1.0, 160, 0.7734204793028322, 0.7127071823204420, 0.25806451612903225),
-    ("tiny_mlp", 1.0, 240, 0.7755991285403050, 0.7154696132596685, 0.24742268041237114),
+    ("pairwise_linear", 0.2, 120, 0.7799564270152506, 0.7138810198300283, 0.22985781990521326),
+    ("pairwise_linear", 0.5, 120, 0.7777777777777778, 0.7110481586402266, 0.2141280353200883),
+    ("pairwise_linear", 1.0, 120, 0.7777777777777778, 0.7110481586402266, 0.10776942355889724),
+    ("pairwise_linear", 0.5, 240, 0.7777777777777778, 0.7110481586402266, 0.20179372197309417),
+    ("pairwise_linear", 1.0, 240, 0.8627450980392157, 0.8215297450424929, 0.07049608355091384),
+    ("tiny_mlp", 0.5, 200, 0.7777777777777778, 0.7110481586402266, 0.21806167400881057),
+    ("tiny_mlp", 0.75, 200, 0.7799564270152506, 0.7138810198300283, 0.21365638766519823),
+    ("tiny_mlp", 1.0, 160, 0.7799564270152506, 0.7138810198300283, 0.2119205298013245),
+    ("tiny_mlp", 1.0, 240, 0.7843137254901961, 0.7195467422096318, 0.2097130242825607),
 )
 
 EASY_CATEGORIES = (
@@ -896,7 +896,11 @@ def _label_row(
         ),
         "hard_categories": list(hard),
         "easy_categories": list(easy),
-        "risk_label": int(is_hard),
+        # This is cohort metadata only.  It must never be reused as the V5
+        # risk target: whether a row came from the Stage-B divergence ledger
+        # is not the same question as whether the selected base residual
+        # harms an otherwise-correct frozen decision.
+        "hard_cohort_label": int(is_hard),
         "sample_weight": 1.5 if is_hard else 1.0,
         "bag_outcome_delta_seconds": outcome_delta,
     }
@@ -1083,6 +1087,7 @@ def build_trace_schema() -> dict[str, Any]:
             "final_score": "frozen_g4e_cost + clipped_learned_residual",
             "residual_clip": [-RESIDUAL_CLIP, RESIDUAL_CLIP],
             "high_uncertainty_behavior": "zero residual; frozen scorer decides",
+            "candidate_filter": "physical shield admitted candidates only",
             "shield_bypass_allowed": False,
             "pibt_ownership_change_allowed": False,
         },
@@ -1188,13 +1193,21 @@ def build_split_manifest(
         "contention_motif",
         "fault_regime",
     )
-    dimension_audit: dict[str, Any] = {}
+    development_rows = [
+        row
+        for row in decisions
+        if assignments[str(row["decision_id"])] != "audit_test"
+    ]
+    development_task_ids = {int(row["task_id"]) for row in development_rows}
+    dimension_group_views: dict[str, Any] = {}
     for dimension in dimensions:
-        values = sorted({str(row[dimension]) for row in decisions})
+        values = sorted({str(row[dimension]) for row in development_rows})
         if len(values) < 2:
-            dimension_audit[dimension] = {
+            dimension_group_views[dimension] = {
                 "status": "NOT_APPLICABLE_SINGLE_VALUE",
                 "observed_values": values,
+                "group_key": "raw task_id/pallet_id",
+                "task_overlap_count": 0,
             }
             continue
         heldout = [
@@ -1204,13 +1217,57 @@ def build_split_manifest(
         ]
         if not heldout:
             heldout = [max(values, key=lambda value: _stable_fraction(dimension, value))]
-        dimension_audit[dimension] = {
+        heldout_set = set(heldout)
+        # Any raw bag with at least one held-out-dimension decision is removed
+        # wholesale from this view's train side.  Evaluation may use only the
+        # matching held-out rows, but no sibling decision from the same bag is
+        # allowed to leak into view training.
+        test_task_ids = {
+            int(row["task_id"])
+            for row in development_rows
+            if str(row[dimension]) in heldout_set
+        }
+        train_task_ids = development_task_ids - test_task_ids
+        if not train_task_ids or not test_task_ids:
+            raise StageFError(
+                f"dimension group view {dimension} has an empty task partition"
+            )
+        view_train_rows = [
+            row
+            for row in development_rows
+            if int(row["task_id"]) in train_task_ids
+        ]
+        view_test_rows = [
+            row
+            for row in development_rows
+            if int(row["task_id"]) in test_task_ids
+        ]
+        evaluation_rows = [
+            row
+            for row in view_test_rows
+            if str(row[dimension]) in heldout_set
+        ]
+        if not evaluation_rows:
+            raise StageFError(
+                f"dimension group view {dimension} has no held-out evaluation rows"
+            )
+        dimension_group_views[dimension] = {
             "status": PASS,
+            "group_key": "raw task_id/pallet_id",
             "observed_value_count": len(values),
             "heldout_values": heldout,
-            "heldout_decision_count": sum(
-                str(row[dimension]) in set(heldout) for row in decisions
+            "assignment_rule": (
+                "if any development decision in a raw bag matches a held-out "
+                "value, hold out the entire raw bag"
             ),
+            "fresh_audit_partition_excluded": True,
+            "train_task_count": len(train_task_ids),
+            "test_task_count": len(test_task_ids),
+            "train_decision_count": len(view_train_rows),
+            "test_decision_count": len(view_test_rows),
+            "heldout_evaluation_decision_count": len(evaluation_rows),
+            "test_task_ids": sorted(test_task_ids),
+            "task_overlap_count": 0,
         }
 
     hard_counts = {
@@ -1251,11 +1308,22 @@ def build_split_manifest(
                 "not used for final model selection or final reported test"
             ),
             "audit_test": (
-                "fresh F2 archive decisions selected after hyperparameters "
-                "were frozen; never used for training or selection"
+                "separate raw-bag-isolated F2 decisions; never used for "
+                "training, calibration, thresholding, or model selection"
             ),
         },
-        "dimension_isolation_audit": dimension_audit,
+        "dimension_group_views": dimension_group_views,
+        "split_scope": {
+            "main_model": (
+                "raw-bag/pallet/task grouped train/validation/development-test/"
+                "fresh-audit split"
+            ),
+            "generalization": (
+                "six independent raw-bag-grouped held-out views for source, "
+                "goal, time_block, junction, storage_leg, and contention_motif"
+            ),
+            "fault_regime": "NOT_APPLICABLE_SINGLE_VALUE",
+        },
         "status": PASS,
     }
     manifest["manifest_sha256"] = _self_hash(manifest, "manifest_sha256")
@@ -1290,11 +1358,18 @@ pretraining. Corrective-learning promotion remains blocked.
   `{validation["candidate_completeness"]:.3f}`.
 - Actual selected-action coverage:
   `{validation["selected_action_coverage"]:.3f}`.
-- Raw-bag split overlap: `0`.
+- Main raw-bag split overlap: `0`.
+- Independent source/goal/time/junction/storage/motif held-out views:
+  `{validation["dimension_group_view_pass_count"]}` PASS, each with raw-bag
+  overlap `0`; the single observed fault regime is explicitly not applicable.
 
 The decision file contains only decision-time local state. Label provenance,
 confidence, weak-teacher status, future-dependency status, and post-hoc
 outcomes live in separate hash-bound files and are not model features.
+The main train/validation/audit split is grouped by raw bag. Dimension
+generalization uses separate grouped views: if any decision matches that
+view's held-out value, the entire raw bag is removed from the view's training
+side.
 
 ## Hard cohort
 
@@ -1575,7 +1650,8 @@ def build_dataset(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
             "f2_binary_sha256": f2_descriptor["identity"]["binary"]["sha256"],
             "f2_decision_trace_count": archive_decision_count,
             "extractor_trainer_source_sha256": sha256_file(Path(__file__)),
-            "hyperparameters_frozen_before_fresh_audit_extraction": True,
+            "fresh_audit_excluded_from_hyperparameter_selection": True,
+            "hyperparameters_frozen_before_fresh_audit_evaluation": True,
             "v2_archive_payload_sha256": v2_descriptor["archive"]["file_sha256"],
             "stage_b_divergence_sha256": sha256_file(root / DIVERGENCE_PATH),
             "stage_b_trace_sample_sha256": sha256_file(
@@ -1614,6 +1690,11 @@ def build_dataset(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
             "confidence_is_model_feature": False,
             "future_coordination_dependency_is_model_feature": False,
             "post_hoc_outcome_is_model_feature": False,
+            "hard_cohort_is_risk_target": False,
+            "v5_risk_target": (
+                "model-specific harmful residual: raw residual choice misses "
+                "the Level-A target while the frozen choice matches it"
+            ),
         },
         "validation": {
             "decision_count": decision_count,
@@ -1634,6 +1715,14 @@ def build_dataset(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
             "label_feature_leakage_count": 0,
             "future_route_feature_count": 0,
             "split_task_overlap_count": 0,
+            "dimension_group_view_pass_count": sum(
+                row["status"] == PASS
+                for row in split_manifest["dimension_group_views"].values()
+            ),
+            "dimension_group_view_task_overlap_count": sum(
+                int(row["task_overlap_count"])
+                for row in split_manifest["dimension_group_views"].values()
+            ),
             "fresh_audit_holdout_count": FRESH_AUDIT_DECISIONS,
             "level_a_authorised_label_count": sum(
                 bool(row["level_a_projection"]["rank_target_authorised"])
@@ -1727,6 +1816,11 @@ def build_dataset(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         "split_isolation": {
             "status": PASS,
             "evidence": [evidence["split_manifest"]],
+            "scope": (
+                "main raw-bag grouped split plus independent raw-bag-grouped "
+                "source/goal/time/junction/storage/motif held-out views; "
+                "fault regime is single-value NOT_APPLICABLE"
+            ),
         },
     }
     gate = {
@@ -1781,7 +1875,17 @@ def load_examples(root: Path) -> tuple[list[Example], dict[str, str]]:
     for row in decisions:
         decision_id = str(row["decision_id"])
         label = labels[decision_id]
-        candidates = row["candidate_records"]
+        # The committed trace retains every true outgoing neighbor for
+        # completeness auditing.  Model fitting/inference, however, follows
+        # the runtime contract and sees only candidates already admitted by
+        # the physical shield.
+        candidates = [
+            record
+            for record in row["candidate_records"]
+            if bool(record["shield_allowed"])
+        ]
+        if not candidates:
+            raise StageFError("physical shield admitted no candidate")
         matrix = np.asarray(
             [
                 [float(record["features"][name]) for name in FEATURE_NAMES]
@@ -1806,7 +1910,9 @@ def load_examples(root: Path) -> tuple[list[Example], dict[str, str]]:
             if int(record["next_node"]) == int(row["selected_next"])
         ]
         if len(f2_indices) != 1:
-            raise StageFError("observed F2 action is not exactly one candidate")
+            raise StageFError(
+                "observed F2 action is not exactly one shield-admitted candidate"
+            )
         examples.append(
             Example(
                 decision=row,
@@ -2063,6 +2169,38 @@ RISK_FEATURE_NAMES = (
 )
 
 
+def _harmful_residual_label(
+    base_model: Mapping[str, Any],
+    example: Example,
+) -> int:
+    """Return one only when the residual breaks a correct frozen decision.
+
+    The target is deliberately model-specific.  Cohort identity, v2
+    disagreement, post-hoc bag outcome, and fresh-audit membership play no
+    role.  Fallback can actually repair every positive by restoring the
+    already-correct frozen argmin.
+    """
+
+    residual = _raw_residual(base_model, example)
+    frozen_choice = int(np.argmin(example.frozen_costs))
+    raw_choice = int(np.argmin(example.frozen_costs + residual))
+    target = int(example.selected_index)
+    return int(raw_choice != target and frozen_choice == target)
+
+
+def _calibrated_logit(
+    head: Mapping[str, Any],
+    features: np.ndarray,
+) -> float:
+    mean = np.asarray(head["normalisation_mean"], dtype=np.float64)
+    scale = np.asarray(head["normalisation_scale"], dtype=np.float64)
+    x = np.clip((features - mean) / scale, -8.0, 8.0)
+    raw_logit = float(x @ np.asarray(head["weights"]) + float(head["bias"]))
+    slope = float(head.get("calibration_slope", 1.0))
+    intercept = float(head.get("calibration_intercept", 0.0))
+    return slope * raw_logit + intercept
+
+
 def _fit_risk_head(
     examples: Sequence[Example],
     train_indices: Sequence[int],
@@ -2076,9 +2214,14 @@ def _fit_risk_head(
         ]
     )
     train_y = np.asarray(
-        [int(examples[index].label["risk_label"]) for index in train_indices],
+        [
+            _harmful_residual_label(base_model, examples[index])
+            for index in train_indices
+        ],
         dtype=np.float64,
     )
+    if len(set(train_y.tolist())) != 2:
+        raise StageFError("risk-head train partition lacks harm class support")
     mean = train_x.mean(axis=0)
     scale = train_x.std(axis=0)
     scale[scale < 1e-8] = 1.0
@@ -2097,27 +2240,55 @@ def _fit_risk_head(
         weights -= rate * (x.T @ derivative / len(x) + 2e-4 * weights)
         bias -= rate * float(derivative.mean())
 
-    candidates = [0.25, 0.35, 0.45, 0.50, 0.60, 0.70, 0.80]
     validation_y = np.asarray(
-        [int(examples[index].label["risk_label"]) for index in validation_indices],
+        [
+            _harmful_residual_label(base_model, examples[index])
+            for index in validation_indices
+        ],
         dtype=np.int64,
     )
-    validation_probability = np.asarray(
+    if len(set(validation_y.tolist())) != 2:
+        raise StageFError("risk-head validation partition lacks harm class support")
+    validation_features = np.stack(
         [
-            _risk_probability(
-                {
-                    "normalisation_mean": mean.tolist(),
-                    "normalisation_scale": scale.tolist(),
-                    "weights": weights.tolist(),
-                    "bias": bias,
-                },
-                _risk_features(
-                    examples[index], _raw_residual(base_model, examples[index])
-                ),
+            _risk_features(
+                examples[index], _raw_residual(base_model, examples[index])
             )
             for index in validation_indices
         ]
     )
+    validation_x = np.clip((validation_features - mean) / scale, -8.0, 8.0)
+    validation_raw_logits = validation_x @ weights + bias
+
+    # Platt-style affine calibration is fit only on validation, after the
+    # base residual and risk classifier have been frozen on train.
+    calibration_slope = 1.0
+    calibration_intercept = 0.0
+    for epoch in range(240):
+        logits = np.clip(
+            calibration_slope * validation_raw_logits + calibration_intercept,
+            -40.0,
+            40.0,
+        )
+        probability = 1.0 / (1.0 + np.exp(-logits))
+        derivative = probability - validation_y
+        rate = 0.04 / math.sqrt(epoch + 1.0)
+        calibration_slope -= rate * float(
+            np.mean(derivative * validation_raw_logits)
+        )
+        calibration_intercept -= rate * float(np.mean(derivative))
+        calibration_slope = float(np.clip(calibration_slope, 0.05, 20.0))
+        calibration_intercept = float(
+            np.clip(calibration_intercept, -20.0, 20.0)
+        )
+    validation_logits = np.clip(
+        calibration_slope * validation_raw_logits + calibration_intercept,
+        -40.0,
+        40.0,
+    )
+    validation_probability = 1.0 / (1.0 + np.exp(-validation_logits))
+
+    candidates = [0.25, 0.35, 0.45, 0.50, 0.60, 0.70, 0.80]
     best = candidates[0]
     best_score = -1.0
     for threshold in candidates:
@@ -2139,17 +2310,32 @@ def _fit_risk_head(
         "normalisation_scale": scale.tolist(),
         "weights": weights.tolist(),
         "bias": bias,
+        "calibration_slope": calibration_slope,
+        "calibration_intercept": calibration_intercept,
         "fallback_threshold": best,
         "fallback_action": "zero_residual_use_frozen_scorer",
-        "calibration_method": "heldout_threshold_selection_on_logistic_probability",
+        "target_semantics": (
+            "raw residual choice misses Level-A target while frozen choice "
+            "matches target"
+        ),
+        "fit_partition": "train",
+        "calibration_partition": "validation",
+        "threshold_selection_partition": "validation",
+        "train_positive_support": int(train_y.sum()),
+        "train_negative_support": int(len(train_y) - train_y.sum()),
+        "validation_positive_support": int(validation_y.sum()),
+        "validation_negative_support": int(
+            len(validation_y) - validation_y.sum()
+        ),
+        "calibration_method": (
+            "Platt affine logit calibration on validation followed by "
+            "validation balanced-recall threshold selection"
+        ),
     }
 
 
 def _risk_probability(head: Mapping[str, Any], features: np.ndarray) -> float:
-    mean = np.asarray(head["normalisation_mean"], dtype=np.float64)
-    scale = np.asarray(head["normalisation_scale"], dtype=np.float64)
-    x = np.clip((features - mean) / scale, -8.0, 8.0)
-    logit = float(x @ np.asarray(head["weights"]) + float(head["bias"]))
+    logit = _calibrated_logit(head, features)
     logit = min(40.0, max(-40.0, logit))
     return 1.0 / (1.0 + math.exp(-logit))
 
@@ -2233,9 +2419,9 @@ def evaluate_model(
         if raw_choice != frozen_choice:
             raw_interventions += 1
             raw_interventions_correct += int(raw_choice == target)
-            if raw_choice != target:
+            if raw_choice != target and frozen_choice == target:
                 harmful_raw_interventions += 1
-                harmful_caught += int(fallback and choice == frozen_choice)
+                harmful_caught += int(fallback and choice == target)
         for other in range(len(costs)):
             if other == target:
                 continue
@@ -2253,7 +2439,7 @@ def evaluate_model(
             high_confidence_wrong += int(not correct)
         risk_fallbacks += int(fallback)
         risk_probabilities.append(risk_probability)
-        risk_labels.append(int(example.label["risk_label"]))
+        risk_labels.append(_harmful_residual_label(model, example))
     count = len(indices)
     risk_ece = _ece(risk_probabilities, [bool(value) for value in risk_labels])
     return {
@@ -2274,6 +2460,8 @@ def evaluate_model(
         "harmful_residual_recall": harmful_caught
         / max(1, harmful_raw_interventions),
         "harmful_residual_support": harmful_raw_interventions,
+        "risk_positive_support": sum(risk_labels),
+        "risk_negative_support": len(risk_labels) - sum(risk_labels),
         "f2_preserved_rate": preserved / max(1, count),
         "risk_fallback_rate": risk_fallbacks / max(1, count),
         "risk_calibration_ece": risk_ece,
@@ -2315,6 +2503,14 @@ def _model_payload(
             "same-state deterministic Level-A one-step projection with "
             "observed F2 fallback on abstention; disagreeing v2 weak teacher "
             "not used as corrective target"
+        ),
+        "risk_target_authority": (
+            (
+                "model-specific harmful residual: raw residual choice misses "
+                "the Level-A target while the frozen choice matches it"
+            )
+            if risk_head is not None
+            else "NOT_APPLICABLE"
         ),
         "hyperparameter_selection": {
             "fit_partition": "train",
@@ -2362,9 +2558,12 @@ def _augment_node_id_examples(examples: Sequence[Example]) -> list[Example]:
             [
                 float(record["next_node"])
                 for record in example.decision["candidate_records"]
+                if bool(record["shield_allowed"])
             ],
             dtype=np.float64,
         )
+        if len(candidate_nodes) != len(example.features):
+            raise StageFError("shield-filtered node-ID diagnostic alignment drift")
         identity = np.stack(
             [
                 np.full(len(candidate_nodes), current),
@@ -2444,12 +2643,21 @@ Positive-residual precision and harmful-residual recall include support
 counts in the CSV; a value with zero support is not presented as causal
 evidence.
 
+V5's risk target is model-specific harm, not hard-cohort membership: the raw
+base residual misses the Level-A target while the frozen scorer would have
+selected it. The fresh audit contains
+`{int(v5_row["risk_positive_support"])}` positive and
+`{int(v5_row["risk_negative_support"])}` negative risk examples. The risk
+classifier is fit on `train`; its affine probability calibration and fallback
+threshold are fit on `validation`; the fresh audit is evaluation-only.
+
 Hyperparameters were selected only on `train` + `validation`. A preliminary
 aggregate read contaminated the old `test` split, so it is quarantined as
-development evidence. The final `{FRESH_AUDIT_DECISIONS}`-decision audit
-cohort was extracted from previously unused F2 decisions after
-hyperparameters were frozen and was not used for model selection. The exact
-probe rows are in `g4irsf13_v3_hyperparameter_selection.csv`.
+development evidence. The separate `{FRESH_AUDIT_DECISIONS}`-decision,
+raw-bag-isolated audit partition is never read by fitting, calibration,
+thresholding, or model selection; it is evaluated only after those choices
+are frozen. The exact probe rows are in
+`g4irsf13_v3_hyperparameter_selection.csv`.
 
 ## Feature and identity ablation
 
@@ -2460,11 +2668,13 @@ and is never exported as a policy candidate.
 
 ## Label boundary
 
-V0-V5 use only authorised Level-A same-state one-step targets; abstentions
-fall back to the observed successful F2 action. Stage-B v2 disagreements
-lack matched runtime-state counterfactual replay, so the v2 action,
-`label_source`, confidence, future dependency, and post-hoc bag delta are
-excluded from feature vectors and never become a Level-B/C causal target.
+V0-V5 rankers use only authorised Level-A same-state one-step targets;
+abstentions fall back to the observed successful F2 action. V5 additionally
+uses the model-specific Level-A harm definition above for risk supervision.
+The Stage-B hard/easy flag remains a reporting slice only. Stage-B v2
+disagreements lack matched runtime-state counterfactual replay, so the v2
+action, `label_source`, confidence, future dependency, and post-hoc bag delta
+are excluded from feature vectors and never become a Level-B/C causal target.
 
 ## Immutable model hashes
 
@@ -2564,7 +2774,9 @@ def _v5_inference_evidence(
             "form raw candidate cost = frozen_g4e_cost + residual",
             (
                 "construct the eight local risk features in RISK_FEATURE_NAMES "
-                "order, normalise/clamp identically, and apply logistic sigmoid"
+                "order, normalise/clamp identically, evaluate the train-fit "
+                "risk logit, apply the validation-fit affine calibration, "
+                "then apply logistic sigmoid"
             ),
             (
                 "if risk_probability >= fallback_threshold, replace every "
@@ -2575,7 +2787,10 @@ def _v5_inference_evidence(
         "activation": {
             "residual_linear": "identity",
             "residual_mlp_hidden": "tanh",
-            "risk": "sigmoid(clamp(logit,-40,40))",
+            "risk": (
+                "sigmoid(clamp(calibration_slope*raw_logit+"
+                "calibration_intercept,-40,40))"
+            ),
         },
         "residual_clip": [-RESIDUAL_CLIP, RESIDUAL_CLIP],
         "risk_fallback": "zero_all_residuals_then_frozen_scorer_argmin",
@@ -2605,6 +2820,13 @@ def _v5_inference_evidence(
     vectors: list[dict[str, Any]] = []
     for index in selected[:3]:
         example = examples[index]
+        inference_records = [
+            row
+            for row in example.decision["candidate_records"]
+            if bool(row["shield_allowed"])
+        ]
+        if len(inference_records) != len(example.frozen_costs):
+            raise StageFError("shield-filtered inference record alignment drift")
         residual = _raw_residual(model, example)
         risk_vector = _risk_features(example, residual)
         risk_probability = _risk_probability(model["risk_head"], risk_vector)
@@ -2621,7 +2843,7 @@ def _v5_inference_evidence(
                     "feature_names": list(FEATURE_NAMES),
                     "candidate_next_nodes": [
                         int(row["next_node"])
-                        for row in example.decision["candidate_records"]
+                        for row in inference_records
                     ],
                     "candidate_feature_vectors": example.features.tolist(),
                     "frozen_g4e_costs": example.frozen_costs.tolist(),
@@ -2636,9 +2858,7 @@ def _v5_inference_evidence(
                     "final_costs": final_cost.tolist(),
                     "selected_candidate_index": selected_index,
                     "selected_next": int(
-                        example.decision["candidate_records"][selected_index][
-                            "next_node"
-                        ]
+                        inference_records[selected_index]["next_node"]
                     ),
                 },
             }
@@ -2673,7 +2893,7 @@ def train_models(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
             "validation_pairwise_accuracy": pairwise,
             "validation_high_confidence_harmful_rate": harmful,
             "selected": (
-                (family == "pairwise_linear" and learning_rate == 1.0 and epochs == 120)
+                (family == "pairwise_linear" and learning_rate == 1.0 and epochs == 240)
                 or (family == "tiny_mlp" and learning_rate == 1.0 and epochs == 240)
             ),
             "fresh_audit_read_during_selection": False,
@@ -2714,7 +2934,7 @@ def train_models(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
         train_indices,
         feature_indices=all_features,
         objective="pairwise",
-        epochs=120,
+        epochs=240,
         learning_rate=1.0,
     )
     trained[MODEL_IDS[2]] = _fit_linear(
@@ -2851,21 +3071,30 @@ def train_models(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
             )
 
     split_manifest = _load_json(root / SPLIT_PATH)
-    for dimension in ("source", "goal", "time_block", "junction", "storage_leg"):
-        audit = split_manifest["dimension_isolation_audit"][dimension]
-        if audit["status"] != PASS:
+    for dimension in (
+        "source",
+        "goal",
+        "time_block",
+        "junction",
+        "storage_leg",
+        "contention_motif",
+    ):
+        view = split_manifest["dimension_group_views"][dimension]
+        if view["status"] != PASS:
             continue
-        heldout = {str(value) for value in audit["heldout_values"]}
+        heldout = {str(value) for value in view["heldout_values"]}
+        test_task_ids = {int(value) for value in view["test_task_ids"]}
         dimension_train = [
             index
             for index, example in enumerate(examples)
             if assignments[str(example.decision["decision_id"])] != "audit_test"
-            and str(example.decision[dimension]) not in heldout
+            and int(example.decision["task_id"]) not in test_task_ids
         ]
         dimension_test = [
             index
             for index, example in enumerate(examples)
             if assignments[str(example.decision["decision_id"])] != "audit_test"
+            and int(example.decision["task_id"]) in test_task_ids
             and str(example.decision[dimension]) in heldout
         ]
         if not dimension_train or not dimension_test:
@@ -3044,6 +3273,8 @@ def train_models(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
         "positive_residual_support",
         "harmful_residual_recall",
         "harmful_residual_support",
+        "risk_positive_support",
+        "risk_negative_support",
         "f2_preserved_rate",
         "risk_fallback_rate",
         "risk_calibration_ece",
@@ -3073,6 +3304,8 @@ def train_models(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
         "positive_residual_support",
         "harmful_residual_recall",
         "harmful_residual_support",
+        "risk_positive_support",
+        "risk_negative_support",
         "f2_preserved_rate",
         "risk_fallback_rate",
         "risk_calibration_ece",
@@ -3084,8 +3317,8 @@ def train_models(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
         for row in offline_rows
         if row["evaluation_scope"] == "fresh_audit_test"
     }
-    # Selection was frozen on validation before the audit cohort was
-    # extracted.  Final-audit metrics above never choose the model.
+    # Selection is frozen from validation before audit metrics are evaluated.
+    # Final-audit metrics above never choose the model.
     best_model_id = MODEL_IDS[5]
     offline_gate_status = model_payloads[MODEL_IDS[5]]["offline_gate"]["status"]
     bundle = {
@@ -3226,6 +3459,11 @@ def validate_committed(root: Path) -> dict[str, Any]:
         raise StageFError("Level-A corrective supervision has no support")
     if validation["fresh_audit_holdout_count"] != FRESH_AUDIT_DECISIONS:
         raise StageFError("fresh audit holdout count mismatch")
+    if (
+        validation.get("dimension_group_view_pass_count") != 6
+        or validation.get("dimension_group_view_task_overlap_count") != 0
+    ):
+        raise StageFError("dimension group-view isolation summary mismatch")
 
     decisions = _load_jsonl(root / DECISIONS_PATH)
     labels = {
@@ -3278,6 +3516,74 @@ def validate_committed(root: Path) -> dict[str, Any]:
         )
     if any(len(values) != 1 for values in task_splits.values()):
         raise StageFError("same task/bag crosses group splits")
+    expected_view_dimensions = {
+        "source",
+        "goal",
+        "time_block",
+        "junction",
+        "storage_leg",
+        "contention_motif",
+        "fault_regime",
+    }
+    views = split.get("dimension_group_views")
+    if not isinstance(views, Mapping) or set(views) != expected_view_dimensions:
+        raise StageFError("dimension group-view inventory mismatch")
+    development_rows = [
+        row
+        for row in decisions
+        if split["assignments"][str(row["decision_id"])] != "audit_test"
+    ]
+    development_task_ids = {int(row["task_id"]) for row in development_rows}
+    for dimension, view in views.items():
+        if view["status"] == "NOT_APPLICABLE_SINGLE_VALUE":
+            if dimension != "fault_regime" or view["task_overlap_count"] != 0:
+                raise StageFError("unexpected non-applicable dimension view")
+            continue
+        if view["status"] != PASS or int(view["task_overlap_count"]) != 0:
+            raise StageFError(f"dimension group view failed: {dimension}")
+        heldout = {str(value) for value in view["heldout_values"]}
+        expected_test_tasks = {
+            int(row["task_id"])
+            for row in development_rows
+            if str(row[dimension]) in heldout
+        }
+        recorded_test_tasks = {int(value) for value in view["test_task_ids"]}
+        if recorded_test_tasks != expected_test_tasks:
+            raise StageFError(
+                f"dimension group view test-task assignment drift: {dimension}"
+            )
+        train_tasks = development_task_ids - recorded_test_tasks
+        if train_tasks & recorded_test_tasks:
+            raise StageFError(
+                f"raw bag crosses dimension group view: {dimension}"
+            )
+        if (
+            int(view["train_task_count"]) != len(train_tasks)
+            or int(view["test_task_count"]) != len(recorded_test_tasks)
+        ):
+            raise StageFError(f"dimension group view task count drift: {dimension}")
+        train_rows = [
+            row
+            for row in development_rows
+            if int(row["task_id"]) in train_tasks
+        ]
+        test_rows = [
+            row
+            for row in development_rows
+            if int(row["task_id"]) in recorded_test_tasks
+        ]
+        evaluation_rows = [
+            row for row in test_rows if str(row[dimension]) in heldout
+        ]
+        if (
+            int(view["train_decision_count"]) != len(train_rows)
+            or int(view["test_decision_count"]) != len(test_rows)
+            or int(view["heldout_evaluation_decision_count"])
+            != len(evaluation_rows)
+        ):
+            raise StageFError(
+                f"dimension group view decision count drift: {dimension}"
+            )
 
     gate = _load_json(root / PRETRAINING_GATE_PATH)
     if gate.get("schema") != GATE_SCHEMA or gate.get("overall_status") != PASS:
@@ -3328,6 +3634,27 @@ def validate_committed(root: Path) -> dict[str, Any]:
                 raise StageFError("V5 calibrated risk head is missing")
             if head.get("fallback_action") != "zero_residual_use_frozen_scorer":
                 raise StageFError("V5 risk fallback does not restore frozen scorer")
+            if head.get("target_semantics") != (
+                "raw residual choice misses Level-A target while frozen choice "
+                "matches target"
+            ):
+                raise StageFError("V5 risk target is not model-specific harm")
+            if (
+                head.get("fit_partition") != "train"
+                or head.get("calibration_partition") != "validation"
+                or head.get("threshold_selection_partition") != "validation"
+            ):
+                raise StageFError("V5 risk partition protocol drift")
+            for support_field in (
+                "train_positive_support",
+                "train_negative_support",
+                "validation_positive_support",
+                "validation_negative_support",
+            ):
+                if int(head.get(support_field, 0)) <= 0:
+                    raise StageFError(
+                        f"V5 risk head lacks class support: {support_field}"
+                    )
             base_model_id = payload["parameters"].get("base_model_id")
             if base_model_id not in MODEL_IDS[:-1]:
                 raise StageFError("V5 base model identity is invalid")
@@ -3424,6 +3751,51 @@ def validate_committed(root: Path) -> dict[str, Any]:
         row["fresh_audit_read_during_selection"] for row in hyperparameter_rows
     } != {"False"}:
         raise StageFError("fresh audit was read during hyperparameter selection")
+    selected_probe_rows = [
+        row for row in hyperparameter_rows if _truth(row["selected"])
+    ]
+    if len(selected_probe_rows) != 2:
+        raise StageFError("expected one selected probe per tuned model family")
+    examples, assignments = load_examples(root)
+    validation_indices = _indices_for(examples, assignments, "validation")
+    selected_models = {
+        "pairwise_linear": MODEL_IDS[1],
+        "tiny_mlp": MODEL_IDS[3],
+    }
+    for row in selected_probe_rows:
+        family = row["model_family"]
+        if family not in selected_models:
+            raise StageFError(f"unknown selected probe family: {family}")
+        payload = _load_json(
+            root / MODEL_DIR / _model_filename(selected_models[family])
+        )
+        parameters = payload["parameters"]
+        if (
+            int(parameters["epochs"]) != int(row["epochs"])
+            or abs(
+                float(parameters["learning_rate"]) - float(row["learning_rate"])
+            )
+            > 1e-12
+        ):
+            raise StageFError(f"selected probe parameters drifted: {family}")
+        metrics = evaluate_model(
+            parameters,
+            examples,
+            validation_indices,
+            subset="validation",
+        )
+        for metric, column in (
+            ("listwise_top1", "validation_listwise_top1"),
+            ("pairwise_accuracy", "validation_pairwise_accuracy"),
+            (
+                "high_confidence_wrong_rate",
+                "validation_high_confidence_harmful_rate",
+            ),
+        ):
+            if abs(float(metrics[metric]) - float(row[column])) > 1e-12:
+                raise StageFError(
+                    f"selected probe metric drifted: {family}/{metric}"
+                )
 
     bundle = _load_json(root / CANDIDATE_BUNDLE_PATH)
     if bundle.get("bundle_sha256") != _self_hash(bundle, "bundle_sha256"):
@@ -3447,6 +3819,24 @@ def validate_committed(root: Path) -> dict[str, Any]:
     _verify_descriptor(root, bundle["offline_table"])
     _verify_descriptor(root, bundle["feature_ablation"])
     _verify_descriptor(root, bundle["hyperparameter_selection"])
+
+    with (root / OFFLINE_TABLE_PATH).open(
+        "r", encoding="utf-8", newline=""
+    ) as stream:
+        offline_rows = list(csv.DictReader(stream))
+    v5_audit_rows = [
+        row
+        for row in offline_rows
+        if row["model_id"] == MODEL_IDS[5]
+        and row["evaluation_scope"] == "fresh_audit_test"
+    ]
+    if len(v5_audit_rows) != 1:
+        raise StageFError("V5 fresh-audit row is missing or duplicated")
+    if (
+        int(v5_audit_rows[0]["risk_positive_support"]) <= 0
+        or int(v5_audit_rows[0]["risk_negative_support"]) <= 0
+    ):
+        raise StageFError("fresh audit lacks V5 harm class support")
 
     with (root / CLOSED_LOOP_TABLE_PATH).open(
         "r", encoding="utf-8", newline=""

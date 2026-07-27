@@ -18,8 +18,8 @@
       "hash_semantics": "sha256_utf8_lf_normalized",
       "path": "artifacts/datasets/g4irsf13_v3_labels.jsonl",
       "row_count": 3501,
-      "sha256": "0029117eef165acc94c0847204d8be430a4fd842efd76907990aeb0da378ec83",
-      "size_bytes": 7435857
+      "sha256": "08dbd18472deab3f89b49300abb2698cb20fd0af404d90be75f6bd01c83e1c63",
+      "size_bytes": 7460364
     },
     "outcomes": {
       "hash_semantics": "sha256_utf8_lf_normalized",
@@ -31,30 +31,31 @@
     "splits": {
       "hash_semantics": "sha256_utf8_lf_normalized",
       "path": "artifacts/datasets/g4irsf13_v3_split_manifest.json",
-      "sha256": "06c23f84153f20ed14a64c5ea125729909e19b7a189126ed619b44e22606053b",
-      "size_bytes": 258172
+      "sha256": "000b17d210d27e9200e3b15596cb61cdd771de74ac523e3cdd631a2615f691a4",
+      "size_bytes": 301331
     },
     "trace_schema": {
       "hash_semantics": "sha256_utf8_lf_normalized",
       "path": "artifacts/datasets/g4irsf13_v3_trace_schema.json",
-      "sha256": "4f697a9dfdc900cff41b0626ed87accb4166bfd84b16338ae2738c5e22619ea7",
-      "size_bytes": 5311
+      "sha256": "324383241ed0b2fb3ea11b8600bf3099663d1095485d30d82bea159515981f02",
+      "size_bytes": 5379
     }
   },
   "claim_boundary": "Real candidate/action data support offline Level-A local corrective pretraining. Level-A is a deterministic one-step projection, not a matched full-state clone or causal TTH label; runtime promotion is not claimed.",
   "fixed_real_map_only": true,
   "generation": {
     "extraction_sampling": "all Stage-B divergence rows plus deterministic sha256 bottom-256 sample per easy category plus 384 fresh raw-bag-isolated audit decisions",
-    "extractor_trainer_source_sha256": "5f14468a548cb165290bb27dc6e0e6952c3a1cf6a8ac146f2a60c0e7bb94bfed",
+    "extractor_trainer_source_sha256": "87dafa5ecc8faad1fb7132df7ae54e5eff8b5c2c25c3265891701c79101c9f10",
     "f2_archive_canonical_json_sha256": "d6c81292f3ef9a238cce5c97c1fee959cbb76728fb3ffd437388e8705339bc54",
     "f2_archive_descriptor_sha256": "d54768682d7f62a9f9cf8746891343ce936935f1126081187f6d2b24c1b9131b",
     "f2_archive_payload_sha256": "3fde48fe4d9974f43dde7971f3a0b9926f8f91090693b0e71584dddf8a496e0b",
     "f2_binary_sha256": "ba202ccc6c1e83fb159a9d662a07bd4610f8e3bed4681164fdc07adfbce0e52a",
     "f2_decision_trace_count": 340810,
+    "fresh_audit_excluded_from_hyperparameter_selection": true,
     "full_astar_calls": 0,
     "future_routes_used_as_features": 0,
     "global_reservation_scans": 0,
-    "hyperparameters_frozen_before_fresh_audit_extraction": true,
+    "hyperparameters_frozen_before_fresh_audit_evaluation": true,
     "one_step_only": true,
     "reservation_depth": 1,
     "stage_b_divergence_sha256": "ced7e4471155cb9f7c35a926a009a8cdfe77276f04bdf1a63ab6edc2f8bfd601",
@@ -64,6 +65,7 @@
   "label_contract": {
     "confidence_is_model_feature": false,
     "future_coordination_dependency_is_model_feature": false,
+    "hard_cohort_is_risk_target": false,
     "label_source_is_model_feature": false,
     "level_a_corrective_label_count": 1363,
     "level_a_formula_id": "g4irsf13_level_a_one_step_projection_v1",
@@ -73,9 +75,10 @@
     "level_b_full_counterfactual_status": "NOT_RUN_NO_MATCHED_RUNTIME_STATE_CLONE",
     "post_hoc_outcome_is_model_feature": false,
     "rank_target": "authorised Level-A deterministic local one-step projection; observed F2 action on abstention",
+    "v5_risk_target": "model-specific harmful residual: raw residual choice misses the Level-A target while the frozen choice matches it",
     "weak_teacher_disagreements_used_as_rank_target": 0
   },
-  "manifest_sha256": "7876f3ebc158015adc6b79aa0561bd1c0bcc5c58a66e73f22605b37ce964cf23",
+  "manifest_sha256": "cdbf4b6fad8d9254ae336fd02e6b07a73a5700be20008581154d1c8fb75e7cee",
   "map": {
     "mutated": false,
     "path": "data/processed/maps/map2.json",
@@ -126,6 +129,8 @@
     "candidate_completeness": 1.0,
     "candidate_record_count": 6259,
     "decision_count": 3501,
+    "dimension_group_view_pass_count": 6,
+    "dimension_group_view_task_overlap_count": 0,
     "easy_category_counts": {
       "direct_goal": 395,
       "f2_v2_current_action_agreement": 1660,

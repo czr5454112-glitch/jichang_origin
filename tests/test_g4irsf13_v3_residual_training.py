@@ -27,6 +27,7 @@ from scripts.train.g4irsf13_v3_residual_training import (
     Example,
     _canonical_bytes,
     _fit_linear,
+    _harmful_residual_label,
     _level_a_projection,
     _load_json,
     _load_jsonl,
@@ -55,6 +56,7 @@ def test_source_manifest_binds_real_candidate_and_action_rows() -> None:
         for row in _load_jsonl(ROOT / LABELS_PATH)
     }
     graph = load_graph(ROOT)
+    examples, _ = load_examples(ROOT)
 
     assert source["schema"] == SOURCE_SCHEMA
     assert source["status"] == "PASS"
@@ -78,6 +80,14 @@ def test_source_manifest_binds_real_candidate_and_action_rows() -> None:
             candidates
         )
         assert labels[str(row["decision_id"])]["preferred_next"] in candidates
+    for example in examples:
+        allowed = [
+            record
+            for record in example.decision["candidate_records"]
+            if record["shield_allowed"]
+        ]
+        assert len(example.frozen_costs) == len(allowed)
+        assert len(example.features) == len(allowed)
 
 
 def test_group_split_keeps_every_raw_bag_in_one_partition() -> None:
@@ -100,6 +110,46 @@ def test_group_split_keeps_every_raw_bag_in_one_partition() -> None:
     }
     assert split["counts"]["audit_test"] == 384
     assert min(split["counts"].values()) > 0
+
+    development = [
+        row
+        for row in decisions
+        if split["assignments"][str(row["decision_id"])] != "audit_test"
+    ]
+    development_tasks = {int(row["task_id"]) for row in development}
+    expected_dimensions = {
+        "source",
+        "goal",
+        "time_block",
+        "junction",
+        "storage_leg",
+        "contention_motif",
+        "fault_regime",
+    }
+    assert set(split["dimension_group_views"]) == expected_dimensions
+    for dimension, view in split["dimension_group_views"].items():
+        assert view["task_overlap_count"] == 0
+        if view["status"] != "PASS":
+            assert dimension == "fault_regime"
+            assert view["status"] == "NOT_APPLICABLE_SINGLE_VALUE"
+            continue
+        heldout = {str(value) for value in view["heldout_values"]}
+        expected_test_tasks = {
+            int(row["task_id"])
+            for row in development
+            if str(row[dimension]) in heldout
+        }
+        test_tasks = {int(value) for value in view["test_task_ids"]}
+        train_tasks = development_tasks - test_tasks
+        assert test_tasks == expected_test_tasks
+        assert not train_tasks & test_tasks
+        assert view["train_task_count"] == len(train_tasks)
+        assert view["test_task_count"] == len(test_tasks)
+        assert all(
+            int(row["task_id"]) not in train_tasks
+            for row in development
+            if str(row[dimension]) in heldout
+        )
 
 
 def test_label_provenance_and_future_dependency_never_enter_features() -> None:
@@ -124,6 +174,11 @@ def test_label_provenance_and_future_dependency_never_enter_features() -> None:
             assert "confidence" not in feature_keys
             assert not any("future" in name for name in feature_keys)
     assert all(row["weak_teacher_used_as_rank_target"] is False for row in labels)
+    assert all("risk_label" not in row for row in labels)
+    assert all(
+        row["hard_cohort_label"] == int(bool(row["hard_categories"]))
+        for row in labels
+    )
     assert all(
         row["level_b_full_counterfactual_status"]
         == "NOT_RUN_NO_MATCHED_RUNTIME_STATE_CLONE"
@@ -259,6 +314,46 @@ def test_v5_inference_vectors_reproduce_residual_risk_and_fallback() -> None:
     assert fallback is True
     assert np.array_equal(costs, example.frozen_costs)
     assert choice == int(np.argmin(example.frozen_costs))
+
+
+def test_v5_risk_target_is_model_specific_harm_not_hard_cohort() -> None:
+    examples, assignments = load_examples(ROOT)
+    payload = _load_json(ROOT / MODEL_DIR / _model_filename(MODEL_IDS[-1]))
+    base_id = payload["parameters"]["base_model_id"]
+    base = _load_json(ROOT / MODEL_DIR / _model_filename(base_id))["parameters"]
+    head = payload["risk_head"]
+
+    assert head["target_semantics"] == (
+        "raw residual choice misses Level-A target while frozen choice matches target"
+    )
+    assert head["fit_partition"] == "train"
+    assert head["calibration_partition"] == "validation"
+    assert head["threshold_selection_partition"] == "validation"
+    for field in (
+        "train_positive_support",
+        "train_negative_support",
+        "validation_positive_support",
+        "validation_negative_support",
+    ):
+        assert head[field] > 0
+
+    audit = [
+        index
+        for index, example in enumerate(examples)
+        if assignments[str(example.decision["decision_id"])] == "audit_test"
+    ]
+    labels = [_harmful_residual_label(base, examples[index]) for index in audit]
+    assert sum(labels) > 0
+    assert len(labels) - sum(labels) > 0
+    for index, label in zip(audit, labels):
+        example = examples[index]
+        residual = _raw_residual(base, example)
+        frozen_choice = int(np.argmin(example.frozen_costs))
+        raw_choice = int(np.argmin(example.frozen_costs + residual))
+        assert label == int(
+            raw_choice != example.selected_index
+            and frozen_choice == example.selected_index
+        )
 
 
 def test_small_real_subset_training_regenerates_bit_for_bit() -> None:

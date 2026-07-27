@@ -14,11 +14,18 @@ pretraining. Corrective-learning promotion remains blocked.
   `1.000`.
 - Actual selected-action coverage:
   `1.000`.
-- Raw-bag split overlap: `0`.
+- Main raw-bag split overlap: `0`.
+- Independent source/goal/time/junction/storage/motif held-out views:
+  `6` PASS, each with raw-bag
+  overlap `0`; the single observed fault regime is explicitly not applicable.
 
 The decision file contains only decision-time local state. Label provenance,
 confidence, weak-teacher status, future-dependency status, and post-hoc
 outcomes live in separate hash-bound files and are not model features.
+The main train/validation/audit split is grouped by raw bag. Dimension
+generalization uses separate grouped views: if any decision matches that
+view's held-out value, the entire raw bag is removed from the view's training
+side.
 
 ## Hard cohort
 
