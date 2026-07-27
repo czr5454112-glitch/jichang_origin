@@ -52,6 +52,28 @@ def test_append_only_source_evolution_does_not_rebuild_sealed_predecessor(
     assert evidence.validate_inputs(ROOT) == []
 
 
+def test_sealed_predecessor_uses_frozen_physical_hashes(tmp_path: Path) -> None:
+    denominator = _object(ROOT / evidence.DENOMINATOR_POLICY)
+    for relative_path, _ in evidence.EXPECTED_G12_DENOMINATOR_OUTPUTS:
+        target = tmp_path / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / relative_path).read_bytes())
+    assert evidence._validate_sealed_denominator_outputs(
+        tmp_path,
+        denominator,
+    ) == []
+
+    report_path = tmp_path / evidence.EXPECTED_G12_DENOMINATOR_OUTPUTS[-1][0]
+    report_path.write_bytes(report_path.read_bytes() + b"\n")
+    assert any(
+        "physical SHA-256 drift" in failure
+        for failure in evidence._validate_sealed_denominator_outputs(
+            tmp_path,
+            denominator,
+        )
+    )
+
+
 def test_build_is_append_only_and_uses_corrected_denominator() -> None:
     payloads = evidence.build_payloads(ROOT)
     assert set(payloads) == {

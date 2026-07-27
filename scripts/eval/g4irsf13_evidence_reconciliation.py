@@ -80,6 +80,23 @@ EXPECTED_F2_SOURCE_MANIFEST_SHA256 = (
 EXPECTED_F2_EXECUTOR_SOURCE_SHA256 = (
     "e1b59eecded76f59991a9276f614aea747a573dbaffdf2139cfd9b6096b69971"
 )
+EXPECTED_G12_DENOMINATOR_SELF_SHA256 = (
+    "d8a577bf1540236d90280440a2a92a01f38abf173fca1fbbffdac8289b544f17"
+)
+EXPECTED_G12_DENOMINATOR_OUTPUTS = (
+    (
+        DENOMINATOR_POLICY,
+        "618c040a5b5bd13ce81c502832575a7ea52bd8b82998ce481ffe79da9b8de4e6",
+    ),
+    (
+        Path("outputs/tables/g4irsf12_denominator_reconciliation.csv"),
+        "8a7754ddb438b4688ad8c4fc68ee4e0f00554b43d8bbe46c4e9b18f1f2466e7b",
+    ),
+    (
+        Path("outputs/reports/g4irsf12_denominator_reconciliation.md"),
+        "216516f23ef5595713aac2e706130ceb9e559a7f75b45df857f3a2598f8788d0",
+    ),
+)
 
 
 class EvidenceError(ValueError):
@@ -174,9 +191,9 @@ def _validate_sealed_denominator_outputs(
     against the *current* formal source tree.  That is correct while G4IRSF12
     is the active phase, but it becomes an invalid requirement once G4IRSF13
     appends runtime sources to that tree.  Here the predecessor is immutable
-    evidence: validate its self-hash and byte-for-byte companion outputs while
+    evidence: validate its frozen physical hashes and internal self-hash while
     the caller separately validates every referenced ledger and provenance
-    binding.
+    binding.  This deliberately avoids a current renderer dependency too.
     """
 
     failures: list[str] = []
@@ -188,23 +205,22 @@ def _validate_sealed_denominator_outputs(
     recorded_hash = denominator.get("reconciliation_sha256")
     unhashed = dict(denominator)
     unhashed.pop("reconciliation_sha256", None)
+    if recorded_hash != EXPECTED_G12_DENOMINATOR_SELF_SHA256:
+        failures.append("sealed denominator reconciliation recorded hash drift")
     if (
         not isinstance(recorded_hash, str)
         or _canonical_sha256(unhashed) != recorded_hash
     ):
         failures.append("sealed denominator reconciliation self-hash drift")
 
-    try:
-        expected_outputs = g12_denominator.rendered_outputs(denominator)
-    except Exception as exc:  # noqa: BLE001 - malformed predecessor fails closed
-        failures.append(f"sealed denominator rendering failed: {exc}")
-        return failures
-    for relative_path, expected in expected_outputs.items():
+    for relative_path, expected_hash in EXPECTED_G12_DENOMINATOR_OUTPUTS:
         path = root / relative_path
         if not path.is_file():
             failures.append(f"missing sealed denominator output: {relative_path}")
-        elif path.read_bytes() != expected:
-            failures.append(f"sealed denominator output drift: {relative_path}")
+        elif _file_sha256(path) != expected_hash:
+            failures.append(
+                f"sealed denominator output physical SHA-256 drift: {relative_path}"
+            )
     return failures
 
 
@@ -247,6 +263,8 @@ def validate_inputs(root: Path = ROOT) -> list[str]:
         failures.append("corrected historical HCA target drift")
     if denominator.get("sealed_execution_evidence_rewritten") is not False:
         failures.append("denominator reconciliation rewrote sealed evidence")
+    if denominator.get("formal_source_bundle_preserved") is not True:
+        failures.append("denominator reconciliation did not preserve source bundle")
     sealed = denominator.get("sealed_phase_j_evidence", {})
     physical_expectations = (
         (
