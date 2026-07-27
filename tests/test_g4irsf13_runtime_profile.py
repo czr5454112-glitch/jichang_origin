@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 from pathlib import Path
+import sys
 
 import pytest
 
@@ -33,6 +35,13 @@ def test_profile_uses_frozen_f2_case_and_append_only_controls() -> None:
     assert controls["scorer_mode"] == (
         "S1_frozen_g4e_legal_local_adapter"
     )
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows process API fallback")
+def test_peak_rss_has_stdlib_windows_fallback(monkeypatch) -> None:
+    assert profile._windows_peak_working_set_bytes() > 0
+    monkeypatch.setitem(sys.modules, "psutil", None)
+    assert profile._rss_peak_bytes() > 0
 
 
 def test_real_map_144_profile_repeats_are_algorithm_equivalent() -> None:

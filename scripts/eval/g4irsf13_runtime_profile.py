@@ -325,13 +325,68 @@ def _algorithm_projection(payload: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _windows_peak_working_set_bytes() -> int:
+    """Read the process peak working set through the Windows process API."""
+
+    if os.name != "nt":
+        raise ProfileError("Windows peak RSS fallback requires Windows")
+
+    import ctypes
+    from ctypes import wintypes
+
+    class ProcessMemoryCountersEx(ctypes.Structure):
+        _fields_ = (
+            ("cb", wintypes.DWORD),
+            ("PageFaultCount", wintypes.DWORD),
+            ("PeakWorkingSetSize", ctypes.c_size_t),
+            ("WorkingSetSize", ctypes.c_size_t),
+            ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+            ("QuotaPagedPoolUsage", ctypes.c_size_t),
+            ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+            ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+            ("PagefileUsage", ctypes.c_size_t),
+            ("PeakPagefileUsage", ctypes.c_size_t),
+            ("PrivateUsage", ctypes.c_size_t),
+        )
+
+    try:
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        psapi = ctypes.WinDLL("psapi", use_last_error=True)
+        get_current_process = kernel32.GetCurrentProcess
+        get_current_process.argtypes = ()
+        get_current_process.restype = wintypes.HANDLE
+        get_process_memory_info = psapi.GetProcessMemoryInfo
+        get_process_memory_info.argtypes = (
+            wintypes.HANDLE,
+            ctypes.POINTER(ProcessMemoryCountersEx),
+            wintypes.DWORD,
+        )
+        get_process_memory_info.restype = wintypes.BOOL
+        counters = ProcessMemoryCountersEx()
+        counters.cb = ctypes.sizeof(counters)
+        if not get_process_memory_info(
+            get_current_process(),
+            ctypes.byref(counters),
+            counters.cb,
+        ):
+            raise ctypes.WinError(ctypes.get_last_error())
+    except (AttributeError, OSError) as exc:
+        raise ProfileError(
+            f"Windows GetProcessMemoryInfo failed: {exc}"
+        ) from exc
+    return int(counters.PeakWorkingSetSize)
+
+
 def _rss_peak_bytes() -> int:
     try:
         import psutil
-    except ImportError as exc:  # pragma: no cover - dependency is bundled
-        raise ProfileError("psutil is required for Windows peak RSS") from exc
+    except ImportError:
+        return _windows_peak_working_set_bytes()
     memory = psutil.Process(os.getpid()).memory_info()
-    return int(getattr(memory, "peak_wset", memory.rss))
+    peak = getattr(memory, "peak_wset", None)
+    if peak is None and os.name == "nt":
+        return _windows_peak_working_set_bytes()
+    return int(memory.rss if peak is None else peak)
 
 
 def execute_repeats(
