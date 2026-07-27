@@ -1,0 +1,32 @@
+{
+  "all_runtime_hard_gates_pass": true,
+  "candidates": [
+    {
+      "candidate_id": "H1_Q1_THESIS_NO_LEARNING",
+      "complete_pointer_file_sha256": "6816522301fdc60d3b3b16ddbe626275f340e50249531a22d886be8bb1396afd",
+      "experiment_identity_file_sha256": "daecb94437eb263ce65b033e825d7c2bd38ad4b006dba97ed3f55f795d790aca",
+      "experiment_identity_sha256": "494f872bdcb73d8b074c240ba5aca6ccec3378908860778181c23342a55c60f6",
+      "repeat_count": 5
+    },
+    {
+      "candidate_id": "H0_F2_FROZEN",
+      "complete_pointer_file_sha256": "54a1299267df3f80663908a292a5e765fd6f24d552fe6cf435b8a4c064cd1d88",
+      "experiment_identity_file_sha256": "9e086389d3a07b72282b4bac11110bf832cdf2e14921ebe1702fd5627f220813",
+      "experiment_identity_sha256": "b82ddece1a02006cf3687d9261c3e4dfd987bf574730eeb2026ef3148b9cee2e",
+      "repeat_count": 5
+    }
+  ],
+  "failed_committed_output_hashes": {
+    "artifacts/policies/g4irsf13_final_candidate_bundle.json": "446a425b71225253b01a783954bd82e379a44206537c0c2349e6c5941a3bc791",
+    "outputs/reports/g4irsf13_original_scale_joint_decision.md": "05658362be771528bdea8a557c5d63df689ea5992e7efc1e0a9af106bcb557b0",
+    "outputs/tables/g4irsf13_original_scale_joint_ab.csv": "b1ce1ece97cbc9e67207dbf6250d8b75e145dcdc90fbbeb0007324a482777708"
+  },
+  "reason": "runtime hard gates used the independent timing projection and passed 43,603/43,603 segments, but the committed CSV projected completed_segment_count from the counter projection where that timing field was absent",
+  "repository_base_head": "a5d96e7e799a2f3f0591b5732b37749ea4a9f472",
+  "reused_for_final_equivalence": false,
+  "runner_source_sha256": "02e98b78b3ce04735350c06d4c41f167edf7d889642bff7cfb433b2c03215644",
+  "schema": "czr005.g4irsf13.projection_validator_failure.v1",
+  "status": "PROJECTION_VALIDATOR_FAILURE",
+  "total_repeat_count": 10,
+  "validator_error": "H0_F2_FROZEN committed hard gate drift: completed_segment_count=''"
+}
