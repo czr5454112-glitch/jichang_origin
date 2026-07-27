@@ -49,6 +49,24 @@ enum class BoundedLocalPIBTMode {
   kP4 = 4,
 };
 
+// Priority and preference are deliberately orthogonal to inheritance depth.
+// Q0/current preserve the sealed G4IRSF12 ordering and candidate comparator.
+// The opt-in variants consume only fields materialised in the bounded local
+// slice; they never query Graph, a route planner, or a reservation table.
+enum class BoundedLocalPIBTPriorityMode {
+  kQ0Current = 0,
+  kQ1ThesisLocalProjection = 1,
+  kQ2TypeSlackAging = 2,
+  kQ3FaultSlackAgeStableId = 3,
+};
+
+enum class BoundedLocalPIBTPreferenceMode {
+  kCurrent = 0,
+  kDodge = 1,
+  kLocalRegret = 2,
+  kDodgeRegret = 3,
+};
+
 inline int bounded_local_pibt_depth(BoundedLocalPIBTMode mode) {
   switch (mode) {
     case BoundedLocalPIBTMode::kP0:
@@ -93,6 +111,14 @@ struct BoundedLocalPIBTCandidate {
   double local_score = 0.0;
   std::uint64_t expected_fault_generation = 0;
   bool physically_blocked_at_snapshot = false;
+  // These diagnostics are computed from the same one-hop local slice as the
+  // candidate.  They are consulted only when static_potential ties exactly.
+  double static_potential = 0.0;
+  bool blocks_higher_priority_exit = false;
+  bool occupies_unique_exit = false;
+  bool enters_wait_for_cycle = false;
+  bool is_local_backtrack = false;
+  double local_regret_prior = 0.0;
 };
 
 struct BoundedLocalPIBTReadyBag {
@@ -109,6 +135,12 @@ struct BoundedLocalPIBTReadyBag {
   bool in_transit = false;
   std::vector<LocalPIBTResourceKey> held_resources;
   std::vector<BoundedLocalPIBTCandidate> candidates;
+  // Lower task_class_rank runs first.  The event runtime supplies a unique,
+  // local-only ordering key; bag_id remains the final stable tie-break.
+  int task_class_rank = 0;
+  std::uint64_t fault_priority_generation = 0;
+  int local_contention = 0;
+  std::uint64_t enqueue_sequence = 0;
 };
 
 struct BoundedLocalPIBTResourceOwner {
@@ -154,6 +186,10 @@ struct BoundedLocalPIBTConfig {
   int max_ready_bags = 32;
   int max_local_resources = 128;
   int max_candidates_per_bag = 16;
+  BoundedLocalPIBTPriorityMode priority_mode =
+      BoundedLocalPIBTPriorityMode::kQ0Current;
+  BoundedLocalPIBTPreferenceMode preference_mode =
+      BoundedLocalPIBTPreferenceMode::kCurrent;
 };
 
 enum class BoundedLocalPIBTOutcome {
@@ -307,7 +343,10 @@ inline void validate_inputs(
           candidate.edge_resource != local_pibt_directed_edge_resource(
                                          bag.current_node,
                                          candidate.next_node) ||
-          !std::isfinite(candidate.local_score)) {
+          !std::isfinite(candidate.local_score) ||
+          !std::isfinite(candidate.static_potential) ||
+          !std::isfinite(candidate.local_regret_prior) ||
+          candidate.local_regret_prior < 0.0) {
         throw std::invalid_argument("bounded local PIBT candidate is invalid");
       }
       if (!next_nodes.insert(candidate.next_node).second) {
@@ -464,20 +503,69 @@ class BoundedLocalPIBTResolver {
       ordered.push_back(&bag);
       bags_by_id.emplace(bag.bag_id, &bag);
     }
-    std::sort(ordered.begin(), ordered.end(), [&](const auto* left, const auto* right) {
-      return std::make_tuple(!left->physical_fault_emergency,
-                             priority_slack(*left, config.decision_time),
-                             -left->accumulated_wait,
-                             -left->retry_age,
-                             -left->source_release_age,
-                             left->bag_id) <
-             std::make_tuple(!right->physical_fault_emergency,
-                             priority_slack(*right, config.decision_time),
-                             -right->accumulated_wait,
-                             -right->retry_age,
-                             -right->source_release_age,
-                             right->bag_id);
-    });
+    std::sort(
+        ordered.begin(),
+        ordered.end(),
+        [&](const auto* left, const auto* right) {
+          switch (config.priority_mode) {
+            case BoundedLocalPIBTPriorityMode::kQ0Current:
+              return std::make_tuple(
+                         !left->physical_fault_emergency,
+                         priority_slack(*left, config.decision_time),
+                         -left->accumulated_wait,
+                         -left->retry_age,
+                         -left->source_release_age,
+                         left->bag_id) <
+                     std::make_tuple(
+                         !right->physical_fault_emergency,
+                         priority_slack(*right, config.decision_time),
+                         -right->accumulated_wait,
+                         -right->retry_age,
+                         -right->source_release_age,
+                         right->bag_id);
+            case BoundedLocalPIBTPriorityMode::kQ1ThesisLocalProjection:
+              return std::make_tuple(
+                         !left->physical_fault_emergency,
+                         priority_slack(*left, config.decision_time),
+                         -left->local_contention,
+                         left->enqueue_sequence,
+                         left->bag_id) <
+                     std::make_tuple(
+                         !right->physical_fault_emergency,
+                         priority_slack(*right, config.decision_time),
+                         -right->local_contention,
+                         right->enqueue_sequence,
+                         right->bag_id);
+            case BoundedLocalPIBTPriorityMode::kQ2TypeSlackAging:
+              return std::make_tuple(
+                         left->task_class_rank,
+                         priority_slack(*left, config.decision_time),
+                         -left->source_release_age,
+                         -left->local_contention,
+                         left->bag_id) <
+                     std::make_tuple(
+                         right->task_class_rank,
+                         priority_slack(*right, config.decision_time),
+                         -right->source_release_age,
+                         -right->local_contention,
+                         right->bag_id);
+            case BoundedLocalPIBTPriorityMode::kQ3FaultSlackAgeStableId:
+              return std::make_tuple(
+                         -static_cast<long long>(
+                             left->fault_priority_generation),
+                         priority_slack(*left, config.decision_time),
+                         -left->source_release_age,
+                         left->bag_id) <
+                     std::make_tuple(
+                         -static_cast<long long>(
+                             right->fault_priority_generation),
+                         priority_slack(*right, config.decision_time),
+                         -right->source_release_age,
+                         right->bag_id);
+          }
+          throw std::invalid_argument(
+              "bounded local PIBT priority mode must be Q0..Q3");
+        });
 
     std::map<int, int> priority_rank;
     for (std::size_t index = 0; index < ordered.size(); ++index) {
@@ -532,18 +620,58 @@ class BoundedLocalPIBTResolver {
       for (const auto& candidate : bag.candidates) {
         candidates.push_back(&candidate);
       }
-      std::sort(candidates.begin(), candidates.end(), [](const auto* left, const auto* right) {
-        const auto left_claims = sorted_unique_resources(left->required_resources);
-        const auto right_claims = sorted_unique_resources(right->required_resources);
-        return std::make_tuple(left->local_score,
-                               left->next_node,
-                               left->edge_resource,
-                               left_claims) <
-               std::make_tuple(right->local_score,
-                               right->next_node,
-                               right->edge_resource,
-                               right_claims);
-      });
+      std::sort(
+          candidates.begin(),
+          candidates.end(),
+          [&](const auto* left, const auto* right) {
+            const auto left_claims =
+                sorted_unique_resources(left->required_resources);
+            const auto right_claims =
+                sorted_unique_resources(right->required_resources);
+            if (config.preference_mode !=
+                    BoundedLocalPIBTPreferenceMode::kCurrent &&
+                left->static_potential == right->static_potential) {
+              const bool use_dodge =
+                  config.preference_mode ==
+                      BoundedLocalPIBTPreferenceMode::kDodge ||
+                  config.preference_mode ==
+                      BoundedLocalPIBTPreferenceMode::kDodgeRegret;
+              const bool use_regret =
+                  config.preference_mode ==
+                      BoundedLocalPIBTPreferenceMode::kLocalRegret ||
+                  config.preference_mode ==
+                      BoundedLocalPIBTPreferenceMode::kDodgeRegret;
+              const auto left_preference = std::make_tuple(
+                  use_dodge && left->blocks_higher_priority_exit,
+                  use_dodge && left->occupies_unique_exit,
+                  use_dodge && left->is_local_backtrack,
+                  use_dodge && left->enters_wait_for_cycle,
+                  use_regret ? left->local_regret_prior : 0.0,
+                  left->local_score,
+                  left->next_node,
+                  left->edge_resource,
+                  left_claims);
+              const auto right_preference = std::make_tuple(
+                  use_dodge && right->blocks_higher_priority_exit,
+                  use_dodge && right->occupies_unique_exit,
+                  use_dodge && right->is_local_backtrack,
+                  use_dodge && right->enters_wait_for_cycle,
+                  use_regret ? right->local_regret_prior : 0.0,
+                  right->local_score,
+                  right->next_node,
+                  right->edge_resource,
+                  right_claims);
+              return left_preference < right_preference;
+            }
+            return std::make_tuple(left->local_score,
+                                   left->next_node,
+                                   left->edge_resource,
+                                   left_claims) <
+                   std::make_tuple(right->local_score,
+                                   right->next_node,
+                                   right->edge_resource,
+                                   right_claims);
+          });
 
       for (const auto* candidate : candidates) {
         ++result.candidate_attempt_count;

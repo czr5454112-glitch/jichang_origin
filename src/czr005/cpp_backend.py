@@ -600,6 +600,12 @@ def g4irsf11_event_runtime_from_records(
     expected_binary_path: PathLike | None = None,
     search_path: PathLike | None = None,
     event_trace_limit: int | None = None,
+    priority_mode: str = "Q0",
+    pibt_preference_mode: str = "current",
+    pibt_regret_prior_records: Sequence[
+        tuple[int, int, int, float]
+    ] = (),
+    selective_credit_contention_threshold: int = 1,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -668,6 +674,10 @@ def g4irsf11_event_runtime_from_records(
     pibt_max_candidates_per_bag = strict_integer(
         pibt_max_candidates_per_bag,
         "pibt_max_candidates_per_bag",
+    )
+    selective_credit_contention_threshold = strict_integer(
+        selective_credit_contention_threshold,
+        "selective_credit_contention_threshold",
     )
 
     enable_source_admission = strict_bool(
@@ -739,10 +749,42 @@ def g4irsf11_event_runtime_from_records(
                 "pibt_max_depth must equal the depth encoded by pibt_mode "
                 f"({pibt_mode} requires {actual_pibt_depth})"
             )
-    if framework_mode != "event_loop_one_step":
+    framework_modes = {
+        "event_loop_one_step",
+        "legacy_order_one_step_diagnostic",
+        "old_scheduling_order_reservation_horizon_one",
+    }
+    if framework_mode not in framework_modes:
         raise ValueError(
-            "unsupported framework_mode: the event runtime implements only "
-            "event_loop_one_step"
+            "framework_mode must be event_loop_one_step or "
+            "legacy_order_one_step_diagnostic"
+        )
+    priority_modes = {
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "current_f2",
+        "thesis_exact_local_projection",
+        "thesis_type_slack_aging",
+        "fault_slack_age_stable_id",
+    }
+    if priority_mode not in priority_modes:
+        raise ValueError("priority_mode must be one of Q0, Q1, Q2, Q3")
+    pibt_preference_modes = {
+        "current",
+        "dodge",
+        "local_regret",
+        "dodge_regret",
+    }
+    if pibt_preference_mode not in pibt_preference_modes:
+        raise ValueError(
+            "pibt_preference_mode must be current, dodge, local_regret, "
+            "or dodge_regret"
+        )
+    if selective_credit_contention_threshold <= 0:
+        raise ValueError(
+            "selective_credit_contention_threshold must be positive"
         )
 
     scorer_modes = {
@@ -1061,6 +1103,40 @@ def g4irsf11_event_runtime_from_records(
                 ),
             )
         )
+    normalized_regret_prior_records: list[
+        tuple[int, int, int, float]
+    ] = []
+    for record_index, record in enumerate(pibt_regret_prior_records):
+        if len(record) != 4:
+            raise ValueError(
+                "pibt_regret_prior_records entries must be "
+                "(from_node,to_node,goal_node,penalty)"
+            )
+        penalty = strict_finite_number(
+            record[3],
+            f"pibt_regret_prior_records[{record_index}].penalty",
+        )
+        if penalty < 0.0:
+            raise ValueError(
+                "pibt_regret_prior_records penalties must be non-negative"
+            )
+        normalized_regret_prior_records.append(
+            (
+                strict_integer(
+                    record[0],
+                    f"pibt_regret_prior_records[{record_index}].from_node",
+                ),
+                strict_integer(
+                    record[1],
+                    f"pibt_regret_prior_records[{record_index}].to_node",
+                ),
+                strict_integer(
+                    record[2],
+                    f"pibt_regret_prior_records[{record_index}].goal_node",
+                ),
+                penalty,
+            )
+        )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
             normalized_node_records,
@@ -1118,6 +1194,10 @@ def g4irsf11_event_runtime_from_records(
                 if summary_only or event_trace_limit is None
                 else int(event_trace_limit)
             ),
+            str(priority_mode),
+            str(pibt_preference_mode),
+            normalized_regret_prior_records,
+            int(selective_credit_contention_threshold),
         )
     )
     summary = payload.get("summary")

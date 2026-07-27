@@ -43,6 +43,7 @@ using EdgeRecordTuple = std::tuple<int, int, double, double>;
 using EdgeReservationTuple = std::tuple<int, int, int, double, double>;
 using EventRuntimeBagTuple = std::tuple<std::string, int, double, double, int, int, std::string>;
 using EventRuntimeFaultTuple = std::tuple<int, int, double, double, double>;
+using EventRuntimeRegretPriorTuple = std::tuple<int, int, int, double>;
 using G4IFallbackRuleTuple = std::tuple<int, int, std::vector<int>, int>;
 using G4IHistoricalRiskRuleTuple = std::tuple<int, std::vector<int>, int>;
 using G4IRouteRecordTuple = std::tuple<std::string,
@@ -3064,6 +3065,19 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["framework_mode_echo"] = summary.framework_mode_echo;
   row["pibt_mode"] = summary.pibt_mode;
   row["pibt_mode_echo"] = summary.pibt_mode_echo;
+  row["priority_mode"] = summary.priority_mode;
+  row["priority_mode_echo"] = summary.priority_mode_echo;
+  row["pibt_preference_mode"] =
+      summary.pibt_preference_mode;
+  row["pibt_preference_mode_echo"] =
+      summary.pibt_preference_mode_echo;
+  row["credit_mode"] = summary.credit_mode;
+  row["priority_claim_boundary"] =
+      summary.priority_claim_boundary;
+  row["framework_diagnostic_only"] =
+      summary.framework_diagnostic_only;
+  row["pibt_mode_diagnostic_only"] =
+      summary.pibt_mode_diagnostic_only;
   row["scorer_mode"] = summary.scorer_mode;
   row["scorer_mode_echo"] = summary.scorer_mode_echo;
   row["scorer_id"] = summary.scorer_id;
@@ -3118,6 +3132,10 @@ py::dict g4irsf11_event_runtime_summary_row(
       summary.credit_capacity_per_edge;
   row["credit_lifecycle_limit"] =
       summary.credit_lifecycle_limit;
+  row["selective_credit_contention_threshold"] =
+      summary.selective_credit_contention_threshold;
+  row["pibt_regret_prior_record_count"] =
+      summary.pibt_regret_prior_record_count;
   row["declared_max_events"] = summary.declared_max_events;
   row["max_events"] = summary.declared_max_events;
   row["declared_max_simulation_time"] =
@@ -3201,6 +3219,14 @@ py::dict g4irsf11_event_runtime_summary_row(
       py::int_(summary.first_edge_credit_local_hold_count);
   row["first_edge_credit_reissue_count"] =
       py::int_(summary.first_edge_credit_reissue_count);
+  row["selective_credit_trigger_count"] =
+      py::int_(summary.selective_credit_trigger_count);
+  row["selective_credit_low_load_bypass_count"] =
+      py::int_(summary.selective_credit_low_load_bypass_count);
+  row["selective_credit_merge_trigger_count"] =
+      py::int_(summary.selective_credit_merge_trigger_count);
+  row["selective_credit_contention_trigger_count"] =
+      py::int_(summary.selective_credit_contention_trigger_count);
   row["first_edge_credit_active_count"] =
       summary.first_edge_credit_active_count;
   row["first_edge_credit_peak_active_count"] =
@@ -3351,6 +3377,28 @@ py::dict g4irsf11_event_runtime_summary_row(
       summary.bounded_local_pibt_max_transaction_action_deltas;
   row["bounded_local_pibt_classical_completeness_claimed"] =
       summary.bounded_local_pibt_classical_completeness_claimed;
+  row["pibt_preference_candidate_count"] =
+      py::int_(summary.pibt_preference_candidate_count);
+  row["pibt_preference_unique_exit_penalty_count"] =
+      py::int_(
+          summary.pibt_preference_unique_exit_penalty_count);
+  row["pibt_preference_wait_cycle_penalty_count"] =
+      py::int_(summary.pibt_preference_wait_cycle_penalty_count);
+  row["pibt_preference_backtrack_penalty_count"] =
+      py::int_(summary.pibt_preference_backtrack_penalty_count);
+  row["pibt_preference_regret_prior_hit_count"] =
+      py::int_(summary.pibt_preference_regret_prior_hit_count);
+  row["repaired_task_reentry_count"] =
+      py::int_(summary.repaired_task_reentry_count);
+  row["repaired_task_reentry_boost_cleared_count"] =
+      py::int_(
+          summary.repaired_task_reentry_boost_cleared_count);
+  row["priority_teacher_input_count"] =
+      summary.priority_teacher_input_count;
+  row["priority_future_route_input_count"] =
+      summary.priority_future_route_input_count;
+  row["priority_global_scan_count"] =
+      summary.priority_global_scan_count;
   row["deadlock_count"] = summary.deadlock_count;
   row["resolved_deadlock_count"] = summary.resolved_deadlock_count;
   row["unresolved_deadlock_count"] = summary.unresolved_deadlock_count;
@@ -3590,6 +3638,20 @@ py::list g4irsf11_event_decision_rows(
                 decision.scorer_id.rfind("S2_", 0) == 0
             ? "higher_is_better_frozen_adapter_score"
             : "lower_is_better_cost";
+    metadata["priority_mode"] = decision.priority_mode;
+    metadata["task_class"] = decision.task_class;
+    metadata["priority_slack_seconds"] =
+        decision.priority_slack_seconds;
+    metadata["priority_age_seconds"] =
+        decision.priority_age_seconds;
+    metadata["priority_local_contention"] =
+        decision.priority_local_contention;
+    metadata["priority_fault_generation"] =
+        py::int_(decision.priority_fault_generation);
+    metadata["priority_enqueue_sequence"] =
+        py::int_(decision.priority_enqueue_sequence);
+    metadata["pibt_preference_mode"] =
+        decision.pibt_preference_mode;
 
     py::dict row;
     row["schema_id"] = "czr005.g4irsf11.decision_trace.v1";
@@ -3829,7 +3891,14 @@ py::dict g4irsf11_event_runtime_from_records(
     double scorer_risk_bottleneck_threshold,
     const std::string& scorer_model_sha256,
     const std::string& framework_mode,
-    const std::optional<int>& event_trace_limit) {
+    const std::optional<int>& event_trace_limit,
+    const std::string& priority_mode,
+    const std::string& pibt_preference_mode,
+    const std::vector<EventRuntimeRegretPriorTuple>&
+        pibt_regret_prior_records,
+    int selective_credit_contention_threshold) {
+  // Keep G4IRSF13 controls append-only so existing positional callers retain
+  // the exact F2/Q0/P0 behavior.
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   std::vector<czr005::ics::EventRuntimeBagRequest> requests;
   requests.reserve(bag_records.size());
@@ -3910,6 +3979,20 @@ py::dict g4irsf11_event_runtime_from_records(
       scorer_risk_bottleneck_threshold;
   config.scorer_model_sha256 = scorer_model_sha256;
   config.framework_mode = framework_mode;
+  config.priority_mode = priority_mode;
+  config.pibt_preference_mode = pibt_preference_mode;
+  config.selective_credit_contention_threshold =
+      selective_credit_contention_threshold;
+  config.pibt_regret_prior_records.reserve(
+      pibt_regret_prior_records.size());
+  for (const auto& record : pibt_regret_prior_records) {
+    config.pibt_regret_prior_records.push_back(
+        czr005::ics::EventRuntimeRegretPriorRecord{
+            std::get<0>(record),
+            std::get<1>(record),
+            std::get<2>(record),
+            std::get<3>(record)});
+  }
 
   czr005::ics::EventDrivenJunctionRuntime runtime(graph, config);
   const auto result = runtime.run(requests, faults);
@@ -3956,7 +4039,7 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["admission_mode_echo"] =
       result.summary.admission_mode_echo;
   trace_context["source_admission_snapshot_scope"] =
-      "outgoing_neighbour_beacon_plus_local_physical_edge";
+      "bounded_one_hop_target_state_or_beacon_plus_local_physical_edge";
   trace_context["first_edge_credit_claim_boundary"] =
       result.summary.first_edge_credit_claim_boundary;
   trace_context["first_edge_credit_fields"] =
@@ -3990,6 +4073,28 @@ py::dict g4irsf11_event_runtime_from_records(
       result.summary.scorer_mode_echo;
   trace_context["framework_mode_echo"] =
       result.summary.framework_mode_echo;
+  trace_context["framework_mode"] =
+      result.summary.framework_mode;
+  trace_context["framework_diagnostic_only"] =
+      result.summary.framework_diagnostic_only;
+  trace_context["priority_mode"] =
+      result.summary.priority_mode;
+  trace_context["priority_mode_echo"] =
+      result.summary.priority_mode_echo;
+  trace_context["priority_claim_boundary"] =
+      result.summary.priority_claim_boundary;
+  trace_context["credit_mode"] =
+      result.summary.credit_mode;
+  trace_context["selective_credit_contention_threshold"] =
+      result.summary.selective_credit_contention_threshold;
+  trace_context["pibt_preference_mode"] =
+      result.summary.pibt_preference_mode;
+  trace_context["pibt_preference_mode_echo"] =
+      result.summary.pibt_preference_mode_echo;
+  trace_context["pibt_regret_prior_record_count"] =
+      result.summary.pibt_regret_prior_record_count;
+  trace_context["pibt_mode_diagnostic_only"] =
+      result.summary.pibt_mode_diagnostic_only;
   trace_context["pibt_max_depth"] =
       result.summary.pibt_max_depth;
   trace_context["declared_max_events"] =
@@ -4277,7 +4382,14 @@ PYBIND11_MODULE(czr005_cpp, module) {
                  std::string(),
              py::arg("framework_mode") =
                  std::string("event_loop_one_step"),
-             py::arg("event_trace_limit") = py::none());
+             py::arg("event_trace_limit") = py::none(),
+             py::arg("priority_mode") = std::string("Q0"),
+             py::arg("pibt_preference_mode") =
+                 std::string("current"),
+             py::arg("pibt_regret_prior_records") =
+                 std::vector<EventRuntimeRegretPriorTuple>{},
+             py::arg("selective_credit_contention_threshold") =
+                 1);
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,

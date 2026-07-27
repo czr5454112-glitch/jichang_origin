@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cctype>
 #include <cstring>
 #include <deque>
 #include <limits>
@@ -91,6 +92,13 @@ struct EventRuntimeFaultWindow {
   bool drop_notification = false;
 };
 
+struct EventRuntimeRegretPriorRecord {
+  int from_node = -1;
+  int to_node = -1;
+  int goal_node = -1;  // -1 is a goal-agnostic local edge prior
+  double penalty = 0.0;
+};
+
 struct EventDrivenJunctionConfig {
   std::string queue_discipline = "aging";  // fifo, deadline, aging
   // R0 preserves the frozen G4IRSF11 negative control.  R1-R4 isolate one
@@ -137,6 +145,7 @@ struct EventDrivenJunctionConfig {
   double credit_snapshot_max_age_seconds = 1.0;
   int credit_capacity_per_edge = 1;
   int credit_lifecycle_limit = 512;
+  int selective_credit_contention_threshold = 1;
   bool enable_source_admission = true;
   bool enable_backpressure = true;
   // P0 preserves the frozen event-runtime dispatch path exactly. P1-P4 opt
@@ -147,6 +156,14 @@ struct EventDrivenJunctionConfig {
   int pibt_max_ready_bags = 8;
   int pibt_max_local_resources = 32;
   int pibt_max_candidates_per_bag = 8;
+  // Q0/current are exact compatibility defaults.  Q1-Q3 translate the
+  // thesis task ordering into unique local queue/PIBT keys without reading a
+  // future route or a global task list.
+  std::string priority_mode = "Q0";
+  // Preference variants are used only by bounded-local PIBT when two
+  // candidates have the same static potential.
+  std::string pibt_preference_mode = "current";
+  std::vector<EventRuntimeRegretPriorRecord> pibt_regret_prior_records;
   // S0 is the exact historical handwritten score. S1/S2 use the immutable
   // G4E diagnostic MLP supplied by the verified Python artifact loader. S3
   // and S4 are deterministic no-model ablations.
@@ -228,6 +245,14 @@ struct EventDecisionTraceRow {
   double max_fault_message_age_seconds = 0.0;
   std::vector<int> short_history;
   bool full_astar_used = false;
+  std::string priority_mode;
+  std::string task_class;
+  double priority_slack_seconds = 0.0;
+  double priority_age_seconds = 0.0;
+  int priority_local_contention = 0;
+  std::uint64_t priority_fault_generation = 0;
+  std::uint64_t priority_enqueue_sequence = 0;
+  std::string pibt_preference_mode;
 };
 
 struct EventRuntimeTraceRow {
@@ -288,6 +313,12 @@ struct EventRuntimeSummary {
   std::string framework_mode_echo;
   std::string pibt_mode;
   std::string pibt_mode_echo;
+  std::string priority_mode;
+  std::string priority_mode_echo;
+  std::string pibt_preference_mode;
+  std::string pibt_preference_mode_echo;
+  std::string credit_mode;
+  std::string priority_claim_boundary;
   std::string scorer_mode;
   std::string scorer_mode_echo;
   std::string scorer_id;
@@ -309,6 +340,8 @@ struct EventRuntimeSummary {
   int scorer_posthoc_input_count = 0;
   int scorer_runtime_global_scan_count = 0;
   int pibt_max_depth = 0;
+  bool pibt_mode_diagnostic_only = false;
+  bool framework_diagnostic_only = false;
   std::string bounded_local_pibt_claim_boundary;
   std::string first_edge_credit_claim_boundary;
   double entry_headway_seconds = 0.0;
@@ -319,6 +352,8 @@ struct EventRuntimeSummary {
   double credit_snapshot_max_age_seconds = 0.0;
   int credit_capacity_per_edge = 0;
   int credit_lifecycle_limit = 0;
+  int selective_credit_contention_threshold = 0;
+  int pibt_regret_prior_record_count = 0;
   int declared_max_events = 0;
   double declared_max_simulation_time = 0.0;
   int local_queue_capacity = 0;
@@ -369,6 +404,10 @@ struct EventRuntimeSummary {
   std::uint64_t first_edge_credit_lifecycle_dropped_count = 0;
   std::uint64_t first_edge_credit_local_hold_count = 0;
   std::uint64_t first_edge_credit_reissue_count = 0;
+  std::uint64_t selective_credit_trigger_count = 0;
+  std::uint64_t selective_credit_low_load_bypass_count = 0;
+  std::uint64_t selective_credit_merge_trigger_count = 0;
+  std::uint64_t selective_credit_contention_trigger_count = 0;
   int first_edge_credit_active_count = 0;
   int first_edge_credit_peak_active_count = 0;
   int first_edge_credit_stored_active_count = 0;
@@ -486,6 +525,16 @@ struct EventRuntimeSummary {
   bool legacy_pibt_lite_enabled = true;
   bool decision_trace_truncated = false;
   bool event_trace_truncated = false;
+  std::uint64_t repaired_task_reentry_count = 0;
+  std::uint64_t repaired_task_reentry_boost_cleared_count = 0;
+  int priority_teacher_input_count = 0;
+  int priority_future_route_input_count = 0;
+  int priority_global_scan_count = 0;
+  std::uint64_t pibt_preference_candidate_count = 0;
+  std::uint64_t pibt_preference_unique_exit_penalty_count = 0;
+  std::uint64_t pibt_preference_wait_cycle_penalty_count = 0;
+  std::uint64_t pibt_preference_backtrack_penalty_count = 0;
+  std::uint64_t pibt_preference_regret_prior_hit_count = 0;
 };
 
 struct EventRuntimeJunctionResult {
@@ -730,6 +779,9 @@ struct BagState {
   double deadlock_started_at = -1.0;
   std::string failure_reason;
   std::deque<int> history;
+  std::uint64_t local_enqueue_sequence = 0;
+  std::uint64_t fault_priority_generation = 0;
+  bool repaired_task_reentry = false;
 };
 
 struct JunctionState {
@@ -893,6 +945,7 @@ class EventDrivenJunctionRuntime {
   explicit EventDrivenJunctionRuntime(const Graph& graph, EventDrivenJunctionConfig config = {})
       : graph_(graph), config_(std::move(config)) {
     validate_config();
+    initialize_regret_prior();
     initialize_scorer();
   }
 
@@ -914,10 +967,27 @@ class EventDrivenJunctionRuntime {
         result_.summary.admission_mode != "off";
     result_.summary.pibt_mode = canonical_pibt_mode_name();
     result_.summary.pibt_mode_echo = config_.pibt_mode;
+    result_.summary.priority_mode = canonical_priority_mode_name();
+    result_.summary.priority_mode_echo = config_.priority_mode;
+    result_.summary.pibt_preference_mode =
+        config_.pibt_preference_mode;
+    result_.summary.pibt_preference_mode_echo =
+        config_.pibt_preference_mode;
+    result_.summary.credit_mode = canonical_credit_mode();
     result_.summary.scorer_mode = config_.scorer_mode;
     result_.summary.scorer_mode_echo = config_.scorer_mode;
-    result_.summary.framework_mode = config_.framework_mode;
+    result_.summary.framework_mode = canonical_framework_mode();
     result_.summary.framework_mode_echo = config_.framework_mode;
+    result_.summary.framework_diagnostic_only =
+        canonical_framework_mode() ==
+        "legacy_order_one_step_diagnostic";
+    result_.summary.pibt_mode_diagnostic_only =
+        canonical_pibt_mode() == BoundedLocalPIBTMode::kP4;
+    result_.summary.priority_claim_boundary =
+        "current_local_queue_and_simultaneously_ready_pibt_slice_only;"
+        "fault_class_current_slack_age_enqueue_sequence_stable_id;"
+        "no_teacher_input;no_future_route_or_schedule;no_global_task_scan;"
+        "Q1_is_ordinal_local_projection_not_invented_numeric_thesis_weights";
     result_.summary.scorer_id = canonical_scorer_id();
     result_.summary.scorer_model_sha256 =
         config_.scorer_model_sha256;
@@ -966,7 +1036,8 @@ class EventDrivenJunctionRuntime {
         "no_astar;no_global_reservation_scan;no_future_route;"
         "pibt_inspired_no_classical_completeness_claim";
     result_.summary.first_edge_credit_claim_boundary =
-        "source_local_state_plus_one_hop_beacon;one_adjacent_selected_edge;"
+        "source_local_state_plus_bounded_one_hop_target_state_or_beacon;"
+        "one_adjacent_selected_edge;"
         "active_only_ledger;bounded_recent_lifecycle;no_future_route;"
         "no_global_scan;physical_interlock_not_bypassable";
     result_.summary.fault_policy_enabled = config_.enable_fault_policy;
@@ -991,6 +1062,10 @@ class EventDrivenJunctionRuntime {
         config_.credit_capacity_per_edge;
     result_.summary.credit_lifecycle_limit =
         config_.credit_lifecycle_limit;
+    result_.summary.selective_credit_contention_threshold =
+        config_.selective_credit_contention_threshold;
+    result_.summary.pibt_regret_prior_record_count =
+        static_cast<int>(pibt_regret_prior_.size());
     result_.summary.declared_max_events = config_.max_events;
     result_.summary.declared_max_simulation_time =
         config_.max_simulation_time;
@@ -1173,8 +1248,11 @@ class EventDrivenJunctionRuntime {
   std::string canonical_admission_mode() const {
     if (config_.admission_mode != "off" &&
         config_.admission_mode != "legacy_unbound" &&
-        config_.admission_mode != "expiring_first_edge_credit") {
-      throw std::invalid_argument("unknown G4IRSF12 admission_mode");
+        config_.admission_mode != "expiring_first_edge_credit" &&
+        config_.admission_mode != "merge_only_first_edge_credit" &&
+        config_.admission_mode !=
+            "contention_triggered_first_edge_credit") {
+      throw std::invalid_argument("unknown event-runtime admission_mode");
     }
     // Preserve the historical boolean API: false always means the original
     // admission-off ablation, regardless of the otherwise valid mode string.
@@ -1182,6 +1260,95 @@ class EventDrivenJunctionRuntime {
       return "off";
     }
     return config_.admission_mode;
+  }
+
+  bool uses_first_edge_credit() const {
+    const auto mode = canonical_admission_mode();
+    return mode == "expiring_first_edge_credit" ||
+           mode == "merge_only_first_edge_credit" ||
+           mode == "contention_triggered_first_edge_credit";
+  }
+
+  std::string canonical_credit_mode() const {
+    const auto mode = canonical_admission_mode();
+    if (mode == "merge_only_first_edge_credit") {
+      return "C7";
+    }
+    if (mode == "contention_triggered_first_edge_credit") {
+      return "C8";
+    }
+    if (mode == "expiring_first_edge_credit") {
+      return "C4_C5_C6";
+    }
+    return "C0";
+  }
+
+  BoundedLocalPIBTPriorityMode canonical_priority_mode() const {
+    if (config_.priority_mode == "Q0" ||
+        config_.priority_mode == "current_f2") {
+      return BoundedLocalPIBTPriorityMode::kQ0Current;
+    }
+    if (config_.priority_mode == "Q1" ||
+        config_.priority_mode == "thesis_exact_local_projection") {
+      return BoundedLocalPIBTPriorityMode::kQ1ThesisLocalProjection;
+    }
+    if (config_.priority_mode == "Q2" ||
+        config_.priority_mode == "thesis_type_slack_aging") {
+      return BoundedLocalPIBTPriorityMode::kQ2TypeSlackAging;
+    }
+    if (config_.priority_mode == "Q3" ||
+        config_.priority_mode == "fault_slack_age_stable_id") {
+      return BoundedLocalPIBTPriorityMode::kQ3FaultSlackAgeStableId;
+    }
+    throw std::invalid_argument(
+        "priority_mode must be one of Q0, Q1, Q2, Q3");
+  }
+
+  std::string canonical_priority_mode_name() const {
+    switch (canonical_priority_mode()) {
+      case BoundedLocalPIBTPriorityMode::kQ0Current:
+        return "Q0";
+      case BoundedLocalPIBTPriorityMode::kQ1ThesisLocalProjection:
+        return "Q1";
+      case BoundedLocalPIBTPriorityMode::kQ2TypeSlackAging:
+        return "Q2";
+      case BoundedLocalPIBTPriorityMode::kQ3FaultSlackAgeStableId:
+        return "Q3";
+    }
+    throw std::invalid_argument("priority_mode must be Q0..Q3");
+  }
+
+  BoundedLocalPIBTPreferenceMode canonical_pibt_preference_mode() const {
+    if (config_.pibt_preference_mode == "current") {
+      return BoundedLocalPIBTPreferenceMode::kCurrent;
+    }
+    if (config_.pibt_preference_mode == "dodge") {
+      return BoundedLocalPIBTPreferenceMode::kDodge;
+    }
+    if (config_.pibt_preference_mode == "local_regret") {
+      return BoundedLocalPIBTPreferenceMode::kLocalRegret;
+    }
+    if (config_.pibt_preference_mode == "dodge_regret") {
+      return BoundedLocalPIBTPreferenceMode::kDodgeRegret;
+    }
+    throw std::invalid_argument(
+        "pibt_preference_mode must be current, dodge, local_regret, or "
+        "dodge_regret");
+  }
+
+  std::string canonical_framework_mode() const {
+    if (config_.framework_mode == "event_loop_one_step") {
+      return "event_loop_one_step";
+    }
+    if (config_.framework_mode ==
+            "legacy_order_one_step_diagnostic" ||
+        config_.framework_mode ==
+            "old_scheduling_order_reservation_horizon_one") {
+      return "legacy_order_one_step_diagnostic";
+    }
+    throw std::invalid_argument(
+        "framework_mode must be event_loop_one_step or "
+        "legacy_order_one_step_diagnostic");
   }
 
   BoundedLocalPIBTMode canonical_pibt_mode() const {
@@ -1329,6 +1496,19 @@ class EventDrivenJunctionRuntime {
     return canonical_map2_detail::sha256_hex(payload);
   }
 
+  void initialize_regret_prior() {
+    for (const auto& record : config_.pibt_regret_prior_records) {
+      const auto key =
+          std::make_tuple(record.from_node,
+                          record.to_node,
+                          record.goal_node);
+      if (!pibt_regret_prior_.emplace(key, record.penalty).second) {
+        throw std::invalid_argument(
+            "pibt_regret_prior_records must have unique from/to/goal keys");
+      }
+    }
+  }
+
   void initialize_scorer() {
     const auto mode = canonical_scorer_mode();
     if (mode != "S1" && mode != "S2") {
@@ -1437,11 +1617,10 @@ class EventDrivenJunctionRuntime {
     (void)canonical_pressure_mode();
     (void)canonical_admission_mode();
     (void)canonical_pibt_mode();
+    (void)canonical_priority_mode();
+    (void)canonical_pibt_preference_mode();
+    (void)canonical_framework_mode();
     const auto scorer_mode = canonical_scorer_mode();
-    if (config_.framework_mode != "event_loop_one_step") {
-      throw std::invalid_argument(
-          "unsupported framework_mode: this runtime implements only event_loop_one_step");
-    }
     if (!std::isfinite(config_.retry_interval) ||
         !std::isfinite(config_.minimum_service_seconds) ||
         !std::isfinite(config_.dispatch_headway_seconds) ||
@@ -1464,9 +1643,29 @@ class EventDrivenJunctionRuntime {
         config_.credit_validity_seconds <= 0.0 ||
         config_.credit_snapshot_max_age_seconds < 0.0 ||
         config_.credit_capacity_per_edge <= 0 ||
-        config_.credit_lifecycle_limit < 0) {
+        config_.credit_lifecycle_limit < 0 ||
+        config_.selective_credit_contention_threshold <= 0) {
       throw std::invalid_argument(
-          "credit validity/capacity must be positive and snapshot age/lifecycle limit non-negative");
+          "credit validity/capacity/contention threshold must be positive "
+          "and snapshot age/lifecycle limit non-negative");
+    }
+    std::set<std::tuple<int, int, int>> regret_keys;
+    const auto graph_nodes = graph_.node_locations();
+    for (const auto& record : config_.pibt_regret_prior_records) {
+      if (!graph_.has_edge(record.from_node, record.to_node) ||
+          (record.goal_node >= 0 &&
+           std::find(graph_nodes.begin(),
+                     graph_nodes.end(),
+                     record.goal_node) == graph_nodes.end()) ||
+          !std::isfinite(record.penalty) || record.penalty < 0.0 ||
+          !regret_keys.insert(std::make_tuple(record.from_node,
+                                              record.to_node,
+                                              record.goal_node))
+               .second) {
+        throw std::invalid_argument(
+            "pibt_regret_prior_records require unique real edges, a real or "
+            "-1 goal, and finite non-negative penalties");
+      }
     }
     if (config_.history_limit <= 0 || config_.history_limit > 8 ||
         config_.max_decisions_per_bag <= 0 ||
@@ -1597,6 +1796,7 @@ class EventDrivenJunctionRuntime {
         static_cast<std::size_t>(config_.credit_lifecycle_limit));
     directed_inflight_counts_.clear();
     fault_affected_bags_.clear();
+    fault_affected_bags_by_edge_.clear();
     fault_instances_by_bag_.clear();
     active_fault_instance_by_edge_.clear();
     repair_time_by_fault_instance_.clear();
@@ -1604,6 +1804,7 @@ class EventDrivenJunctionRuntime {
     next_event_seq_ = 1;
     next_decision_id_ = 1;
     next_pibt_activation_id_ = 1;
+    next_local_enqueue_sequence_ = 1;
     staged_event_sink_ = nullptr;
     now_ = 0.0;
     active_bag_count_ = 0;
@@ -1710,6 +1911,7 @@ class EventDrivenJunctionRuntime {
       result_.summary.peak_active_bag_count =
           std::max(result_.summary.peak_active_bag_count, active_bag_count_);
       bag.source_enqueued_at = event.time;
+      bag.local_enqueue_sequence = next_local_enqueue_sequence_++;
       controller.source_queue.push_back(event.task_id);
       update_queue_maxima(controller);
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
@@ -1761,8 +1963,10 @@ class EventDrivenJunctionRuntime {
       ++result_.summary.source_admission_downstream_pressure_hold_count;
       return -1;
     }
-    if (admission_mode == "expiring_first_edge_credit" &&
-        node != bag.request.goal &&
+    const bool first_edge_credit_required =
+        uses_first_edge_credit() &&
+        observe_first_edge_credit_requirement(bag, node);
+    if (first_edge_credit_required &&
         !ensure_first_edge_credit(bag,
                                   node,
                                   time,
@@ -1878,6 +2082,128 @@ class EventDrivenJunctionRuntime {
     return ready;
   }
 
+  bool merge_credit_triggered(int node) const {
+    for (const int target : graph_.outgoing(node)) {
+      if (graph_.incoming_degree(target) <= 1) {
+        continue;
+      }
+      const auto beacon = congestion_beacons_.find(target);
+      int pressure =
+          beacon == congestion_beacons_.end()
+              ? 0
+              : beacon->second.queue_length +
+                    beacon->second.scheduled_incoming;
+      const auto target_state = junctions_.find(target);
+      if (target_state != junctions_.end()) {
+        pressure = std::max(
+            pressure,
+            static_cast<int>(target_state->second.queue.size()) +
+                target_state->second.scheduled_incoming);
+      }
+      if (pressure >=
+          config_.selective_credit_contention_threshold) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool contention_credit_triggered(int node) const {
+    const auto local = junctions_.find(node);
+    if (local != junctions_.end() &&
+        static_cast<int>(local->second.queue.size()) >
+            config_.selective_credit_contention_threshold) {
+      return true;
+    }
+    for (const int target : graph_.outgoing(node)) {
+      const auto beacon = congestion_beacons_.find(target);
+      const int queue_length =
+          beacon == congestion_beacons_.end()
+              ? 0
+              : beacon->second.queue_length;
+      const int scheduled =
+          beacon == congestion_beacons_.end()
+              ? 0
+              : beacon->second.scheduled_incoming;
+      const auto target_state = junctions_.find(target);
+      const int current_queue =
+          target_state == junctions_.end()
+              ? queue_length
+              : std::max(
+                    queue_length,
+                    static_cast<int>(
+                        target_state->second.queue.size()));
+      const int current_scheduled =
+          target_state == junctions_.end()
+              ? scheduled
+              : std::max(
+                    scheduled,
+                    target_state->second.scheduled_incoming);
+      if (current_scheduled >=
+              config_.selective_credit_contention_threshold ||
+          (graph_.incoming_degree(target) > 1 &&
+           current_queue >=
+               config_.selective_credit_contention_threshold) ||
+          (config_.local_queue_capacity > 0 &&
+           current_queue + current_scheduled >=
+               config_.local_queue_capacity)) {
+        return true;
+      }
+      const auto physical = physical_faults_.find(
+          event_runtime_detail::directed_key(node, target));
+      if (physical != physical_faults_.end() &&
+          physical->second.physical_generation > 0) {
+        // A non-zero generation is a bounded local fault/recovery trigger.
+        // The ledger still validates the exact current generation at bind.
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool first_edge_credit_required_for_bag(const BagState& bag,
+                                          int node) const {
+    if (bag.first_edge_credit_consumed ||
+        node == bag.request.goal) {
+      return false;
+    }
+    const auto mode = canonical_admission_mode();
+    if (mode == "expiring_first_edge_credit") {
+      return true;
+    }
+    if (mode == "merge_only_first_edge_credit") {
+      return merge_credit_triggered(node);
+    }
+    if (mode ==
+        "contention_triggered_first_edge_credit") {
+      return contention_credit_triggered(node);
+    }
+    return false;
+  }
+
+  bool observe_first_edge_credit_requirement(const BagState& bag,
+                                             int node) {
+    const bool required =
+        first_edge_credit_required_for_bag(bag, node);
+    const auto mode = canonical_admission_mode();
+    if (mode == "merge_only_first_edge_credit" ||
+        mode == "contention_triggered_first_edge_credit") {
+      if (required) {
+        ++result_.summary.selective_credit_trigger_count;
+        if (mode == "merge_only_first_edge_credit") {
+          ++result_.summary.selective_credit_merge_trigger_count;
+        } else {
+          ++result_.summary
+                .selective_credit_contention_trigger_count;
+        }
+      } else {
+        ++result_.summary
+              .selective_credit_low_load_bypass_count;
+      }
+    }
+    return required;
+  }
+
   FirstEdgeCreditUseContext credit_use_context(const BagState& bag,
                                                int from_node,
                                                int to_node,
@@ -1979,9 +2305,31 @@ class EventDrivenJunctionRuntime {
             config_.local_queue_capacity <= 0 ||
             pressure < config_.local_queue_capacity;
       }
+      if (canonical_admission_mode() ==
+              "merge_only_first_edge_credit" ||
+          canonical_admission_mode() ==
+              "contention_triggered_first_edge_credit") {
+        const auto target_state = junctions_.find(downstream);
+        if (target_state != junctions_.end()) {
+          pressure = std::max(
+              pressure,
+              static_cast<int>(target_state->second.queue.size()) +
+                  target_state->second.scheduled_incoming);
+          downstream_queue_ready =
+              config_.local_queue_capacity <= 0 ||
+              pressure < config_.local_queue_capacity;
+        }
+      }
       result_.summary.source_admission_max_observed_downstream_pressure =
           std::max(result_.summary.source_admission_max_observed_downstream_pressure,
                    pressure);
+      if (canonical_admission_mode() ==
+              "merge_only_first_edge_credit" &&
+          (graph_.incoming_degree(downstream) <= 1 ||
+           pressure <
+               config_.selective_credit_contention_threshold)) {
+        continue;
+      }
 
       bool local_corridor_ready = true;
       if (uses_corridor_calendar()) {
@@ -2184,6 +2532,7 @@ class EventDrivenJunctionRuntime {
       }
       bag.status = BagStatus::kJunctionQueue;
       bag.junction_enqueued_at = event.time;
+      bag.local_enqueue_sequence = next_local_enqueue_sequence_++;
       controller.queue.push_back(event.task_id);
       update_queue_maxima(controller);
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
@@ -2346,8 +2695,7 @@ class EventDrivenJunctionRuntime {
                                   double time) const {
     PIBTCreditView view;
     view.required =
-        canonical_admission_mode() == "expiring_first_edge_credit" &&
-        !bag.first_edge_credit_consumed;
+        first_edge_credit_required_for_bag(bag, node);
     if (!view.required) {
       return view;
     }
@@ -2677,6 +3025,7 @@ class EventDrivenJunctionRuntime {
     trace.junction_next_dispatch_time = controller.next_dispatch_time;
     trace.short_history.assign(bag.history.begin(), bag.history.end());
     trace.full_astar_used = false;
+    populate_priority_trace(trace, bag, time);
     const bool escape_active =
         config_.enable_deadlock_escape &&
         controller.escape_token_task == bag.request.runtime_bag_id;
@@ -2740,9 +3089,44 @@ class EventDrivenJunctionRuntime {
     return trace;
   }
 
+  void mark_fault_exposure(BagState& bag,
+                           long long physical_key,
+                           int physical_generation) {
+    bag.fault_priority_generation =
+        std::max(
+            bag.fault_priority_generation,
+            static_cast<std::uint64_t>(
+                std::max(0, physical_generation)));
+    bag.repaired_task_reentry = false;
+    fault_affected_bags_.insert(bag.request.runtime_bag_id);
+    fault_affected_bags_by_edge_[physical_key].insert(
+        bag.request.runtime_bag_id);
+    const auto active_instance =
+        active_fault_instance_by_edge_.find(physical_key);
+    if (active_instance != active_fault_instance_by_edge_.end()) {
+      fault_instances_by_bag_[bag.request.runtime_bag_id].insert(
+          {physical_key, active_instance->second});
+    }
+    result_.summary.fault_affected_bag_count =
+        static_cast<int>(fault_affected_bags_.size());
+  }
+
+  void clear_consumed_repair_reentry_boost(BagState& bag) {
+    if (!bag.repaired_task_reentry) {
+      return;
+    }
+    // The repair boost is deliberately a one-successful-re-entry token.
+    // Keep it through holds so the recovered bag receives the intended
+    // local priority once, then revoke both the marker and generation after
+    // its next committed one-edge action.
+    bag.repaired_task_reentry = false;
+    bag.fault_priority_generation = 0;
+    ++result_.summary.repaired_task_reentry_boost_cleared_count;
+  }
+
   void record_committed_pibt_fault_accounting(
       EventDecisionTraceRow& trace,
-      const BagState& bag,
+      BagState& bag,
       int selected_next) {
     for (const auto& record : trace.candidates) {
       const long long physical_key =
@@ -2754,15 +3138,10 @@ class EventDrivenJunctionRuntime {
         continue;
       }
       ++result_.summary.fault_target_edge_candidate_exposure_count;
-      fault_affected_bags_.insert(bag.request.runtime_bag_id);
-      const auto active_instance =
-          active_fault_instance_by_edge_.find(physical_key);
-      if (active_instance != active_fault_instance_by_edge_.end()) {
-        fault_instances_by_bag_[bag.request.runtime_bag_id].insert(
-            {physical_key, active_instance->second});
-      }
-      result_.summary.fault_affected_bag_count =
-          static_cast<int>(fault_affected_bags_.size());
+      mark_fault_exposure(
+          bag,
+          physical_key,
+          physical->second.physical_generation);
       append_fault_decision_audit(
           trace.arrive_event_seq,
           "target_edge_candidate_exposure",
@@ -3034,7 +3413,10 @@ class EventDrivenJunctionRuntime {
       ready.bag_id = runtime_bag_id;
       ready.current_node = node;
       ready.goal_node = bag.request.goal;
-      ready.physical_fault_emergency = false;
+      ready.physical_fault_emergency =
+          canonical_priority_mode() !=
+                  BoundedLocalPIBTPriorityMode::kQ0Current &&
+              bag.fault_priority_generation > 0;
       ready.deadline = bag.request.deadline;
       ready.ready_time = bag.junction_enqueued_at;
       ready.accumulated_wait =
@@ -3045,6 +3427,14 @@ class EventDrivenJunctionRuntime {
           std::max(0.0, time - bag.request.release_time);
       ready.movable = true;
       ready.in_transit = false;
+      ready.task_class_rank =
+          local_task_class_rank(bag);
+      ready.fault_priority_generation =
+          bag.fault_priority_generation;
+      ready.local_contention =
+          local_priority_contention(bag);
+      ready.enqueue_sequence =
+          bag.local_enqueue_sequence;
 
       for (const auto& record : trace.candidates) {
         if (credit.required &&
@@ -3108,6 +3498,12 @@ class EventDrivenJunctionRuntime {
                         candidate.required_resources.end()),
             candidate.required_resources.end());
         candidate.local_score = record.model_score;
+        candidate.static_potential =
+            record.static_potential;
+        candidate.is_local_backtrack =
+            record.recent_visit_count > 0;
+        candidate.local_regret_prior =
+            local_regret_prior(node, target, bag.request.goal);
         const long long edge_key =
             event_runtime_detail::directed_key(node, target);
         const auto fault = physical_faults_.find(edge_key);
@@ -3160,6 +3556,59 @@ class EventDrivenJunctionRuntime {
                       ready.held_resources.end()),
           ready.held_resources.end());
     }
+    if (canonical_pibt_preference_mode() !=
+        BoundedLocalPIBTPreferenceMode::kCurrent) {
+      std::map<int, BoundedLocalPIBTReadyBag*> ready_by_node;
+      for (auto& ready : slice.ready_bags) {
+        ready_by_node.emplace(ready.current_node, &ready);
+      }
+      for (auto& ready : slice.ready_bags) {
+        const auto current_bag = bags_.find(ready.bag_id);
+        for (auto& candidate : ready.candidates) {
+          ++result_.summary.pibt_preference_candidate_count;
+          if (candidate.is_local_backtrack) {
+            ++result_.summary
+                  .pibt_preference_backtrack_penalty_count;
+          }
+          if (candidate.local_regret_prior > 0.0) {
+            ++result_.summary
+                  .pibt_preference_regret_prior_hit_count;
+          }
+          const auto owner =
+              ready_by_node.find(candidate.next_node);
+          if (owner == ready_by_node.end() ||
+              owner->second->bag_id == ready.bag_id) {
+            continue;
+          }
+          candidate.occupies_unique_exit =
+              owner->second->candidates.size() == 1;
+          if (candidate.occupies_unique_exit) {
+            ++result_.summary
+                  .pibt_preference_unique_exit_penalty_count;
+          }
+          const auto owner_bag =
+              bags_.find(owner->second->bag_id);
+          candidate.blocks_higher_priority_exit =
+              current_bag != bags_.end() &&
+              owner_bag != bags_.end() &&
+              local_priority_less(owner_bag->second,
+                                  current_bag->second,
+                                  time);
+          candidate.enters_wait_for_cycle =
+              std::any_of(
+                  owner->second->candidates.begin(),
+                  owner->second->candidates.end(),
+                  [&](const BoundedLocalPIBTCandidate& owner_candidate) {
+                    return owner_candidate.next_node ==
+                           ready.current_node;
+                  });
+          if (candidate.enters_wait_for_cycle) {
+            ++result_.summary
+                  .pibt_preference_wait_cycle_penalty_count;
+          }
+        }
+      }
+    }
     slice.resource_count = static_cast<int>(touched_resources.size());
     if (slice.resource_count > config_.pibt_max_local_resources) {
       slice.applicable = false;
@@ -3177,8 +3626,8 @@ class EventDrivenJunctionRuntime {
                                    int from_node,
                                    int to_node,
                                    double time) const {
-    if (canonical_admission_mode() != "expiring_first_edge_credit" ||
-        bag.first_edge_credit_consumed) {
+    if (!uses_first_edge_credit() ||
+        !first_edge_credit_required_for_bag(bag, from_node)) {
       return true;
     }
     if (bag.first_edge_credit_id == 0) {
@@ -3373,9 +3822,9 @@ class EventDrivenJunctionRuntime {
         return false;
       }
       const auto& bag = bag_found->second;
-      if (canonical_admission_mode() !=
-              "expiring_first_edge_credit" ||
-          bag.first_edge_credit_consumed) {
+      if (!uses_first_edge_credit() ||
+          !first_edge_credit_required_for_bag(
+              bag, action.from_node)) {
         continue;
       }
       if (!pibt_credit_is_commit_ready(
@@ -3740,6 +4189,15 @@ class EventDrivenJunctionRuntime {
           }
         }
       }
+      if (uses_first_edge_credit()) {
+        for (const auto& action : actions) {
+          auto& bag = bags_.at(action.bag_id);
+          if (!bag.first_edge_credit_consumed) {
+            bag.first_edge_credit_id = 0;
+            bag.first_edge_credit_consumed = true;
+          }
+        }
+      }
     } catch (const PIBTLogicalCommitFailure&) {
       staged_event_sink_ = nullptr;
       restore_pibt_transaction(snapshot);
@@ -3759,6 +4217,10 @@ class EventDrivenJunctionRuntime {
     snapshot.staged_events.clear();
     snapshot.applied_action_count = 0;
     snapshot.mutated = false;
+    for (const auto& action : actions) {
+      clear_consumed_repair_reentry_boost(
+          bags_.at(action.bag_id));
+    }
     return true;
   }
 
@@ -3901,6 +4363,10 @@ class EventDrivenJunctionRuntime {
         config_.pibt_max_local_resources;
     resolver_config.max_candidates_per_bag =
         config_.pibt_max_candidates_per_bag;
+    resolver_config.priority_mode =
+        canonical_priority_mode();
+    resolver_config.preference_mode =
+        canonical_pibt_preference_mode();
     BoundedLocalPIBTResult resolved;
     try {
       resolved = BoundedLocalPIBTResolver().resolve(
@@ -4116,8 +4582,8 @@ class EventDrivenJunctionRuntime {
         std::max(result_.summary.max_candidate_count, static_cast<int>(outgoing.size()));
 
     const bool first_edge_credit_required =
-        canonical_admission_mode() == "expiring_first_edge_credit" &&
-        !bag.first_edge_credit_consumed;
+        uses_first_edge_credit() &&
+        observe_first_edge_credit_requirement(bag, node);
     bool first_edge_credit_ready = true;
     int first_edge_credit_to = -1;
     if (first_edge_credit_required) {
@@ -4146,6 +4612,7 @@ class EventDrivenJunctionRuntime {
     trace.junction_next_dispatch_time = controller.next_dispatch_time;
     trace.short_history.assign(bag.history.begin(), bag.history.end());
     trace.full_astar_used = false;
+    populate_priority_trace(trace, bag, time);
 
     const bool escape_active = config_.enable_deadlock_escape &&
                                controller.escape_token_task == task_id;
@@ -4168,15 +4635,10 @@ class EventDrivenJunctionRuntime {
       const auto physical = physical_faults_.find(physical_key);
       if (physical != physical_faults_.end() && physical->second.active_count > 0) {
         ++result_.summary.fault_target_edge_candidate_exposure_count;
-        fault_affected_bags_.insert(bag.request.runtime_bag_id);
-        const auto active_instance =
-            active_fault_instance_by_edge_.find(physical_key);
-        if (active_instance != active_fault_instance_by_edge_.end()) {
-          fault_instances_by_bag_[bag.request.runtime_bag_id].insert(
-              {physical_key, active_instance->second});
-        }
-        result_.summary.fault_affected_bag_count =
-            static_cast<int>(fault_affected_bags_.size());
+        mark_fault_exposure(
+            bag,
+            physical_key,
+            physical->second.physical_generation);
         append_fault_decision_audit(arrive_event_seq,
                                     "target_edge_candidate_exposure",
                                     time,
@@ -4457,6 +4919,11 @@ class EventDrivenJunctionRuntime {
         bag.first_edge_credit_id = 0;
         bag.first_edge_credit_consumed = true;
       }
+      if (uses_first_edge_credit() &&
+          !bag.first_edge_credit_consumed) {
+        bag.first_edge_credit_id = 0;
+        bag.first_edge_credit_consumed = true;
+      }
       if (bounded_local_same_bag_fallback_selected) {
         ++result_.summary
               .bounded_local_pibt_same_bag_fallback_count;
@@ -4488,6 +4955,7 @@ class EventDrivenJunctionRuntime {
       if (controller.escape_token_task == task_id) {
         controller.escape_token_task = -1;
       }
+      clear_consumed_repair_reentry_boost(bag);
     } else {
       ++bag.retry_count;
       trace.decision_source = local_fault_policy_acted
@@ -4932,7 +5400,7 @@ class EventDrivenJunctionRuntime {
         controller.service_calendar.reserved_until(event.time);
     beacon.received_at = event.time;
     ++beacon.generation;
-    if (canonical_admission_mode() == "expiring_first_edge_credit") {
+    if (uses_first_edge_credit()) {
       credit_ledger_.revoke_destination_generation(event.node,
                                                    beacon.generation,
                                                    event.time);
@@ -5032,8 +5500,38 @@ class EventDrivenJunctionRuntime {
       }
       last_physical_repair_time_ = event.time;
       active_backlog_at_last_repair_ = active_bag_count_;
+      const auto affected =
+          fault_affected_bags_by_edge_.find(key);
+      if (affected != fault_affected_bags_by_edge_.end()) {
+        for (const int runtime_bag_id : affected->second) {
+          auto bag = bags_.find(runtime_bag_id);
+          if (bag == bags_.end() ||
+              bag->second.status == BagStatus::kCompleted ||
+              bag->second.status == BagStatus::kFailed ||
+              bag->second.repaired_task_reentry) {
+            continue;
+          }
+          bag->second.repaired_task_reentry = true;
+          bag->second.fault_priority_generation =
+              std::max(
+                  bag->second.fault_priority_generation,
+                  static_cast<std::uint64_t>(
+                      physical.physical_generation));
+          bag->second.local_enqueue_sequence =
+              next_local_enqueue_sequence_++;
+          ++result_.summary.repaired_task_reentry_count;
+          if (bag->second.status == BagStatus::kJunctionQueue) {
+            schedule_junction_wakeup(
+                bag->second.current, event.time);
+          } else if (bag->second.status ==
+                     BagStatus::kSourceQueue) {
+            schedule_source_wakeup(
+                bag->second.request.start, event.time);
+          }
+        }
+      }
     }
-    if (canonical_admission_mode() == "expiring_first_edge_credit") {
+    if (uses_first_edge_credit()) {
       credit_ledger_.revoke_edge_fault_generation(
           event.from_node,
           event.to_node,
@@ -5216,6 +5714,38 @@ class EventDrivenJunctionRuntime {
       }
     }
 
+    if (canonical_framework_mode() ==
+        "legacy_order_one_step_diagnostic") {
+      // The legacy Java comparator is `(int)(left.pass_time-right.pass_time)`.
+      // Scanning the stable local deque with that exact truncation preserves
+      // sub-second ties without importing its A* or reservation table.
+      std::size_t best = 0;
+      for (std::size_t index = 1; index < queue.size(); ++index) {
+        const auto& candidate = bags_.at(queue[index]);
+        const auto& incumbent = bags_.at(queue[best]);
+        const int coarse_difference = static_cast<int>(
+            candidate.request.release_time -
+            incumbent.request.release_time);
+        if (coarse_difference < 0) {
+          best = index;
+        }
+      }
+      return best;
+    }
+
+    if (canonical_priority_mode() !=
+        BoundedLocalPIBTPriorityMode::kQ0Current) {
+      std::size_t best = 0;
+      for (std::size_t index = 1; index < queue.size(); ++index) {
+        if (local_priority_less(bags_.at(queue[index]),
+                                bags_.at(queue[best]),
+                                time)) {
+          best = index;
+        }
+      }
+      return best;
+    }
+
     std::size_t best = 0;
     for (std::size_t index = 1; index < queue.size(); ++index) {
       if (bag_priority(bags_.at(queue[index]), time) < bag_priority(bags_.at(queue[best]), time)) {
@@ -5227,6 +5757,157 @@ class EventDrivenJunctionRuntime {
       }
     }
     return best;
+  }
+
+  double local_priority_slack(const BagState& bag, double time) const {
+    return bag.request.deadline >= 0.0
+               ? bag.request.deadline - time
+               : std::numeric_limits<double>::infinity();
+  }
+
+  double local_priority_age(const BagState& bag, double time) const {
+    return std::max(0.0, time - bag.request.release_time);
+  }
+
+  int local_priority_contention(const BagState& bag) const {
+    const int node = bag.current >= 0 ? bag.current : bag.request.start;
+    int contention = 0;
+    const auto local = junctions_.find(node);
+    if (local != junctions_.end()) {
+      contention = static_cast<int>(local->second.queue.size()) +
+                   local->second.scheduled_incoming;
+    }
+    for (const int target : graph_.outgoing(node)) {
+      const auto beacon = congestion_beacons_.find(target);
+      if (beacon != congestion_beacons_.end()) {
+        contention = std::max(
+            contention,
+            beacon->second.queue_length +
+                beacon->second.scheduled_incoming);
+      }
+    }
+    return contention;
+  }
+
+  bool is_storage_out_task(const BagState& bag) const {
+    if (bag.request.start == 52) {
+      return true;
+    }
+    std::string source = bag.request.source;
+    std::transform(source.begin(),
+                   source.end(),
+                   source.begin(),
+                   [](unsigned char value) {
+                     return static_cast<char>(std::tolower(value));
+                   });
+    return source.find("storage") != std::string::npos ||
+           source.find("ebs") != std::string::npos;
+  }
+
+  std::string local_task_class(const BagState& bag) const {
+    if (bag.repaired_task_reentry) {
+      return "repaired_fault_affected";
+    }
+    if (bag.fault_priority_generation > 0) {
+      return "fault_affected";
+    }
+    if (is_storage_out_task(bag)) {
+      return "storage_out";
+    }
+    if (bag.status == BagStatus::kSourceQueue ||
+        bag.status == BagStatus::kPendingRelease) {
+      return "new";
+    }
+    return "on_path";
+  }
+
+  int local_task_class_rank(const BagState& bag) const {
+    const auto task_class = local_task_class(bag);
+    if (task_class == "repaired_fault_affected" ||
+        task_class == "fault_affected") {
+      return 0;
+    }
+    if (task_class == "storage_out") {
+      return 1;
+    }
+    if (task_class == "on_path") {
+      return 2;
+    }
+    return 3;
+  }
+
+  bool local_priority_less(const BagState& left,
+                           const BagState& right,
+                           double time) const {
+    const auto mode = canonical_priority_mode();
+    const bool left_fault = left.fault_priority_generation > 0;
+    const bool right_fault = right.fault_priority_generation > 0;
+    const double left_slack = local_priority_slack(left, time);
+    const double right_slack = local_priority_slack(right, time);
+    const double left_age = local_priority_age(left, time);
+    const double right_age = local_priority_age(right, time);
+    const int left_contention = local_priority_contention(left);
+    const int right_contention = local_priority_contention(right);
+    switch (mode) {
+      case BoundedLocalPIBTPriorityMode::kQ0Current:
+        break;
+      case BoundedLocalPIBTPriorityMode::kQ1ThesisLocalProjection:
+        return std::make_tuple(!left_fault,
+                               left_slack,
+                               -left_contention,
+                               left.local_enqueue_sequence,
+                               left.request.runtime_bag_id) <
+               std::make_tuple(!right_fault,
+                               right_slack,
+                               -right_contention,
+                               right.local_enqueue_sequence,
+                               right.request.runtime_bag_id);
+      case BoundedLocalPIBTPriorityMode::kQ2TypeSlackAging:
+        return std::make_tuple(local_task_class_rank(left),
+                               left_slack,
+                               -left_age,
+                               -left_contention,
+                               left.request.runtime_bag_id) <
+               std::make_tuple(local_task_class_rank(right),
+                               right_slack,
+                               -right_age,
+                               -right_contention,
+                               right.request.runtime_bag_id);
+      case BoundedLocalPIBTPriorityMode::kQ3FaultSlackAgeStableId:
+        return std::make_tuple(
+                   -static_cast<long long>(
+                       left.fault_priority_generation),
+                   left_slack,
+                   -left_age,
+                   left.request.runtime_bag_id) <
+               std::make_tuple(
+                   -static_cast<long long>(
+                       right.fault_priority_generation),
+                   right_slack,
+                   -right_age,
+                   right.request.runtime_bag_id);
+    }
+    return std::tie(left.request.runtime_bag_id) <
+           std::tie(right.request.runtime_bag_id);
+  }
+
+  void populate_priority_trace(EventDecisionTraceRow& trace,
+                               const BagState& bag,
+                               double time) const {
+    trace.priority_mode = canonical_priority_mode_name();
+    trace.task_class = local_task_class(bag);
+    trace.priority_slack_seconds =
+        local_priority_slack(bag, time);
+    trace.priority_age_seconds =
+        local_priority_age(bag, time);
+    trace.priority_local_contention =
+        local_priority_contention(bag);
+    trace.priority_fault_generation =
+        bag.fault_priority_generation;
+    trace.priority_enqueue_sequence =
+        bag.local_enqueue_sequence;
+    trace.pibt_preference_mode =
+        config_.pibt_preference_mode;
   }
 
   double bag_priority(const BagState& bag, double time) const {
@@ -5260,6 +5941,21 @@ class EventDrivenJunctionRuntime {
       throw std::logic_error("event runtime requires a finite canonical heuristic value");
     }
     return value;
+  }
+
+  double local_regret_prior(int from_node,
+                            int to_node,
+                            int goal_node) const {
+    const auto exact = pibt_regret_prior_.find(
+        std::make_tuple(from_node, to_node, goal_node));
+    if (exact != pibt_regret_prior_.end()) {
+      return exact->second;
+    }
+    const auto goal_agnostic = pibt_regret_prior_.find(
+        std::make_tuple(from_node, to_node, -1));
+    return goal_agnostic == pibt_regret_prior_.end()
+               ? 0.0
+               : goal_agnostic->second;
   }
 
   int recent_visit_count(const BagState& bag, int node) const {
@@ -5620,6 +6316,8 @@ class EventDrivenJunctionRuntime {
     accounted += advertised_faults_.size() * sizeof(event_runtime_detail::AdvertisedFaultState);
     accounted += congestion_beacons_.size() *
                  sizeof(event_runtime_detail::CongestionBeaconState);
+    accounted += pibt_regret_prior_.size() *
+                 sizeof(std::pair<const std::tuple<int, int, int>, double>);
     accounted += fault_affected_bags_.size() * sizeof(int);
     for (const auto& entry : fault_instances_by_bag_) {
       accounted += sizeof(entry) +
@@ -5753,6 +6451,8 @@ class EventDrivenJunctionRuntime {
   EventDrivenJunctionConfig config_;
   std::optional<EdgeScoreModel> scorer_model_;
   std::map<std::pair<int, int>, int> scorer_static_hops_;
+  std::map<std::tuple<int, int, int>, double>
+      pibt_regret_prior_;
   EventDrivenJunctionResult result_;
   std::unordered_map<int, BagState> bags_;
   std::unordered_map<std::string, int> segment_runtime_ids_;
@@ -5764,6 +6464,8 @@ class EventDrivenJunctionRuntime {
   ExpiringFirstEdgeCreditLedger credit_ledger_;
   std::unordered_map<long long, int> directed_inflight_counts_;
   std::unordered_set<int> fault_affected_bags_;
+  std::unordered_map<long long, std::set<int>>
+      fault_affected_bags_by_edge_;
   std::unordered_map<int, std::set<std::pair<long long, int>>>
       fault_instances_by_bag_;
   std::unordered_map<long long, int>
@@ -5775,6 +6477,7 @@ class EventDrivenJunctionRuntime {
   std::uint64_t next_event_seq_ = 1;
   std::uint64_t next_decision_id_ = 1;
   std::uint64_t next_pibt_activation_id_ = 1;
+  std::uint64_t next_local_enqueue_sequence_ = 1;
   double now_ = 0.0;
   int active_bag_count_ = 0;
   double last_physical_repair_time_ = -1.0;

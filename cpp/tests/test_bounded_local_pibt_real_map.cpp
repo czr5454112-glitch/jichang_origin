@@ -28,6 +28,8 @@ using czr005::ics::BoundedLocalPIBTCandidate;
 using czr005::ics::BoundedLocalPIBTConfig;
 using czr005::ics::BoundedLocalPIBTMode;
 using czr005::ics::BoundedLocalPIBTOutcome;
+using czr005::ics::BoundedLocalPIBTPriorityMode;
+using czr005::ics::BoundedLocalPIBTPreferenceMode;
 using czr005::ics::BoundedLocalPIBTReadyBag;
 using czr005::ics::BoundedLocalPIBTResolver;
 using czr005::ics::BoundedLocalPIBTResourceOwner;
@@ -273,6 +275,111 @@ void test_priority_components_are_local_and_explainable(Checks& checks) {
                  "deterministic priority");
   checks.require(result.local_message_count == 0,
                  "independent local actions must not emit inheritance messages");
+}
+
+void test_q1_q3_unique_local_priority_on_real_merge(Checks& checks) {
+  const auto& graph = canonical_graph();
+  checks.require(graph.has_edge(6, 8) && graph.has_edge(7, 8) &&
+                     graph.incoming_degree(8) > 1,
+                 "Q priority fixture must use the real map2 merge at node 8");
+  auto left = ready_bag(11, 6, 47, 100.0, {candidate(6, 8)});
+  auto right = ready_bag(22, 7, 47, 50.0, {candidate(7, 8)});
+  left.enqueue_sequence = 1;
+  right.enqueue_sequence = 2;
+  left.local_contention = 2;
+  right.local_contention = 2;
+
+  for (const auto mode : {
+           BoundedLocalPIBTPriorityMode::kQ1ThesisLocalProjection,
+           BoundedLocalPIBTPriorityMode::kQ2TypeSlackAging,
+           BoundedLocalPIBTPriorityMode::kQ3FaultSlackAgeStableId}) {
+    auto local_config = config(BoundedLocalPIBTMode::kP0);
+    local_config.priority_mode = mode;
+    CallbackState state;
+    const auto result = BoundedLocalPIBTResolver().resolve(
+        {left, right}, {}, local_config, callbacks(state));
+    checks.require(result.outcome == BoundedLocalPIBTOutcome::kCommitted &&
+                       result.actions.size() == 1 &&
+                       result.actions.front().bag_id == 22,
+                   "without a fault boost Q1-Q3 must grant the shared real "
+                   "merge to the lower-slack unique winner");
+  }
+
+  left.physical_fault_emergency = true;
+  left.fault_priority_generation = 9;
+  left.task_class_rank = 0;
+  right.task_class_rank = 3;
+  for (const auto mode : {
+           BoundedLocalPIBTPriorityMode::kQ1ThesisLocalProjection,
+           BoundedLocalPIBTPriorityMode::kQ2TypeSlackAging,
+           BoundedLocalPIBTPriorityMode::kQ3FaultSlackAgeStableId}) {
+    auto local_config = config(BoundedLocalPIBTMode::kP0);
+    local_config.priority_mode = mode;
+    CallbackState state;
+    const auto result = BoundedLocalPIBTResolver().resolve(
+        {right, left}, {}, local_config, callbacks(state));
+    checks.require(result.actions.size() == 1 &&
+                       result.actions.front().bag_id == 11 &&
+                       result.priority_order.front() == 11,
+                   "fault class/generation must deterministically boost the "
+                   "affected bag in Q1-Q3 regardless of input order");
+  }
+}
+
+void test_one_step_dodge_and_regret_preference_on_real_split(
+    Checks& checks) {
+  const auto& graph = canonical_graph();
+  checks.require(graph.has_edge(6, 8) && graph.has_edge(6, 12) &&
+                     graph.outgoing(6).size() > 1,
+                 "preference fixture must use the real map2 split at node 6");
+  auto blocked = candidate(6, 8, 0.0);
+  blocked.static_potential = 7.0;
+  blocked.blocks_higher_priority_exit = true;
+  blocked.occupies_unique_exit = true;
+  blocked.enters_wait_for_cycle = true;
+  blocked.is_local_backtrack = true;
+  blocked.local_regret_prior = 4.0;
+  auto clear = candidate(6, 12, 0.0);
+  clear.static_potential = 7.0;
+  const auto bag =
+      ready_bag(1, 6, 47, 100.0, {blocked, clear});
+
+  auto current_config = config(BoundedLocalPIBTMode::kP0);
+  CallbackState current_state;
+  const auto current = BoundedLocalPIBTResolver().resolve(
+      {bag}, {}, current_config, callbacks(current_state));
+  checks.require(current.actions.size() == 1 &&
+                     current.actions.front().next_node == 8,
+                 "current comparator must preserve the stable next-node tie");
+
+  for (const auto preference : {
+           BoundedLocalPIBTPreferenceMode::kDodge,
+           BoundedLocalPIBTPreferenceMode::kLocalRegret,
+           BoundedLocalPIBTPreferenceMode::kDodgeRegret}) {
+    auto local_config = config(BoundedLocalPIBTMode::kP0);
+    local_config.preference_mode = preference;
+    CallbackState state;
+    const auto result = BoundedLocalPIBTResolver().resolve(
+        {bag}, {}, local_config, callbacks(state));
+    checks.require(result.actions.size() == 1 &&
+                       result.actions.front().next_node == 12,
+                   "opt-in one-step dodge/regret must avoid the penalised "
+                   "equal-potential real split edge");
+  }
+
+  clear.static_potential = 8.0;
+  const auto non_tie =
+      ready_bag(2, 6, 47, 100.0, {blocked, clear});
+  auto local_config = config(BoundedLocalPIBTMode::kP0);
+  local_config.preference_mode =
+      BoundedLocalPIBTPreferenceMode::kDodgeRegret;
+  CallbackState state;
+  const auto result = BoundedLocalPIBTResolver().resolve(
+      {non_tie}, {}, local_config, callbacks(state));
+  checks.require(result.actions.size() == 1 &&
+                     result.actions.front().next_node == 8,
+                 "preference must not override unequal static potential; it "
+                 "is a one-step tie-break, not route planning");
 }
 
 void test_visiting_guard_and_candidate_backtracking(Checks& checks) {
@@ -763,6 +870,8 @@ int main() {
   test_p0_to_p4_depth_ladder(checks);
   test_deterministic_unique_priority(checks);
   test_priority_components_are_local_and_explainable(checks);
+  test_q1_q3_unique_local_priority_on_real_merge(checks);
+  test_one_step_dodge_and_regret_preference_on_real_split(checks);
   test_visiting_guard_and_candidate_backtracking(checks);
   test_cross_blocker_combination_backtracking(checks);
   test_two_phase_rollback_and_fault_revalidation(checks);
