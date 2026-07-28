@@ -1,0 +1,14 @@
+﻿scope,check,status,observed,expected,evidence,notes
+git,phase_start_branch,PASS,codex/czr005-rewrite,codex/czr005-rewrite,git branch --show-current,exact Stage-14A generation snapshot
+git,phase_start_head,PASS,750a14ca52755df99fa5f6f0952f04e014ff2274,750a14ca52755df99fa5f6f0952f04e014ff2274,git rev-parse HEAD,exact Stage-14A generation snapshot
+git,phase_start_upstream,PASS,origin/codex/czr005-rewrite,origin/codex/czr005-rewrite,git rev-parse --abbrev-ref --symbolic-full-name @{u},
+git,phase_start_upstream_head,PASS,750a14ca52755df99fa5f6f0952f04e014ff2274,750a14ca52755df99fa5f6f0952f04e014ff2274,git rev-parse @{u},local HEAD equaled upstream HEAD before Stage-14A writes
+git,tracked_worktree_clean,PASS,true,true,git status --short --untracked-files=no,unrelated pre-existing untracked scratch directories excluded
+protection,legacy_clean,PASS,true,true,git status --short -- legacy,
+protection,canonical_map_clean,PASS,true,true,git status --short -- data/processed/maps/map2.json,
+protection,canonical_task_clean,PASS,true,true,git status --short -- data/processed/tasks/inputdata.jsonl,
+identity,map_raw_sha256,PASS,9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4,9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4,data/processed/maps/map2.json,SHA-256 over exact bytes
+identity,map_semantic_sha256,PASS,67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63,67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63,data/processed/maps/map2.json,UTF-8 with CRLF/CR normalized to LF
+identity,task_raw_sha256,PASS,968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f,968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f,data/processed/tasks/inputdata.jsonl,SHA-256 over exact bytes
+identity,task_semantic_sha256,PASS,968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f,968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f,data/processed/tasks/inputdata.jsonl,UTF-8 with CRLF/CR normalized to LF
+identity,task_counts,PASS,43603 segments / 28506 raw bags,43603 segments / 28506 raw bags,data/processed/tasks/inputdata.jsonl,raw bags are unique task_id values

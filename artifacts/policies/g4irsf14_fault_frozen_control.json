@@ -1,0 +1,70 @@
+{
+  "bti_scope": "ACTUAL_CURRENT_SAFE_NODE_ONLY",
+  "claim_boundary": "Promotion applies only to the executed matched local exposure cases. Paper Table 5.5 outcomes remain external reference values.",
+  "containment": [
+    "revoke_unconsumed_first_edge_credit",
+    "cancel_uncommitted_pibt_batch",
+    "hold_at_safe_local_queue"
+  ],
+  "control_sha256": "bd2c60ecb089312e99d5b1dcd82342f93a44fcd70915c9425ec11638bd50f64f",
+  "ddi_scope": "GENERATION_TAGGED_BOUNDED_LOCAL_OVERLAY",
+  "executed_evidence": {
+    "causally_promoted_case_ids": [
+      "G2_ddi_local_policy",
+      "G3_ddi_plus_p2",
+      "G7_repair_reopen"
+    ],
+    "executed_case_count": 13,
+    "executed_case_gate_pass": true,
+    "hard_failure_count": 0,
+    "informative_fault_case_count": 12,
+    "physical_generation_audit_pass": true,
+    "unsafe_entry_count": 0
+  },
+  "forbidden": [
+    "full_astar_or_cie",
+    "future_route_storage",
+    "global_reservation_scan",
+    "global_replanning"
+  ],
+  "phase": "G4IRSF14-A",
+  "physical_interlock": "ALWAYS_ON_NOT_POLICY_CONFIGURABLE",
+  "policy_id": "g4irsf13_local_ddi_bti_fault_control",
+  "repair": [
+    "generation_tagged_reopen",
+    "wake_affected_local_queues",
+    "temporary_fault_affected_priority"
+  ],
+  "runtime_identity": {
+    "binary_sha256": "814b233016a51a755d6f568604fcb04ca81d781222416075cf2648ec087f1de7",
+    "case_config_sha256": "60c91e937f3c8f14ff4a80f685ec3294da6e22196cdf254eea998acb677becf1",
+    "frozen_binary_match_pass": true,
+    "map_raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+    "task_raw_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+  },
+  "runtime_scope": "ONE_NEXT_EDGE_RESERVATION_DEPTH_ONE",
+  "schema": "czr005.g4irsf14.fault_frozen_control.v1",
+  "source_bindings": {
+    "fault_bundle": {
+      "declared_self_sha256": "b298c53c2c1a0a3ed2ec8a9dcbda253675737f10ccb9c4277cbb754bf7efa0c2",
+      "file_sha256": "2725cde581268aacc2bd37ad15e6b1c19fe4204c04f233eaa947d55986ac2272",
+      "path": "artifacts/policies/g4irsf13_fault_control_bundle.json",
+      "self_hash_field": "self_sha256",
+      "self_hash_valid": true
+    },
+    "fault_report": {
+      "file_sha256": "0e560943c0b27ca738b70f0f041fe906fb70911fc346972db3ae10f7c1b9f781",
+      "path": "outputs/reports/g4irsf13_fault_recovery_results.md"
+    },
+    "fault_table": {
+      "file_sha256": "acd60372deaf2b4a9f5f91ae12df7b252a46691521602d66ae3b3c96c7383250",
+      "path": "outputs/tables/g4irsf13_fault_causal_ab.csv"
+    }
+  },
+  "status": "FAULT_DISCRIMINATING_PASS_FROZEN",
+  "unproven_boundary": {
+    "cut_isolation_active_policy_benefit": "NOT_PROVEN",
+    "multi_fault_active_policy_benefit": "NOT_PROVEN",
+    "v3_fault_aware_status": "NOT_RUN_FRESH_HOLDOUT_OFFLINE_FAIL_RUNTIME_ACTIVATION_FORBIDDEN"
+  }
+}

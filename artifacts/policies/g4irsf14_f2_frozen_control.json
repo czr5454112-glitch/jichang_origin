@@ -1,0 +1,219 @@
+{
+  "candidate_id": "G4IRSF14_F2_FROZEN_CONTROL",
+  "claim_boundary": "Frozen control only: complete and safe at original 1x, better than corrected historical HCA, but 1.1347038098698192 s/bag slower than frozen v2-safe. No new candidate is promoted.",
+  "comparators": {
+    "delta_vs_historical_hca_seconds_per_bag": -97.30317374668473,
+    "delta_vs_v2_safe_seconds_per_bag": 1.1347038098698192,
+    "f2_original_entry_mean_minutes": 41.514218717973414,
+    "frozen_v2_safe_original_entry_mean_minutes": 41.49530698780892,
+    "historical_hca_original_entry_mean_minutes": 43.13593828041816,
+    "primary_denominator": "original_entry_time_tth"
+  },
+  "configuration": {
+    "admission_mode": "off",
+    "control": "C0",
+    "framework": "event_loop_one_step",
+    "pibt": "P2",
+    "pressure_mode": "off",
+    "reservation_depth": 1,
+    "resource": "R3_java_node_window_compatible",
+    "scorer": "S1_frozen_g4e_legal_local_adapter"
+  },
+  "control_sha256": "3c1753737200a6cfda8634201df4e0d456f641031a21aefeaf8405e284e3220e",
+  "final_runtime_identity": {
+    "algorithm_summary_sha256": "4da96d17e7c19493cadf13be0a3ef9271fc9e7a6b30d33a27f6972082de63635",
+    "bags_sha256": "b958d6b77e263821fd902805834ad6332c30f368c53515468332323fe6c7a016",
+    "binary": {
+      "expected_file_sha256": "814b233016a51a755d6f568604fcb04ca81d781222416075cf2648ec087f1de7",
+      "file_sha256": "814b233016a51a755d6f568604fcb04ca81d781222416075cf2648ec087f1de7",
+      "path": "build_g4irsf12/python/czr005_cpp.cp311-win_amd64.pyd",
+      "tracked_artifact": false
+    },
+    "case_config_sha256": "60c91e937f3c8f14ff4a80f685ec3294da6e22196cdf254eea998acb677becf1",
+    "junction_state_sha256": "3adf79cf863ad9f80a916002de96dbe232da06045ebc5078be848343e19e4685",
+    "model": {
+      "file_sha256": "4a058dee0bdd17e15f67d1943a551822847d0c066ac3cf03a5da71a07731bbca",
+      "model_type": "g4e_risk_calibrated_policy",
+      "path": "artifacts/models/g4e_risk_calibrated_policy.json"
+    },
+    "repeat_count": 5,
+    "repeat_result_file_sha256": [
+      "c41659ed671fa34a99e2f7bb8ccaf9cd5c213c429d8b5a975c2cbfd731ef9cbe",
+      "b64c94b0f1e4342276ad899a67279a41493691103cbcec1c79eadefc33ed6830",
+      "35b2d977cd3b77cb582c4f33b2c04ca76160c83166091a4d903ba54e1538a6c0",
+      "af79e4de0e52f5c90d321616784187154e1ff4b722c01c2f06e587abf2f5d465",
+      "9beb094eb61fb1768f37650beeb4e9ce35bd05bcd7b1d84381425b1cba1d77cb"
+    ],
+    "runtime_deterministic_sha256": "ccb017518d2d00b6d3290882380cf90e62402a2892bb2b485823f5a8deefe937",
+    "source_bundle_sha256": "95026955f7ff96f9894220b2c4fea17b1ed2270b39ca59bd9feded8e4b7423e3",
+    "source_files": [
+      {
+        "path": "scripts/eval/g4irsf13_final_joint_evaluation.py",
+        "sha256": "45bef8d4d8c682765c0ad21cc6dc7e7b5ef2d855f409f5cd5094fb533e94f431"
+      },
+      {
+        "path": "scripts/eval/g4irsf13_cde_experiments.py",
+        "sha256": "98f944a665a5c58a472c79eb342dda8d1c38902d7225a83c8d800f14fedb7ed2"
+      },
+      {
+        "path": "scripts/eval/g4irsf12_reproducible_harness.py",
+        "sha256": "d138faba4f46a9933e7530c0d7cb2ff1339fd6f671ec2400882c0ec23bdef37c"
+      },
+      {
+        "path": "src/czr005/cpp_backend.py",
+        "sha256": "27ea588191767ca3cdc71eca86ef7be5a612036c66bdd4890f3ced5e497e531c"
+      },
+      {
+        "path": "cpp/ics_core/runtime/event_driven_junction.hpp",
+        "sha256": "bbd6b09f9c1ac32bb94c58b0edfff1b9765cd44f99d2e49032c03ad3cd9709d0"
+      },
+      {
+        "path": "cpp/ics_core/runtime/bounded_local_pibt.hpp",
+        "sha256": "9d985f46a4e46148060dc2a8eee9cff1bde5c3ee28e6903f24e6644ab7c2b600"
+      },
+      {
+        "path": "cpp/ics_core/runtime/expiring_first_edge_credit.hpp",
+        "sha256": "d4f56d9146bd425f8229d84038c7b0bf4c6ea1d93692f5eefd6048e8c9418116"
+      },
+      {
+        "path": "cpp/ics_core/bindings/czr005_cpp.cpp",
+        "sha256": "668c0bae91695fa76e5c0708ed4c223affa50787f09060c9c8bc61b3ade1ee72"
+      },
+      {
+        "path": "artifacts/models/g4e_risk_calibrated_policy.json",
+        "sha256": "4a058dee0bdd17e15f67d1943a551822847d0c066ac3cf03a5da71a07731bbca"
+      }
+    ],
+    "source_path_manifest_sha256": "2bc2abca4612464f2e59a774158c3b44ac76c3c29702cd1e7ad08a61b20e8b40",
+    "trace_context_sha256": "ffc8052d34d3218c78cddcb6b42b78ad3cf84ad58ee21def07fda51743ca860f"
+  },
+  "hard_gates": {
+    "complete_raw_bags": 28506,
+    "completed_segments": 43603,
+    "conflicts": 0,
+    "event_limit_reached": false,
+    "failed_segments": 0,
+    "future_routes_stored": 0,
+    "global_reservation_scans": 0,
+    "max_edges_selected_per_bag_per_decision": 1,
+    "runtime_full_astar_calls": 0,
+    "time_limit_reached": false,
+    "unresolved_deadlocks": 0,
+    "unsafe_entries": 0
+  },
+  "inherited_candidate_id": "G4IRSF13_F2_FROZEN",
+  "metrics": {
+    "decision_sensitive_mean_minutes": 4.143217183651398,
+    "network_time_mean_minutes": 3.7804989547405254,
+    "original_entry_mean_minutes": 41.514218717973414,
+    "path_edge_count_mean": 11.95572861853645,
+    "source_wait_mean_minutes": 0.3627182289108726
+  },
+  "phase": "G4IRSF14-A",
+  "protected_inputs": {
+    "hash_semantics": "raw=sha256_exact_bytes; semantic=sha256_utf8_after_crlf_cr_to_lf",
+    "map": {
+      "edge_count": 69,
+      "heuristic_column_counts": [
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54
+      ],
+      "heuristic_row_count": 54,
+      "node_count": 54,
+      "path": "data/processed/maps/map2.json",
+      "raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+      "semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63"
+    },
+    "task": {
+      "path": "data/processed/tasks/inputdata.jsonl",
+      "raw_bag_count": 28506,
+      "raw_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+      "segment_count": 43603,
+      "semantic_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+    }
+  },
+  "schema": "czr005.g4irsf14.f2_frozen_control.v1",
+  "sealed_predecessor_runtime_identity": {
+    "binary_sha256": "82f15f08a8cff0e887447f017f0aa03fffabe9bfb3a79a563b16d779219d8222",
+    "case_config_sha256": "60c91e937f3c8f14ff4a80f685ec3294da6e22196cdf254eea998acb677becf1",
+    "claim_boundary": "Earlier sealed F2 evidence generation; retained separately and not conflated with the final five-repeat binary.",
+    "source_bundle_sha256": "eca01993a9094c8e86558d15246628acd3162d5d769916ded6365ec6437f0df7",
+    "source_path_manifest_sha256": "720843eb169dc451d8949c4d6b4d8dec8f3d43a6288492c5d23ef8321a712c3b"
+  },
+  "source_bindings": {
+    "denominator_reconciliation": {
+      "declared_self_sha256": "d8a577bf1540236d90280440a2a92a01f38abf173fca1fbbffdac8289b544f17",
+      "file_sha256": "618c040a5b5bd13ce81c502832575a7ea52bd8b82998ce481ffe79da9b8de4e6",
+      "path": "artifacts/policies/g4irsf12_denominator_reconciliation.json",
+      "self_hash_field": "reconciliation_sha256",
+      "self_hash_valid": true
+    },
+    "f2_policy": {
+      "declared_self_sha256": "9c12b004fc1dc0fe19dfa3d014a1fcc51dcb5edb538c15bf01a3f6daf32333eb",
+      "file_sha256": "9fdbb15c5446ac1dd693d0fdb1fdc87aba550e104706515f137859f2f3950054",
+      "path": "artifacts/policies/g4irsf13_f2_frozen_baseline.json",
+      "self_hash_field": "policy_sha256",
+      "self_hash_valid": true
+    },
+    "final_candidate_bundle": {
+      "declared_self_sha256": "6e50dfa81fc1ef65979c9e8e99f3ffdab42f6a1c6ffeb007f6e4b6b8191e34ba",
+      "file_sha256": "202b6fbf4608ceaeba9bb215a02ece5473471330705358bb191ff9d2f8f95fc8",
+      "path": "artifacts/policies/g4irsf13_final_candidate_bundle.json",
+      "self_hash_field": "bundle_sha256",
+      "self_hash_valid": true
+    }
+  },
+  "status": "PASS_FROZEN_CONTROL"
+}
