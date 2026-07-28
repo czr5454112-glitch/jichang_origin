@@ -47,6 +47,7 @@ using czr005::ics::RollingHorizonFaultWindow;
 using czr005::ics::SafetyStatus;
 using czr005::ics::SIPPPlanner;
 using czr005::ics::compute_episode_metrics;
+using czr005::ics::normalize_legacy_line_ending;
 using czr005::ics::read_legacy_inputdata;
 using czr005::ics::read_legacy_map2;
 using czr005::ics::run_edge_score_fallback_replay;
@@ -197,6 +198,13 @@ int map_value_or(const std::map<int, int>& values, int key, int fallback = -1) {
 
 int main() {
   TestContext test;
+  std::string crlf_header =
+      "ID EntryTime(s) STD(s) star end Unloader Loader\r";
+  normalize_legacy_line_ending(crlf_header);
+  test.check(
+      crlf_header == "ID EntryTime(s) STD(s) star end Unloader Loader",
+      "legacy CRLF residue should normalize identically on every platform");
+
   const Graph graph = make_graph();
   test.check(graph.node_count() == 3, "sample graph node count should be 3");
   test.check(graph.edge_count() == 2, "sample graph edge count should be 2");

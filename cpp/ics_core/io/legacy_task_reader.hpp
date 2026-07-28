@@ -38,6 +38,12 @@ inline bool is_blank_line(const std::string& line) {
   return line.find_first_not_of(" \t\r\n") == std::string::npos;
 }
 
+inline void normalize_legacy_line_ending(std::string& line) noexcept {
+  if (!line.empty() && line.back() == '\r') {
+    line.pop_back();
+  }
+}
+
 inline TaskLeg make_task_leg(const RawLegacyTask& raw,
                              std::string leg,
                              bool early_bag_split,
@@ -81,11 +87,13 @@ inline LegacyTaskReadResult read_legacy_inputdata(
   if (!std::getline(input, result.header)) {
     throw std::runtime_error("empty legacy inputdata: " + path);
   }
+  normalize_legacy_line_ending(result.header);
 
   std::string line;
   int line_no = 1;
   while (std::getline(input, line)) {
     ++line_no;
+    normalize_legacy_line_ending(line);
     if (is_blank_line(line)) {
       continue;
     }
