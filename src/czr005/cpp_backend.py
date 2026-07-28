@@ -606,6 +606,9 @@ def g4irsf11_event_runtime_from_records(
         tuple[int, int, int, float]
     ] = (),
     selective_credit_contention_threshold: int = 1,
+    event_semantics: str = "E0_immediate_dispatch_f2",
+    enable_opportunity_telemetry: bool = False,
+    opportunity_trace_limit: int = 200_000,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -679,6 +682,9 @@ def g4irsf11_event_runtime_from_records(
         selective_credit_contention_threshold,
         "selective_credit_contention_threshold",
     )
+    opportunity_trace_limit = strict_integer(
+        opportunity_trace_limit, "opportunity_trace_limit"
+    )
 
     enable_source_admission = strict_bool(
         enable_source_admission, "enable_source_admission"
@@ -694,6 +700,10 @@ def g4irsf11_event_runtime_from_records(
     )
     enable_fault_policy = strict_bool(
         enable_fault_policy, "enable_fault_policy"
+    )
+    enable_opportunity_telemetry = strict_bool(
+        enable_opportunity_telemetry,
+        "enable_opportunity_telemetry",
     )
     summary_only = strict_bool(summary_only, "summary_only")
 
@@ -785,6 +795,26 @@ def g4irsf11_event_runtime_from_records(
     if selective_credit_contention_threshold <= 0:
         raise ValueError(
             "selective_credit_contention_threshold must be positive"
+        )
+    event_semantics_modes = {
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E0_immediate_dispatch_f2",
+        "E1_batch_source_same_timestamp",
+        "E2_batch_junction_same_timestamp",
+        "E3_batch_source_and_junction_same_timestamp",
+    }
+    if not isinstance(event_semantics, str):
+        raise TypeError("event_semantics must be a string")
+    if event_semantics not in event_semantics_modes:
+        raise ValueError(
+            "event_semantics must be E0, E1, E2, or E3"
+        )
+    if opportunity_trace_limit < 0:
+        raise ValueError(
+            "opportunity_trace_limit must be non-negative"
         )
 
     scorer_modes = {
@@ -1198,6 +1228,9 @@ def g4irsf11_event_runtime_from_records(
             str(pibt_preference_mode),
             normalized_regret_prior_records,
             int(selective_credit_contention_threshold),
+            str(event_semantics),
+            bool(enable_opportunity_telemetry),
+            int(opportunity_trace_limit),
         )
     )
     summary = payload.get("summary")

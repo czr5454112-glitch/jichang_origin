@@ -10,6 +10,7 @@
 #include <deque>
 #include <limits>
 #include <map>
+#include <memory>
 #include <optional>
 #include <queue>
 #include <set>
@@ -46,6 +47,8 @@ enum class JunctionEventType {
   kRepair,
   kLocalQueueUpdate,
   kCongestionBeaconUpdate,
+  kSourceArbitration,
+  kJunctionArbitration,
 };
 
 inline const char* junction_event_name(JunctionEventType type) {
@@ -68,6 +71,10 @@ inline const char* junction_event_name(JunctionEventType type) {
       return "LOCAL_QUEUE_UPDATE";
     case JunctionEventType::kCongestionBeaconUpdate:
       return "CONGESTION_BEACON_UPDATE";
+    case JunctionEventType::kSourceArbitration:
+      return "SOURCE_ARBITRATION";
+    case JunctionEventType::kJunctionArbitration:
+      return "JUNCTION_ARBITRATION";
   }
   return "UNKNOWN";
 }
@@ -182,6 +189,20 @@ struct EventDrivenJunctionConfig {
   // Controls proactive use of locally advertised fault state.  The physical
   // edge-entry interlock is independent and cannot be disabled.
   bool enable_fault_policy = true;
+  // G4IRSF14 event modes are append-only. E0 is the exact historical
+  // immediate-dispatch path; E1/E2/E3 defer only the named local arbitration
+  // boundary to an exact-timestamp, generation-stamped event.
+  std::string event_semantics = "E0_immediate_dispatch_f2";
+  bool enable_opportunity_telemetry = false;
+  int opportunity_trace_limit = 200000;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  // Native-only fault injection used to verify transaction rollback after
+  // multiple action rows have been staged. It is absent from production
+  // builds and bindings.
+  int test_pibt_logical_failure_after_staged_actions = -1;
+  bool test_pibt_logical_failure_after_followup_scheduling = false;
+  bool test_verify_pibt_rollback_logical_state = false;
+#endif
 };
 
 struct EventCandidateRecord {
@@ -535,6 +556,39 @@ struct EventRuntimeSummary {
   std::uint64_t pibt_preference_wait_cycle_penalty_count = 0;
   std::uint64_t pibt_preference_backtrack_penalty_count = 0;
   std::uint64_t pibt_preference_regret_prior_hit_count = 0;
+  // G4IRSF14 append-only event-semantics diagnostics. The Python binding
+  // omits these keys for the exact E0/telemetry-off compatibility path.
+  std::string event_semantics;
+  std::string event_semantics_echo;
+  bool opportunity_telemetry_enabled = false;
+  std::uint64_t source_arbitration_event_count = 0;
+  std::uint64_t junction_arbitration_event_count = 0;
+  std::uint64_t stale_arbitration_event_count = 0;
+  std::uint64_t superseded_arbitration_event_rejected_count = 0;
+  std::uint64_t duplicate_same_time_arbitration_prevented_count = 0;
+  std::uint64_t source_same_timestamp_batch_count = 0;
+  std::uint64_t junction_same_timestamp_batch_count = 0;
+  int max_source_arbitration_batch_size = 0;
+  int max_junction_arbitration_batch_size = 0;
+  std::uint64_t opportunity_event_queue_inspection_count = 0;
+  std::uint64_t source_opportunity_total_count = 0;
+  std::uint64_t source_opportunity_stored_count = 0;
+  std::uint64_t source_opportunity_dropped_count = 0;
+  std::uint64_t junction_opportunity_total_count = 0;
+  std::uint64_t junction_opportunity_stored_count = 0;
+  std::uint64_t junction_opportunity_dropped_count = 0;
+  std::uint64_t merge_visibility_total_count = 0;
+  std::uint64_t merge_visibility_stored_count = 0;
+  std::uint64_t merge_visibility_dropped_count = 0;
+  std::uint64_t event_seq_audit_total_count = 0;
+  std::uint64_t event_seq_audit_stored_count = 0;
+  std::uint64_t event_seq_audit_dropped_count = 0;
+  std::uint64_t arbitration_batch_total_count = 0;
+  std::uint64_t arbitration_batch_stored_count = 0;
+  std::uint64_t arbitration_batch_dropped_count = 0;
+  std::uint64_t fault_generation_commit_recheck_count = 0;
+  int microphase_runtime_global_scan_count = 0;
+  double artificial_batch_delay_seconds = 0.0;
 };
 
 struct EventRuntimeJunctionResult {
@@ -623,6 +677,100 @@ struct EventRuntimePIBTAuditRow {
   std::vector<BoundedLocalPIBTAction> actions;
 };
 
+struct EventRuntimeSourceOpportunityRow {
+  double event_time = 0.0;
+  std::uint64_t timestamp_bits = 0;
+  int source_node = -1;
+  int queue_length_before_enqueue = 0;
+  int queue_length_after_enqueue = 0;
+  int queue_length_before_arbitration = 0;
+  int queue_length_after_arbitration = 0;
+  int same_timestamp_release_batch_size = 0;
+  int same_time_pending_source_releases = 0;
+  int same_time_pending_shared_merge_releases = 0;
+  int ready_set_size = 0;
+  int priority_comparison_count = 0;
+  int chosen_task_id = -1;
+  int chosen_runtime_bag_id = -1;
+  std::string chosen_segment_id;
+  std::string queue_discipline;
+  std::uint64_t event_seq = 0;
+  std::uint64_t arbitration_generation = 0;
+  bool batched_arbitration = false;
+};
+
+struct EventRuntimeJunctionOpportunityRow {
+  double event_time = 0.0;
+  std::uint64_t timestamp_bits = 0;
+  int junction_node = -1;
+  int queue_length_before_enqueue = 0;
+  int queue_length_after_enqueue = 0;
+  int queue_length_before_arbitration = 0;
+  int queue_length_after_arbitration = 0;
+  int same_timestamp_arrival_batch_size = 0;
+  int same_time_pending_arrivals = 0;
+  int same_time_pending_shared_merge_requests = 0;
+  int ready_set_size = 0;
+  int priority_comparison_count = 0;
+  int pibt_slice_bag_count = 0;
+  int pibt_owner_count = 0;
+  int chosen_task_id = -1;
+  int chosen_runtime_bag_id = -1;
+  std::string chosen_segment_id;
+  std::uint64_t event_seq = 0;
+  std::uint64_t arbitration_generation = 0;
+  bool batched_arbitration = false;
+};
+
+struct EventRuntimeMergeVisibilityRow {
+  double event_time = 0.0;
+  std::uint64_t timestamp_bits = 0;
+  int destination_node = -1;
+  int upstream_node = -1;
+  int incoming_edge_start = -1;
+  int incoming_edge_end = -1;
+  int requesting_task_id = -1;
+  int requesting_runtime_bag_id = -1;
+  std::string requesting_segment_id;
+  double earliest_arrival = 0.0;
+  double slot_start = 0.0;
+  double slot_end = 0.0;
+  int known_competing_request_count = 0;
+  int later_same_time_competitor_count = 0;
+  bool later_same_time_competitor_exists = false;
+  bool seq_determined_order = false;
+  std::uint64_t event_seq = 0;
+};
+
+struct EventRuntimeEventSeqAuditRow {
+  double event_time = 0.0;
+  std::uint64_t timestamp_bits = 0;
+  std::string boundary;
+  int node = -1;
+  int destination_node = -1;
+  int ready_set_size = 0;
+  int priority_comparison_count = 0;
+  int later_same_time_competitor_count = 0;
+  int chosen_runtime_bag_id = -1;
+  std::uint64_t chosen_enqueue_sequence = 0;
+  std::uint64_t event_seq = 0;
+  bool seq_determined_order = false;
+  std::string reason;
+};
+
+struct EventRuntimeArbitrationBatchRow {
+  double event_time = 0.0;
+  std::uint64_t timestamp_bits = 0;
+  std::string boundary;
+  int node = -1;
+  int enqueue_count = 0;
+  int ready_set_size = 0;
+  int pending_same_time_event_count = 0;
+  int chosen_runtime_bag_id = -1;
+  std::uint64_t event_seq = 0;
+  std::uint64_t arbitration_generation = 0;
+};
+
 struct EventDrivenJunctionResult {
   EventRuntimeSummary summary;
   std::vector<EventRuntimeBagResult> bags;
@@ -633,11 +781,28 @@ struct EventDrivenJunctionResult {
   std::vector<EventRuntimeFaultAuditRow> fault_events;
   std::vector<EventRuntimeCreditAuditRow> credit_events;
   std::vector<EventRuntimePIBTAuditRow> pibt_events;
+  std::vector<EventRuntimeSourceOpportunityRow> source_admission_opportunities;
+  std::vector<EventRuntimeJunctionOpportunityRow> junction_arbitration_opportunities;
+  std::vector<EventRuntimeMergeVisibilityRow> merge_request_visibility;
+  std::vector<EventRuntimeEventSeqAuditRow> event_seq_ordering_audit;
+  std::vector<EventRuntimeArbitrationBatchRow> arbitration_batch_cardinality;
 };
 
 namespace event_runtime_detail {
 
 constexpr double kEpsilon = 1.0e-9;
+
+inline std::uint64_t timestamp_bits(double value) noexcept {
+  std::uint64_t bits = 0;
+  static_assert(sizeof(bits) == sizeof(value));
+  std::memcpy(&bits, &value, sizeof(bits));
+  return bits;
+}
+
+inline bool same_timestamp(double left, double right) noexcept {
+  return timestamp_bits(left) == timestamp_bits(right) ||
+         std::abs(left - right) <= kEpsilon;
+}
 
 inline long long directed_key(int start, int end) {
   return (static_cast<long long>(start) << 32) ^ static_cast<unsigned int>(end);
@@ -729,6 +894,22 @@ class LocalCalendar {
   }
 
   [[nodiscard]] int size() const { return static_cast<int>(intervals_.size()); }
+
+  [[nodiscard]] std::uint64_t logical_state_fingerprint() const noexcept {
+    std::uint64_t hash = 1469598103934665603ULL;
+    const auto mix = [&](std::uint64_t value) {
+      hash ^= value;
+      hash *= 1099511628211ULL;
+    };
+    mix(static_cast<std::uint64_t>(intervals_.size()));
+    for (const auto& interval : intervals_) {
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(interval.task_id)));
+      mix(timestamp_bits(interval.start));
+      mix(timestamp_bits(interval.end));
+    }
+    return hash;
+  }
 
   // Payload lower bound for intervals that are logically active right now.
   [[nodiscard]] std::size_t dynamic_interval_lower_bound_bytes() const noexcept {
@@ -880,6 +1061,9 @@ struct RuntimeEvent {
   bool drop_notification = false;
   bool retry = false;
   std::string reason;
+  // Negative preserves the frozen comparator. Opt-in G4IRSF14 modes assign
+  // an explicit deterministic microphase rank at publication time.
+  int microphase_priority = -1;
 };
 
 inline int event_priority(const RuntimeEvent& event) {
@@ -905,10 +1089,16 @@ inline int event_priority(const RuntimeEvent& event) {
   if (event.type == JunctionEventType::kBagRelease) {
     return 6;
   }
-  if (event.type == JunctionEventType::kEdgeEnter) {
+  if (event.type == JunctionEventType::kSourceArbitration) {
     return 7;
   }
-  return 8;  // LOCAL_QUEUE_UPDATE
+  if (event.type == JunctionEventType::kJunctionArbitration) {
+    return 8;
+  }
+  if (event.type == JunctionEventType::kEdgeEnter) {
+    return 9;
+  }
+  return 10;  // LOCAL_QUEUE_UPDATE
 }
 
 struct RuntimeEventLater {
@@ -916,8 +1106,12 @@ struct RuntimeEventLater {
     if (std::abs(left.time - right.time) > kEpsilon) {
       return left.time > right.time;
     }
-    const int left_priority = event_priority(left);
-    const int right_priority = event_priority(right);
+    const int left_priority = left.microphase_priority >= 0
+                                  ? left.microphase_priority
+                                  : event_priority(left);
+    const int right_priority = right.microphase_priority >= 0
+                                   ? right.microphase_priority
+                                   : event_priority(right);
     if (left_priority != right_priority) {
       return left_priority > right_priority;
     }
@@ -933,6 +1127,44 @@ class RuntimeEventQueue
   void reserve(std::size_t capacity) {
     this->c.reserve(capacity);
   }
+
+  template <typename Visitor>
+  void inspect(Visitor&& visitor) const {
+    for (const auto& event : this->c) {
+      visitor(event);
+    }
+  }
+};
+
+struct LocalArbitrationState {
+  double source_wakeup_time = std::numeric_limits<double>::infinity();
+  double junction_wakeup_time = std::numeric_limits<double>::infinity();
+  bool has_last_source_arbitration = false;
+  bool has_last_junction_arbitration = false;
+  double last_source_arbitration_time = 0.0;
+  double last_junction_arbitration_time = 0.0;
+  std::uint64_t last_source_arbitration_generation = 0;
+  std::uint64_t last_junction_arbitration_generation = 0;
+  bool source_batch_open = false;
+  bool junction_batch_open = false;
+  double source_batch_time = 0.0;
+  double junction_batch_time = 0.0;
+  int source_queue_before_enqueue = 0;
+  int source_queue_after_enqueue = 0;
+  int junction_queue_before_enqueue = 0;
+  int junction_queue_after_enqueue = 0;
+  int source_enqueue_count = 0;
+  int junction_enqueue_count = 0;
+};
+
+struct G4IRSF14RuntimeState {
+  std::unordered_map<int, LocalArbitrationState> local;
+  std::uint64_t current_event_seq = 0;
+  bool microphase_floor_active = false;
+  double microphase_floor_time = 0.0;
+  int microphase_floor_priority = -1;
+  int current_pibt_slice_bag_count = 0;
+  int current_pibt_owner_count = 0;
 };
 
 static_assert(std::is_nothrow_move_constructible_v<RuntimeEvent>);
@@ -945,6 +1177,10 @@ class EventDrivenJunctionRuntime {
   explicit EventDrivenJunctionRuntime(const Graph& graph, EventDrivenJunctionConfig config = {})
       : graph_(graph), config_(std::move(config)) {
     validate_config();
+    if (g4irsf14_extensions_enabled()) {
+      g4irsf14_state_ =
+          std::make_unique<event_runtime_detail::G4IRSF14RuntimeState>();
+    }
     initialize_regret_prior();
     initialize_scorer();
   }
@@ -961,6 +1197,10 @@ class EventDrivenJunctionRuntime {
         !config_.event_trace_limit.has_value();
     result_.summary.trace_shard_count = config_.trace_shard_count;
     result_.summary.trace_shard_index = config_.trace_shard_index;
+    result_.summary.event_semantics = canonical_event_semantics();
+    result_.summary.event_semantics_echo = config_.event_semantics;
+    result_.summary.opportunity_telemetry_enabled =
+        config_.enable_opportunity_telemetry;
     result_.summary.admission_mode = canonical_admission_mode();
     result_.summary.admission_mode_echo = config_.admission_mode;
     result_.summary.source_admission_enabled =
@@ -1030,7 +1270,7 @@ class EventDrivenJunctionRuntime {
         "real_adjacent_one_edge_candidates;"
         "bounded_bags_resources_candidates;"
         "credit_transaction_scoped_to_selected_action_ids;"
-        "transaction_deltas_O_selected_actions_no_queue_or_calendar_copy;"
+        "transaction_state_bounded_by_selected_bags_nodes_and_corridors;"
         "two_phase_local_prevalidation_and_logical_failure_atomic_publish;"
         "one_edge_per_bag_per_decision;multi_bag_batch_action_count_reported_separately;"
         "no_astar;no_global_reservation_scan;no_future_route;"
@@ -1192,6 +1432,49 @@ class EventDrivenJunctionRuntime {
                       const std::string& short_name,
                       const std::string& full_name) {
     return actual == short_name || actual == full_name;
+  }
+
+  std::string canonical_event_semantics() const {
+    if (mode_is(config_.event_semantics,
+                "E0",
+                "E0_immediate_dispatch_f2")) {
+      return "E0_immediate_dispatch_f2";
+    }
+    if (mode_is(config_.event_semantics,
+                "E1",
+                "E1_batch_source_same_timestamp")) {
+      return "E1_batch_source_same_timestamp";
+    }
+    if (mode_is(config_.event_semantics,
+                "E2",
+                "E2_batch_junction_same_timestamp")) {
+      return "E2_batch_junction_same_timestamp";
+    }
+    if (mode_is(config_.event_semantics,
+                "E3",
+                "E3_batch_source_and_junction_same_timestamp")) {
+      return "E3_batch_source_and_junction_same_timestamp";
+    }
+    throw std::invalid_argument(
+        "event_semantics must be E0, E1, E2, or E3");
+  }
+
+  bool batches_source_same_timestamp() const {
+    const auto mode = canonical_event_semantics();
+    return mode == "E1_batch_source_same_timestamp" ||
+           mode == "E3_batch_source_and_junction_same_timestamp";
+  }
+
+  bool batches_junction_same_timestamp() const {
+    const auto mode = canonical_event_semantics();
+    return mode == "E2_batch_junction_same_timestamp" ||
+           mode == "E3_batch_source_and_junction_same_timestamp";
+  }
+
+  bool g4irsf14_extensions_enabled() const {
+    return canonical_event_semantics() !=
+               "E0_immediate_dispatch_f2" ||
+           config_.enable_opportunity_telemetry;
   }
 
   std::string canonical_resource_semantics() const {
@@ -1620,6 +1903,7 @@ class EventDrivenJunctionRuntime {
     (void)canonical_priority_mode();
     (void)canonical_pibt_preference_mode();
     (void)canonical_framework_mode();
+    (void)canonical_event_semantics();
     const auto scorer_mode = canonical_scorer_mode();
     if (!std::isfinite(config_.retry_interval) ||
         !std::isfinite(config_.minimum_service_seconds) ||
@@ -1753,6 +2037,10 @@ class EventDrivenJunctionRuntime {
       throw std::invalid_argument(
           "trace_shard_count must be positive and trace_shard_index must be in range");
     }
+    if (config_.opportunity_trace_limit < 0) {
+      throw std::invalid_argument(
+          "opportunity_trace_limit must be non-negative");
+    }
   }
 
   void validate_request(const EventRuntimeBagRequest& request) const {
@@ -1806,6 +2094,16 @@ class EventDrivenJunctionRuntime {
     next_pibt_activation_id_ = 1;
     next_local_enqueue_sequence_ = 1;
     staged_event_sink_ = nullptr;
+    staged_merge_visibility_sink_ = nullptr;
+    staged_destination_known_competitor_counts_ =
+        nullptr;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    test_pibt_logical_failure_injected_ = false;
+#endif
+    if (g4irsf14_state_ != nullptr) {
+      *g4irsf14_state_ =
+          event_runtime_detail::G4IRSF14RuntimeState{};
+    }
     now_ = 0.0;
     active_bag_count_ = 0;
     last_physical_repair_time_ = -1.0;
@@ -1845,12 +2143,132 @@ class EventDrivenJunctionRuntime {
     publish_event(std::move(event));
   }
 
-  void publish_event(RuntimeEvent event) {
+  int g4irsf14_microphase_priority(
+      const RuntimeEvent& event) const {
+    const auto mode = canonical_event_semantics();
+    if (mode == "E0_immediate_dispatch_f2") {
+      return -1;
+    }
+    if (mode == "E3_batch_source_and_junction_same_timestamp") {
+      if ((event.type == JunctionEventType::kFault ||
+           event.type == JunctionEventType::kRepair) &&
+          event.notification) {
+        return 3;
+      }
+      if (event.type == JunctionEventType::kFault ||
+          event.type == JunctionEventType::kRepair) {
+        return 0;
+      }
+      if (event.type == JunctionEventType::kEdgeExit ||
+          event.type ==
+              JunctionEventType::kJunctionServiceComplete) {
+        return 1;
+      }
+      if (event.type == JunctionEventType::kArriveJunction ||
+          event.type == JunctionEventType::kBagRelease) {
+        return 2;
+      }
+      if (event.type ==
+              JunctionEventType::kCongestionBeaconUpdate ||
+          event.type == JunctionEventType::kLocalQueueUpdate) {
+        return 3;
+      }
+      if (event.type == JunctionEventType::kSourceArbitration) {
+        return 4;
+      }
+      if (event.type ==
+          JunctionEventType::kJunctionArbitration) {
+        return 5;
+      }
+      if (event.type == JunctionEventType::kEdgeEnter) {
+        return 6;
+      }
+      return 7;
+    }
+    // E1/E2 preserve the untouched immediate boundary's legacy ordering and
+    // insert only the selected exact-time arbitration after queue/beacon
+    // publication. Values are deliberately between BAG_RELEASE and passive
+    // EDGE_ENTER/trace processing in the legacy priority space.
+    if (event.type == JunctionEventType::kLocalQueueUpdate) {
+      return 7;
+    }
+    if (event.type == JunctionEventType::kSourceArbitration) {
+      return 8;
+    }
+    if (event.type ==
+        JunctionEventType::kJunctionArbitration) {
+      return 8;
+    }
+    if (event.type == JunctionEventType::kEdgeEnter) {
+      return 9;
+    }
+    return -1;
+  }
+
+  void prepare_event_for_publication(
+      RuntimeEvent& event) {
+    const int base_priority =
+        g4irsf14_microphase_priority(event);
+    event.microphase_priority = base_priority;
+    if (g4irsf14_state_ != nullptr &&
+        canonical_event_semantics() !=
+            "E0_immediate_dispatch_f2" &&
+        g4irsf14_state_->microphase_floor_active &&
+        event_runtime_detail::same_timestamp(
+            event.time,
+            g4irsf14_state_->microphase_floor_time)) {
+      const int effective_base =
+          base_priority >= 0
+              ? base_priority
+              : event_runtime_detail::event_priority(event);
+      event.microphase_priority =
+          std::max(
+              effective_base,
+              g4irsf14_state_->microphase_floor_priority);
+    }
+  }
+
+  void publish_prepared_event(RuntimeEvent event) {
     event.seq = next_event_seq_++;
     events_.push(std::move(event));
   }
 
+  void publish_prepared_reserved_event(
+      RuntimeEvent event) noexcept {
+    event.seq = next_event_seq_++;
+    events_.push(std::move(event));
+  }
+
+  void publish_event(RuntimeEvent event) {
+    prepare_event_for_publication(event);
+    publish_prepared_event(std::move(event));
+  }
+
   void process_event(const RuntimeEvent& event) {
+    if (g4irsf14_state_ != nullptr) {
+      g4irsf14_state_->current_event_seq = event.seq;
+      if (canonical_event_semantics() !=
+          "E0_immediate_dispatch_f2") {
+        const int effective_priority =
+            event.microphase_priority >= 0
+                ? event.microphase_priority
+                : event_runtime_detail::event_priority(event);
+        if (!g4irsf14_state_->microphase_floor_active ||
+            !event_runtime_detail::same_timestamp(
+                event.time,
+                g4irsf14_state_->microphase_floor_time)) {
+          g4irsf14_state_->microphase_floor_active = true;
+          g4irsf14_state_->microphase_floor_time = event.time;
+          g4irsf14_state_->microphase_floor_priority =
+              effective_priority;
+        } else {
+          g4irsf14_state_->microphase_floor_priority =
+              std::max(
+                  g4irsf14_state_->microphase_floor_priority,
+                  effective_priority);
+        }
+      }
+    }
     switch (event.type) {
       case JunctionEventType::kBagRelease:
         ++result_.summary.bag_release_event_count;
@@ -1888,6 +2306,14 @@ class EventDrivenJunctionRuntime {
         ++result_.summary.congestion_beacon_update_event_count;
         process_congestion_beacon_update(event);
         break;
+      case JunctionEventType::kSourceArbitration:
+        ++result_.summary.source_arbitration_event_count;
+        process_source_arbitration(event);
+        break;
+      case JunctionEventType::kJunctionArbitration:
+        ++result_.summary.junction_arbitration_event_count;
+        process_junction_arbitration(event);
+        break;
     }
   }
 
@@ -1914,6 +2340,7 @@ class EventDrivenJunctionRuntime {
       bag.local_enqueue_sequence = next_local_enqueue_sequence_++;
       controller.source_queue.push_back(event.task_id);
       update_queue_maxima(controller);
+      observe_source_enqueue(event.node, event.time);
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
                        event.time,
                        event.task_id,
@@ -1923,7 +2350,38 @@ class EventDrivenJunctionRuntime {
                        "source_enqueue");
     }
 
-    const int admitted_task = try_admit_source(event.node, event.time);
+    if (batches_source_same_timestamp()) {
+      schedule_source_wakeup(event.node, event.time);
+      append_event_trace(event,
+                         event.task_id,
+                         event.node,
+                         -1,
+                         -1,
+                         "source_release_enqueue",
+                         0);
+      return;
+    }
+
+    const int ready_set_size =
+        static_cast<int>(controller.source_queue.size());
+    int priority_comparison_count = 0;
+    int chosen_task = -1;
+    int* comparison_counter =
+        config_.enable_opportunity_telemetry
+            ? &priority_comparison_count
+            : nullptr;
+    const int admitted_task =
+        try_admit_source(event.node,
+                         event.time,
+                         config_.enable_opportunity_telemetry
+                             ? &chosen_task
+                             : nullptr,
+                         comparison_counter);
+    append_source_opportunity(event,
+                              ready_set_size,
+                              chosen_task,
+                              priority_comparison_count,
+                              false);
     append_event_trace(event,
                        admitted_task,
                        event.node,
@@ -1939,15 +2397,74 @@ class EventDrivenJunctionRuntime {
     }
   }
 
-  int try_admit_source(int node, double time) {
+  void process_source_arbitration(const RuntimeEvent& event) {
+    if (!consume_source_arbitration_wakeup(event)) {
+      return;
+    }
+    auto& controller = junctions_[event.node];
+    if (controller.source_queue.empty()) {
+      ++result_.summary.stale_arbitration_event_count;
+      return;
+    }
+    const int ready_set_size =
+        static_cast<int>(controller.source_queue.size());
+    int priority_comparison_count = 0;
+    int chosen_task = -1;
+    int* comparison_counter =
+        config_.enable_opportunity_telemetry
+            ? &priority_comparison_count
+            : nullptr;
+    const int admitted_task =
+        try_admit_source(event.node,
+                         event.time,
+                         config_.enable_opportunity_telemetry
+                             ? &chosen_task
+                             : nullptr,
+                         comparison_counter);
+    append_source_opportunity(event,
+                              ready_set_size,
+                              chosen_task,
+                              priority_comparison_count,
+                              true);
+    append_event_trace(event,
+                       admitted_task,
+                       event.node,
+                       -1,
+                       -1,
+                       "same_timestamp_source_arbitration",
+                       0);
+    if (!controller.source_queue.empty()) {
+      const double duration = service_duration(event.node);
+      const double calendar_ready =
+          controller.service_calendar.earliest_start(event.time,
+                                                     duration);
+      schedule_source_wakeup(
+          event.node,
+          std::max(event.time + config_.retry_interval,
+                   calendar_ready));
+    }
+  }
+
+  int try_admit_source(
+      int node,
+      double time,
+      int* chosen_task = nullptr,
+      int* priority_comparison_count = nullptr) {
     auto& controller = junctions_[node];
     controller.service_calendar.purge(time);
     controller.observe_local_state();
     if (controller.source_queue.empty()) {
       return -1;
     }
-    const std::size_t queue_index = choose_bag(controller.source_queue, time, controller.escape_token_task);
+    const std::size_t queue_index =
+        choose_bag(controller.source_queue,
+                   time,
+                   controller.escape_token_task,
+                   priority_comparison_count);
     const int task_id = controller.source_queue[queue_index];
+    if (chosen_task != nullptr) {
+      *chosen_task = task_id;
+    }
     auto& bag = bags_.at(task_id);
     const double duration = service_duration(node);
     ++result_.summary.source_admission_attempt_count;
@@ -2535,6 +3052,7 @@ class EventDrivenJunctionRuntime {
       bag.local_enqueue_sequence = next_local_enqueue_sequence_++;
       controller.queue.push_back(event.task_id);
       update_queue_maxima(controller);
+      observe_junction_enqueue(event.node, event.time);
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
                        event.time,
                        event.task_id,
@@ -2544,11 +3062,55 @@ class EventDrivenJunctionRuntime {
                        "junction_enqueue");
     }
 
+    if (batches_junction_same_timestamp()) {
+      schedule_junction_wakeup(event.node, event.time);
+      append_event_trace(event,
+                         event.task_id,
+                         event.node,
+                         event.from_node,
+                         event.node,
+                         "junction_arrival_enqueue",
+                         0);
+      return;
+    }
+
+    dispatch_junction_once(event, false);
+  }
+
+  void process_junction_arbitration(const RuntimeEvent& event) {
+    if (!consume_junction_arbitration_wakeup(event)) {
+      return;
+    }
+    if (junctions_[event.node].queue.empty()) {
+      ++result_.summary.stale_arbitration_event_count;
+      return;
+    }
+    dispatch_junction_once(event, true);
+  }
+
+  void dispatch_junction_once(const RuntimeEvent& event,
+                              bool batched_arbitration) {
+    auto& controller = junctions_[event.node];
+    const int ready_set_size =
+        static_cast<int>(controller.queue.size());
+    if (g4irsf14_state_ != nullptr) {
+      g4irsf14_state_->current_pibt_slice_bag_count = 0;
+      g4irsf14_state_->current_pibt_owner_count = 0;
+    }
     DispatchResult dispatch;
+    int priority_comparison_count = 0;
+    int* comparison_counter =
+        config_.enable_opportunity_telemetry
+            ? &priority_comparison_count
+            : nullptr;
     int bounded_local_same_bag_fallback_next = -1;
     if (canonical_pibt_mode() != BoundedLocalPIBTMode::kP0) {
       dispatch =
-          try_dispatch_bounded_local_pibt(event.node, event.time, event.seq);
+          try_dispatch_bounded_local_pibt(
+              event.node,
+              event.time,
+              event.seq,
+              comparison_counter);
       bounded_local_same_bag_fallback_next =
           dispatch.same_bag_fallback_next;
     }
@@ -2557,8 +3119,24 @@ class EventDrivenJunctionRuntime {
           event.node,
           event.time,
           event.seq,
-          bounded_local_same_bag_fallback_next);
+          bounded_local_same_bag_fallback_next,
+          comparison_counter);
     }
+    const int pibt_slice_bag_count =
+        g4irsf14_state_ == nullptr
+            ? 0
+            : g4irsf14_state_->current_pibt_slice_bag_count;
+    const int pibt_owner_count =
+        g4irsf14_state_ == nullptr
+            ? 0
+            : g4irsf14_state_->current_pibt_owner_count;
+    append_junction_opportunity(event,
+                                ready_set_size,
+                                dispatch.task_id,
+                                pibt_slice_bag_count,
+                                pibt_owner_count,
+                                priority_comparison_count,
+                                batched_arbitration);
     schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
                      event.time,
                      dispatch.task_id >= 0 ? dispatch.task_id : event.task_id,
@@ -2577,7 +3155,10 @@ class EventDrivenJunctionRuntime {
                        event.node,
                        event.from_node,
                        dispatch.selected_next,
-                       event.retry ? "junction_retry" : "junction_arrival",
+                       batched_arbitration
+                           ? "same_timestamp_junction_arbitration"
+                           : (event.retry ? "junction_retry"
+                                          : "junction_arrival"),
                        dispatch.selected_edge_count);
     if (!controller.queue.empty() && !controller.junction_wakeup_pending) {
       schedule_junction_wakeup(event.node, event.time + config_.retry_interval);
@@ -2625,6 +3206,7 @@ class EventDrivenJunctionRuntime {
 
   struct PIBTJunctionSnapshot {
     int node = -1;
+    std::deque<int> queue;
     int peak_source_queue_length = 0;
     int peak_junction_queue_length = 0;
     int peak_service_calendar_intervals = 0;
@@ -2635,11 +3217,19 @@ class EventDrivenJunctionRuntime {
     double last_service_reservation_end_time = -1.0;
     double next_dispatch_time = 0.0;
     int scheduled_incoming = 0;
-    std::map<int, std::pair<bool, int>>
+    std::unordered_map<int, int>
         scheduled_incoming_by_goal;
+    std::uint64_t source_wakeup_generation = 0;
     std::uint64_t junction_wakeup_generation = 0;
+    bool source_wakeup_pending = false;
     bool junction_wakeup_pending = false;
     int escape_token_task = -1;
+    bool g4irsf14_local_state_existed = false;
+    event_runtime_detail::LocalArbitrationState
+        g4irsf14_local_state;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    std::uint64_t logical_state_fingerprint = 0;
+#endif
   };
 
   struct PIBTActionDelta {
@@ -2648,12 +3238,23 @@ class EventDrivenJunctionRuntime {
     int next_node = -1;
     std::size_t queue_index = 0;
     bool has_corridor_reservation = false;
+    bool corridor_existed = false;
     long long corridor_key = 0;
     double corridor_start = 0.0;
     double corridor_end = 0.0;
     bool has_destination_reservation = false;
     double destination_start = 0.0;
     double destination_end = 0.0;
+  };
+
+  struct PIBTStagedMergeVisibility {
+    EventRuntimeMergeVisibilityRow merge;
+    EventRuntimeEventSeqAuditRow audit;
+  };
+
+  struct PIBTCorridorSnapshot {
+    bool existed = false;
+    std::uint64_t logical_state_fingerprint = 0;
   };
 
   struct PIBTTransactionSnapshot {
@@ -2664,8 +3265,24 @@ class EventDrivenJunctionRuntime {
     EventRuntimeSummary summary;
     std::map<int, PIBTBagSnapshot> bags;
     std::map<int, PIBTJunctionSnapshot> junctions;
+    std::map<long long, PIBTCorridorSnapshot> corridors;
     std::vector<PIBTActionDelta> action_deltas;
     std::vector<RuntimeEvent> staged_events;
+    std::vector<PIBTStagedMergeVisibility>
+        staged_merge_visibility;
+    std::map<int, int>
+        staged_destination_known_competitor_counts;
+    std::uint64_t next_event_seq = 0;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    bool calendar_logical_state_restored = true;
+    std::size_t event_queue_size = 0;
+    std::uint64_t event_queue_logical_fingerprint = 0;
+    std::size_t merge_visibility_size = 0;
+    std::size_t event_seq_audit_size = 0;
+    FirstEdgeCreditCounters credit_counters;
+    std::size_t credit_active_count = 0;
+    std::size_t credit_lifecycle_count = 0;
+#endif
   };
 
   class PIBTLogicalCommitFailure : public std::runtime_error {
@@ -3273,7 +3890,10 @@ class EventDrivenJunctionRuntime {
     }
   }
 
-  std::optional<int> pibt_ready_owner_at_node(int node, double time) const {
+  std::optional<int> pibt_ready_owner_at_node(
+      int node,
+      double time,
+      int* priority_comparison_count) const {
     const auto controller = junctions_.find(node);
     if (controller == junctions_.end() || controller->second.queue.empty() ||
         time + event_runtime_detail::kEpsilon <
@@ -3282,7 +3902,8 @@ class EventDrivenJunctionRuntime {
     }
     const std::size_t index = choose_bag(controller->second.queue,
                                          time,
-                                         controller->second.escape_token_task);
+                                         controller->second.escape_token_task,
+                                         priority_comparison_count);
     const int runtime_bag_id = controller->second.queue[index];
     const auto bag = bags_.find(runtime_bag_id);
     if (bag == bags_.end() ||
@@ -3299,7 +3920,8 @@ class EventDrivenJunctionRuntime {
   PIBTLocalSlice build_pibt_local_slice(int trigger_node,
                                         int trigger_runtime_bag_id,
                                         double time,
-                                        std::uint64_t arrive_event_seq) {
+                                        std::uint64_t arrive_event_seq,
+                                        int* priority_comparison_count) {
     PIBTLocalSlice slice;
     slice.trigger_runtime_bag_id = trigger_runtime_bag_id;
     if (config_.local_queue_capacity <= 0) {
@@ -3456,7 +4078,10 @@ class EventDrivenJunctionRuntime {
         std::optional<int> blocker_owner;
         if (target != bag.request.goal &&
             occupancy >= config_.local_queue_capacity) {
-          blocker_owner = pibt_ready_owner_at_node(target, time);
+          blocker_owner = pibt_ready_owner_at_node(
+              target,
+              time,
+              priority_comparison_count);
           if (!blocker_owner.has_value()) {
             continue;
           }
@@ -3846,6 +4471,189 @@ class EventDrivenJunctionRuntime {
     return true;
   }
 
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  std::uint64_t test_junction_logical_fingerprint(
+      const JunctionState& junction) const {
+    std::uint64_t hash = 1469598103934665603ULL;
+    const auto mix = [&](std::uint64_t value) {
+      hash ^= value;
+      hash *= 1099511628211ULL;
+    };
+    for (const int bag_id : junction.source_queue) {
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(bag_id)));
+    }
+    mix(0x51ceULL);
+    for (const int bag_id : junction.queue) {
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(bag_id)));
+    }
+    mix(junction.service_calendar
+            .logical_state_fingerprint());
+    mix(static_cast<std::uint64_t>(
+        junction.scheduled_incoming));
+    std::vector<std::pair<int, int>> goals(
+        junction.scheduled_incoming_by_goal.begin(),
+        junction.scheduled_incoming_by_goal.end());
+    std::sort(goals.begin(), goals.end());
+    mix(static_cast<std::uint64_t>(goals.size()));
+    for (const auto& goal : goals) {
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(goal.first)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(goal.second)));
+    }
+    mix(static_cast<std::uint64_t>(
+        junction.peak_source_queue_length));
+    mix(static_cast<std::uint64_t>(
+        junction.peak_junction_queue_length));
+    mix(static_cast<std::uint64_t>(
+        junction.peak_service_calendar_intervals));
+    mix(static_cast<std::uint64_t>(
+        junction.peak_local_state_accounted_bytes));
+    mix(junction.service_reservation_count);
+    mix(event_runtime_detail::timestamp_bits(
+        junction.cumulative_service_reserved_seconds));
+    mix(event_runtime_detail::timestamp_bits(
+        junction.first_service_reservation_start_time));
+    mix(event_runtime_detail::timestamp_bits(
+        junction.last_service_reservation_end_time));
+    mix(junction.source_wakeup_generation);
+    mix(junction.junction_wakeup_generation);
+    mix(junction.source_wakeup_pending ? 1 : 0);
+    mix(junction.junction_wakeup_pending ? 1 : 0);
+    mix(event_runtime_detail::timestamp_bits(
+        junction.next_dispatch_time));
+    mix(static_cast<std::uint64_t>(
+        static_cast<std::uint32_t>(
+            junction.escape_token_task)));
+    return hash;
+  }
+
+  std::uint64_t test_event_queue_logical_fingerprint()
+      const noexcept {
+    std::uint64_t hash = 1469598103934665603ULL;
+    const auto mix = [&](std::uint64_t value) {
+      hash ^= value;
+      hash *= 1099511628211ULL;
+    };
+    events_.inspect([&](const RuntimeEvent& event) {
+      mix(static_cast<std::uint64_t>(event.type));
+      mix(event_runtime_detail::timestamp_bits(event.time));
+      mix(event.seq);
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(event.task_id)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(event.node)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(event.from_node)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(event.to_node)));
+      mix(event.retry ? 1 : 0);
+      mix(event.wakeup_generation);
+      mix(event.notification ? 1 : 0);
+      mix(event.message_generation);
+      mix(event_runtime_detail::timestamp_bits(
+          event.service_end));
+      mix(event_runtime_detail::timestamp_bits(
+          event.message_delay));
+      mix(event.drop_notification ? 1 : 0);
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              event.microphase_priority)));
+      mix(static_cast<std::uint64_t>(
+          std::hash<std::string>{}(event.reason)));
+    });
+    return hash;
+  }
+
+  static bool test_credit_counters_equal(
+      const FirstEdgeCreditCounters& left,
+      const FirstEdgeCreditCounters& right) noexcept {
+    return left.issue_attempt_count ==
+               right.issue_attempt_count &&
+           left.issued_count == right.issued_count &&
+           left.validation_attempt_count ==
+               right.validation_attempt_count &&
+           left.validation_success_count ==
+               right.validation_success_count &&
+           left.bind_attempt_count ==
+               right.bind_attempt_count &&
+           left.bound_count == right.bound_count &&
+           left.consume_attempt_count ==
+               right.consume_attempt_count &&
+           left.consumed_count == right.consumed_count &&
+           left.expired_count == right.expired_count &&
+           left.fault_revocation_count ==
+               right.fault_revocation_count &&
+           left.generation_revocation_count ==
+               right.generation_revocation_count &&
+           left.invalid_revocation_count ==
+               right.invalid_revocation_count &&
+           left.duplicate_rejection_count ==
+               right.duplicate_rejection_count &&
+           left.capacity_rejection_count ==
+               right.capacity_rejection_count &&
+           left.stale_snapshot_rejection_count ==
+               right.stale_snapshot_rejection_count &&
+           left.physical_fault_rejection_count ==
+               right.physical_fault_rejection_count &&
+           left.too_early_rejection_count ==
+               right.too_early_rejection_count &&
+           left.unknown_credit_rejection_count ==
+               right.unknown_credit_rejection_count &&
+           left.invalid_request_rejection_count ==
+               right.invalid_request_rejection_count &&
+           left.lifecycle_dropped_count ==
+               right.lifecycle_dropped_count &&
+           left.active_count == right.active_count &&
+           left.peak_active_count ==
+               right.peak_active_count;
+  }
+
+  static bool test_transaction_summary_equal(
+      const EventRuntimeSummary& left,
+      const EventRuntimeSummary& right) noexcept {
+    return left.reservation_conflicts ==
+               right.reservation_conflicts &&
+           left.decision_count == right.decision_count &&
+           left.resolved_deadlock_count ==
+               right.resolved_deadlock_count &&
+           left.max_deadlock_duration ==
+               right.max_deadlock_duration &&
+           left.max_local_calendar_intervals ==
+               right.max_local_calendar_intervals &&
+           left.max_corridor_calendar_intervals ==
+               right.max_corridor_calendar_intervals &&
+           left.fault_generation_commit_recheck_count ==
+               right.fault_generation_commit_recheck_count &&
+           left.opportunity_event_queue_inspection_count ==
+               right.opportunity_event_queue_inspection_count &&
+           left.merge_visibility_total_count ==
+               right.merge_visibility_total_count &&
+           left.merge_visibility_stored_count ==
+               right.merge_visibility_stored_count &&
+           left.merge_visibility_dropped_count ==
+               right.merge_visibility_dropped_count &&
+           left.event_seq_audit_total_count ==
+               right.event_seq_audit_total_count &&
+           left.event_seq_audit_stored_count ==
+               right.event_seq_audit_stored_count &&
+           left.event_seq_audit_dropped_count ==
+               right.event_seq_audit_dropped_count &&
+           left.duplicate_same_time_arbitration_prevented_count ==
+               right.duplicate_same_time_arbitration_prevented_count &&
+           left.bounded_local_pibt_max_transaction_credit_entries ==
+               right.bounded_local_pibt_max_transaction_credit_entries &&
+           left.bounded_local_pibt_max_transaction_bag_entries ==
+               right.bounded_local_pibt_max_transaction_bag_entries &&
+           left.bounded_local_pibt_max_transaction_junction_scalar_entries ==
+               right.bounded_local_pibt_max_transaction_junction_scalar_entries &&
+           left.bounded_local_pibt_max_transaction_action_deltas ==
+               right.bounded_local_pibt_max_transaction_action_deltas;
+  }
+#endif
+
   void capture_pibt_transaction(
       const std::vector<BoundedLocalPIBTAction>& actions,
       double time,
@@ -3862,6 +4670,7 @@ class EventDrivenJunctionRuntime {
       if (inserted.second) {
         const auto& junction = junctions_.at(node);
         saved.node = node;
+        saved.queue = junction.queue;
         saved.peak_source_queue_length =
             junction.peak_source_queue_length;
         saved.peak_junction_queue_length =
@@ -3880,11 +4689,30 @@ class EventDrivenJunctionRuntime {
             junction.last_service_reservation_end_time;
         saved.next_dispatch_time = junction.next_dispatch_time;
         saved.scheduled_incoming = junction.scheduled_incoming;
+        saved.scheduled_incoming_by_goal =
+            junction.scheduled_incoming_by_goal;
+        saved.source_wakeup_generation =
+            junction.source_wakeup_generation;
         saved.junction_wakeup_generation =
             junction.junction_wakeup_generation;
+        saved.source_wakeup_pending =
+            junction.source_wakeup_pending;
         saved.junction_wakeup_pending =
             junction.junction_wakeup_pending;
         saved.escape_token_task = junction.escape_token_task;
+        if (g4irsf14_state_ != nullptr) {
+          const auto local =
+              g4irsf14_state_->local.find(node);
+          saved.g4irsf14_local_state_existed =
+              local != g4irsf14_state_->local.end();
+          if (saved.g4irsf14_local_state_existed) {
+            saved.g4irsf14_local_state = local->second;
+          }
+        }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+        saved.logical_state_fingerprint =
+            test_junction_logical_fingerprint(junction);
+#endif
       }
       return saved;
     };
@@ -3905,21 +4733,7 @@ class EventDrivenJunctionRuntime {
               bag.first_edge_credit_id,
               bag.first_edge_credit_consumed});
       auto& from_saved = capture_junction(action.from_node);
-      auto& target_saved = capture_junction(action.next_node);
-      const auto& target = junctions_.at(action.next_node);
-      if (target_saved.scheduled_incoming_by_goal.find(
-              bag.request.goal) ==
-          target_saved.scheduled_incoming_by_goal.end()) {
-        const auto goal = target.scheduled_incoming_by_goal.find(
-            bag.request.goal);
-        target_saved.scheduled_incoming_by_goal.emplace(
-            bag.request.goal,
-            std::make_pair(
-                goal != target.scheduled_incoming_by_goal.end(),
-                goal == target.scheduled_incoming_by_goal.end()
-                    ? 0
-                    : goal->second));
-      }
+      (void)capture_junction(action.next_node);
 
       const auto& from = junctions_.at(action.from_node);
       const auto queued =
@@ -3942,6 +4756,27 @@ class EventDrivenJunctionRuntime {
         delta.has_corridor_reservation = true;
         delta.corridor_key =
             resource_corridor_key(action.from_node, action.next_node);
+        const auto inserted =
+            snapshot.corridors.emplace(
+                delta.corridor_key,
+                PIBTCorridorSnapshot{});
+        if (inserted.second) {
+          const auto corridor =
+              corridors_.find(delta.corridor_key);
+          inserted.first->second.existed =
+              corridor != corridors_.end();
+          delta.corridor_existed =
+              inserted.first->second.existed;
+          if (inserted.first->second.existed) {
+            inserted.first->second
+                .logical_state_fingerprint =
+                corridor->second
+                    .logical_state_fingerprint();
+          }
+        } else {
+          delta.corridor_existed =
+              inserted.first->second.existed;
+        }
         delta.corridor_start = time;
         delta.corridor_end =
             time + corridor_reservation_duration(travel);
@@ -3959,6 +4794,7 @@ class EventDrivenJunctionRuntime {
     }
     if (snapshot.bags.size() > actions.size() ||
         snapshot.junctions.size() > actions.size() * 2 ||
+        snapshot.corridors.size() > actions.size() ||
         snapshot.action_deltas.size() != actions.size() ||
         static_cast<int>(snapshot.action_deltas.size()) >
             config_.pibt_max_ready_bags) {
@@ -3982,27 +4818,56 @@ class EventDrivenJunctionRuntime {
                 .bounded_local_pibt_max_transaction_action_deltas,
             static_cast<int>(snapshot.action_deltas.size()));
     snapshot.summary = result_.summary;
+    snapshot.next_event_seq = next_event_seq_;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    snapshot.event_queue_size = events_.size();
+    snapshot.event_queue_logical_fingerprint =
+        test_event_queue_logical_fingerprint();
+    snapshot.merge_visibility_size =
+        result_.merge_request_visibility.size();
+    snapshot.event_seq_audit_size =
+        result_.event_seq_ordering_audit.size();
+    snapshot.credit_counters =
+        credit_ledger_.counters();
+    snapshot.credit_active_count =
+        credit_ledger_.stored_active_count();
+    snapshot.credit_lifecycle_count =
+        credit_ledger_.stored_lifecycle_count();
+#endif
     snapshot.captured = true;
   }
 
   void restore_pibt_transaction(PIBTTransactionSnapshot& snapshot) {
     staged_event_sink_ = nullptr;
+    staged_merge_visibility_sink_ = nullptr;
+    staged_destination_known_competitor_counts_ =
+        nullptr;
     snapshot.staged_events.clear();
+    snapshot.staged_merge_visibility.clear();
+    snapshot.staged_destination_known_competitor_counts
+        .clear();
     if (!snapshot.captured || !snapshot.mutated) {
       return;
     }
     result_.summary = snapshot.summary;
+    next_event_seq_ = snapshot.next_event_seq;
     for (std::size_t index = snapshot.applied_action_count;
          index > 0;
          --index) {
-      const auto& delta = snapshot.action_deltas[index - 1];
+      const auto& delta =
+          snapshot.action_deltas[index - 1];
       if (delta.has_corridor_reservation) {
-        const auto corridor = corridors_.find(delta.corridor_key);
+        const auto corridor =
+            corridors_.find(delta.corridor_key);
         if (corridor != corridors_.end()) {
           corridor->second.erase_exact(
               delta.bag_id,
               delta.corridor_start,
               delta.corridor_end);
+          if (!delta.corridor_existed &&
+              corridor->second.size() == 0) {
+            corridors_.erase(corridor);
+          }
         }
       }
       if (delta.has_destination_reservation) {
@@ -4012,15 +4877,31 @@ class EventDrivenJunctionRuntime {
                 delta.destination_start,
                 delta.destination_end);
       }
-      auto& queue = junctions_.at(delta.from_node).queue;
-      const auto position =
-          std::min(delta.queue_index, queue.size());
-      if (std::find(queue.begin(), queue.end(), delta.bag_id) ==
-          queue.end()) {
-        queue.insert(
-            queue.begin() + static_cast<std::ptrdiff_t>(position),
-            delta.bag_id);
+    }
+    for (auto& entry : snapshot.corridors) {
+      auto corridor = corridors_.find(entry.first);
+      if (!entry.second.existed) {
+        if (corridor != corridors_.end()) {
+          corridors_.erase(corridor);
+        }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+        snapshot.calendar_logical_state_restored =
+            snapshot.calendar_logical_state_restored &&
+            corridors_.find(entry.first) ==
+                corridors_.end();
+#endif
+        continue;
       }
+      if (corridor == corridors_.end()) {
+        throw std::logic_error(
+            "PIBT rollback lost an existing corridor calendar");
+      }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+      snapshot.calendar_logical_state_restored =
+          snapshot.calendar_logical_state_restored &&
+          corridor->second.logical_state_fingerprint() ==
+              entry.second.logical_state_fingerprint;
+#endif
     }
     for (const auto& entry : snapshot.bags) {
       auto& bag = bags_.at(entry.first);
@@ -4037,9 +4918,10 @@ class EventDrivenJunctionRuntime {
       bag.first_edge_credit_consumed =
           saved.first_edge_credit_consumed;
     }
-    for (const auto& entry : snapshot.junctions) {
+    for (auto& entry : snapshot.junctions) {
       auto& junction = junctions_.at(entry.first);
-      const auto& saved = entry.second;
+      auto& saved = entry.second;
+      junction.queue.swap(saved.queue);
       junction.peak_source_queue_length =
           saved.peak_source_queue_length;
       junction.peak_junction_queue_length =
@@ -4058,23 +4940,164 @@ class EventDrivenJunctionRuntime {
           saved.last_service_reservation_end_time;
       junction.next_dispatch_time = saved.next_dispatch_time;
       junction.scheduled_incoming = saved.scheduled_incoming;
+      junction.scheduled_incoming_by_goal.swap(
+          saved.scheduled_incoming_by_goal);
+      junction.source_wakeup_generation =
+          saved.source_wakeup_generation;
       junction.junction_wakeup_generation =
           saved.junction_wakeup_generation;
+      junction.source_wakeup_pending =
+          saved.source_wakeup_pending;
       junction.junction_wakeup_pending =
           saved.junction_wakeup_pending;
       junction.escape_token_task = saved.escape_token_task;
-      for (const auto& goal : saved.scheduled_incoming_by_goal) {
-        if (goal.second.first) {
-          junction.scheduled_incoming_by_goal[goal.first] =
-              goal.second.second;
+      if (g4irsf14_state_ != nullptr) {
+        if (saved.g4irsf14_local_state_existed) {
+          g4irsf14_state_->local[entry.first] =
+              saved.g4irsf14_local_state;
         } else {
-          junction.scheduled_incoming_by_goal.erase(goal.first);
+          g4irsf14_state_->local.erase(entry.first);
         }
       }
     }
     snapshot.applied_action_count = 0;
     snapshot.mutated = false;
   }
+
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  bool pibt_logical_state_matches_snapshot(
+      const PIBTTransactionSnapshot& snapshot) const {
+    if (!snapshot.calendar_logical_state_restored) {
+      return false;
+    }
+    if (staged_event_sink_ != nullptr ||
+        staged_merge_visibility_sink_ != nullptr ||
+        staged_destination_known_competitor_counts_ !=
+            nullptr ||
+        !snapshot.staged_events.empty() ||
+        !snapshot.staged_merge_visibility.empty() ||
+        !snapshot
+             .staged_destination_known_competitor_counts
+             .empty() ||
+        events_.size() != snapshot.event_queue_size ||
+        test_event_queue_logical_fingerprint() !=
+            snapshot.event_queue_logical_fingerprint ||
+        next_event_seq_ != snapshot.next_event_seq) {
+      return false;
+    }
+    if (result_.merge_request_visibility.size() !=
+            snapshot.merge_visibility_size ||
+        result_.event_seq_ordering_audit.size() !=
+            snapshot.event_seq_audit_size) {
+      return false;
+    }
+    const auto& current_credit =
+        credit_ledger_.counters();
+    if (!test_credit_counters_equal(
+            current_credit,
+            snapshot.credit_counters) ||
+        credit_ledger_.stored_active_count() !=
+            snapshot.credit_active_count ||
+        credit_ledger_.stored_lifecycle_count() !=
+            snapshot.credit_lifecycle_count) {
+      return false;
+    }
+    if (!test_transaction_summary_equal(
+            result_.summary,
+            snapshot.summary)) {
+      return false;
+    }
+    for (const auto& entry : snapshot.bags) {
+      const auto bag = bags_.find(entry.first);
+      if (bag == bags_.end()) {
+        return false;
+      }
+      const auto& current = bag->second;
+      const auto& saved = entry.second;
+      if (current.status != saved.status ||
+          current.total_wait != saved.total_wait ||
+          current.junction_queue_wait_seconds !=
+              saved.junction_queue_wait_seconds ||
+          current.transit_from != saved.transit_from ||
+          current.transit_to != saved.transit_to ||
+          current.decision_count != saved.decision_count ||
+          current.deadlock_started_at !=
+              saved.deadlock_started_at ||
+          current.first_edge_credit_id !=
+              saved.first_edge_credit_id ||
+          current.first_edge_credit_consumed !=
+              saved.first_edge_credit_consumed) {
+        return false;
+      }
+    }
+    for (const auto& entry : snapshot.junctions) {
+      const auto junction =
+          junctions_.find(entry.first);
+      if (junction == junctions_.end() ||
+          test_junction_logical_fingerprint(
+              junction->second) !=
+              entry.second.logical_state_fingerprint) {
+        return false;
+      }
+    }
+    if (g4irsf14_state_ == nullptr) {
+      return true;
+    }
+    const auto same =
+        [](const event_runtime_detail::LocalArbitrationState& left,
+           const event_runtime_detail::LocalArbitrationState& right) {
+          return left.source_wakeup_time == right.source_wakeup_time &&
+                 left.junction_wakeup_time ==
+                     right.junction_wakeup_time &&
+                 left.has_last_source_arbitration ==
+                     right.has_last_source_arbitration &&
+                 left.has_last_junction_arbitration ==
+                     right.has_last_junction_arbitration &&
+                 left.last_source_arbitration_time ==
+                     right.last_source_arbitration_time &&
+                 left.last_junction_arbitration_time ==
+                     right.last_junction_arbitration_time &&
+                 left.last_source_arbitration_generation ==
+                     right.last_source_arbitration_generation &&
+                 left.last_junction_arbitration_generation ==
+                     right.last_junction_arbitration_generation &&
+                 left.source_batch_open ==
+                     right.source_batch_open &&
+                 left.junction_batch_open ==
+                     right.junction_batch_open &&
+                 left.source_batch_time ==
+                     right.source_batch_time &&
+                 left.junction_batch_time ==
+                     right.junction_batch_time &&
+                 left.source_queue_before_enqueue ==
+                     right.source_queue_before_enqueue &&
+                 left.source_queue_after_enqueue ==
+                     right.source_queue_after_enqueue &&
+                 left.junction_queue_before_enqueue ==
+                     right.junction_queue_before_enqueue &&
+                 left.junction_queue_after_enqueue ==
+                     right.junction_queue_after_enqueue &&
+                 left.source_enqueue_count ==
+                     right.source_enqueue_count &&
+                 left.junction_enqueue_count ==
+                     right.junction_enqueue_count;
+        };
+    for (const auto& entry : snapshot.junctions) {
+      const auto local =
+          g4irsf14_state_->local.find(entry.first);
+      if (entry.second.g4irsf14_local_state_existed) {
+        if (local == g4irsf14_state_->local.end() ||
+            !same(local->second,
+                  entry.second.g4irsf14_local_state)) {
+          return false;
+        }
+      } else if (local != g4irsf14_state_->local.end()) {
+        return false;
+      }
+    }
+    return true;
+  }
+#endif
 
   bool commit_pibt_batch(
       const std::vector<BoundedLocalPIBTAction>& actions,
@@ -4084,6 +5107,8 @@ class EventDrivenJunctionRuntime {
     if (!prevalidate_pibt_batch(actions, time, blocker)) {
       return false;
     }
+    const bool first_edge_credit_mode =
+        uses_first_edge_credit();
     std::vector<FirstEdgeCreditBatchEntry> credit_entries;
     if (!build_pibt_credit_batch(
             actions, time, credit_entries, blocker)) {
@@ -4104,11 +5129,100 @@ class EventDrivenJunctionRuntime {
     const std::size_t max_staged_events =
         actions.size() * 5;
     snapshot.staged_events.reserve(max_staged_events);
-    events_.reserve(events_.size() + max_staged_events);
+    snapshot.staged_merge_visibility.reserve(
+        actions.size());
+    events_.reserve(events_.size() +
+                    max_staged_events);
+    if (config_.enable_opportunity_telemetry) {
+      result_.merge_request_visibility.reserve(
+          result_.merge_request_visibility.size() +
+          actions.size());
+      result_.event_seq_ordering_audit.reserve(
+          result_.event_seq_ordering_audit.size() +
+          actions.size());
+    }
+    std::vector<int> action_source_nodes;
+    action_source_nodes.reserve(actions.size());
+    for (const auto& action : actions) {
+      action_source_nodes.push_back(action.from_node);
+    }
+    std::sort(action_source_nodes.begin(),
+              action_source_nodes.end());
+    action_source_nodes.erase(
+        std::unique(action_source_nodes.begin(),
+                    action_source_nodes.end()),
+        action_source_nodes.end());
+    std::set<long long> maintained_corridors;
+    std::set<int> maintained_destination_calendars;
+    for (const auto& action : actions) {
+      if (uses_corridor_calendar()) {
+        const auto key = resource_corridor_key(
+            action.from_node, action.next_node);
+        if (maintained_corridors.insert(key).second) {
+          const auto corridor = corridors_.find(key);
+          if (corridor != corridors_.end()) {
+            corridor->second.purge(time);
+          }
+        }
+      }
+      const auto& bag = bags_.at(action.bag_id);
+      if (uses_destination_calendar(
+              action.next_node,
+              bag.request.goal) &&
+          maintained_destination_calendars
+              .insert(action.next_node)
+              .second) {
+        junctions_.at(action.next_node)
+            .service_calendar.purge(time);
+      }
+    }
     capture_pibt_transaction(actions, time, snapshot);
+    for (const auto& action : actions) {
+      ++snapshot
+            .staged_destination_known_competitor_counts[
+                action.next_node];
+    }
+    for (auto& entry :
+         snapshot
+             .staged_destination_known_competitor_counts) {
+      const auto destination =
+          junctions_.find(entry.first);
+      const int baseline =
+          destination == junctions_.end()
+              ? 0
+              : destination->second.scheduled_incoming +
+                    static_cast<int>(
+                        destination->second.queue.size());
+      entry.second = baseline +
+                     std::max(0, entry.second - 1);
+    }
     snapshot.mutated = true;
     staged_event_sink_ = &snapshot.staged_events;
+    staged_merge_visibility_sink_ =
+        &snapshot.staged_merge_visibility;
+    staged_destination_known_competitor_counts_ =
+        &snapshot
+             .staged_destination_known_competitor_counts;
     try {
+      // An atomic PIBT batch can dequeue an owner at a different junction
+      // from the arbitration that triggered it.  Invalidate that junction's
+      // already-published wakeup before mutating its queue; any remaining
+      // queue is rescheduled below with a fresh generation.
+      if (batches_junction_same_timestamp()) {
+        for (const int source_node : action_source_nodes) {
+          auto& controller = junctions_.at(source_node);
+          if (!controller.junction_wakeup_pending) {
+            continue;
+          }
+          controller.junction_wakeup_pending = false;
+          ++controller.junction_wakeup_generation;
+          if (g4irsf14_state_ != nullptr) {
+            g4irsf14_local_state(source_node)
+                .junction_wakeup_time =
+                std::numeric_limits<double>::infinity();
+          }
+        }
+      }
       for (const auto& action : actions) {
         auto& bag = bags_.at(action.bag_id);
         auto& controller = junctions_.at(action.from_node);
@@ -4160,6 +5274,19 @@ class EventDrivenJunctionRuntime {
         if (controller.escape_token_task == action.bag_id) {
           controller.escape_token_task = -1;
         }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+        if (config_
+                .test_pibt_logical_failure_after_staged_actions > 0 &&
+            !test_pibt_logical_failure_injected_ &&
+            snapshot.applied_action_count ==
+                static_cast<std::size_t>(
+                    config_
+                        .test_pibt_logical_failure_after_staged_actions)) {
+          test_pibt_logical_failure_injected_ = true;
+          blocker = "test_injected_post_stage_logical_failure";
+          throw PIBTLogicalCommitFailure(blocker);
+        }
+#endif
       }
 
       for (const auto& action : actions) {
@@ -4170,6 +5297,20 @@ class EventDrivenJunctionRuntime {
               action.from_node, controller.next_dispatch_time);
         }
       }
+      for (auto& staged_event :
+           snapshot.staged_events) {
+        prepare_event_for_publication(staged_event);
+      }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+      if (config_
+              .test_pibt_logical_failure_after_followup_scheduling &&
+          !test_pibt_logical_failure_injected_) {
+        test_pibt_logical_failure_injected_ = true;
+        blocker =
+            "test_injected_post_followup_logical_failure";
+        throw PIBTLogicalCommitFailure(blocker);
+      }
+#endif
       if (!credit_entries.empty()) {
         const auto closed =
             credit_ledger_.bind_and_consume_bounded_batch(
@@ -4189,7 +5330,7 @@ class EventDrivenJunctionRuntime {
           }
         }
       }
-      if (uses_first_edge_credit()) {
+      if (first_edge_credit_mode) {
         for (const auto& action : actions) {
           auto& bag = bags_.at(action.bag_id);
           if (!bag.first_edge_credit_consumed) {
@@ -4200,21 +5341,44 @@ class EventDrivenJunctionRuntime {
       }
     } catch (const PIBTLogicalCommitFailure&) {
       staged_event_sink_ = nullptr;
+      staged_merge_visibility_sink_ = nullptr;
+      staged_destination_known_competitor_counts_ =
+          nullptr;
       restore_pibt_transaction(snapshot);
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+      if (config_
+              .test_verify_pibt_rollback_logical_state &&
+          !pibt_logical_state_matches_snapshot(snapshot)) {
+        throw std::logic_error(
+            "PIBT rollback did not restore complete logical state");
+      }
+#endif
       if (blocker.empty()) {
         blocker = "logical_atomic_commit_state_mutation_failed";
       }
       return false;
     } catch (...) {
       staged_event_sink_ = nullptr;
+      staged_merge_visibility_sink_ = nullptr;
+      staged_destination_known_competitor_counts_ =
+          nullptr;
       restore_pibt_transaction(snapshot);
       throw;
     }
     staged_event_sink_ = nullptr;
+    staged_merge_visibility_sink_ = nullptr;
+    staged_destination_known_competitor_counts_ =
+        nullptr;
     for (auto& event : snapshot.staged_events) {
-      publish_event(std::move(event));
+      publish_prepared_reserved_event(
+          std::move(event));
     }
     snapshot.staged_events.clear();
+    for (auto& visibility :
+         snapshot.staged_merge_visibility) {
+      publish_merge_visibility(std::move(visibility));
+    }
+    snapshot.staged_merge_visibility.clear();
     snapshot.applied_action_count = 0;
     snapshot.mutated = false;
     for (const auto& action : actions) {
@@ -4227,7 +5391,8 @@ class EventDrivenJunctionRuntime {
   DispatchResult try_dispatch_bounded_local_pibt(
       int node,
       double time,
-      std::uint64_t arrive_event_seq) {
+      std::uint64_t arrive_event_seq,
+      int* priority_comparison_count) {
     auto& controller = junctions_[node];
     if (controller.queue.empty() ||
         time + event_runtime_detail::kEpsilon <
@@ -4237,11 +5402,22 @@ class EventDrivenJunctionRuntime {
     const std::size_t root_index =
         choose_bag(controller.queue,
                    time,
-                   controller.escape_token_task);
+                   controller.escape_token_task,
+                   priority_comparison_count);
     const int trigger_runtime_bag_id = controller.queue[root_index];
     const auto decision_started = std::chrono::steady_clock::now();
     PIBTLocalSlice slice = build_pibt_local_slice(
-        node, trigger_runtime_bag_id, time, arrive_event_seq);
+        node,
+        trigger_runtime_bag_id,
+        time,
+        arrive_event_seq,
+        priority_comparison_count);
+    if (g4irsf14_state_ != nullptr) {
+      g4irsf14_state_->current_pibt_slice_bag_count =
+          static_cast<int>(slice.ready_bags.size());
+      g4irsf14_state_->current_pibt_owner_count =
+          static_cast<int>(slice.owners.size());
+    }
     if (!slice.applicable) {
       ++result_.summary.bounded_local_pibt_not_applicable_count;
       return {};
@@ -4542,7 +5718,8 @@ class EventDrivenJunctionRuntime {
       int node,
       double time,
       std::uint64_t arrive_event_seq,
-      int bounded_local_same_bag_fallback_next = -1) {
+      int bounded_local_same_bag_fallback_next = -1,
+      int* priority_comparison_count = nullptr) {
     auto& controller = junctions_[node];
     if (controller.queue.empty()) {
       return {};
@@ -4552,7 +5729,11 @@ class EventDrivenJunctionRuntime {
       return {};
     }
 
-    const std::size_t queue_index = choose_bag(controller.queue, time, controller.escape_token_task);
+    const std::size_t queue_index =
+        choose_bag(controller.queue,
+                   time,
+                   controller.escape_token_task,
+                   priority_comparison_count);
     const auto decision_started = std::chrono::steady_clock::now();
     const int task_id = controller.queue[queue_index];
     auto& bag = bags_.at(task_id);
@@ -5240,10 +6421,44 @@ class EventDrivenJunctionRuntime {
         target.service_calendar.available(exit_time,
                                            service_end,
                                            bag.request.runtime_bag_id);
-    if (!corridor_available || !destination_available) {
+    const long long physical_key =
+        event_runtime_detail::directed_key(current, selected);
+    const auto physical_before =
+        physical_faults_.find(physical_key);
+    const int physical_generation_before =
+        physical_before == physical_faults_.end()
+            ? 0
+            : physical_before->second.physical_generation;
+    const bool physically_faulted_before =
+        physical_before != physical_faults_.end() &&
+        physical_before->second.active_count > 0;
+    const auto physical_commit =
+        physical_faults_.find(physical_key);
+    const int physical_generation_commit =
+        physical_commit == physical_faults_.end()
+            ? 0
+            : physical_commit->second.physical_generation;
+    const bool physically_faulted_commit =
+        physical_commit != physical_faults_.end() &&
+        physical_commit->second.active_count > 0;
+    if (g4irsf14_extensions_enabled()) {
+      ++result_.summary
+            .fault_generation_commit_recheck_count;
+    }
+    if (!corridor_available || !destination_available ||
+        physically_faulted_before ||
+        physically_faulted_commit ||
+        physical_generation_before !=
+            physical_generation_commit) {
       ++result_.summary.reservation_conflicts;
       throw std::logic_error("local shield/reservation state diverged");
     }
+    append_merge_visibility(bag,
+                            current,
+                            selected,
+                            time,
+                            exit_time,
+                            service_end);
     if (corridor != nullptr) {
       corridor->reserve(bag.request.runtime_bag_id, time, corridor_end);
     }
@@ -5562,7 +6777,10 @@ class EventDrivenJunctionRuntime {
                          physical.physical_generation,
                          0,
                          true);
-    } else if (event.message_delay <= event_runtime_detail::kEpsilon) {
+    } else if (
+        event.message_delay <= event_runtime_detail::kEpsilon &&
+        canonical_event_semantics() !=
+            "E3_batch_source_and_junction_same_timestamp") {
       if (config_.enable_fault_policy) {
         auto& advertised = advertised_faults_[key];
         advertised.generation = physical.physical_generation;
@@ -5577,7 +6795,10 @@ class EventDrivenJunctionRuntime {
                          false);
     } else {
       RuntimeEvent notification = event;
-      notification.time = event.time + event.message_delay;
+      notification.time =
+          event.message_delay <= event_runtime_detail::kEpsilon
+              ? event.time
+              : event.time + event.message_delay;
       notification.notification = true;
       notification.message_generation = physical.physical_generation;
       notification.type = physical.active_count > 0 ? JunctionEventType::kFault
@@ -5665,8 +6886,681 @@ class EventDrivenJunctionRuntime {
     result_.fault_events.push_back(std::move(row));
   }
 
+  struct PendingOpportunityCounts {
+    int same_node = 0;
+    int shared_merge = 0;
+  };
+
+  bool sources_share_downstream_merge(int left_node,
+                                      int right_node) const {
+    for (const int left_target : graph_.outgoing(left_node)) {
+      if (graph_.incoming_degree(left_target) <= 1) {
+        continue;
+      }
+      const auto& right_targets = graph_.outgoing(right_node);
+      if (std::find(right_targets.begin(),
+                    right_targets.end(),
+                    left_target) != right_targets.end()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool valid_source_dispatch_event(
+      const RuntimeEvent& pending) const {
+    if (pending.type != JunctionEventType::kBagRelease &&
+        pending.type !=
+            JunctionEventType::kSourceArbitration) {
+      return false;
+    }
+    if (pending.type == JunctionEventType::kBagRelease &&
+        !pending.retry) {
+      return true;
+    }
+    const auto controller =
+        junctions_.find(pending.node);
+    return controller != junctions_.end() &&
+           controller->second.source_wakeup_pending &&
+           controller->second.source_wakeup_generation ==
+               pending.wakeup_generation;
+  }
+
+  bool valid_junction_dispatch_event(
+      const RuntimeEvent& pending) const {
+    if (pending.type !=
+            JunctionEventType::kArriveJunction &&
+        pending.type !=
+            JunctionEventType::kJunctionArbitration) {
+      return false;
+    }
+    if (pending.type ==
+            JunctionEventType::kArriveJunction &&
+        !pending.retry) {
+      return true;
+    }
+    const auto controller =
+        junctions_.find(pending.node);
+    return controller != junctions_.end() &&
+           controller->second.junction_wakeup_pending &&
+           controller->second.junction_wakeup_generation ==
+               pending.wakeup_generation;
+  }
+
+  PendingOpportunityCounts pending_source_opportunities(
+      int source_node, double time) {
+    PendingOpportunityCounts counts;
+    if (!config_.enable_opportunity_telemetry) {
+      return counts;
+    }
+    ++result_.summary.opportunity_event_queue_inspection_count;
+    events_.inspect([&](const RuntimeEvent& pending) {
+      if (!valid_source_dispatch_event(pending) ||
+          !event_runtime_detail::same_timestamp(pending.time,
+                                                time)) {
+        return;
+      }
+      const bool pending_release =
+          pending.type == JunctionEventType::kBagRelease &&
+          !pending.retry;
+      if (pending_release &&
+          pending.node == source_node) {
+        ++counts.same_node;
+      }
+      if (pending.node >= 0 &&
+          pending.node != source_node &&
+          sources_share_downstream_merge(source_node,
+                                         pending.node)) {
+        ++counts.shared_merge;
+      }
+    });
+    return counts;
+  }
+
+  PendingOpportunityCounts pending_junction_opportunities(
+      int junction_node, double time) {
+    PendingOpportunityCounts counts;
+    if (!config_.enable_opportunity_telemetry) {
+      return counts;
+    }
+    ++result_.summary.opportunity_event_queue_inspection_count;
+    events_.inspect([&](const RuntimeEvent& pending) {
+      const bool pending_arrival =
+          pending.type == JunctionEventType::kArriveJunction &&
+          !pending.retry;
+      if (!valid_junction_dispatch_event(pending) ||
+          !event_runtime_detail::same_timestamp(pending.time,
+                                                time)) {
+        return;
+      }
+      if (pending_arrival && pending.node == junction_node) {
+        ++counts.same_node;
+      }
+      if (pending.node >= 0 &&
+          pending.node != junction_node &&
+          sources_share_downstream_merge(junction_node,
+                                         pending.node)) {
+        ++counts.shared_merge;
+      }
+    });
+    return counts;
+  }
+
+  int pending_destination_competitors(int upstream_node,
+                                      int destination_node,
+                                      double time) {
+    if (!config_.enable_opportunity_telemetry) {
+      return 0;
+    }
+    int count = 0;
+    ++result_.summary.opportunity_event_queue_inspection_count;
+    events_.inspect([&](const RuntimeEvent& pending) {
+      if (!event_runtime_detail::same_timestamp(pending.time,
+                                                time) ||
+          pending.node < 0 ||
+          pending.node == upstream_node) {
+        return;
+      }
+      const bool can_dispatch =
+          valid_source_dispatch_event(pending) ||
+          valid_junction_dispatch_event(pending);
+      if (!can_dispatch) {
+        return;
+      }
+      const auto& outgoing = graph_.outgoing(pending.node);
+      if (std::find(outgoing.begin(),
+                    outgoing.end(),
+                    destination_node) != outgoing.end()) {
+        ++count;
+      }
+    });
+    return count;
+  }
+
+  bool account_opportunity_trace_row(
+      std::size_t stored_size,
+      std::uint64_t& total_count,
+      std::uint64_t& stored_count,
+      std::uint64_t& dropped_count) {
+    if (!config_.enable_opportunity_telemetry) {
+      return false;
+    }
+    ++total_count;
+    if (stored_size <
+        static_cast<std::size_t>(
+            config_.opportunity_trace_limit)) {
+      ++stored_count;
+      return true;
+    }
+    ++dropped_count;
+    return false;
+  }
+
+  void append_source_opportunity(const RuntimeEvent& event,
+                                 int ready_set_size,
+                                 int chosen_runtime_bag_id,
+                                 int priority_comparison_count,
+                                 bool batched_arbitration) {
+    int queue_before_enqueue = ready_set_size;
+    int queue_after_enqueue = ready_set_size;
+    int enqueue_count = 0;
+    std::uint64_t generation = 0;
+    if (g4irsf14_state_ != nullptr) {
+      auto& local = g4irsf14_local_state(event.node);
+      generation = event.wakeup_generation;
+      if (local.source_batch_open &&
+          event_runtime_detail::same_timestamp(
+              local.source_batch_time, event.time)) {
+        queue_before_enqueue =
+            local.source_queue_before_enqueue;
+        queue_after_enqueue =
+            local.source_queue_after_enqueue;
+        enqueue_count = local.source_enqueue_count;
+        local.source_batch_open = false;
+        local.source_enqueue_count = 0;
+      }
+    }
+    result_.summary.max_source_arbitration_batch_size =
+        std::max(result_.summary.max_source_arbitration_batch_size,
+                 enqueue_count);
+    if (batched_arbitration && enqueue_count > 1) {
+      ++result_.summary.source_same_timestamp_batch_count;
+    }
+    if (!config_.enable_opportunity_telemetry) {
+      return;
+    }
+    const auto pending =
+        pending_source_opportunities(event.node, event.time);
+    EventRuntimeSourceOpportunityRow row;
+    row.event_time = event.time;
+    row.timestamp_bits =
+        event_runtime_detail::timestamp_bits(event.time);
+    row.source_node = event.node;
+    row.queue_length_before_enqueue = queue_before_enqueue;
+    row.queue_length_after_enqueue = queue_after_enqueue;
+    row.queue_length_before_arbitration = ready_set_size;
+    row.queue_length_after_arbitration =
+        static_cast<int>(
+            junctions_[event.node].source_queue.size());
+    row.same_timestamp_release_batch_size = enqueue_count;
+    row.same_time_pending_source_releases = pending.same_node;
+    row.same_time_pending_shared_merge_releases =
+        pending.shared_merge;
+    row.ready_set_size = ready_set_size;
+    row.priority_comparison_count =
+        priority_comparison_count;
+    row.queue_discipline = config_.queue_discipline;
+    row.event_seq = event.seq;
+    row.arbitration_generation = generation;
+    row.batched_arbitration = batched_arbitration;
+    const auto chosen = bags_.find(chosen_runtime_bag_id);
+    if (chosen != bags_.end()) {
+      row.chosen_task_id = chosen->second.request.task_id;
+      row.chosen_runtime_bag_id =
+          chosen->second.request.runtime_bag_id;
+      row.chosen_segment_id =
+          chosen->second.request.segment_id;
+    }
+    if (account_opportunity_trace_row(
+            result_.source_admission_opportunities.size(),
+            result_.summary.source_opportunity_total_count,
+            result_.summary.source_opportunity_stored_count,
+            result_.summary.source_opportunity_dropped_count)) {
+      result_.source_admission_opportunities.push_back(row);
+    }
+    if (account_opportunity_trace_row(
+            result_.arbitration_batch_cardinality.size(),
+            result_.summary.arbitration_batch_total_count,
+            result_.summary.arbitration_batch_stored_count,
+            result_.summary.arbitration_batch_dropped_count)) {
+      EventRuntimeArbitrationBatchRow batch;
+      batch.event_time = event.time;
+      batch.timestamp_bits = row.timestamp_bits;
+      batch.boundary = "source";
+      batch.node = event.node;
+      batch.enqueue_count = enqueue_count;
+      batch.ready_set_size = ready_set_size;
+      batch.pending_same_time_event_count =
+          pending.same_node;
+      batch.chosen_runtime_bag_id =
+          row.chosen_runtime_bag_id;
+      batch.event_seq = event.seq;
+      batch.arbitration_generation = generation;
+      result_.arbitration_batch_cardinality.push_back(
+          std::move(batch));
+    }
+    if (account_opportunity_trace_row(
+            result_.event_seq_ordering_audit.size(),
+            result_.summary.event_seq_audit_total_count,
+            result_.summary.event_seq_audit_stored_count,
+            result_.summary.event_seq_audit_dropped_count)) {
+      EventRuntimeEventSeqAuditRow audit;
+      audit.event_time = event.time;
+      audit.timestamp_bits = row.timestamp_bits;
+      audit.boundary = "source_admission";
+      audit.node = event.node;
+      audit.ready_set_size = ready_set_size;
+      audit.priority_comparison_count =
+          row.priority_comparison_count;
+      audit.later_same_time_competitor_count =
+          pending.same_node;
+      audit.chosen_runtime_bag_id =
+          row.chosen_runtime_bag_id;
+      if (chosen != bags_.end()) {
+        audit.chosen_enqueue_sequence =
+            chosen->second.local_enqueue_sequence;
+      }
+      audit.event_seq = event.seq;
+      audit.seq_determined_order =
+          pending.same_node > 0;
+      audit.reason = audit.seq_determined_order
+                         ? "later_same_time_release_unseen_at_arbitration"
+                         : "no_later_same_time_release";
+      result_.event_seq_ordering_audit.push_back(
+          std::move(audit));
+    }
+  }
+
+  void append_junction_opportunity(
+      const RuntimeEvent& event,
+      int ready_set_size,
+      int chosen_runtime_bag_id,
+      int pibt_slice_bag_count,
+      int pibt_owner_count,
+      int priority_comparison_count,
+      bool batched_arbitration) {
+    int queue_before_enqueue = ready_set_size;
+    int queue_after_enqueue = ready_set_size;
+    int enqueue_count = 0;
+    std::uint64_t generation = 0;
+    if (g4irsf14_state_ != nullptr) {
+      auto& local = g4irsf14_local_state(event.node);
+      generation = event.wakeup_generation;
+      if (local.junction_batch_open &&
+          event_runtime_detail::same_timestamp(
+              local.junction_batch_time, event.time)) {
+        queue_before_enqueue =
+            local.junction_queue_before_enqueue;
+        queue_after_enqueue =
+            local.junction_queue_after_enqueue;
+        enqueue_count = local.junction_enqueue_count;
+        local.junction_batch_open = false;
+        local.junction_enqueue_count = 0;
+      }
+    }
+    result_.summary.max_junction_arbitration_batch_size =
+        std::max(
+            result_.summary.max_junction_arbitration_batch_size,
+            enqueue_count);
+    if (batched_arbitration && enqueue_count > 1) {
+      ++result_.summary.junction_same_timestamp_batch_count;
+    }
+    if (!config_.enable_opportunity_telemetry) {
+      return;
+    }
+    const auto pending =
+        pending_junction_opportunities(event.node, event.time);
+    EventRuntimeJunctionOpportunityRow row;
+    row.event_time = event.time;
+    row.timestamp_bits =
+        event_runtime_detail::timestamp_bits(event.time);
+    row.junction_node = event.node;
+    row.queue_length_before_enqueue = queue_before_enqueue;
+    row.queue_length_after_enqueue = queue_after_enqueue;
+    row.queue_length_before_arbitration = ready_set_size;
+    row.queue_length_after_arbitration =
+        static_cast<int>(junctions_[event.node].queue.size());
+    row.same_timestamp_arrival_batch_size = enqueue_count;
+    row.same_time_pending_arrivals = pending.same_node;
+    row.same_time_pending_shared_merge_requests =
+        pending.shared_merge;
+    row.ready_set_size = ready_set_size;
+    row.priority_comparison_count =
+        priority_comparison_count;
+    row.pibt_slice_bag_count = pibt_slice_bag_count;
+    row.pibt_owner_count = pibt_owner_count;
+    row.event_seq = event.seq;
+    row.arbitration_generation = generation;
+    row.batched_arbitration = batched_arbitration;
+    const auto chosen = bags_.find(chosen_runtime_bag_id);
+    if (chosen != bags_.end()) {
+      row.chosen_task_id = chosen->second.request.task_id;
+      row.chosen_runtime_bag_id =
+          chosen->second.request.runtime_bag_id;
+      row.chosen_segment_id =
+          chosen->second.request.segment_id;
+    }
+    if (account_opportunity_trace_row(
+            result_.junction_arbitration_opportunities.size(),
+            result_.summary.junction_opportunity_total_count,
+            result_.summary.junction_opportunity_stored_count,
+            result_.summary.junction_opportunity_dropped_count)) {
+      result_.junction_arbitration_opportunities.push_back(row);
+    }
+    if (account_opportunity_trace_row(
+            result_.arbitration_batch_cardinality.size(),
+            result_.summary.arbitration_batch_total_count,
+            result_.summary.arbitration_batch_stored_count,
+            result_.summary.arbitration_batch_dropped_count)) {
+      EventRuntimeArbitrationBatchRow batch;
+      batch.event_time = event.time;
+      batch.timestamp_bits = row.timestamp_bits;
+      batch.boundary = "junction";
+      batch.node = event.node;
+      batch.enqueue_count = enqueue_count;
+      batch.ready_set_size = ready_set_size;
+      batch.pending_same_time_event_count =
+          pending.same_node;
+      batch.chosen_runtime_bag_id =
+          row.chosen_runtime_bag_id;
+      batch.event_seq = event.seq;
+      batch.arbitration_generation = generation;
+      result_.arbitration_batch_cardinality.push_back(
+          std::move(batch));
+    }
+    if (account_opportunity_trace_row(
+            result_.event_seq_ordering_audit.size(),
+            result_.summary.event_seq_audit_total_count,
+            result_.summary.event_seq_audit_stored_count,
+            result_.summary.event_seq_audit_dropped_count)) {
+      EventRuntimeEventSeqAuditRow audit;
+      audit.event_time = event.time;
+      audit.timestamp_bits = row.timestamp_bits;
+      audit.boundary = "junction_arbitration";
+      audit.node = event.node;
+      audit.ready_set_size = ready_set_size;
+      audit.priority_comparison_count =
+          row.priority_comparison_count;
+      audit.later_same_time_competitor_count =
+          pending.same_node;
+      audit.chosen_runtime_bag_id =
+          row.chosen_runtime_bag_id;
+      if (chosen != bags_.end()) {
+        audit.chosen_enqueue_sequence =
+            chosen->second.local_enqueue_sequence;
+      }
+      audit.event_seq = event.seq;
+      audit.seq_determined_order =
+          pending.same_node > 0;
+      audit.reason = audit.seq_determined_order
+                         ? "later_same_time_arrival_unseen_at_arbitration"
+                         : "no_later_same_time_arrival";
+      result_.event_seq_ordering_audit.push_back(
+          std::move(audit));
+    }
+  }
+
+  void append_merge_visibility(const BagState& bag,
+                               int upstream_node,
+                               int destination_node,
+                               double time,
+                               double slot_start,
+                               double slot_end) {
+    if (!config_.enable_opportunity_telemetry) {
+      return;
+    }
+    auto& destination = junctions_[destination_node];
+    const int later_competitors =
+        pending_destination_competitors(upstream_node,
+                                        destination_node,
+                                        time);
+    EventRuntimeMergeVisibilityRow row;
+    row.event_time = time;
+    row.timestamp_bits =
+        event_runtime_detail::timestamp_bits(time);
+    row.destination_node = destination_node;
+    row.upstream_node = upstream_node;
+    row.incoming_edge_start = upstream_node;
+    row.incoming_edge_end = destination_node;
+    row.requesting_task_id = bag.request.task_id;
+    row.requesting_runtime_bag_id =
+        bag.request.runtime_bag_id;
+    row.requesting_segment_id = bag.request.segment_id;
+    row.earliest_arrival = slot_start;
+    row.slot_start = slot_start;
+    row.slot_end = slot_end;
+    const auto staged_known =
+        staged_destination_known_competitor_counts_ ==
+                nullptr
+            ? std::map<int, int>::const_iterator{}
+            : staged_destination_known_competitor_counts_
+                  ->find(destination_node);
+    row.known_competing_request_count =
+        staged_destination_known_competitor_counts_ !=
+                    nullptr &&
+                staged_known !=
+                    staged_destination_known_competitor_counts_
+                        ->end()
+            ? staged_known->second
+            : destination.scheduled_incoming +
+                  static_cast<int>(destination.queue.size());
+    row.later_same_time_competitor_count =
+        later_competitors;
+    row.later_same_time_competitor_exists =
+        later_competitors > 0;
+    row.seq_determined_order =
+        row.later_same_time_competitor_exists;
+    row.event_seq =
+        g4irsf14_state_ == nullptr
+            ? 0
+            : g4irsf14_state_->current_event_seq;
+    EventRuntimeEventSeqAuditRow audit;
+    audit.event_time = time;
+    audit.timestamp_bits = row.timestamp_bits;
+    audit.boundary = "destination_slot_reservation";
+    audit.node = upstream_node;
+    audit.destination_node = destination_node;
+    audit.ready_set_size =
+        1 + row.known_competing_request_count;
+    audit.later_same_time_competitor_count =
+        later_competitors;
+    audit.chosen_runtime_bag_id =
+        bag.request.runtime_bag_id;
+    audit.chosen_enqueue_sequence =
+        bag.local_enqueue_sequence;
+    audit.event_seq = row.event_seq;
+    audit.seq_determined_order =
+        row.seq_determined_order;
+    audit.reason = row.seq_determined_order
+                       ? "later_same_time_competitor_not_yet_reserved"
+                       : "no_later_same_time_destination_competitor";
+    PIBTStagedMergeVisibility visibility{
+        std::move(row), std::move(audit)};
+    if (staged_merge_visibility_sink_ != nullptr) {
+      staged_merge_visibility_sink_->push_back(
+          std::move(visibility));
+      return;
+    }
+    publish_merge_visibility(std::move(visibility));
+  }
+
+  void publish_merge_visibility(
+      PIBTStagedMergeVisibility visibility) {
+    if (account_opportunity_trace_row(
+            result_.merge_request_visibility.size(),
+            result_.summary.merge_visibility_total_count,
+            result_.summary.merge_visibility_stored_count,
+            result_.summary.merge_visibility_dropped_count)) {
+      result_.merge_request_visibility.push_back(
+          std::move(visibility.merge));
+    }
+    if (account_opportunity_trace_row(
+            result_.event_seq_ordering_audit.size(),
+            result_.summary.event_seq_audit_total_count,
+            result_.summary.event_seq_audit_stored_count,
+            result_.summary.event_seq_audit_dropped_count)) {
+      result_.event_seq_ordering_audit.push_back(
+          std::move(visibility.audit));
+    }
+  }
+
+  event_runtime_detail::LocalArbitrationState&
+  g4irsf14_local_state(int node) {
+    if (g4irsf14_state_ == nullptr) {
+      throw std::logic_error(
+          "G4IRSF14 local arbitration state is unavailable");
+    }
+    return g4irsf14_state_->local[node];
+  }
+
+  void observe_source_enqueue(int node, double time) {
+    if (g4irsf14_state_ == nullptr) {
+      return;
+    }
+    auto& local = g4irsf14_local_state(node);
+    const int after =
+        static_cast<int>(junctions_[node].source_queue.size());
+    if (!local.source_batch_open ||
+        !event_runtime_detail::same_timestamp(
+            local.source_batch_time, time)) {
+      local.source_batch_open = true;
+      local.source_batch_time = time;
+      local.source_queue_before_enqueue =
+          std::max(0, after - 1);
+      local.source_enqueue_count = 0;
+    }
+    local.source_queue_after_enqueue = after;
+    ++local.source_enqueue_count;
+  }
+
+  void observe_junction_enqueue(int node, double time) {
+    if (g4irsf14_state_ == nullptr) {
+      return;
+    }
+    auto& local = g4irsf14_local_state(node);
+    const int after =
+        static_cast<int>(junctions_[node].queue.size());
+    if (!local.junction_batch_open ||
+        !event_runtime_detail::same_timestamp(
+            local.junction_batch_time, time)) {
+      local.junction_batch_open = true;
+      local.junction_batch_time = time;
+      local.junction_queue_before_enqueue =
+          std::max(0, after - 1);
+      local.junction_enqueue_count = 0;
+    }
+    local.junction_queue_after_enqueue = after;
+    ++local.junction_enqueue_count;
+  }
+
+  bool consume_source_arbitration_wakeup(
+      const RuntimeEvent& event) {
+    auto& controller = junctions_[event.node];
+    auto& local = g4irsf14_local_state(event.node);
+    if (!controller.source_wakeup_pending ||
+        controller.source_wakeup_generation !=
+            event.wakeup_generation) {
+      ++result_.summary
+            .superseded_arbitration_event_rejected_count;
+      return false;
+    }
+    controller.source_wakeup_pending = false;
+    local.source_wakeup_time =
+        std::numeric_limits<double>::infinity();
+    if (local.has_last_source_arbitration &&
+        event_runtime_detail::same_timestamp(
+            local.last_source_arbitration_time,
+            event.time)) {
+      ++result_.summary
+            .duplicate_same_time_arbitration_prevented_count;
+      return false;
+    }
+    local.has_last_source_arbitration = true;
+    local.last_source_arbitration_time = event.time;
+    local.last_source_arbitration_generation =
+        event.wakeup_generation;
+    return true;
+  }
+
+  bool consume_junction_arbitration_wakeup(
+      const RuntimeEvent& event) {
+    auto& controller = junctions_[event.node];
+    auto& local = g4irsf14_local_state(event.node);
+    if (!controller.junction_wakeup_pending ||
+        controller.junction_wakeup_generation !=
+            event.wakeup_generation) {
+      ++result_.summary
+            .superseded_arbitration_event_rejected_count;
+      return false;
+    }
+    controller.junction_wakeup_pending = false;
+    local.junction_wakeup_time =
+        std::numeric_limits<double>::infinity();
+    if (local.has_last_junction_arbitration &&
+        event_runtime_detail::same_timestamp(
+            local.last_junction_arbitration_time,
+            event.time)) {
+      ++result_.summary
+            .duplicate_same_time_arbitration_prevented_count;
+      return false;
+    }
+    local.has_last_junction_arbitration = true;
+    local.last_junction_arbitration_time = event.time;
+    local.last_junction_arbitration_generation =
+        event.wakeup_generation;
+    return true;
+  }
+
   void schedule_source_wakeup(int node, double time) {
     auto& controller = junctions_[node];
+    if (batches_source_same_timestamp()) {
+      auto& local = g4irsf14_local_state(node);
+      if (controller.source_wakeup_pending) {
+        if (time <
+            local.source_wakeup_time -
+                event_runtime_detail::kEpsilon) {
+          local.source_wakeup_time = time;
+          const auto generation =
+              ++controller.source_wakeup_generation;
+          schedule(JunctionEventType::kSourceArbitration,
+                   time,
+                   -1,
+                   node,
+                   -1,
+                   -1,
+                   true,
+                   generation);
+        } else if (event_runtime_detail::same_timestamp(
+                       time, local.source_wakeup_time)) {
+          ++result_.summary
+                .duplicate_same_time_arbitration_prevented_count;
+        }
+        return;
+      }
+      controller.source_wakeup_pending = true;
+      local.source_wakeup_time = time;
+      const auto generation =
+          ++controller.source_wakeup_generation;
+      schedule(JunctionEventType::kSourceArbitration,
+               time,
+               -1,
+               node,
+               -1,
+               -1,
+               true,
+               generation);
+      return;
+    }
     if (controller.source_wakeup_pending) {
       return;
     }
@@ -5687,11 +7581,50 @@ class EventDrivenJunctionRuntime {
     if (controller.queue.empty()) {
       return;
     }
+    if (batches_junction_same_timestamp()) {
+      auto& local = g4irsf14_local_state(node);
+      if (controller.junction_wakeup_pending) {
+        if (time <
+            local.junction_wakeup_time -
+                event_runtime_detail::kEpsilon) {
+          local.junction_wakeup_time = time;
+          const auto generation =
+              ++controller.junction_wakeup_generation;
+          schedule(JunctionEventType::kJunctionArbitration,
+                   time,
+                   -1,
+                   node,
+                   -1,
+                   node,
+                   true,
+                   generation);
+        } else if (event_runtime_detail::same_timestamp(
+                       time, local.junction_wakeup_time)) {
+          ++result_.summary
+                .duplicate_same_time_arbitration_prevented_count;
+        }
+        return;
+      }
+      controller.junction_wakeup_pending = true;
+      local.junction_wakeup_time = time;
+      const auto generation =
+          ++controller.junction_wakeup_generation;
+      schedule(JunctionEventType::kJunctionArbitration,
+               time,
+               -1,
+               node,
+               -1,
+               node,
+               true,
+               generation);
+      return;
+    }
     if (controller.junction_wakeup_pending) {
       return;
     }
     controller.junction_wakeup_pending = true;
-    const auto generation = ++controller.junction_wakeup_generation;
+    const auto generation =
+        ++controller.junction_wakeup_generation;
     schedule(JunctionEventType::kArriveJunction,
              time,
              -1,
@@ -5704,7 +7637,9 @@ class EventDrivenJunctionRuntime {
 
   std::size_t choose_bag(const std::deque<int>& queue,
                          double time,
-                         int escape_token_task) const {
+                         int escape_token_task,
+                         int* priority_comparison_count =
+                             nullptr) const {
     if (queue.empty()) {
       throw std::logic_error("cannot choose from an empty local queue");
     }
@@ -5721,6 +7656,9 @@ class EventDrivenJunctionRuntime {
       // sub-second ties without importing its A* or reservation table.
       std::size_t best = 0;
       for (std::size_t index = 1; index < queue.size(); ++index) {
+        if (priority_comparison_count != nullptr) {
+          ++*priority_comparison_count;
+        }
         const auto& candidate = bags_.at(queue[index]);
         const auto& incumbent = bags_.at(queue[best]);
         const int coarse_difference = static_cast<int>(
@@ -5737,6 +7675,9 @@ class EventDrivenJunctionRuntime {
         BoundedLocalPIBTPriorityMode::kQ0Current) {
       std::size_t best = 0;
       for (std::size_t index = 1; index < queue.size(); ++index) {
+        if (priority_comparison_count != nullptr) {
+          ++*priority_comparison_count;
+        }
         if (local_priority_less(bags_.at(queue[index]),
                                 bags_.at(queue[best]),
                                 time)) {
@@ -5748,6 +7689,9 @@ class EventDrivenJunctionRuntime {
 
     std::size_t best = 0;
     for (std::size_t index = 1; index < queue.size(); ++index) {
+      if (priority_comparison_count != nullptr) {
+        ++*priority_comparison_count;
+      }
       if (bag_priority(bags_.at(queue[index]), time) < bag_priority(bags_.at(queue[best]), time)) {
         best = index;
       } else if (bag_priority(bags_.at(queue[index]), time) ==
@@ -6303,7 +8247,17 @@ class EventDrivenJunctionRuntime {
         static_cast<int>(credit_ledger_.stored_lifecycle_count());
     result_.summary.first_edge_credit_lifecycle_limit =
         static_cast<int>(credit_ledger_.lifecycle_limit());
-    std::size_t accounted = sizeof(*this);
+    // Keep the frozen Win64 E0 accounted-byte scalar exact. The append-only
+    // config/result/state holders are inactive there and must not perturb a
+    // deterministic compatibility hash merely because their empty C++
+    // container objects exist in the class layout.
+    std::size_t runtime_object_bytes = sizeof(*this);
+#if defined(_MSC_VER) && defined(_WIN64)
+    if (!g4irsf14_extensions_enabled()) {
+      runtime_object_bytes = 4496;
+    }
+#endif
+    std::size_t accounted = runtime_object_bytes;
     accounted += bags_.size() * sizeof(BagState);
     for (const auto& entry : junctions_) {
       accounted += entry.second.current_local_state_accounted_bytes();
@@ -6341,6 +8295,28 @@ class EventDrivenJunctionRuntime {
                  sizeof(EventRuntimeCreditAuditRow);
     accounted += result_.pibt_events.capacity() *
                  sizeof(EventRuntimePIBTAuditRow);
+    accounted +=
+        result_.source_admission_opportunities.capacity() *
+        sizeof(EventRuntimeSourceOpportunityRow);
+    accounted +=
+        result_.junction_arbitration_opportunities.capacity() *
+        sizeof(EventRuntimeJunctionOpportunityRow);
+    accounted += result_.merge_request_visibility.capacity() *
+                 sizeof(EventRuntimeMergeVisibilityRow);
+    accounted += result_.event_seq_ordering_audit.capacity() *
+                 sizeof(EventRuntimeEventSeqAuditRow);
+    accounted +=
+        result_.arbitration_batch_cardinality.capacity() *
+        sizeof(EventRuntimeArbitrationBatchRow);
+    if (g4irsf14_state_ != nullptr) {
+      accounted +=
+          sizeof(event_runtime_detail::G4IRSF14RuntimeState);
+      accounted +=
+          g4irsf14_state_->local.size() *
+          sizeof(std::pair<const int,
+                           event_runtime_detail::
+                               LocalArbitrationState>);
+    }
     result_.summary.cpp_internal_accounted_bytes = accounted;
   }
 
@@ -6474,6 +8450,14 @@ class EventDrivenJunctionRuntime {
       repair_time_by_fault_instance_;
   event_runtime_detail::RuntimeEventQueue events_;
   std::vector<RuntimeEvent>* staged_event_sink_ = nullptr;
+  std::vector<PIBTStagedMergeVisibility>*
+      staged_merge_visibility_sink_ = nullptr;
+  const std::map<int, int>*
+      staged_destination_known_competitor_counts_ =
+          nullptr;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  bool test_pibt_logical_failure_injected_ = false;
+#endif
   std::uint64_t next_event_seq_ = 1;
   std::uint64_t next_decision_id_ = 1;
   std::uint64_t next_pibt_activation_id_ = 1;
@@ -6485,6 +8469,8 @@ class EventDrivenJunctionRuntime {
   int active_backlog_at_runtime_stop_ = -1;
   std::vector<double> waits_;
   std::vector<double> decision_latencies_us_;
+  std::unique_ptr<event_runtime_detail::G4IRSF14RuntimeState>
+      g4irsf14_state_;
 };
 
 }  // namespace czr005::ics

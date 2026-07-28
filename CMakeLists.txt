@@ -22,6 +22,19 @@ target_link_libraries(test_event_driven_junction PRIVATE ics_core)
 target_compile_definitions(test_event_driven_junction PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME event_driven_junction COMMAND test_event_driven_junction)
 
+add_executable(
+  test_g4irsf14_event_microphase
+  cpp/tests/test_g4irsf14_event_microphase.cpp)
+target_link_libraries(test_g4irsf14_event_microphase PRIVATE ics_core)
+target_compile_definitions(
+  test_g4irsf14_event_microphase
+  PRIVATE
+    CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    CZR005_EVENT_RUNTIME_TESTING=1)
+add_test(
+  NAME g4irsf14_event_microphase
+  COMMAND test_g4irsf14_event_microphase)
+
 add_executable(test_g4irsf12_runtime_controls cpp/tests/test_g4irsf12_runtime_controls.cpp)
 target_link_libraries(test_g4irsf12_runtime_controls PRIVATE ics_core)
 target_compile_definitions(

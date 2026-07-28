@@ -3454,6 +3454,77 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["internal_state_bytes_semantics"] = "accounted_cpp_lower_bound_not_process_rss";
   row["event_limit_reached"] = summary.event_limit_reached;
   row["time_limit_reached"] = summary.time_limit_reached;
+  const bool g4irsf14_extensions_enabled =
+      summary.event_semantics != "E0_immediate_dispatch_f2" ||
+      summary.opportunity_telemetry_enabled;
+  if (g4irsf14_extensions_enabled) {
+    row["event_semantics"] = summary.event_semantics;
+    row["event_semantics_echo"] =
+        summary.event_semantics_echo;
+    row["opportunity_telemetry_enabled"] =
+        summary.opportunity_telemetry_enabled;
+    row["source_arbitration_event_count"] =
+        py::int_(summary.source_arbitration_event_count);
+    row["junction_arbitration_event_count"] =
+        py::int_(summary.junction_arbitration_event_count);
+    row["stale_arbitration_event_count"] =
+        py::int_(summary.stale_arbitration_event_count);
+    row["superseded_arbitration_event_rejected_count"] =
+        py::int_(
+            summary
+                .superseded_arbitration_event_rejected_count);
+    row["duplicate_same_time_arbitration_prevented_count"] =
+        py::int_(
+            summary
+                .duplicate_same_time_arbitration_prevented_count);
+    row["source_same_timestamp_batch_count"] =
+        py::int_(summary.source_same_timestamp_batch_count);
+    row["junction_same_timestamp_batch_count"] =
+        py::int_(summary.junction_same_timestamp_batch_count);
+    row["max_source_arbitration_batch_size"] =
+        summary.max_source_arbitration_batch_size;
+    row["max_junction_arbitration_batch_size"] =
+        summary.max_junction_arbitration_batch_size;
+    row["opportunity_event_queue_inspection_count"] =
+        py::int_(
+            summary.opportunity_event_queue_inspection_count);
+    row["source_opportunity_total_count"] =
+        py::int_(summary.source_opportunity_total_count);
+    row["source_opportunity_stored_count"] =
+        py::int_(summary.source_opportunity_stored_count);
+    row["source_opportunity_dropped_count"] =
+        py::int_(summary.source_opportunity_dropped_count);
+    row["junction_opportunity_total_count"] =
+        py::int_(summary.junction_opportunity_total_count);
+    row["junction_opportunity_stored_count"] =
+        py::int_(summary.junction_opportunity_stored_count);
+    row["junction_opportunity_dropped_count"] =
+        py::int_(summary.junction_opportunity_dropped_count);
+    row["merge_visibility_total_count"] =
+        py::int_(summary.merge_visibility_total_count);
+    row["merge_visibility_stored_count"] =
+        py::int_(summary.merge_visibility_stored_count);
+    row["merge_visibility_dropped_count"] =
+        py::int_(summary.merge_visibility_dropped_count);
+    row["event_seq_audit_total_count"] =
+        py::int_(summary.event_seq_audit_total_count);
+    row["event_seq_audit_stored_count"] =
+        py::int_(summary.event_seq_audit_stored_count);
+    row["event_seq_audit_dropped_count"] =
+        py::int_(summary.event_seq_audit_dropped_count);
+    row["arbitration_batch_total_count"] =
+        py::int_(summary.arbitration_batch_total_count);
+    row["arbitration_batch_stored_count"] =
+        py::int_(summary.arbitration_batch_stored_count);
+    row["arbitration_batch_dropped_count"] =
+        py::int_(summary.arbitration_batch_dropped_count);
+    row["fault_generation_commit_recheck_count"] =
+        py::int_(summary.fault_generation_commit_recheck_count);
+    row["microphase_runtime_global_scan_count"] =
+        summary.microphase_runtime_global_scan_count;
+    row["artificial_batch_delay_seconds"] =
+        summary.artificial_batch_delay_seconds;
+  }
   row["safe_execution_pass"] = summary.reservation_conflicts == 0 &&
                                  summary.runtime_full_astar_calls == 0 &&
                                  summary.physical_fault_edge_entry_violation_count == 0;
@@ -3840,6 +3911,179 @@ py::list g4irsf12_event_runtime_pibt_rows(
   return rows;
 }
 
+py::list g4irsf14_source_opportunity_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeSourceOpportunityRow>& events) {
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["event_time"] = event.event_time;
+    row["timestamp_bits"] = py::int_(event.timestamp_bits);
+    row["source_node"] = event.source_node;
+    row["queue_length_before_enqueue"] =
+        event.queue_length_before_enqueue;
+    row["queue_length_after_enqueue"] =
+        event.queue_length_after_enqueue;
+    row["queue_length_before_arbitration"] =
+        event.queue_length_before_arbitration;
+    row["queue_length_after_arbitration"] =
+        event.queue_length_after_arbitration;
+    row["same_timestamp_release_batch_size"] =
+        event.same_timestamp_release_batch_size;
+    row["same_time_pending_source_releases"] =
+        event.same_time_pending_source_releases;
+    row["same_time_pending_shared_merge_releases"] =
+        event.same_time_pending_shared_merge_releases;
+    row["ready_set_size"] = event.ready_set_size;
+    row["priority_comparison_count"] =
+        event.priority_comparison_count;
+    row["chosen_task_id"] = event.chosen_task_id;
+    row["chosen_runtime_bag_id"] =
+        event.chosen_runtime_bag_id;
+    row["chosen_segment_id"] = event.chosen_segment_id;
+    row["queue_discipline"] = event.queue_discipline;
+    row["event_seq"] = py::int_(event.event_seq);
+    row["arbitration_generation"] =
+        py::int_(event.arbitration_generation);
+    row["batched_arbitration"] =
+        event.batched_arbitration;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf14_junction_opportunity_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeJunctionOpportunityRow>& events) {
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["event_time"] = event.event_time;
+    row["timestamp_bits"] = py::int_(event.timestamp_bits);
+    row["junction_node"] = event.junction_node;
+    row["queue_length_before_enqueue"] =
+        event.queue_length_before_enqueue;
+    row["queue_length_after_enqueue"] =
+        event.queue_length_after_enqueue;
+    row["queue_length_before_arbitration"] =
+        event.queue_length_before_arbitration;
+    row["queue_length_after_arbitration"] =
+        event.queue_length_after_arbitration;
+    row["same_timestamp_arrival_batch_size"] =
+        event.same_timestamp_arrival_batch_size;
+    row["same_time_pending_arrivals"] =
+        event.same_time_pending_arrivals;
+    row["same_time_pending_shared_merge_requests"] =
+        event.same_time_pending_shared_merge_requests;
+    row["ready_set_size"] = event.ready_set_size;
+    row["priority_comparison_count"] =
+        event.priority_comparison_count;
+    row["pibt_slice_bag_count"] =
+        event.pibt_slice_bag_count;
+    row["pibt_owner_count"] = event.pibt_owner_count;
+    row["chosen_task_id"] = event.chosen_task_id;
+    row["chosen_runtime_bag_id"] =
+        event.chosen_runtime_bag_id;
+    row["chosen_segment_id"] = event.chosen_segment_id;
+    row["event_seq"] = py::int_(event.event_seq);
+    row["arbitration_generation"] =
+        py::int_(event.arbitration_generation);
+    row["batched_arbitration"] =
+        event.batched_arbitration;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf14_merge_visibility_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeMergeVisibilityRow>& events) {
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["event_time"] = event.event_time;
+    row["timestamp_bits"] = py::int_(event.timestamp_bits);
+    row["destination_node"] = event.destination_node;
+    row["upstream_node"] = event.upstream_node;
+    row["incoming_edge_start"] =
+        event.incoming_edge_start;
+    row["incoming_edge_end"] = event.incoming_edge_end;
+    row["requesting_task_id"] =
+        event.requesting_task_id;
+    row["requesting_runtime_bag_id"] =
+        event.requesting_runtime_bag_id;
+    row["requesting_segment_id"] =
+        event.requesting_segment_id;
+    row["earliest_arrival"] = event.earliest_arrival;
+    row["slot_start"] = event.slot_start;
+    row["slot_end"] = event.slot_end;
+    row["known_competing_request_count"] =
+        event.known_competing_request_count;
+    row["later_same_time_competitor_count"] =
+        event.later_same_time_competitor_count;
+    row["later_same_time_competitor_exists"] =
+        event.later_same_time_competitor_exists;
+    row["seq_determined_order"] =
+        event.seq_determined_order;
+    row["event_seq"] = py::int_(event.event_seq);
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf14_event_seq_audit_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeEventSeqAuditRow>& events) {
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["event_time"] = event.event_time;
+    row["timestamp_bits"] = py::int_(event.timestamp_bits);
+    row["boundary"] = event.boundary;
+    row["node"] = event.node;
+    row["destination_node"] = event.destination_node;
+    row["ready_set_size"] = event.ready_set_size;
+    row["priority_comparison_count"] =
+        event.priority_comparison_count;
+    row["later_same_time_competitor_count"] =
+        event.later_same_time_competitor_count;
+    row["chosen_runtime_bag_id"] =
+        event.chosen_runtime_bag_id;
+    row["chosen_enqueue_sequence"] =
+        py::int_(event.chosen_enqueue_sequence);
+    row["event_seq"] = py::int_(event.event_seq);
+    row["seq_determined_order"] =
+        event.seq_determined_order;
+    row["reason"] = event.reason;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf14_arbitration_batch_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeArbitrationBatchRow>& events) {
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["event_time"] = event.event_time;
+    row["timestamp_bits"] = py::int_(event.timestamp_bits);
+    row["boundary"] = event.boundary;
+    row["node"] = event.node;
+    row["enqueue_count"] = event.enqueue_count;
+    row["ready_set_size"] = event.ready_set_size;
+    row["pending_same_time_event_count"] =
+        event.pending_same_time_event_count;
+    row["chosen_runtime_bag_id"] =
+        event.chosen_runtime_bag_id;
+    row["event_seq"] = py::int_(event.event_seq);
+    row["arbitration_generation"] =
+        py::int_(event.arbitration_generation);
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
 py::dict g4irsf11_event_runtime_from_records(
     const std::vector<NodeRecordTuple>& node_records,
     const std::vector<EdgeRecordTuple>& edge_records,
@@ -3896,7 +4140,10 @@ py::dict g4irsf11_event_runtime_from_records(
     const std::string& pibt_preference_mode,
     const std::vector<EventRuntimeRegretPriorTuple>&
         pibt_regret_prior_records,
-    int selective_credit_contention_threshold) {
+    int selective_credit_contention_threshold,
+    const std::string& event_semantics,
+    bool enable_opportunity_telemetry,
+    int opportunity_trace_limit) {
   // Keep G4IRSF13 controls append-only so existing positional callers retain
   // the exact F2/Q0/P0 behavior.
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
@@ -3983,6 +4230,10 @@ py::dict g4irsf11_event_runtime_from_records(
   config.pibt_preference_mode = pibt_preference_mode;
   config.selective_credit_contention_threshold =
       selective_credit_contention_threshold;
+  config.event_semantics = event_semantics;
+  config.enable_opportunity_telemetry =
+      enable_opportunity_telemetry;
+  config.opportunity_trace_limit = opportunity_trace_limit;
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -4137,6 +4388,40 @@ py::dict g4irsf11_event_runtime_from_records(
       "grandfathered_audit_not_unsafe_entry";
   trace_context["unsafe_fault_entry_semantics"] =
       "EDGE_ENTER_after_directed_physical_fault_activation";
+  const bool g4irsf14_extensions_enabled =
+      result.summary.event_semantics !=
+          "E0_immediate_dispatch_f2" ||
+      result.summary.opportunity_telemetry_enabled;
+  if (g4irsf14_extensions_enabled) {
+    trace_context["event_semantics"] =
+        result.summary.event_semantics;
+    trace_context["event_semantics_echo"] =
+        result.summary.event_semantics_echo;
+    trace_context["opportunity_telemetry_enabled"] =
+        result.summary.opportunity_telemetry_enabled;
+    trace_context["event_timestamp_grouping"] =
+        "exact_double_bits_or_numeric_epsilon_1e-9";
+    trace_context["local_arbitration_key"] =
+        "node,timestamp_bits,wakeup_generation";
+    trace_context["priority_comparison_semantics"] =
+        "actual_choose_bag_comparator_invocations_escape_bypass_zero";
+    trace_context["stale_arbitration_event_semantics"] =
+        "valid_generation_arbitration_executed_against_stale_runtime_state";
+    trace_context["superseded_arbitration_event_rejected_semantics"] =
+        "generation_or_pending_mismatch_rejected_before_arbitration_execution";
+    trace_context["arbitration_worklist_scope"] =
+        "event_triggered_active_nodes_only_no_all_node_scan";
+    trace_context["event_queue_inspection_scope"] =
+        "passive_opportunity_audit_only_not_runtime_feature_or_"
+        "reservation_scan";
+    trace_context["destination_competitor_visibility_semantics"] =
+        "outgoing_edge_potential_competitor_upper_bound_not_selected_route_"
+        "or_grant";
+    trace_context["opportunity_trace_limit"] =
+        opportunity_trace_limit;
+    trace_context["artificial_batch_delay_seconds"] = 0.0;
+    trace_context["destination_merge_grant_enabled"] = false;
+  }
 
   py::dict payload;
   payload["summary"] = g4irsf11_event_runtime_summary_row(result.summary);
@@ -4153,6 +4438,23 @@ py::dict g4irsf11_event_runtime_from_records(
       g4irsf12_event_runtime_credit_rows(result.credit_events);
   payload["pibt_events"] =
       g4irsf12_event_runtime_pibt_rows(result.pibt_events);
+  if (g4irsf14_extensions_enabled) {
+    payload["source_admission_opportunities"] =
+        g4irsf14_source_opportunity_rows(
+            result.source_admission_opportunities);
+    payload["junction_arbitration_opportunities"] =
+        g4irsf14_junction_opportunity_rows(
+            result.junction_arbitration_opportunities);
+    payload["merge_request_visibility"] =
+        g4irsf14_merge_visibility_rows(
+            result.merge_request_visibility);
+    payload["event_seq_ordering_audit"] =
+        g4irsf14_event_seq_audit_rows(
+            result.event_seq_ordering_audit);
+    payload["arbitration_batch_cardinality"] =
+        g4irsf14_arbitration_batch_rows(
+            result.arbitration_batch_cardinality);
+  }
   payload["trace_context"] = std::move(trace_context);
   return payload;
 }
@@ -4389,7 +4691,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("pibt_regret_prior_records") =
                  std::vector<EventRuntimeRegretPriorTuple>{},
              py::arg("selective_credit_contention_threshold") =
-                 1);
+                 1,
+             py::arg("event_semantics") =
+                 std::string("E0_immediate_dispatch_f2"),
+             py::arg("enable_opportunity_telemetry") = false,
+             py::arg("opportunity_trace_limit") = 200000);
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,
