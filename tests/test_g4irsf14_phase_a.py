@@ -137,11 +137,11 @@ def test_inherited_artifact_drift_in_temp_copy_fails_closed(
 
 def test_publication_writes_exactly_five_outputs_and_preserves_inputs(
     tmp_path: Path,
+    inherited_evidence: dict[str, Any],
 ) -> None:
     root = _copy_freeze_inputs(tmp_path / "publication")
-    evidence = phase_a.collect_inherited_evidence(root)
     before = phase_a.snapshot_files(root)
-    payloads = phase_a.build_payloads(evidence)
+    payloads = phase_a.build_payloads(inherited_evidence)
     written = phase_a.publish_payloads(payloads, root)
     after = phase_a.snapshot_files(root)
 
@@ -149,7 +149,7 @@ def test_publication_writes_exactly_five_outputs_and_preserves_inputs(
     assert {path.relative_to(root) for path in written} == set(
         phase_a.OUTPUT_PATHS
     )
-    assert phase_a.validate_committed_outputs(root, evidence) == []
+    assert phase_a.validate_committed_outputs(root, inherited_evidence) == []
 
 
 def test_frozen_outputs_bind_runtime_decision_and_no_scale(
