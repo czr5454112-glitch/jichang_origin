@@ -1562,10 +1562,13 @@ def snapshot_files(
     root: Path,
     paths: Iterable[Path] = IMMUTABILITY_SNAPSHOT_PATHS,
 ) -> dict[str, str]:
-    return {
-        path.as_posix(): file_sha256(root / path)
-        for path in paths
-    }
+    snapshots: dict[str, str] = {}
+    for path in paths:
+        physical = root / path
+        if path == FROZEN_BINARY_PATH and not physical.is_file():
+            continue
+        snapshots[path.as_posix()] = file_sha256(physical)
+    return snapshots
 
 
 def publish_payloads(

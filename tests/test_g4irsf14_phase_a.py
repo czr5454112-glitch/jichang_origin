@@ -18,6 +18,9 @@ def _copy_freeze_inputs(destination: Path) -> Path:
     paths = tuple(dict.fromkeys(phase_a.IMMUTABILITY_SNAPSHOT_PATHS))
     for relative in paths:
         source = phase_a.ROOT / relative
+        if not source.is_file():
+            assert relative == phase_a.FROZEN_BINARY_PATH
+            continue
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
@@ -70,6 +73,29 @@ def test_hash_conventions_match_canonical_predecessor() -> None:
     left = {"z": 2, "a": [1, "x"]}
     right = {"a": [1, "x"], "z": 2}
     assert phase_a.canonical_sha256(left) == phase_a.canonical_sha256(right)
+
+
+def test_temp_fixture_accepts_only_the_untracked_frozen_binary_as_absent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_root = _copy_freeze_inputs(tmp_path / "source_without_binary")
+    (source_root / phase_a.FROZEN_BINARY_PATH).unlink(missing_ok=True)
+    monkeypatch.setattr(phase_a, "ROOT", source_root)
+    copied_root = _copy_freeze_inputs(tmp_path / "copied_without_binary")
+    assert not (copied_root / phase_a.FROZEN_BINARY_PATH).exists()
+
+
+def test_snapshot_treats_only_the_untracked_frozen_binary_as_optional(
+    tmp_path: Path,
+) -> None:
+    root = _copy_freeze_inputs(tmp_path / "snapshot_without_binary")
+    (root / phase_a.FROZEN_BINARY_PATH).unlink(missing_ok=True)
+    snapshot = phase_a.snapshot_files(root)
+    assert phase_a.FROZEN_BINARY_PATH.as_posix() not in snapshot
+    (root / phase_a.MAP_PATH).unlink()
+    with pytest.raises(phase_a.FreezeError, match="missing required file"):
+        phase_a.snapshot_files(root)
 
 
 def test_map_drift_in_temp_copy_fails_closed(tmp_path: Path) -> None:
@@ -165,6 +191,6 @@ def test_frozen_outputs_bind_runtime_decision_and_no_scale(
 
 def test_missing_binary_is_a_fail_closed_collection_error(tmp_path: Path) -> None:
     root = _copy_freeze_inputs(tmp_path / "missing_binary")
-    (root / phase_a.FROZEN_BINARY_PATH).unlink()
+    (root / phase_a.FROZEN_BINARY_PATH).unlink(missing_ok=True)
     with pytest.raises(phase_a.FreezeError, match="missing required file"):
         phase_a.collect_inherited_evidence(root, require_binary=True)
