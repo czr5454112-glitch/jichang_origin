@@ -16,8 +16,8 @@ for path in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(path))
 
 from czr005.datasets.decision_trace import (  # noqa: E402
+    FROZEN_G4IRSF11_V1_FEATURE_SOURCES,
     SCHEMA_ID,
-    decision_trace_schema,
     load_adjacency,
     load_jsonl,
     validate_decision_rows,
@@ -55,6 +55,9 @@ ROW_COUNT_ARTIFACTS = {
     "source_release_mapping",
     "source_identity_table",
 }
+FROZEN_G4IRSF11_V1_SCHEMA_SHA256 = (
+    "acd53fb07770616abf590b3b33a2574bff060f20243d976869cd8f6675f8ac95"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -209,8 +212,11 @@ def _validate_committed_artifacts_unlocked(
         checked += 1
 
     schema_path = resolved_artifacts.get("schema", root / "__missing_schema__")
-    if schema_path.is_file() and _object(schema_path) != decision_trace_schema():
-        failures.append("committed decision schema differs from executable schema")
+    if (
+        schema_path.is_file()
+        and _sha256(schema_path) != FROZEN_G4IRSF11_V1_SCHEMA_SHA256
+    ):
+        failures.append("committed decision schema differs from frozen G4IRSF11 v1 schema")
     sample_path = resolved_artifacts.get("trace_sample", root / "__missing_trace__")
     outcome_path = resolved_artifacts.get("outcome_sample", root / "__missing_outcomes__")
     validated: list[dict[str, Any]] = []
@@ -278,7 +284,10 @@ def _validate_committed_artifacts_unlocked(
                     ):
                         row[field] = str(row.get(field, "")).strip().lower() == "true"
                     lineage_rows.append(row)
-                validate_feature_lineage(lineage_rows)
+                validate_feature_lineage(
+                    lineage_rows,
+                    feature_sources=FROZEN_G4IRSF11_V1_FEATURE_SOURCES,
+                )
         except ValueError as exc:
             failures.append(f"feature lineage validation failed: {exc}")
     return {

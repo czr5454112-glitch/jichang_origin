@@ -555,11 +555,37 @@ def test_feature_lineage_separates_runtime_metadata_and_labels() -> None:
     dt.validate_feature_lineage(rows)
 
     by_field = {row["field_path"]: row for row in rows}
+    assert len(dt.EVENT_RUNTIME_FEATURE_SOURCES) == 21
     assert by_field["candidate_records[].features.*"]["lineage"] == "runtime"
     assert by_field["original_arrival_time"]["lineage"] == "metadata"
     assert by_field["tail_bucket"]["lineage"] == "label"
     assert by_field["tail_bucket"]["storage_boundary"] == "separate_outcome_table"
     assert by_field["tail_bucket"]["model_input_allowed"] is False
+
+
+def test_current_feature_lineage_requires_all_twenty_one_runtime_features() -> None:
+    rows = [
+        row
+        for row in dt.feature_lineage_rows()
+        if row["field_path"]
+        != "candidate_records[].features.first_edge_credit_slack_seconds"
+    ]
+
+    with pytest.raises(dt.DecisionTraceValidationError, match="lineage missing required"):
+        dt.validate_feature_lineage(rows)
+
+
+def test_feature_lineage_recursively_rejects_undeclared_runtime_source() -> None:
+    rows = dt.feature_lineage_rows()
+    target = next(
+        row
+        for row in rows
+        if row["field_path"] == "candidate_records[].features.static_potential"
+    )
+    target["sources"] = ["runtime.undeclared_source"]
+
+    with pytest.raises(dt.DecisionTraceValidationError, match="undeclared lineage source"):
+        dt.validate_feature_lineage(rows)
 
 
 def test_feature_lineage_recursively_rejects_label_derived_runtime_feature() -> None:

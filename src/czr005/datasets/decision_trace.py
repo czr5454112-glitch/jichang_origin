@@ -28,10 +28,10 @@ CANDIDATE_ORDERING = "next_node_ascending"
 MODEL_SCORE_SEMANTICS = "lower_is_better_cost"
 DEFAULT_SAMPLING_SEED = "czr005-g4irsf11-stratified-reservoir-v1"
 
-# The G4IRSF11 event runtime exposes only these bounded local/static candidate
-# observations to the scorer.  Keeping an allow-list here turns lineage from a
-# prose claim into a fail-closed executable contract.
-EVENT_RUNTIME_FEATURE_SOURCES: dict[str, tuple[str, ...]] = {
+# The committed G4IRSF11 evidence predates the G4IRSF12 runtime extensions.
+# Keep its original ten-feature contract explicit so a later runtime feature
+# cannot silently redefine the already-published v1 evidence.
+FROZEN_G4IRSF11_V1_FEATURE_SOURCES: dict[str, tuple[str, ...]] = {
     "static_potential": ("graph.static_potential", "goal_node", "candidate_records[].next_node"),
     "travel_time": ("graph.edge_travel_time", "current_node", "candidate_records[].next_node"),
     "target_queue_length": ("local_neighbor.queue_length",),
@@ -45,6 +45,14 @@ EVENT_RUNTIME_FEATURE_SOURCES: dict[str, tuple[str, ...]] = {
     ),
     "recent_visit_count": ("short_history", "candidate_records[].next_node"),
     "two_hop_queue_pressure": ("bounded_two_hop.queue_summary",),
+}
+
+# The current event runtime exposes these bounded local/static candidate
+# observations to the scorer. Keeping a separate current allow-list preserves
+# the default fail-closed validator while the historical committed validator
+# selects the frozen v1 contract explicitly.
+EVENT_RUNTIME_FEATURE_SOURCES: dict[str, tuple[str, ...]] = {
+    **FROZEN_G4IRSF11_V1_FEATURE_SOURCES,
     "current_goal_queue_length": ("local_current.goal_conditioned_queue_length",),
     "target_goal_queue_length": ("local_neighbor.goal_conditioned_queue_length",),
     "target_goal_scheduled_incoming": (
@@ -1237,8 +1245,17 @@ def feature_lineage_rows() -> list[dict[str, Any]]:
     return result
 
 
-def validate_feature_lineage(rows: Iterable[Mapping[str, Any]]) -> None:
-    """Validate lineage completeness and recursively audit model dependencies."""
+def validate_feature_lineage(
+    rows: Iterable[Mapping[str, Any]],
+    *,
+    feature_sources: Mapping[str, Sequence[str]] | None = None,
+) -> None:
+    """Validate lineage completeness and recursively audit model dependencies.
+
+    ``feature_sources`` selects an explicit published contract. Omitting it
+    retains the current runtime contract, so current callers continue to
+    require every approved event-runtime feature.
+    """
 
     by_field: dict[str, Mapping[str, Any]] = {}
     for index, row in enumerate(rows):
@@ -1264,9 +1281,17 @@ def validate_feature_lineage(rows: Iterable[Mapping[str, Any]]) -> None:
             raise DecisionTraceValidationError(f"label field is not separated from runtime trace: {field}")
         by_field[field] = row
 
+    contract_sources = (
+        EVENT_RUNTIME_FEATURE_SOURCES
+        if feature_sources is None
+        else feature_sources
+    )
+    contract_feature_fields = {
+        f"candidate_records[].features.{name}" for name in contract_sources
+    }
     required = {
         "candidate_records[].features.*",
-        *(f"candidate_records[].features.{name}" for name in EVENT_RUNTIME_FEATURE_SOURCES),
+        *contract_feature_fields,
         "model_margin",
         "fallback_selected_next",
         "selected_next",
@@ -1308,6 +1333,32 @@ def validate_feature_lineage(rows: Iterable[Mapping[str, Any]]) -> None:
             if row["lineage"] != "runtime":
                 raise DecisionTraceValidationError(f"non-runtime model input declared: {field}")
             verify_runtime_dependency(field, field)
+
+    feature_prefix = "candidate_records[].features."
+    declared_feature_fields = {
+        field
+        for field in by_field
+        if field.startswith(feature_prefix) and field != f"{feature_prefix}*"
+    }
+    unexpected_features = declared_feature_fields - contract_feature_fields
+    if unexpected_features:
+        raise DecisionTraceValidationError(
+            "lineage declares feature(s) outside selected contract: "
+            f"{sorted(unexpected_features)}"
+        )
+    for feature_name, expected_sources in contract_sources.items():
+        field = f"{feature_prefix}{feature_name}"
+        if tuple(by_field[field]["sources"]) != tuple(expected_sources):
+            raise DecisionTraceValidationError(
+                f"lineage sources differ from selected contract for {field}"
+            )
+    group_sources = by_field[f"{feature_prefix}*"]["sources"]
+    if set(group_sources) != contract_feature_fields or len(group_sources) != len(
+        contract_feature_fields
+    ):
+        raise DecisionTraceValidationError(
+            "candidate feature-group lineage differs from selected contract"
+        )
 
 
 def source_release_mapping(task_rows: Iterable[Mapping[str, Any]]) -> dict[tuple[int, str], dict[str, Any]]:
