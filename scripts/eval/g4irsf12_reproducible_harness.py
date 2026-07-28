@@ -27,6 +27,7 @@ import inspect
 import io
 import json
 import math
+import ntpath
 import os
 from pathlib import Path
 import re
@@ -3592,6 +3593,8 @@ def seal_evidence_row(row: Mapping[str, Any]) -> dict[str, Any]:
 def execution_provenance_matches(
     row: Mapping[str, Any],
     provenance: ExecutionProvenance,
+    *,
+    require_binary_file: bool = True,
 ) -> bool:
     """Match one sealed row to the single frozen formal execution identity."""
 
@@ -3616,15 +3619,39 @@ def execution_provenance_matches(
     binding = str(row.get("evidence_row_binding_sha256", ""))
     if not binding or binding != evidence_row_binding_sha256(row):
         return False
+    expected_path_text = str(provenance.binary_path).strip()
+    loaded_path_text = str(
+        row.get("loaded_cpp_binary_path", "")
+    ).strip()
+    if not expected_path_text or not loaded_path_text:
+        return False
+    if not require_binary_file:
+        return ntpath.normcase(
+            ntpath.normpath(expected_path_text)
+        ) == ntpath.normcase(ntpath.normpath(loaded_path_text))
     try:
-        expected_path = Path(provenance.binary_path).resolve(strict=True)
-        loaded_path = Path(
-            str(row.get("loaded_cpp_binary_path", ""))
-        ).resolve(strict=True)
+        expected_path = Path(expected_path_text).resolve(strict=True)
+        loaded_path = Path(loaded_path_text).resolve(strict=True)
     except (OSError, RuntimeError, ValueError):
         return False
     return os.path.normcase(str(expected_path)) == os.path.normcase(
         str(loaded_path)
+    )
+
+
+def _is_frozen_phase_j_provenance(
+    provenance: ExecutionProvenance,
+) -> bool:
+    return (
+        provenance.binary_sha256.lower()
+        == "82f15f08a8cff0e887447f017f0aa03fffabe9bfb3a79a563b16d779219d8222"
+        and provenance.source_bundle_sha256
+        == "eca01993a9094c8e86558d15246628acd3162d5d769916ded6365ec6437f0df7"
+        and provenance.executor_source_sha256
+        == "e1b59eecded76f59991a9276f614aea747a573dbaffdf2139cfd9b6096b69971"
+        and provenance.executor_id == FORMAL_EXECUTOR_ID
+        and provenance.source_path_manifest_sha256
+        == FORMAL_SOURCE_PATH_MANIFEST_SHA256
     )
 
 
@@ -5184,7 +5211,20 @@ def candidate_bundle(
     rows: Sequence[Mapping[str, Any]],
     *,
     current_provenance: ExecutionProvenance | None = None,
+    require_binary_file: bool | None = None,
 ) -> dict[str, Any]:
+    if require_binary_file is not None and not isinstance(
+        require_binary_file, bool
+    ):
+        raise TypeError("require_binary_file must be bool or None")
+    effective_require_binary_file = (
+        require_binary_file
+        if require_binary_file is not None
+        else (
+            current_provenance is None
+            or not _is_frozen_phase_j_provenance(current_provenance)
+        )
+    )
     finalists = [case for case in original_scale_cases() if case.finalist_role]
     if len(finalists) > 3:
         raise AssertionError("at most three original-scale finalists are allowed")
@@ -5201,7 +5241,11 @@ def candidate_bundle(
             [
                 row
                 for row in all_evidence
-                if execution_provenance_matches(row, current_provenance)
+                if execution_provenance_matches(
+                    row,
+                    current_provenance,
+                    require_binary_file=effective_require_binary_file,
+                )
             ]
             if current_provenance is not None
             else []
@@ -5559,6 +5603,7 @@ def write_harness_outputs(
     bundle = candidate_bundle(
         by_phase["J"],
         current_provenance=current_provenance,
+        require_binary_file=True,
     )
     _atomic_write(
         paths["candidate_bundle"],

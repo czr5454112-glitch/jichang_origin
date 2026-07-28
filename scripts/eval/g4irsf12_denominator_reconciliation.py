@@ -493,7 +493,11 @@ def _candidate_rows(
             for row in admitted
             if row.get("candidate_id") == candidate_id
             and int(row.get("size_segments", 0)) == FULL_SIZE_SEGMENTS
-            and execution_provenance_matches(row, provenance)
+            and execution_provenance_matches(
+                row,
+                provenance,
+                require_binary_file=False,
+            )
         ]
         repeat_indexes = sorted(int(row["repeat_index"]) for row in rows)
         hashes = {
@@ -599,7 +603,11 @@ def _candidate_rows(
         for row in admitted
         if row.get("candidate_id") == "J_CTRL_PIBT_OFF"
         and int(row.get("size_segments", 0)) == FULL_SIZE_SEGMENTS
-        and execution_provenance_matches(row, provenance)
+        and execution_provenance_matches(
+            row,
+            provenance,
+            require_binary_file=False,
+        )
     ]
     if len(control_rows) != 5:
         raise ReconciliationError("PIBT-off control lacks five admitted repeats")

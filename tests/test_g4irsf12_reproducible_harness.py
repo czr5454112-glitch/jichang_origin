@@ -705,6 +705,209 @@ def test_same_byte_binary_copy_cannot_match_current_run_provenance(
         executor_source_sha256="d" * 64,
     )
     assert harness.execution_provenance_matches(row, provenance) is False
+    assert (
+        harness.execution_provenance_matches(
+            row,
+            provenance,
+            require_binary_file=False,
+        )
+        is False
+    )
+
+
+def test_exact_frozen_phase_j_identity_auto_matches_absent_binary() -> None:
+    binary_path = (
+        r"C:\__czr005_absent_historical_fixture__\phase-j"
+        r"\czr005_cpp.pyd"
+    )
+    lexical_echo = (
+        "c:/__CZR005_ABSENT_HISTORICAL_FIXTURE__/phase-j/./czr005_cpp.pyd"
+    )
+    binary_sha256 = (
+        "82f15f08a8cff0e887447f017f0aa03fffabe9bfb3a79a563b16d779219d8222"
+    )
+    source_sha256 = (
+        "eca01993a9094c8e86558d15246628acd3162d5d769916ded6365ec6437f0df7"
+    )
+    executor_sha256 = (
+        "e1b59eecded76f59991a9276f614aea747a573dbaffdf2139cfd9b6096b69971"
+    )
+    finalist = next(
+        case
+        for case in harness.original_scale_cases()
+        if case.candidate_id == "J_F1"
+    )
+    rows = [
+        _valid_prior_result(
+            finalist,
+            harness.FULL_SIZE_SEGMENTS,
+            repeat_index=index,
+            binary_sha256=binary_sha256,
+            source_bundle_sha256=source_sha256,
+            executor_source_sha256=executor_sha256,
+            loaded_cpp_binary_path=lexical_echo,
+        )
+        for index in range(1, 6)
+    ]
+    provenance = harness.ExecutionProvenance(
+        binary_path=binary_path,
+        binary_sha256=binary_sha256,
+        source_bundle_sha256=source_sha256,
+        source_path_manifest_sha256=(
+            harness.FORMAL_SOURCE_PATH_MANIFEST_SHA256
+        ),
+        executor_id=harness.FORMAL_EXECUTOR_ID,
+        executor_source_sha256=executor_sha256,
+    )
+
+    assert not harness.execution_provenance_matches(rows[0], provenance)
+    assert harness.execution_provenance_matches(
+        rows[0],
+        provenance,
+        require_binary_file=False,
+    )
+    strict_bundle = harness.candidate_bundle(
+        rows,
+        current_provenance=provenance,
+        require_binary_file=True,
+    )
+    historical_bundle = harness.candidate_bundle(
+        rows,
+        current_provenance=provenance,
+    )
+    strict_finalist = next(
+        row
+        for row in strict_bundle["finalists"]
+        if row["candidate_id"] == "J_F1"
+    )
+    historical_finalist = next(
+        row
+        for row in historical_bundle["finalists"]
+        if row["candidate_id"] == "J_F1"
+    )
+    assert strict_finalist["executed_full_repeat_count"] == 0
+    assert historical_finalist["executed_full_repeat_count"] == 5
+    assert historical_finalist["promotion_status"] == "PROMOTED"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("binary_sha256", "0" * 64),
+        ("source_bundle_sha256", "1" * 64),
+        ("executor_source_sha256", "2" * 64),
+        ("executor_id", "fixture:drifted_executor"),
+        ("source_path_manifest_sha256", "3" * 64),
+    ],
+)
+def test_candidate_bundle_auto_mode_rejects_any_frozen_identity_drift(
+    tmp_path: Path,
+    field: str,
+    value: str,
+) -> None:
+    missing_binary = str(tmp_path / "absent" / "czr005_cpp.pyd")
+    identity: dict[str, str] = {
+        "binary_path": missing_binary,
+        "binary_sha256": (
+            "82f15f08a8cff0e887447f017f0aa03fffabe9bfb3a79a563b16d779219d8222"
+        ),
+        "source_bundle_sha256": (
+            "eca01993a9094c8e86558d15246628acd3162d5d769916ded6365ec6437f0df7"
+        ),
+        "source_path_manifest_sha256": (
+            harness.FORMAL_SOURCE_PATH_MANIFEST_SHA256
+        ),
+        "executor_id": harness.FORMAL_EXECUTOR_ID,
+        "executor_source_sha256": (
+            "e1b59eecded76f59991a9276f614aea747a573dbaffdf2139cfd9b6096b69971"
+        ),
+    }
+    identity[field] = value
+    finalist = next(
+        case
+        for case in harness.original_scale_cases()
+        if case.candidate_id == "J_F1"
+    )
+    rows = [
+        _valid_prior_result(
+            finalist,
+            harness.FULL_SIZE_SEGMENTS,
+            repeat_index=index,
+            binary_sha256=identity["binary_sha256"],
+            source_bundle_sha256=identity["source_bundle_sha256"],
+            executor_source_sha256=identity["executor_source_sha256"],
+            loaded_cpp_binary_path=missing_binary,
+        )
+        for index in range(1, 6)
+    ]
+    for row in rows:
+        row["executor_id"] = identity["executor_id"]
+        row["source_path_manifest_sha256"] = identity[
+            "source_path_manifest_sha256"
+        ]
+    rows = [harness.seal_evidence_row(row) for row in rows]
+    provenance = harness.ExecutionProvenance(**identity)
+
+    bundle = harness.candidate_bundle(
+        rows,
+        current_provenance=provenance,
+    )
+    admitted = next(
+        row
+        for row in bundle["finalists"]
+        if row["candidate_id"] == "J_F1"
+    )
+    assert admitted["executed_full_repeat_count"] == 0
+    assert admitted["promotion_status"] == "PENDING"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        (
+            "loaded_cpp_binary_path",
+            r"C:\__czr005_absent_historical_fixture__\other"
+            r"\czr005_cpp.pyd",
+        ),
+        ("loaded_cpp_binary_sha256", "f" * 64),
+    ],
+)
+def test_historical_lexical_binary_match_still_rejects_path_or_hash_drift(
+    field: str,
+    value: str,
+) -> None:
+    binary_path = (
+        r"C:\__czr005_absent_historical_fixture__\phase-j"
+        r"\czr005_cpp.pyd"
+    )
+    case = next(
+        case
+        for case in harness.framework_delta_cases()
+        if case.framework_label == "B5"
+    )
+    row = _valid_prior_result(
+        case,
+        144,
+        loaded_cpp_binary_path=binary_path,
+    )
+    row[field] = value
+    row = harness.seal_evidence_row(row)
+    provenance = harness.ExecutionProvenance(
+        binary_path=binary_path,
+        binary_sha256="c" * 64,
+        source_bundle_sha256="b" * 64,
+        source_path_manifest_sha256=(
+            harness.FORMAL_SOURCE_PATH_MANIFEST_SHA256
+        ),
+        executor_id=harness.FORMAL_EXECUTOR_ID,
+        executor_source_sha256="d" * 64,
+    )
+
+    assert not harness.execution_provenance_matches(
+        row,
+        provenance,
+        require_binary_file=False,
+    )
 
 
 def test_early_abort_retains_partial_result(tmp_path: Path) -> None:
