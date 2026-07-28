@@ -247,6 +247,14 @@ void test_e0_exact_compatibility(Checks& checks) {
   checks.require(implicit.summary.source_arbitration_event_count == 0 &&
                      implicit.summary.junction_arbitration_event_count == 0,
                  "E0 must schedule no new arbitration event type");
+  checks.require(
+      implicit.summary.bounded_local_pibt_claim_boundary.find(
+          "transaction_deltas_O_selected_actions_no_queue_or_calendar_copy") !=
+              std::string::npos &&
+          implicit.summary.bounded_local_pibt_claim_boundary.find(
+              "transaction_state_bounded_by_selected_bags_nodes_and_corridors") ==
+              std::string::npos,
+      "E0 must retain the frozen differential-rollback claim boundary");
 }
 
 void test_mode_isolation_and_source_batch(Checks& checks) {
@@ -255,6 +263,12 @@ void test_mode_isolation_and_source_batch(Checks& checks) {
                                        config_for(mode, true));
     const auto result = runtime.run(source_batch_motif());
     require_hard_invariants(checks, result, 3);
+    checks.require(
+        result.summary.bounded_local_pibt_claim_boundary.find(
+            "transaction_state_bounded_by_selected_bags_nodes_and_corridors") !=
+            std::string::npos,
+        std::string(mode) +
+            " must report the full bounded local snapshot claim boundary");
     const bool source_expected =
         std::string(mode) == "E1" || std::string(mode) == "E3";
     const bool junction_expected =
@@ -637,6 +651,86 @@ void test_p2_post_stage_failure_rolls_back_complete_logical_state(
       "restored local wakeup state must leave no stale arbitration");
 }
 
+void test_e0_differential_rollback_restores_multi_action_multigoal_transaction(
+    Checks& checks) {
+  auto config = config_for("E0", true);
+  config.pibt_mode = "P2";
+  config.pibt_max_ready_bags = 16;
+  config.pibt_max_local_resources = 64;
+  config.pibt_max_candidates_per_bag = 8;
+  config.local_queue_capacity = 1;
+  config.retry_interval = 0.1;
+  config.test_pibt_logical_failure_after_followup_scheduling =
+      true;
+  config.test_verify_pibt_rollback_logical_state = true;
+
+  std::vector<EventRuntimeBagRequest> requests;
+  requests.reserve(9);
+  for (int index = 0; index < 8; ++index) {
+    requests.push_back(
+        {"e0-long-owner-" + std::to_string(index),
+         100 + index,
+         0.0,
+         50.0 + static_cast<double>(index),
+         8,
+         index % 2 == 0 ? 47 : 11,
+         "long-multigoal-owner"});
+  }
+  requests.push_back(
+      {"e0-long-trigger",
+       200,
+       0.55,
+       100.0,
+       6,
+       11,
+       "long-multigoal-trigger"});
+
+  EventDrivenJunctionRuntime runtime(canonical_graph(), config);
+  const auto result = runtime.run(
+      requests,
+      {EventRuntimeFaultWindow{
+          8, 11, 0.0, 1.55, 0.0, false}});
+  require_hard_invariants(
+      checks, result, static_cast<int>(requests.size()));
+  checks.require(
+      result.summary.bounded_local_pibt_rollback_count >= 1 &&
+          result.summary.bounded_local_pibt_commit_rejection_count >= 1,
+      "E0 multi-goal motif must traverse the differential post-followup "
+      "rollback path");
+  checks.require(
+      result.summary.bounded_local_pibt_max_transaction_action_deltas >= 2,
+      "E0 multi-goal motif must roll back a real multi-action transaction");
+  checks.require(
+      std::any_of(
+          result.decisions.begin(),
+          result.decisions.end(),
+          [](const auto& row) {
+            return row.task_id == 100 &&
+                   row.current_node == 8 &&
+                   row.selected_next == 11;
+          }) &&
+          std::any_of(
+              result.decisions.begin(),
+              result.decisions.end(),
+              [](const auto& row) {
+                return row.task_id == 200 &&
+                       row.current_node == 6 &&
+                       row.selected_next == 8;
+              }),
+      "the committed retry must move the goal-47 owner and goal-11 trigger "
+      "as the real two-action transaction");
+  checks.require(
+      result.summary.bounded_local_pibt_claim_boundary.find(
+          "transaction_deltas_O_selected_actions_no_queue_or_calendar_copy") !=
+          std::string::npos,
+      "E0 multi-action rollback must expose the differential transaction "
+      "boundary");
+  checks.require(
+      result.summary.stale_arbitration_event_count == 0,
+      "E0 differential rollback must preserve wakeup generations and event "
+      "sequence state");
+}
+
 void test_raw_event_queue_orders_arrivals_before_arbitration(
     Checks& checks) {
   using czr005::ics::JunctionEventType;
@@ -690,6 +784,8 @@ int main() {
     test_generated_events_respect_the_active_phase_floor(checks);
     test_p2_commit_publishes_transactional_visibility(checks);
     test_p2_post_stage_failure_rolls_back_complete_logical_state(
+        checks);
+    test_e0_differential_rollback_restores_multi_action_multigoal_transaction(
         checks);
     test_raw_event_queue_orders_arrivals_before_arbitration(checks);
   } catch (const std::exception& error) {

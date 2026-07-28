@@ -8,6 +8,7 @@
 #include <limits>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -102,6 +103,11 @@ struct FirstEdgeCreditBatchOperation {
   std::string reason;
   std::size_t entry_count = 0;
 };
+
+static_assert(
+    std::is_nothrow_move_constructible_v<
+        FirstEdgeCreditBatchOperation>,
+    "committed batch results must be returnable without allocation or throw");
 
 struct FirstEdgeCreditLifecycleEvent {
   double time = 0.0;
@@ -366,6 +372,13 @@ class ExpiringFirstEdgeCreditLedger {
       }
     }
 
+    // Construct the complete success result before append_lifecycle_batch
+    // performs the first ledger mutation.  Returning this named local uses
+    // the statically enforced noexcept move above, so no allocation or
+    // exception remains possible after the active indexes are erased.
+    FirstEdgeCreditBatchOperation success{
+        true, "consumed", entries.size()};
+
     std::vector<FirstEdgeCreditLifecycleEvent> staged_lifecycle;
     staged_lifecycle.reserve(entries.size() * 2);
     for (const auto& entry : entries) {
@@ -409,7 +422,7 @@ class ExpiringFirstEdgeCreditLedger {
       counters_.active_count =
           std::max(0, counters_.active_count - 1);
     }
-    return {true, "consumed", entries.size()};
+    return success;
   }
 
   std::size_t revoke_edge_fault_generation(int from_node,

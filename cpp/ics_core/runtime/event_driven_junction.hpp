@@ -1269,8 +1269,12 @@ class EventDrivenJunctionRuntime {
         "simultaneously_ready_one_owner_per_node;"
         "real_adjacent_one_edge_candidates;"
         "bounded_bags_resources_candidates;"
-        "credit_transaction_scoped_to_selected_action_ids;"
-        "transaction_state_bounded_by_selected_bags_nodes_and_corridors;"
+        "credit_transaction_scoped_to_selected_action_ids;" +
+        std::string(
+            canonical_event_semantics() ==
+                    "E0_immediate_dispatch_f2"
+                ? "transaction_deltas_O_selected_actions_no_queue_or_calendar_copy;"
+                : "transaction_state_bounded_by_selected_bags_nodes_and_corridors;") +
         "two_phase_local_prevalidation_and_logical_failure_atomic_publish;"
         "one_edge_per_bag_per_decision;multi_bag_batch_action_count_reported_separately;"
         "no_astar;no_global_reservation_scan;no_future_route;"
@@ -3237,14 +3241,20 @@ class EventDrivenJunctionRuntime {
     int from_node = -1;
     int next_node = -1;
     std::size_t queue_index = 0;
-    bool has_corridor_reservation = false;
+    JunctionState* source_junction = nullptr;
+    std::deque<int>::const_iterator source_queue_iterator;
+    bool corridor_reservation_inserted = false;
     bool corridor_existed = false;
     long long corridor_key = 0;
     double corridor_start = 0.0;
     double corridor_end = 0.0;
-    bool has_destination_reservation = false;
+    bool destination_reservation_inserted = false;
     double destination_start = 0.0;
     double destination_end = 0.0;
+    int destination_goal = -1;
+    bool destination_goal_existed = false;
+    int destination_goal_value = 0;
+    bool destination_goal_incremented = false;
   };
 
   struct PIBTStagedMergeVisibility {
@@ -3260,6 +3270,7 @@ class EventDrivenJunctionRuntime {
   struct PIBTTransactionSnapshot {
     bool captured = false;
     bool mutated = false;
+    bool differential_rollback = false;
     int credit_entry_count = 0;
     std::size_t applied_action_count = 0;
     EventRuntimeSummary summary;
@@ -4658,6 +4669,9 @@ class EventDrivenJunctionRuntime {
       const std::vector<BoundedLocalPIBTAction>& actions,
       double time,
       PIBTTransactionSnapshot& snapshot) {
+    snapshot.differential_rollback =
+        canonical_event_semantics() ==
+        "E0_immediate_dispatch_f2";
     snapshot.summary = result_.summary;
     snapshot.action_deltas.reserve(actions.size());
 
@@ -4670,7 +4684,9 @@ class EventDrivenJunctionRuntime {
       if (inserted.second) {
         const auto& junction = junctions_.at(node);
         saved.node = node;
-        saved.queue = junction.queue;
+        if (!snapshot.differential_rollback) {
+          saved.queue = junction.queue;
+        }
         saved.peak_source_queue_length =
             junction.peak_source_queue_length;
         saved.peak_junction_queue_length =
@@ -4689,8 +4705,10 @@ class EventDrivenJunctionRuntime {
             junction.last_service_reservation_end_time;
         saved.next_dispatch_time = junction.next_dispatch_time;
         saved.scheduled_incoming = junction.scheduled_incoming;
-        saved.scheduled_incoming_by_goal =
-            junction.scheduled_incoming_by_goal;
+        if (!snapshot.differential_rollback) {
+          saved.scheduled_incoming_by_goal =
+              junction.scheduled_incoming_by_goal;
+        }
         saved.source_wakeup_generation =
             junction.source_wakeup_generation;
         saved.junction_wakeup_generation =
@@ -4735,7 +4753,7 @@ class EventDrivenJunctionRuntime {
       auto& from_saved = capture_junction(action.from_node);
       (void)capture_junction(action.next_node);
 
-      const auto& from = junctions_.at(action.from_node);
+      auto& from = junctions_.at(action.from_node);
       const auto queued =
           std::find(from.queue.begin(), from.queue.end(), action.bag_id);
       if (queued == from.queue.end()) {
@@ -4752,8 +4770,21 @@ class EventDrivenJunctionRuntime {
       delta.next_node = action.next_node;
       delta.queue_index = static_cast<std::size_t>(
           std::distance(from.queue.begin(), queued));
+      delta.source_junction = &from;
+      delta.source_queue_iterator = queued;
+      const auto& destination = junctions_.at(action.next_node);
+      delta.destination_goal = bag.request.goal;
+      const auto destination_goal =
+          destination.scheduled_incoming_by_goal.find(
+              delta.destination_goal);
+      delta.destination_goal_existed =
+          destination_goal !=
+          destination.scheduled_incoming_by_goal.end();
+      if (delta.destination_goal_existed) {
+        delta.destination_goal_value =
+            destination_goal->second;
+      }
       if (uses_corridor_calendar()) {
-        delta.has_corridor_reservation = true;
         delta.corridor_key =
             resource_corridor_key(action.from_node, action.next_node);
         const auto inserted =
@@ -4783,7 +4814,6 @@ class EventDrivenJunctionRuntime {
       }
       if (uses_destination_calendar(action.next_node,
                                     bag.request.goal)) {
-        delta.has_destination_reservation = true;
         delta.destination_start = time + travel;
         delta.destination_end =
             delta.destination_start +
@@ -4856,7 +4886,7 @@ class EventDrivenJunctionRuntime {
          --index) {
       const auto& delta =
           snapshot.action_deltas[index - 1];
-      if (delta.has_corridor_reservation) {
+      if (delta.corridor_reservation_inserted) {
         const auto corridor =
             corridors_.find(delta.corridor_key);
         if (corridor != corridors_.end()) {
@@ -4870,12 +4900,37 @@ class EventDrivenJunctionRuntime {
           }
         }
       }
-      if (delta.has_destination_reservation) {
+      if (delta.destination_reservation_inserted) {
         junctions_.at(delta.next_node)
             .service_calendar.erase_exact(
                 delta.bag_id,
                 delta.destination_start,
                 delta.destination_end);
+      }
+    }
+    if (snapshot.differential_rollback) {
+      for (std::size_t index = snapshot.applied_action_count;
+           index > 0;
+           --index) {
+        const auto& delta =
+            snapshot.action_deltas[index - 1];
+        if (!delta.destination_goal_incremented) {
+          continue;
+        }
+        auto& by_goal =
+            junctions_.at(delta.next_node)
+                .scheduled_incoming_by_goal;
+        if (delta.destination_goal_existed) {
+          const auto current =
+              by_goal.find(delta.destination_goal);
+          if (current == by_goal.end()) {
+            throw std::logic_error(
+                "PIBT rollback lost an existing destination goal counter");
+          }
+          current->second = delta.destination_goal_value;
+        } else {
+          by_goal.erase(delta.destination_goal);
+        }
       }
     }
     for (auto& entry : snapshot.corridors) {
@@ -4921,7 +4976,9 @@ class EventDrivenJunctionRuntime {
     for (auto& entry : snapshot.junctions) {
       auto& junction = junctions_.at(entry.first);
       auto& saved = entry.second;
-      junction.queue.swap(saved.queue);
+      if (!snapshot.differential_rollback) {
+        junction.queue.swap(saved.queue);
+      }
       junction.peak_source_queue_length =
           saved.peak_source_queue_length;
       junction.peak_junction_queue_length =
@@ -4940,8 +4997,10 @@ class EventDrivenJunctionRuntime {
           saved.last_service_reservation_end_time;
       junction.next_dispatch_time = saved.next_dispatch_time;
       junction.scheduled_incoming = saved.scheduled_incoming;
-      junction.scheduled_incoming_by_goal.swap(
-          saved.scheduled_incoming_by_goal);
+      if (!snapshot.differential_rollback) {
+        junction.scheduled_incoming_by_goal.swap(
+            saved.scheduled_incoming_by_goal);
+      }
       junction.source_wakeup_generation =
           saved.source_wakeup_generation;
       junction.junction_wakeup_generation =
@@ -5226,13 +5285,20 @@ class EventDrivenJunctionRuntime {
       for (const auto& action : actions) {
         auto& bag = bags_.at(action.bag_id);
         auto& controller = junctions_.at(action.from_node);
+        auto& transaction_delta =
+            snapshot.action_deltas[
+                snapshot.applied_action_count];
         // Arm the current differential rollback entry before the first
         // mutation.  dispatch_selected_edge may have inserted one calendar
         // interval or staged one event before an exception is raised.
         ++snapshot.applied_action_count;
         try {
           dispatch_selected_edge(
-              bag, action.from_node, action.next_node, time);
+              bag,
+              action.from_node,
+              action.next_node,
+              time,
+              &transaction_delta);
         } catch (const std::logic_error& error) {
           // dispatch_selected_edge uses an exact std::logic_error for a
           // revalidated local reservation race. Derived logic errors such as
@@ -5244,15 +5310,29 @@ class EventDrivenJunctionRuntime {
           blocker = "local_reservation_state_changed";
           throw PIBTLogicalCommitFailure(blocker);
         }
-        const auto queued = std::find(controller.queue.begin(),
-                                      controller.queue.end(),
-                                      action.bag_id);
+        const auto queued =
+            snapshot.differential_rollback
+                ? (transaction_delta.queue_index <
+                           controller.queue.size() &&
+                       controller.queue[
+                           transaction_delta.queue_index] ==
+                           action.bag_id
+                       ? std::next(
+                             controller.queue.begin(),
+                             static_cast<std::ptrdiff_t>(
+                                 transaction_delta.queue_index))
+                       : controller.queue.end())
+                : std::find(controller.queue.begin(),
+                            controller.queue.end(),
+                            action.bag_id);
         if (queued == controller.queue.end()) {
           blocker = "ready_owner_disappeared_during_commit";
           throw PIBTLogicalCommitFailure(blocker);
         }
-        controller.queue.erase(queued);
-        controller.observe_local_state();
+        if (!snapshot.differential_rollback) {
+          controller.queue.erase(queued);
+          controller.observe_local_state();
+        }
         schedule_passive(JunctionEventType::kLocalQueueUpdate,
                          time,
                          action.bag_id,
@@ -5291,7 +5371,11 @@ class EventDrivenJunctionRuntime {
 
       for (const auto& action : actions) {
         auto& controller = junctions_.at(action.from_node);
-        if (!controller.queue.empty() &&
+        const bool queue_remains_after_commit =
+            snapshot.differential_rollback
+                ? controller.queue.size() > 1
+                : !controller.queue.empty();
+        if (queue_remains_after_commit &&
             !controller.junction_wakeup_pending) {
           schedule_junction_wakeup(
               action.from_node, controller.next_dispatch_time);
@@ -5337,6 +5421,20 @@ class EventDrivenJunctionRuntime {
             bag.first_edge_credit_id = 0;
             bag.first_edge_credit_consumed = true;
           }
+        }
+      }
+      if (snapshot.differential_rollback) {
+        // The exact owner/index pair was revalidated above, and prevalidation
+        // guarantees at most one action per source queue.  Credit is now
+        // irrevocably committed, so this is the allocation-free tail: erase
+        // each int owner and perform only noexcept observation afterwards.
+        for (std::size_t index = 0;
+             index < snapshot.action_deltas.size();
+             ++index) {
+          auto& delta = snapshot.action_deltas[index];
+          delta.source_junction->queue.erase(
+              delta.source_queue_iterator);
+          delta.source_junction->observe_local_state();
         }
       }
     } catch (const PIBTLogicalCommitFailure&) {
@@ -6399,7 +6497,12 @@ class EventDrivenJunctionRuntime {
     return "allowed";
   }
 
-  void dispatch_selected_edge(BagState& bag, int current, int selected, double time) {
+  void dispatch_selected_edge(
+      BagState& bag,
+      int current,
+      int selected,
+      double time,
+      PIBTActionDelta* transaction_delta = nullptr) {
     const auto& edge = graph_.edge(current, selected);
     const double travel = std::max(edge.travel_time(), config_.minimum_service_seconds);
     const double exit_time = time + travel;
@@ -6461,16 +6564,28 @@ class EventDrivenJunctionRuntime {
                             service_end);
     if (corridor != nullptr) {
       corridor->reserve(bag.request.runtime_bag_id, time, corridor_end);
+      if (transaction_delta != nullptr) {
+        transaction_delta->corridor_reservation_inserted =
+            true;
+      }
     }
     if (uses_destination_calendar(selected,
                                   bag.request.goal)) {
       target.service_calendar.reserve(bag.request.runtime_bag_id,
                                       exit_time,
                                       service_end);
+      if (transaction_delta != nullptr) {
+        transaction_delta->destination_reservation_inserted =
+            true;
+      }
       target.record_service_reservation(exit_time, service_end);
     }
     ++target.scheduled_incoming;
     ++target.scheduled_incoming_by_goal[bag.request.goal];
+    if (transaction_delta != nullptr) {
+      transaction_delta->destination_goal_incremented =
+          true;
+    }
     update_calendar_maxima(target, corridor);
     schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
                      time,
