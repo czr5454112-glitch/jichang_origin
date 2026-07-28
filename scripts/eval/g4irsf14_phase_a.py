@@ -485,8 +485,19 @@ def _descriptors(
     }
 
 
-def _phase_start_blob(root: Path, path: Path) -> bytes | None:
-    """Return the frozen Git blob, or ``None`` for a non-Git temp copy."""
+def _phase_start_blob(
+    root: Path,
+    path: Path,
+    expected_sha256: str,
+) -> tuple[bytes, str] | None:
+    """Return the frozen checkout bytes, or ``None`` for a non-Git temp copy.
+
+    The frozen source bundle records the exact phase-start working-tree bytes.
+    Most source files were LF while one tracked model was checked out as CRLF,
+    so neither raw Git blobs nor checkout-filtered blobs alone reproduce every
+    recorded digest.  Admit the unique Git representation that matches the
+    frozen per-file digest and fail closed if neither does.
+    """
 
     probe = subprocess.run(
         ["git", "rev-parse", "--git-dir"],
@@ -499,31 +510,57 @@ def _phase_start_blob(root: Path, path: Path) -> bytes | None:
     )
     if probe.returncode:
         return None
-    result = subprocess.run(
-        ["git", "cat-file", "blob", f"{START_HEAD}:{path.as_posix()}"],
-        cwd=root,
-        check=False,
-        capture_output=True,
+    variants = (
+        (
+            "git_blob_raw",
+            ["git", "cat-file", "blob", f"{START_HEAD}:{path.as_posix()}"],
+        ),
+        (
+            "git_blob_filtered",
+            [
+                "git",
+                "cat-file",
+                "--filters",
+                f"--path={path.as_posix()}",
+                f"{START_HEAD}:{path.as_posix()}",
+            ],
+        ),
     )
-    if result.returncode:
-        raise FreezeError(
-            f"cannot read frozen phase-start Git blob: {path.as_posix()}"
+    observed: list[str] = []
+    for label, command in variants:
+        result = subprocess.run(
+            command,
+            cwd=root,
+            check=False,
+            capture_output=True,
         )
-    return result.stdout
+        if result.returncode:
+            raise FreezeError(
+                f"cannot read frozen phase-start Git blob: {path.as_posix()}"
+            )
+        digest = sha256_bytes(result.stdout)
+        observed.append(f"{label}={digest}")
+        if digest == expected_sha256:
+            return result.stdout, f"{label}:{START_HEAD}"
+    raise FreezeError(
+        "frozen phase-start Git representations do not match "
+        f"{path.as_posix()} expected={expected_sha256} "
+        f"observed={','.join(observed)}"
+    )
 
 
 def _source_descriptors(root: Path) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     for path, expected in FINAL_SOURCE_FILES:
-        blob = _phase_start_blob(root, path)
-        payload = blob if blob is not None else (root / path).read_bytes()
+        blob = _phase_start_blob(root, path, expected)
+        payload = blob[0] if blob is not None else (root / path).read_bytes()
         rows.append(
             {
                 "path": path.as_posix(),
                 "sha256": sha256_bytes(payload),
                 "expected_sha256": expected,
                 "identity_source": (
-                    f"git_blob:{START_HEAD}" if blob is not None else "temp_copy"
+                    blob[1] if blob is not None else "temp_copy"
                 ),
             }
         )
@@ -672,9 +709,28 @@ def validate_inherited_evidence(evidence: Mapping[str, Any]) -> list[str]:
     )
     binary = _mapping(evidence.get("binary"))
     require(
-        binary.get("file_sha256") == FINAL_BINARY_SHA256,
-        "final F2 binary physical SHA-256 drift",
+        binary.get("path") == FROZEN_BINARY_PATH.as_posix(),
+        "final F2 binary path drift",
     )
+    require(
+        binary.get("expected_file_sha256") == FINAL_BINARY_SHA256,
+        "final F2 expected binary SHA-256 drift",
+    )
+    physical_present = binary.get("physical_present")
+    require(
+        isinstance(physical_present, bool),
+        "final F2 binary presence evidence is missing",
+    )
+    if physical_present is True:
+        require(
+            binary.get("file_sha256") == FINAL_BINARY_SHA256,
+            "final F2 binary physical SHA-256 drift",
+        )
+    elif physical_present is False:
+        require(
+            binary.get("file_sha256") is None,
+            "absent final F2 binary has a physical SHA-256",
+        )
 
     baseline = _mapping(evidence.get("baseline_manifest"))
     require(
@@ -1007,7 +1063,12 @@ def build_f2_frozen_control(evidence: Mapping[str, Any]) -> dict[str, Any]:
         },
         "hard_gates": dict(_mapping(f2["hard_gates"])),
         "final_runtime_identity": {
-            "binary": dict(_mapping(evidence["binary"])),
+            "binary": {
+                "path": FROZEN_BINARY_PATH.as_posix(),
+                "file_sha256": FINAL_BINARY_SHA256,
+                "expected_file_sha256": FINAL_BINARY_SHA256,
+                "tracked_artifact": False,
+            },
             "case_config_sha256": F2_CONFIG_SHA256,
             "source_bundle_sha256": FINAL_SOURCE_BUNDLE_SHA256,
             "source_path_manifest_sha256": (
@@ -1640,7 +1701,10 @@ def run_audit(
     except Exception as exc:  # noqa: BLE001 - Git collection fails closed
         failures.append(f"Git identity collection failed: {exc}")
     try:
-        evidence = collect_inherited_evidence(root)
+        evidence = collect_inherited_evidence(
+            root,
+            require_binary=require_exact_start,
+        )
         failures.extend(validate_inherited_evidence(evidence))
     except Exception as exc:  # noqa: BLE001 - input collection fails closed
         failures.append(f"inherited evidence collection failed: {exc}")

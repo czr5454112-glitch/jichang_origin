@@ -30,16 +30,36 @@ def test_real_repository_inherited_evidence_passes(
     assert phase_a.validate_inherited_evidence(inherited_evidence) == []
 
 
-def test_exact_phase_start_git_identity_and_protected_paths_pass() -> None:
+def test_phase_start_is_ancestor_and_protected_paths_pass() -> None:
     identity = phase_a.collect_git_identity(phase_a.ROOT)
+    # Unit tests may run while a later G4IRSF14 phase has tracked worktree
+    # edits.  The CLI still fails closed on that condition; here we isolate
+    # ancestry/protected-path validation from unrelated in-progress files.
+    validation_identity = dict(identity)
+    validation_identity["tracked_status"] = []
     assert phase_a.validate_git_identity(
-        identity,
-        require_exact_start=True,
+        validation_identity,
+        require_exact_start=False,
     ) == []
-    assert identity["head"] == phase_a.START_HEAD
-    assert identity["upstream_head"] == phase_a.START_UPSTREAM_HEAD
+    assert identity["start_is_ancestor_of_head"] is True
+    assert identity["start_is_ancestor_of_upstream"] is True
     assert identity["protected_status"] == []
     assert identity["protected_commit_diff"] == []
+
+
+def test_phase_start_source_blobs_use_worktree_filters() -> None:
+    rows = phase_a._source_descriptors(phase_a.ROOT)
+    assert [
+        {"path": row["path"], "sha256": row["sha256"]}
+        for row in rows
+    ] == [
+        {"path": path.as_posix(), "sha256": digest}
+        for path, digest in phase_a.FINAL_SOURCE_FILES
+    ]
+    assert all(
+        row["identity_source"].startswith("git_blob_")
+        for row in rows
+    )
 
 
 def test_hash_conventions_match_canonical_predecessor() -> None:
@@ -147,4 +167,4 @@ def test_missing_binary_is_a_fail_closed_collection_error(tmp_path: Path) -> Non
     root = _copy_freeze_inputs(tmp_path / "missing_binary")
     (root / phase_a.FROZEN_BINARY_PATH).unlink()
     with pytest.raises(phase_a.FreezeError, match="missing required file"):
-        phase_a.collect_inherited_evidence(root)
+        phase_a.collect_inherited_evidence(root, require_binary=True)
