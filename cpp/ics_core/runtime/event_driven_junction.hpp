@@ -11,6 +11,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <optional>
 #include <queue>
 #include <set>
@@ -28,6 +29,7 @@
 #include "ics_core/io/canonical_map2_reader.hpp"
 #include "ics_core/models/edge_score.hpp"
 #include "ics_core/runtime/bounded_local_pibt.hpp"
+#include "ics_core/runtime/destination_merge_grant.hpp"
 #include "ics_core/runtime/expiring_first_edge_credit.hpp"
 
 namespace czr005::ics {
@@ -49,6 +51,7 @@ enum class JunctionEventType {
   kCongestionBeaconUpdate,
   kSourceArbitration,
   kJunctionArbitration,
+  kDestinationMergeArbitration,
 };
 
 inline const char* junction_event_name(JunctionEventType type) {
@@ -75,6 +78,8 @@ inline const char* junction_event_name(JunctionEventType type) {
       return "SOURCE_ARBITRATION";
     case JunctionEventType::kJunctionArbitration:
       return "JUNCTION_ARBITRATION";
+    case JunctionEventType::kDestinationMergeArbitration:
+      return "DESTINATION_MERGE_ARBITRATION";
   }
   return "UNKNOWN";
 }
@@ -195,6 +200,14 @@ struct EventDrivenJunctionConfig {
   std::string event_semantics = "E0_immediate_dispatch_f2";
   bool enable_opportunity_telemetry = false;
   int opportunity_trace_limit = 200000;
+  // E4 owns a bounded request queue at each real destination merge. Request
+  // expiry reuses the existing retry interval; no new physical headway or
+  // future service-window parameter is introduced.
+  // M7 is diagnostic-only and M8/M9 are fail-closed until a validated model
+  // artifact is explicitly wired into this runtime.
+  std::string merge_grant_rule = "M1";
+  int merge_grant_max_pending_requests = 64;
+  int merge_grant_lifecycle_limit = 1024;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -202,6 +215,30 @@ struct EventDrivenJunctionConfig {
   int test_pibt_logical_failure_after_staged_actions = -1;
   bool test_pibt_logical_failure_after_followup_scheduling = false;
   bool test_verify_pibt_rollback_logical_state = false;
+  bool test_merge_grant_fail_after_calendar_prepare = false;
+  bool test_merge_grant_flip_advertised_generation_before_commit = false;
+  bool test_merge_grant_flip_physical_generation_before_commit = false;
+  bool test_merge_grant_flip_calendar_generation_before_commit = false;
+  bool test_merge_grant_flip_queue_generation_before_commit = false;
+  bool test_merge_grant_drop_capability_before_edge_exit = false;
+  bool test_merge_grant_flip_physical_generation_before_edge_exit = false;
+  bool test_merge_grant_flip_advertised_generation_before_edge_exit = false;
+  bool test_merge_grant_remove_calendar_before_edge_exit = false;
+  bool test_merge_grant_expire_before_edge_exit = false;
+  bool test_merge_grant_wrong_owner_before_edge_exit = false;
+  bool test_merge_grant_wrong_edge_before_edge_exit = false;
+  bool test_merge_grant_wrong_destination_before_edge_exit = false;
+  bool test_merge_grant_tamper_claimed_request_generation_before_edge_exit =
+      false;
+  bool test_merge_grant_tamper_claimed_queue_generation_before_edge_exit =
+      false;
+  bool test_merge_grant_tamper_claimed_calendar_generation_before_edge_exit =
+      false;
+  bool test_merge_grant_advance_live_queue_generation_before_edge_exit =
+      false;
+  bool test_merge_grant_advance_live_calendar_generation_before_edge_exit =
+      false;
+  bool test_pibt_fail_after_commit_before_publication = false;
 #endif
 };
 
@@ -306,6 +343,7 @@ struct EventRuntimeBagResult {
   double source_queue_delay = 0.0;
   double total_local_wait = 0.0;
   double junction_queue_wait_seconds = 0.0;
+  double merge_grant_wait_seconds = 0.0;
   double edge_travel_time_seconds = 0.0;
   double node_service_time_seconds = 0.0;
   // Diagnostic subset of edge_travel_time_seconds: travel on a committed
@@ -488,6 +526,12 @@ struct EventRuntimeSummary {
   std::uint64_t bounded_local_pibt_fault_rejection_count = 0;
   std::uint64_t bounded_local_pibt_prepare_rejection_count = 0;
   std::uint64_t bounded_local_pibt_commit_rejection_count = 0;
+  std::uint64_t
+      bounded_local_pibt_post_commit_failure_injection_count = 0;
+  std::uint64_t
+      bounded_local_pibt_rollback_fingerprint_match_count = 0;
+  std::uint64_t
+      bounded_local_pibt_rollback_calendar_generation_match_count = 0;
   int bounded_local_pibt_max_inheritance_depth = 0;
   int bounded_local_pibt_max_slice_bags = 0;
   int bounded_local_pibt_max_slice_resources = 0;
@@ -496,6 +540,7 @@ struct EventRuntimeSummary {
   int bounded_local_pibt_max_transaction_bag_entries = 0;
   int bounded_local_pibt_max_transaction_junction_scalar_entries = 0;
   int bounded_local_pibt_max_transaction_action_deltas = 0;
+  int bounded_local_pibt_max_transaction_calendar_generation_entries = 0;
   bool bounded_local_pibt_classical_completeness_claimed = false;
   int deadlock_count = 0;
   int resolved_deadlock_count = 0;
@@ -589,6 +634,53 @@ struct EventRuntimeSummary {
   std::uint64_t fault_generation_commit_recheck_count = 0;
   int microphase_runtime_global_scan_count = 0;
   double artificial_batch_delay_seconds = 0.0;
+  std::uint64_t destination_merge_arbitration_event_count = 0;
+  std::uint64_t merge_grant_request_count = 0;
+  std::uint64_t merge_grant_issued_count = 0;
+  std::uint64_t merge_grant_prepared_count = 0;
+  std::uint64_t merge_grant_committed_count = 0;
+  std::uint64_t
+      merge_grant_issued_transition_count = 0;
+  std::uint64_t
+      merge_grant_prepared_transition_count = 0;
+  std::uint64_t
+      merge_grant_committed_transition_count = 0;
+  std::uint64_t merge_grant_consumed_count = 0;
+  std::uint64_t merge_grant_expired_count = 0;
+  std::uint64_t merge_grant_request_expired_count = 0;
+  std::uint64_t merge_grant_grant_expired_count = 0;
+  std::uint64_t merge_grant_revoked_count = 0;
+  std::uint64_t merge_grant_revoked_fault_count = 0;
+  std::uint64_t merge_grant_revoked_stale_state_count = 0;
+  std::uint64_t
+      merge_grant_revoked_replan_current_edge_count = 0;
+  std::uint64_t merge_grant_rolled_back_count = 0;
+  std::uint64_t
+      merge_grant_post_commit_revoked_count = 0;
+  std::uint64_t
+      merge_grant_post_commit_expired_count = 0;
+  std::uint64_t
+      merge_grant_post_commit_rollback_count = 0;
+  std::uint64_t merge_grant_exact_slot_busy_count = 0;
+  std::uint64_t
+      merge_grant_active_grant_rejection_count = 0;
+  std::uint64_t merge_grant_queue_capacity_block_count = 0;
+  std::uint64_t merge_grant_contended_loser_retry_count = 0;
+  std::uint64_t merge_grant_lifecycle_transition_count = 0;
+  std::uint64_t merge_grant_lifecycle_stored_count = 0;
+  std::uint64_t merge_grant_lifecycle_dropped_count = 0;
+  std::uint64_t merge_grant_terminal_request_count = 0;
+  std::uint64_t merge_grant_outstanding_request_count = 0;
+  std::uint64_t merge_grant_goal_exempt_bypass_count = 0;
+  std::uint64_t merge_grant_stale_arbitration_count = 0;
+  std::uint64_t merge_grant_duplicate_wakeup_prevented_count = 0;
+  int merge_grant_peak_pending_requests = 0;
+  int merge_grant_peak_active_unconsumed = 0;
+  int merge_grant_final_active_unconsumed = 0;
+  bool merge_grant_conservation_holds = true;
+  bool merge_grant_active_bijection_holds = true;
+  bool merge_grant_runtime_owned_capability = false;
+  bool merge_grant_exact_slot_no_future_shift = false;
 };
 
 struct EventRuntimeJunctionResult {
@@ -786,6 +878,7 @@ struct EventDrivenJunctionResult {
   std::vector<EventRuntimeMergeVisibilityRow> merge_request_visibility;
   std::vector<EventRuntimeEventSeqAuditRow> event_seq_ordering_audit;
   std::vector<EventRuntimeArbitrationBatchRow> arbitration_batch_cardinality;
+  std::vector<DestinationMergeGrantLifecycleRow> merge_grant_lifecycle;
 };
 
 namespace event_runtime_detail {
@@ -822,15 +915,67 @@ struct CalendarInterval {
 
 class LocalCalendar {
  public:
+  class PreparedExactReservation {
+   public:
+    PreparedExactReservation(const PreparedExactReservation&) = delete;
+    PreparedExactReservation& operator=(const PreparedExactReservation&) =
+        delete;
+    PreparedExactReservation(PreparedExactReservation&& other) noexcept
+        : owner_(other.owner_),
+          task_id_(other.task_id_),
+          start_(other.start_),
+          end_(other.end_),
+          generation_(other.generation_) {
+      other.owner_ = nullptr;
+    }
+    PreparedExactReservation& operator=(
+        PreparedExactReservation&& other) noexcept {
+      if (this != &other) {
+        owner_ = other.owner_;
+        task_id_ = other.task_id_;
+        start_ = other.start_;
+        end_ = other.end_;
+        generation_ = other.generation_;
+        other.owner_ = nullptr;
+      }
+      return *this;
+    }
+
+   private:
+    friend class LocalCalendar;
+    PreparedExactReservation(LocalCalendar* owner,
+                             int task_id,
+                             double start,
+                             double end,
+                             std::uint64_t generation) noexcept
+        : owner_(owner),
+          task_id_(task_id),
+          start_(start),
+          end_(end),
+          generation_(generation) {}
+
+    LocalCalendar* owner_ = nullptr;
+    int task_id_ = -1;
+    double start_ = 0.0;
+    double end_ = 0.0;
+    std::uint64_t generation_ = 0;
+  };
+
   void purge(double now) {
+    const auto previous_size = intervals_.size();
     intervals_.erase(
         std::remove_if(intervals_.begin(), intervals_.end(), [now](const CalendarInterval& item) {
           return item.end <= now + kEpsilon;
         }),
         intervals_.end());
+    if (intervals_.size() != previous_size) {
+      ++generation_;
+    }
   }
 
-  [[nodiscard]] bool available(double start, double end, int ignore_task = -1) const {
+  [[nodiscard]] bool available(double start,
+                               double end,
+                               int ignore_task = -1) const noexcept {
     if (end <= start) {
       return true;
     }
@@ -870,11 +1015,42 @@ class LocalCalendar {
     if (end <= start) {
       return;
     }
-    intervals_.push_back(CalendarInterval{task_id, start, end});
-    std::sort(intervals_.begin(), intervals_.end(), [](const auto& left, const auto& right) {
-      return std::tie(left.start, left.end, left.task_id) <
-             std::tie(right.start, right.end, right.task_id);
-    });
+    intervals_.reserve(intervals_.size() + 1);
+    append_sorted_noexcept(CalendarInterval{task_id, start, end});
+    ++generation_;
+  }
+
+  [[nodiscard]] std::optional<PreparedExactReservation>
+  prepare_exact_reservation(int task_id,
+                            double start,
+                            double end) {
+    if (end <= start || !available(start, end, task_id)) {
+      return std::nullopt;
+    }
+    // Any allocation is completed before the runtime mutates a bag, queue,
+    // incoming counter, event queue, or grant lifecycle.
+    intervals_.reserve(intervals_.size() + 1);
+    return PreparedExactReservation(
+        this, task_id, start, end, generation_);
+  }
+
+  bool commit_exact_reservation(
+      PreparedExactReservation&& prepared) noexcept {
+    if (prepared.owner_ != this ||
+        prepared.generation_ != generation_ ||
+        prepared.end_ <= prepared.start_ ||
+        !available(prepared.start_,
+                   prepared.end_,
+                   prepared.task_id_)) {
+      return false;
+    }
+    append_sorted_noexcept(
+        CalendarInterval{prepared.task_id_,
+                         prepared.start_,
+                         prepared.end_});
+    ++generation_;
+    prepared.owner_ = nullptr;
+    return true;
   }
 
   bool erase_exact(int task_id, double start, double end) noexcept {
@@ -890,10 +1066,67 @@ class LocalCalendar {
       return false;
     }
     intervals_.erase(found);
+    ++generation_;
     return true;
   }
 
+  [[nodiscard]] bool contains_exact(
+      int task_id,
+      double start,
+      double end) const noexcept {
+    return std::any_of(
+        intervals_.begin(),
+        intervals_.end(),
+        [&](const CalendarInterval& item) {
+          return item.task_id == task_id &&
+                 std::abs(item.start - start) <= kEpsilon &&
+                 std::abs(item.end - end) <= kEpsilon;
+        });
+  }
+
+  bool restore_exact_reservation_noexcept(
+      int task_id,
+      double start,
+      double end,
+      std::uint64_t restore_generation) noexcept {
+    if (generation_ != restore_generation + 1) {
+      return false;
+    }
+    const auto found = std::find_if(
+        intervals_.begin(),
+        intervals_.end(),
+        [&](const CalendarInterval& item) {
+          return item.task_id == task_id &&
+                 std::abs(item.start - start) <= kEpsilon &&
+                 std::abs(item.end - end) <= kEpsilon;
+        });
+    if (found == intervals_.end()) {
+      return false;
+    }
+    intervals_.erase(found);
+    generation_ = restore_generation;
+    return true;
+  }
+
+  bool rollback_exact_reservation(
+      int task_id,
+      double start,
+      double end,
+      std::uint64_t restore_generation) noexcept {
+    return restore_exact_reservation_noexcept(
+        task_id, start, end, restore_generation);
+  }
+
   [[nodiscard]] int size() const { return static_cast<int>(intervals_.size()); }
+  [[nodiscard]] std::uint64_t generation() const noexcept {
+    return generation_;
+  }
+
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  void test_advance_generation() noexcept {
+    ++generation_;
+  }
+#endif
 
   [[nodiscard]] std::uint64_t logical_state_fingerprint() const noexcept {
     std::uint64_t hash = 1469598103934665603ULL;
@@ -901,6 +1134,7 @@ class LocalCalendar {
       hash ^= value;
       hash *= 1099511628211ULL;
     };
+    mix(generation_);
     mix(static_cast<std::uint64_t>(intervals_.size()));
     for (const auto& interval : intervals_) {
       mix(static_cast<std::uint64_t>(
@@ -922,8 +1156,34 @@ class LocalCalendar {
   }
 
  private:
+  void append_sorted_noexcept(CalendarInterval interval) noexcept {
+    intervals_.push_back(interval);
+    std::size_t index = intervals_.size() - 1;
+    while (index > 0) {
+      const auto& left = intervals_[index];
+      const auto& right = intervals_[index - 1];
+      if (std::tie(right.start, right.end, right.task_id) <=
+          std::tie(left.start, left.end, left.task_id)) {
+        break;
+      }
+      std::swap(intervals_[index], intervals_[index - 1]);
+      --index;
+    }
+  }
+
   std::vector<CalendarInterval> intervals_;
+  std::uint64_t generation_ = 0;
 };
+
+static_assert(
+    !std::is_default_constructible_v<
+        LocalCalendar::PreparedExactReservation>);
+static_assert(
+    !std::is_copy_constructible_v<
+        LocalCalendar::PreparedExactReservation>);
+static_assert(
+    std::is_nothrow_move_constructible_v<
+        LocalCalendar::PreparedExactReservation>);
 
 enum class BagStatus {
   kPendingRelease,
@@ -942,6 +1202,8 @@ struct BagState {
   int current = -1;
   int transit_from = -1;
   int transit_to = -1;
+  DestinationMergeGrantExpectation
+      transit_merge_grant;
   double admitted_time = -1.0;
   double finish_time = -1.0;
   double source_enqueued_at = -1.0;
@@ -1095,10 +1357,13 @@ inline int event_priority(const RuntimeEvent& event) {
   if (event.type == JunctionEventType::kJunctionArbitration) {
     return 8;
   }
-  if (event.type == JunctionEventType::kEdgeEnter) {
+  if (event.type == JunctionEventType::kDestinationMergeArbitration) {
     return 9;
   }
-  return 10;  // LOCAL_QUEUE_UPDATE
+  if (event.type == JunctionEventType::kEdgeEnter) {
+    return 10;
+  }
+  return 11;  // LOCAL_QUEUE_UPDATE
 }
 
 struct RuntimeEventLater {
@@ -1126,6 +1391,16 @@ class RuntimeEventQueue
  public:
   void reserve(std::size_t capacity) {
     this->c.reserve(capacity);
+  }
+
+  [[nodiscard]] std::size_t
+  dynamic_storage_accounted_bytes() const noexcept {
+    std::size_t accounted =
+        this->c.capacity() * sizeof(RuntimeEvent);
+    for (const auto& event : this->c) {
+      accounted += event.reason.capacity();
+    }
+    return accounted;
   }
 
   template <typename Visitor>
@@ -1157,8 +1432,29 @@ struct LocalArbitrationState {
   int junction_enqueue_count = 0;
 };
 
+struct DestinationMergeArbitrationState {
+  double wakeup_time = std::numeric_limits<double>::infinity();
+  std::uint64_t wakeup_generation = 0;
+  bool wakeup_pending = false;
+};
+
+struct DestinationMergeBagState {
+  std::uint64_t junction_queue_generation = 0;
+  std::uint64_t request_generation = 0;
+  std::uint64_t pending_request_id = 0;
+  std::uint64_t pending_lineage = 0;
+  double pending_request_time = -1.0;
+  double first_contention_time = -1.0;
+  double grant_wait_seconds = 0.0;
+  std::optional<MergeGrantCapability> capability;
+};
+
 struct G4IRSF14RuntimeState {
   std::unordered_map<int, LocalArbitrationState> local;
+  std::unordered_map<int, DestinationMergeArbitrationState>
+      destination_merge;
+  std::unordered_map<int, DestinationMergeBagState>
+      destination_merge_bags;
   std::uint64_t current_event_seq = 0;
   bool microphase_floor_active = false;
   double microphase_floor_time = 0.0;
@@ -1201,6 +1497,10 @@ class EventDrivenJunctionRuntime {
     result_.summary.event_semantics_echo = config_.event_semantics;
     result_.summary.opportunity_telemetry_enabled =
         config_.enable_opportunity_telemetry;
+    result_.summary.merge_grant_runtime_owned_capability =
+        uses_destination_merge_grants();
+    result_.summary.merge_grant_exact_slot_no_future_shift =
+        uses_destination_merge_grants();
     result_.summary.admission_mode = canonical_admission_mode();
     result_.summary.admission_mode_echo = config_.admission_mode;
     result_.summary.source_admission_enabled =
@@ -1459,20 +1759,83 @@ class EventDrivenJunctionRuntime {
                 "E3_batch_source_and_junction_same_timestamp")) {
       return "E3_batch_source_and_junction_same_timestamp";
     }
+    if (mode_is(config_.event_semantics,
+                "E4",
+                "E4_batch_plus_destination_merge_request")) {
+      return "E4_batch_plus_destination_merge_request";
+    }
     throw std::invalid_argument(
-        "event_semantics must be E0, E1, E2, or E3");
+        "event_semantics must be E0, E1, E2, E3, or E4");
   }
 
   bool batches_source_same_timestamp() const {
     const auto mode = canonical_event_semantics();
     return mode == "E1_batch_source_same_timestamp" ||
-           mode == "E3_batch_source_and_junction_same_timestamp";
+           mode == "E3_batch_source_and_junction_same_timestamp" ||
+           mode == "E4_batch_plus_destination_merge_request";
   }
 
   bool batches_junction_same_timestamp() const {
     const auto mode = canonical_event_semantics();
     return mode == "E2_batch_junction_same_timestamp" ||
-           mode == "E3_batch_source_and_junction_same_timestamp";
+           mode == "E3_batch_source_and_junction_same_timestamp" ||
+           mode == "E4_batch_plus_destination_merge_request";
+  }
+
+  bool uses_destination_merge_grants() const {
+    return canonical_event_semantics() ==
+           "E4_batch_plus_destination_merge_request";
+  }
+
+  DestinationMergeGrantRule canonical_merge_grant_rule() const {
+    if (config_.merge_grant_rule == "M0" ||
+        config_.merge_grant_rule ==
+            "M0_current_event_seq_earliest_known") {
+      return DestinationMergeGrantRule::kM0EarliestKnown;
+    }
+    if (config_.merge_grant_rule == "M1" ||
+        config_.merge_grant_rule == "M1_fifo") {
+      return DestinationMergeGrantRule::kM1Fifo;
+    }
+    if (config_.merge_grant_rule == "M2" ||
+        config_.merge_grant_rule ==
+            "M2_earliest_projected_arrival") {
+      return DestinationMergeGrantRule::
+          kM2EarliestProjectedArrival;
+    }
+    if (config_.merge_grant_rule == "M3" ||
+        config_.merge_grant_rule ==
+            "M3_deadline_aging") {
+      return DestinationMergeGrantRule::kM3DeadlineAging;
+    }
+    if (config_.merge_grant_rule == "M4" ||
+        config_.merge_grant_rule ==
+            "M4_fairness_progress") {
+      return DestinationMergeGrantRule::
+          kM4FairnessProgress;
+    }
+    if (config_.merge_grant_rule == "M5" ||
+        config_.merge_grant_rule ==
+            "M5_local_externality") {
+      return DestinationMergeGrantRule::kM5LocalExternality;
+    }
+    if (config_.merge_grant_rule == "M6" ||
+        config_.merge_grant_rule ==
+            "M6_thesis_local") {
+      return DestinationMergeGrantRule::kM6ThesisLocal;
+    }
+    if (config_.merge_grant_rule == "M7") {
+      throw std::invalid_argument(
+          "merge_grant_rule M7 is diagnostic-only and cannot run online");
+    }
+    if (config_.merge_grant_rule == "M8" ||
+        config_.merge_grant_rule == "M9") {
+      throw std::invalid_argument(
+          "merge_grant_rule M8/M9 require a validated model artifact; "
+          "runtime selection fails closed");
+    }
+    throw std::invalid_argument(
+        "merge_grant_rule must be M0..M9");
   }
 
   bool g4irsf14_extensions_enabled() const {
@@ -1908,6 +2271,7 @@ class EventDrivenJunctionRuntime {
     (void)canonical_pibt_preference_mode();
     (void)canonical_framework_mode();
     (void)canonical_event_semantics();
+    (void)canonical_merge_grant_rule();
     const auto scorer_mode = canonical_scorer_mode();
     if (!std::isfinite(config_.retry_interval) ||
         !std::isfinite(config_.minimum_service_seconds) ||
@@ -2045,6 +2409,25 @@ class EventDrivenJunctionRuntime {
       throw std::invalid_argument(
           "opportunity_trace_limit must be non-negative");
     }
+    if (config_.merge_grant_max_pending_requests <= 0 ||
+        config_.merge_grant_lifecycle_limit < 0) {
+      throw std::invalid_argument(
+          "merge grant pending bound must be positive and lifecycle bound "
+          "must be non-negative");
+    }
+    if (uses_destination_merge_grants() &&
+        canonical_resource_semantics() !=
+            "R3_java_node_window_compatible") {
+      throw std::invalid_argument(
+          "E4 destination merge grants require frozen R3 node-window "
+          "semantics");
+    }
+    if (uses_destination_merge_grants() &&
+        uses_first_edge_credit()) {
+      throw std::invalid_argument(
+          "E4 vertical slice requires frozen C0 admission; first-edge "
+          "credits are not destination merge capabilities");
+    }
   }
 
   void validate_request(const EventRuntimeBagRequest& request) const {
@@ -2084,6 +2467,8 @@ class EventDrivenJunctionRuntime {
     physical_faults_.clear();
     advertised_faults_.clear();
     congestion_beacons_.clear();
+    destination_merge_controllers_.clear();
+    pending_merge_dispatches_.clear();
     credit_ledger_ = ExpiringFirstEdgeCreditLedger(
         static_cast<std::size_t>(config_.credit_lifecycle_limit));
     directed_inflight_counts_.clear();
@@ -2097,12 +2482,37 @@ class EventDrivenJunctionRuntime {
     next_decision_id_ = 1;
     next_pibt_activation_id_ = 1;
     next_local_enqueue_sequence_ = 1;
+    next_merge_request_lineage_ = 1;
     staged_event_sink_ = nullptr;
     staged_merge_visibility_sink_ = nullptr;
     staged_destination_known_competitor_counts_ =
         nullptr;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
     test_pibt_logical_failure_injected_ = false;
+    test_merge_grant_prepare_failure_injected_ = false;
+    test_merge_grant_advertised_flip_injected_ = false;
+    test_merge_grant_physical_flip_injected_ = false;
+    test_merge_grant_calendar_flip_injected_ = false;
+    test_merge_grant_queue_flip_injected_ = false;
+    test_merge_grant_edge_exit_capability_drop_injected_ = false;
+    test_merge_grant_edge_exit_physical_flip_injected_ = false;
+    test_merge_grant_edge_exit_advertised_flip_injected_ = false;
+    test_merge_grant_edge_exit_calendar_remove_injected_ = false;
+    test_merge_grant_edge_exit_expiry_injected_ = false;
+    test_merge_grant_edge_exit_wrong_owner_injected_ = false;
+    test_merge_grant_edge_exit_wrong_edge_injected_ = false;
+    test_merge_grant_edge_exit_wrong_destination_injected_ = false;
+    test_merge_grant_edge_exit_claimed_request_generation_tamper_injected_ =
+        false;
+    test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected_ =
+        false;
+    test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected_ =
+        false;
+    test_merge_grant_edge_exit_live_queue_generation_advance_injected_ =
+        false;
+    test_merge_grant_edge_exit_live_calendar_generation_advance_injected_ =
+        false;
+    test_pibt_post_commit_failure_injected_ = false;
 #endif
     if (g4irsf14_state_ != nullptr) {
       *g4irsf14_state_ =
@@ -2153,7 +2563,8 @@ class EventDrivenJunctionRuntime {
     if (mode == "E0_immediate_dispatch_f2") {
       return -1;
     }
-    if (mode == "E3_batch_source_and_junction_same_timestamp") {
+    if (mode == "E3_batch_source_and_junction_same_timestamp" ||
+        mode == "E4_batch_plus_destination_merge_request") {
       if ((event.type == JunctionEventType::kFault ||
            event.type == JunctionEventType::kRepair) &&
           event.notification) {
@@ -2184,10 +2595,18 @@ class EventDrivenJunctionRuntime {
           JunctionEventType::kJunctionArbitration) {
         return 5;
       }
-      if (event.type == JunctionEventType::kEdgeEnter) {
+      if (event.type ==
+          JunctionEventType::kDestinationMergeArbitration) {
         return 6;
       }
-      return 7;
+      if (event.type == JunctionEventType::kEdgeEnter) {
+        return mode == "E4_batch_plus_destination_merge_request"
+                   ? 7
+                   : 6;
+      }
+      return mode == "E4_batch_plus_destination_merge_request"
+                 ? 8
+                 : 7;
     }
     // E1/E2 preserve the untouched immediate boundary's legacy ordering and
     // insert only the selected exact-time arbitration after queue/beacon
@@ -2317,6 +2736,10 @@ class EventDrivenJunctionRuntime {
       case JunctionEventType::kJunctionArbitration:
         ++result_.summary.junction_arbitration_event_count;
         process_junction_arbitration(event);
+        break;
+      case JunctionEventType::kDestinationMergeArbitration:
+        ++result_.summary.destination_merge_arbitration_event_count;
+        process_destination_merge_arbitration(event);
         break;
     }
   }
@@ -3054,6 +3477,11 @@ class EventDrivenJunctionRuntime {
       bag.status = BagStatus::kJunctionQueue;
       bag.junction_enqueued_at = event.time;
       bag.local_enqueue_sequence = next_local_enqueue_sequence_++;
+      if (uses_destination_merge_grants()) {
+        ++destination_merge_bag_state(
+              bag.request.runtime_bag_id)
+              .junction_queue_generation;
+      }
       controller.queue.push_back(event.task_id);
       update_queue_maxima(controller);
       observe_junction_enqueue(event.node, event.time);
@@ -3092,6 +3520,1115 @@ class EventDrivenJunctionRuntime {
     dispatch_junction_once(event, true);
   }
 
+  DestinationMergeGrantController& destination_merge_controller(
+      int destination_node) {
+    auto found =
+        destination_merge_controllers_.find(destination_node);
+    if (found != destination_merge_controllers_.end()) {
+      return found->second;
+    }
+    return destination_merge_controllers_
+        .try_emplace(
+            destination_node,
+            destination_node,
+            static_cast<std::size_t>(
+                config_.merge_grant_max_pending_requests),
+            static_cast<std::size_t>(
+                config_.merge_grant_lifecycle_limit))
+        .first->second;
+  }
+
+  bool submit_destination_merge_request(
+      BagState& bag,
+      int upstream_node,
+      int destination_node,
+      double time,
+      EventDecisionTraceRow& trace) {
+    auto& bag_merge =
+        destination_merge_bag_state(
+            bag.request.runtime_bag_id);
+    if (bag_merge.pending_request_id != 0) {
+      return true;
+    }
+    const auto& edge =
+        graph_.edge(upstream_node, destination_node);
+    const double travel =
+        std::max(edge.travel_time(),
+                 config_.minimum_service_seconds);
+    const long long directed =
+        event_runtime_detail::directed_key(
+            upstream_node, destination_node);
+    const auto physical = physical_faults_.find(directed);
+    const auto advertised =
+        advertised_faults_.find(directed);
+
+    DestinationMergeRequest request;
+    request.lineage = next_merge_request_lineage_;
+    request.request_id = request.lineage;
+    request.request_generation =
+        bag_merge.request_generation + 1;
+    request.junction_queue_generation =
+        bag_merge.junction_queue_generation;
+    request.runtime_bag_id =
+        bag.request.runtime_bag_id;
+    request.task_id = bag.request.task_id;
+    request.segment_id = bag.request.segment_id;
+    request.upstream_node = upstream_node;
+    request.destination_merge_node = destination_node;
+    request.requested_directed_edge =
+        MergeDirectedEdge{upstream_node, destination_node};
+    request.request_time = time;
+    request.fifo_request_time =
+        bag_merge.first_contention_time < 0.0
+            ? time
+            : bag_merge.first_contention_time;
+    request.earliest_edge_entry = time;
+    request.exact_edge_travel_seconds = travel;
+    request.projected_arrival = time + travel;
+    request.goal = bag.request.goal;
+    const auto selected_candidate = std::find_if(
+        trace.candidates.begin(),
+        trace.candidates.end(),
+        [&](const EventCandidateRecord& candidate) {
+          return candidate.next_node == destination_node;
+        });
+    if (selected_candidate != trace.candidates.end()) {
+      request.route_score =
+          selected_candidate->model_score;
+      request.static_remaining =
+          selected_candidate->static_potential;
+    }
+    request.destination_service_seconds =
+        service_duration(destination_node);
+    request.downstream_queue_pressure =
+        static_cast<int>(
+            junctions_[destination_node].queue.size()) +
+        junctions_[destination_node].scheduled_incoming;
+    request.deadline_slack =
+        bag.request.deadline >= 0.0
+            ? bag.request.deadline - time
+            : std::numeric_limits<double>::max();
+    request.wait_age =
+        std::max(0.0, time - bag.junction_enqueued_at);
+    request.task_class_code =
+        local_task_class_code(bag);
+    request.task_class = local_task_class_rank(bag);
+    request.storage_leg = is_storage_out_task(bag);
+    request.source_release_age =
+        std::max(0.0, time - bag.request.release_time);
+    request.local_queue_age =
+        std::max(0.0, time - bag.junction_enqueued_at);
+    request.advertised_fault_generation =
+        advertised == advertised_faults_.end()
+            ? 0
+            : advertised->second.generation;
+    request.physical_fault_generation =
+        physical == physical_faults_.end()
+            ? 0
+            : physical->second.physical_generation;
+    request.destination_calendar_generation =
+        junctions_[destination_node]
+            .service_calendar.generation();
+    request.enqueue_sequence =
+        bag.local_enqueue_sequence;
+    request.expiry = time + config_.retry_interval;
+
+    auto& controller =
+        destination_merge_controller(destination_node);
+    if (controller.pending_count() >=
+        static_cast<std::size_t>(
+            config_.merge_grant_max_pending_requests)) {
+      return false;
+    }
+    controller.reserve_lifecycle_for_transaction(1);
+    events_.reserve(events_.size() + 1);
+    // Materialize both map nodes and the full trace before controller.submit
+    // mutates protocol counters/generation/pending state.
+    g4irsf14_state_->destination_merge.try_emplace(
+        destination_node);
+    PendingMergeDispatch pending;
+    pending.request_id = request.request_id;
+    pending.lineage = request.lineage;
+    pending.runtime_bag_id =
+        bag.request.runtime_bag_id;
+    pending.upstream_node = upstream_node;
+    pending.destination_node = destination_node;
+    pending.trace = trace;
+    const auto inserted =
+        pending_merge_dispatches_.emplace(
+        request.lineage, std::move(pending));
+    if (!inserted.second) {
+      return false;
+    }
+    const std::uint64_t request_id =
+        request.request_id;
+    const std::uint64_t lineage =
+        request.lineage;
+    const std::uint64_t request_generation =
+        request.request_generation;
+    const auto submitted =
+        controller.submit(std::move(request));
+    if (!submitted.accepted ||
+        submitted.request_id != request_id) {
+      pending_merge_dispatches_.erase(inserted.first);
+      return false;
+    }
+    ++next_merge_request_lineage_;
+    bag_merge.request_generation =
+        request_generation;
+    bag_merge.pending_request_id =
+        request_id;
+    bag_merge.pending_lineage = lineage;
+    bag_merge.pending_request_time = time;
+    if (bag_merge.first_contention_time < 0.0) {
+      bag_merge.first_contention_time = time;
+    }
+    schedule_destination_merge_wakeup(
+        destination_node, time);
+    return true;
+  }
+
+  DestinationMergeGrantObservedState
+  observe_destination_merge_request(
+      const DestinationMergeRequest& request) const noexcept {
+    DestinationMergeGrantObservedState observed;
+    observed.claimed_request_generation =
+        request.request_generation;
+    observed.claimed_junction_queue_generation =
+        request.junction_queue_generation;
+    observed.claimed_calendar_generation =
+        request.destination_calendar_generation;
+    observed.claimed_owner_runtime_bag_id =
+        request.runtime_bag_id;
+    observed.claimed_edge =
+        request.requested_directed_edge;
+    observed.claimed_destination_node =
+        request.destination_merge_node;
+    observed.event_owner_runtime_bag_id =
+        request.runtime_bag_id;
+    observed.event_edge =
+        request.requested_directed_edge;
+    observed.event_destination_node =
+        request.destination_merge_node;
+    if (g4irsf14_state_ != nullptr) {
+      const auto bag_state =
+          g4irsf14_state_
+              ->destination_merge_bags.find(
+                  request.runtime_bag_id);
+      if (bag_state !=
+          g4irsf14_state_
+              ->destination_merge_bags.end()) {
+        observed.junction_queue_generation =
+            bag_state->second
+                .junction_queue_generation;
+      }
+    }
+    const auto destination =
+        junctions_.find(
+            request.destination_merge_node);
+    if (destination != junctions_.end()) {
+      observed.calendar_generation =
+          destination->second
+              .service_calendar.generation();
+      observed.exact_calendar_reservation_present =
+          destination->second.service_calendar
+              .contains_exact(
+                  request.runtime_bag_id,
+                  request.projected_arrival,
+                  request.projected_arrival +
+                      request
+                          .destination_service_seconds);
+    }
+    const long long directed =
+        event_runtime_detail::directed_key(
+            request.requested_directed_edge.from_node,
+            request.requested_directed_edge.to_node);
+    const auto physical =
+        physical_faults_.find(directed);
+    if (physical != physical_faults_.end()) {
+      observed.physical_fault_generation =
+          physical->second.physical_generation;
+      observed.physical_fault_active =
+          physical->second.active_count > 0;
+    }
+    const auto advertised =
+        advertised_faults_.find(directed);
+    if (advertised != advertised_faults_.end()) {
+      observed.advertised_fault_generation =
+          advertised->second.generation;
+    }
+    return observed;
+  }
+
+  void reject_destination_merge_request(
+      DestinationMergeGrantController& controller,
+      const DestinationMergeRequest& request,
+      MergeGrantState state,
+      MergeGrantReason reason,
+      double time) {
+    const auto pending =
+        pending_merge_dispatches_.find(request.lineage);
+    if (pending != pending_merge_dispatches_.end()) {
+      pending->second.trace.selected_next = -1;
+      pending->second.trace.decision_source =
+          "destination_merge_grant_hold";
+      pending->second.trace.rule_reason =
+          merge_grant_reason_name(reason);
+    }
+    const auto observed =
+        observe_destination_merge_request(request);
+    controller.reject_noexcept(
+        request.request_id,
+        state,
+        reason,
+        time,
+        &observed);
+    const auto bag_found =
+        bags_.find(request.runtime_bag_id);
+    if (bag_found != bags_.end()) {
+      auto& bag_merge =
+          destination_merge_bag_state(
+              request.runtime_bag_id);
+      if (bag_merge.pending_request_id ==
+              request.request_id &&
+          bag_merge.pending_lineage ==
+              request.lineage) {
+        bag_merge.pending_request_id = 0;
+        bag_merge.pending_lineage = 0;
+        bag_merge.pending_request_time = -1.0;
+      }
+      ++bag_found->second.retry_count;
+    }
+    if (pending != pending_merge_dispatches_.end()) {
+      publish_prepared_decision_trace_noexcept(
+          std::move(pending->second.trace), false);
+      pending_merge_dispatches_.erase(pending);
+    }
+  }
+
+  void reject_all_destination_merge_requests(
+      DestinationMergeGrantController& controller,
+      MergeGrantState selected_state,
+      MergeGrantReason selected_reason,
+      double time) {
+    std::vector<DestinationMergeRequest> requests;
+    requests.reserve(controller.pending_.size());
+    for (const auto& pending : controller.pending_) {
+      requests.push_back(pending.request);
+    }
+    for (const auto& request : requests) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          selected_state,
+          selected_reason,
+          time);
+    }
+  }
+
+  void reject_prepared_destination_merge_request_noexcept(
+      DestinationMergeGrantController& controller,
+      const DestinationMergeRequest& request,
+      MergeGrantState state,
+      MergeGrantReason reason,
+      double time) noexcept {
+    const auto observed =
+        observe_destination_merge_request(request);
+    controller.reject_noexcept(
+        request.request_id,
+        state,
+        reason,
+        time,
+        &observed);
+    const auto bag_found =
+        bags_.find(request.runtime_bag_id);
+    if (bag_found != bags_.end()) {
+      auto& bag_merge =
+          destination_merge_bag_state(
+              request.runtime_bag_id);
+      if (bag_merge.pending_request_id ==
+              request.request_id &&
+          bag_merge.pending_lineage ==
+              request.lineage) {
+        bag_merge.pending_request_id = 0;
+        bag_merge.pending_lineage = 0;
+        bag_merge.pending_request_time = -1.0;
+      }
+      ++bag_found->second.retry_count;
+    }
+    const auto pending =
+        pending_merge_dispatches_.find(request.lineage);
+    if (pending != pending_merge_dispatches_.end()) {
+      publish_prepared_decision_trace_noexcept(
+          std::move(pending->second.trace), false);
+      pending_merge_dispatches_.erase(pending);
+    }
+  }
+
+  void process_destination_merge_arbitration(
+      const RuntimeEvent& event) {
+    if (!uses_destination_merge_grants() ||
+        g4irsf14_state_ == nullptr) {
+      ++result_.summary
+            .merge_grant_stale_arbitration_count;
+      return;
+    }
+    auto state_found =
+        g4irsf14_state_->destination_merge.find(
+            event.node);
+    if (state_found ==
+            g4irsf14_state_->destination_merge.end() ||
+        !state_found->second.wakeup_pending ||
+        state_found->second.wakeup_generation !=
+            event.wakeup_generation ||
+        !event_runtime_detail::same_timestamp(
+            state_found->second.wakeup_time,
+            event.time)) {
+      ++result_.summary
+            .merge_grant_stale_arbitration_count;
+      return;
+    }
+    state_found->second.wakeup_pending = false;
+
+    auto controller_found =
+        destination_merge_controllers_.find(event.node);
+    if (controller_found ==
+            destination_merge_controllers_.end() ||
+        controller_found->second.pending_.empty()) {
+      ++result_.summary
+            .merge_grant_stale_arbitration_count;
+      return;
+    }
+    auto& controller = controller_found->second;
+    const std::size_t pending_count =
+        controller.pending_.size();
+
+    // Complete every potentially throwing allocation before any real
+    // calendar, bag, queue, incoming counter, or grant capability changes.
+    controller.reserve_lifecycle_for_transaction(
+        pending_count + 4);
+    events_.reserve(events_.size() +
+                    pending_count + 4);
+    result_.decisions.reserve(
+        result_.decisions.size() + 1);
+    result_.hold_attempts.reserve(
+        result_.hold_attempts.size() +
+        pending_count);
+    if (config_.enable_opportunity_telemetry) {
+      result_.merge_request_visibility.reserve(
+          result_.merge_request_visibility.size() + 1);
+      result_.event_seq_ordering_audit.reserve(
+          result_.event_seq_ordering_audit.size() + 1);
+    }
+
+    std::vector<DestinationMergeRequest>
+        expired_requests;
+    expired_requests.reserve(pending_count);
+    for (const auto& pending :
+         controller.pending_) {
+      if (pending.request.expiry +
+              event_runtime_detail::kEpsilon <
+          event.time) {
+        expired_requests.push_back(
+            pending.request);
+      }
+    }
+    for (const auto& expired :
+         expired_requests) {
+      reject_destination_merge_request(
+          controller,
+          expired,
+          MergeGrantState::kExpired,
+          MergeGrantReason::kRequestExpired,
+          event.time);
+    }
+    if (controller.pending_.empty()) {
+      return;
+    }
+
+    auto* selected =
+        controller.select(canonical_merge_grant_rule(),
+                          event.time,
+                          config_.starvation_threshold);
+    if (selected == nullptr) {
+      reject_all_destination_merge_requests(
+          controller,
+          MergeGrantState::kExpired,
+          MergeGrantReason::kRequestExpired,
+          event.time);
+      return;
+    }
+    const DestinationMergeRequest request =
+        selected->request;
+
+    auto bag_found = bags_.find(request.runtime_bag_id);
+    if (bag_found == bags_.end() ||
+        bag_found->second.status !=
+            BagStatus::kJunctionQueue ||
+        bag_found->second.current !=
+            request.upstream_node) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRevokedStaleState,
+          MergeGrantReason::kOwnerStateChanged,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+    auto& bag = bag_found->second;
+    auto& bag_merge =
+        destination_merge_bag_state(
+            request.runtime_bag_id);
+    if (bag_merge.pending_request_id !=
+            request.request_id ||
+        bag_merge.pending_lineage != request.lineage ||
+        bag_merge.request_generation !=
+            request.request_generation ||
+        bag_merge.junction_queue_generation !=
+            request.junction_queue_generation ||
+        std::find(
+            junctions_[request.upstream_node].queue.begin(),
+            junctions_[request.upstream_node].queue.end(),
+            request.runtime_bag_id) ==
+            junctions_[request.upstream_node].queue.end()) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRevokedStaleState,
+          MergeGrantReason::kQueueGenerationChanged,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+
+    const long long directed =
+        event_runtime_detail::directed_key(
+            request.upstream_node,
+            request.destination_merge_node);
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    if (config_
+            .test_merge_grant_flip_advertised_generation_before_commit &&
+        !test_merge_grant_advertised_flip_injected_) {
+      // Materialise the map node before the transaction so the failpoint
+      // itself changes only a scalar generation.
+      advertised_faults_.try_emplace(directed);
+    }
+    if (config_
+            .test_merge_grant_flip_physical_generation_before_commit &&
+        !test_merge_grant_physical_flip_injected_) {
+      physical_faults_.try_emplace(directed);
+    }
+#endif
+    const auto physical = physical_faults_.find(directed);
+    const auto advertised =
+        advertised_faults_.find(directed);
+    const int physical_generation =
+        physical == physical_faults_.end()
+            ? 0
+            : physical->second.physical_generation;
+    const bool physical_active =
+        physical != physical_faults_.end() &&
+        physical->second.active_count > 0;
+    const int advertised_generation =
+        advertised == advertised_faults_.end()
+            ? 0
+            : advertised->second.generation;
+    if (physical_active ||
+        physical_generation !=
+            request.physical_fault_generation ||
+        advertised_generation !=
+            request.advertised_fault_generation) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRevokedFault,
+          MergeGrantReason::kFaultGenerationChanged,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+
+    auto& destination =
+        junctions_[request.destination_merge_node];
+    destination.service_calendar.purge(event.time);
+    if (destination.service_calendar.generation() !=
+        request.destination_calendar_generation) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRevokedStaleState,
+          MergeGrantReason::kCalendarGenerationChanged,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+    const bool queue_capacity_blocked =
+        config_.local_queue_capacity > 0 &&
+        static_cast<int>(destination.queue.size()) +
+                destination.scheduled_incoming >=
+            config_.local_queue_capacity;
+    if (queue_capacity_blocked &&
+        canonical_pibt_mode() ==
+            BoundedLocalPIBTMode::kP0) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRolledBack,
+          MergeGrantReason::kQueueCapacityBlock,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+
+    const double slot_start =
+        request.request_time +
+        request.exact_edge_travel_seconds;
+    const double slot_end =
+        slot_start +
+        service_duration(
+            request.destination_merge_node);
+    if (!controller.active_capacity_available() ||
+        controller.has_overlapping_active_slot(
+            slot_start, slot_end)) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRolledBack,
+          MergeGrantReason::kActiveGrantExists,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+    auto prepared =
+        destination.service_calendar
+            .prepare_exact_reservation(
+                request.runtime_bag_id,
+                slot_start,
+                slot_end);
+    if (!prepared.has_value()) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRolledBack,
+          MergeGrantReason::kExactSlotBusy,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+
+    auto winner_pending =
+        pending_merge_dispatches_.find(request.lineage);
+    if (winner_pending ==
+        pending_merge_dispatches_.end()) {
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRevokedStaleState,
+          MergeGrantReason::kOwnerStateChanged,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+
+    // Fully materialize every string/vector/event/telemetry object and loser
+    // copy before the exact calendar commit. The tail below the commit is
+    // allocation-free and uses only noexcept moves/scalar mutations.
+    winner_pending->second.trace.selected_next =
+        request.destination_merge_node;
+    winner_pending->second.trace.decision_source =
+        "destination_owned_merge_grant";
+    winner_pending->second.trace.rule_reason =
+        std::string(
+            destination_merge_grant_rule_name(
+                canonical_merge_grant_rule())) +
+        "_exact_R3_slot_runtime_owned_capability";
+
+    std::vector<DestinationMergeRequest> losers;
+    losers.reserve(
+        controller.pending_.size() > 0
+            ? controller.pending_.size() - 1
+            : 0);
+    for (const auto& remaining : controller.pending_) {
+      if (remaining.request.request_id ==
+          request.request_id) {
+        continue;
+      }
+      losers.push_back(remaining.request);
+      const auto loser_pending =
+          pending_merge_dispatches_.find(
+              remaining.request.lineage);
+      if (loser_pending !=
+          pending_merge_dispatches_.end()) {
+        loser_pending->second.trace.selected_next = -1;
+        loser_pending->second.trace.decision_source =
+            "destination_merge_grant_hold";
+        loser_pending->second.trace.rule_reason =
+            merge_grant_reason_name(
+                MergeGrantReason::kContendedLoserRetry);
+      }
+    }
+
+    std::vector<RuntimeEvent> staged_events;
+    staged_events.reserve(4);
+    const auto stage_event =
+        [&](JunctionEventType type,
+            double time,
+            int task_id,
+            int node,
+            int from_node,
+            int to_node,
+            double service_end,
+            std::string reason) {
+          RuntimeEvent staged;
+          staged.type = type;
+          staged.time = time;
+          staged.task_id = task_id;
+          staged.node = node;
+          staged.from_node = from_node;
+          staged.to_node = to_node;
+          staged.service_end = service_end;
+          staged.reason = std::move(reason);
+          prepare_event_for_publication(staged);
+          staged_events.push_back(std::move(staged));
+        };
+    stage_event(
+        JunctionEventType::kCongestionBeaconUpdate,
+        event.time,
+        request.runtime_bag_id,
+        request.destination_merge_node,
+        request.upstream_node,
+        request.destination_merge_node,
+        0.0,
+        "incoming_reservation_snapshot");
+    stage_event(
+        JunctionEventType::kEdgeEnter,
+        event.time,
+        request.runtime_bag_id,
+        request.upstream_node,
+        request.upstream_node,
+        request.destination_merge_node,
+        0.0,
+        "one_step_merge_grant_committed");
+    stage_event(
+        JunctionEventType::kEdgeExit,
+        slot_start,
+        request.runtime_bag_id,
+        request.destination_merge_node,
+        request.upstream_node,
+        request.destination_merge_node,
+        slot_end,
+        {});
+    stage_event(
+        JunctionEventType::kLocalQueueUpdate,
+        event.time,
+        request.runtime_bag_id,
+        request.upstream_node,
+        request.upstream_node,
+        request.destination_merge_node,
+        0.0,
+        "merge_grant_junction_dequeue");
+    events_.reserve(events_.size() +
+                    staged_events.size());
+
+    std::vector<PIBTStagedMergeVisibility>
+        staged_visibility;
+    std::map<int, int> staged_known_competitors;
+    if (config_.enable_opportunity_telemetry) {
+      staged_visibility.reserve(1);
+      staged_known_competitors.emplace(
+          request.destination_merge_node,
+          std::max(
+              0,
+              static_cast<int>(
+                  controller.pending_.size()) -
+                  1));
+      staged_merge_visibility_sink_ =
+          &staged_visibility;
+      staged_destination_known_competitor_counts_ =
+          &staged_known_competitors;
+      try {
+        append_merge_visibility(
+            bag,
+            request.upstream_node,
+            request.destination_merge_node,
+            event.time,
+            slot_start,
+            slot_end);
+      } catch (...) {
+        staged_merge_visibility_sink_ = nullptr;
+        staged_destination_known_competitor_counts_ =
+            nullptr;
+        throw;
+      }
+      staged_merge_visibility_sink_ = nullptr;
+      staged_destination_known_competitor_counts_ =
+          nullptr;
+    }
+
+    destination.scheduled_incoming_by_goal.reserve(
+        destination.scheduled_incoming_by_goal.size() +
+        1);
+    const auto goal_entry =
+        destination.scheduled_incoming_by_goal.try_emplace(
+            bag.request.goal, 0);
+    const bool inserted_goal_entry =
+        goal_entry.second;
+
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    if (config_
+            .test_merge_grant_fail_after_calendar_prepare &&
+        !test_merge_grant_prepare_failure_injected_) {
+      test_merge_grant_prepare_failure_injected_ = true;
+      if (inserted_goal_entry) {
+        destination.scheduled_incoming_by_goal.erase(
+            goal_entry.first);
+      }
+      reject_all_destination_merge_requests(
+          controller,
+          MergeGrantState::kRolledBack,
+          MergeGrantReason::kInjectedPrepareRollback,
+          event.time);
+      return;
+    }
+    if (config_
+            .test_merge_grant_flip_advertised_generation_before_commit &&
+        !test_merge_grant_advertised_flip_injected_) {
+      test_merge_grant_advertised_flip_injected_ = true;
+      ++advertised_faults_.at(directed).generation;
+    }
+    if (config_
+            .test_merge_grant_flip_physical_generation_before_commit &&
+        !test_merge_grant_physical_flip_injected_) {
+      test_merge_grant_physical_flip_injected_ = true;
+      ++physical_faults_.at(directed).physical_generation;
+    }
+    if (config_
+            .test_merge_grant_flip_calendar_generation_before_commit &&
+        !test_merge_grant_calendar_flip_injected_) {
+      test_merge_grant_calendar_flip_injected_ = true;
+      destination.service_calendar.test_advance_generation();
+    }
+    if (config_
+            .test_merge_grant_flip_queue_generation_before_commit &&
+        !test_merge_grant_queue_flip_injected_) {
+      test_merge_grant_queue_flip_injected_ = true;
+      ++bag_merge.junction_queue_generation;
+    }
+#endif
+
+    const auto physical_commit =
+        physical_faults_.find(directed);
+    const auto advertised_commit =
+        advertised_faults_.find(directed);
+    const int physical_generation_commit =
+        physical_commit == physical_faults_.end()
+            ? 0
+            : physical_commit->second.physical_generation;
+    const bool physical_active_commit =
+        physical_commit != physical_faults_.end() &&
+        physical_commit->second.active_count > 0;
+    const int advertised_generation_commit =
+        advertised_commit == advertised_faults_.end()
+            ? 0
+            : advertised_commit->second.generation;
+    ++result_.summary
+          .fault_generation_commit_recheck_count;
+    if (physical_active_commit ||
+        physical_generation_commit !=
+            request.physical_fault_generation ||
+        advertised_generation_commit !=
+            request.advertised_fault_generation ||
+        bag_merge.junction_queue_generation !=
+            request.junction_queue_generation) {
+      if (inserted_goal_entry) {
+        destination.scheduled_incoming_by_goal.erase(
+            goal_entry.first);
+      }
+      reject_destination_merge_request(
+          controller,
+          request,
+          physical_active_commit ||
+                  physical_generation_commit !=
+                      request.physical_fault_generation ||
+                  advertised_generation_commit !=
+                      request.advertised_fault_generation
+              ? MergeGrantState::kRevokedFault
+              : MergeGrantState::kRevokedStaleState,
+          physical_active_commit ||
+                  physical_generation_commit !=
+                      request.physical_fault_generation ||
+                  advertised_generation_commit !=
+                      request.advertised_fault_generation
+              ? MergeGrantReason::kFaultGenerationChanged
+              : MergeGrantReason::kQueueGenerationChanged,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+    if (destination.service_calendar.generation() !=
+        request.destination_calendar_generation) {
+      if (inserted_goal_entry) {
+        destination.scheduled_incoming_by_goal.erase(
+            goal_entry.first);
+      }
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRevokedStaleState,
+          MergeGrantReason::kCalendarGenerationChanged,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+
+    if (!destination.service_calendar
+             .commit_exact_reservation(
+                 std::move(*prepared))) {
+      if (inserted_goal_entry) {
+        destination.scheduled_incoming_by_goal.erase(
+            goal_entry.first);
+      }
+      reject_destination_merge_request(
+          controller,
+          request,
+          MergeGrantState::kRevokedStaleState,
+          MergeGrantReason::kCalendarGenerationChanged,
+          event.time);
+      if (controller.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.node, event.time);
+      }
+      return;
+    }
+
+    // Point of no return. Capacity, strings, traces, lifecycle rows, calendar
+    // storage, goal-map node, and event storage were all prepared above.
+    auto capability =
+        controller.commit_selected_noexcept(
+            request.request_id,
+            slot_start,
+            slot_end,
+            event.time,
+            destination.service_calendar.generation(),
+            physical_generation);
+    bag_merge.capability.emplace(
+        std::move(capability));
+
+    if (queue_capacity_blocked) {
+      const auto rollback_grant_and_calendar =
+          [&]() {
+            const bool grant_rolled_back =
+                bag_merge.capability.has_value() &&
+                controller.rollback_committed_noexcept(
+                    *bag_merge.capability,
+                    request,
+                    event.time,
+                    MergeGrantReason::kQueueCapacityBlock);
+            const bool calendar_rolled_back =
+                destination.service_calendar
+                    .restore_exact_reservation_noexcept(
+                        request.runtime_bag_id,
+                        slot_start,
+                        slot_end,
+                        request.destination_calendar_generation);
+            bag_merge.capability.reset();
+            if (!grant_rolled_back ||
+                !calendar_rolled_back) {
+              throw std::logic_error(
+                  "post-grant PIBT compensation failed");
+            }
+          };
+
+      DispatchResult pibt_dispatch;
+      try {
+        pibt_dispatch =
+            try_dispatch_bounded_local_pibt(
+                request.upstream_node,
+                event.time,
+                event.seq,
+                nullptr,
+                &*bag_merge.capability);
+      } catch (...) {
+        if (inserted_goal_entry &&
+            goal_entry.first->second == 0) {
+          destination
+              .scheduled_incoming_by_goal.erase(
+                  goal_entry.first);
+        }
+        rollback_grant_and_calendar();
+        throw;
+      }
+      if (!pibt_dispatch.handled) {
+        if (inserted_goal_entry &&
+            goal_entry.first->second == 0) {
+          destination
+              .scheduled_incoming_by_goal.erase(
+                  goal_entry.first);
+        }
+        rollback_grant_and_calendar();
+        winner_pending->second.trace.selected_next = -1;
+        winner_pending->second.trace.decision_source =
+            "destination_merge_grant_hold";
+        winner_pending->second.trace.rule_reason =
+            merge_grant_reason_name(
+                MergeGrantReason::kQueueCapacityBlock);
+        bag_merge.pending_request_id = 0;
+        bag_merge.pending_lineage = 0;
+        bag_merge.pending_request_time = -1.0;
+        ++bag.retry_count;
+        publish_prepared_decision_trace_noexcept(
+            std::move(winner_pending->second.trace), false);
+        pending_merge_dispatches_.erase(winner_pending);
+        if (controller.pending_count() > 0) {
+          schedule_destination_merge_wakeup(
+              event.node, event.time);
+        }
+        return;
+      }
+      bag_merge.grant_wait_seconds +=
+          std::max(
+              0.0,
+              event.time -
+                  bag_merge.first_contention_time);
+      bag_merge.pending_request_id = 0;
+      bag_merge.pending_lineage = 0;
+      bag_merge.pending_request_time = -1.0;
+      bag_merge.first_contention_time = -1.0;
+      clear_consumed_repair_reentry_boost(bag);
+      publish_prepared_decision_trace_noexcept(
+          std::move(winner_pending->second.trace), true);
+      pending_merge_dispatches_.erase(winner_pending);
+      for (const auto& loser : losers) {
+        reject_prepared_destination_merge_request_noexcept(
+            controller,
+            loser,
+            MergeGrantState::kRolledBack,
+            MergeGrantReason::kContendedLoserRetry,
+            event.time);
+      }
+      return;
+    }
+
+    bag_merge.grant_wait_seconds +=
+        std::max(
+            0.0,
+            event.time -
+                bag_merge.first_contention_time);
+    bag_merge.pending_request_id = 0;
+    bag_merge.pending_lineage = 0;
+    bag_merge.pending_request_time = -1.0;
+    bag_merge.first_contention_time = -1.0;
+
+    destination.record_service_reservation(
+        slot_start, slot_end);
+    ++destination.scheduled_incoming;
+    ++goal_entry.first->second;
+    update_calendar_maxima(destination, nullptr);
+
+    const double queue_wait =
+        std::max(
+            0.0,
+            event.time - bag.junction_enqueued_at);
+    bag.total_wait += queue_wait;
+    bag.junction_queue_wait_seconds += queue_wait;
+    bag.status = BagStatus::kInTransit;
+    bag.transit_from = request.upstream_node;
+    bag.transit_to =
+        request.destination_merge_node;
+    bag.transit_merge_grant =
+        bag_merge.capability->expectation();
+    for (auto& staged : staged_events) {
+      publish_prepared_reserved_event(
+          std::move(staged));
+    }
+
+    ++bag.decision_count;
+    ++result_.summary.decision_count;
+    result_.summary.max_edges_selected_per_arrive =
+        std::max(
+            result_.summary
+                .max_edges_selected_per_arrive,
+            1);
+    result_.summary
+        .max_edges_selected_per_bag_per_decision =
+        std::max(
+            result_.summary
+                .max_edges_selected_per_bag_per_decision,
+            1);
+    auto& upstream =
+        junctions_[request.upstream_node];
+    const auto queue_owner = std::find(
+        upstream.queue.begin(),
+        upstream.queue.end(),
+        request.runtime_bag_id);
+    upstream.queue.erase(queue_owner);
+    ++bag_merge.junction_queue_generation;
+    upstream.observe_local_state();
+    upstream.next_dispatch_time =
+        event.time +
+        config_.dispatch_headway_seconds;
+    if (upstream.queue.empty() &&
+        upstream.junction_wakeup_pending) {
+      upstream.junction_wakeup_pending = false;
+      ++upstream.junction_wakeup_generation;
+      auto local =
+          g4irsf14_state_->local.find(
+              request.upstream_node);
+      if (local != g4irsf14_state_->local.end()) {
+        local->second.junction_wakeup_time =
+            std::numeric_limits<double>::infinity();
+      }
+    }
+    clear_consumed_repair_reentry_boost(bag);
+
+    publish_prepared_decision_trace_noexcept(
+        std::move(winner_pending->second.trace), true);
+    pending_merge_dispatches_.erase(winner_pending);
+    for (auto& visibility : staged_visibility) {
+      publish_prepared_merge_visibility_noexcept(
+          std::move(visibility));
+    }
+    for (const auto& loser : losers) {
+      reject_prepared_destination_merge_request_noexcept(
+          controller,
+          loser,
+          MergeGrantState::kRolledBack,
+          MergeGrantReason::kContendedLoserRetry,
+          event.time);
+    }
+  }
+
   void dispatch_junction_once(const RuntimeEvent& event,
                               bool batched_arbitration) {
     auto& controller = junctions_[event.node];
@@ -3108,7 +4645,12 @@ class EventDrivenJunctionRuntime {
             ? &priority_comparison_count
             : nullptr;
     int bounded_local_same_bag_fallback_next = -1;
-    if (canonical_pibt_mode() != BoundedLocalPIBTMode::kP0) {
+    // E4 phase 5a is ordinary destination-merge request publication. PIBT
+    // must not pre-emptively order that queue; it remains available only
+    // after a destination-owned winner/capability exists and an exceptional
+    // local blocker requires an atomic handoff.
+    if (!uses_destination_merge_grants() &&
+        canonical_pibt_mode() != BoundedLocalPIBTMode::kP0) {
       dispatch =
           try_dispatch_bounded_local_pibt(
               event.node,
@@ -3177,6 +4719,15 @@ class EventDrivenJunctionRuntime {
     int same_bag_fallback_next = -1;
   };
 
+  struct PendingMergeDispatch {
+    std::uint64_t request_id = 0;
+    std::uint64_t lineage = 0;
+    int runtime_bag_id = -1;
+    int upstream_node = -1;
+    int destination_node = -1;
+    EventDecisionTraceRow trace;
+  };
+
   struct PIBTCreditView {
     bool required = false;
     bool ready = true;
@@ -3202,6 +4753,8 @@ class EventDrivenJunctionRuntime {
     double junction_queue_wait_seconds = 0.0;
     int transit_from = -1;
     int transit_to = -1;
+    DestinationMergeGrantExpectation
+        transit_merge_grant;
     int decision_count = 0;
     double deadlock_started_at = -1.0;
     std::uint64_t first_edge_credit_id = 0;
@@ -3210,6 +4763,7 @@ class EventDrivenJunctionRuntime {
 
   struct PIBTJunctionSnapshot {
     int node = -1;
+    std::uint64_t service_calendar_generation = 0;
     std::deque<int> queue;
     int peak_source_queue_length = 0;
     int peak_junction_queue_length = 0;
@@ -3236,6 +4790,19 @@ class EventDrivenJunctionRuntime {
 #endif
   };
 
+  struct PIBTMergeBagSnapshot {
+    std::uint64_t junction_queue_generation = 0;
+    std::uint64_t request_generation = 0;
+    std::uint64_t pending_request_id = 0;
+    std::uint64_t pending_lineage = 0;
+    double pending_request_time = -1.0;
+    double first_contention_time = -1.0;
+    double grant_wait_seconds = 0.0;
+    bool capability_present = false;
+    DestinationMergeGrantExpectation
+        capability_identity;
+  };
+
   struct PIBTActionDelta {
     int bag_id = -1;
     int from_node = -1;
@@ -3248,9 +4815,11 @@ class EventDrivenJunctionRuntime {
     long long corridor_key = 0;
     double corridor_start = 0.0;
     double corridor_end = 0.0;
+    std::uint64_t corridor_generation_before = 0;
     bool destination_reservation_inserted = false;
     double destination_start = 0.0;
     double destination_end = 0.0;
+    std::uint64_t destination_generation_before = 0;
     int destination_goal = -1;
     bool destination_goal_existed = false;
     int destination_goal_value = 0;
@@ -3264,6 +4833,7 @@ class EventDrivenJunctionRuntime {
 
   struct PIBTCorridorSnapshot {
     bool existed = false;
+    std::uint64_t generation = 0;
     std::uint64_t logical_state_fingerprint = 0;
   };
 
@@ -3275,6 +4845,8 @@ class EventDrivenJunctionRuntime {
     std::size_t applied_action_count = 0;
     EventRuntimeSummary summary;
     std::map<int, PIBTBagSnapshot> bags;
+    std::map<int, PIBTMergeBagSnapshot>
+        destination_merge_bags;
     std::map<int, PIBTJunctionSnapshot> junctions;
     std::map<long long, PIBTCorridorSnapshot> corridors;
     std::vector<PIBTActionDelta> action_deltas;
@@ -3286,6 +4858,7 @@ class EventDrivenJunctionRuntime {
     std::uint64_t next_event_seq = 0;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
     bool calendar_logical_state_restored = true;
+    bool calendar_generation_restored = true;
     std::size_t event_queue_size = 0;
     std::uint64_t event_queue_logical_fingerprint = 0;
     std::size_t merge_visibility_size = 0;
@@ -3293,6 +4866,10 @@ class EventDrivenJunctionRuntime {
     FirstEdgeCreditCounters credit_counters;
     std::size_t credit_active_count = 0;
     std::size_t credit_lifecycle_count = 0;
+    std::map<int, std::uint64_t>
+        destination_merge_controller_fingerprints;
+    std::uint64_t
+        pending_merge_dispatches_logical_fingerprint = 0;
 #endif
   };
 
@@ -3301,6 +4878,10 @@ class EventDrivenJunctionRuntime {
     explicit PIBTLogicalCommitFailure(const std::string& message)
         : std::runtime_error(message) {}
   };
+
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  class PIBTPostCommitFailureInjection final {};
+#endif
 
   static LocalPIBTResourceKey pibt_runtime_corridor_resource(int start,
                                                               int end,
@@ -3739,7 +5320,8 @@ class EventDrivenJunctionRuntime {
         static_cast<int>(fault_affected_bags_.size());
   }
 
-  void clear_consumed_repair_reentry_boost(BagState& bag) {
+  void clear_consumed_repair_reentry_boost(
+      BagState& bag) noexcept {
     if (!bag.repaired_task_reentry) {
       return;
     }
@@ -3928,15 +5510,135 @@ class EventDrivenJunctionRuntime {
     return runtime_bag_id;
   }
 
+  bool merge_grant_authority_is_commit_ready(
+      const MergeGrantCapability* authority,
+      int trigger_runtime_bag_id,
+      double time,
+      std::string& blocker) const {
+    if (authority == nullptr || authority->grant_id() == 0) {
+      blocker = "CREDIT_OR_GRANT_MISSING";
+      return false;
+    }
+    if (authority->state() != MergeGrantState::kCommitted ||
+        authority->owner_runtime_bag_id() !=
+            trigger_runtime_bag_id ||
+        authority->exact_directed_edge().to_node !=
+            authority->destination_node() ||
+        time > authority->expiry() +
+                   event_runtime_detail::kEpsilon) {
+      blocker = "CREDIT_OR_GRANT_STALE";
+      return false;
+    }
+    const auto bag = bags_.find(trigger_runtime_bag_id);
+    if (bag == bags_.end() ||
+        bag->second.status != BagStatus::kJunctionQueue ||
+        bag->second.current !=
+            authority->exact_directed_edge().from_node ||
+        bag->second.request.runtime_bag_id !=
+            trigger_runtime_bag_id ||
+        !graph_.has_edge(
+            authority->exact_directed_edge().from_node,
+            authority->exact_directed_edge().to_node)) {
+      blocker = "CREDIT_OR_GRANT_STALE";
+      return false;
+    }
+    if (g4irsf14_state_ == nullptr) {
+      blocker = "CREDIT_OR_GRANT_STALE";
+      return false;
+    }
+    const auto merge_state =
+        g4irsf14_state_->destination_merge_bags.find(
+            trigger_runtime_bag_id);
+    if (merge_state ==
+            g4irsf14_state_->destination_merge_bags.end() ||
+        !merge_state->second.capability.has_value() ||
+        &*merge_state->second.capability != authority ||
+        merge_state->second.request_generation !=
+            authority->request_generation() ||
+        merge_state->second.pending_request_id !=
+            authority->request_id() ||
+        merge_state->second.pending_lineage !=
+            authority->lineage()) {
+      blocker = "CREDIT_OR_GRANT_STALE";
+      return false;
+    }
+    const auto controller =
+        destination_merge_controllers_.find(
+            authority->destination_node());
+    if (controller ==
+            destination_merge_controllers_.end() ||
+        !controller->second.validates_active_capability(
+            *authority)) {
+      blocker = "CREDIT_OR_GRANT_STALE";
+      return false;
+    }
+    const auto& destination =
+        junctions_.at(authority->destination_node());
+    if (!destination.service_calendar.contains_exact(
+            trigger_runtime_bag_id,
+            authority->slot_start(),
+            authority->slot_end())) {
+      blocker = "CREDIT_OR_GRANT_STALE";
+      return false;
+    }
+    const long long directed =
+        event_runtime_detail::directed_key(
+            authority->exact_directed_edge().from_node,
+            authority->exact_directed_edge().to_node);
+    const auto physical = physical_faults_.find(directed);
+    const auto advertised =
+        advertised_faults_.find(directed);
+    const int physical_generation =
+        physical == physical_faults_.end()
+            ? 0
+            : physical->second.physical_generation;
+    const int advertised_generation =
+        advertised == advertised_faults_.end()
+            ? 0
+            : advertised->second.generation;
+    if ((physical != physical_faults_.end() &&
+         physical->second.active_count > 0) ||
+        physical_generation != authority->fault_generation() ||
+        advertised_generation !=
+            authority->advertised_fault_generation()) {
+      blocker = "FAULT_GENERATION_CHANGED";
+      return false;
+    }
+    const auto& edge = graph_.edge(
+        authority->exact_directed_edge().from_node,
+        authority->exact_directed_edge().to_node);
+    const double exact_start =
+        authority->request_time() +
+        std::max(edge.travel_time(),
+                 config_.minimum_service_seconds);
+    if (std::abs(exact_start - authority->slot_start()) >
+            event_runtime_detail::kEpsilon ||
+        std::abs(
+            authority->slot_end() -
+            authority->slot_start() -
+            service_duration(authority->destination_node())) >
+            event_runtime_detail::kEpsilon) {
+      blocker = "CREDIT_OR_GRANT_STALE";
+      return false;
+    }
+    return true;
+  }
+
   PIBTLocalSlice build_pibt_local_slice(int trigger_node,
                                         int trigger_runtime_bag_id,
                                         double time,
                                         std::uint64_t arrive_event_seq,
-                                        int* priority_comparison_count) {
+                                        int* priority_comparison_count,
+                                        const MergeGrantCapability*
+                                            merge_grant_authority = nullptr) {
     PIBTLocalSlice slice;
     slice.trigger_runtime_bag_id = trigger_runtime_bag_id;
-    if (config_.local_queue_capacity <= 0) {
-      slice.blocker = "queue_capacity_unknown_or_unlimited";
+    if (merge_grant_authority != nullptr &&
+        !merge_grant_authority_is_commit_ready(
+            merge_grant_authority,
+            trigger_runtime_bag_id,
+            time,
+            slice.blocker)) {
       return slice;
     }
 
@@ -3962,6 +5664,13 @@ class EventDrivenJunctionRuntime {
     auto trigger_trace = std::move(*trigger_trace_result);
     const EventCandidateRecord* preferred = nullptr;
     for (const auto& candidate : trigger_trace.candidates) {
+      if (merge_grant_authority != nullptr &&
+          candidate.next_node !=
+              merge_grant_authority
+                  ->exact_directed_edge()
+                  .to_node) {
+        continue;
+      }
       if (trigger_credit.required &&
           (!trigger_credit.ready ||
            candidate.next_node != trigger_credit.to_node)) {
@@ -3974,7 +5683,8 @@ class EventDrivenJunctionRuntime {
       }
     }
     if (preferred == nullptr ||
-        preferred->shield_reason != "destination_queue_full" ||
+        (merge_grant_authority == nullptr &&
+         preferred->shield_reason != "destination_queue_full") ||
         (config_.enable_fault_policy && preferred->advertised_fault)) {
       slice.blocker = "trigger_preferred_edge_has_no_finite_queue_blocker";
       return slice;
@@ -4068,8 +5778,17 @@ class EventDrivenJunctionRuntime {
           local_priority_contention(bag);
       ready.enqueue_sequence =
           bag.local_enqueue_sequence;
+      bool filtered_missing_merge_grant = false;
 
       for (const auto& record : trace.candidates) {
+        if (merge_grant_authority != nullptr &&
+            runtime_bag_id == trigger_runtime_bag_id &&
+            record.next_node !=
+                merge_grant_authority
+                    ->exact_directed_edge()
+                    .to_node) {
+          continue;
+        }
         if (credit.required &&
             (!credit.ready || record.next_node != credit.to_node)) {
           continue;
@@ -4088,6 +5807,7 @@ class EventDrivenJunctionRuntime {
             target_controller.scheduled_incoming;
         std::optional<int> blocker_owner;
         if (target != bag.request.goal &&
+            config_.local_queue_capacity > 0 &&
             occupancy >= config_.local_queue_capacity) {
           blocker_owner = pibt_ready_owner_at_node(
               target,
@@ -4095,6 +5815,20 @@ class EventDrivenJunctionRuntime {
               priority_comparison_count);
           if (!blocker_owner.has_value()) {
             continue;
+          }
+          if (uses_destination_merge_grants() &&
+              *blocker_owner != trigger_runtime_bag_id) {
+            const auto blocker_merge =
+                g4irsf14_state_
+                    ->destination_merge_bags.find(
+                        *blocker_owner);
+            if (blocker_merge !=
+                    g4irsf14_state_
+                        ->destination_merge_bags.end() &&
+                blocker_merge->second.pending_request_id !=
+                    0) {
+              continue;
+            }
           }
           const auto node_resource = local_pibt_node_resource(target);
           const auto existing_owner = owner_by_resource.find(node_resource);
@@ -4106,6 +5840,27 @@ class EventDrivenJunctionRuntime {
           }
           owner_by_resource[node_resource] = *blocker_owner;
           pending.push_back(*blocker_owner);
+        }
+        const bool destination_merge_edge =
+            uses_destination_merge_grants() &&
+            graph_.incoming_degree(target) > 1 &&
+            target != bag.request.goal;
+        const bool exact_authorized_trigger =
+            destination_merge_edge &&
+            merge_grant_authority != nullptr &&
+            runtime_bag_id == trigger_runtime_bag_id &&
+            node ==
+                merge_grant_authority
+                    ->exact_directed_edge()
+                    .from_node &&
+            target ==
+                merge_grant_authority
+                    ->exact_directed_edge()
+                    .to_node;
+        if (destination_merge_edge &&
+            !exact_authorized_trigger) {
+          filtered_missing_merge_grant = true;
+          continue;
         }
 
         BoundedLocalPIBTCandidate candidate;
@@ -4140,6 +5895,30 @@ class EventDrivenJunctionRuntime {
             record.recent_visit_count > 0;
         candidate.local_regret_prior =
             local_regret_prior(node, target, bag.request.goal);
+        const double candidate_travel =
+            std::max(
+                graph_.edge(node, target).travel_time(),
+                config_.minimum_service_seconds);
+        const double candidate_slot_start =
+            time + candidate_travel;
+        const double candidate_slot_end =
+            candidate_slot_start +
+            service_duration(target);
+        if (uses_destination_calendar(
+                target, bag.request.goal) &&
+            !junctions_[target]
+                 .service_calendar.available(
+                     candidate_slot_start,
+                     candidate_slot_end,
+                     runtime_bag_id)) {
+          continue;
+        }
+        if (target != bag.request.goal &&
+            config_.local_queue_capacity > 0 &&
+            occupancy >= config_.local_queue_capacity &&
+            !blocker_owner.has_value()) {
+          continue;
+        }
         const long long edge_key =
             event_runtime_detail::directed_key(node, target);
         const auto fault = physical_faults_.find(edge_key);
@@ -4160,6 +5939,15 @@ class EventDrivenJunctionRuntime {
             {node, target};
       }
       slice.candidate_count += static_cast<int>(ready.candidates.size());
+      if (merge_grant_authority != nullptr &&
+          ready.candidates.empty()) {
+        slice.applicable = false;
+        slice.blocker =
+            filtered_missing_merge_grant
+                ? "CREDIT_OR_GRANT_MISSING"
+                : "NO_ALTERNATIVE_EDGE";
+        return slice;
+      }
       slice.traces_by_bag.emplace(runtime_bag_id, std::move(trace));
       slice.ready_bags.push_back(std::move(ready));
     }
@@ -4180,6 +5968,12 @@ class EventDrivenJunctionRuntime {
       if (bag == slice.ready_bags.end()) {
         slice.applicable = false;
         slice.blocker = "local_owner_missing_from_ready_slice";
+        return slice;
+      }
+      if (merge_grant_authority != nullptr &&
+          bag->candidates.empty()) {
+        slice.applicable = false;
+        slice.blocker = "NO_ALTERNATIVE_EDGE";
         return slice;
       }
       bag->held_resources.push_back(entry.first);
@@ -4290,12 +6084,24 @@ class EventDrivenJunctionRuntime {
   bool prevalidate_pibt_batch(
       const std::vector<BoundedLocalPIBTAction>& actions,
       double time,
-      std::string& blocker) const {
+      std::string& blocker,
+      const MergeGrantCapability*
+          merge_grant_authority = nullptr,
+      int merge_grant_trigger_bag_id = -1) const {
     if (actions.empty() ||
         static_cast<int>(actions.size()) > config_.pibt_max_ready_bags) {
       blocker = "empty_or_oversized_action_batch";
       return false;
     }
+    if (merge_grant_authority != nullptr &&
+        !merge_grant_authority_is_commit_ready(
+            merge_grant_authority,
+            merge_grant_trigger_bag_id,
+            time,
+            blocker)) {
+      return false;
+    }
+    bool authorized_trigger_action_seen = false;
     std::set<int> action_bags;
     std::set<int> action_from_nodes;
     std::map<int, int> leaving_by_node;
@@ -4344,6 +6150,33 @@ class EventDrivenJunctionRuntime {
         return false;
       }
       const auto& bag = bag_found->second;
+      const bool destination_merge_edge =
+          uses_destination_merge_grants() &&
+          graph_.incoming_degree(action.next_node) > 1 &&
+          action.next_node != bag.request.goal;
+      if (destination_merge_edge) {
+        const bool exact_authorized_trigger =
+            merge_grant_authority != nullptr &&
+            action.bag_id == merge_grant_trigger_bag_id &&
+            action.from_node ==
+                merge_grant_authority
+                    ->exact_directed_edge()
+                    .from_node &&
+            action.next_node ==
+                merge_grant_authority
+                    ->exact_directed_edge()
+                    .to_node;
+        if (!exact_authorized_trigger) {
+          blocker = "CREDIT_OR_GRANT_MISSING";
+          return false;
+        }
+        authorized_trigger_action_seen = true;
+      } else if (merge_grant_authority != nullptr &&
+                 action.bag_id ==
+                     merge_grant_trigger_bag_id) {
+        blocker = "CREDIT_OR_GRANT_STALE";
+        return false;
+      }
       if (!pibt_credit_is_commit_ready(
               bag, action.from_node, action.next_node, time)) {
         blocker = "first_edge_credit_not_commit_ready";
@@ -4435,11 +6268,17 @@ class EventDrivenJunctionRuntime {
               : controller->second.scheduled_incoming;
       const int leaving = leaving_by_node[node];
       const int entering = entering_nonterminal_by_node[node];
-      if (queue_size - leaving + scheduled + entering >
-          config_.local_queue_capacity) {
+      if (config_.local_queue_capacity > 0 &&
+          queue_size - leaving + scheduled + entering >
+              config_.local_queue_capacity) {
         blocker = "finite_local_queue_capacity_prevalidation_failed";
         return false;
       }
+    }
+    if (merge_grant_authority != nullptr &&
+        !authorized_trigger_action_seen) {
+      blocker = "CREDIT_OR_GRANT_MISSING";
+      return false;
     }
     return true;
   }
@@ -4578,6 +6417,148 @@ class EventDrivenJunctionRuntime {
     return hash;
   }
 
+  std::uint64_t
+  test_destination_merge_controller_fingerprint(
+      const DestinationMergeGrantController& controller)
+      const noexcept {
+    std::uint64_t hash = 1469598103934665603ULL;
+    const auto mix = [&](std::uint64_t value) {
+      hash ^= value;
+      hash *= 1099511628211ULL;
+    };
+    mix(static_cast<std::uint64_t>(
+        static_cast<std::uint32_t>(
+            controller.destination_node_)));
+    mix(controller.generation_);
+    mix(controller.next_request_id_);
+    mix(controller.next_grant_id_);
+    mix(controller.pending_.size());
+    for (const auto& pending : controller.pending_) {
+      mix(pending.request.request_id);
+      mix(pending.request.lineage);
+      mix(pending.request.request_generation);
+      mix(pending.request.junction_queue_generation);
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              pending.request.runtime_bag_id)));
+      mix(event_runtime_detail::timestamp_bits(
+          pending.request.request_time));
+      mix(event_runtime_detail::timestamp_bits(
+          pending.request.expiry));
+    }
+    mix(controller.active_.size());
+    for (const auto& active : controller.active_) {
+      mix(active.grant_id);
+      mix(active.request_id);
+      mix(active.lineage);
+      mix(active.request_generation);
+      mix(active.junction_queue_generation);
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              active.owner_runtime_bag_id)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              active.edge.from_node)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              active.edge.to_node)));
+      mix(event_runtime_detail::timestamp_bits(
+          active.slot_start));
+      mix(event_runtime_detail::timestamp_bits(
+          active.slot_end));
+      mix(event_runtime_detail::timestamp_bits(
+          active.issue_time));
+      mix(event_runtime_detail::timestamp_bits(
+          active.grant_expiry));
+      mix(active.calendar_generation);
+      mix(static_cast<std::uint64_t>(
+          active.physical_fault_generation));
+      mix(static_cast<std::uint64_t>(
+          active.advertised_fault_generation));
+    }
+    const auto& counters = controller.counters_;
+    mix(counters.request_count);
+    mix(counters.issued_count);
+    mix(counters.prepared_count);
+    mix(counters.committed_count);
+    mix(counters.issued_transition_count);
+    mix(counters.prepared_transition_count);
+    mix(counters.committed_transition_count);
+    mix(counters.consumed_count);
+    mix(counters.expired_count);
+    mix(counters.request_expired_count);
+    mix(counters.grant_expired_count);
+    mix(counters.revoked_count);
+    mix(counters.revoked_fault_count);
+    mix(counters.revoked_stale_state_count);
+    mix(counters.revoked_replan_current_edge_count);
+    mix(counters.rolled_back_count);
+    mix(counters.post_commit_revoked_count);
+    mix(counters.post_commit_expired_count);
+    mix(counters.post_commit_rollback_count);
+    mix(counters.lifecycle_transition_count);
+    mix(counters.lifecycle_stored_count);
+    mix(counters.lifecycle_dropped_count);
+    mix(controller.lifecycle_.size());
+    if (!controller.lifecycle_.empty()) {
+      const auto& tail = controller.lifecycle_.back();
+      mix(tail.request_id);
+      mix(tail.grant_id);
+      mix(static_cast<std::uint64_t>(tail.state));
+      mix(static_cast<std::uint64_t>(tail.reason));
+      mix(event_runtime_detail::timestamp_bits(
+          tail.time));
+    }
+    return hash;
+  }
+
+  std::uint64_t
+  test_pending_merge_dispatches_logical_fingerprint()
+      const {
+    std::vector<std::pair<std::uint64_t, std::uint64_t>>
+        rows;
+    rows.reserve(pending_merge_dispatches_.size());
+    for (const auto& entry :
+         pending_merge_dispatches_) {
+      std::uint64_t value = 1469598103934665603ULL;
+      const auto mix = [&](std::uint64_t item) {
+        value ^= item;
+        value *= 1099511628211ULL;
+      };
+      mix(entry.second.request_id);
+      mix(entry.second.lineage);
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              entry.second.runtime_bag_id)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              entry.second.upstream_node)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              entry.second.destination_node)));
+      mix(static_cast<std::uint64_t>(
+          static_cast<std::uint32_t>(
+              entry.second.trace.selected_next)));
+      mix(static_cast<std::uint64_t>(
+          std::hash<std::string>{}(
+              entry.second.trace.decision_source)));
+      mix(static_cast<std::uint64_t>(
+          std::hash<std::string>{}(
+              entry.second.trace.rule_reason)));
+      mix(entry.second.trace.candidates.size());
+      rows.emplace_back(entry.first, value);
+    }
+    std::sort(rows.begin(), rows.end());
+    std::uint64_t hash = 1469598103934665603ULL;
+    for (const auto& row : rows) {
+      hash ^= row.first;
+      hash *= 1099511628211ULL;
+      hash ^= row.second;
+      hash *= 1099511628211ULL;
+    }
+    return hash;
+  }
+
   static bool test_credit_counters_equal(
       const FirstEdgeCreditCounters& left,
       const FirstEdgeCreditCounters& right) noexcept {
@@ -4661,7 +6642,9 @@ class EventDrivenJunctionRuntime {
            left.bounded_local_pibt_max_transaction_junction_scalar_entries ==
                right.bounded_local_pibt_max_transaction_junction_scalar_entries &&
            left.bounded_local_pibt_max_transaction_action_deltas ==
-               right.bounded_local_pibt_max_transaction_action_deltas;
+               right.bounded_local_pibt_max_transaction_action_deltas &&
+           left.bounded_local_pibt_max_transaction_calendar_generation_entries ==
+               right.bounded_local_pibt_max_transaction_calendar_generation_entries;
   }
 #endif
 
@@ -4684,6 +6667,8 @@ class EventDrivenJunctionRuntime {
       if (inserted.second) {
         const auto& junction = junctions_.at(node);
         saved.node = node;
+        saved.service_calendar_generation =
+            junction.service_calendar.generation();
         if (!snapshot.differential_rollback) {
           saved.queue = junction.queue;
         }
@@ -4746,10 +6731,48 @@ class EventDrivenJunctionRuntime {
               bag.junction_queue_wait_seconds,
               bag.transit_from,
               bag.transit_to,
+              bag.transit_merge_grant,
               bag.decision_count,
               bag.deadlock_started_at,
               bag.first_edge_credit_id,
               bag.first_edge_credit_consumed});
+      if (uses_destination_merge_grants() &&
+          g4irsf14_state_ != nullptr) {
+        const auto merge =
+            g4irsf14_state_
+                ->destination_merge_bags.find(
+                    action.bag_id);
+        if (merge !=
+            g4irsf14_state_
+                ->destination_merge_bags.end()) {
+          PIBTMergeBagSnapshot saved_merge;
+          saved_merge.junction_queue_generation =
+              merge->second
+                  .junction_queue_generation;
+          saved_merge.request_generation =
+              merge->second.request_generation;
+          saved_merge.pending_request_id =
+              merge->second.pending_request_id;
+          saved_merge.pending_lineage =
+              merge->second.pending_lineage;
+          saved_merge.pending_request_time =
+              merge->second.pending_request_time;
+          saved_merge.first_contention_time =
+              merge->second.first_contention_time;
+          saved_merge.grant_wait_seconds =
+              merge->second.grant_wait_seconds;
+          saved_merge.capability_present =
+              merge->second.capability.has_value();
+          if (saved_merge.capability_present) {
+            saved_merge.capability_identity =
+                merge->second.capability
+                    ->expectation();
+          }
+          snapshot.destination_merge_bags.emplace(
+              action.bag_id,
+              std::move(saved_merge));
+        }
+      }
       auto& from_saved = capture_junction(action.from_node);
       (void)capture_junction(action.next_node);
 
@@ -4799,6 +6822,8 @@ class EventDrivenJunctionRuntime {
           delta.corridor_existed =
               inserted.first->second.existed;
           if (inserted.first->second.existed) {
+            inserted.first->second.generation =
+                corridor->second.generation();
             inserted.first->second
                 .logical_state_fingerprint =
                 corridor->second
@@ -4825,6 +6850,8 @@ class EventDrivenJunctionRuntime {
     if (snapshot.bags.size() > actions.size() ||
         snapshot.junctions.size() > actions.size() * 2 ||
         snapshot.corridors.size() > actions.size() ||
+        snapshot.junctions.size() + snapshot.corridors.size() >
+            actions.size() * 3 ||
         snapshot.action_deltas.size() != actions.size() ||
         static_cast<int>(snapshot.action_deltas.size()) >
             config_.pibt_max_ready_bags) {
@@ -4847,6 +6874,14 @@ class EventDrivenJunctionRuntime {
             result_.summary
                 .bounded_local_pibt_max_transaction_action_deltas,
             static_cast<int>(snapshot.action_deltas.size()));
+    result_.summary
+        .bounded_local_pibt_max_transaction_calendar_generation_entries =
+        std::max(
+            result_.summary
+                .bounded_local_pibt_max_transaction_calendar_generation_entries,
+            static_cast<int>(
+                snapshot.junctions.size() +
+                snapshot.corridors.size()));
     snapshot.summary = result_.summary;
     snapshot.next_event_seq = next_event_seq_;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
@@ -4863,6 +6898,18 @@ class EventDrivenJunctionRuntime {
         credit_ledger_.stored_active_count();
     snapshot.credit_lifecycle_count =
         credit_ledger_.stored_lifecycle_count();
+    for (const auto& controller :
+         destination_merge_controllers_) {
+      snapshot
+          .destination_merge_controller_fingerprints
+          .emplace(
+              controller.first,
+              test_destination_merge_controller_fingerprint(
+                  controller.second));
+    }
+    snapshot
+        .pending_merge_dispatches_logical_fingerprint =
+        test_pending_merge_dispatches_logical_fingerprint();
 #endif
     snapshot.captured = true;
   }
@@ -4881,31 +6928,35 @@ class EventDrivenJunctionRuntime {
     }
     result_.summary = snapshot.summary;
     next_event_seq_ = snapshot.next_event_seq;
+    bool exact_calendar_restore_succeeded = true;
     for (std::size_t index = snapshot.applied_action_count;
          index > 0;
          --index) {
       const auto& delta =
           snapshot.action_deltas[index - 1];
+      if (delta.destination_reservation_inserted) {
+        exact_calendar_restore_succeeded =
+            junctions_.at(delta.next_node)
+                    .service_calendar
+                    .restore_exact_reservation_noexcept(
+                        delta.bag_id,
+                        delta.destination_start,
+                        delta.destination_end,
+                        delta.destination_generation_before) &&
+            exact_calendar_restore_succeeded;
+      }
       if (delta.corridor_reservation_inserted) {
         const auto corridor =
             corridors_.find(delta.corridor_key);
-        if (corridor != corridors_.end()) {
-          corridor->second.erase_exact(
-              delta.bag_id,
-              delta.corridor_start,
-              delta.corridor_end);
-          if (!delta.corridor_existed &&
-              corridor->second.size() == 0) {
-            corridors_.erase(corridor);
-          }
-        }
-      }
-      if (delta.destination_reservation_inserted) {
-        junctions_.at(delta.next_node)
-            .service_calendar.erase_exact(
-                delta.bag_id,
-                delta.destination_start,
-                delta.destination_end);
+        exact_calendar_restore_succeeded =
+            corridor != corridors_.end() &&
+            corridor->second
+                .restore_exact_reservation_noexcept(
+                    delta.bag_id,
+                    delta.corridor_start,
+                    delta.corridor_end,
+                    delta.corridor_generation_before) &&
+            exact_calendar_restore_succeeded;
       }
     }
     if (snapshot.differential_rollback) {
@@ -4951,11 +7002,19 @@ class EventDrivenJunctionRuntime {
         throw std::logic_error(
             "PIBT rollback lost an existing corridor calendar");
       }
+      exact_calendar_restore_succeeded =
+          exact_calendar_restore_succeeded &&
+          corridor->second.generation() ==
+              entry.second.generation;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
       snapshot.calendar_logical_state_restored =
           snapshot.calendar_logical_state_restored &&
           corridor->second.logical_state_fingerprint() ==
               entry.second.logical_state_fingerprint;
+      snapshot.calendar_generation_restored =
+          snapshot.calendar_generation_restored &&
+          corridor->second.generation() ==
+              entry.second.generation;
 #endif
     }
     for (const auto& entry : snapshot.bags) {
@@ -4967,15 +7026,43 @@ class EventDrivenJunctionRuntime {
           saved.junction_queue_wait_seconds;
       bag.transit_from = saved.transit_from;
       bag.transit_to = saved.transit_to;
+      bag.transit_merge_grant =
+          saved.transit_merge_grant;
       bag.decision_count = saved.decision_count;
       bag.deadlock_started_at = saved.deadlock_started_at;
       bag.first_edge_credit_id = saved.first_edge_credit_id;
       bag.first_edge_credit_consumed =
           saved.first_edge_credit_consumed;
     }
+    if (g4irsf14_state_ != nullptr) {
+      for (const auto& entry :
+           snapshot.destination_merge_bags) {
+        const auto merge =
+            g4irsf14_state_
+                ->destination_merge_bags.find(
+                    entry.first);
+        if (merge !=
+            g4irsf14_state_
+                ->destination_merge_bags.end()) {
+          merge->second.junction_queue_generation =
+              entry.second
+                  .junction_queue_generation;
+        }
+      }
+    }
     for (auto& entry : snapshot.junctions) {
       auto& junction = junctions_.at(entry.first);
       auto& saved = entry.second;
+      exact_calendar_restore_succeeded =
+          exact_calendar_restore_succeeded &&
+          junction.service_calendar.generation() ==
+              saved.service_calendar_generation;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+      snapshot.calendar_generation_restored =
+          snapshot.calendar_generation_restored &&
+          junction.service_calendar.generation() ==
+              saved.service_calendar_generation;
+#endif
       if (!snapshot.differential_rollback) {
         junction.queue.swap(saved.queue);
       }
@@ -5019,6 +7106,10 @@ class EventDrivenJunctionRuntime {
         }
       }
     }
+    if (!exact_calendar_restore_succeeded) {
+      throw std::logic_error(
+          "PIBT rollback failed exact calendar generation restore");
+    }
     snapshot.applied_action_count = 0;
     snapshot.mutated = false;
   }
@@ -5026,7 +7117,8 @@ class EventDrivenJunctionRuntime {
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   bool pibt_logical_state_matches_snapshot(
       const PIBTTransactionSnapshot& snapshot) const {
-    if (!snapshot.calendar_logical_state_restored) {
+    if (!snapshot.calendar_logical_state_restored ||
+        !snapshot.calendar_generation_restored) {
       return false;
     }
     if (staged_event_sink_ != nullptr ||
@@ -5066,6 +7158,28 @@ class EventDrivenJunctionRuntime {
             snapshot.summary)) {
       return false;
     }
+    if (destination_merge_controllers_.size() !=
+            snapshot
+                .destination_merge_controller_fingerprints
+                .size() ||
+        test_pending_merge_dispatches_logical_fingerprint() !=
+            snapshot
+                .pending_merge_dispatches_logical_fingerprint) {
+      return false;
+    }
+    for (const auto& expected :
+         snapshot
+             .destination_merge_controller_fingerprints) {
+      const auto controller =
+          destination_merge_controllers_.find(
+              expected.first);
+      if (controller ==
+              destination_merge_controllers_.end() ||
+          test_destination_merge_controller_fingerprint(
+              controller->second) != expected.second) {
+        return false;
+      }
+    }
     for (const auto& entry : snapshot.bags) {
       const auto bag = bags_.find(entry.first);
       if (bag == bags_.end()) {
@@ -5079,6 +7193,8 @@ class EventDrivenJunctionRuntime {
               saved.junction_queue_wait_seconds ||
           current.transit_from != saved.transit_from ||
           current.transit_to != saved.transit_to ||
+          current.transit_merge_grant !=
+              saved.transit_merge_grant ||
           current.decision_count != saved.decision_count ||
           current.deadlock_started_at !=
               saved.deadlock_started_at ||
@@ -5087,6 +7203,42 @@ class EventDrivenJunctionRuntime {
           current.first_edge_credit_consumed !=
               saved.first_edge_credit_consumed) {
         return false;
+      }
+    }
+    if (g4irsf14_state_ != nullptr) {
+      for (const auto& entry :
+           snapshot.destination_merge_bags) {
+        const auto merge =
+            g4irsf14_state_
+                ->destination_merge_bags.find(
+                    entry.first);
+        if (merge ==
+                g4irsf14_state_
+                    ->destination_merge_bags.end() ||
+            merge->second.junction_queue_generation !=
+                entry.second
+                    .junction_queue_generation ||
+            merge->second.request_generation !=
+                entry.second.request_generation ||
+            merge->second.pending_request_id !=
+                entry.second.pending_request_id ||
+            merge->second.pending_lineage !=
+                entry.second.pending_lineage ||
+            merge->second.pending_request_time !=
+                entry.second.pending_request_time ||
+            merge->second.first_contention_time !=
+                entry.second.first_contention_time ||
+            merge->second.grant_wait_seconds !=
+                entry.second.grant_wait_seconds ||
+            merge->second.capability.has_value() !=
+                entry.second.capability_present ||
+            (entry.second.capability_present &&
+             merge->second.capability
+                     ->expectation() !=
+                 entry.second
+                     .capability_identity)) {
+          return false;
+        }
       }
     }
     for (const auto& entry : snapshot.junctions) {
@@ -5162,8 +7314,16 @@ class EventDrivenJunctionRuntime {
       const std::vector<BoundedLocalPIBTAction>& actions,
       double time,
       PIBTTransactionSnapshot& snapshot,
-      std::string& blocker) {
-    if (!prevalidate_pibt_batch(actions, time, blocker)) {
+      std::string& blocker,
+      const MergeGrantCapability*
+          merge_grant_authority = nullptr,
+      int merge_grant_trigger_bag_id = -1) {
+    if (!prevalidate_pibt_batch(
+            actions,
+            time,
+            blocker,
+            merge_grant_authority,
+            merge_grant_trigger_bag_id)) {
       return false;
     }
     const bool first_edge_credit_mode =
@@ -5192,6 +7352,8 @@ class EventDrivenJunctionRuntime {
         actions.size());
     events_.reserve(events_.size() +
                     max_staged_events);
+    result_.decisions.reserve(
+        result_.decisions.size() + actions.size());
     if (config_.enable_opportunity_telemetry) {
       result_.merge_request_visibility.reserve(
           result_.merge_request_visibility.size() +
@@ -5298,7 +7460,12 @@ class EventDrivenJunctionRuntime {
               action.from_node,
               action.next_node,
               time,
-              &transaction_delta);
+              &transaction_delta,
+              merge_grant_authority != nullptr &&
+                  action.bag_id ==
+                      merge_grant_trigger_bag_id
+                  ? merge_grant_authority
+                  : nullptr);
         } catch (const std::logic_error& error) {
           // dispatch_selected_edge uses an exact std::logic_error for a
           // revalidated local reservation race. Derived logic errors such as
@@ -5332,6 +7499,12 @@ class EventDrivenJunctionRuntime {
         if (!snapshot.differential_rollback) {
           controller.queue.erase(queued);
           controller.observe_local_state();
+        }
+        if (uses_destination_merge_grants() &&
+            g4irsf14_state_ != nullptr) {
+          ++destination_merge_bag_state(
+                action.bag_id)
+                .junction_queue_generation;
         }
         schedule_passive(JunctionEventType::kLocalQueueUpdate,
                          time,
@@ -5467,22 +7640,10 @@ class EventDrivenJunctionRuntime {
     staged_merge_visibility_sink_ = nullptr;
     staged_destination_known_competitor_counts_ =
         nullptr;
-    for (auto& event : snapshot.staged_events) {
-      publish_prepared_reserved_event(
-          std::move(event));
-    }
-    snapshot.staged_events.clear();
-    for (auto& visibility :
-         snapshot.staged_merge_visibility) {
-      publish_merge_visibility(std::move(visibility));
-    }
-    snapshot.staged_merge_visibility.clear();
-    snapshot.applied_action_count = 0;
-    snapshot.mutated = false;
-    for (const auto& action : actions) {
-      clear_consumed_repair_reentry_boost(
-          bags_.at(action.bag_id));
-    }
+    // Keep the transaction rollbackable after the resolver callback returns.
+    // The caller still has to materialize audit/decision rows and may fail.
+    // Publication and the final no-throw commit point therefore live in
+    // try_dispatch_bounded_local_pibt().
     return true;
   }
 
@@ -5490,18 +7651,34 @@ class EventDrivenJunctionRuntime {
       int node,
       double time,
       std::uint64_t arrive_event_seq,
-      int* priority_comparison_count) {
+      int* priority_comparison_count,
+      const MergeGrantCapability*
+          merge_grant_authority = nullptr) {
     auto& controller = junctions_[node];
     if (controller.queue.empty() ||
         time + event_runtime_detail::kEpsilon <
             controller.next_dispatch_time) {
       return {};
     }
-    const std::size_t root_index =
-        choose_bag(controller.queue,
-                   time,
-                   controller.escape_token_task,
-                   priority_comparison_count);
+    std::size_t root_index = 0;
+    if (merge_grant_authority != nullptr) {
+      const auto root = std::find(
+          controller.queue.begin(),
+          controller.queue.end(),
+          merge_grant_authority
+              ->owner_runtime_bag_id());
+      if (root == controller.queue.end()) {
+        return {};
+      }
+      root_index = static_cast<std::size_t>(
+          std::distance(controller.queue.begin(), root));
+    } else {
+      root_index =
+          choose_bag(controller.queue,
+                     time,
+                     controller.escape_token_task,
+                     priority_comparison_count);
+    }
     const int trigger_runtime_bag_id = controller.queue[root_index];
     const auto decision_started = std::chrono::steady_clock::now();
     PIBTLocalSlice slice = build_pibt_local_slice(
@@ -5509,7 +7686,8 @@ class EventDrivenJunctionRuntime {
         trigger_runtime_bag_id,
         time,
         arrive_event_seq,
-        priority_comparison_count);
+        priority_comparison_count,
+        merge_grant_authority);
     if (g4irsf14_state_ != nullptr) {
       g4irsf14_state_->current_pibt_slice_bag_count =
           static_cast<int>(slice.ready_bags.size());
@@ -5520,6 +7698,15 @@ class EventDrivenJunctionRuntime {
       ++result_.summary.bounded_local_pibt_not_applicable_count;
       return {};
     }
+    if (config_.trace_limit != 0 &&
+        (config_.trace_limit < 0 ||
+         static_cast<int>(result_.pibt_events.size()) <
+             config_.trace_limit)) {
+      result_.pibt_events.reserve(
+          result_.pibt_events.size() + 1);
+    }
+    decision_latencies_us_.reserve(
+        decision_latencies_us_.size() + 1);
     ++result_.summary.bounded_local_pibt_activation_count;
     result_.summary.bounded_local_pibt_max_slice_bags =
         std::max(result_.summary.bounded_local_pibt_max_slice_bags,
@@ -5617,16 +7804,52 @@ class EventDrivenJunctionRuntime {
             return false;
           }
           return prevalidate_pibt_batch(
-              actions, time, callback_blocker);
+              actions,
+              time,
+              callback_blocker,
+              merge_grant_authority,
+              trigger_runtime_bag_id);
         };
     callbacks.commit =
         [&](const std::vector<BoundedLocalPIBTAction>& actions) {
           return commit_pibt_batch(
-              actions, time, transaction, callback_blocker);
+              actions,
+              time,
+              transaction,
+              callback_blocker,
+              merge_grant_authority,
+              trigger_runtime_bag_id);
         };
     callbacks.rollback =
         [&](const std::vector<BoundedLocalPIBTAction>&) {
           restore_pibt_transaction(transaction);
+        };
+    const auto rollback_post_commit_transaction =
+        [&]() {
+          const bool was_mutated = transaction.mutated;
+          restore_pibt_transaction(transaction);
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+          if (was_mutated &&
+              config_.test_verify_pibt_rollback_logical_state) {
+            if (!pibt_logical_state_matches_snapshot(
+                    transaction)) {
+              throw std::logic_error(
+                  "PIBT post-commit rollback did not restore "
+                  "the exact logical fingerprint");
+            }
+            ++result_.summary
+                  .bounded_local_pibt_rollback_fingerprint_match_count;
+            if (!transaction.calendar_generation_restored) {
+              throw std::logic_error(
+                  "PIBT post-commit rollback did not restore "
+                  "the exact calendar generations");
+            }
+            ++result_.summary
+                  .bounded_local_pibt_rollback_calendar_generation_match_count;
+          }
+#else
+          (void)was_mutated;
+#endif
         };
 
     BoundedLocalPIBTConfig resolver_config;
@@ -5649,10 +7872,14 @@ class EventDrivenJunctionRuntime {
           resolver_config,
           callbacks);
     } catch (const std::invalid_argument& error) {
+      rollback_post_commit_transaction();
       ++result_.summary.bounded_local_pibt_not_applicable_count;
       callback_blocker =
           std::string("resolver_slice_validation_failed:") + error.what();
       return {};
+    } catch (...) {
+      rollback_post_commit_transaction();
+      throw;
     }
 
     if (!resolved.actions.empty()) {
@@ -5696,120 +7923,264 @@ class EventDrivenJunctionRuntime {
       ++result_.summary.bounded_local_pibt_commit_rejection_count;
     }
 
-    EventRuntimePIBTAuditRow audit;
-    audit.activation_id = next_pibt_activation_id_++;
-    audit.time = time;
-    audit.trigger_node = node;
-    audit.trigger_runtime_bag_id = trigger_runtime_bag_id;
-    audit.mode = canonical_pibt_mode_name();
-    audit.outcome = bounded_local_pibt_outcome_name(resolved.outcome);
-    audit.blocker =
-        callback_blocker.empty() ? resolved.blocker : callback_blocker;
-    audit.local_slice_bag_count =
-        static_cast<int>(slice.traces_by_bag.size());
-    audit.local_slice_resource_count = slice.resource_count;
-    audit.local_slice_candidate_count = slice.candidate_count;
-    audit.proposed_action_count =
-        static_cast<int>(resolved.actions.size());
-    audit.committed_action_count =
-        resolved.committed ? static_cast<int>(resolved.actions.size()) : 0;
-    audit.inherited_action_count = resolved.inherited_action_count;
-    audit.max_inheritance_depth =
-        resolved.max_inheritance_depth_observed;
-    audit.backtrack_count = resolved.backtrack_count;
-    audit.cycle_guard_count = resolved.visiting_cycle_guard_count;
-    audit.rollback_count = resolved.rollback_call_count;
-    audit.transaction_credit_entry_count =
-        transaction.credit_entry_count;
-    audit.transaction_bag_entry_count =
-        static_cast<int>(transaction.bags.size());
-    audit.transaction_junction_scalar_entry_count =
-        static_cast<int>(transaction.junctions.size());
-    audit.transaction_action_delta_count =
-        static_cast<int>(transaction.action_deltas.size());
-    audit.actions = resolved.actions;
-    if (config_.trace_limit != 0 &&
-        (config_.trace_limit < 0 ||
-         static_cast<int>(result_.pibt_events.size()) <
-             config_.trace_limit)) {
-      result_.pibt_events.push_back(std::move(audit));
-    }
+    try {
+      EventRuntimePIBTAuditRow audit;
+      audit.activation_id = next_pibt_activation_id_;
+      audit.time = time;
+      audit.trigger_node = node;
+      audit.trigger_runtime_bag_id = trigger_runtime_bag_id;
+      audit.mode = canonical_pibt_mode_name();
+      audit.outcome =
+          bounded_local_pibt_outcome_name(resolved.outcome);
+      audit.blocker = callback_blocker.empty()
+                          ? resolved.blocker
+                          : callback_blocker;
+      audit.local_slice_bag_count =
+          static_cast<int>(slice.traces_by_bag.size());
+      audit.local_slice_resource_count = slice.resource_count;
+      audit.local_slice_candidate_count = slice.candidate_count;
+      audit.proposed_action_count =
+          static_cast<int>(resolved.actions.size());
+      audit.committed_action_count =
+          resolved.committed
+              ? static_cast<int>(resolved.actions.size())
+              : 0;
+      audit.inherited_action_count =
+          resolved.inherited_action_count;
+      audit.max_inheritance_depth =
+          resolved.max_inheritance_depth_observed;
+      audit.backtrack_count = resolved.backtrack_count;
+      audit.cycle_guard_count =
+          resolved.visiting_cycle_guard_count;
+      audit.rollback_count = resolved.rollback_call_count;
+      audit.transaction_credit_entry_count =
+          transaction.credit_entry_count;
+      audit.transaction_bag_entry_count =
+          static_cast<int>(transaction.bags.size());
+      audit.transaction_junction_scalar_entry_count =
+          static_cast<int>(transaction.junctions.size());
+      audit.transaction_action_delta_count =
+          static_cast<int>(transaction.action_deltas.size());
+      audit.actions = resolved.actions;
+      const bool publish_audit =
+          config_.trace_limit != 0 &&
+          (config_.trace_limit < 0 ||
+           static_cast<int>(result_.pibt_events.size()) <
+               config_.trace_limit);
 
-    if (!resolved.committed) {
-      ++result_.summary.bounded_local_pibt_not_applicable_count;
-      int same_bag_fallback_next = -1;
-      if (resolved.outcome ==
-              BoundedLocalPIBTOutcome::kPrepareRejected &&
-          callback_blocker ==
-              "proposal_lacks_trigger_or_real_blocker_owner_move" &&
-          resolved.inherited_action_count == 0 &&
-          resolved.actions.size() == 1) {
-        const auto& action = resolved.actions.front();
-        if (action.bag_id == trigger_runtime_bag_id &&
-            action.from_node == node && !action.inherited &&
-            graph_.has_edge(action.from_node, action.next_node)) {
-          // This root-only proposal is not a true PIBT commit because no
-          // blocker moved.  Preserve its already-materialized adjacent edge
-          // only as a candidate for the ordinary one-bag dispatch path,
-          // which revalidates the current shield/credit state before commit.
-          same_bag_fallback_next = action.next_node;
+      if (!resolved.committed) {
+        ++result_.summary
+              .bounded_local_pibt_not_applicable_count;
+        int same_bag_fallback_next = -1;
+        if (resolved.outcome ==
+                BoundedLocalPIBTOutcome::kPrepareRejected &&
+            callback_blocker ==
+                "proposal_lacks_trigger_or_real_blocker_owner_move" &&
+            resolved.inherited_action_count == 0 &&
+            resolved.actions.size() == 1) {
+          const auto& action = resolved.actions.front();
+          if (action.bag_id == trigger_runtime_bag_id &&
+              action.from_node == node &&
+              !action.inherited &&
+              graph_.has_edge(action.from_node,
+                              action.next_node)) {
+            // This root-only proposal is not a true PIBT commit because no
+            // blocker moved. Keep its adjacent edge only as an ordinary
+            // one-bag fallback candidate.
+            same_bag_fallback_next = action.next_node;
+          }
+        }
+        if (publish_audit) {
+          ++next_pibt_activation_id_;
+          result_.pibt_events.push_back(std::move(audit));
+        }
+        record_decision_latency(decision_started);
+        return DispatchResult{
+            trigger_runtime_bag_id,
+            -1,
+            0,
+            false,
+            same_bag_fallback_next};
+      }
+
+      const auto selected_trigger_blocker_bag_ids =
+          required_trigger_blocker_bag_ids(
+              resolved.actions);
+      std::vector<
+          std::pair<EventDecisionTraceRow, bool>>
+          prepared_traces;
+      prepared_traces.reserve(resolved.actions.size());
+      int trigger_next = -1;
+      for (const auto& action : resolved.actions) {
+        auto trace =
+            slice.traces_by_bag.at(action.bag_id);
+        trace.selected_next = action.next_node;
+        trace.fallback_selected_next =
+            action.inherited ? action.next_node : -1;
+        trace.decision_source =
+            action.bag_id == trigger_runtime_bag_id
+                ? "bounded_local_pibt_trigger_action"
+            : action.inherited
+                ? "bounded_local_pibt_inherited_action"
+            : selected_trigger_blocker_bag_ids.find(
+                      action.bag_id) !=
+                      selected_trigger_blocker_bag_ids.end()
+                ? "bounded_local_pibt_blocker_owner_action"
+                : "bounded_local_pibt_independent_ready_action";
+        trace.rule_reason =
+            (trace.scorer_risk_abstain
+                 ? "frozen_scorer_risk_abstain_exact_s0_fallback;"
+                 : "") +
+            std::string(
+                "bounded_local_pibt_logical_failure_atomic_one_edge_batch");
+        const bool publish_trace =
+            merge_grant_authority == nullptr ||
+            action.bag_id != trigger_runtime_bag_id;
+        prepared_traces.emplace_back(
+            std::move(trace), publish_trace);
+        if (action.bag_id ==
+            trigger_runtime_bag_id) {
+          trigger_next = action.next_node;
         }
       }
+
+      if (merge_grant_authority != nullptr) {
+        const auto expected =
+            merge_grant_authority->expectation();
+        const auto trigger_action = std::find_if(
+            resolved.actions.begin(),
+            resolved.actions.end(),
+            [&](const BoundedLocalPIBTAction& action) {
+              return action.bag_id ==
+                  trigger_runtime_bag_id;
+            });
+        const auto trigger_bag =
+            bags_.find(trigger_runtime_bag_id);
+        if (trigger_action == resolved.actions.end() ||
+            trigger_bag == bags_.end() ||
+            expected.owner_runtime_bag_id !=
+                trigger_runtime_bag_id ||
+            expected.edge.from_node != node ||
+            expected.edge.to_node != trigger_next ||
+            expected.destination_node != trigger_next ||
+            trigger_action->from_node !=
+                expected.edge.from_node ||
+            trigger_action->next_node !=
+                expected.edge.to_node ||
+            trigger_bag->second.status !=
+                BagStatus::kInTransit ||
+            trigger_bag->second.transit_from !=
+                expected.edge.from_node ||
+            trigger_bag->second.transit_to !=
+                expected.edge.to_node ||
+            trigger_bag->second.transit_merge_grant !=
+                expected) {
+          throw std::logic_error(
+              "post-grant PIBT committed without the exact "
+              "authorized trigger action");
+        }
+      }
+
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+      if (config_
+              .test_pibt_fail_after_commit_before_publication &&
+          !test_pibt_post_commit_failure_injected_) {
+        test_pibt_post_commit_failure_injected_ = true;
+        throw PIBTPostCommitFailureInjection{};
+      }
+#endif
+
+      ++result_.summary
+            .bounded_local_pibt_committed_batch_count;
+      result_.summary.bounded_local_pibt_handoff_count +=
+          resolved.inherited_action_count;
+      result_.summary
+          .bounded_local_pibt_committed_action_count +=
+          resolved.actions.size();
+      result_.summary
+          .max_edges_selected_per_bag_per_decision =
+          std::max(
+              result_.summary
+                  .max_edges_selected_per_bag_per_decision,
+              resolved.actions.empty() ? 0 : 1);
+      result_.summary
+          .max_actions_committed_per_pibt_batch =
+          std::max(
+              result_.summary
+                  .max_actions_committed_per_pibt_batch,
+              static_cast<int>(resolved.actions.size()));
       record_decision_latency(decision_started);
+
+      // Point of no return for the complete PIBT transaction. Everything
+      // below is capacity-backed noexcept publication or best-effort
+      // telemetry that cannot escape.
+      transaction.applied_action_count = 0;
+      transaction.mutated = false;
+      [&]() noexcept {
+        for (auto& event : transaction.staged_events) {
+          publish_prepared_reserved_event(
+              std::move(event));
+        }
+        transaction.staged_events.clear();
+        for (auto& visibility :
+             transaction.staged_merge_visibility) {
+          publish_prepared_merge_visibility_noexcept(
+              std::move(visibility));
+        }
+        transaction.staged_merge_visibility.clear();
+        for (std::size_t index = 0;
+             index < resolved.actions.size();
+             ++index) {
+          auto& prepared = prepared_traces[index];
+          const auto bag =
+              bags_.find(resolved.actions[index].bag_id);
+          try {
+            if (bag != bags_.end()) {
+              record_committed_pibt_fault_accounting(
+                  prepared.first,
+                  bag->second,
+                  resolved.actions[index].next_node);
+            }
+          } catch (...) {
+            // Fault accounting is telemetry only. Logical action
+            // publication remains non-throwing after commit.
+          }
+          if (prepared.second) {
+            publish_prepared_decision_trace_noexcept(
+                std::move(prepared.first), true);
+          }
+        }
+        if (publish_audit) {
+          ++next_pibt_activation_id_;
+          result_.pibt_events.push_back(std::move(audit));
+        }
+        for (const auto& action : resolved.actions) {
+          const auto bag = bags_.find(action.bag_id);
+          if (bag != bags_.end()) {
+            clear_consumed_repair_reentry_boost(
+                bag->second);
+          }
+        }
+      }();
       return DispatchResult{
           trigger_runtime_bag_id,
-          -1,
-          0,
-          false,
-          same_bag_fallback_next};
+          trigger_next,
+          1,
+          true};
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    } catch (const PIBTPostCommitFailureInjection&) {
+      rollback_post_commit_transaction();
+      ++result_.summary
+            .bounded_local_pibt_post_commit_failure_injection_count;
+      ++result_.summary
+            .bounded_local_pibt_not_applicable_count;
+      record_decision_latency(decision_started);
+      return {};
+#endif
+    } catch (...) {
+      rollback_post_commit_transaction();
+      throw;
     }
-
-    const auto selected_trigger_blocker_bag_ids =
-        required_trigger_blocker_bag_ids(resolved.actions);
-    ++result_.summary.bounded_local_pibt_committed_batch_count;
-    result_.summary.bounded_local_pibt_handoff_count +=
-        resolved.inherited_action_count;
-    result_.summary.bounded_local_pibt_committed_action_count +=
-        resolved.actions.size();
-    result_.summary.max_edges_selected_per_bag_per_decision =
-        std::max(
-            result_.summary.max_edges_selected_per_bag_per_decision,
-            resolved.actions.empty() ? 0 : 1);
-    result_.summary.max_actions_committed_per_pibt_batch =
-        std::max(
-            result_.summary.max_actions_committed_per_pibt_batch,
-            static_cast<int>(resolved.actions.size()));
-    int trigger_next = -1;
-    for (const auto& action : resolved.actions) {
-      auto trace = slice.traces_by_bag.at(action.bag_id);
-      record_committed_pibt_fault_accounting(
-          trace, bags_.at(action.bag_id), action.next_node);
-      trace.selected_next = action.next_node;
-      trace.fallback_selected_next =
-          action.inherited ? action.next_node : -1;
-      trace.decision_source =
-          action.bag_id == trigger_runtime_bag_id
-              ? "bounded_local_pibt_trigger_action"
-          : action.inherited
-              ? "bounded_local_pibt_inherited_action"
-          : selected_trigger_blocker_bag_ids.find(action.bag_id) !=
-                    selected_trigger_blocker_bag_ids.end()
-              ? "bounded_local_pibt_blocker_owner_action"
-              : "bounded_local_pibt_independent_ready_action";
-      trace.rule_reason =
-          (trace.scorer_risk_abstain
-               ? "frozen_scorer_risk_abstain_exact_s0_fallback;"
-               : "") +
-          std::string(
-              "bounded_local_pibt_logical_failure_atomic_one_edge_batch");
-      append_decision_trace(std::move(trace), true);
-      if (action.bag_id == trigger_runtime_bag_id) {
-        trigger_next = action.next_node;
-      }
-    }
-    record_decision_latency(decision_started);
-    return DispatchResult{
-        trigger_runtime_bag_id, trigger_next, 1, true};
   }
 
   DispatchResult try_dispatch_one(
@@ -5838,6 +8209,11 @@ class EventDrivenJunctionRuntime {
     if (bag.decision_count >= config_.max_decisions_per_bag) {
       fail_bag(bag, "max_decisions_exceeded", time);
       controller.queue.erase(controller.queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
+      if (uses_destination_merge_grants()) {
+        ++destination_merge_bag_state(
+              bag.request.runtime_bag_id)
+              .junction_queue_generation;
+      }
       controller.observe_local_state();
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
                        time,
@@ -6147,6 +8523,33 @@ class EventDrivenJunctionRuntime {
       }
     }
 
+    if (selected >= 0 && uses_destination_merge_grants() &&
+        graph_.incoming_degree(selected) > 1 &&
+        selected != bag.request.goal) {
+      trace.selected_next = selected;
+      trace.decision_source = "destination_merge_request_pending";
+      trace.rule_reason =
+          (trace.scorer_risk_abstain
+               ? "frozen_scorer_risk_abstain_exact_s0_fallback;"
+               : "") +
+          selected_reason +
+          ";phase5a_destination_request_no_edge_commit";
+      if (submit_destination_merge_request(
+              bag, node, selected, time, trace)) {
+        record_decision_latency(decision_started);
+        return DispatchResult{task_id, selected, 0, true};
+      }
+      selected = -1;
+      selected_reason = "destination_merge_request_rejected";
+    } else if (selected >= 0 && uses_destination_merge_grants() &&
+               selected == bag.request.goal &&
+               graph_.incoming_degree(selected) > 1) {
+      // Frozen R3 exempts a bag's actual goal from destination service
+      // reservation. E4 preserves that semantic rather than fabricating a
+      // terminal slot/grant.
+      ++result_.summary.merge_grant_goal_exempt_bypass_count;
+    }
+
     bool first_edge_credit_bound = false;
     if (selected >= 0 && first_edge_credit_required) {
       const auto bound = credit_ledger_.bind(
@@ -6216,6 +8619,11 @@ class EventDrivenJunctionRuntime {
       ++bag.decision_count;
       ++result_.summary.decision_count;
       controller.queue.erase(controller.queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
+      if (uses_destination_merge_grants()) {
+        ++destination_merge_bag_state(
+              bag.request.runtime_bag_id)
+              .junction_queue_generation;
+      }
       controller.observe_local_state();
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
                        time,
@@ -6307,7 +8715,10 @@ class EventDrivenJunctionRuntime {
     const double service = service_duration(candidate);
     record.target_next_available = time + record.travel_time;
     if (uses_destination_calendar(candidate,
-                                  bag.request.goal)) {
+                                  bag.request.goal) &&
+        !(uses_destination_merge_grants() &&
+          graph_.incoming_degree(candidate) > 1 &&
+          candidate != bag.request.goal)) {
       record.target_next_available =
           target.service_calendar.earliest_start(time + record.travel_time, service);
     }
@@ -6477,6 +8888,15 @@ class EventDrivenJunctionRuntime {
       }
     }
 
+    if (uses_destination_merge_grants() &&
+        graph_.incoming_degree(candidate) > 1 &&
+        candidate != bag.request.goal) {
+      // E4 route selection publishes a request for the exact current slot.
+      // Calendar/queue contention is decided by the destination in phase 5b,
+      // never converted into an upstream alternate-edge/PIBT handoff.
+      return "allowed";
+    }
+
     auto& target = junctions_[candidate];
     target.service_calendar.purge(time);
     target.observe_local_state();
@@ -6502,7 +8922,9 @@ class EventDrivenJunctionRuntime {
       int current,
       int selected,
       double time,
-      PIBTActionDelta* transaction_delta = nullptr) {
+      PIBTActionDelta* transaction_delta = nullptr,
+      const MergeGrantCapability*
+          destination_merge_grant_authority = nullptr) {
     const auto& edge = graph_.edge(current, selected);
     const double travel = std::max(edge.travel_time(), config_.minimum_service_seconds);
     const double exit_time = time + travel;
@@ -6563,6 +8985,10 @@ class EventDrivenJunctionRuntime {
                             exit_time,
                             service_end);
     if (corridor != nullptr) {
+      if (transaction_delta != nullptr) {
+        transaction_delta->corridor_generation_before =
+            corridor->generation();
+      }
       corridor->reserve(bag.request.runtime_bag_id, time, corridor_end);
       if (transaction_delta != nullptr) {
         transaction_delta->corridor_reservation_inserted =
@@ -6571,12 +8997,17 @@ class EventDrivenJunctionRuntime {
     }
     if (uses_destination_calendar(selected,
                                   bag.request.goal)) {
-      target.service_calendar.reserve(bag.request.runtime_bag_id,
-                                      exit_time,
-                                      service_end);
-      if (transaction_delta != nullptr) {
-        transaction_delta->destination_reservation_inserted =
-            true;
+      if (destination_merge_grant_authority == nullptr) {
+        if (transaction_delta != nullptr) {
+          transaction_delta
+              ->destination_generation_before =
+              target.service_calendar.generation();
+        }
+        target.service_calendar.reserve(bag.request.runtime_bag_id, exit_time, service_end);
+        if (transaction_delta != nullptr) {
+          transaction_delta->destination_reservation_inserted =
+              true;
+        }
       }
       target.record_service_reservation(exit_time, service_end);
     }
@@ -6604,6 +9035,11 @@ class EventDrivenJunctionRuntime {
     bag.status = BagStatus::kInTransit;
     bag.transit_from = current;
     bag.transit_to = selected;
+    bag.transit_merge_grant =
+        destination_merge_grant_authority == nullptr
+            ? DestinationMergeGrantExpectation{}
+            : destination_merge_grant_authority
+                  ->expectation();
     schedule_passive(JunctionEventType::kEdgeEnter,
                      time,
                      bag.request.runtime_bag_id,
@@ -6665,6 +9101,279 @@ class EventDrivenJunctionRuntime {
         directed_inflight_counts_.erase(inflight);
       }
     }
+    if (uses_destination_merge_grants()) {
+      auto& merge_state =
+          destination_merge_bag_state(
+              bag.request.runtime_bag_id);
+      const auto stored_expected =
+          bag.transit_merge_grant;
+      auto expected = stored_expected;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+      if (expected.required &&
+          config_
+              .test_merge_grant_drop_capability_before_edge_exit &&
+          !test_merge_grant_edge_exit_capability_drop_injected_) {
+        test_merge_grant_edge_exit_capability_drop_injected_ =
+            true;
+        merge_state.capability.reset();
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_flip_physical_generation_before_edge_exit &&
+          !test_merge_grant_edge_exit_physical_flip_injected_) {
+        test_merge_grant_edge_exit_physical_flip_injected_ =
+            true;
+        ++physical_faults_
+              .try_emplace(directed)
+              .first->second.physical_generation;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_flip_advertised_generation_before_edge_exit &&
+          !test_merge_grant_edge_exit_advertised_flip_injected_) {
+        test_merge_grant_edge_exit_advertised_flip_injected_ =
+            true;
+        ++advertised_faults_
+              .try_emplace(directed)
+              .first->second.generation;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_remove_calendar_before_edge_exit &&
+          !test_merge_grant_edge_exit_calendar_remove_injected_) {
+        test_merge_grant_edge_exit_calendar_remove_injected_ =
+            true;
+        auto destination =
+            junctions_.find(expected.destination_node);
+        if (destination != junctions_.end()) {
+          destination->second.service_calendar.erase_exact(
+              expected.owner_runtime_bag_id,
+              expected.slot_start,
+              expected.slot_end);
+        }
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_wrong_owner_before_edge_exit &&
+          !test_merge_grant_edge_exit_wrong_owner_injected_) {
+        test_merge_grant_edge_exit_wrong_owner_injected_ =
+            true;
+        ++expected.owner_runtime_bag_id;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_wrong_edge_before_edge_exit &&
+          !test_merge_grant_edge_exit_wrong_edge_injected_) {
+        test_merge_grant_edge_exit_wrong_edge_injected_ =
+            true;
+        ++expected.edge.from_node;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_wrong_destination_before_edge_exit &&
+          !test_merge_grant_edge_exit_wrong_destination_injected_) {
+        test_merge_grant_edge_exit_wrong_destination_injected_ =
+            true;
+        (void)destination_merge_controller(
+            expected.destination_node + 1);
+        ++expected.destination_node;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_tamper_claimed_request_generation_before_edge_exit &&
+          !test_merge_grant_edge_exit_claimed_request_generation_tamper_injected_) {
+        test_merge_grant_edge_exit_claimed_request_generation_tamper_injected_ =
+            true;
+        ++expected.request_generation;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_tamper_claimed_queue_generation_before_edge_exit &&
+          !test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected_) {
+        test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected_ =
+            true;
+        ++expected.junction_queue_generation;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_tamper_claimed_calendar_generation_before_edge_exit &&
+          !test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected_) {
+        test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected_ =
+            true;
+        ++expected.calendar_generation;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_advance_live_queue_generation_before_edge_exit &&
+          !test_merge_grant_edge_exit_live_queue_generation_advance_injected_) {
+        test_merge_grant_edge_exit_live_queue_generation_advance_injected_ =
+            true;
+        ++merge_state.junction_queue_generation;
+      }
+      if (expected.required &&
+          config_
+              .test_merge_grant_advance_live_calendar_generation_before_edge_exit &&
+          !test_merge_grant_edge_exit_live_calendar_generation_advance_injected_) {
+        test_merge_grant_edge_exit_live_calendar_generation_advance_injected_ =
+            true;
+        auto destination =
+            junctions_.find(expected.destination_node);
+        if (destination != junctions_.end()) {
+          // Simulate an unrelated aggregate-calendar epoch advance without
+          // disturbing the stable exact(owner, slot) lease.
+          destination->second.service_calendar
+              .test_advance_generation();
+        }
+      }
+#endif
+      const bool unexpected_capability =
+          !expected.required &&
+          merge_state.capability.has_value();
+      if (expected.required || unexpected_capability) {
+        auto cleanup_expected = stored_expected;
+        if (unexpected_capability) {
+          cleanup_expected =
+              merge_state.capability->expectation();
+          expected =
+              cleanup_expected;
+          expected.required = false;
+        }
+        DestinationMergeGrantConsumeContext context;
+        context.expected = expected;
+        context.event_owner_runtime_bag_id =
+            bag.request.runtime_bag_id;
+        context.event_edge =
+            MergeDirectedEdge{event.from_node,
+                              event.to_node};
+        context.event_destination_node =
+            event.to_node;
+        context.current_junction_queue_generation =
+            merge_state.junction_queue_generation;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+        context.now =
+            expected.required &&
+                    config_
+                        .test_merge_grant_expire_before_edge_exit &&
+                    !test_merge_grant_edge_exit_expiry_injected_
+                ? (test_merge_grant_edge_exit_expiry_injected_ =
+                       true,
+                   expected.expiry +
+                       2.0 *
+                           event_runtime_detail::kEpsilon)
+                : event.time;
+#else
+        context.now = event.time;
+#endif
+        const auto physical =
+            physical_faults_.find(directed);
+        context.physical_fault_active =
+            physical != physical_faults_.end() &&
+            physical->second.active_count > 0;
+        context.current_physical_fault_generation =
+            physical == physical_faults_.end()
+                ? 0
+                : physical->second.physical_generation;
+        const auto advertised =
+            advertised_faults_.find(directed);
+        context.current_advertised_fault_generation =
+            advertised == advertised_faults_.end()
+                ? 0
+                : advertised->second.generation;
+        const auto destination =
+            junctions_.find(expected.destination_node);
+        context.current_calendar_generation =
+            destination == junctions_.end()
+                ? 0
+                : destination->second
+                      .service_calendar.generation();
+        context
+            .exact_destination_calendar_reservation_present =
+            destination != junctions_.end() &&
+            destination->second.service_calendar.contains_exact(
+                expected.owner_runtime_bag_id,
+                expected.slot_start,
+                expected.slot_end);
+        auto controller =
+            destination_merge_controllers_.find(
+                cleanup_expected.destination_node);
+        const auto consumed =
+            controller ==
+                    destination_merge_controllers_.end()
+                ? DestinationMergeGrantConsumeResult::
+                      kActiveGrantMissing
+                : controller->second.consume_noexcept(
+                      merge_state.capability.has_value()
+                          ? &*merge_state.capability
+                          : nullptr,
+                      context);
+        merge_state.capability.reset();
+        bag.transit_merge_grant = {};
+        if (consumed !=
+            DestinationMergeGrantConsumeResult::kConsumed) {
+          auto target = junctions_.find(event.to_node);
+          if (target != junctions_.end()) {
+            target->second.service_calendar.erase_exact(
+                bag.request.runtime_bag_id,
+                cleanup_expected.slot_start,
+                cleanup_expected.slot_end);
+            if (target->second.scheduled_incoming > 0) {
+              --target->second.scheduled_incoming;
+            }
+            auto by_goal =
+                target->second
+                    .scheduled_incoming_by_goal.find(
+                        bag.request.goal);
+            if (by_goal !=
+                target->second
+                    .scheduled_incoming_by_goal.end()) {
+              by_goal->second =
+                  std::max(0, by_goal->second - 1);
+              if (by_goal->second == 0) {
+                target->second
+                    .scheduled_incoming_by_goal.erase(
+                        by_goal);
+              }
+            }
+          }
+          bag.current = event.to_node;
+          const double executed_travel =
+              std::max(
+                  graph_
+                      .edge(event.from_node,
+                            event.to_node)
+                      .travel_time(),
+                  config_.minimum_service_seconds);
+          bag.edge_travel_time_seconds +=
+              executed_travel;
+          bag.transit_from = -1;
+          bag.transit_to = -1;
+          fail_bag(
+              bag,
+              "destination_merge_grant_rejected_at_edge_exit",
+              event.time);
+          schedule_junction_wakeup(
+              event.from_node, event.time);
+          schedule_passive(
+              JunctionEventType::kCongestionBeaconUpdate,
+              event.time,
+              event.task_id,
+              event.to_node,
+              event.from_node,
+              event.to_node,
+              "merge_grant_edge_exit_rejected");
+          append_event_trace(
+              event,
+              event.task_id,
+              event.to_node,
+              event.from_node,
+              event.to_node,
+              "merge_grant_edge_exit_rejected",
+              0);
+          return;
+        }
+      }
+    }
+    bag.transit_merge_grant = {};
     bag.current = event.to_node;
     const double executed_travel =
         std::max(graph_.edge(event.from_node, event.to_node).travel_time(),
@@ -7469,11 +10178,18 @@ class EventDrivenJunctionRuntime {
             ? staged_known->second
             : destination.scheduled_incoming +
                   static_cast<int>(destination.queue.size());
+    const bool destination_owned_arbitration =
+        uses_destination_merge_grants() &&
+        staged_destination_known_competitor_counts_ !=
+            nullptr;
     row.later_same_time_competitor_count =
-        later_competitors;
+        destination_owned_arbitration
+            ? 0
+            : later_competitors;
     row.later_same_time_competitor_exists =
-        later_competitors > 0;
+        row.later_same_time_competitor_count > 0;
     row.seq_determined_order =
+        !destination_owned_arbitration &&
         row.later_same_time_competitor_exists;
     row.event_seq =
         g4irsf14_state_ == nullptr
@@ -7488,7 +10204,7 @@ class EventDrivenJunctionRuntime {
     audit.ready_set_size =
         1 + row.known_competing_request_count;
     audit.later_same_time_competitor_count =
-        later_competitors;
+        row.later_same_time_competitor_count;
     audit.chosen_runtime_bag_id =
         bag.request.runtime_bag_id;
     audit.chosen_enqueue_sequence =
@@ -7496,9 +10212,15 @@ class EventDrivenJunctionRuntime {
     audit.event_seq = row.event_seq;
     audit.seq_determined_order =
         row.seq_determined_order;
-    audit.reason = row.seq_determined_order
-                       ? "later_same_time_competitor_not_yet_reserved"
-                       : "no_later_same_time_destination_competitor";
+    audit.reason =
+        destination_owned_arbitration
+            ? std::string(
+                  destination_merge_grant_rule_name(
+                      canonical_merge_grant_rule())) +
+                  "_stable_rule_not_event_seq"
+            : (row.seq_determined_order
+                   ? "later_same_time_competitor_not_yet_reserved"
+                   : "no_later_same_time_destination_competitor");
     PIBTStagedMergeVisibility visibility{
         std::move(row), std::move(audit)};
     if (staged_merge_visibility_sink_ != nullptr) {
@@ -7536,6 +10258,17 @@ class EventDrivenJunctionRuntime {
           "G4IRSF14 local arbitration state is unavailable");
     }
     return g4irsf14_state_->local[node];
+  }
+
+  event_runtime_detail::DestinationMergeBagState&
+  destination_merge_bag_state(int runtime_bag_id) {
+    if (!uses_destination_merge_grants() ||
+        g4irsf14_state_ == nullptr) {
+      throw std::logic_error(
+          "destination merge bag state is unavailable outside E4");
+    }
+    return g4irsf14_state_
+        ->destination_merge_bags[runtime_bag_id];
   }
 
   void observe_source_enqueue(int node, double time) {
@@ -7750,6 +10483,44 @@ class EventDrivenJunctionRuntime {
              generation);
   }
 
+  void schedule_destination_merge_wakeup(
+      int destination_node,
+      double time) {
+    if (!uses_destination_merge_grants() ||
+        g4irsf14_state_ == nullptr) {
+      return;
+    }
+    auto& state =
+        g4irsf14_state_
+            ->destination_merge[destination_node];
+    if (state.wakeup_pending) {
+      if (event_runtime_detail::same_timestamp(
+              state.wakeup_time, time)) {
+        ++result_.summary
+              .merge_grant_duplicate_wakeup_prevented_count;
+        return;
+      }
+      if (time >
+          state.wakeup_time -
+              event_runtime_detail::kEpsilon) {
+        return;
+      }
+    }
+    state.wakeup_pending = true;
+    state.wakeup_time = time;
+    const auto generation =
+        ++state.wakeup_generation;
+    schedule(
+        JunctionEventType::kDestinationMergeArbitration,
+        time,
+        -1,
+        destination_node,
+        -1,
+        destination_node,
+        true,
+        generation);
+  }
+
   std::size_t choose_bag(const std::deque<int>& queue,
                          double time,
                          int escape_token_task,
@@ -7878,6 +10649,15 @@ class EventDrivenJunctionRuntime {
       return "new";
     }
     return "on_path";
+  }
+
+  int local_task_class_code(const BagState& bag) const {
+    return destination_merge_task_class_code(
+        bag.repaired_task_reentry,
+        bag.fault_priority_generation > 0,
+        is_storage_out_task(bag),
+        bag.status == BagStatus::kSourceQueue ||
+            bag.status == BagStatus::kPendingRelease);
   }
 
   int local_task_class_rank(const BagState& bag) const {
@@ -8127,6 +10907,18 @@ class EventDrivenJunctionRuntime {
       row.total_local_wait = bag.total_wait;
       row.junction_queue_wait_seconds =
           bag.junction_queue_wait_seconds;
+      if (uses_destination_merge_grants() &&
+          g4irsf14_state_ != nullptr) {
+        const auto merge =
+            g4irsf14_state_
+                ->destination_merge_bags.find(task_id);
+        if (merge !=
+            g4irsf14_state_
+                ->destination_merge_bags.end()) {
+          row.merge_grant_wait_seconds =
+              merge->second.grant_wait_seconds;
+        }
+      }
       row.edge_travel_time_seconds =
           bag.edge_travel_time_seconds;
       row.node_service_time_seconds =
@@ -8362,6 +11154,284 @@ class EventDrivenJunctionRuntime {
         static_cast<int>(credit_ledger_.stored_lifecycle_count());
     result_.summary.first_edge_credit_lifecycle_limit =
         static_cast<int>(credit_ledger_.lifecycle_limit());
+    if (uses_destination_merge_grants()) {
+      std::size_t lifecycle_rows = 0;
+      for (const auto& entry :
+           destination_merge_controllers_) {
+        lifecycle_rows +=
+            entry.second.lifecycle().size();
+      }
+      result_.merge_grant_lifecycle.reserve(
+          lifecycle_rows);
+      std::size_t active_record_count = 0;
+      for (const auto& entry :
+           destination_merge_controllers_) {
+        const auto& controller = entry.second;
+        active_record_count += controller.active_.size();
+        for (const auto& active : controller.active_) {
+          const auto bag = bags_.find(
+              active.owner_runtime_bag_id);
+          const auto merge =
+              g4irsf14_state_
+                  ->destination_merge_bags.find(
+                      active.owner_runtime_bag_id);
+          const bool capability_matches =
+              merge !=
+                      g4irsf14_state_
+                          ->destination_merge_bags.end() &&
+              merge->second.capability.has_value() &&
+              merge->second.capability->grant_id() ==
+                  active.grant_id &&
+              controller.validates_active_capability(
+                  *merge->second.capability);
+          const auto destination =
+              junctions_.find(entry.first);
+          result_.summary
+              .merge_grant_active_bijection_holds =
+              result_.summary
+                      .merge_grant_active_bijection_holds &&
+              bag != bags_.end() &&
+              bag->second.status == BagStatus::kInTransit &&
+              bag->second.transit_from ==
+                  active.edge.from_node &&
+              bag->second.transit_to ==
+                  active.edge.to_node &&
+              bag->second.transit_merge_grant.required &&
+              bag->second
+                      .transit_merge_grant.grant_id ==
+                  active.grant_id &&
+              bag->second
+                      .transit_merge_grant.request_id ==
+                  active.request_id &&
+              bag->second
+                      .transit_merge_grant.lineage ==
+                  active.lineage &&
+              bag->second
+                      .transit_merge_grant.edge ==
+                  active.edge &&
+              capability_matches &&
+              destination != junctions_.end() &&
+              destination->second
+                  .service_calendar.contains_exact(
+                      active.owner_runtime_bag_id,
+                      active.slot_start,
+                      active.slot_end);
+        }
+      }
+      std::size_t stored_capability_count = 0;
+      for (const auto& entry :
+           g4irsf14_state_->destination_merge_bags) {
+        if (!entry.second.capability.has_value()) {
+          continue;
+        }
+        ++stored_capability_count;
+        const auto& capability =
+            *entry.second.capability;
+        const auto controller =
+            destination_merge_controllers_.find(
+                capability.destination_node());
+        result_.summary
+            .merge_grant_active_bijection_holds =
+            result_.summary
+                    .merge_grant_active_bijection_holds &&
+            capability.owner_runtime_bag_id() ==
+                entry.first &&
+            controller !=
+                destination_merge_controllers_.end() &&
+            controller->second
+                .validates_active_capability(capability);
+      }
+      result_.summary
+          .merge_grant_active_bijection_holds =
+          result_.summary
+                  .merge_grant_active_bijection_holds &&
+          active_record_count ==
+              stored_capability_count;
+      for (const auto& entry :
+           destination_merge_controllers_) {
+        const auto& controller = entry.second;
+        const auto& counters = controller.counters();
+        result_.summary.merge_grant_request_count +=
+            counters.request_count;
+        result_.summary.merge_grant_issued_count +=
+            counters.issued_count;
+        result_.summary.merge_grant_prepared_count +=
+            counters.prepared_count;
+        result_.summary.merge_grant_committed_count +=
+            counters.committed_count;
+        result_.summary
+            .merge_grant_issued_transition_count +=
+            counters.issued_transition_count;
+        result_.summary
+            .merge_grant_prepared_transition_count +=
+            counters.prepared_transition_count;
+        result_.summary
+            .merge_grant_committed_transition_count +=
+            counters.committed_transition_count;
+        result_.summary.merge_grant_consumed_count +=
+            counters.consumed_count;
+        result_.summary.merge_grant_expired_count +=
+            counters.expired_count;
+        result_.summary
+            .merge_grant_request_expired_count +=
+            counters.request_expired_count;
+        result_.summary
+            .merge_grant_grant_expired_count +=
+            counters.grant_expired_count;
+        result_.summary.merge_grant_revoked_count +=
+            counters.revoked_count;
+        result_.summary
+            .merge_grant_revoked_fault_count +=
+            counters.revoked_fault_count;
+        result_.summary
+            .merge_grant_revoked_stale_state_count +=
+            counters.revoked_stale_state_count;
+        result_.summary
+            .merge_grant_revoked_replan_current_edge_count +=
+            counters
+                .revoked_replan_current_edge_count;
+        result_.summary.merge_grant_rolled_back_count +=
+            counters.rolled_back_count;
+        result_.summary
+            .merge_grant_post_commit_revoked_count +=
+            counters.post_commit_revoked_count;
+        result_.summary
+            .merge_grant_post_commit_expired_count +=
+            counters.post_commit_expired_count;
+        result_.summary
+            .merge_grant_post_commit_rollback_count +=
+            counters.post_commit_rollback_count;
+        result_.summary.merge_grant_exact_slot_busy_count +=
+            counters.exact_slot_busy_count;
+        result_.summary
+            .merge_grant_active_grant_rejection_count +=
+            counters.active_grant_rejection_count;
+        result_.summary
+            .merge_grant_queue_capacity_block_count +=
+            counters.queue_capacity_block_count;
+        result_.summary
+            .merge_grant_contended_loser_retry_count +=
+            counters.contended_loser_retry_count;
+        result_.summary
+            .merge_grant_lifecycle_transition_count +=
+            counters.lifecycle_transition_count;
+        result_.summary
+            .merge_grant_lifecycle_stored_count +=
+            counters.lifecycle_stored_count;
+        result_.summary
+            .merge_grant_lifecycle_dropped_count +=
+            counters.lifecycle_dropped_count;
+        result_.summary
+            .merge_grant_peak_pending_requests =
+            std::max(
+                result_.summary
+                    .merge_grant_peak_pending_requests,
+                static_cast<int>(
+                    counters.peak_pending_count));
+        result_.summary
+            .merge_grant_peak_active_unconsumed =
+            std::max(
+                result_.summary
+                    .merge_grant_peak_active_unconsumed,
+                static_cast<int>(
+                    counters
+                        .peak_active_unconsumed_count));
+        result_.summary
+            .merge_grant_conservation_holds =
+            result_.summary
+                .merge_grant_conservation_holds &&
+            controller.conservation_holds();
+        result_.summary
+            .merge_grant_outstanding_request_count +=
+            controller.pending_count();
+        result_.summary
+            .merge_grant_final_active_unconsumed +=
+            static_cast<int>(
+                controller.active_unconsumed_count());
+        result_.merge_grant_lifecycle.insert(
+            result_.merge_grant_lifecycle.end(),
+            controller.lifecycle().begin(),
+            controller.lifecycle().end());
+      }
+      std::sort(
+          result_.merge_grant_lifecycle.begin(),
+          result_.merge_grant_lifecycle.end(),
+          [](const auto& left, const auto& right) {
+            return std::tie(
+                       left.time,
+                       left.destination_node,
+                       left.request_id,
+                       left.grant_id,
+                       left.state) <
+                   std::tie(
+                       right.time,
+                       right.destination_node,
+                       right.request_id,
+                       right.grant_id,
+                       right.state);
+          });
+      result_.summary
+          .merge_grant_terminal_request_count =
+          result_.summary.merge_grant_expired_count +
+          result_.summary.merge_grant_revoked_count +
+          result_.summary.merge_grant_rolled_back_count;
+      result_.summary.merge_grant_conservation_holds =
+          result_.summary
+              .merge_grant_conservation_holds &&
+          result_.summary.merge_grant_request_count ==
+              result_.summary
+                      .merge_grant_committed_count +
+                  result_.summary
+                      .merge_grant_terminal_request_count +
+                  result_.summary
+                      .merge_grant_outstanding_request_count &&
+          result_.summary.merge_grant_issued_count ==
+              result_.summary
+                  .merge_grant_prepared_count &&
+          result_.summary.merge_grant_prepared_count ==
+              result_.summary
+                  .merge_grant_committed_count &&
+          result_.summary
+                  .merge_grant_issued_transition_count ==
+              result_.summary
+                  .merge_grant_prepared_transition_count &&
+          result_.summary
+                  .merge_grant_prepared_transition_count ==
+              result_.summary
+                  .merge_grant_committed_transition_count &&
+          result_.summary
+                  .merge_grant_committed_transition_count ==
+              result_.summary
+                      .merge_grant_committed_count +
+                  result_.summary
+                      .merge_grant_post_commit_revoked_count +
+                  result_.summary
+                      .merge_grant_post_commit_expired_count +
+                  result_.summary
+                      .merge_grant_post_commit_rollback_count &&
+          result_.summary.merge_grant_committed_count ==
+              result_.summary
+                  .merge_grant_consumed_count +
+                  static_cast<std::uint64_t>(
+                      std::accumulate(
+                          destination_merge_controllers_
+                              .begin(),
+                          destination_merge_controllers_
+                              .end(),
+                          std::size_t{0},
+                          [](std::size_t count,
+                             const auto& item) {
+                            return count +
+                                   item.second
+                                       .active_unconsumed_count();
+                          })) &&
+          result_.summary
+                  .merge_grant_lifecycle_transition_count ==
+              result_.summary
+                      .merge_grant_lifecycle_stored_count +
+                  result_.summary
+                      .merge_grant_lifecycle_dropped_count;
+    }
     // Keep the frozen Win64 E0 accounted-byte scalar exact. The append-only
     // config/result/state holders are inactive there and must not perturb a
     // deterministic compatibility hash merely because their empty C++
@@ -8374,11 +11444,21 @@ class EventDrivenJunctionRuntime {
 #endif
     std::size_t accounted = runtime_object_bytes;
     accounted += bags_.size() * sizeof(BagState);
+    const std::size_t calendar_extension_bytes =
+        sizeof(LocalCalendar) -
+        sizeof(std::vector<CalendarInterval>);
     for (const auto& entry : junctions_) {
-      accounted += entry.second.current_local_state_accounted_bytes();
+      accounted +=
+          entry.second.current_local_state_accounted_bytes() -
+          (!g4irsf14_extensions_enabled()
+               ? calendar_extension_bytes
+               : 0);
     }
     for (const auto& entry : corridors_) {
-      accounted += sizeof(LocalCalendar) +
+      accounted +=
+                   (!g4irsf14_extensions_enabled()
+                        ? sizeof(std::vector<CalendarInterval>)
+                        : sizeof(LocalCalendar)) +
                    entry.second.dynamic_interval_capacity_accounted_bytes();
     }
     accounted += physical_faults_.size() * sizeof(event_runtime_detail::FaultState);
@@ -8400,7 +11480,11 @@ class EventDrivenJunctionRuntime {
         repair_time_by_fault_instance_.size() *
         sizeof(std::pair<const std::pair<long long, int>, double>);
     accounted += credit_ledger_.accounted_bytes();
-    accounted += result_.bags.capacity() * sizeof(EventRuntimeBagResult);
+    accounted +=
+        result_.bags.capacity() *
+        (!g4irsf14_extensions_enabled()
+             ? sizeof(EventRuntimeBagResult) - sizeof(double)
+             : sizeof(EventRuntimeBagResult));
     accounted += result_.events.capacity() * sizeof(EventRuntimeTraceRow);
     accounted += result_.decisions.capacity() * sizeof(EventDecisionTraceRow);
     accounted += result_.hold_attempts.capacity() * sizeof(EventDecisionTraceRow);
@@ -8423,6 +11507,9 @@ class EventDrivenJunctionRuntime {
     accounted +=
         result_.arbitration_batch_cardinality.capacity() *
         sizeof(EventRuntimeArbitrationBatchRow);
+    accounted +=
+        result_.merge_grant_lifecycle.capacity() *
+        sizeof(DestinationMergeGrantLifecycleRow);
     if (g4irsf14_state_ != nullptr) {
       accounted +=
           sizeof(event_runtime_detail::G4IRSF14RuntimeState);
@@ -8431,6 +11518,71 @@ class EventDrivenJunctionRuntime {
           sizeof(std::pair<const int,
                            event_runtime_detail::
                                LocalArbitrationState>);
+      accounted +=
+          g4irsf14_state_->destination_merge.size() *
+          sizeof(std::pair<
+                 const int,
+                 event_runtime_detail::
+                     DestinationMergeArbitrationState>);
+      accounted +=
+          g4irsf14_state_->destination_merge_bags.size() *
+          sizeof(std::pair<
+                 const int,
+                 event_runtime_detail::
+                     DestinationMergeBagState>);
+    }
+    if (uses_destination_merge_grants()) {
+      accounted +=
+          destination_merge_controllers_.size() *
+          sizeof(std::pair<
+                 const int,
+                 DestinationMergeGrantController>);
+      for (const auto& entry :
+           destination_merge_controllers_) {
+        accounted +=
+            entry.second
+                .dynamic_storage_accounted_bytes();
+      }
+      accounted +=
+          pending_merge_dispatches_.size() *
+          sizeof(std::pair<
+                 const std::uint64_t,
+                 PendingMergeDispatch>);
+      for (const auto& entry :
+           pending_merge_dispatches_) {
+        const auto& trace = entry.second.trace;
+        accounted += trace.segment_id.capacity();
+        accounted +=
+            trace.candidates.capacity() *
+            sizeof(EventCandidateRecord);
+        for (const auto& candidate :
+             trace.candidates) {
+          accounted +=
+              candidate.shield_reason.capacity();
+        }
+        accounted +=
+            trace.scorer_risk_reasons.capacity() *
+            sizeof(std::string);
+        for (const auto& reason :
+             trace.scorer_risk_reasons) {
+          accounted += reason.capacity();
+        }
+        accounted += trace.scorer_id.capacity();
+        accounted +=
+            trace.scorer_effective_id.capacity();
+        accounted +=
+            trace.decision_source.capacity();
+        accounted += trace.rule_reason.capacity();
+        accounted +=
+            trace.short_history.capacity() *
+            sizeof(int);
+        accounted += trace.priority_mode.capacity();
+        accounted += trace.task_class.capacity();
+        accounted +=
+            trace.pibt_preference_mode.capacity();
+      }
+      accounted +=
+          events_.dynamic_storage_accounted_bytes();
     }
     result_.summary.cpp_internal_accounted_bytes = accounted;
   }
@@ -8504,6 +11656,61 @@ class EventDrivenJunctionRuntime {
     }
   }
 
+  void publish_prepared_decision_trace_noexcept(
+      EventDecisionTraceRow row,
+      bool selected_edge) noexcept {
+    ++result_.summary.decision_trace_seen_count;
+    const int shard =
+        ((row.task_id % config_.trace_shard_count) +
+         config_.trace_shard_count) %
+        config_.trace_shard_count;
+    if (shard != config_.trace_shard_index) {
+      return;
+    }
+    ++result_.summary.decision_trace_shard_seen_count;
+    const std::size_t total_rows =
+        result_.decisions.size() +
+        result_.hold_attempts.size();
+    if (!trace_available(total_rows)) {
+      result_.summary.decision_trace_truncated = true;
+      return;
+    }
+    if (selected_edge) {
+      result_.decisions.push_back(std::move(row));
+      ++result_.summary.decision_trace_stored_count;
+    } else {
+      result_.hold_attempts.push_back(std::move(row));
+      ++result_.summary.hold_trace_stored_count;
+    }
+  }
+
+  void publish_prepared_merge_visibility_noexcept(
+      PIBTStagedMergeVisibility visibility) noexcept {
+    if (!config_.enable_opportunity_telemetry) {
+      return;
+    }
+    ++result_.summary.merge_visibility_total_count;
+    if (result_.merge_request_visibility.size() <
+        static_cast<std::size_t>(
+            config_.opportunity_trace_limit)) {
+      ++result_.summary.merge_visibility_stored_count;
+      result_.merge_request_visibility.push_back(
+          std::move(visibility.merge));
+    } else {
+      ++result_.summary.merge_visibility_dropped_count;
+    }
+    ++result_.summary.event_seq_audit_total_count;
+    if (result_.event_seq_ordering_audit.size() <
+        static_cast<std::size_t>(
+            config_.opportunity_trace_limit)) {
+      ++result_.summary.event_seq_audit_stored_count;
+      result_.event_seq_ordering_audit.push_back(
+          std::move(visibility.audit));
+    } else {
+      ++result_.summary.event_seq_audit_dropped_count;
+    }
+  }
+
   bool trace_available(std::size_t current_size) const {
     return config_.trace_limit < 0 || static_cast<int>(current_size) < config_.trace_limit;
   }
@@ -8552,6 +11759,10 @@ class EventDrivenJunctionRuntime {
   std::unordered_map<long long, event_runtime_detail::FaultState> physical_faults_;
   std::unordered_map<long long, event_runtime_detail::AdvertisedFaultState> advertised_faults_;
   std::unordered_map<int, event_runtime_detail::CongestionBeaconState> congestion_beacons_;
+  std::unordered_map<int, DestinationMergeGrantController>
+      destination_merge_controllers_;
+  std::unordered_map<std::uint64_t, PendingMergeDispatch>
+      pending_merge_dispatches_;
   ExpiringFirstEdgeCreditLedger credit_ledger_;
   std::unordered_map<long long, int> directed_inflight_counts_;
   std::unordered_set<int> fault_affected_bags_;
@@ -8572,11 +11783,39 @@ class EventDrivenJunctionRuntime {
           nullptr;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   bool test_pibt_logical_failure_injected_ = false;
+  bool test_merge_grant_prepare_failure_injected_ = false;
+  bool test_merge_grant_advertised_flip_injected_ = false;
+  bool test_merge_grant_physical_flip_injected_ = false;
+  bool test_merge_grant_calendar_flip_injected_ = false;
+  bool test_merge_grant_queue_flip_injected_ = false;
+  bool test_merge_grant_edge_exit_capability_drop_injected_ = false;
+  bool test_merge_grant_edge_exit_physical_flip_injected_ = false;
+  bool test_merge_grant_edge_exit_advertised_flip_injected_ = false;
+  bool test_merge_grant_edge_exit_calendar_remove_injected_ = false;
+  bool test_merge_grant_edge_exit_expiry_injected_ = false;
+  bool test_merge_grant_edge_exit_wrong_owner_injected_ = false;
+  bool test_merge_grant_edge_exit_wrong_edge_injected_ = false;
+  bool test_merge_grant_edge_exit_wrong_destination_injected_ = false;
+  bool
+      test_merge_grant_edge_exit_claimed_request_generation_tamper_injected_ =
+          false;
+  bool
+      test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected_ =
+          false;
+  bool
+      test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected_ =
+          false;
+  bool test_merge_grant_edge_exit_live_queue_generation_advance_injected_ =
+      false;
+  bool test_merge_grant_edge_exit_live_calendar_generation_advance_injected_ =
+      false;
+  bool test_pibt_post_commit_failure_injected_ = false;
 #endif
   std::uint64_t next_event_seq_ = 1;
   std::uint64_t next_decision_id_ = 1;
   std::uint64_t next_pibt_activation_id_ = 1;
   std::uint64_t next_local_enqueue_sequence_ = 1;
+  std::uint64_t next_merge_request_lineage_ = 1;
   double now_ = 0.0;
   int active_bag_count_ = 0;
   double last_physical_repair_time_ = -1.0;

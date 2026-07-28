@@ -121,6 +121,12 @@ def test_default_e0_payload_and_algorithm_fields_are_exactly_compatible() -> Non
         not in implicit["summary"]
     )
     assert "event_semantics" not in implicit["trace_context"]
+    assert "merge_grant_lifecycle" not in implicit
+    assert "merge_grant_rule" not in implicit["summary"]
+    assert all(
+        "merge_grant_wait_seconds" not in bag
+        for bag in implicit["bags"]
+    )
 
 
 @pytest.mark.parametrize(
@@ -166,6 +172,12 @@ def test_append_only_modes_isolate_exact_local_arbitration(
         for prefix in _TELEMETRY_COUNT_PREFIXES.values()
     )
     assert payload["trace_context"]["destination_merge_grant_enabled"] is False
+    assert "merge_grant_lifecycle" not in payload
+    assert "merge_grant_rule" not in summary
+    assert all(
+        "merge_grant_wait_seconds" not in bag
+        for bag in payload["bags"]
+    )
     assert payload["trace_context"]["arbitration_worklist_scope"] == (
         "event_triggered_active_nodes_only_no_all_node_scan"
     )
@@ -444,7 +456,7 @@ def test_p2_commit_publishes_transactional_visibility() -> None:
     )
 
 
-@pytest.mark.parametrize("value", ["E4", "batch", ""])
+@pytest.mark.parametrize("value", ["E5", "batch", ""])
 def test_backend_rejects_unknown_event_semantics(value: object) -> None:
     with pytest.raises(ValueError, match="event_semantics"):
         _run(

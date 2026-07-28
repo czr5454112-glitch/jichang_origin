@@ -35,6 +35,21 @@ add_test(
   NAME g4irsf14_event_microphase
   COMMAND test_g4irsf14_event_microphase)
 
+add_executable(
+  test_destination_merge_grant_real_map
+  cpp/tests/test_destination_merge_grant_real_map.cpp)
+target_link_libraries(
+  test_destination_merge_grant_real_map
+  PRIVATE ics_core)
+target_compile_definitions(
+  test_destination_merge_grant_real_map
+  PRIVATE
+    CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    CZR005_EVENT_RUNTIME_TESTING=1)
+add_test(
+  NAME destination_merge_grant_real_map
+  COMMAND test_destination_merge_grant_real_map)
+
 add_executable(test_g4irsf12_runtime_controls cpp/tests/test_g4irsf12_runtime_controls.cpp)
 target_link_libraries(test_g4irsf12_runtime_controls PRIVATE ics_core)
 target_compile_definitions(

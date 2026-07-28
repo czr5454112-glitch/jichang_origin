@@ -609,6 +609,9 @@ def g4irsf11_event_runtime_from_records(
     event_semantics: str = "E0_immediate_dispatch_f2",
     enable_opportunity_telemetry: bool = False,
     opportunity_trace_limit: int = 200_000,
+    merge_grant_rule: str = "M1",
+    merge_grant_max_pending_requests: int = 64,
+    merge_grant_lifecycle_limit: int = 1024,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -684,6 +687,14 @@ def g4irsf11_event_runtime_from_records(
     )
     opportunity_trace_limit = strict_integer(
         opportunity_trace_limit, "opportunity_trace_limit"
+    )
+    merge_grant_max_pending_requests = strict_integer(
+        merge_grant_max_pending_requests,
+        "merge_grant_max_pending_requests",
+    )
+    merge_grant_lifecycle_limit = strict_integer(
+        merge_grant_lifecycle_limit,
+        "merge_grant_lifecycle_limit",
     )
 
     enable_source_admission = strict_bool(
@@ -801,21 +812,117 @@ def g4irsf11_event_runtime_from_records(
         "E1",
         "E2",
         "E3",
+        "E4",
         "E0_immediate_dispatch_f2",
         "E1_batch_source_same_timestamp",
         "E2_batch_junction_same_timestamp",
         "E3_batch_source_and_junction_same_timestamp",
+        "E4_batch_plus_destination_merge_request",
     }
     if not isinstance(event_semantics, str):
         raise TypeError("event_semantics must be a string")
     if event_semantics not in event_semantics_modes:
         raise ValueError(
-            "event_semantics must be E0, E1, E2, or E3"
+            "event_semantics must be E0, E1, E2, E3, or E4"
         )
     if opportunity_trace_limit < 0:
         raise ValueError(
             "opportunity_trace_limit must be non-negative"
         )
+    if not isinstance(merge_grant_rule, str):
+        raise TypeError("merge_grant_rule must be a string")
+    merge_grant_rule_aliases = {
+        "M0": "M0",
+        "M0_current_event_seq_earliest_known": "M0",
+        "M1": "M1",
+        "M1_fifo": "M1",
+        "M2": "M2",
+        "M2_earliest_projected_arrival": "M2",
+        "M3": "M3",
+        "M3_deadline_aging": "M3",
+        "M4": "M4",
+        "M4_fairness_progress": "M4",
+        "M5": "M5",
+        "M5_local_externality": "M5",
+        "M6": "M6",
+        "M6_thesis_local": "M6",
+    }
+    if merge_grant_rule == "M7":
+        raise ValueError(
+            "merge_grant_rule M7 is diagnostic-only and cannot run online"
+        )
+    if merge_grant_rule in {"M8", "M9"}:
+        raise ValueError(
+            "merge_grant_rule M8/M9 require a validated model artifact; "
+            "runtime selection fails closed"
+        )
+    if merge_grant_rule not in merge_grant_rule_aliases:
+        raise ValueError(
+            "merge_grant_rule must be M0, M1, M2, M3, M4, M5, or M6"
+        )
+    if merge_grant_max_pending_requests <= 0:
+        raise ValueError(
+            "merge_grant_max_pending_requests must be positive"
+        )
+    if merge_grant_lifecycle_limit < 0:
+        raise ValueError(
+            "merge_grant_lifecycle_limit must be non-negative"
+        )
+
+    uses_destination_merge_grants = event_semantics in {
+        "E4",
+        "E4_batch_plus_destination_merge_request",
+    }
+    if not uses_destination_merge_grants and (
+        merge_grant_rule != "M1"
+        or merge_grant_max_pending_requests != 64
+        or merge_grant_lifecycle_limit != 1024
+    ):
+        raise ValueError(
+            "merge grant controls are only valid with E4 destination "
+            "merge-request semantics"
+        )
+    if uses_destination_merge_grants:
+        if resource_semantics not in {
+            "R3",
+            "R3_java_node_window_compatible",
+        }:
+            raise ValueError(
+                "E4 destination merge grants require frozen R3 "
+                "node-window semantics"
+            )
+        if pibt_mode != "P2":
+            raise ValueError(
+                "E4 destination merge grants require the frozen P2 "
+                "bounded-local PIBT mode"
+            )
+        if scorer_mode not in {
+            "S1",
+            "S1_frozen_g4e_legal_local_adapter",
+        }:
+            raise ValueError(
+                "E4 destination merge grants require the frozen S1 "
+                "G4E legal-local scorer"
+            )
+        if priority_mode not in {"Q0", "current_f2"}:
+            raise ValueError(
+                "E4 destination merge grants require the frozen Q0 "
+                "priority mode"
+            )
+        valid_admission_modes = {
+            "off",
+            "legacy_unbound",
+            "expiring_first_edge_credit",
+            "merge_only_first_edge_credit",
+            "contention_triggered_first_edge_credit",
+        }
+        if admission_mode not in valid_admission_modes:
+            raise ValueError("unknown event-runtime admission_mode")
+        if admission_mode not in {"off", "legacy_unbound"}:
+            raise ValueError(
+                "E4 vertical slice requires frozen C0 admission; "
+                "first-edge credits are not destination merge capabilities"
+            )
 
     scorer_modes = {
         "S0",
@@ -1167,6 +1274,17 @@ def g4irsf11_event_runtime_from_records(
                 penalty,
             )
         )
+    native_event_tail: tuple[object, ...] = (
+        str(event_semantics),
+        bool(enable_opportunity_telemetry),
+        int(opportunity_trace_limit),
+    )
+    if uses_destination_merge_grants:
+        native_event_tail += (
+            str(merge_grant_rule),
+            int(merge_grant_max_pending_requests),
+            int(merge_grant_lifecycle_limit),
+        )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
             normalized_node_records,
@@ -1228,9 +1346,7 @@ def g4irsf11_event_runtime_from_records(
             str(pibt_preference_mode),
             normalized_regret_prior_records,
             int(selective_credit_contention_threshold),
-            str(event_semantics),
-            bool(enable_opportunity_telemetry),
-            int(opportunity_trace_limit),
+            *native_event_tail,
         )
     )
     summary = payload.get("summary")

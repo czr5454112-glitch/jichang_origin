@@ -3049,8 +3049,66 @@ py::dict edge_score_native_event_fallback_replay_trace_from_records(
   return payload;
 }
 
+std::string canonical_merge_grant_rule_for_binding(
+    const std::string& rule) {
+  if (rule == "M0" ||
+      rule == "M0_current_event_seq_earliest_known") {
+    return "M0";
+  }
+  if (rule == "M1" || rule == "M1_fifo") {
+    return "M1";
+  }
+  if (rule == "M2" ||
+      rule == "M2_earliest_projected_arrival") {
+    return "M2";
+  }
+  if (rule == "M3" || rule == "M3_deadline_aging") {
+    return "M3";
+  }
+  if (rule == "M4" || rule == "M4_fairness_progress") {
+    return "M4";
+  }
+  if (rule == "M5" || rule == "M5_local_externality") {
+    return "M5";
+  }
+  if (rule == "M6" || rule == "M6_thesis_local") {
+    return "M6";
+  }
+  throw std::invalid_argument(
+      "merge_grant_rule must be M0, M1, M2, M3, M4, M5, or M6");
+}
+
+int strict_python_integer_argument(
+    const py::handle& value,
+    const char* name) {
+  if (PyBool_Check(value.ptr()) ||
+      !PyLong_Check(value.ptr())) {
+    throw py::type_error(
+        std::string(name) + " must be an integer, not bool");
+  }
+  const long long converted =
+      PyLong_AsLongLong(value.ptr());
+  if (converted == -1 && PyErr_Occurred()) {
+    throw py::error_already_set();
+  }
+  if (converted <
+          static_cast<long long>(
+              std::numeric_limits<int>::min()) ||
+      converted >
+          static_cast<long long>(
+              std::numeric_limits<int>::max())) {
+    throw py::value_error(
+        std::string(name) + " is outside the supported integer range");
+  }
+  return static_cast<int>(converted);
+}
+
 py::dict g4irsf11_event_runtime_summary_row(
-    const czr005::ics::EventRuntimeSummary& summary) {
+    const czr005::ics::EventRuntimeSummary& summary,
+    bool include_destination_merge_grants,
+    const std::string& merge_grant_rule,
+    int merge_grant_max_pending_requests,
+    int merge_grant_lifecycle_limit) {
   py::dict row;
   row["runtime_name"] = "event_driven_local_decision_runtime";
   row["runtime_loop_owner"] = "cpp_event_scheduler";
@@ -3524,6 +3582,125 @@ py::dict g4irsf11_event_runtime_summary_row(
         summary.microphase_runtime_global_scan_count;
     row["artificial_batch_delay_seconds"] =
         summary.artificial_batch_delay_seconds;
+    if (include_destination_merge_grants) {
+      row["merge_grant_rule"] =
+          canonical_merge_grant_rule_for_binding(merge_grant_rule);
+      row["merge_grant_rule_echo"] = merge_grant_rule;
+      row["merge_grant_max_pending_requests"] =
+          merge_grant_max_pending_requests;
+      row["merge_grant_lifecycle_limit"] =
+          merge_grant_lifecycle_limit;
+      row["destination_merge_arbitration_event_count"] =
+          py::int_(
+              summary.destination_merge_arbitration_event_count);
+      row["merge_grant_request_count"] =
+          py::int_(summary.merge_grant_request_count);
+      row["merge_grant_issued_count"] =
+          py::int_(summary.merge_grant_issued_count);
+      row["merge_grant_issued_transition_count"] =
+          py::int_(
+              summary.merge_grant_issued_transition_count);
+      row["merge_grant_prepared_count"] =
+          py::int_(summary.merge_grant_prepared_count);
+      row["merge_grant_prepared_transition_count"] =
+          py::int_(
+              summary.merge_grant_prepared_transition_count);
+      row["merge_grant_committed_count"] =
+          py::int_(summary.merge_grant_committed_count);
+      row["merge_grant_committed_transition_count"] =
+          py::int_(
+              summary.merge_grant_committed_transition_count);
+      row["merge_grant_consumed_count"] =
+          py::int_(summary.merge_grant_consumed_count);
+      row["merge_grant_expired_count"] =
+          py::int_(summary.merge_grant_expired_count);
+      row["merge_grant_request_expired_count"] =
+          py::int_(summary.merge_grant_request_expired_count);
+      row["merge_grant_grant_expired_count"] =
+          py::int_(summary.merge_grant_grant_expired_count);
+      row["merge_grant_revoked_count"] =
+          py::int_(summary.merge_grant_revoked_count);
+      row["merge_grant_post_commit_revoked_count"] =
+          py::int_(
+              summary.merge_grant_post_commit_revoked_count);
+      row["merge_grant_post_commit_expired_count"] =
+          py::int_(
+              summary.merge_grant_post_commit_expired_count);
+      row["merge_grant_post_commit_rollback_count"] =
+          py::int_(
+              summary.merge_grant_post_commit_rollback_count);
+      row["merge_grant_revoked_fault_count"] =
+          py::int_(summary.merge_grant_revoked_fault_count);
+      row["merge_grant_revoked_stale_state_count"] =
+          py::int_(
+              summary.merge_grant_revoked_stale_state_count);
+      row["merge_grant_revoked_replan_current_edge_count"] =
+          py::int_(
+              summary
+                  .merge_grant_revoked_replan_current_edge_count);
+      row["merge_grant_rolled_back_count"] =
+          py::int_(summary.merge_grant_rolled_back_count);
+      row["merge_grant_exact_slot_busy_count"] =
+          py::int_(summary.merge_grant_exact_slot_busy_count);
+      row["merge_grant_active_grant_rejection_count"] =
+          py::int_(
+              summary.merge_grant_active_grant_rejection_count);
+      row["merge_grant_queue_capacity_block_count"] =
+          py::int_(
+              summary.merge_grant_queue_capacity_block_count);
+      row["merge_grant_contended_loser_retry_count"] =
+          py::int_(
+              summary.merge_grant_contended_loser_retry_count);
+      row["merge_grant_lifecycle_transition_count"] =
+          py::int_(
+              summary.merge_grant_lifecycle_transition_count);
+      row["merge_grant_lifecycle_stored_count"] =
+          py::int_(
+              summary.merge_grant_lifecycle_stored_count);
+      row["merge_grant_lifecycle_dropped_count"] =
+          py::int_(
+              summary.merge_grant_lifecycle_dropped_count);
+      row["merge_grant_terminal_request_count"] =
+          py::int_(
+              summary.merge_grant_terminal_request_count);
+      row["merge_grant_outstanding_request_count"] =
+          py::int_(
+              summary.merge_grant_outstanding_request_count);
+      row["merge_grant_goal_exempt_bypass_count"] =
+          py::int_(
+              summary.merge_grant_goal_exempt_bypass_count);
+      row["merge_grant_stale_arbitration_count"] =
+          py::int_(
+              summary.merge_grant_stale_arbitration_count);
+      row["merge_grant_duplicate_wakeup_prevented_count"] =
+          py::int_(
+              summary
+                  .merge_grant_duplicate_wakeup_prevented_count);
+      row["merge_grant_peak_pending_requests"] =
+          summary.merge_grant_peak_pending_requests;
+      row["merge_grant_peak_active_unconsumed"] =
+          summary.merge_grant_peak_active_unconsumed;
+      row["merge_grant_final_active_unconsumed"] =
+          summary.merge_grant_final_active_unconsumed;
+      row["merge_grant_conservation_holds"] =
+          summary.merge_grant_conservation_holds;
+      row["merge_grant_active_bijection_holds"] =
+          summary.merge_grant_active_bijection_holds;
+      row["merge_grant_runtime_owned_capability"] =
+          summary.merge_grant_runtime_owned_capability;
+      row["merge_grant_exact_slot_no_future_shift"] =
+          summary.merge_grant_exact_slot_no_future_shift;
+      row["merge_grant_lifecycle_complete"] =
+          summary.merge_grant_lifecycle_dropped_count == 0;
+      row["merge_grant_protocol_integrity_pass"] =
+          summary.merge_grant_conservation_holds &&
+          summary.merge_grant_active_bijection_holds &&
+          summary.merge_grant_runtime_owned_capability &&
+          summary.merge_grant_exact_slot_no_future_shift &&
+          summary.merge_grant_lifecycle_dropped_count == 0 &&
+          summary.merge_grant_final_active_unconsumed == 0 &&
+          summary.merge_grant_outstanding_request_count == 0;
+    }
   }
   row["safe_execution_pass"] = summary.reservation_conflicts == 0 &&
                                  summary.runtime_full_astar_calls == 0 &&
@@ -3532,7 +3709,8 @@ py::dict g4irsf11_event_runtime_summary_row(
 }
 
 py::list g4irsf11_event_runtime_bag_rows(
-    const std::vector<czr005::ics::EventRuntimeBagResult>& bags) {
+    const std::vector<czr005::ics::EventRuntimeBagResult>& bags,
+    bool include_destination_merge_grants) {
   py::list rows;
   for (const auto& bag : bags) {
     py::dict row;
@@ -3552,6 +3730,10 @@ py::list g4irsf11_event_runtime_bag_rows(
     row["total_local_wait"] = bag.total_local_wait;
     row["junction_queue_wait_seconds"] =
         bag.junction_queue_wait_seconds;
+    if (include_destination_merge_grants) {
+      row["merge_grant_wait_seconds"] =
+          bag.merge_grant_wait_seconds;
+    }
     row["edge_travel_time_seconds"] =
         bag.edge_travel_time_seconds;
     row["node_service_time_seconds"] =
@@ -3567,6 +3749,107 @@ py::list g4irsf11_event_runtime_bag_rows(
     row["starved"] = bag.starved;
     row["failure_reason"] = bag.failure_reason;
     row["short_history"] = bag.short_history;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf14_merge_grant_lifecycle_rows(
+    const std::vector<
+        czr005::ics::DestinationMergeGrantLifecycleRow>& lifecycle) {
+  py::list rows;
+  for (const auto& event : lifecycle) {
+    if (event.segment_id == nullptr) {
+      throw std::logic_error(
+          "merge grant lifecycle row is missing immutable segment identity");
+    }
+    py::dict row;
+    row["time"] = event.time;
+    row["request_id"] = py::int_(event.request_id);
+    row["grant_id"] = py::int_(event.grant_id);
+    row["lineage"] = py::int_(event.lineage);
+    row["request_generation"] =
+        py::int_(event.request_generation);
+    row["junction_queue_generation"] =
+        py::int_(event.junction_queue_generation);
+    row["runtime_bag_id"] = event.runtime_bag_id;
+    row["task_id"] = event.task_id;
+    row["segment_id"] = *event.segment_id;
+    row["upstream_node"] = event.upstream_node;
+    row["destination_node"] = event.destination_node;
+    row["edge_from_node"] = event.edge.from_node;
+    row["edge_to_node"] = event.edge.to_node;
+    row["request_time"] = event.request_time;
+    row["fifo_request_time"] = event.fifo_request_time;
+    row["earliest_edge_entry"] = event.earliest_edge_entry;
+    row["exact_edge_travel_seconds"] =
+        event.exact_edge_travel_seconds;
+    row["projected_arrival"] = event.projected_arrival;
+    row["goal"] = event.goal;
+    row["route_score"] = event.route_score;
+    row["static_remaining"] = event.static_remaining;
+    row["destination_service_seconds"] =
+        event.destination_service_seconds;
+    row["downstream_queue_pressure"] =
+        event.downstream_queue_pressure;
+    row["deadline_slack"] = event.deadline_slack;
+    row["wait_age"] = event.wait_age;
+    row["task_class_code"] = event.task_class_code;
+    row["task_class"] = event.task_class;
+    row["storage_leg"] = event.storage_leg;
+    row["source_release_age"] = event.source_release_age;
+    row["local_queue_age"] = event.local_queue_age;
+    row["enqueue_sequence"] =
+        py::int_(event.enqueue_sequence);
+    row["request_expiry"] = event.request_expiry;
+    row["slot_start"] = event.slot_start;
+    row["slot_end"] = event.slot_end;
+    row["issue_time"] = event.issue_time;
+    row["grant_expiry"] = event.grant_expiry;
+    row["calendar_generation"] =
+        py::int_(event.calendar_generation);
+    row["fault_generation"] = event.fault_generation;
+    row["advertised_fault_generation"] =
+        event.advertised_fault_generation;
+    row["observed_claimed_request_generation"] =
+        py::int_(event.observed_claimed_request_generation);
+    row["observed_claimed_junction_queue_generation"] =
+        py::int_(
+            event.observed_claimed_junction_queue_generation);
+    row["observed_claimed_calendar_generation"] =
+        py::int_(event.observed_claimed_calendar_generation);
+    row["observed_claimed_owner_runtime_bag_id"] =
+        event.observed_claimed_owner_runtime_bag_id;
+    row["observed_claimed_edge_from_node"] =
+        event.observed_claimed_edge.from_node;
+    row["observed_claimed_edge_to_node"] =
+        event.observed_claimed_edge.to_node;
+    row["observed_claimed_destination_node"] =
+        event.observed_claimed_destination_node;
+    row["observed_event_owner_runtime_bag_id"] =
+        event.observed_event_owner_runtime_bag_id;
+    row["observed_event_edge_from_node"] =
+        event.observed_event_edge.from_node;
+    row["observed_event_edge_to_node"] =
+        event.observed_event_edge.to_node;
+    row["observed_event_destination_node"] =
+        event.observed_event_destination_node;
+    row["observed_junction_queue_generation"] =
+        py::int_(event.observed_junction_queue_generation);
+    row["observed_calendar_generation"] =
+        py::int_(event.observed_calendar_generation);
+    row["observed_physical_fault_generation"] =
+        event.observed_physical_fault_generation;
+    row["observed_advertised_fault_generation"] =
+        event.observed_advertised_fault_generation;
+    row["observed_physical_fault_active"] =
+        event.observed_physical_fault_active;
+    row["observed_exact_calendar_reservation_present"] =
+        event.observed_exact_calendar_reservation_present;
+    row["state"] = czr005::ics::merge_grant_state_name(
+        event.state);
+    row["reason"] = czr005::ics::merge_grant_reason_name(
+        event.reason);
     rows.append(std::move(row));
   }
   return rows;
@@ -4143,9 +4426,75 @@ py::dict g4irsf11_event_runtime_from_records(
     int selective_credit_contention_threshold,
     const std::string& event_semantics,
     bool enable_opportunity_telemetry,
-    int opportunity_trace_limit) {
-  // Keep G4IRSF13 controls append-only so existing positional callers retain
-  // the exact F2/Q0/P0 behavior.
+    int opportunity_trace_limit,
+    const std::string& merge_grant_rule,
+    const py::object& merge_grant_max_pending_requests_value,
+    const py::object& merge_grant_lifecycle_limit_value) {
+  // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
+  // retain the exact F2/Q0/P0/E0 behavior.
+  const int merge_grant_max_pending_requests =
+      strict_python_integer_argument(
+          merge_grant_max_pending_requests_value,
+          "merge_grant_max_pending_requests");
+  const int merge_grant_lifecycle_limit =
+      strict_python_integer_argument(
+          merge_grant_lifecycle_limit_value,
+          "merge_grant_lifecycle_limit");
+  const bool requested_destination_merge_grants =
+      event_semantics == "E4" ||
+      event_semantics ==
+          "E4_batch_plus_destination_merge_request";
+  if (merge_grant_max_pending_requests <= 0) {
+    throw py::value_error(
+        "merge_grant_max_pending_requests must be positive");
+  }
+  if (merge_grant_lifecycle_limit < 0) {
+    throw py::value_error(
+        "merge_grant_lifecycle_limit must be non-negative");
+  }
+  if (!requested_destination_merge_grants &&
+      (merge_grant_rule != "M1" ||
+       merge_grant_max_pending_requests != 64 ||
+       merge_grant_lifecycle_limit != 1024)) {
+    throw py::value_error(
+        "merge grant controls are only valid with E4 destination "
+        "merge-request semantics");
+  }
+  if (requested_destination_merge_grants &&
+      admission_mode != "off" &&
+      admission_mode != "legacy_unbound") {
+    throw std::invalid_argument(
+        "E4 vertical slice requires frozen C0 admission; first-edge "
+        "credits are not destination merge capabilities");
+  }
+  if (requested_destination_merge_grants &&
+      resource_semantics != "R3" &&
+      resource_semantics !=
+          "R3_java_node_window_compatible") {
+    throw std::invalid_argument(
+        "E4 destination merge grants require frozen R3 node-window "
+        "semantics");
+  }
+  if (requested_destination_merge_grants &&
+      pibt_mode != "P2") {
+    throw std::invalid_argument(
+        "E4 destination merge grants require the frozen P2 bounded-local "
+        "PIBT mode");
+  }
+  if (requested_destination_merge_grants &&
+      scorer_mode != "S1" &&
+      scorer_mode !=
+          "S1_frozen_g4e_legal_local_adapter") {
+    throw std::invalid_argument(
+        "E4 destination merge grants require the frozen S1 G4E "
+        "legal-local scorer");
+  }
+  if (requested_destination_merge_grants &&
+      priority_mode != "Q0" &&
+      priority_mode != "current_f2") {
+    throw std::invalid_argument(
+        "E4 destination merge grants require the frozen Q0 priority mode");
+  }
   const auto graph = graph_from_records(node_records, edge_records, heuristic_time);
   std::vector<czr005::ics::EventRuntimeBagRequest> requests;
   requests.reserve(bag_records.size());
@@ -4234,6 +4583,11 @@ py::dict g4irsf11_event_runtime_from_records(
   config.enable_opportunity_telemetry =
       enable_opportunity_telemetry;
   config.opportunity_trace_limit = opportunity_trace_limit;
+  config.merge_grant_rule = merge_grant_rule;
+  config.merge_grant_max_pending_requests =
+      merge_grant_max_pending_requests;
+  config.merge_grant_lifecycle_limit =
+      merge_grant_lifecycle_limit;
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -4392,6 +4746,9 @@ py::dict g4irsf11_event_runtime_from_records(
       result.summary.event_semantics !=
           "E0_immediate_dispatch_f2" ||
       result.summary.opportunity_telemetry_enabled;
+  const bool uses_destination_merge_grants =
+      result.summary.event_semantics ==
+      "E4_batch_plus_destination_merge_request";
   if (g4irsf14_extensions_enabled) {
     trace_context["event_semantics"] =
         result.summary.event_semantics;
@@ -4415,17 +4772,49 @@ py::dict g4irsf11_event_runtime_from_records(
         "passive_opportunity_audit_only_not_runtime_feature_or_"
         "reservation_scan";
     trace_context["destination_competitor_visibility_semantics"] =
-        "outgoing_edge_potential_competitor_upper_bound_not_selected_route_"
-        "or_grant";
+        uses_destination_merge_grants
+            ? "destination_owned_pending_current_one_hop_request_set"
+            : "outgoing_edge_potential_competitor_upper_bound_not_selected_"
+              "route_or_grant";
     trace_context["opportunity_trace_limit"] =
         opportunity_trace_limit;
     trace_context["artificial_batch_delay_seconds"] = 0.0;
-    trace_context["destination_merge_grant_enabled"] = false;
+    trace_context["destination_merge_grant_enabled"] =
+        uses_destination_merge_grants;
+    if (uses_destination_merge_grants) {
+      trace_context["merge_grant_rule"] =
+          canonical_merge_grant_rule_for_binding(merge_grant_rule);
+      trace_context["merge_grant_rule_echo"] =
+          merge_grant_rule;
+      trace_context["merge_grant_max_pending_requests"] =
+          merge_grant_max_pending_requests;
+      trace_context["merge_grant_lifecycle_limit"] =
+          merge_grant_lifecycle_limit;
+      trace_context["merge_grant_owner"] =
+          "destination_local_controller";
+      trace_context["merge_grant_request_scope"] =
+          "current_one_hop_exact_directed_edge_only_no_future_route";
+      trace_context["merge_grant_slot_semantics"] =
+          "frozen_R3_destination_node_service_exact_slot_no_future_shift";
+      trace_context["merge_grant_capability_semantics"] =
+          "runtime_owned_move_only_consumed_at_destination_entry";
+      trace_context["merge_grant_wait_seconds_semantics"] =
+          "diagnostic_subset_of_junction_queue_wait_not_additive";
+      trace_context["merge_grant_lifecycle_storage"] =
+          "bounded_prefix_transition_rows_with_total_stored_dropped_counters";
+    }
   }
 
   py::dict payload;
-  payload["summary"] = g4irsf11_event_runtime_summary_row(result.summary);
-  payload["bags"] = g4irsf11_event_runtime_bag_rows(result.bags);
+  payload["summary"] = g4irsf11_event_runtime_summary_row(
+      result.summary,
+      uses_destination_merge_grants,
+      merge_grant_rule,
+      merge_grant_max_pending_requests,
+      merge_grant_lifecycle_limit);
+  payload["bags"] = g4irsf11_event_runtime_bag_rows(
+      result.bags,
+      uses_destination_merge_grants);
   payload["events"] = g4irsf11_event_runtime_event_rows(result.events);
   payload["decisions"] =
       g4irsf11_event_decision_rows(result.decisions, scenario, scale, false);
@@ -4454,6 +4843,11 @@ py::dict g4irsf11_event_runtime_from_records(
     payload["arbitration_batch_cardinality"] =
         g4irsf14_arbitration_batch_rows(
             result.arbitration_batch_cardinality);
+    if (uses_destination_merge_grants) {
+      payload["merge_grant_lifecycle"] =
+          g4irsf14_merge_grant_lifecycle_rows(
+              result.merge_grant_lifecycle);
+    }
   }
   payload["trace_context"] = std::move(trace_context);
   return payload;
@@ -4695,7 +5089,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("event_semantics") =
                  std::string("E0_immediate_dispatch_f2"),
              py::arg("enable_opportunity_telemetry") = false,
-             py::arg("opportunity_trace_limit") = 200000);
+             py::arg("opportunity_trace_limit") = 200000,
+             py::arg("merge_grant_rule") =
+                 std::string("M1"),
+             py::arg("merge_grant_max_pending_requests") = 64,
+             py::arg("merge_grant_lifecycle_limit") = 1024);
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,
