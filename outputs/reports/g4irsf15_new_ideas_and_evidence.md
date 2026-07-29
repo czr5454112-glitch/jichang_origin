@@ -416,3 +416,21 @@
   artifacts 的条件分支实际通过后，状态才可升级为 `RUNTIME_VERIFIED`。
 - 对方向的意义：去中心化、跨 worker、跨站点的大规模执行天然会遇到异构部署；
   把跨 OS 复验纳入发布门禁，能避免把生成机文件系统偶然性误当成算法证据的一部分。
+
+### NI-027：输入身份应绑定原生适配后的语义记录，而不是猜测原始字段名
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：首次真实 census 在干预前 fail closed；冻结 `inputdata.jsonl` 使用 `std`
+  表示 deadline，且允许省略 `source`，而 workload identity 重建误读了不存在的
+  `deadline`/`source` 字段。合成 fixture 同时提供这两个字段，因而没有暴露偏差。
+- 决策：producer 与独立 validator 都按既有 G4IRSF12 native adapter 的精确定义
+  重建记录：`deadline=std`，`source=source or node_<start>`；原始 JSON SHA 仍先固定，
+  随后再对适配后的有序 runtime cohort 做 canonical hash。新增直接读取全部 43,603
+  条冻结记录的回归，并要求 producer/validator 的 segment、raw-task、runtime mapping、
+  original-entry mapping 与 workload identity 逐项一致。
+- 证据：真实输入回归通过，修复后的聚焦冻结集 106 项全部通过；首次失败发生在
+  census 读入阶段，没有产生 descriptor 或因果 label。完整 census 仍须在新源码提交
+  和新 exact binary 上重跑，旧 build manifest 明确作废。
+- 对方向的意义：面向更多站点和订单 schema 时，去中心化 worker 必须对“进入本地
+  决策器的实际请求语义”达成一致；把 adapter 后的语义身份作为契约，可避免不同节点
+  因字段别名或默认值不同而悄然处理不同 workload。

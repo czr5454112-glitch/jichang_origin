@@ -953,11 +953,16 @@ def _protected_inputs(root: Path) -> dict[str, Any]:
         task_id = int(row["task_id"])
         original_entry = float(row["original_entry_time"])
         release = float(row["pass_time"])
+        deadline = float(row["std"])
+        source = str(
+            row.get("source", f"node_{int(row['start'])}")
+        )
         _require(
             math.isfinite(original_entry)
             and math.isfinite(release)
+            and math.isfinite(deadline)
             and original_entry <= release,
-            f"ORIGINAL_ENTRY_AFTER_RELEASE:{task_id}",
+            f"INVALID_PROTECTED_REQUEST_TIMES:{task_id}",
         )
         previous = original_entry_by_task.setdefault(task_id, original_entry)
         _require(
@@ -979,8 +984,8 @@ def _protected_inputs(root: Path) -> dict[str, Any]:
                         ("start", "i", int(row["start"])),
                         ("goal", "i", int(row["goal"])),
                         ("release_time", "d", release),
-                        ("deadline", "d", float(row["deadline"])),
-                        ("source", "s", str(row["source"])),
+                        ("deadline", "d", deadline),
+                        ("source", "s", source),
                     ]
                 ),
             )

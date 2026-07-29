@@ -19,6 +19,80 @@ def _sha(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
 
 
+def test_real_protected_input_schema_reconstructs_native_record_identity() -> None:
+    root = Path(__file__).resolve().parents[1]
+    with (root / campaign.TASK_PATH).open(
+        "r", encoding="utf-8"
+    ) as handle:
+        first_row = json.loads(handle.readline())
+    assert "deadline" not in first_row
+    assert "source" not in first_row
+    assert first_row["std"] == 22_200.0
+
+    prefix = campaign.g12.load_input_prefix(
+        campaign.FULL_SEGMENT_COUNT, root=root
+    )
+    native_records = campaign.g12.binding_bag_records(prefix)
+    native_workload_fields: list[tuple[str, str, object]] = [
+        (
+            "schema",
+            "s",
+            "czr005.g4irsf15.input_runtime_cohort_order.v1",
+        ),
+        ("request_count", "u", len(native_records)),
+    ]
+    for runtime_bag_id, record in enumerate(native_records):
+        segment_id, task_id, release, deadline, start, goal, source = record
+        native_workload_fields.append(
+            (
+                "request",
+                "s",
+                validator.canonical_fields_payload(
+                    [
+                        ("runtime_bag_id", "u", runtime_bag_id),
+                        ("task_id", "i", task_id),
+                        ("segment_id", "s", segment_id),
+                        ("start", "i", start),
+                        ("goal", "i", goal),
+                        ("release_time", "d", release),
+                        ("deadline", "d", deadline),
+                        ("source", "s", source),
+                    ]
+                ),
+            )
+        )
+    native_workload_sha256 = validator.canonical_fields_sha256(
+        native_workload_fields
+    )
+
+    produced = campaign._protected_inputs(root)
+    independently_reconstructed = validator.protected_inputs(root)
+
+    assert produced["task"]["segment_count"] == campaign.FULL_SEGMENT_COUNT
+    assert produced["task"]["raw_bag_count"] == campaign.FULL_RAW_BAG_COUNT
+    assert (
+        produced["task"]["input_runtime_cohort_sha256"]
+        == native_workload_sha256
+        == "7f3a01c58ae4e703297320f2fa8d8020564f32cb1c3661e2f97c7fd8967fea60"
+    )
+    assert independently_reconstructed == {
+        "segment_count": produced["task"]["segment_count"],
+        "raw_bag_count": produced["task"]["raw_bag_count"],
+        "input_runtime_cohort_sha256": produced["task"][
+            "input_runtime_cohort_sha256"
+        ],
+        "runtime_segment_mapping_sha256": produced["task"][
+            "runtime_segment_mapping_sha256"
+        ],
+        "raw_bag_mapping_sha256": produced["task"][
+            "raw_bag_mapping_sha256"
+        ],
+        "raw_bag_original_entry_mapping_sha256": produced["task"][
+            "raw_bag_original_entry_mapping_sha256"
+        ],
+    }
+
+
 def _sampling() -> dict[str, object]:
     return {
         "sampling_stratum_id": "I1|TAIL|NO_DIVERGENCE|LOW",
