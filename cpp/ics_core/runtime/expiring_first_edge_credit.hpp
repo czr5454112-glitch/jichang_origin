@@ -1222,8 +1222,10 @@ inline void ExpiringFirstEdgeCreditLedger::validate_checkpoint(
   {
     std::size_t position = 0;
     for (const auto& expected : expected_capacities) {
-      if (checkpoint.active_capacity_by_edge[position] !=
-          expected) {
+      const auto& actual =
+          checkpoint.active_capacity_by_edge[position];
+      if (actual.first != expected.first ||
+          actual.second != expected.second) {
         throw std::invalid_argument(
             "credit capacity index content mismatch");
       }
@@ -1238,7 +1240,9 @@ inline void ExpiringFirstEdgeCreditLedger::validate_checkpoint(
   {
     std::size_t position = 0;
     for (const auto& expected : expected_owners) {
-      if (checkpoint.active_by_owner[position] != expected) {
+      const auto& actual = checkpoint.active_by_owner[position];
+      if (actual.first != expected.first ||
+          actual.second != expected.second) {
         throw std::invalid_argument(
             "credit owner index content mismatch");
       }
