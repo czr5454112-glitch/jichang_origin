@@ -1,0 +1,418 @@
+# G4IRSF15 新想法、证据与决策日志
+
+本日志记录实施过程中形成、被验证或被否证的想法。它不是性能结论；
+只有状态为 `RUNTIME_VERIFIED` 或 `EXPERIMENT_VERIFIED` 的条目才可用于正式结论。
+
+## 状态词
+
+- `SOURCE_AUDIT_SUPPORTED`：由源码、冻结产物或输入拓扑审计支持，仍需运行验证。
+- `RUNTIME_VERIFIED`：已有原生运行时回归测试支持。
+- `EXPERIMENT_VERIFIED`：已有原始 `map2`、原始 1x 任务的实验支持。
+- `REJECTED`：验证失败，不进入候选。
+- `PENDING`：尚未取得足够证据。
+
+## 决策条目
+
+### NI-001：因果动作证书必须绑定“已提交动作”，不能绑定“已选择意图”
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：旧 I1 在源服务资源检查前记为 applied，旧 I3 在 merge request
+  接受或边提交前记为 applied，可能产生 action-changing 假阳性。
+- 决策：I1 只在源服务预约和入场事件发布后签发证书；I3 只在目的合流请求
+  成功入队或单边移动真正提交后签发证书。未提交的选择意图保持
+  `changed_action_count=0`。
+- 证据：原生 `test_g4irsf14_causal_intervention` 已覆盖“源资源被占用时 I1
+  不得记为 action-changing”，以及 I1/I3 正常提交路径。
+- 对方向的意义：训练标签对应可执行的局部动作，而不是中央离线脚本的意图，
+  避免把不可落地的动作教给去中心化策略。
+
+### NI-002：I4 应定义为“等待一个局部服务机会”，而不是固定秒数退避
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：固定 `retry_interval` 会把实验旋钮混入动作定义；使用最小 1ms 粒度又会
+  制造无意义事件抖动。
+- 决策：I4 的处理动作冻结为等待当前节点一个真实服务周期：
+  `max(local_service_duration, dispatch_headway)`。证书还必须绑定已发布的局部
+  wakeup 时间和 generation。
+- 证据：原生回归用 `retry_interval=0.01` 与 `7.0` 两个配置验证，I4 的动作时长
+  和证书不变。
+- 对方向的意义：动作只依赖当前局部节点的自然节拍，适合后续 supervisor 和
+  分布式实现。
+
+### NI-003：H_system 固定为完整原始 1x cohort
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：旧机制允许调用方任意传入“selected system IDs”；用 affected bag
+  加一个无关 bag 不能代表系统外部性。
+- 决策：G4IRSF15 的 `H_system` 唯一定义为原始 1x 输入展开后的全部 runtime
+  segment IDs，并完整 drain/finalize；不得按干预结果改变 cohort。
+- 待验证：正式 campaign 必须完成至少 128 个不同 clone group 的完整
+  H_system matched pairs。
+- 对方向的意义：可测量一个局部动作对其余订单的真实外部性，避免只优化受影响
+  行李而把延迟转嫁给系统。
+
+### NI-004：checkpoint bank 采用两遍确定性重放，而不伪造磁盘序列化
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：当前 checkpoint 是持有私有 `CheckpointStorage` 的进程内
+  `shared_ptr`，不存在可审计的跨进程序列化协议。
+- 决策：第一遍只生成内容寻址 descriptor；第二遍按连续 event ordinal
+  shard 在新进程中确定性重放到目标，在同一 checkpoint 上顺序运行 baseline
+  与 treatment。每个 shard 原子写出并可从 descriptor 重放恢复。
+- 待验证：pilot 对 1/2/4 worker 做吞吐、峰值 RSS、重放一致性比较后再冻结并发。
+- 对方向的意义：保留精确配对和可恢复性，同时不把未经验证的 checkpoint 文件
+  冒充真实运行时状态。
+
+### NI-005：人口样本与长尾富集样本分离
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：只按高风险尾部富集会高估 oracle coverage，不能代表原始机会总体。
+- 决策：用确定性最小哈希保留独立 population sample，并另建 enriched-tail
+  sample；记录每层 `N_h/n_h/pi_h`，用于审计覆盖构成。原“人口结论使用抽样权重”
+  的提案已被 NI-017/NI-020 部分覆盖：本轮未建模 horizon assignment，且 formal
+  frame 受 pilot 历史条件化，因此不发布无条件 population causal effect；权重只作
+  post-pilot 条件有限 frame 的 reference sensitivity，区间只描述 realized panel
+  对 clone-group 重采样的敏感性。
+- 待验证：Stage 15D 产出必须同时报告 population/enriched strata 的 realized-panel
+  描述、唯一 clone group 数和每组标签数，并由 validator 拒绝任何总体因果识别声明。
+- 对方向的意义：既能集中学习稀有拥堵状态，又不牺牲对大规模订单总体的可解释性。
+
+### NI-006：把直接处理集合与实际系统受影响集合分开
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：一个局部动作的直接 target bags 与最终产生结果差异的 bags 并不等价。
+- 决策：每个完整 H_system pair 同时记录 `direct_treatment_set` 和
+  `realized_affected_set`，报告外部性大小与 H_bag/H_system 符号不一致率。
+- 待验证：128 个 H_system pairs 完成后计算。
+- 对方向的意义：这是判断局部自治是否会产生不可接受全局副作用的关键证据。
+
+### NI-007：G2 活跃 token 上限可按“上游前沿”而非订单数界定
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：`map2` 有 54 个节点、69 条有向边、23 个多入边合流节点；本图所有合流
+  节点入度均为 2。旧 E4 的 pending request churn 与订单数强相关。
+- 决策候选：G2 在每个 `(upstream, destination)` 前沿最多保留一个代表请求，
+  使每个目的节点活跃 token/request 上界为入度，而不是上游等待订单数。
+- 必须保持：slot-first、work-conserving、一步预约、目的节点所有权、loser 留在
+  上游；不得读取未来路线或全局队列。
+- 待验证：实现后必须证明
+  `eligible_request_exists_but_slot_idle_seconds == 0`，并完成守恒、代次、
+  stale/forged token、checkpoint/digest/tamper 回归。
+- 对方向的意义：把协议状态复杂度从订单规模解耦到局部拓扑度数，是面向更大订单
+  规模的直接结构性改进。
+
+### NI-008：当前“去中心化”结论限定为逻辑与信息作用域
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：当前实现仍在单进程事件循环中；目的节点 controller 的所有权和策略输入
+  是局部的，但尚未证明跨进程消息传递、容错一致性或网络部署。
+- 决策：正式文档使用“destination-owned / local-information decentralized
+  semantics”，不宣称已经完成物理分布式部署。
+- 对方向的意义：保持论文和工程声明与证据边界一致，同时为后续真正分布式实现
+  保留清晰接口。
+
+### NI-009：所有新协议/监督器状态都必须进入 checkpoint 与确定性摘要
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：若 G2 token、supervisor latch 或代次不进入 checkpoint/digest，
+  matched replay 可能表面相同、实际遗漏关键状态。
+- 决策：任何新增持久运行时状态必须同时进入 capture/restore、组件 digest、
+  aggregate seal、tamper test 和 no-op replay fidelity。
+- 待验证：G2/supervisor 实现阶段执行。
+- 对方向的意义：确保局部自治机制在并行实验、故障恢复和可复现实验中仍是同一个
+  状态机。
+
+## 暂不采纳
+
+### NR-001：把内存 checkpoint 直接称为 sparse checkpoint 文件
+
+- 状态：`REJECTED`
+- 原因：源码没有可验证的序列化/反序列化契约，也没有跨进程 seal；这样做会产生
+  无法恢复且不可审计的“证据文件”。采用 NI-004 的两遍确定性重放。
+
+### NR-002：未过 2048/128 硬门就训练并发布正式学习模型
+
+- 状态：`REJECTED`
+- 原因：这会重复 G4IRSF14 “有 descriptor、没有完成 action-changing label”
+  的失败。硬门未满足时只允许输出阻塞证据和机制候选，不得声称学习收益。
+
+## 实施中新发现
+
+### NI-010：机会普查、统计选样和完整 descriptor 物化必须分成三阶段
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：在每个候选边界计算完整 18 组件状态摘要，会让仅 512 个 segment 的试扫
+  超过 120 秒；直接对原始 43,603 segment 运行该算法不可行。
+- 决策：第一遍原生运行只发布 outcome-free、无完整状态摘要的轻量 skeleton 人口；
+  第二阶段在 Python 中与受保护的 task/tail 元数据连接，按层记录
+  `N_h/n_h/pi_h` 并冻结选中 skeleton；第三遍原生确定性重放，只为选中的
+  skeleton 计算完整状态摘要和唯一主动作，生成内容寻址 descriptor。
+- 必须验证：轻量 skeleton 步骤与正常 no-op 步骤的事件后状态完全一致；人口终止
+  必须证明 finalize、43,603 complete、0 failed、无 event-limit；选中 skeleton
+  必须在第二遍重放到同一事件并重新成为原生唯一主动作。
+- 已验证：Debug/Release tiny canonical map2 链路得到 190 events、18 个 skeleton，
+  I1/I3/I4 各物化并完成一个 action-changing H_bag；later-only ordinal 129
+  重放精确命中。原生回归证明 full probe 与 skeleton no-op 的事件后状态摘要一致，
+  event-cap 截断不能冒充完整 census。原始 43,603 segment 人口仍需正式执行。
+- 对方向的意义：人口普查成本随事件数增长，而昂贵状态封装成本随实验目标数增长，
+  避免为了扩大订单规模而让证据生成成本二次爆炸。
+
+### NI-011：二进制哈希不能替代“该二进制由这些源码构建”的证明
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：同时记录 `.pyd` SHA 和当前源码 SHA，只能证明两个对象当时存在，不能证明
+  二进制确由这些源码编译。
+- 决策：正式 campaign 只接受由 clean Release 构建过程生成的 exact-binary
+  manifest；它绑定本地传递依赖清单、CMakeCache、编译器/Python/pybind11、
+  configure/build argv、Git HEAD、binary diff、staged diff、未跟踪源码和最终
+  模块 SHA。源码在构建期间变化则中止。
+- 证据：独立生成器和 6 个定向单元测试已实现；实际清单只能在最终接口冻结并完成
+  clean build 后发布。
+- 对方向的意义：后续局部自治策略、监督器或学习器的收益都能追溯到同一份可重建
+  运行时，而不是不可解释的本地二进制。
+
+### NI-012：历史 fail-closed 证据应通过显式 successor transition 延续
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：G4IRSF14 历史校验器把自身及 Stage-E 源码纳入冻结身份；直接修改它来
+  “允许新源码”会破坏它自己的证据链，而永远要求当前源码等于旧源码又会阻止合法
+  后继开发。
+- 决策：保持 G4IRSF14 校验器字节不变。新校验器从冻结 Git commit 重建历史源码
+  临时快照并运行原校验器，再验证内容寻址的 G4IRSF14→G4IRSF15 源码过渡清单。
+- 证据：合法过渡、successor 源码篡改和 manifest 自哈希篡改 3 个回归均已通过；
+  旧校验器仍保持 Git 零差异。
+- 对方向的意义：每代去中心化机制都能演进运行时，同时保留上一代负结果和门禁的
+  原始含义，避免“为了让 CI 绿而重写历史”。
+
+### NI-013：系统指标必须同时保留 runtime segment 与原始订单两个口径
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：原始 28,506 个订单展开成 43,603 个 runtime segment；只按 segment
+  汇总会给多段订单更高权重。现有七元 runtime records 又没有受保护的
+  `original_entry_time`，不能从 release 猜测。
+- 决策：三个原生 campaign API 接受按 segment 对齐、由受保护 inputdata 重建的
+  `original_entry_times`；校验同一 task 值一致且不晚于 release，并同时发布
+  43,603 segment cohort 和 28,506 raw-bag original-entry 聚合及 mapping SHA。
+- 待验证：真实 exact-pyd 集成测试和 128 个完整 H_system pairs 必须让两种口径
+  贯穿 native evidence、label、独立 validator 和最终报告。
+- 已验证：Release tiny H_system smoke 已能从完整 cohort difference sidecar
+  重算 changed set、realized numeric delta 与 raw-original delta；tiny 输入因不是
+  43,603/28,506 protected shape 而被 formal hard gate 正确阻断。
+- 对方向的意义：扩展到更大订单规模时，不把拆分较多的订单误当成更多独立需求，
+  使局部策略的系统级外部性结论保持业务可解释性。
+
+### NI-014：exact binary 应同时做到内容绑定与字节可复现
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：同一冻结源码、同一 MSVC/LTCG 工具链连续两次 clean Release build 得到
+  相同大小但不同 SHA 的 `.pyd`；单纯记录某次二进制哈希可精确重放，却不利于第三方
+  从源码复建同一字节。
+- 决策：仅对 MSVC 的 `czr005_cpp` MODULE 目标同时增加编译与链接 `/Brepro`；
+  不能只设置 shared-linker flags，因为 pybind 目标属于 MODULE。
+- 证据：在两个全新独立 build 目录、MSVC 19.41 上分别 clean build，两个
+  2,030,080-byte 模块逐字节相同，SHA256 均为
+  `c0ffa547cd1ad1bad0418dd29c540c540b97186a89901897bec71202dc638d2e`，
+  其中一份通过 pybind smoke。
+- 待验证：最终源码提交后由 exact-binary attestor 再执行一次 clean build，并与
+  第二个独立目录复核 SHA；正式 manifest 记录最终提交上的哈希。
+- 对方向的意义：扩大实验和部署规模后，每个 worker 都能验证自己加载的是同一
+  状态机字节，而不只是“由相似源码编译”的模块。
+
+### NI-015：离线人口分层不得参与局部动作排序
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：第一版 skeleton 把全局 merge/fault/queue 计数放进 population group
+  hash，又用该 hash 给 I1/I3 候选动作排序；因此远端拥堵变化可能改变同一局部
+  boundary 的处理动作，且生产 global-scan 计数不会暴露这条离线审计路径。
+- 决策：把 projection 拆成两部分。全局计数只生成 offline population group，
+  用于实验分层；primary treatment 完全采用局部稳定数值序：I1 取本地 ready-set
+  最小合法 peer，I3 取本地 legal-next 中最小非 baseline 邻边，I4 只有唯一 hold。
+  event ordinal、全局 event sequence 和任何 offline strata 都不得参与 action rank。
+  因此“runtime no global scan”限定为在线决策执行路径；离线 census 仍可遍历已冻结
+  controller/fault/junction 计数做审计分层，但该遍历不属于可部署策略输入。
+- 证据：远端 queue/fault/merge strata 扰动回归证明 group/evidence hash 会变化，
+  但 I1 peer 与 I3 next-edge 不变；Release CTest 2/2 通过。受保护 map/model 前
+  512 segments 的 6,863 个 skeleton（I1=238、I3=1,850、I4=4,775）全部满足
+  局部数值序。
+- 对方向的意义：离线研究仍可观察总体分层，但未来部署的 destination-owned
+  controller 不会因不可见的远端状态改变本地决策，守住逻辑去中心化边界。
+
+### NI-016：因果 campaign 必须执行完整预注册面板，工程门槛不能成为提前停止条件
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：若在累计达到 2,048 个 H_bag 或 128 个 H_system label 后停止，后续 target
+  是否被观测将依赖先前 outcome；即使已执行行全部正确，抽样权重、失败率和尾部结论
+  仍会产生不可恢复的选择偏差。
+- 决策：formal plan 冻结全部 target、shard 与顺序；发布必须恰好执行所有预注册
+  shard，并为每个 target 保留一行（包括 false positive、horizon incomplete、
+  neutral 与 harmful）。任一 shard 缺失、重复或额外出现时，只允许发布
+  `INCOMPLETE_PANEL`，不得发布 effect estimate 或 gate pass。
+- 证据：generator 与独立 validator 已实现完整 shard inventory、target inventory、
+  native pair 到 label 的逐行重建及禁止 outcome-dependent early stop；仍需最终
+  exact binary 的完整 formal 运行验证。
+- 对方向的意义：大规模场景中的局部策略必须对“没有奏效的局部机会”同样负责，
+  不能只保留成功干预，从而为后续 supervisor 和学习器提供可审计的失败边界。
+
+### NI-017：horizon assignment 概率未冻结时，H_system 与混合 horizon 只能作描述性证据
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：当前 H_system target 由 deterministic hash、clone/event 去重和固定预算
+  分配；它没有可审计的随机 horizon assignment probability。assigned H_bag 又是
+  该分配的补集，因此仅用 descriptor 的抽样比例不能把任一 horizon 的效应升级为
+  原始 skeleton 总体的无偏 HT/Hájek 估计。
+- 决策：本轮 population effect 明确标记为未识别；H_system、H_bag-only 和混合
+  horizon 指标仅发布 complete realized panel 的 descriptive/reference-sensitivity
+  结果。下一版若需要总体估计，应按 clone cluster 在预注册 block 内做 SRSWOR，
+  再在选中 clone 内均匀选择一个 descriptor，并记录
+  `rho=(H_q/G_q)*(1/g_c)`；或让每个 formal target 都发布同定义的 H_bag endpoint。
+- 证据：统计审计已给出有限总体与 horizon 两阶段概率合同；独立 validator 正在
+  加入“任何未建模 horizon 均不得声称 population causal inference”的篡改回归。
+- 对方向的意义：去中心化控制的局部收益和系统外部性被分开陈述，避免用小范围
+  局部 endpoint 掩盖全系统代价，也避免以复杂权重制造不存在的总体代表性。
+
+### NI-018：split 连通分量必须合并 I1 的全部直接受影响 raw tasks
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：I1 会在 target 与 peer 两个 ready bag 之间交换本次 source service；若 split
+  只按 target task 或 clone group 分组，peer task 可以进入另一数据切分，形成直接
+  outcome 泄漏。H_system 的外部性集合若全部并入，则又会把大部分 1x cohort
+  不必要地塌缩成单一连通分量。
+- 决策：split 使用 clone group 与所有 direct-affected task IDs 的并查集连通分量；
+  I1 同时纳入 target 与 peer，I3/I4 纳入各自直接处理 task；H_system externality
+  只用于评估，不参与 split 连边。
+- 证据：generator 与独立 validator 已分别重建 direct-task union，并要求 split
+  contamination 为 0；最终 formal labels 仍需验证实际连通分量规模。
+- 对方向的意义：局部动作学习不会通过同一订单的直接反事实结果“偷看”验证集，
+  同时保留足够多的独立局部自治单元用于训练、校准和评估。
+
+### NI-019：H_system 原始订单指标需要逐 raw-bag sufficient-statistics sidecar
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：只有 43,603 个 segment 的 outcome hash 和 changed-row 数值，无法从发布
+  证据独立重算 28,506 个原始订单的均值、分位数、deadline miss 与完整性；仅核对
+  native aggregate 会留下“重哈希 aggregate 与 shard”仍能通过的审计缺口。
+- 决策：每个 H_system branch 按 task ID 严格升序发布 raw-bag sufficient statistics：
+  runtime ID mapping、完成/失败/deadline 标志、original-entry、release、source-wait、
+  network 与 total-system 累计量，并绑定逐行 SHA、全体 content SHA、segment/raw-bag
+  mapping SHA。label 只保留 binding；原“每个压缩 shard 保存完整 raw rows”的存储
+  条款已被 NI-022 覆盖，改为一份完整 baseline 加每个 treatment 的稀疏 changed rows。
+- 证据：原生 sidecar、聚合等价回归、Python 独立重算和定向篡改测试已实现并通过；
+  正式 protected 28,506-row H_system 运行、稀疏差分大小与总发布体积仍待实测。
+- 对方向的意义：扩展到更多订单和拆分 segment 时，系统指标仍以业务订单为单位，
+  且任何 worker、validator 或后续论文分析都能从充分统计独立恢复结论。
+
+### NI-020：pilot 自适应后的权重必须限定为条件有限总体或 reference sensitivity
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：active kind、R2 是否执行和 formal attempt budget 均由 pilot outcome 决定。
+  因此把多阶段比例约掉得到 `m_h/N_h`，不能无条件解释为原始 skeleton 总体的一阶
+  inclusion probability；blocked kind 的 formal inclusion probability 更是 0。
+- 决策：工程 gate 与总体推断分开。本轮若保留权重，只称
+  `design-conditional on observed pilot history and active-kind set` 的 post-pilot
+  finite-frame reference weight；complete/action-changing responder 的 ratio mean
+  不称为所有 opportunity 的 ATE。下一版在 census 时预留互斥 R1/R2，并在 outcome
+  前冻结独立 formal randomization seed。
+- 证据：统计审计已推导 conditional `pi=m_h/F_h`、responder-domain HT total 与
+  Hájek ratio 的适用边界；正式 artifact 与 validator 仍需逐字段验证这些 claim。
+- 对方向的意义：框架可以继续利用 pilot 做资源分配和机制筛查，同时不把工程上的
+  自适应决策误包装成对所有局部自治状态的无偏因果结论。
+
+### NI-021：R2 必须绑定可解释的 screening 修订，单纯换一批 target 不等于修复
+
+- 状态：`PENDING`
+- 发现：若 R1 的 action-changing complete 支持不足，仅从同一 sealed pool 换 64 个
+  descriptor，最多证明另一批样本的命中率，不能证明 false-positive screening 已被
+  修复。若修订会改变原生动作、descriptor 定义或 binary，旧 census、pool 与 R1
+  又全部失去同源性。
+- 决策：R2 只接受两种 fail-closed 路径：其一，发布绑定 R1 false-positive taxonomy、
+  同一冻结 source/binary/census 的离线 screening-revision manifest，再重建 pool；
+  其二，明确发布 `SCREENING_REPAIR_REQUIRED` blocker 而不运行 R2。任何原生源码或
+  descriptor 语义变化都必须重建 exact binary、census、pool，并从 R1 重新开始。
+- 待验证：只有 R1 出现 `RESAMPLE_REQUIRED` 时才激活该合同；若 R1 全部通过，则该
+  路径保持 dormant，不制造虚构的“已修复”证据。
+- 对方向的意义：局部机制的稀疏支持会被当作需要解释和修复的结构性信号，而不是
+  靠不断重抽样掩盖；这对更大拓扑、更大订单规模下的机制迁移尤其重要。
+
+### NI-022：完整 shard 是运行态，Git 发布应使用单一 baseline 加稀疏 treatment 差分
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：每个完整 H_system pair 若重复保存 43,603-row cohort hash sidecar 和两份
+  28,506-row raw-bag sufficient statistics，实测约 10.70 MB zstd；仅 128 个 complete
+  pair 就约 1.28 GiB，固定 256 次尝试最坏约 2.55 GiB，虽单 shard 小于 GitHub
+  100 MiB 限制，整个证据包仍不可持续推送。
+- 决策：完整 native shard 保留为本地、可恢复、内容寻址的 run-state，不直接进入
+  Git。正式发布保存一份所有 H_system target 共同的 deterministic baseline：
+  全 cohort baseline outcome-hash inventory 与 baseline raw-bag rows；每个 treatment
+  只保存 changed segment outcomes 和 changed raw-task rows。validator 以 baseline
+  补齐未变化行，重建完整 43,603-row cohort outcome-hash inventory 与 28,506-row
+  raw-bag sidecar/content SHA，并从 raw rows 独立重算订单聚合与分位数后再接纳
+  label；不从 cohort hashes 虚构 segment 数值聚合。若任一 baseline root 不同，则
+  fail closed，禁止去重。
+- 证据：尺寸测量已完成；compact producer、独立 validator 与定向 tamper tests
+  已实现并通过。baseline continuation 的最终 cohort/raw roots、首个真实 sparse
+  change-set 密度及 256-pair 总 Git 体积仍须在正式 protected 面板中逐 pair 验证。
+- 对方向的意义：证据体积从“订单规模 × 干预数”中的重复 baseline 项移除，保留
+  与真实外部性变化量近似成正比的增量；这是框架面向更大订单规模时同样重要的
+  数据平面去中心化与可扩展性改进。
+
+### NI-023：分片内容正确还不够，发布物必须绑定可审计的执行 profile
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：单独验证 shard 内容不能证明 worker 采用新进程、受到内存上限约束、持续
+  存活或执行了完整预注册面板；人工 tmux 日志也无法形成便携的内容寻址契约。
+- 决策：使用 bounded fresh-process orchestrator。每次执行发布原子、自哈希 profile
+  与 heartbeat，绑定 plan/binary/build/worker/orchestrator SHA、精确 argv、整棵
+  worker process-tree RSS、强制 cap、时间戳和 shard 结果。pilot/formal finalizer
+  只接受一个或多个互斥 profile，且其 requested shard 并集必须精确等于计划全集；
+  profile 只能发布到非忽略的专用目录，portable validator 不依赖原主机二进制路径。
+- 证据：Windows process-tree RSS 实测、cap 超限/不可观测/快速退出/TERM 升级、
+  周期 heartbeat、覆盖缺口/重叠、源码与输入篡改、外部二进制删除后复制仓库验证等
+  回归均已通过；真实 protected pilot 的 1/2/4-worker 吞吐与峰值仍待运行。
+- 对方向的意义：扩大订单与并行度时，资源边界、恢复语义和完整执行面板成为正式
+  证据的一部分，避免“算法可扩展”被不可复现的进程管理或隐式内存过载掩盖。
+
+### NI-024：native formal shape 门可进一步绑定 pinned cohort 身份
+
+- 状态：`PENDING`
+- 发现：当前 native `protected_full_1x_shape` 直接检查 43,603/28,506 数量；精确
+  runtime/raw/original-entry mapping SHA 与 protected input SHA 由外层 plan、pair
+  attestation 和独立 validator 绑定。该组合已 fail closed，但 native 单层仍是数量门。
+- 候选改进：后续把 pinned runtime/raw/original-entry mapping SHA 作为只读配置传入
+  native formal gate，使数量相同但身份不同的 cohort 在原生层也立即失败。这个改动
+  会改变 binary/source identity，不能在本轮 census 之后热补。
+- 证据边界：本轮由双层 Python provenance 与逐 pair mapping SHA 提供完整身份保证；
+  native pinning 仅作为纵深防御候选，不冒充已实现功能。
+- 对方向的意义：多站点或更大订单规模下，不同 cohort 可能具有相同计数；把身份门
+  下沉能减少跨部署误接数据集的风险，同时保持局部运行时不读取全局未来信息。
+
+### NI-025：资源上限应产生结构化 blocker，而不是通用异常
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：event cap 恰好落在 nonzero candidate-mask 顶部时，旧 skeleton probe 会因
+  `event_processed=false` 抛通用 invalid-step 异常；它虽不会伪造完成，却丢失了可
+  审计的截断原因。
+- 决策：只在 event/time limit 已被 runtime 明确置位时返回
+  `SKELETON_PROBE_SKIPPED_RUNTIME_LIMIT`，要求 observed set 为空、事件计数不增长，
+  scan 终止并发布不完整 census；其他 `event_processed=false` 仍抛错。未处理的顶部
+  不计入 processed candidate 统计。
+- 证据：新增“完整 skeleton census 与普通 drain 的五项 terminal replay hash/计数
+  完全一致”回归，以及“cap 精确落在首个 nonzero mask”回归；原生测试和三 API
+  pybind smoke 均通过。
+- 对方向的意义：当更大规模运行触碰资源边界时，框架能输出机器可判定的负证据并
+  安全恢复，而不是留下无法区分算法错误、资源截断和真实不可行性的模糊失败。
+
+### NI-026：发布级因果证据应在异构操作系统上复验
+
+- 状态：`PROPOSED`
+- 发现：Windows 生成端的盘符绝对路径若在 Linux 校验端直接交给宿主 `Path`，
+  会被误判为相对路径；CMake 与 worker argv 的 basename 也存在同类生产端语义
+  丢失风险。本机生成与本机复验都通过，仍不足以证明证据包可移植。
+- 决策：build manifest、orchestrator profile 与 portable validator 按生产端
+  Windows/POSIX 词法解释路径；GitHub Ubuntu workflow 在相应产物存在时分别执行
+  scan、pilot R1/R2 或 formal 的静态内容复验，不依赖重新打开生成机上的外部
+  binary。源码阶段无产物时允许显式跳过，不能据此把本条升级为已验证。
+- 现有证据：Windows 聚焦回归、纯 Windows producer-path 的跨主机词法回归、外部
+  binary 删除后复制仓库复验均已通过；只有当 Ubuntu CI 对已提交 protected
+  artifacts 的条件分支实际通过后，状态才可升级为 `RUNTIME_VERIFIED`。
+- 对方向的意义：去中心化、跨 worker、跨站点的大规模执行天然会遇到异构部署；
+  把跨 OS 复验纳入发布门禁，能避免把生成机文件系统偶然性误当成算法证据的一部分。

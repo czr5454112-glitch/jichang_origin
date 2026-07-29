@@ -4,6 +4,7 @@ import csv
 import json
 from pathlib import Path, PurePosixPath, PureWindowsPath
 import shutil
+import subprocess
 from typing import Any, Callable
 
 import pytest
@@ -13,15 +14,38 @@ from scripts import validate_g4irsf14_fail_closed_completion as validator
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+PREDECESSOR_SOURCE_COMMIT = "966a063573f0419df1324708db75211c521d59db"
+SUCCESSOR_CHANGED_STAGE_E_PATHS = {
+    Path("CMakeLists.txt"),
+    Path("cpp/ics_core/bindings/czr005_cpp.cpp"),
+    Path("cpp/ics_core/runtime/event_driven_junction.hpp"),
+}
 
 
 def _copy_bundle(destination: Path) -> Path:
     for relative in validator.REQUIRED_BUNDLE_FILES:
-        source = REPOSITORY_ROOT / relative
-        assert source.is_file(), relative.as_posix()
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source, target)
+        if relative in SUCCESSOR_CHANGED_STAGE_E_PATHS:
+            historical = subprocess.run(
+                [
+                        "git",
+                        "show",
+                        (
+                            f"{PREDECESSOR_SOURCE_COMMIT}:"
+                            f"{relative.as_posix()}"
+                        ),
+                ],
+                cwd=REPOSITORY_ROOT,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            ).stdout
+            target.write_bytes(historical)
+        else:
+            source = REPOSITORY_ROOT / relative
+            assert source.is_file(), relative.as_posix()
+            shutil.copyfile(source, target)
     return destination
 
 

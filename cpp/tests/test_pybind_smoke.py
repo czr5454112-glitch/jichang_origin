@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 
 import czr005_cpp
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 LEGACY = ROOT / "legacy" / "jichang_origin_readonly"
 RUNTIME = ROOT / "artifacts" / "runtime"
 
@@ -125,6 +127,138 @@ def main() -> None:
     assert task_summary["early_split_raw_task_count"] == 15097
     assert task_summary["expanded_task_count"] == 43603
     assert task_summary["expanded_by_start"][52] == 15097
+
+    from scripts.eval import g4irsf15_causal_campaign as g4irsf15
+
+    native_arguments, _, _ = g4irsf15._native_arguments(ROOT)
+    small_arguments = list(native_arguments)
+    small_arguments[3] = small_arguments[3][:16]
+    small_arguments[11] = small_arguments[11][:16]
+
+    bad_arguments = list(small_arguments)
+    bad_arguments[11] = bad_arguments[11][:-1]
+    try:
+        czr005_cpp.g4irsf15_scan_causal_skeletons_from_records(
+            *bad_arguments
+        )
+    except ValueError as exc:
+        assert "original_entry_times" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 scan must reject misaligned original entry times"
+        )
+
+    g15_scan = czr005_cpp.g4irsf15_scan_causal_skeletons_from_records(
+        *small_arguments
+    )
+    assert g15_scan["input_request_count"] == 16
+    assert g15_scan["terminal_finalized"] is True
+    assert g15_scan["census_complete"] is False
+    assert g15_scan["terminal_invariants"]["event_limit_reached"] is False
+    assert g15_scan["terminal_invariants"]["time_limit_reached"] is False
+    assert g15_scan["terminal_invariants"]["hard_gate_fail_reasons"] == [
+        "PROTECTED_FULL_1X_SHAPE_MISMATCH"
+    ]
+
+    selected_skeletons = [
+        next(
+            dict(row)
+            for row in g15_scan["skeletons"]
+            if row["kind"] == kind
+        )
+        for kind in ("I1", "I3", "I4")
+    ]
+    try:
+        czr005_cpp.g4irsf15_materialize_causal_descriptors_from_records(
+            *bad_arguments,
+            selected_skeletons,
+        )
+    except ValueError as exc:
+        assert "original_entry_times" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 materialize must reject misaligned original entries"
+        )
+
+    materialized = (
+        czr005_cpp.g4irsf15_materialize_causal_descriptors_from_records(
+            *small_arguments,
+            selected_skeletons,
+        )
+    )
+    descriptors = [dict(row) for row in materialized["descriptors"]]
+    assert [row["kind"] for row in descriptors] == ["I1", "I3", "I4"]
+    assert all(
+        row["runtime_state_sha256"] and row["boundary_sha256"]
+        for row in descriptors
+    )
+
+    h_bag_targets = []
+    for descriptor in descriptors:
+        target = dict(descriptor)
+        target["horizon"] = "H_bag"
+        target["intervention_sha256"] = dict(
+            target["intervention_sha256_by_horizon"]
+        )["H_bag"]
+        h_bag_targets.append(target)
+    try:
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *bad_arguments,
+            h_bag_targets,
+        )
+    except ValueError as exc:
+        assert "original_entry_times" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 pair runner must reject misaligned original entries"
+        )
+
+    h_bag_payload = (
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            h_bag_targets,
+        )
+    )
+    h_bag_pairs = [dict(row) for row in h_bag_payload["pairs"]]
+    assert len(h_bag_pairs) == 3
+    for pair, target in zip(h_bag_pairs, h_bag_targets, strict=True):
+        assert pair["pair_status"] == "ACTION_CHANGED_HORIZON_COMPLETE"
+        assert pair["action_changed"] is True
+        assert pair["same_state_start"] is True
+        assert pair["treatment_step"]["changed_action_count"] == 1
+        assert g4irsf15._validate_action_change_certificate(
+            pair, target
+        )
+
+    h_system_target = dict(descriptors[0])
+    h_system_target["horizon"] = "H_system"
+    h_system_target["intervention_sha256"] = dict(
+        h_system_target["intervention_sha256_by_horizon"]
+    )["H_system"]
+    h_system_payload = (
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [h_system_target],
+        )
+    )
+    h_system_pair = dict(h_system_payload["pairs"][0])
+    assert h_system_pair["action_changed"] is True
+    assert h_system_pair["same_state_start"] is True
+    assert h_system_pair["horizon_complete"] is True
+    assert h_system_pair["h_system_cohort_size"] == 16
+    assert h_system_payload["raw_bag_count"] == 8
+    assert h_system_pair["pair_status"] == "ACTION_CHANGED_HARD_GATE_FAILED"
+    assert any(
+        reason.endswith("PROTECTED_FULL_1X_SHAPE_MISMATCH")
+        for reason in h_system_pair["hard_gate_fail_reasons"]
+    )
+    for branch_name in ("baseline", "treatment"):
+        raw_sidecar = h_system_pair[branch_name][
+            "raw_bag_sufficient_statistics_sidecar"
+        ]
+        assert raw_sidecar["row_count"] == 8
+        assert raw_sidecar["selected_segment_count"] == 16
+        assert raw_sidecar["complete_coverage"] is True
 
     native_replay = czr005_cpp.edge_score_native_replay_summary(
         str(LEGACY / "map2.txt"),

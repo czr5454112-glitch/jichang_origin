@@ -33,6 +33,7 @@
 #include "ics_core/routing/sipp.hpp"
 #include "ics_core/runtime/edge_score_replay.hpp"
 #include "ics_core/runtime/event_driven_junction.hpp"
+#include "ics_core/bindings/g4irsf15_causal_campaign_binding.hpp"
 
 namespace py = pybind11;
 
@@ -5312,6 +5313,8 @@ py::dict g4irsf11_event_runtime_from_records(
 
 PYBIND11_MODULE(czr005_cpp, module) {
   module.doc() = "Minimal czr005 C++ core bindings for Phase1D parity checks.";
+  czr005::bindings::g4irsf15::register_causal_campaign_bindings(
+      module);
   py::class_<czr005::ics::EdgeScoreModel>(module, "EdgeScoreRuntimeModel")
       .def(py::init<std::vector<std::vector<double>>, std::vector<double>, std::vector<double>, double>(),
            py::arg("w1"),

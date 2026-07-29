@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -198,6 +199,46 @@ EventRuntimeBagRequest request(int task_id,
   value.start = start;
   value.goal = goal;
   value.source = "NON_FORMAL_CAUSAL_RUNTIME_FIXTURE";
+  return value;
+}
+
+EventRuntimeBagRequest raw_sidecar_request(
+    int task_id, std::string segment_id, double release_time,
+    double deadline) {
+  EventRuntimeBagRequest value;
+  value.task_id = task_id;
+  value.segment_id = std::move(segment_id);
+  value.release_time = release_time;
+  value.deadline = deadline;
+  value.start = 46;
+  value.goal = 51;
+  value.source = "NON_FORMAL_RAW_SIDECAR_FIXTURE";
+  return value;
+}
+
+G4IRSF15CausalBagOutcome raw_sidecar_outcome(
+    int runtime_bag_id,
+    const EventRuntimeBagRequest& request,
+    double admitted_time, double finish_time,
+    double source_wait_seconds) {
+  G4IRSF15CausalBagOutcome value;
+  value.runtime_bag_id = runtime_bag_id;
+  value.task_id = request.task_id;
+  value.segment_id = request.segment_id;
+  value.start = request.start;
+  value.goal = request.goal;
+  value.current_node = request.goal;
+  value.known = true;
+  value.completed = true;
+  value.failed = false;
+  value.release_time = request.release_time;
+  value.deadline = request.deadline;
+  value.admitted_time = admitted_time;
+  value.finish_time = finish_time;
+  value.source_wait_seconds = source_wait_seconds;
+  value.completion_seconds =
+      finish_time - request.release_time;
+  value.status = "COMPLETED";
   return value;
 }
 
@@ -484,6 +525,106 @@ void test_i3_and_i4_local_actions() {
       [&] { unsafe_reverse.validate(); },
       "I4 must reject unsafe hold/release direction");
   apply_and_finish(config, hold);
+}
+
+struct I4NaturalHoldEvidence {
+  double action_time = -1.0;
+  double wakeup_time = -1.0;
+  std::uint64_t wakeup_generation = 0;
+  std::string application_reason;
+};
+
+I4NaturalHoldEvidence apply_i4_natural_hold_once(
+    const EventDrivenJunctionConfig& config) {
+  const auto captured = branch_opportunity(
+      G4IRSF14CloneBoundaryKind::kHoldReleaseOpportunity,
+      kG4IRSF14CausalCandidateI4, config);
+  EventDrivenJunctionRuntime treatment(
+      canonical_map2().graph, config);
+  treatment.restore_state_checkpoint(captured.checkpoint);
+  const auto applied =
+      treatment.process_one_event_with_causal_intervention(
+          make_directive(captured.boundary));
+  require(
+      applied.intervention_applied &&
+          applied.changed_action_count == 1 &&
+          applied.application_reason ==
+              "APPLIED_I4_SAFE_HOLD_UNTIL_NEXT_JUNCTION_SERVICE_OPPORTUNITY",
+      "I4 must certify one committed natural local hold");
+  const auto snapshot = treatment.g4irsf15_local_action_snapshot(
+      captured.boundary.runtime_bag_id);
+  require(
+      snapshot.known && snapshot.queued_at_current_node &&
+          snapshot.junction_wakeup_pending &&
+          snapshot.junction_wakeup_generation > 0 &&
+          snapshot.junction_wakeup_time >
+              captured.boundary.time,
+      "I4 certificate must expose a queued bag and a live future wakeup");
+  const double expected_wakeup =
+      captured.boundary.time +
+      std::max(service_duration(captured.boundary.node, config),
+               config.dispatch_headway_seconds);
+  require(
+      std::abs(snapshot.junction_wakeup_time -
+               expected_wakeup) <= 1.0e-12,
+      "I4 must wait exactly one natural local service opportunity");
+  return I4NaturalHoldEvidence{
+      captured.boundary.time,
+      snapshot.junction_wakeup_time,
+      snapshot.junction_wakeup_generation,
+      applied.application_reason};
+}
+
+void test_i4_natural_hold_is_retry_interval_independent() {
+  auto short_retry = frozen_config();
+  short_retry.retry_interval = 0.01;
+  auto long_retry = frozen_config();
+  long_retry.retry_interval = 7.0;
+  const auto short_evidence =
+      apply_i4_natural_hold_once(short_retry);
+  const auto long_evidence =
+      apply_i4_natural_hold_once(long_retry);
+  require(
+      std::abs(
+          (short_evidence.wakeup_time -
+           short_evidence.action_time) -
+          (long_evidence.wakeup_time -
+           long_evidence.action_time)) <= 1.0e-12 &&
+          short_evidence.application_reason ==
+              long_evidence.application_reason,
+      "I4 committed action must not depend on the generic retry interval");
+}
+
+void test_i1_blocked_admission_is_not_action_changing() {
+  auto config = frozen_config();
+  const int source = 46;
+  const double duration = service_duration(source, config);
+  EventDrivenJunctionRuntime runtime(
+      canonical_map2().graph, config);
+  runtime.initialize(
+      {
+          request(63501, source, 51, 2.0, "i1-resource-owner"),
+          request(63502, source, 51, 2.0 + duration * 0.5,
+                  "i1-blocked-a"),
+          request(63503, source, 51, 2.0 + duration * 0.5,
+                  "i1-blocked-b"),
+      });
+  const auto captured = capture_opportunity(
+      runtime,
+      G4IRSF14CloneBoundaryKind::kSourceArbitration,
+      kG4IRSF14CausalCandidateI1);
+  EventDrivenJunctionRuntime treatment(
+      canonical_map2().graph, config);
+  treatment.restore_state_checkpoint(captured.checkpoint);
+  const auto attempted =
+      treatment.process_one_event_with_causal_intervention(
+          make_directive(captured.boundary));
+  require(
+      attempted.target_opportunity_observed &&
+          !attempted.intervention_applied &&
+          attempted.changed_action_count == 0,
+      "I1 source-order intent must not be labelled action-changing when "
+      "the selected peer cannot reserve source service");
 }
 
 void test_i5_same_ready_slice_disable() {
@@ -793,6 +934,565 @@ void test_explicit_horizon_stop_semantics() {
   }
 }
 
+void test_g4irsf15_skeleton_probe_exact_post_state() {
+  const auto config = frozen_config();
+  const auto captured = branch_opportunity(
+      G4IRSF14CloneBoundaryKind::kJunctionRouteArbitration,
+      kG4IRSF14CausalCandidateI3, config);
+  EventDrivenJunctionRuntime full(canonical_map2().graph,
+                                  config);
+  EventDrivenJunctionRuntime skeleton(canonical_map2().graph,
+                                      config);
+  full.restore_state_checkpoint(captured.checkpoint);
+  skeleton.restore_state_checkpoint(captured.checkpoint);
+  const auto full_step =
+      full.probe_one_event_for_causal_opportunities();
+  const auto skeleton_step =
+      skeleton.probe_one_event_for_causal_skeletons();
+  require(
+      full_step.event_processed &&
+          skeleton_step.event_processed &&
+          skeleton_step.application_reason ==
+              "SKELETON_PROBE_ONLY_NO_ACTION_CHANGED",
+      "full and skeleton probes must consume one no-op event");
+  std::size_t expected_skeleton_count = 0;
+  for (const auto& boundary :
+       full_step.observed_opportunities) {
+    if (boundary.kind !=
+            G4IRSF14CloneBoundaryKind::kSourceArbitration &&
+        boundary.kind !=
+            G4IRSF14CloneBoundaryKind::
+                kJunctionRouteArbitration &&
+        boundary.kind !=
+            G4IRSF14CloneBoundaryKind::
+                kHoldReleaseOpportunity) {
+      continue;
+    }
+    ++expected_skeleton_count;
+    const auto found = std::find_if(
+        skeleton_step.observed_opportunities.begin(),
+        skeleton_step.observed_opportunities.end(),
+        [&](const auto& row) {
+          return row.kind == boundary.kind &&
+                 row.event_seq == boundary.event_seq &&
+                 event_runtime_detail::same_timestamp(
+                     row.time, boundary.time) &&
+                 row.node == boundary.node &&
+                 row.runtime_bag_id ==
+                     boundary.runtime_bag_id &&
+                 row.baseline_next_node ==
+                     boundary.baseline_next_node &&
+                 row.baseline_release ==
+                     boundary.baseline_release &&
+                 row.source_ready_order ==
+                     boundary.source_ready_order &&
+                 row.legal_next_edges ==
+                     boundary.legal_next_edges;
+        });
+    require(
+        found != skeleton_step.observed_opportunities.end(),
+        "lightweight skeleton must exactly match the sealed "
+        "local opportunity");
+  }
+  require(
+      skeleton_step.observed_opportunities.size() ==
+          expected_skeleton_count,
+      "skeleton probe must expose exactly the I1/I3/I4 subset");
+  require(
+      full.deterministic_state_sha256() ==
+          skeleton.deterministic_state_sha256(),
+      "full and lightweight no-op probes must produce the exact "
+      "same post-event runtime state and counters");
+}
+
+void test_g4irsf15_i3_zero_to_pending_certificate() {
+  const auto config = frozen_config();
+  EventDrivenJunctionRuntime source(canonical_map2().graph,
+                                    config);
+  source.initialize({
+      request(66501, 6, 51, 2.0, "i3-pending"),
+      request(66502, 3, 47, 100.0,
+              "i3-pending-system")});
+  const auto captured = capture_opportunity(
+      source,
+      G4IRSF14CloneBoundaryKind::kJunctionRouteArbitration,
+      kG4IRSF14CausalCandidateI3);
+  const auto selected = std::find_if(
+      captured.boundary.legal_next_edges.begin(),
+      captured.boundary.legal_next_edges.end(),
+      [&](int next) {
+        return next !=
+                   captured.boundary.baseline_next_node &&
+               canonical_map2().graph.incoming_degree(next) > 1;
+      });
+  require(
+      selected != captured.boundary.legal_next_edges.end(),
+      "I3 certificate fixture needs an alternative destination "
+      "merge edge");
+  auto directive = make_directive(captured.boundary);
+  directive.intervention.selected_next_node = *selected;
+  directive.validate();
+  EventDrivenJunctionRuntime treatment(
+      canonical_map2().graph, config);
+  treatment.restore_state_checkpoint(captured.checkpoint);
+  const auto before =
+      treatment.g4irsf15_local_action_snapshot(
+          captured.boundary.runtime_bag_id);
+  const auto step =
+      treatment.process_one_event_with_causal_intervention(
+          directive);
+  const auto after =
+      treatment.g4irsf15_local_action_snapshot(
+          captured.boundary.runtime_bag_id);
+  require(
+      before.pending_merge_request_id == 0U &&
+          before.pending_merge_lineage == 0U &&
+          after.pending_merge_request_id != 0U &&
+          after.pending_merge_lineage != 0U &&
+          after.pending_merge_destination == *selected &&
+          step.intervention_applied &&
+          step.changed_action_count == 1 &&
+          step.application_reason ==
+              "APPLIED_I3_MERGE_REQUEST_ENQUEUED_ONE_ACTION",
+      "I3 merge-request action certificate must require a real "
+      "0-to-pending commit");
+  require(
+      g4irsf15_i3_committed_new_pending_request(
+          0U, 0U, after.pending_merge_request_id,
+          after.pending_merge_lineage, true),
+      "I3 0-to-pending predicate must accept the committed request");
+  require(
+      !g4irsf15_i3_committed_new_pending_request(
+          after.pending_merge_request_id,
+          after.pending_merge_lineage,
+          after.pending_merge_request_id,
+          after.pending_merge_lineage, true),
+      "an already-pending request must never be certified as a "
+      "new I3 action");
+  require(
+      !g4irsf15_i3_committed_new_pending_request(
+          0U, 0U, after.pending_merge_request_id,
+          after.pending_merge_lineage, false),
+      "I3 certificate must bind the pending dispatch to the "
+      "selected local action");
+}
+
+void test_g4irsf15_primary_action_is_remote_strata_independent() {
+  G4IRSF15CausalOpportunitySkeleton i1;
+  i1.kind = G4IRSF14CloneBoundaryKind::kSourceArbitration;
+  i1.time = 17.0;
+  i1.event_seq = 91;
+  i1.node = 52;
+  i1.runtime_bag_id = 42;
+  i1.source_ready_order = {42, 19, 7};
+
+  G4IRSF15CausalPrepopStrata quiet;
+  quiet.event_time = i1.time;
+  quiet.event_seq = i1.event_seq;
+  quiet.node = i1.node;
+  quiet.queued_bag_count = 3;
+
+  auto remote_contention = quiet;
+  remote_contention.active_merge_capability_count = 11;
+  remote_contention.pending_merge_request_count = 23;
+  remote_contention.active_physical_fault_edge_count = 5;
+  remote_contention.queued_bag_count = 307;
+
+  const auto quiet_projection =
+      g4irsf15_project_offline_population(
+          i1, quiet, 1001, false);
+  const auto contended_projection =
+      g4irsf15_project_offline_population(
+          i1, remote_contention, 1001, false);
+  require(
+      quiet_projection.has_value() &&
+          contended_projection.has_value(),
+      "same local I1 boundary must remain actionable under remote "
+      "strata changes");
+  require(
+      quiet_projection->population_group_sha256 !=
+          contended_projection->population_group_sha256,
+      "offline population group must retain remote strata for "
+      "sampling coverage");
+  require(
+      quiet_projection
+              ->population_selection_evidence_sha256 !=
+          contended_projection
+              ->population_selection_evidence_sha256,
+      "content-addressed selection evidence may retain its offline "
+      "population-group binding");
+  require(
+      quiet_projection->primary_local_action.peer_runtime_bag_id ==
+              7 &&
+          contended_projection->primary_local_action
+                  .peer_runtime_bag_id ==
+              7 &&
+          quiet_projection->primary_local_action
+                  .candidate_action_count ==
+              2 &&
+          contended_projection->primary_local_action
+                  .candidate_action_count ==
+              2,
+      "remote queue/fault/merge strata must not change the local "
+      "numeric-min I1 peer");
+
+  G4IRSF15CausalOpportunitySkeleton i3;
+  i3.kind =
+      G4IRSF14CloneBoundaryKind::kJunctionRouteArbitration;
+  i3.time = 29.0;
+  i3.event_seq = 103;
+  i3.node = 12;
+  i3.runtime_bag_id = 88;
+  i3.baseline_next_node = 3;
+  i3.legal_next_edges = {9, 3, 6};
+  quiet.event_time = i3.time;
+  quiet.event_seq = i3.event_seq;
+  quiet.node = i3.node;
+  remote_contention.event_time = i3.time;
+  remote_contention.event_seq = i3.event_seq;
+  remote_contention.node = i3.node;
+
+  const auto quiet_i3 =
+      g4irsf15_project_offline_population(
+          i3, quiet, 2002, false);
+  const auto contended_i3 =
+      g4irsf15_project_offline_population(
+          i3, remote_contention, 2002, false);
+  require(
+      quiet_i3.has_value() && contended_i3.has_value() &&
+          quiet_i3->population_group_sha256 !=
+              contended_i3->population_group_sha256 &&
+          quiet_i3->population_selection_evidence_sha256 !=
+              contended_i3
+                  ->population_selection_evidence_sha256 &&
+          quiet_i3->primary_local_action.selected_next_node == 6 &&
+          contended_i3->primary_local_action.selected_next_node ==
+              6,
+      "remote strata may change offline I3 grouping but never its "
+      "local numeric-min alternative edge");
+}
+
+void test_g4irsf15_raw_bag_sufficient_statistics_sidecar() {
+  const std::vector<EventRuntimeBagRequest> requests = {
+      raw_sidecar_request(20, "raw-20-a", 5.0, 20.0),
+      raw_sidecar_request(10, "raw-10-a", 4.0, 8.0),
+      raw_sidecar_request(20, "raw-20-b", 6.0, 17.0),
+  };
+  const std::vector<double> original_entry_times = {
+      0.0, 2.0, 0.0};
+  std::vector<G4IRSF15CausalBagOutcome> outcomes = {
+      raw_sidecar_outcome(0, requests[0], 7.0, 15.0, 2.0),
+      raw_sidecar_outcome(1, requests[1], 5.0, 9.0, 1.0),
+      raw_sidecar_outcome(2, requests[2], 8.0, 18.0, 2.0),
+  };
+
+  const auto sufficient =
+      g4irsf15_build_raw_bag_sufficient_statistics(
+          outcomes, requests, original_entry_times);
+  require(
+      sufficient.complete_coverage &&
+          sufficient.selected_segment_count == 3 &&
+          sufficient.rows.size() == 2U,
+      "raw-bag sidecar must cover every runtime segment exactly once");
+  const auto& task10 = sufficient.rows.at(0);
+  const auto& task20 = sufficient.rows.at(1);
+  require(
+      task10.task_id == 10 &&
+          task20.task_id == 20 &&
+          task10.runtime_bag_ids == std::vector<int>{1} &&
+          task20.runtime_bag_ids == std::vector<int>({0, 2}),
+      "raw-bag sidecar rows must use strict ascending task_id order "
+      "while preserving protected runtime-ID order");
+  require(
+      task10.completed_segment_count == 1 &&
+          task10.complete && !task10.failed &&
+          task10.deadline_miss &&
+          task10.original_entry_total_seconds == 7.0 &&
+          task10.java_release_total_seconds == 5.0 &&
+          task10.scheduled_pre_release_wait_total_seconds == 2.0 &&
+          task10.source_wait_total_seconds == 1.0 &&
+          task10.network_time_total_seconds == 4.0 &&
+          task10.total_system_time_total_seconds == 7.0,
+      "single-segment raw-task sufficient statistics drifted");
+  require(
+      task20.completed_segment_count == 2 &&
+          task20.complete && !task20.failed &&
+          task20.deadline_miss &&
+          task20.original_entry_total_seconds == 33.0 &&
+          task20.java_release_total_seconds == 22.0 &&
+          task20.scheduled_pre_release_wait_total_seconds == 11.0 &&
+          task20.source_wait_total_seconds == 4.0 &&
+          task20.network_time_total_seconds == 18.0 &&
+          task20.total_system_time_total_seconds == 33.0,
+      "multi-segment raw-task sufficient statistics drifted");
+
+  int completed_segment_count = 0;
+  int complete_raw_bag_count = 0;
+  int failed_raw_bag_count = 0;
+  int deadline_miss_raw_bag_count = 0;
+  std::vector<double> original_entry_totals;
+  std::vector<double> java_release_totals;
+  std::vector<double> scheduled_totals;
+  std::vector<double> source_wait_totals;
+  std::vector<double> network_totals;
+  std::vector<double> total_system_totals;
+  for (const auto& row : sufficient.rows) {
+    completed_segment_count += row.completed_segment_count;
+    failed_raw_bag_count += row.failed ? 1 : 0;
+    if (!row.complete) {
+      continue;
+    }
+    ++complete_raw_bag_count;
+    deadline_miss_raw_bag_count +=
+        row.deadline_miss ? 1 : 0;
+    original_entry_totals.push_back(
+        row.original_entry_total_seconds);
+    java_release_totals.push_back(
+        row.java_release_total_seconds);
+    scheduled_totals.push_back(
+        row.scheduled_pre_release_wait_total_seconds);
+    source_wait_totals.push_back(
+        row.source_wait_total_seconds);
+    network_totals.push_back(
+        row.network_time_total_seconds);
+    total_system_totals.push_back(
+        row.total_system_time_total_seconds);
+  }
+  const auto mean = [](const std::vector<double>& values) {
+    return std::accumulate(values.begin(), values.end(), 0.0) /
+           static_cast<double>(values.size());
+  };
+  const auto linear_quantile = [](
+      std::vector<double> values, double probability) {
+    std::sort(values.begin(), values.end());
+    const double position =
+        probability * static_cast<double>(values.size() - 1U);
+    const auto lower =
+        static_cast<std::size_t>(std::floor(position));
+    const auto upper =
+        static_cast<std::size_t>(std::ceil(position));
+    const double fraction =
+        position - static_cast<double>(lower);
+    return values[lower] * (1.0 - fraction) +
+           values[upper] * fraction;
+  };
+  require(
+      completed_segment_count == 3 &&
+          complete_raw_bag_count == 2 &&
+          failed_raw_bag_count == 0 &&
+          deadline_miss_raw_bag_count == 2 &&
+          mean(original_entry_totals) == 20.0 &&
+          linear_quantile(original_entry_totals, 0.5) == 20.0 &&
+          std::abs(
+              linear_quantile(original_entry_totals, 0.95) -
+              31.7) <= 1.0e-12 &&
+          std::abs(
+              linear_quantile(original_entry_totals, 0.99) -
+              32.74) <= 1.0e-12 &&
+          *std::max_element(original_entry_totals.begin(),
+                            original_entry_totals.end()) == 33.0 &&
+          mean(java_release_totals) == 13.5 &&
+          mean(scheduled_totals) == 6.5 &&
+          mean(source_wait_totals) == 2.5 &&
+          mean(network_totals) == 11.0 &&
+          mean(total_system_totals) == 20.0,
+      "serialized raw-task rows must exactly recompute every "
+      "raw_bag_cohort_metrics sufficient statistic");
+
+  const auto is_sha256 = [](const std::string& value) {
+    return value.size() == 64U &&
+           std::all_of(value.begin(), value.end(), [](char ch) {
+             return (ch >= '0' && ch <= '9') ||
+                    (ch >= 'a' && ch <= 'f');
+           });
+  };
+  const std::string runtime_mapping_sha256(64U, '1');
+  const std::string raw_mapping_sha256(64U, '2');
+  const std::string original_entry_mapping_sha256(64U, '3');
+  const auto content_sha256 = sufficient.content_sha256(
+      runtime_mapping_sha256, raw_mapping_sha256,
+      original_entry_mapping_sha256);
+  require(
+      is_sha256(task10.runtime_id_mapping_sha256()) &&
+          is_sha256(task10.row_sha256()) &&
+          is_sha256(content_sha256) &&
+          sufficient.content_sha256(
+              runtime_mapping_sha256, raw_mapping_sha256,
+              original_entry_mapping_sha256) == content_sha256,
+      "raw-bag sidecar row/content hashes must be canonical and stable");
+  auto tampered = sufficient;
+  tampered.rows[0].java_release_total_seconds += 1.0;
+  require(
+      tampered.rows[0].runtime_id_mapping_sha256() ==
+              task10.runtime_id_mapping_sha256() &&
+          tampered.rows[0].row_sha256() != task10.row_sha256() &&
+          tampered.content_sha256(
+              runtime_mapping_sha256, raw_mapping_sha256,
+              original_entry_mapping_sha256) != content_sha256,
+      "raw-bag row/content hashes must bind every sufficient statistic "
+      "without changing the runtime-ID mapping identity");
+
+  auto failed_outcomes = outcomes;
+  failed_outcomes[0].completed = false;
+  failed_outcomes[0].failed = true;
+  failed_outcomes[0].finish_time = -1.0;
+  failed_outcomes[0].admitted_time = -1.0;
+  failed_outcomes[0].source_wait_seconds = 0.0;
+  failed_outcomes[0].status = "FAILED";
+  const auto partial =
+      g4irsf15_build_raw_bag_sufficient_statistics(
+          failed_outcomes, requests, original_entry_times);
+  require(
+      partial.complete_coverage &&
+          partial.rows.size() == 2U &&
+          partial.rows[1].task_id == 20 &&
+          !partial.rows[1].complete &&
+          partial.rows[1].failed &&
+          partial.rows[1].completed_segment_count == 1 &&
+          partial.rows[1].original_entry_total_seconds == 18.0,
+      "sidecar coverage/order must remain complete when a raw task "
+      "is outcome-incomplete");
+
+  auto misordered_outcomes = outcomes;
+  misordered_outcomes[0].runtime_bag_id = 2;
+  require_invalid(
+      [&] {
+        (void)g4irsf15_build_raw_bag_sufficient_statistics(
+            misordered_outcomes, requests,
+            original_entry_times);
+      },
+      "runtime-ID mapping drift must fail closed");
+}
+
+void test_g4irsf15_full_skeleton_census_matches_plain_drain() {
+  const auto config = frozen_config();
+  const std::vector<EventRuntimeBagRequest> requests = {
+      request(66501, 46, 51, 2.0, "census-exact-a"),
+      request(66502, 46, 51, 2.0, "census-exact-b"),
+      request(66503, 3, 47, 100.0, "census-exact-system"),
+  };
+  EventDrivenJunctionRuntime plain(canonical_map2().graph, config);
+  EventDrivenJunctionRuntime census(canonical_map2().graph, config);
+  plain.initialize(requests);
+  census.initialize(requests);
+
+  plain.drain();
+  plain.finalize();
+
+  std::uint64_t probed_candidate_event_count = 0;
+  while (census.peek_safe_boundary().has_value()) {
+    const auto mask =
+        census.peek_causal_candidate_kind_mask() &
+        (kG4IRSF14CausalCandidateI1 |
+         kG4IRSF14CausalCandidateI3 |
+         kG4IRSF14CausalCandidateI4);
+    if (mask == 0U) {
+      if (!census.process_one_event()) {
+        break;
+      }
+      continue;
+    }
+    const auto step =
+        census.probe_one_event_for_causal_skeletons();
+    require(
+        step.event_processed &&
+            step.application_reason ==
+                "SKELETON_PROBE_ONLY_NO_ACTION_CHANGED",
+        "full skeleton census must consume each candidate event "
+        "without changing an action");
+    ++probed_candidate_event_count;
+  }
+  census.finalize();
+
+  const auto plain_hashes = plain.deterministic_replay_hashes();
+  const auto census_hashes = census.deterministic_replay_hashes();
+  require(
+      probed_candidate_event_count > 0 &&
+          census_hashes.exactly_matches(plain_hashes) &&
+          census.current_result().summary.event_count ==
+              plain.current_result().summary.event_count &&
+          census.current_result().summary.completed_count ==
+              plain.current_result().summary.completed_count &&
+          census.current_result().summary.failed_count ==
+              plain.current_result().summary.failed_count,
+      "a complete lightweight skeleton census must have the exact "
+      "terminal replay hashes and counts of an ordinary no-probe drain");
+}
+
+void test_g4irsf15_truncated_census_is_detectable() {
+  const std::vector<EventRuntimeBagRequest> requests = {
+      request(67001, 46, 51, 2.0, "census-cap-a"),
+      request(67002, 46, 51, 2.0, "census-cap-b"),
+  };
+  const auto candidate_mask =
+      kG4IRSF14CausalCandidateI1 |
+      kG4IRSF14CausalCandidateI3 |
+      kG4IRSF14CausalCandidateI4;
+
+  auto discovery_config = frozen_config();
+  EventDrivenJunctionRuntime discovery(
+      canonical_map2().graph, discovery_config);
+  discovery.initialize(requests);
+  while ((discovery.peek_causal_candidate_kind_mask() &
+          candidate_mask) == 0U) {
+    require(
+        discovery.process_one_event(),
+        "candidate-boundary cap fixture stopped before a causal mask");
+  }
+  const int events_before_candidate =
+      discovery.current_result().summary.event_count;
+  require(
+      events_before_candidate > 0 &&
+          (discovery.peek_causal_candidate_kind_mask() &
+           candidate_mask) != 0U,
+      "event-cap regression requires a live nonzero candidate mask");
+
+  auto capped_config = frozen_config();
+  capped_config.max_events = events_before_candidate;
+  EventDrivenJunctionRuntime runtime(
+      canonical_map2().graph, capped_config);
+  runtime.initialize(requests);
+  while (runtime.current_result().summary.event_count <
+         events_before_candidate) {
+    require(
+        runtime.process_one_event(),
+        "capped census failed before the intended candidate boundary");
+  }
+  const auto capped_top_mask =
+      runtime.peek_causal_candidate_kind_mask() &
+        (kG4IRSF14CausalCandidateI1 |
+         kG4IRSF14CausalCandidateI3 |
+         kG4IRSF14CausalCandidateI4);
+  require(
+      capped_top_mask != 0U,
+      "event cap must land exactly on a nonzero candidate-mask top");
+  const auto skipped =
+      runtime.probe_one_event_for_causal_skeletons();
+  require(
+      !skipped.event_processed &&
+          skipped.observed_opportunities.empty() &&
+          skipped.application_reason ==
+              "SKELETON_PROBE_SKIPPED_RUNTIME_LIMIT" &&
+          runtime.current_result().summary.event_count ==
+              events_before_candidate,
+      "an unprocessed candidate top must be excluded from census counts");
+  runtime.finalize();
+  const auto& summary = runtime.current_result().summary;
+  const bool census_complete =
+      !summary.event_limit_reached &&
+      !summary.time_limit_reached &&
+      summary.completed_count == summary.requested_count &&
+      summary.failed_count == 0;
+  require(
+      !census_complete &&
+          summary.event_limit_reached &&
+          !summary.time_limit_reached &&
+          (summary.completed_count != summary.requested_count ||
+           summary.failed_count != 0),
+      "a candidate-boundary event cap must report explicit event-limit "
+      "evidence and census_complete=false");
+}
+
 }  // namespace
 
 int main() {
@@ -802,11 +1502,19 @@ int main() {
     test_i1_source_swap();
     test_i2_merge_swap();
     test_i3_and_i4_local_actions();
+    test_i4_natural_hold_is_retry_interval_independent();
+    test_i1_blocked_admission_is_not_action_changing();
     test_i5_same_ready_slice_disable();
     test_exhaustive_candidate_mask_soundness();
     test_i2_native_counter_matches_observed_boundaries();
     test_i5_non_applicable_slice_is_not_actionable();
     test_explicit_horizon_stop_semantics();
+    test_g4irsf15_skeleton_probe_exact_post_state();
+    test_g4irsf15_i3_zero_to_pending_certificate();
+    test_g4irsf15_primary_action_is_remote_strata_independent();
+    test_g4irsf15_raw_bag_sufficient_statistics_sidecar();
+    test_g4irsf15_full_skeleton_census_matches_plain_drain();
+    test_g4irsf15_truncated_census_is_detectable();
   } catch (const std::exception& error) {
     std::cerr << "G4IRSF14 causal intervention test failed: "
               << error.what() << '\n';

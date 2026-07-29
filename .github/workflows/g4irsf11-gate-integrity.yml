@@ -66,11 +66,34 @@ jobs:
           tests/test_g4irsf14_state_clone_validation.py
           tests/test_g4irsf14_opportunity_census.py
           tests/test_g4irsf14_fail_closed_completion.py
+          tests/test_g4irsf15_exact_binary_build_manifest.py
+          tests/test_g4irsf15_predecessor_source_transition.py
+          tests/test_g4irsf15_causal_campaign.py
+          tests/test_run_g4irsf15_campaign_shards.py
+          tests/test_validate_g4irsf15_causal_campaign.py
       - name: Validate committed decision schema and artifact hashes
         run: python scripts/eval/validate_g4irsf11_committed_artifacts.py
       - name: Validate committed G4IRSF14 merge-grant evidence
         run: python scripts/validate_g4irsf14_merge_grant_artifacts.py
       - name: Validate deterministic G4IRSF14 fail-closed publication
         run: python scripts/eval/g4irsf14_fail_closed_completion.py --validate-only
-      - name: Validate committed G4IRSF14 downstream fail-closed completion
-        run: python scripts/validate_g4irsf14_fail_closed_completion.py
+      - name: Validate immutable G4IRSF14 evidence through G4IRSF15 source transition
+        run: python scripts/validate_g4irsf15_predecessor_source_transition.py
+      - name: Validate committed G4IRSF15 census when published
+        run: |
+          if [ -f artifacts/datasets/g4irsf15_causal_descriptor_manifest.json ]; then
+            python scripts/validate_g4irsf15_causal_campaign.py --scope scan
+          fi
+      - name: Validate committed G4IRSF15 pilot when published
+        run: |
+          if [ -f artifacts/datasets/g4irsf15_pilot_causal_result.json ]; then
+            python scripts/validate_g4irsf15_causal_campaign.py --scope pilot --round 1
+          fi
+          if [ -f artifacts/datasets/g4irsf15_pilot_causal_result_round2.json ]; then
+            python scripts/validate_g4irsf15_causal_campaign.py --scope pilot --round 2
+          fi
+      - name: Validate committed G4IRSF15 formal campaign when published
+        run: |
+          if [ -f artifacts/datasets/g4irsf15_causal_label_manifest.json ]; then
+            python scripts/validate_g4irsf15_causal_campaign.py --scope formal
+          fi

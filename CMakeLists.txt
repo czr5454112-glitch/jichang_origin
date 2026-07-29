@@ -128,6 +128,13 @@ if(CZR005_BUILD_PYBIND)
 
   pybind11_add_module(czr005_cpp cpp/ics_core/bindings/czr005_cpp.cpp)
   target_link_libraries(czr005_cpp PRIVATE ics_core)
+  if(MSVC)
+    # Make the exact native campaign binary byte-reproducible across clean
+    # Release build directories.  Both compile and MODULE-link stages are
+    # required when MSVC LTCG is enabled.
+    target_compile_options(czr005_cpp PRIVATE /Brepro)
+    target_link_options(czr005_cpp PRIVATE /Brepro)
+  endif()
   set_target_properties(
     czr005_cpp
     PROPERTIES

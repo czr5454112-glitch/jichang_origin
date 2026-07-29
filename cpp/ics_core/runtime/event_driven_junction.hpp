@@ -33,6 +33,7 @@
 #include "ics_core/runtime/expiring_first_edge_credit.hpp"
 #include "ics_core/runtime/g4irsf14_causal_intervention.hpp"
 #include "ics_core/runtime/g4irsf14_state_clone.hpp"
+#include "ics_core/runtime/g4irsf15_causal_campaign.hpp"
 
 namespace czr005::ics {
 
@@ -96,6 +97,308 @@ struct EventRuntimeBagRequest {
   std::string source;
   int runtime_bag_id = -1;  // assigned by run(); original task_id is never rewritten
 };
+
+struct G4IRSF15RawBagSufficientStatisticsRow {
+  int task_id = -1;
+  std::vector<int> runtime_bag_ids;
+  int completed_segment_count = 0;
+  bool complete = false;
+  bool failed = false;
+  bool deadline_miss = false;
+  double original_entry_total_seconds = 0.0;
+  double java_release_total_seconds = 0.0;
+  double scheduled_pre_release_wait_total_seconds = 0.0;
+  double source_wait_total_seconds = 0.0;
+  double network_time_total_seconds = 0.0;
+  double total_system_time_total_seconds = 0.0;
+
+  void validate() const {
+    const auto finite_non_negative = [](double value) {
+      return std::isfinite(value) && value >= 0.0;
+    };
+    if (task_id < 0 || runtime_bag_ids.empty() ||
+        !std::is_sorted(runtime_bag_ids.begin(),
+                        runtime_bag_ids.end()) ||
+        std::adjacent_find(runtime_bag_ids.begin(),
+                           runtime_bag_ids.end()) !=
+            runtime_bag_ids.end() ||
+        completed_segment_count < 0 ||
+        completed_segment_count >
+            static_cast<int>(runtime_bag_ids.size()) ||
+        (complete &&
+         (failed ||
+          completed_segment_count !=
+              static_cast<int>(runtime_bag_ids.size()))) ||
+        !finite_non_negative(original_entry_total_seconds) ||
+        !finite_non_negative(java_release_total_seconds) ||
+        !finite_non_negative(
+            scheduled_pre_release_wait_total_seconds) ||
+        !finite_non_negative(source_wait_total_seconds) ||
+        !finite_non_negative(network_time_total_seconds) ||
+        !finite_non_negative(total_system_time_total_seconds)) {
+      throw std::invalid_argument(
+          "invalid G4IRSF15 raw-bag sufficient-statistics row");
+    }
+    const double decomposed =
+        scheduled_pre_release_wait_total_seconds +
+        source_wait_total_seconds + network_time_total_seconds;
+    if (complete &&
+        std::abs(decomposed - original_entry_total_seconds) >
+            1.0e-7) {
+      throw std::invalid_argument(
+          "complete raw-bag timing decomposition drifted");
+    }
+    if (std::abs(decomposed - total_system_time_total_seconds) >
+        1.0e-7) {
+      throw std::invalid_argument(
+          "raw-bag total-system sufficient statistic drifted");
+    }
+  }
+
+  [[nodiscard]] std::string runtime_id_mapping_payload() const {
+    validate();
+    g4irsf14_clone_detail::CanonicalFields fields;
+    fields.string(
+        "schema",
+        "czr005.g4irsf15.raw_bag_runtime_id_mapping_row.v1");
+    fields.integer("task_id", task_id);
+    fields.integers("runtime_bag_ids", runtime_bag_ids);
+    return fields.payload();
+  }
+
+  [[nodiscard]] std::string runtime_id_mapping_sha256() const {
+    return canonical_map2_detail::sha256_hex(
+        runtime_id_mapping_payload());
+  }
+
+  [[nodiscard]] std::string canonical_payload() const {
+    validate();
+    g4irsf14_clone_detail::CanonicalFields fields;
+    fields.string(
+        "schema",
+        "czr005.g4irsf15.raw_bag_sufficient_statistics_row.v1");
+    fields.integer("task_id", task_id);
+    fields.integers("runtime_bag_ids", runtime_bag_ids);
+    fields.integer(
+        "runtime_segment_count",
+        static_cast<int>(runtime_bag_ids.size()));
+    fields.integer("completed_segment_count",
+                   completed_segment_count);
+    fields.boolean("complete", complete);
+    fields.boolean("failed", failed);
+    fields.boolean("deadline_miss", deadline_miss);
+    fields.floating("original_entry_total_seconds",
+                    original_entry_total_seconds);
+    fields.floating("java_release_total_seconds",
+                    java_release_total_seconds);
+    fields.floating(
+        "scheduled_pre_release_wait_total_seconds",
+        scheduled_pre_release_wait_total_seconds);
+    fields.floating("source_wait_total_seconds",
+                    source_wait_total_seconds);
+    fields.floating("network_time_total_seconds",
+                    network_time_total_seconds);
+    fields.floating("total_system_time_total_seconds",
+                    total_system_time_total_seconds);
+    fields.string("runtime_id_mapping_sha256",
+                  runtime_id_mapping_sha256());
+    return fields.payload();
+  }
+
+  [[nodiscard]] std::string row_sha256() const {
+    return canonical_map2_detail::sha256_hex(canonical_payload());
+  }
+};
+
+struct G4IRSF15RawBagSufficientStatistics {
+  int selected_segment_count = 0;
+  bool complete_coverage = false;
+  std::vector<G4IRSF15RawBagSufficientStatisticsRow> rows;
+
+  void validate() const {
+    if (selected_segment_count < 0 ||
+        static_cast<int>(rows.size()) >
+            selected_segment_count) {
+      throw std::invalid_argument(
+          "invalid G4IRSF15 raw-bag sufficient-statistics inventory");
+    }
+    int previous_task_id = -1;
+    std::vector<int> covered_runtime_ids;
+    covered_runtime_ids.reserve(
+        static_cast<std::size_t>(selected_segment_count));
+    for (const auto& row : rows) {
+      row.validate();
+      if (row.task_id <= previous_task_id) {
+        throw std::invalid_argument(
+            "raw-bag sufficient statistics are not in strict "
+            "ascending task_id order");
+      }
+      previous_task_id = row.task_id;
+      covered_runtime_ids.insert(covered_runtime_ids.end(),
+                                 row.runtime_bag_ids.begin(),
+                                 row.runtime_bag_ids.end());
+    }
+    std::sort(covered_runtime_ids.begin(),
+              covered_runtime_ids.end());
+    bool exact_coverage =
+        covered_runtime_ids.size() ==
+        static_cast<std::size_t>(selected_segment_count);
+    for (int runtime_id = 0;
+         exact_coverage &&
+         runtime_id < selected_segment_count;
+         ++runtime_id) {
+      exact_coverage =
+          covered_runtime_ids[static_cast<std::size_t>(runtime_id)] ==
+          runtime_id;
+    }
+    if (complete_coverage != exact_coverage) {
+      throw std::invalid_argument(
+          "raw-bag sufficient-statistics coverage flag drifted");
+    }
+  }
+
+  [[nodiscard]] std::string canonical_payload(
+      const std::string& runtime_segment_mapping_sha256,
+      const std::string& raw_bag_mapping_sha256,
+      const std::string&
+          raw_bag_original_entry_mapping_sha256) const {
+    validate();
+    g4irsf14_clone_detail::require_sha256(
+        "runtime_segment_mapping_sha256",
+        runtime_segment_mapping_sha256);
+    g4irsf14_clone_detail::require_sha256(
+        "raw_bag_mapping_sha256",
+        raw_bag_mapping_sha256);
+    g4irsf14_clone_detail::require_sha256(
+        "raw_bag_original_entry_mapping_sha256",
+        raw_bag_original_entry_mapping_sha256);
+    g4irsf14_clone_detail::CanonicalFields fields;
+    fields.string(
+        "schema",
+        "czr005.g4irsf15.raw_bag_sufficient_statistics.v1");
+    fields.integer("row_count",
+                   static_cast<int>(rows.size()));
+    fields.integer("expected_raw_bag_count",
+                   static_cast<int>(rows.size()));
+    fields.integer("selected_segment_count",
+                   selected_segment_count);
+    fields.boolean("complete_coverage", complete_coverage);
+    fields.string("task_id_order",
+                  "STRICT_ASCENDING_NUMERIC");
+    fields.string("runtime_segment_mapping_sha256",
+                  runtime_segment_mapping_sha256);
+    fields.string("raw_bag_mapping_sha256",
+                  raw_bag_mapping_sha256);
+    fields.string(
+        "raw_bag_original_entry_mapping_sha256",
+        raw_bag_original_entry_mapping_sha256);
+    for (const auto& row : rows) {
+      fields.string("row_sha256", row.row_sha256());
+    }
+    return fields.payload();
+  }
+
+  [[nodiscard]] std::string content_sha256(
+      const std::string& runtime_segment_mapping_sha256,
+      const std::string& raw_bag_mapping_sha256,
+      const std::string&
+          raw_bag_original_entry_mapping_sha256) const {
+    return canonical_map2_detail::sha256_hex(
+        canonical_payload(
+            runtime_segment_mapping_sha256,
+            raw_bag_mapping_sha256,
+            raw_bag_original_entry_mapping_sha256));
+  }
+};
+
+inline G4IRSF15RawBagSufficientStatistics
+g4irsf15_build_raw_bag_sufficient_statistics(
+    const std::vector<G4IRSF15CausalBagOutcome>& outcomes,
+    const std::vector<EventRuntimeBagRequest>& requests,
+    const std::vector<double>& original_entry_times) {
+  if (outcomes.size() != requests.size() ||
+      original_entry_times.size() != requests.size()) {
+    throw std::invalid_argument(
+        "raw-bag sufficient statistics require a full aligned cohort");
+  }
+  std::map<int, std::vector<std::size_t>> mapping;
+  std::map<int, std::uint64_t> original_entry_bits;
+  for (std::size_t index = 0; index < requests.size(); ++index) {
+    const auto& request = requests[index];
+    const auto& outcome = outcomes[index];
+    const double original_entry = original_entry_times[index];
+    if (request.task_id < 0 ||
+        outcome.runtime_bag_id != static_cast<int>(index) ||
+        outcome.task_id != request.task_id ||
+        outcome.segment_id != request.segment_id ||
+        !std::isfinite(original_entry) ||
+        original_entry < 0.0 ||
+        original_entry > request.release_time + 1.0e-9) {
+      throw std::invalid_argument(
+          "raw-bag sufficient-statistics cohort alignment drifted");
+    }
+    std::uint64_t bits = 0;
+    static_assert(sizeof(bits) == sizeof(original_entry));
+    std::memcpy(&bits, &original_entry, sizeof(bits));
+    const auto [found, inserted] =
+        original_entry_bits.emplace(request.task_id, bits);
+    if (!inserted && found->second != bits) {
+      throw std::invalid_argument(
+          "one raw task has inconsistent original-entry times");
+    }
+    mapping[request.task_id].push_back(index);
+  }
+
+  G4IRSF15RawBagSufficientStatistics result;
+  result.selected_segment_count =
+      static_cast<int>(requests.size());
+  result.rows.reserve(mapping.size());
+  for (const auto& [task_id, runtime_ids] : mapping) {
+    G4IRSF15RawBagSufficientStatisticsRow row;
+    row.task_id = task_id;
+    row.complete = true;
+    for (const auto runtime_id : runtime_ids) {
+      const auto& outcome = outcomes[runtime_id];
+      const auto& request = requests[runtime_id];
+      row.runtime_bag_ids.push_back(
+          static_cast<int>(runtime_id));
+      row.complete =
+          row.complete && outcome.known && outcome.completed &&
+          !outcome.failed && outcome.finish_time >= 0.0 &&
+          outcome.admitted_time >= request.release_time - 1.0e-9;
+      row.failed = row.failed || outcome.failed;
+      if (!outcome.completed) {
+        continue;
+      }
+      ++row.completed_segment_count;
+      row.deadline_miss =
+          row.deadline_miss ||
+          (request.deadline >= 0.0 &&
+           outcome.finish_time > request.deadline);
+      row.original_entry_total_seconds +=
+          outcome.finish_time -
+          original_entry_times[runtime_id];
+      row.java_release_total_seconds +=
+          outcome.finish_time - request.release_time;
+      row.scheduled_pre_release_wait_total_seconds +=
+          request.release_time -
+          original_entry_times[runtime_id];
+      row.source_wait_total_seconds +=
+          outcome.source_wait_seconds;
+      row.network_time_total_seconds +=
+          outcome.finish_time - outcome.admitted_time;
+    }
+    row.total_system_time_total_seconds =
+        row.scheduled_pre_release_wait_total_seconds +
+        row.source_wait_total_seconds +
+        row.network_time_total_seconds;
+    row.validate();
+    result.rows.push_back(std::move(row));
+  }
+  result.complete_coverage = true;
+  result.validate();
+  return result;
+}
 
 struct EventRuntimeFaultWindow {
   int start = -1;
@@ -1992,6 +2295,46 @@ class EventDrivenJunctionRuntime {
     return process_one_event_causal_impl(nullptr);
   }
 
+  // Lightweight, outcome-free census transition.  Unlike the sealed causal
+  // probe above, this path never computes the 18-component runtime digest.
+  // It observes the same local opportunities and consumes the same one event.
+  [[nodiscard]] G4IRSF15CausalPrepopStrata
+  g4irsf15_causal_prepop_strata() const {
+    if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+        events_.empty()) {
+      throw std::logic_error(
+          "G4IRSF15 pre-pop strata require a live queue-top event");
+    }
+    require_checkpoint_safe_boundary();
+    const auto& event = events_.top();
+    G4IRSF15CausalPrepopStrata strata;
+    strata.event_time = event.time;
+    strata.event_seq = event.seq;
+    strata.node = event.node;
+    for (const auto& entry : destination_merge_controllers_) {
+      strata.active_merge_capability_count +=
+          static_cast<int>(
+              entry.second.active_unconsumed_count());
+      strata.pending_merge_request_count +=
+          static_cast<int>(entry.second.pending_count());
+    }
+    for (const auto& entry : physical_faults_) {
+      strata.active_physical_fault_edge_count +=
+          entry.second.active_count > 0 ? 1 : 0;
+    }
+    for (const auto& entry : junctions_) {
+      strata.queued_bag_count +=
+          static_cast<int>(entry.second.source_queue.size() +
+                           entry.second.queue.size());
+    }
+    return strata;
+  }
+
+  G4IRSF15CausalSkeletonStepResult
+  probe_one_event_for_causal_skeletons() {
+    return process_one_event_causal_skeleton_impl();
+  }
+
   // Apply one content-addressed action treatment while consuming the same
   // queue-top event.  The directive lives only on this call's stack and is
   // never copied into config, the event queue, or a runtime checkpoint.
@@ -2244,6 +2587,171 @@ class EventDrivenJunctionRuntime {
     return result_;
   }
 
+  [[nodiscard]] G4IRSF15CausalBagOutcome
+  g4irsf15_causal_bag_outcome(int runtime_bag_id) const {
+    G4IRSF15CausalBagOutcome row;
+    row.runtime_bag_id = runtime_bag_id;
+    const auto found = bags_.find(runtime_bag_id);
+    if (found == bags_.end()) {
+      return row;
+    }
+    const auto& bag = found->second;
+    row.known = true;
+    row.task_id = bag.request.task_id;
+    row.segment_id = bag.request.segment_id;
+    row.start = bag.request.start;
+    row.goal = bag.request.goal;
+    row.current_node = bag.current;
+    row.completed = bag.status == BagStatus::kCompleted;
+    row.failed = bag.status == BagStatus::kFailed;
+    row.release_time = bag.request.release_time;
+    row.deadline = bag.request.deadline;
+    row.admitted_time = bag.admitted_time;
+    row.finish_time = bag.finish_time;
+    row.source_wait_seconds =
+        bag.admitted_time >= 0.0
+            ? std::max(0.0,
+                       bag.admitted_time - bag.request.release_time)
+            : std::max(0.0, now_ - bag.request.release_time);
+    row.total_local_wait_seconds = bag.total_wait;
+    row.junction_wait_seconds =
+        bag.junction_queue_wait_seconds;
+    if (uses_destination_merge_grants() &&
+        g4irsf14_state_ != nullptr) {
+      const auto merge =
+          g4irsf14_state_->destination_merge_bags.find(
+              runtime_bag_id);
+      if (merge !=
+          g4irsf14_state_->destination_merge_bags.end()) {
+        row.merge_wait_seconds =
+            merge->second.grant_wait_seconds;
+      }
+    }
+    row.edge_travel_seconds =
+        bag.edge_travel_time_seconds;
+    row.node_service_seconds =
+        bag.node_service_time_seconds;
+    row.loop_extra_seconds =
+        bag.loop_extra_time_seconds;
+    row.completion_seconds =
+        bag.goal_completion_time_seconds;
+    row.decision_count = bag.decision_count;
+    row.retry_count = bag.retry_count;
+    row.loop_count = bag.loop_count;
+    row.failure_reason = bag.failure_reason;
+    switch (bag.status) {
+      case BagStatus::kPendingRelease:
+        row.status = "PENDING_RELEASE";
+        break;
+      case BagStatus::kSourceQueue:
+        row.status = "SOURCE_QUEUE";
+        break;
+      case BagStatus::kInService:
+        row.status = "IN_SERVICE";
+        break;
+      case BagStatus::kJunctionQueue:
+        row.status = "JUNCTION_QUEUE";
+        break;
+      case BagStatus::kInTransit:
+        row.status = "IN_TRANSIT";
+        break;
+      case BagStatus::kCompleted:
+        row.status = "COMPLETED";
+        break;
+      case BagStatus::kFailed:
+        row.status = "FAILED";
+        break;
+    }
+    return row;
+  }
+
+  [[nodiscard]] G4IRSF15LocalActionSnapshot
+  g4irsf15_local_action_snapshot(int runtime_bag_id) const {
+    G4IRSF15LocalActionSnapshot row;
+    row.runtime_bag_id = runtime_bag_id;
+    const auto found = bags_.find(runtime_bag_id);
+    if (found == bags_.end()) {
+      return row;
+    }
+    const auto& bag = found->second;
+    row.known = true;
+    row.current_node = bag.current;
+    row.transit_from = bag.transit_from;
+    row.transit_to = bag.transit_to;
+    row.admitted_time = bag.admitted_time;
+    row.decision_count = bag.decision_count;
+    row.retry_count = bag.retry_count;
+    switch (bag.status) {
+      case BagStatus::kPendingRelease:
+        row.status = "PENDING_RELEASE";
+        break;
+      case BagStatus::kSourceQueue:
+        row.status = "SOURCE_QUEUE";
+        break;
+      case BagStatus::kInService:
+        row.status = "IN_SERVICE";
+        break;
+      case BagStatus::kJunctionQueue:
+        row.status = "JUNCTION_QUEUE";
+        break;
+      case BagStatus::kInTransit:
+        row.status = "IN_TRANSIT";
+        break;
+      case BagStatus::kCompleted:
+        row.status = "COMPLETED";
+        break;
+      case BagStatus::kFailed:
+        row.status = "FAILED";
+        break;
+    }
+    const auto controller = junctions_.find(bag.current);
+    if (controller != junctions_.end()) {
+      row.queued_at_current_node =
+          std::find(controller->second.queue.begin(),
+                    controller->second.queue.end(),
+                    runtime_bag_id) !=
+          controller->second.queue.end();
+      row.source_queued_at_current_node =
+          std::find(controller->second.source_queue.begin(),
+                    controller->second.source_queue.end(),
+                    runtime_bag_id) !=
+          controller->second.source_queue.end();
+      row.junction_wakeup_pending =
+          controller->second.junction_wakeup_pending;
+      row.junction_wakeup_generation =
+          controller->second.junction_wakeup_generation;
+    }
+    if (g4irsf14_state_ != nullptr) {
+      const auto local =
+          g4irsf14_state_->local.find(bag.current);
+      if (local != g4irsf14_state_->local.end() &&
+          std::isfinite(local->second.junction_wakeup_time)) {
+        row.junction_wakeup_time =
+            local->second.junction_wakeup_time;
+      }
+      const auto merge =
+          g4irsf14_state_->destination_merge_bags.find(
+              runtime_bag_id);
+      if (merge !=
+          g4irsf14_state_->destination_merge_bags.end()) {
+        row.pending_merge_request_id =
+            merge->second.pending_request_id;
+        row.pending_merge_lineage =
+            merge->second.pending_lineage;
+        const auto pending =
+            pending_merge_dispatches_.find(
+                merge->second.pending_request_id);
+        if (pending != pending_merge_dispatches_.end()) {
+          row.pending_merge_upstream =
+              pending->second.upstream_node;
+          row.pending_merge_destination =
+              pending->second.destination_node;
+        }
+      }
+    }
+    return row;
+  }
+
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   void test_mutate_final_result_hash_field(
       std::string_view family) {
@@ -2332,6 +2840,8 @@ class EventDrivenJunctionRuntime {
 
   struct ActiveCausalStep {
     G4IRSF14CausalStepResult* result = nullptr;
+    G4IRSF15CausalSkeletonStepResult* skeleton_result =
+        nullptr;
     const G4IRSF14CausalInterventionDirective* directive =
         nullptr;
     RuntimeEvent prepop_event;
@@ -2356,6 +2866,51 @@ class EventDrivenJunctionRuntime {
           "Stage 14E causal intervention requires frozen "
           "R3/S1/P2/C0/Q0/E4/M0");
     }
+  }
+
+  G4IRSF15CausalSkeletonStepResult
+  process_one_event_causal_skeleton_impl() {
+    require_g4irsf14_causal_frozen_tuple();
+    if (active_causal_step_ != nullptr) {
+      throw std::logic_error(
+          "nested G4IRSF15 causal skeleton processing is forbidden");
+    }
+    if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+        events_.empty()) {
+      throw std::logic_error(
+          "causal skeleton probe requires a live queue-top pre-pop event");
+    }
+    require_checkpoint_safe_boundary();
+
+    G4IRSF15CausalSkeletonStepResult result;
+    result.prepop = g4irsf15_causal_prepop_strata();
+    const auto pibt_prefilter_before =
+        result_.summary.g4irsf14_i5_prefilter_candidate_count;
+    ActiveCausalStep frame;
+    frame.skeleton_result = &result;
+    frame.prepop_event = events_.top();
+    active_causal_step_ = &frame;
+    try {
+      result.event_processed = process_one_event();
+    } catch (...) {
+      active_causal_step_ = nullptr;
+      throw;
+    }
+    active_causal_step_ = nullptr;
+    result.pibt_prefilter_candidate_event =
+        result_.summary.g4irsf14_i5_prefilter_candidate_count >
+        pibt_prefilter_before;
+    if (!result.event_processed) {
+      if (!result_.summary.event_limit_reached &&
+          !result_.summary.time_limit_reached) {
+        throw std::logic_error(
+            "causal skeleton probe stopped without a hard runtime limit");
+      }
+      result.application_reason =
+          "SKELETON_PROBE_SKIPPED_RUNTIME_LIMIT";
+    }
+    result.validate();
+    return result;
   }
 
   G4IRSF14CausalStepResult process_one_event_causal_impl(
@@ -2456,6 +3011,36 @@ class EventDrivenJunctionRuntime {
   observe_causal_boundary(
       G4IRSF14CloneBoundary boundary) {
     if (active_causal_step_ == nullptr) {
+      return nullptr;
+    }
+    if (active_causal_step_->skeleton_result != nullptr) {
+      if (boundary.kind !=
+              G4IRSF14CloneBoundaryKind::kSourceArbitration &&
+          boundary.kind !=
+              G4IRSF14CloneBoundaryKind::kJunctionRouteArbitration &&
+          boundary.kind !=
+              G4IRSF14CloneBoundaryKind::kHoldReleaseOpportunity) {
+        return nullptr;
+      }
+      G4IRSF15CausalOpportunitySkeleton skeleton;
+      skeleton.kind = boundary.kind;
+      skeleton.time =
+          active_causal_step_->prepop_event.time;
+      skeleton.event_seq =
+          active_causal_step_->prepop_event.seq;
+      skeleton.node = boundary.node;
+      skeleton.runtime_bag_id = boundary.runtime_bag_id;
+      skeleton.baseline_next_node =
+          boundary.baseline_next_node;
+      skeleton.baseline_release =
+          boundary.baseline_release;
+      skeleton.source_ready_order =
+          std::move(boundary.source_ready_order);
+      skeleton.legal_next_edges =
+          std::move(boundary.legal_next_edges);
+      active_causal_step_->skeleton_result
+          ->observed_opportunities.push_back(
+              std::move(skeleton));
       return nullptr;
     }
     boundary = seal_causal_boundary(
@@ -3834,6 +4419,9 @@ class EventDrivenJunctionRuntime {
                    time,
                    controller.escape_token_task,
                    priority_comparison_count);
+    bool causal_i1_swap_selected = false;
+    int causal_i1_baseline_runtime_bag_id = -1;
+    int causal_i1_peer_runtime_bag_id = -1;
     if (active_causal_step_ != nullptr &&
         controller.source_queue.size() >= 2U) {
       G4IRSF14CloneBoundary boundary;
@@ -3866,10 +4454,11 @@ class EventDrivenJunctionRuntime {
         queue_index = static_cast<std::size_t>(
             std::distance(controller.source_queue.begin(),
                           peer));
-        mark_causal_action_applied(
-            "APPLIED_I1_SOURCE_ORDER_SWAP_ONE_ACTION",
-            {intervention->runtime_bag_id,
-             intervention->peer_runtime_bag_id});
+        causal_i1_swap_selected = true;
+        causal_i1_baseline_runtime_bag_id =
+            intervention->runtime_bag_id;
+        causal_i1_peer_runtime_bag_id =
+            intervention->peer_runtime_bag_id;
       }
     }
     const int task_id = controller.source_queue[queue_index];
@@ -3939,6 +4528,12 @@ class EventDrivenJunctionRuntime {
                      node,
                      "source_service_reservation_snapshot");
     ++result_.summary.source_admission_admitted_count;
+    if (causal_i1_swap_selected) {
+      mark_causal_action_applied(
+          "APPLIED_I1_SOURCE_ADMIT_COMMITTED_ONE_ACTION",
+          {causal_i1_baseline_runtime_bag_id,
+           causal_i1_peer_runtime_bag_id});
+    }
     return task_id;
   }
 
@@ -9312,6 +9907,8 @@ class EventDrivenJunctionRuntime {
     const auto decision_started = std::chrono::steady_clock::now();
     const int task_id = controller.queue[queue_index];
     auto& bag = bags_.at(task_id);
+    bool causal_i3_override_selected = false;
+    bool causal_i4_natural_hold_selected = false;
     if (bag.decision_count >= config_.max_decisions_per_bag) {
       fail_bag(bag, "max_decisions_exceeded", time);
       controller.queue.erase(controller.queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
@@ -9635,9 +10232,7 @@ class EventDrivenJunctionRuntime {
         selected_reason =
             "g4irsf14_I3_content_addressed_legal_next_edge";
         bounded_local_same_bag_fallback_selected = false;
-        mark_causal_action_applied(
-            "APPLIED_I3_LEGAL_NEXT_EDGE_ONE_ACTION",
-            {task_id});
+        causal_i3_override_selected = true;
       }
     }
 
@@ -9666,9 +10261,7 @@ class EventDrivenJunctionRuntime {
         selected_reason =
             "g4irsf14_I4_content_addressed_safe_hold";
         bounded_local_same_bag_fallback_selected = false;
-        mark_causal_action_applied(
-            "APPLIED_I4_RELEASE_TO_HOLD_ONE_ACTION",
-            {task_id});
+        causal_i4_natural_hold_selected = true;
       }
     }
 
@@ -9733,8 +10326,41 @@ class EventDrivenJunctionRuntime {
                : "") +
           selected_reason +
           ";phase5a_destination_request_no_edge_commit";
+      const auto& pre_request_state =
+          destination_merge_bag_state(
+              bag.request.runtime_bag_id);
+      const std::uint64_t pre_request_id =
+          pre_request_state.pending_request_id;
+      const std::uint64_t pre_request_lineage =
+          pre_request_state.pending_lineage;
       if (submit_destination_merge_request(
               bag, node, selected, time, trace)) {
+        if (causal_i3_override_selected) {
+          const auto& post_request_state =
+              destination_merge_bag_state(
+                  bag.request.runtime_bag_id);
+          const auto pending =
+              pending_merge_dispatches_.find(
+                  post_request_state.pending_request_id);
+          const bool newly_committed =
+              g4irsf15_i3_committed_new_pending_request(
+                  pre_request_id,
+                  pre_request_lineage,
+                  post_request_state.pending_request_id,
+                  post_request_state.pending_lineage,
+                  pending != pending_merge_dispatches_.end() &&
+                      pending->second.runtime_bag_id ==
+                          task_id &&
+                      pending->second.upstream_node ==
+                          node &&
+                      pending->second.destination_node ==
+                          selected);
+          if (newly_committed) {
+            mark_causal_action_applied(
+                "APPLIED_I3_MERGE_REQUEST_ENQUEUED_ONE_ACTION",
+                {task_id});
+          }
+        }
         record_decision_latency(decision_started);
         return DispatchResult{task_id, selected, 0, true};
       }
@@ -9789,6 +10415,11 @@ class EventDrivenJunctionRuntime {
                : "") +
           selected_reason;
       dispatch_selected_edge(bag, node, selected, time);
+      if (causal_i3_override_selected) {
+        mark_causal_action_applied(
+            "APPLIED_I3_ONE_EDGE_COMMIT_ONE_ACTION",
+            {task_id});
+      }
       if (first_edge_credit_bound) {
         const auto consumed = credit_ledger_.consume(
             bag.first_edge_credit_id,
@@ -9871,11 +10502,28 @@ class EventDrivenJunctionRuntime {
           earliest_resource_retry = std::min(earliest_resource_retry, resource_ready);
         }
       }
-      const double retry_time = std::isfinite(earliest_resource_retry)
-                                    ? std::max(time + config_.retry_interval,
-                                               earliest_resource_retry)
-                                    : time + config_.retry_interval;
+      const double retry_time =
+          causal_i4_natural_hold_selected
+              ? time + std::max(service_duration(node),
+                                config_.dispatch_headway_seconds)
+          : std::isfinite(earliest_resource_retry)
+              ? std::max(time + config_.retry_interval,
+                         earliest_resource_retry)
+              : time + config_.retry_interval;
       schedule_junction_wakeup(node, retry_time);
+      if (causal_i4_natural_hold_selected) {
+        const auto& local = g4irsf14_local_state(node);
+        if (!controller.junction_wakeup_pending ||
+            !event_runtime_detail::same_timestamp(
+                local.junction_wakeup_time, retry_time)) {
+          throw std::logic_error(
+              "I4 natural hold did not commit its next local service "
+              "opportunity");
+        }
+        mark_causal_action_applied(
+            "APPLIED_I4_SAFE_HOLD_UNTIL_NEXT_JUNCTION_SERVICE_OPPORTUNITY",
+            {task_id});
+      }
     }
 
     append_decision_trace(std::move(trace), selected >= 0);
