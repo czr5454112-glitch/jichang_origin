@@ -1,0 +1,70 @@
+{
+  "binary": {
+    "binding_type": "CONTENT_ADDRESS_FROM_SEALED_G4IRSF14_ARTIFACT",
+    "physical_generation_path_is_not_a_portability_requirement": true,
+    "sha256": "814b233016a51a755d6f568604fcb04ca81d781222416075cf2648ec087f1de7"
+  },
+  "candidate_id": "G4IRSF15_F2_FROZEN_CONTROL",
+  "claim_boundary": "Frozen control only: complete and safe at original 1x, better than corrected historical HCA, but 1.1347038098698192 s/bag slower than frozen v2-safe. No new candidate is promoted.",
+  "comparators": {
+    "delta_vs_historical_hca_seconds_per_bag": -97.30317374668473,
+    "delta_vs_v2_safe_seconds_per_bag": 1.1347038098698192,
+    "f2_original_entry_mean_minutes": 41.514218717973414,
+    "frozen_v2_safe_original_entry_mean_minutes": 41.49530698780892,
+    "historical_hca_original_entry_mean_minutes": 43.13593828041816,
+    "primary_denominator": "original_entry_time_tth"
+  },
+  "configuration": {
+    "admission_mode": "off",
+    "control": "C0",
+    "framework": "event_loop_one_step",
+    "pibt": "P2",
+    "pressure_mode": "off",
+    "reservation_depth": 1,
+    "resource": "R3_java_node_window_compatible",
+    "scorer": "S1_frozen_g4e_legal_local_adapter"
+  },
+  "copy_semantics": "selected immutable projection plus predecessor content binding; predecessor file is not rewritten",
+  "hard_gates": {
+    "complete_raw_bags": 28506,
+    "completed_segments": 43603,
+    "conflicts": 0,
+    "event_limit_reached": false,
+    "failed_segments": 0,
+    "future_routes_stored": 0,
+    "global_reservation_scans": 0,
+    "max_edges_selected_per_bag_per_decision": 1,
+    "runtime_full_astar_calls": 0,
+    "time_limit_reached": false,
+    "unresolved_deadlocks": 0,
+    "unsafe_entries": 0
+  },
+  "predecessor": {
+    "access": "READ_ONLY_SEALED_EVIDENCE",
+    "byte_count": 8332,
+    "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+    "path": "artifacts/policies/g4irsf14_f2_frozen_control.json",
+    "semantic_sha256": "2e2c66244ceb4ff1b514da211487d8c5223f7a29304548309856824297eccfaf"
+  },
+  "protected_inputs": {
+    "map": {
+      "access": "READ_ONLY_PROTECTED",
+      "byte_count": 105086,
+      "path": "data/processed/maps/map2.json",
+      "raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+      "semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63"
+    },
+    "task": {
+      "access": "READ_ONLY_PROTECTED",
+      "byte_count": 12252445,
+      "path": "data/processed/tasks/inputdata.jsonl",
+      "raw_bag_count": 28506,
+      "raw_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+      "segment_count": 43603,
+      "semantic_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+    }
+  },
+  "schema": "czr005.g4irsf15.f2_frozen_control.v1",
+  "self_sha256": "a939691ccbc68508aca79a77a058a4d9e6268298312e82d7b9dd8a6660a3e15b",
+  "status": "PASS_FROZEN_BY_CONTENT_BINDING"
+}

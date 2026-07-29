@@ -1,0 +1,236 @@
+{
+  "causal_label_count": 0,
+  "complete_h_bag_count": 0,
+  "complete_h_system_count": 0,
+  "evidence_limitations": {
+    "committed_exact_target_rows_available": false,
+    "missing_dimensions": [
+      "destination",
+      "upstream",
+      "hour",
+      "source",
+      "goal",
+      "storage_direct",
+      "entry_time_band",
+      "deadline_slack_bucket",
+      "retry_count",
+      "active_grant",
+      "queue_capacity",
+      "stale_generation",
+      "exact_slot_busy",
+      "fault"
+    ],
+    "original_1x_request_breakdown_available": false,
+    "required_next_action": "rematerialize exact I1/I3/I4 target descriptors with the exact screening binary, then execute same-state action-changing H_bag/H_system pairs",
+    "screening_false_positive_rate_estimable": false,
+    "stage_d_144_extrapolation_to_original_1x_allowed": false
+  },
+  "exact_binary_requirement": {
+    "binding_type": "CONTENT_ADDRESS_FROM_SEALED_G4IRSF14_ARTIFACT",
+    "physical_generation_path_is_not_a_portability_requirement": true,
+    "sha256": "11b957890666a4ac4dd056fca4828cecb6b3f3ff29fdc590d05c4cff875ebc71"
+  },
+  "formal_campaign_authorized": false,
+  "generation_binary_verification": {
+    "roles_verified_in_this_invocation": [
+      "e4_original_1x_screening",
+      "e4_stage_d_mechanism",
+      "event_microphase_instrumented",
+      "f2_frozen_control"
+    ],
+    "verification_is_log_only_not_a_portability_dependency": true
+  },
+  "input_bindings": {
+    "artifacts/configs/g4irsf14_merge_grant_protocol.json": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 60669,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "artifacts/configs/g4irsf14_merge_grant_protocol.json",
+      "semantic_sha256": "e36e81bcc4aafa1b3d222fdd0d634dae687fa337d706c7af28c38141585298e4"
+    },
+    "artifacts/datasets/g4irsf14_clone_manifest.json": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 7024,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "artifacts/datasets/g4irsf14_clone_manifest.json",
+      "semantic_sha256": "f5b8c2629f627728aa774bf1117f8a6f1eef90ad6be2417a35ed962ad2e0fa0f"
+    },
+    "artifacts/gates/g4irsf14_baseline_registry.json": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 7982,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "artifacts/gates/g4irsf14_baseline_registry.json",
+      "semantic_sha256": "331338197366eb51e604d4f18296d6c41a54a6a426eee5963648223ae9f24e46"
+    },
+    "artifacts/policies/g4irsf14_f2_frozen_control.json": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 8332,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "artifacts/policies/g4irsf14_f2_frozen_control.json",
+      "semantic_sha256": "2e2c66244ceb4ff1b514da211487d8c5223f7a29304548309856824297eccfaf"
+    },
+    "data/processed/maps/map2.json": {
+      "access": "READ_ONLY_PROTECTED",
+      "byte_count": 105086,
+      "path": "data/processed/maps/map2.json",
+      "raw_sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+      "semantic_sha256": "67266b1746f64ae40b4b1b52a8a74eedc6338c90b646708db2dc29e93c514c63"
+    },
+    "data/processed/tasks/inputdata.jsonl": {
+      "access": "READ_ONLY_PROTECTED",
+      "byte_count": 12252445,
+      "path": "data/processed/tasks/inputdata.jsonl",
+      "raw_bag_count": 28506,
+      "raw_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+      "segment_count": 43603,
+      "semantic_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+    },
+    "outputs/reports/g4irsf14_event_microphase_ab.md": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 3391,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "outputs/reports/g4irsf14_event_microphase_ab.md",
+      "semantic_sha256": "c2cd7a80f7cd5b318891e7e9393ed9c80f7c4c25263007fc85b8bac86c77720f"
+    },
+    "outputs/tables/g4irsf13_per_bag_delta.csv": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 29121147,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "outputs/tables/g4irsf13_per_bag_delta.csv",
+      "semantic_sha256": "fc3dde5aa958d23be4a186e0727702db6895980847d1473b21c5134d002ca551"
+    },
+    "outputs/tables/g4irsf14_event_microphase_ab.csv": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 396050,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "outputs/tables/g4irsf14_event_microphase_ab.csv",
+      "semantic_sha256": "86344c5f48cba6a378855129509ad5267b8300485f8609f2976aed53db15c3ce"
+    },
+    "outputs/tables/g4irsf14_merge_grant_lifecycle.csv": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 17103238,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "outputs/tables/g4irsf14_merge_grant_lifecycle.csv",
+      "semantic_sha256": "138f8af81d844cb2aa021f7b0667c0c1aa1133db29fb7b640e0f6fa6eec9920f"
+    },
+    "outputs/tables/g4irsf14_merge_rule_ab.csv": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 12077,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "outputs/tables/g4irsf14_merge_rule_ab.csv",
+      "semantic_sha256": "8808a79443a20bf2bfdee35ead5789b52d76a0ea386153ffd267a78020dc31c1"
+    },
+    "outputs/tables/g4irsf14_opportunity_census.json": {
+      "access": "READ_ONLY_SEALED_EVIDENCE",
+      "byte_count": 24673,
+      "hash_mode": "sha256_utf8_after_crlf_cr_to_lf",
+      "path": "outputs/tables/g4irsf14_opportunity_census.json",
+      "semantic_sha256": "365d2a8f860944616f5e7199be2c3c86b3d07dc743ba793b978b0fedf4586de3"
+    }
+  },
+  "output_bindings": {
+    "artifacts/gates/g4irsf15_baseline_registry.json": {
+      "byte_count": 3910,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "artifacts/gates/g4irsf15_baseline_registry.json",
+      "sha256": "63df4e4b17ffb48a12bfe0811ced523ccd9613a5d33453156e0b2a4add0dc466"
+    },
+    "artifacts/policies/g4irsf15_e4_frozen_mechanism_control.json": {
+      "byte_count": 9265,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "artifacts/policies/g4irsf15_e4_frozen_mechanism_control.json",
+      "sha256": "74653af83b0edd8a3ee861b534d72f748b5863384aa9f1f733ee42e89d560c0f"
+    },
+    "artifacts/policies/g4irsf15_f2_frozen_control.json": {
+      "byte_count": 2920,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "artifacts/policies/g4irsf15_f2_frozen_control.json",
+      "sha256": "31b12b4b4b3344c6ec275a92a3fecb0ca73577ac5b0bfc5e8323699a63ee9a27"
+    },
+    "outputs/reports/g4irsf15_g4irsf14_postmortem.md": {
+      "byte_count": 3131,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "outputs/reports/g4irsf15_g4irsf14_postmortem.md",
+      "sha256": "6e034c38c8de9780df9cd5cb51d2156fb7c5413980abf5d3675c42e0b65b11ca"
+    },
+    "outputs/reports/g4irsf15_merge_request_churn_postmortem.md": {
+      "byte_count": 1755,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "outputs/reports/g4irsf15_merge_request_churn_postmortem.md",
+      "sha256": "4cdbe6224b90ba6cf68a7a13773627958f741aa70535c3e504efc29be71ffbcf"
+    },
+    "outputs/reports/g4irsf15_start_state.md": {
+      "byte_count": 2439,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "outputs/reports/g4irsf15_start_state.md",
+      "sha256": "1c6ba38030c974c7f8f37286a107669c891ea6ce7b0404a947a63ae384a59fb6"
+    },
+    "outputs/tables/g4irsf15_merge_destination_hotspots.csv": {
+      "byte_count": 4542,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "outputs/tables/g4irsf15_merge_destination_hotspots.csv",
+      "sha256": "ae48ff6569751dbb89d31ba14ac46fa1efc00a2e78e159b96ab02332f9c59303"
+    },
+    "outputs/tables/g4irsf15_merge_request_churn.csv": {
+      "byte_count": 22473,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "outputs/tables/g4irsf15_merge_request_churn.csv",
+      "sha256": "072f8891ee7c3fa67b225ef29b0e84fd2150920237b2155da890ab7e250d5c23"
+    },
+    "outputs/tables/g4irsf15_screening_false_positive_estimate.csv": {
+      "byte_count": 2232,
+      "hash_mode": "sha256_exact_bytes",
+      "path": "outputs/tables/g4irsf15_screening_false_positive_estimate.csv",
+      "sha256": "025f7912a28c5946577051de204c82dfb8bbc311d81e03ba354652d8d18f0163"
+    }
+  },
+  "retention_contract": {
+    "manifest_binding": "SHA256_EXACT_BYTES",
+    "non_target_retention": "AGGREGATES_PLUS_DETERMINISTIC_MINHASH_SAMPLE",
+    "selected_target_dropped_count_required": 0,
+    "selected_target_local_lifecycle": "FULL",
+    "shard_write": "STREAM_COMPRESS_ATOMIC_CLOSE",
+    "unbounded_in_memory_trace_allowed": false
+  },
+  "schema": "czr005.g4irsf15.campaign_source_manifest.v1",
+  "self_sha256": "d41142ea2549f2eed1d81a20d6b146dbfd4ba315e7d87b2e757be59abcfdbf77",
+  "source_families": {
+    "I1_SOURCE_ORDER_SWAP": {
+      "blocker": "no committed target descriptors and no action-changing trial",
+      "prefilter_count": 0,
+      "screening_support_count": 41679,
+      "source_screening_manifest_sha256": "f4eed359e1905164abf8d3ebfe7742a50613a89a9fcb875943f8387ff6892a26",
+      "status": "SOURCE_FAMILY_SUPPORTED_TARGETS_REQUIRE_REMATERIALIZATION"
+    },
+    "I2_MERGE_ORDER_SWAP": {
+      "blocker": "only one live multi-request boundary",
+      "prefilter_count": 0,
+      "screening_support_count": 1,
+      "source_screening_manifest_sha256": "",
+      "status": "BLOCKED_INSUFFICIENT_PRIMARY_SUPPORT"
+    },
+    "I3_NEXT_EDGE": {
+      "blocker": "lower bound only; no action-changing trial",
+      "prefilter_count": 0,
+      "screening_support_count": 19898,
+      "source_screening_manifest_sha256": "3790c75a3c9dbda6d25c72243b8e7cdeff0582da88e39c76a0ce254405feaea1",
+      "status": "SOURCE_FAMILY_SUPPORTED_TARGETS_REQUIRE_REMATERIALIZATION"
+    },
+    "I4_HOLD_RELEASE": {
+      "blocker": "one-local-opportunity hold horizon not executed",
+      "prefilter_count": 0,
+      "screening_support_count": 59049,
+      "source_screening_manifest_sha256": "279ca57dd84898348f4ec265942ed88144563a87b85dc1a82cba2cf25f33e816",
+      "status": "SOURCE_FAMILY_SUPPORTED_TARGETS_REQUIRE_REMATERIALIZATION"
+    },
+    "I5_PIBT_TRIGGER": {
+      "blocker": "1337 queue-capacity prefilters are not PIBT applicability",
+      "prefilter_count": 1337,
+      "screening_support_count": 0,
+      "source_screening_manifest_sha256": "",
+      "status": "BLOCKED_ZERO_STRICT_APPLICABLE_SUPPORT"
+    }
+  },
+  "status": "SOURCE_FAMILIES_AUDITED_TARGET_DESCRIPTORS_NOT_MATERIALIZED",
+  "target_descriptor_count": 0
+}
