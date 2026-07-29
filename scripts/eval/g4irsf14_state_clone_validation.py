@@ -1,8 +1,9 @@
 """Independent, fail-closed validation for G4IRSF14 Stage 14E evidence.
 
 The generator is deliberately not imported here.  This module validates the
-five published Stage 14E artifacts from raw hashes, raw branch counters and raw
-branch metrics.  Summary booleans are neither accepted nor used as evidence.
+six published Stage 14E artifacts from raw hashes, raw branch counters and raw
+branch metrics, including content-addressed exact-binary native JSONL records.
+Summary booleans are neither accepted nor used as evidence.
 
 The validator does not attest that arbitrary bytes were produced by a trusted
 machine.  It does make every accepted row content-addressed, binds it to the
@@ -33,10 +34,14 @@ from typing import Any, Iterable, Mapping, Sequence
 
 SCHEMA = "czr005.g4irsf14.matched_runtime_state_clone.v2"
 FIDELITY_SCHEMA = "czr005.g4irsf14.clone_fidelity.v2"
-INTERVENTION_SCHEMA = "czr005.g4irsf14.causal_intervention.v2"
-OUTCOME_SCHEMA = "czr005.g4irsf14.clone_outcome.v2"
-LEDGER_SCHEMA = "czr005.g4irsf14.causal_component_ledger.v2"
-MANIFEST_SCHEMA = "czr005.g4irsf14.clone_manifest.v2"
+INTERVENTION_SCHEMA = "czr005.g4irsf14.causal_intervention.v3"
+OUTCOME_SCHEMA = "czr005.g4irsf14.clone_outcome.v3"
+LEDGER_SCHEMA = "czr005.g4irsf14.causal_component_ledger.v3"
+MANIFEST_SCHEMA = "czr005.g4irsf14.clone_manifest.v3"
+NATIVE_EVIDENCE_SCHEMA = (
+    "czr005.g4irsf14.exact_binary_intervention_rerun.v1"
+)
+NATIVE_BRANCH_SCHEMA = "czr005.g4irsf14.exact_binary_branch.v1"
 PROTOCOL_STATUS = (
     "NOOP_EXACT_BINARY_FIDELITY_AVAILABLE_"
     "FORMAL_CAUSAL_EVIDENCE_BLOCKED"
@@ -55,6 +60,9 @@ FIDELITY_PATH = "outputs/tables/g4irsf14_clone_fidelity.csv"
 INTERVENTION_PATH = "outputs/tables/g4irsf14_causal_interventions.csv"
 LEDGER_PATH = "outputs/tables/g4irsf14_causal_component_ledger.csv"
 MANIFEST_PATH = "artifacts/datasets/g4irsf14_clone_manifest.json"
+NATIVE_EVIDENCE_PATH = (
+    "outputs/tables/g4irsf14_exact_binary_intervention_reruns.jsonl"
+)
 
 CANONICAL_MAP_PATH = "data/processed/maps/map2.json"
 CANONICAL_MAP_RAW_SHA256 = (
@@ -132,6 +140,13 @@ INTERVENTION_BOUNDARY_KIND = {
     "I4_hold_release": "hold_release_opportunity",
     "I5_pibt_trigger": "pibt_ready_slice",
 }
+INTERVENTION_ALLOWED_CHANGED_FIELDS = {
+    "I1_source_order_swap": ("source_ready_order",),
+    "I2_merge_request_order_swap": ("pending_merge_request_order",),
+    "I3_next_edge": ("selected_next_node",),
+    "I4_hold_release": ("release",),
+    "I5_pibt_trigger": ("pibt_enabled",),
+}
 NATIVE_INTERVENTION_FIELDS = (
     "runtime_bag_id",
     "peer_runtime_bag_id",
@@ -165,12 +180,178 @@ BRANCH_INVARIANTS = (
     "runtime_global_scan_count",
     "runtime_future_route_read_count",
     "runtime_future_schedule_read_count",
+    "teacher_input_count",
+    "priority_teacher_input_count",
+    "scorer_teacher_input_count",
+    "full_future_routes_stored",
+    "bag_future_path_field_present",
     "max_selected_edges_per_bag",
     "reservation_depth",
+    "two_step_reservation_count",
     "failed_segment_count",
     "unresolved_deadlock_count",
     "event_limit_reached",
     "time_limit_reached",
+    "merge_grant_conservation_holds",
+    "merge_grant_active_bijection_holds",
+    "merge_grant_runtime_owned_capability",
+    "merge_grant_exact_slot_no_future_shift",
+    "merge_grant_final_active_unconsumed",
+    "merge_grant_outstanding_request_count",
+    "merge_grant_stale_arbitration_count",
+    "merge_grant_lifecycle_dropped_count",
+    "merge_grant_lifecycle_complete",
+    "merge_grant_active_state_integrity_pass",
+    "merge_grant_protocol_integrity_pass",
+    "stale_arbitration_event_count",
+    "artificial_batch_delay_seconds",
+)
+
+BRANCH_BOOLEAN_INVARIANTS = {
+    "bag_future_path_field_present",
+    "event_limit_reached",
+    "time_limit_reached",
+    "merge_grant_conservation_holds",
+    "merge_grant_active_bijection_holds",
+    "merge_grant_runtime_owned_capability",
+    "merge_grant_exact_slot_no_future_shift",
+    "merge_grant_lifecycle_complete",
+    "merge_grant_active_state_integrity_pass",
+    "merge_grant_protocol_integrity_pass",
+}
+BRANCH_DECIMAL_INVARIANTS = {"artificial_batch_delay_seconds"}
+
+PRIORITY_COHORTS = (
+    "top_1_percent_delta_286",
+    "no_divergence_representative",
+    "early_band",
+    "tight_slack",
+    "storage_in",
+    "storage_out",
+    "goal_50",
+    "hour_6",
+    "source_0",
+    "source_1",
+    "source_2",
+    "source_53",
+    "node_52",
+    "node_19_negative_control",
+    "node_22_negative_control",
+    "p2_involved",
+    "high_merge_request_cardinality",
+    "grant_wait_tail",
+)
+
+SAMPLING_FUNNEL_FIELDS = (
+    "static_opportunity_count",
+    "static_registry_sha256",
+    "h_local_screened_count",
+    "h_local_registry_sha256",
+    "h_bag_completed_count",
+    "h_bag_registry_sha256",
+    "h_system_completed_count",
+    "h_system_registry_sha256",
+)
+
+PIBT_SLICE_FIELDS = (
+    "pibt_ready_bag_ids",
+    "pibt_ready_current_nodes",
+    "pibt_owner_resources",
+    "pibt_owner_bag_ids",
+    "pibt_candidate_bag_ids",
+    "pibt_candidate_next_nodes",
+    "pibt_candidate_edge_resources",
+    "pibt_candidate_expected_fault_generations",
+    "pibt_candidate_required_resource_offsets",
+    "pibt_candidate_required_resources",
+)
+
+BOUNDARY_FIELDS = (
+    "clone_group_id",
+    "boundary_sha256",
+    "decision_boundary_kind",
+    "decision_time_bits",
+    "decision_event_seq",
+    "node",
+    "runtime_bag_id",
+    "baseline_next_node",
+    "baseline_release",
+    "baseline_pibt_enabled",
+    "pibt_owner_runtime_bag_id",
+    "source_ready_order",
+    "pending_merge_request_order",
+    "legal_next_edges",
+    *PIBT_SLICE_FIELDS,
+    "ready_set_sha256",
+    "runtime_state_sha256",
+    "state_components",
+    "queue_top_not_popped",
+    "staged_event_sink_empty",
+    "runtime_global_scan_count",
+    "runtime_future_route_read_count",
+    "runtime_future_schedule_read_count",
+    "reservation_depth",
+    "max_selected_edges_per_bag",
+)
+
+NATIVE_RECORD_FIELDS = (
+    "schema",
+    "evidence_scope",
+    "formal_pass_claimed",
+    "actual_loaded_cpp_binary_path",
+    "actual_loaded_cpp_binary_sha256",
+    "inputs",
+    "frozen_controls",
+    "event_ordinal",
+    "checkpoint",
+    "intervention",
+    "horizon",
+    "priority_cohort_tags",
+    "baseline",
+    "treatment",
+    "native_record_sha256",
+)
+NATIVE_INPUT_FIELDS = (
+    "map_path",
+    "map_raw_sha256",
+    "map_semantic_sha256",
+    "task_path",
+    "task_sha256",
+    "segment_count",
+    "raw_bag_count",
+    "demand_scale",
+    "expanded_workload_used",
+)
+NATIVE_CHECKPOINT_FIELDS = (
+    "boundary",
+    "checkpoint_record_sha256",
+)
+NATIVE_INTERVENTION_RECORD_FIELDS = (
+    "kind",
+    "intervention_id",
+    "intervention_token_sha256",
+    "action",
+    "allowed_changed_fields",
+)
+NATIVE_HORIZON_FIELDS = (
+    "kind",
+    "affected_bag_ids",
+    "horizon_entity_ids",
+    "horizon_entity_set_sha256",
+)
+NATIVE_BRANCH_FIELDS = (
+    "start_state_sha256",
+    "start_state_components",
+    "terminal_state_sha256",
+    "terminal_state_components",
+    "branch_finalized",
+    "completed_affected_bag_ids",
+    "completed_horizon_entity_ids",
+    "stop_reason",
+    "replay_hashes",
+    "invariants",
+    "metrics",
+    "branch_record_sha256",
 )
 
 FIDELITY_COLUMNS = (
@@ -190,6 +371,7 @@ FIDELITY_COLUMNS = (
     "source_ready_order_json",
     "pending_merge_request_order_json",
     "legal_next_edges_json",
+    *(f"{name}_json" for name in PIBT_SLICE_FIELDS),
     "ready_set_sha256",
     "runtime_state_sha256",
     "state_components_json",
@@ -212,6 +394,7 @@ INTERVENTION_COLUMNS = (
     "intervention_id",
     "clone_group_id",
     "intervention_token_sha256",
+    "native_record_sha256",
     "boundary_sha256",
     "decision_boundary_kind",
     "decision_time_bits",
@@ -225,6 +408,7 @@ INTERVENTION_COLUMNS = (
     "source_ready_order_json",
     "pending_merge_request_order_json",
     "legal_next_edges_json",
+    *(f"{name}_json" for name in PIBT_SLICE_FIELDS),
     "ready_set_sha256",
     "runtime_state_sha256",
     "state_components_json",
@@ -330,9 +514,11 @@ class CanonicalFields:
         for value in values:
             if not isinstance(value, int) or isinstance(value, bool):
                 raise CloneValidationError(f"{name} must contain integers")
-            if not -(1 << 63) <= value < (1 << 63):
-                raise CloneValidationError(f"{name} value is outside int64")
-            self._payload.extend(struct.pack(">q", value))
+            if not -(1 << 31) <= value < (1 << 31):
+                raise CloneValidationError(f"{name} value is outside int32")
+            self._payload.extend(
+                struct.pack(">Q", value & 0xFFFFFFFFFFFFFFFF)
+            )
 
     def unsigned_integers(self, name: str, values: Sequence[int]) -> None:
         self._begin(name, b"U")
@@ -345,6 +531,26 @@ class CanonicalFields:
             ):
                 raise CloneValidationError(f"{name} must contain uint64 values")
             self._payload.extend(struct.pack(">Q", value))
+
+    def signed_integers(
+        self,
+        name: str,
+        values: Sequence[int],
+    ) -> None:
+        self._begin(name, b"L")
+        self._payload.extend(struct.pack(">Q", len(values)))
+        for value in values:
+            if (
+                not isinstance(value, int)
+                or isinstance(value, bool)
+                or not -(1 << 63) <= value < (1 << 63)
+            ):
+                raise CloneValidationError(
+                    f"{name} must contain int64 values"
+                )
+            self._payload.extend(
+                struct.pack(">Q", value & 0xFFFFFFFFFFFFFFFF)
+            )
 
     def payload(self) -> bytes:
         return bytes(self._payload)
@@ -443,7 +649,13 @@ def _require_string(label: str, value: object) -> str:
     return value
 
 
-def _require_int(label: str, value: object, *, minimum: int | None = None) -> int:
+def _require_int(
+    label: str,
+    value: object,
+    *,
+    minimum: int | None = None,
+    maximum: int | None = None,
+) -> int:
     if isinstance(value, bool):
         raise CloneValidationError(f"{label} must be an integer")
     if isinstance(value, int):
@@ -454,6 +666,8 @@ def _require_int(label: str, value: object, *, minimum: int | None = None) -> in
         raise CloneValidationError(f"{label} must be a canonical integer")
     if minimum is not None and parsed < minimum:
         raise CloneValidationError(f"{label} must be >= {minimum}")
+    if maximum is not None and parsed > maximum:
+        raise CloneValidationError(f"{label} must be <= {maximum}")
     return parsed
 
 
@@ -530,18 +744,26 @@ def _require_int_array(
     value: object,
     *,
     unsigned: bool = False,
+    bits: int | None = None,
+    duplicate_free: bool = True,
 ) -> list[int]:
     if not isinstance(value, list):
         raise CloneValidationError(f"{label} must be an ordered array")
+    width = bits if bits is not None else (64 if unsigned else 32)
+    if width not in {32, 64}:
+        raise AssertionError("integer arrays support only 32- or 64-bit widths")
+    minimum = 0 if unsigned else -(1 << (width - 1))
+    maximum = (1 << width) - 1 if unsigned else (1 << (width - 1)) - 1
     normalized = [
         _require_int(
             f"{label}[{index}]",
             item,
-            minimum=0 if unsigned else None,
+            minimum=minimum,
+            maximum=maximum,
         )
         for index, item in enumerate(value)
     ]
-    if len(normalized) != len(set(normalized)):
+    if duplicate_free and len(normalized) != len(set(normalized)):
         raise CloneValidationError(f"{label} must be duplicate-free")
     return normalized
 
@@ -557,6 +779,42 @@ def _time_from_bits(value: object) -> tuple[str, float]:
     if parsed != parsed or parsed in {float("inf"), float("-inf")} or parsed < 0:
         raise CloneValidationError("decision time must be finite and non-negative")
     return value, parsed
+
+
+def _append_pibt_slice_fields(
+    fields: CanonicalFields,
+    row: Mapping[str, object],
+) -> None:
+    fields.integers("pibt_ready_bag_ids", row["pibt_ready_bag_ids"])
+    fields.integers(
+        "pibt_ready_current_nodes", row["pibt_ready_current_nodes"]
+    )
+    fields.signed_integers(
+        "pibt_owner_resources", row["pibt_owner_resources"]
+    )
+    fields.integers("pibt_owner_bag_ids", row["pibt_owner_bag_ids"])
+    fields.integers(
+        "pibt_candidate_bag_ids", row["pibt_candidate_bag_ids"]
+    )
+    fields.integers(
+        "pibt_candidate_next_nodes", row["pibt_candidate_next_nodes"]
+    )
+    fields.signed_integers(
+        "pibt_candidate_edge_resources",
+        row["pibt_candidate_edge_resources"],
+    )
+    fields.unsigned_integers(
+        "pibt_candidate_expected_fault_generations",
+        row["pibt_candidate_expected_fault_generations"],
+    )
+    fields.unsigned_integers(
+        "pibt_candidate_required_resource_offsets",
+        row["pibt_candidate_required_resource_offsets"],
+    )
+    fields.signed_integers(
+        "pibt_candidate_required_resources",
+        row["pibt_candidate_required_resources"],
+    )
 
 
 def _native_boundary_payload(
@@ -589,6 +847,7 @@ def _native_boundary_payload(
         row["pending_merge_request_order"],
     )
     fields.integers("legal_next_edges", row["legal_next_edges"])
+    _append_pibt_slice_fields(fields, row)
     fields.string("runtime_state_sha256", str(row["runtime_state_sha256"]))
     fields.boolean("queue_top_not_popped", bool(row["queue_top_not_popped"]))
     fields.boolean(
@@ -624,13 +883,20 @@ def canonical_ready_set_sha256(row: Mapping[str, object]) -> str:
         row["pending_merge_request_order"],
     )
     fields.integers("legal_next_edges", row["legal_next_edges"])
+    _append_pibt_slice_fields(fields, row)
     return fields.sha256()
 
 
 def expected_clone_group_id(row: Mapping[str, object]) -> str:
-    return hashlib.sha256(
-        _native_boundary_payload(row, include_clone_group_id=False)
-    ).hexdigest()
+    fields = CanonicalFields()
+    fields.string("schema", SCHEMA)
+    fields.string(
+        "runtime_state_sha256",
+        _require_sha256(
+            "runtime_state_sha256", row.get("runtime_state_sha256")
+        ),
+    )
+    return fields.sha256()
 
 
 def expected_boundary_sha256(row: Mapping[str, object]) -> str:
@@ -675,6 +941,128 @@ def _validate_boundary(row: Mapping[str, object]) -> dict[str, object]:
     legal_edges = _require_int_array(
         "legal_next_edges", row.get("legal_next_edges")
     )
+    pibt_ready_bag_ids = _require_int_array(
+        "pibt_ready_bag_ids", row.get("pibt_ready_bag_ids")
+    )
+    pibt_ready_current_nodes = _require_int_array(
+        "pibt_ready_current_nodes",
+        row.get("pibt_ready_current_nodes"),
+        duplicate_free=False,
+    )
+    pibt_owner_resources = _require_int_array(
+        "pibt_owner_resources",
+        row.get("pibt_owner_resources"),
+        bits=64,
+    )
+    pibt_owner_bag_ids = _require_int_array(
+        "pibt_owner_bag_ids",
+        row.get("pibt_owner_bag_ids"),
+        duplicate_free=False,
+    )
+    pibt_candidate_bag_ids = _require_int_array(
+        "pibt_candidate_bag_ids",
+        row.get("pibt_candidate_bag_ids"),
+        duplicate_free=False,
+    )
+    pibt_candidate_next_nodes = _require_int_array(
+        "pibt_candidate_next_nodes",
+        row.get("pibt_candidate_next_nodes"),
+        duplicate_free=False,
+    )
+    pibt_candidate_edge_resources = _require_int_array(
+        "pibt_candidate_edge_resources",
+        row.get("pibt_candidate_edge_resources"),
+        bits=64,
+        duplicate_free=False,
+    )
+    pibt_candidate_expected_fault_generations = _require_int_array(
+        "pibt_candidate_expected_fault_generations",
+        row.get("pibt_candidate_expected_fault_generations"),
+        unsigned=True,
+        duplicate_free=False,
+    )
+    pibt_candidate_required_resource_offsets = _require_int_array(
+        "pibt_candidate_required_resource_offsets",
+        row.get("pibt_candidate_required_resource_offsets"),
+        unsigned=True,
+        duplicate_free=False,
+    )
+    pibt_candidate_required_resources = _require_int_array(
+        "pibt_candidate_required_resources",
+        row.get("pibt_candidate_required_resources"),
+        bits=64,
+        duplicate_free=False,
+    )
+    pibt_vectors = {
+        "pibt_ready_bag_ids": pibt_ready_bag_ids,
+        "pibt_ready_current_nodes": pibt_ready_current_nodes,
+        "pibt_owner_resources": pibt_owner_resources,
+        "pibt_owner_bag_ids": pibt_owner_bag_ids,
+        "pibt_candidate_bag_ids": pibt_candidate_bag_ids,
+        "pibt_candidate_next_nodes": pibt_candidate_next_nodes,
+        "pibt_candidate_edge_resources": pibt_candidate_edge_resources,
+        "pibt_candidate_expected_fault_generations": (
+            pibt_candidate_expected_fault_generations
+        ),
+        "pibt_candidate_required_resource_offsets": (
+            pibt_candidate_required_resource_offsets
+        ),
+        "pibt_candidate_required_resources": (
+            pibt_candidate_required_resources
+        ),
+    }
+    if kind == INTERVENTION_BOUNDARY_KIND["I5_pibt_trigger"]:
+        candidate_count = len(pibt_candidate_bag_ids)
+        valid_i5_shape = (
+            baseline_pibt
+            and runtime_bag_id >= 0
+            and pibt_owner == runtime_bag_id
+            and bool(pibt_ready_bag_ids)
+            and bool(pibt_owner_resources)
+            and bool(pibt_candidate_bag_ids)
+            and len(pibt_ready_current_nodes) == len(pibt_ready_bag_ids)
+            and len(pibt_owner_resources) == len(pibt_owner_bag_ids)
+            and len(pibt_candidate_next_nodes) == candidate_count
+            and len(pibt_candidate_edge_resources) == candidate_count
+            and len(pibt_candidate_expected_fault_generations)
+            == candidate_count
+            and len(pibt_candidate_required_resource_offsets)
+            == candidate_count + 1
+            and pibt_candidate_required_resource_offsets[0] == 0
+            and pibt_candidate_required_resource_offsets[-1]
+            == len(pibt_candidate_required_resources)
+            and pibt_owner in pibt_ready_bag_ids
+        )
+        if not valid_i5_shape:
+            raise CloneValidationError(
+                "I5 boundary must bind one complete applicable PIBT slice"
+            )
+        ready_bags = set(pibt_ready_bag_ids)
+        if any(owner not in ready_bags for owner in pibt_owner_bag_ids):
+            raise CloneValidationError(
+                "PIBT owner map references a bag outside the ready slice"
+            )
+        for index, candidate_bag_id in enumerate(
+            pibt_candidate_bag_ids
+        ):
+            begin = pibt_candidate_required_resource_offsets[index]
+            end = pibt_candidate_required_resource_offsets[index + 1]
+            candidate_edge_resource = pibt_candidate_edge_resources[index]
+            if (
+                pibt_candidate_next_nodes[index] < 0
+                or candidate_bag_id not in ready_bags
+                or begin >= end
+                or end > len(pibt_candidate_required_resources)
+                or candidate_edge_resource
+                not in pibt_candidate_required_resources[begin:end]
+            ):
+                raise CloneValidationError(
+                    "PIBT candidate set is not a valid ordered slice"
+                )
+    elif any(pibt_vectors.values()):
+        raise CloneValidationError(
+            "non-I5 boundary cannot carry PIBT slice state"
+        )
     queue_pre_pop = _require_bool(
         "queue_top_not_popped", row.get("queue_top_not_popped")
     )
@@ -734,6 +1122,7 @@ def _validate_boundary(row: Mapping[str, object]) -> dict[str, object]:
         "source_ready_order": source_ready,
         "pending_merge_request_order": pending_merge,
         "legal_next_edges": legal_edges,
+        **pibt_vectors,
         "runtime_state_sha256": state_sha,
         "state_components": dict(components),
         "queue_top_not_popped": queue_pre_pop,
@@ -906,6 +1295,7 @@ def _validate_native_intervention(
             and next_node == -1
             and selected is False
             and bag != peer
+            and bag == boundary["runtime_bag_id"]
             and bag in boundary["source_ready_order"]
             and peer in boundary["source_ready_order"]
         )
@@ -917,6 +1307,7 @@ def _validate_native_intervention(
             and selected is False
             and request > 0
             and request != peer_request
+            and request == boundary["pending_merge_request_order"][0]
             and request in boundary["pending_merge_request_order"]
             and peer_request in boundary["pending_merge_request_order"]
         )
@@ -937,7 +1328,8 @@ def _validate_native_intervention(
             and peer_request == 0
             and next_node == -1
             and bag == boundary["runtime_bag_id"]
-            and selected != boundary["baseline_release"]
+            and boundary["baseline_release"] is True
+            and selected is False
         )
     else:
         valid = (
@@ -1008,8 +1400,10 @@ def _normalize_branch_invariants(
     normalized: dict[str, object] = {}
     for name in BRANCH_INVARIANTS:
         label = f"{prefix}.{name}"
-        if name in {"event_limit_reached", "time_limit_reached"}:
+        if name in BRANCH_BOOLEAN_INVARIANTS:
             normalized[name] = _require_bool(label, raw[name])
+        elif name in BRANCH_DECIMAL_INVARIANTS:
+            normalized[name] = _require_decimal(label, raw[name])
         else:
             normalized[name] = _require_int(label, raw[name], minimum=0)
     return normalized
@@ -1067,6 +1461,9 @@ def validate_intervention_row(
     split = row.get("split")
     if split not in SPLITS:
         raise CloneValidationError(f"invalid data split: {split}")
+    native_record_sha = _require_sha256(
+        "native_record_sha256", row.get("native_record_sha256")
+    )
     intervention = _validate_native_intervention(row, boundary)
 
     if row.get("baseline_start_state_sha256") != boundary[
@@ -1084,6 +1481,7 @@ def validate_intervention_row(
         "intervention_kind": kind,
         "horizon": horizon,
         "split": split,
+        "native_record_sha256": native_record_sha,
         "raw_bag_ids": list(
             _require_id_list("raw_bag_ids", row.get("raw_bag_ids"))
         ),
@@ -1198,12 +1596,47 @@ def validate_intervention_row(
             "runtime_global_scan_count",
             "runtime_future_route_read_count",
             "runtime_future_schedule_read_count",
+            "teacher_input_count",
+            "priority_teacher_input_count",
+            "scorer_teacher_input_count",
+            "full_future_routes_stored",
+            "two_step_reservation_count",
             "failed_segment_count",
             "unresolved_deadlock_count",
+            "merge_grant_final_active_unconsumed",
+            "merge_grant_outstanding_request_count",
+            "merge_grant_stale_arbitration_count",
+            "merge_grant_lifecycle_dropped_count",
+            "stale_arbitration_event_count",
+            "artificial_batch_delay_seconds",
         ):
             if invariants[field] != 0:
                 raise CloneValidationError(
                     f"{prefix} invariant failed: {field}"
+                )
+        if invariants["teacher_input_count"] != (
+            invariants["priority_teacher_input_count"]
+            + invariants["scorer_teacher_input_count"]
+        ):
+            raise CloneValidationError(
+                f"{prefix} teacher-input aggregate is inconsistent"
+            )
+        if invariants["bag_future_path_field_present"] is not False:
+            raise CloneValidationError(
+                f"{prefix} retained a future-path field"
+            )
+        for field in (
+            "merge_grant_conservation_holds",
+            "merge_grant_active_bijection_holds",
+            "merge_grant_runtime_owned_capability",
+            "merge_grant_exact_slot_no_future_shift",
+            "merge_grant_lifecycle_complete",
+            "merge_grant_active_state_integrity_pass",
+            "merge_grant_protocol_integrity_pass",
+        ):
+            if invariants[field] is not True:
+                raise CloneValidationError(
+                    f"{prefix} live merge integrity failed: {field}"
                 )
         if invariants["max_selected_edges_per_bag"] > 1:
             raise CloneValidationError(
@@ -1302,12 +1735,13 @@ class _DisjointSet:
 def validate_split_disjointness(
     rows: Sequence[Mapping[str, object]],
 ) -> int:
-    """Union shared clone/task/segment/ready-set identities, then audit splits."""
+    """Union shared state/clone/task/segment/ready-set IDs, then audit splits."""
 
     dsu = _DisjointSet(len(rows))
     owners: dict[tuple[str, str], int] = {}
     for index, row in enumerate(rows):
         keys: list[tuple[str, str]] = [
+            ("runtime_state", str(row["runtime_state_sha256"])),
             ("clone_group", str(row["clone_group_id"])),
             ("ready_set", str(row["ready_set_sha256"])),
         ]
@@ -1332,7 +1766,8 @@ def validate_split_disjointness(
     ]
     if crossing:
         raise CloneValidationError(
-            "union-find split leakage across clone/task/segment/ready-set: "
+            "union-find split leakage across "
+            "state/clone/task/segment/ready-set: "
             f"{crossing[:3]}"
         )
     return len(component_splits)
@@ -1567,6 +2002,12 @@ def _decode_boundary_csv(row: Mapping[str, object]) -> dict[str, object]:
         "legal_next_edges": _parse_canonical_json(
             "legal_next_edges_json", row["legal_next_edges_json"]
         ),
+        **{
+            field: _parse_canonical_json(
+                f"{field}_json", row[f"{field}_json"]
+            )
+            for field in PIBT_SLICE_FIELDS
+        },
         "ready_set_sha256": row["ready_set_sha256"],
         "runtime_state_sha256": row["runtime_state_sha256"],
         "state_components": _parse_canonical_json(
@@ -1614,6 +2055,7 @@ def _decode_intervention_csv_row(
         "schema": row["schema"],
         "intervention_id": row["intervention_id"],
         "intervention_token_sha256": row["intervention_token_sha256"],
+        "native_record_sha256": row["native_record_sha256"],
         **_decode_boundary_csv(row),
         "intervention_kind": row["intervention_kind"],
         "horizon": row["horizon"],
@@ -1685,6 +2127,667 @@ def _read_csv(
                 )
             rows.append(decoder(row) if decoder is not None else dict(row))
     return rows
+
+
+def _read_canonical_jsonl(path: Path) -> list[dict[str, object]]:
+    if not path.is_file():
+        raise CloneValidationError(f"required artifact missing: {path}")
+    rows: list[dict[str, object]] = []
+    with path.open("r", encoding="utf-8", newline="") as stream:
+        for line_number, raw_line in enumerate(stream, start=1):
+            line = raw_line.rstrip("\r\n")
+            if not line:
+                raise CloneValidationError(
+                    f"{path.name} row {line_number} is blank"
+                )
+            try:
+                parsed = json.loads(line)
+            except json.JSONDecodeError as error:
+                raise CloneValidationError(
+                    f"{path.name} row {line_number} is invalid JSON"
+                ) from error
+            if not isinstance(parsed, Mapping):
+                raise CloneValidationError(
+                    f"{path.name} row {line_number} must be an object"
+                )
+            if canonical_json(parsed) != line:
+                raise CloneValidationError(
+                    f"{path.name} row {line_number} is not canonical JSON"
+                )
+            rows.append(dict(parsed))
+    if not rows:
+        raise CloneValidationError(
+            "exact-binary native evidence JSONL is empty"
+        )
+    return rows
+
+
+def _require_native_json_int(
+    label: str,
+    value: object,
+    *,
+    minimum: int | None = None,
+) -> int:
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise CloneValidationError(f"{label} must be a native JSON integer")
+    if minimum is not None and value < minimum:
+        raise CloneValidationError(f"{label} must be >= {minimum}")
+    return value
+
+
+def _expected_native_input_identity() -> dict[str, object]:
+    return {
+        "map_path": CANONICAL_MAP_PATH,
+        "map_raw_sha256": CANONICAL_MAP_RAW_SHA256,
+        "map_semantic_sha256": CANONICAL_MAP_SEMANTIC_SHA256,
+        "task_path": CANONICAL_TASK_PATH,
+        "task_sha256": CANONICAL_TASK_SHA256,
+        "segment_count": CANONICAL_SEGMENT_COUNT,
+        "raw_bag_count": CANONICAL_RAW_BAG_COUNT,
+        "demand_scale": "1.0",
+        "expanded_workload_used": False,
+    }
+
+
+def _expected_native_frozen_controls() -> dict[str, object]:
+    return {
+        "resource_semantics": "R3_java_node_window_compatible",
+        "scorer_mode": "S1_frozen_g4e_legal_local_adapter",
+        "scorer_model_sha256": FROZEN_G13_MODEL_FILE_SHA256,
+        "pibt_mode": "P2",
+        "admission_mode": "off",
+        "pressure_mode": "off",
+        "priority_mode": "Q0",
+        "event_semantics": "E4_batch_plus_destination_merge_request",
+        "merge_grant_rule": "M0",
+        "scale": 1.0,
+        "reservation_depth": 1,
+        "max_events": 20_000_000,
+        "max_simulation_time": -1.0,
+        "trace_limit": 0,
+        "event_trace_limit": 0,
+    }
+
+
+def _normalize_priority_cohort_tags(value: object) -> list[str]:
+    if not isinstance(value, list):
+        raise CloneValidationError(
+            "priority_cohort_tags must be an ordered array"
+        )
+    if any(
+        not isinstance(item, str) or item not in PRIORITY_COHORTS
+        for item in value
+    ):
+        raise CloneValidationError(
+            "priority_cohort_tags contains an unknown cohort"
+        )
+    if value != sorted(set(value)):
+        raise CloneValidationError(
+            "priority_cohort_tags must be sorted and duplicate-free"
+        )
+    return list(value)
+
+
+def _validate_native_branch(
+    value: object,
+    *,
+    branch_name: str,
+    horizon_kind: str,
+    checkpoint_state_sha256: str,
+    checkpoint_components: Mapping[str, object],
+    affected_bag_ids: Sequence[str],
+    horizon_entity_ids: Sequence[str],
+    stop_reason: str,
+    expected_invariants: Mapping[str, object],
+    expected_metrics: Mapping[str, object],
+) -> dict[str, object]:
+    if not isinstance(value, Mapping):
+        raise CloneValidationError(
+            f"native {branch_name} branch must be an object"
+        )
+    _require_exact_keys(
+        value, NATIVE_BRANCH_FIELDS, f"native {branch_name} branch"
+    )
+    components = value["start_state_components"]
+    if not isinstance(components, Mapping):
+        raise CloneValidationError(
+            f"native {branch_name} start_state_components must be an object"
+        )
+    _require_exact_keys(
+        components,
+        REQUIRED_STATE_COMPONENTS,
+        f"native {branch_name} start-state inventory",
+    )
+    normalized_components = {
+        field: _require_sha256(
+            f"native {branch_name}.{field}", components[field]
+        )
+        for field in REQUIRED_STATE_COMPONENTS
+    }
+    start_state_sha = _require_sha256(
+        f"native {branch_name}.start_state_sha256",
+        value["start_state_sha256"],
+    )
+    if (
+        canonical_state_component_sha256(normalized_components)
+        != start_state_sha
+        or start_state_sha != checkpoint_state_sha256
+        or normalized_components != dict(checkpoint_components)
+    ):
+        raise CloneValidationError(
+            f"native {branch_name} branch did not restore the exact checkpoint"
+        )
+    terminal_components = value["terminal_state_components"]
+    if not isinstance(terminal_components, Mapping):
+        raise CloneValidationError(
+            f"native {branch_name} terminal_state_components must be an object"
+        )
+    _require_exact_keys(
+        terminal_components,
+        REQUIRED_STATE_COMPONENTS,
+        f"native {branch_name} terminal-state inventory",
+    )
+    normalized_terminal_components = {
+        field: _require_sha256(
+            f"native {branch_name}.terminal.{field}",
+            terminal_components[field],
+        )
+        for field in REQUIRED_STATE_COMPONENTS
+    }
+    terminal_state_sha = _require_sha256(
+        f"native {branch_name}.terminal_state_sha256",
+        value["terminal_state_sha256"],
+    )
+    if (
+        canonical_state_component_sha256(normalized_terminal_components)
+        != terminal_state_sha
+    ):
+        raise CloneValidationError(
+            f"native {branch_name} terminal state does not bind its inventory"
+        )
+    branch_finalized = value["branch_finalized"]
+    if not isinstance(branch_finalized, bool):
+        raise CloneValidationError(
+            f"native {branch_name}.branch_finalized must be boolean"
+        )
+
+    completed_affected = list(
+        _require_id_list(
+            f"native {branch_name}.completed_affected_bag_ids",
+            value["completed_affected_bag_ids"],
+        )
+    )
+    completed_horizon = list(
+        _require_id_list(
+            f"native {branch_name}.completed_horizon_entity_ids",
+            value["completed_horizon_entity_ids"],
+        )
+    )
+    if completed_affected != list(affected_bag_ids):
+        raise CloneValidationError(
+            f"native {branch_name} affected-bag completion set is incomplete"
+        )
+    if completed_horizon != list(horizon_entity_ids):
+        raise CloneValidationError(
+            f"native {branch_name} horizon completion set is incomplete"
+        )
+    if value["stop_reason"] != stop_reason:
+        raise CloneValidationError(
+            f"native {branch_name} branch used the wrong horizon stop reason"
+        )
+
+    replay_hashes = value["replay_hashes"]
+    normalized_replay: dict[str, str] | None
+    if horizon_kind == "H_bag":
+        if branch_finalized or replay_hashes is not None:
+            raise CloneValidationError(
+                f"native {branch_name} H_bag branch must stop at the "
+                "affected-bag horizon without final replay hashes"
+            )
+        normalized_replay = None
+    else:
+        if not branch_finalized or not isinstance(replay_hashes, Mapping):
+            raise CloneValidationError(
+                f"native {branch_name} H_system branch must be finalized "
+                "with replay hashes"
+            )
+        _require_exact_keys(
+            replay_hashes,
+            REQUIRED_FIDELITY_HASHES,
+            f"native {branch_name} replay hashes",
+        )
+        normalized_replay = {
+            field: _require_sha256(
+                f"native {branch_name}.{field}", replay_hashes[field]
+            )
+            for field in REQUIRED_FIDELITY_HASHES
+        }
+    raw_invariants = value["invariants"]
+    if not isinstance(raw_invariants, Mapping):
+        raise CloneValidationError(
+            f"native {branch_name} invariants must be an object"
+        )
+    for field in BRANCH_INVARIANTS:
+        raw_field = raw_invariants.get(field)
+        if field in BRANCH_BOOLEAN_INVARIANTS:
+            if not isinstance(raw_field, bool):
+                raise CloneValidationError(
+                    f"native {branch_name}.{field} must be boolean"
+                )
+        elif field not in BRANCH_DECIMAL_INVARIANTS:
+            _require_native_json_int(
+                f"native {branch_name}.{field}",
+                raw_field,
+                minimum=0,
+            )
+    invariants = _normalize_branch_invariants(
+        branch_name, raw_invariants
+    )
+    metrics = _normalize_metrics(branch_name, value["metrics"])
+    if invariants != dict(expected_invariants):
+        raise CloneValidationError(
+            f"native {branch_name} invariants differ from the CSV row"
+        )
+    if metrics != dict(expected_metrics):
+        raise CloneValidationError(
+            f"native {branch_name} metrics differ from the CSV row"
+        )
+    normalized = {
+        "start_state_sha256": start_state_sha,
+        "start_state_components": normalized_components,
+        "terminal_state_sha256": terminal_state_sha,
+        "terminal_state_components": normalized_terminal_components,
+        "branch_finalized": branch_finalized,
+        "completed_affected_bag_ids": completed_affected,
+        "completed_horizon_entity_ids": completed_horizon,
+        "stop_reason": stop_reason,
+        "replay_hashes": normalized_replay,
+        "invariants": invariants,
+        "metrics": metrics,
+    }
+    expected_branch_sha = canonical_sha256(
+        {
+            "schema": NATIVE_BRANCH_SCHEMA,
+            "branch": branch_name,
+            **normalized,
+        }
+    )
+    if value["branch_record_sha256"] != expected_branch_sha:
+        raise CloneValidationError(
+            f"native {branch_name} branch_record_sha256 mismatch"
+        )
+    normalized["branch_record_sha256"] = expected_branch_sha
+    return normalized
+
+
+def validate_native_evidence_record(
+    value: object,
+    *,
+    root: Path,
+    generator_provenance: Mapping[str, object],
+    intervention_row: Mapping[str, object],
+) -> dict[str, object]:
+    """Validate one raw exact-binary checkpoint/baseline/treatment record."""
+
+    if not isinstance(value, Mapping):
+        raise CloneValidationError("native evidence record must be an object")
+    _require_exact_keys(value, NATIVE_RECORD_FIELDS, "native evidence record")
+    if value["schema"] != NATIVE_EVIDENCE_SCHEMA:
+        raise CloneValidationError("native evidence schema mismatch")
+    if value["evidence_scope"] != (
+        "EXACT_BINARY_ONE_SHOT_CAUSAL_RERUN_NOT_A_FORMAL_PASS"
+    ):
+        raise CloneValidationError("native evidence scope mismatch")
+    if value["formal_pass_claimed"] is not False:
+        raise CloneValidationError(
+            "a raw native record must not claim a formal PASS"
+        )
+
+    binary_relative = _require_string(
+        "generator runtime_binary_path",
+        generator_provenance.get("runtime_binary_path"),
+    )
+    bound_binary = (root / binary_relative).resolve()
+    if not bound_binary.is_file():
+        raise CloneValidationError("bound native runtime binary is missing")
+    bound_binary_sha = _require_sha256(
+        "generator runtime_binary_sha256",
+        generator_provenance.get("runtime_binary_sha256"),
+    )
+    if sha256_file(bound_binary) != bound_binary_sha:
+        raise CloneValidationError("bound native runtime binary hash mismatch")
+    actual_binary_text = _require_string(
+        "actual_loaded_cpp_binary_path",
+        value["actual_loaded_cpp_binary_path"],
+    )
+    actual_binary = Path(actual_binary_text)
+    if not actual_binary.is_absolute() or actual_binary.resolve() != bound_binary:
+        raise CloneValidationError(
+            "actual loaded C++ binary path differs from the bound binary"
+        )
+    actual_binary_sha = _require_sha256(
+        "actual_loaded_cpp_binary_sha256",
+        value["actual_loaded_cpp_binary_sha256"],
+    )
+    if actual_binary_sha != bound_binary_sha:
+        raise CloneValidationError(
+            "actual loaded C++ binary SHA-256 differs from provenance"
+        )
+
+    inputs = value["inputs"]
+    if not isinstance(inputs, Mapping):
+        raise CloneValidationError("native inputs must be an object")
+    _require_exact_keys(inputs, NATIVE_INPUT_FIELDS, "native input identity")
+    if dict(inputs) != _expected_native_input_identity():
+        raise CloneValidationError(
+            "native record is not bound to canonical map/task at 1x"
+        )
+    controls = value["frozen_controls"]
+    if not isinstance(controls, Mapping):
+        raise CloneValidationError("frozen_controls must be an object")
+    if dict(controls) != _expected_native_frozen_controls():
+        raise CloneValidationError(
+            "native record drifted from R3/S1/P2/C0/Q0/E4/M0 controls"
+        )
+
+    event_ordinal = _require_native_json_int(
+        "event_ordinal", value["event_ordinal"], minimum=0
+    )
+    checkpoint = value["checkpoint"]
+    if not isinstance(checkpoint, Mapping):
+        raise CloneValidationError("native checkpoint must be an object")
+    _require_exact_keys(
+        checkpoint, NATIVE_CHECKPOINT_FIELDS, "native checkpoint"
+    )
+    raw_boundary = checkpoint["boundary"]
+    if not isinstance(raw_boundary, Mapping):
+        raise CloneValidationError(
+            "native checkpoint boundary must be an object"
+        )
+    _require_exact_keys(
+        raw_boundary, BOUNDARY_FIELDS, "native checkpoint boundary"
+    )
+    for field in (
+        "baseline_release",
+        "baseline_pibt_enabled",
+        "queue_top_not_popped",
+        "staged_event_sink_empty",
+    ):
+        if not isinstance(raw_boundary[field], bool):
+            raise CloneValidationError(
+                f"native checkpoint boundary {field} must be boolean"
+            )
+    for field in (
+        "decision_event_seq",
+        "node",
+        "runtime_global_scan_count",
+        "runtime_future_route_read_count",
+        "runtime_future_schedule_read_count",
+        "reservation_depth",
+        "max_selected_edges_per_bag",
+    ):
+        _require_native_json_int(
+            f"native checkpoint boundary {field}",
+            raw_boundary[field],
+            minimum=0,
+        )
+    for field in (
+        "runtime_bag_id",
+        "baseline_next_node",
+        "pibt_owner_runtime_bag_id",
+    ):
+        _require_native_json_int(
+            f"native checkpoint boundary {field}", raw_boundary[field]
+        )
+    for field in (
+        "source_ready_order",
+        "pending_merge_request_order",
+        "legal_next_edges",
+        *PIBT_SLICE_FIELDS,
+    ):
+        raw_values = raw_boundary[field]
+        if not isinstance(raw_values, list) or any(
+            not isinstance(item, int) or isinstance(item, bool)
+            for item in raw_values
+        ):
+            raise CloneValidationError(
+                f"native checkpoint boundary {field} must contain integers"
+            )
+    boundary = _validate_boundary(raw_boundary)
+    for field in BOUNDARY_FIELDS:
+        if boundary[field] != intervention_row[field]:
+            raise CloneValidationError(
+                f"native checkpoint boundary differs from CSV field {field}"
+            )
+    expected_checkpoint_sha = canonical_sha256(
+        {
+            "schema": NATIVE_EVIDENCE_SCHEMA,
+            "event_ordinal": event_ordinal,
+            "boundary": boundary,
+        }
+    )
+    if checkpoint["checkpoint_record_sha256"] != expected_checkpoint_sha:
+        raise CloneValidationError("checkpoint_record_sha256 mismatch")
+    checkpoint_state_sha = str(boundary["runtime_state_sha256"])
+    checkpoint_components = boundary["state_components"]
+    assert isinstance(checkpoint_components, Mapping)
+
+    raw_intervention = value["intervention"]
+    if not isinstance(raw_intervention, Mapping):
+        raise CloneValidationError(
+            "native intervention record must be an object"
+        )
+    _require_exact_keys(
+        raw_intervention,
+        NATIVE_INTERVENTION_RECORD_FIELDS,
+        "native intervention record",
+    )
+    expected_kind = str(intervention_row["intervention_kind"])
+    if (
+        raw_intervention["kind"] != expected_kind
+        or raw_intervention["intervention_id"]
+        != intervention_row["intervention_id"]
+        or raw_intervention["intervention_token_sha256"]
+        != intervention_row["intervention_token_sha256"]
+        or raw_intervention["action"] != intervention_row["intervention"]
+    ):
+        raise CloneValidationError(
+            "native intervention identity/action differs from the CSV row"
+        )
+    allowed_changed_fields = raw_intervention["allowed_changed_fields"]
+    expected_changed_fields = list(
+        INTERVENTION_ALLOWED_CHANGED_FIELDS[expected_kind]
+    )
+    if allowed_changed_fields != expected_changed_fields:
+        raise CloneValidationError(
+            "native intervention changed fields outside its one-shot scope"
+        )
+    normalized_intervention = {
+        "kind": expected_kind,
+        "intervention_id": intervention_row["intervention_id"],
+        "intervention_token_sha256": intervention_row[
+            "intervention_token_sha256"
+        ],
+        "action": dict(intervention_row["intervention"]),
+        "allowed_changed_fields": expected_changed_fields,
+    }
+
+    raw_horizon = value["horizon"]
+    if not isinstance(raw_horizon, Mapping):
+        raise CloneValidationError("native horizon must be an object")
+    _require_exact_keys(raw_horizon, NATIVE_HORIZON_FIELDS, "native horizon")
+    affected_bag_ids = list(
+        _require_id_list(
+            "native horizon affected_bag_ids",
+            raw_horizon["affected_bag_ids"],
+        )
+    )
+    horizon_entity_ids = list(
+        _require_id_list(
+            "native horizon horizon_entity_ids",
+            raw_horizon["horizon_entity_ids"],
+        )
+    )
+    if (
+        raw_horizon["kind"] != intervention_row["horizon"]
+        or affected_bag_ids != intervention_row["raw_bag_ids"]
+        or horizon_entity_ids != intervention_row["horizon_entity_ids"]
+        or raw_horizon["horizon_entity_set_sha256"]
+        != intervention_row["horizon_entity_set_sha256"]
+    ):
+        raise CloneValidationError(
+            "native horizon identity differs from the CSV row"
+        )
+    normalized_horizon = {
+        "kind": intervention_row["horizon"],
+        "affected_bag_ids": affected_bag_ids,
+        "horizon_entity_ids": horizon_entity_ids,
+        "horizon_entity_set_sha256": intervention_row[
+            "horizon_entity_set_sha256"
+        ],
+    }
+    tags = _normalize_priority_cohort_tags(value["priority_cohort_tags"])
+    stop_reason = (
+        "AFFECTED_BAGS_COMPLETE"
+        if intervention_row["horizon"] == "H_bag"
+        else "SELECTED_COHORT_DRAINED"
+    )
+    baseline = _validate_native_branch(
+        value["baseline"],
+        branch_name="baseline",
+        horizon_kind=str(intervention_row["horizon"]),
+        checkpoint_state_sha256=checkpoint_state_sha,
+        checkpoint_components=checkpoint_components,
+        affected_bag_ids=affected_bag_ids,
+        horizon_entity_ids=horizon_entity_ids,
+        stop_reason=stop_reason,
+        expected_invariants=intervention_row["baseline_invariants"],
+        expected_metrics=intervention_row["baseline_metrics"],
+    )
+    treatment = _validate_native_branch(
+        value["treatment"],
+        branch_name="treatment",
+        horizon_kind=str(intervention_row["horizon"]),
+        checkpoint_state_sha256=checkpoint_state_sha,
+        checkpoint_components=checkpoint_components,
+        affected_bag_ids=affected_bag_ids,
+        horizon_entity_ids=horizon_entity_ids,
+        stop_reason=stop_reason,
+        expected_invariants=intervention_row["treatment_invariants"],
+        expected_metrics=intervention_row["treatment_metrics"],
+    )
+    if baseline["invariants"]["intervention_hit_count"] != 0:
+        raise CloneValidationError(
+            "native baseline branch consumed an intervention token"
+        )
+    if treatment["invariants"]["intervention_hit_count"] != 1:
+        raise CloneValidationError(
+            "native treatment branch did not apply exactly one intervention"
+        )
+    if not (
+        baseline["start_state_sha256"]
+        == treatment["start_state_sha256"]
+        == checkpoint_state_sha
+        and baseline["start_state_components"]
+        == treatment["start_state_components"]
+        == dict(checkpoint_components)
+    ):
+        raise CloneValidationError(
+            "native baseline/treatment branches have different start states"
+        )
+
+    normalized = {
+        "schema": NATIVE_EVIDENCE_SCHEMA,
+        "evidence_scope": (
+            "EXACT_BINARY_ONE_SHOT_CAUSAL_RERUN_NOT_A_FORMAL_PASS"
+        ),
+        "formal_pass_claimed": False,
+        "actual_loaded_cpp_binary_path": actual_binary_text,
+        "actual_loaded_cpp_binary_sha256": actual_binary_sha,
+        "inputs": dict(inputs),
+        "frozen_controls": dict(controls),
+        "event_ordinal": event_ordinal,
+        "checkpoint": {
+            "boundary": boundary,
+            "checkpoint_record_sha256": expected_checkpoint_sha,
+        },
+        "intervention": normalized_intervention,
+        "horizon": normalized_horizon,
+        "priority_cohort_tags": tags,
+        "baseline": baseline,
+        "treatment": treatment,
+    }
+    expected_native_sha = canonical_sha256(normalized)
+    if value["native_record_sha256"] != expected_native_sha:
+        raise CloneValidationError("native_record_sha256 mismatch")
+    if intervention_row["native_record_sha256"] != expected_native_sha:
+        raise CloneValidationError(
+            "intervention CSV row does not bind its raw native record"
+        )
+    normalized["native_record_sha256"] = expected_native_sha
+    return normalized
+
+
+def validate_native_evidence_records(
+    records: Sequence[Mapping[str, object]],
+    intervention_rows: Sequence[Mapping[str, object]],
+    *,
+    root: Path,
+    generator_provenance: Mapping[str, object],
+) -> dict[str, object]:
+    rows_by_native_sha: dict[str, Mapping[str, object]] = {}
+    for row in intervention_rows:
+        native_sha = _require_sha256(
+            "intervention native_record_sha256",
+            row["native_record_sha256"],
+        )
+        if native_sha in rows_by_native_sha:
+            raise CloneValidationError(
+                "multiple intervention rows bind the same native record"
+            )
+        rows_by_native_sha[native_sha] = row
+    normalized_records: list[dict[str, object]] = []
+    seen: set[str] = set()
+    cohort_bags: dict[str, set[str]] = {
+        cohort: set() for cohort in PRIORITY_COHORTS
+    }
+    for raw in records:
+        declared_sha = _require_sha256(
+            "native evidence native_record_sha256",
+            raw.get("native_record_sha256"),
+        )
+        if declared_sha in seen:
+            raise CloneValidationError("duplicate raw native evidence record")
+        expected_row = rows_by_native_sha.get(declared_sha)
+        if expected_row is None:
+            raise CloneValidationError(
+                "raw native evidence record is not bound by an intervention row"
+            )
+        normalized = validate_native_evidence_record(
+            raw,
+            root=root,
+            generator_provenance=generator_provenance,
+            intervention_row=expected_row,
+        )
+        normalized_records.append(normalized)
+        seen.add(declared_sha)
+        affected = set(normalized["horizon"]["affected_bag_ids"])
+        for cohort in normalized["priority_cohort_tags"]:
+            cohort_bags[cohort].update(affected)
+    missing_records = sorted(set(rows_by_native_sha) - seen)
+    if missing_records:
+        raise CloneValidationError(
+            "intervention rows lack raw native evidence records: "
+            f"{missing_records[:3]}"
+        )
+    record_hashes = sorted(seen)
+    return {
+        "native_record_count": len(normalized_records),
+        "native_record_manifest_sha256": canonical_sha256(record_hashes),
+        "priority_cohort_coverage_summary": {
+            cohort: len(cohort_bags[cohort]) for cohort in PRIORITY_COHORTS
+        },
+    }
 
 
 def _expected_provenance() -> dict[str, object]:
@@ -2196,9 +3299,88 @@ def _validate_preregistration(value: object) -> dict[str, object]:
     return normalized
 
 
+def _validate_priority_cohort_coverage(
+    value: object,
+    derived: Mapping[str, object],
+) -> dict[str, int]:
+    if not isinstance(value, Mapping):
+        raise CloneValidationError(
+            "priority_cohort_coverage_summary must be an object"
+        )
+    _require_exact_keys(
+        value, PRIORITY_COHORTS, "priority cohort coverage summary"
+    )
+    normalized = {
+        cohort: _require_int(
+            f"priority cohort {cohort}", value[cohort], minimum=0
+        )
+        for cohort in PRIORITY_COHORTS
+    }
+    expected = {
+        cohort: _require_int(
+            f"derived priority cohort {cohort}",
+            derived.get(cohort),
+            minimum=0,
+        )
+        for cohort in PRIORITY_COHORTS
+    }
+    if normalized != expected:
+        raise CloneValidationError(
+            "priority cohort coverage summary is not derived from native rows"
+        )
+    if normalized["top_1_percent_delta_286"] < 286:
+        raise CloneValidationError(
+            "priority cohort coverage omits top-1% delta bags"
+        )
+    missing = [
+        cohort
+        for cohort in PRIORITY_COHORTS
+        if cohort != "top_1_percent_delta_286"
+        and normalized[cohort] <= 0
+    ]
+    if missing:
+        raise CloneValidationError(
+            f"priority cohort coverage is incomplete: {missing}"
+        )
+    return normalized
+
+
+def _validate_sampling_funnel(
+    value: object,
+    campaign: Mapping[str, object],
+) -> dict[str, object]:
+    if not isinstance(value, Mapping):
+        raise CloneValidationError("sampling_funnel must be an object")
+    _require_exact_keys(value, SAMPLING_FUNNEL_FIELDS, "sampling funnel")
+    normalized: dict[str, object] = {}
+    for field in SAMPLING_FUNNEL_FIELDS:
+        if field.endswith("_sha256"):
+            normalized[field] = _require_sha256(field, value[field])
+        else:
+            normalized[field] = _require_int(field, value[field], minimum=0)
+    static_count = int(normalized["static_opportunity_count"])
+    local_count = int(normalized["h_local_screened_count"])
+    bag_count = int(normalized["h_bag_completed_count"])
+    system_count = int(normalized["h_system_completed_count"])
+    if not static_count >= local_count >= bag_count >= system_count:
+        raise CloneValidationError(
+            "sampling funnel counts are not monotone "
+            "static->H_local->H_bag->H_system"
+        )
+    if bag_count != campaign["matched_intervention_count"]:
+        raise CloneValidationError(
+            "H_bag-complete funnel denominator differs from matched labels"
+        )
+    if system_count != campaign["h_system_count"] or system_count <= 0:
+        raise CloneValidationError(
+            "H_system funnel denominator differs from formal labels"
+        )
+    return normalized
+
+
 def _validate_report(report: str, summary: Mapping[str, object]) -> None:
     required = (
-        f"G4IRSF14-D STATUS: {PROTOCOL_STATUS}",
+        f"G4IRSF14-E STATUS: {PROTOCOL_STATUS}",
         "exact-binary no-op fidelity mechanism: available",
         "formal exact-binary I1-I5 one-shot reruns: not established",
         "original-task 2000/H_system formal evidence: not established",
@@ -2210,6 +3392,10 @@ def _validate_report(report: str, summary: Mapping[str, object]) -> None:
         (
             "protocol-validated matched intervention rows: "
             f"{summary['matched_intervention_count']}"
+        ),
+        (
+            "content-addressed native rerun records: "
+            f"{summary['native_record_count']}"
         ),
         f"H_bag labels: {summary['h_bag_count']}",
         f"H_system labels: {summary['h_system_count']}",
@@ -2227,6 +3413,7 @@ def _validate_report(report: str, summary: Mapping[str, object]) -> None:
 def _expected_manifest_summary(
     campaign: Mapping[str, object],
     ledger: Mapping[str, object],
+    native_evidence: Mapping[str, object],
 ) -> dict[str, object]:
     fields = (
         "fidelity_clone_count",
@@ -2249,11 +3436,15 @@ def _expected_manifest_summary(
         **{field: campaign[field] for field in fields},
         "ledger_row_count": ledger["ledger_row_count"],
         "ledger_manifest_sha256": ledger["ledger_manifest_sha256"],
+        "native_record_count": native_evidence["native_record_count"],
+        "native_record_manifest_sha256": native_evidence[
+            "native_record_manifest_sha256"
+        ],
     }
 
 
 def validate_artifact_protocol(root: Path) -> dict[str, object]:
-    """Validate the five-artifact protocol without granting a causal PASS."""
+    """Validate six bound artifacts without granting a formal causal PASS."""
 
     root = root.resolve()
     manifest_path = root / MANIFEST_PATH
@@ -2272,6 +3463,8 @@ def validate_artifact_protocol(root: Path) -> dict[str, object]:
         "provenance",
         "generator_provenance",
         "preregistration",
+        "priority_cohort_coverage_summary",
+        "sampling_funnel",
         "campaign_identity_sha256",
         "artifact_bindings",
         "summary",
@@ -2282,7 +3475,7 @@ def validate_artifact_protocol(root: Path) -> dict[str, object]:
     if manifest["schema"] != MANIFEST_SCHEMA:
         raise CloneValidationError("clone manifest schema mismatch")
     if (
-        manifest["stage"] != "G4IRSF14-D"
+        manifest["stage"] != "G4IRSF14-E"
         or manifest["status"] != PROTOCOL_STATUS
     ):
         raise CloneValidationError(
@@ -2297,16 +3490,6 @@ def validate_artifact_protocol(root: Path) -> dict[str, object]:
         manifest["generator_provenance"], root
     )
     preregistration = _validate_preregistration(manifest["preregistration"])
-    campaign_identity = canonical_sha256(
-        {
-            "schema": MANIFEST_SCHEMA,
-            "provenance": provenance,
-            "generator_provenance": generator,
-            "preregistration": preregistration,
-        }
-    )
-    if manifest["campaign_identity_sha256"] != campaign_identity:
-        raise CloneValidationError("campaign identity hash mismatch")
 
     unsigned = dict(manifest)
     declared_self = unsigned.pop("self_sha256")
@@ -2321,6 +3504,7 @@ def validate_artifact_protocol(root: Path) -> dict[str, object]:
         FIDELITY_PATH,
         INTERVENTION_PATH,
         LEDGER_PATH,
+        NATIVE_EVIDENCE_PATH,
     }
     if not isinstance(bindings, Mapping):
         raise CloneValidationError("artifact_bindings must be an object")
@@ -2348,6 +3532,32 @@ def validate_artifact_protocol(root: Path) -> dict[str, object]:
         validate_intervention_row(row) for row in intervention_rows
     ]
     validate_input_identity_bindings(normalized_interventions, root)
+    native_rows = _read_canonical_jsonl(root / NATIVE_EVIDENCE_PATH)
+    native_evidence = validate_native_evidence_records(
+        native_rows,
+        normalized_interventions,
+        root=root,
+        generator_provenance=generator,
+    )
+    priority_coverage = _validate_priority_cohort_coverage(
+        manifest["priority_cohort_coverage_summary"],
+        native_evidence["priority_cohort_coverage_summary"],
+    )
+    sampling_funnel = _validate_sampling_funnel(
+        manifest["sampling_funnel"], campaign
+    )
+    campaign_identity = canonical_sha256(
+        {
+            "schema": MANIFEST_SCHEMA,
+            "provenance": provenance,
+            "generator_provenance": generator,
+            "preregistration": preregistration,
+            "priority_cohort_coverage_summary": priority_coverage,
+            "sampling_funnel": sampling_funnel,
+        }
+    )
+    if manifest["campaign_identity_sha256"] != campaign_identity:
+        raise CloneValidationError("campaign identity hash mismatch")
     observed_registration = sorted(
         [
             {
@@ -2375,7 +3585,9 @@ def validate_artifact_protocol(root: Path) -> dict[str, object]:
         )
     ledger_rows = _read_csv(root / LEDGER_PATH, LEDGER_COLUMNS)
     ledger = validate_ledger_rows(ledger_rows, normalized_interventions)
-    expected_summary = _expected_manifest_summary(campaign, ledger)
+    expected_summary = _expected_manifest_summary(
+        campaign, ledger, native_evidence
+    )
     if manifest["summary"] != expected_summary:
         raise CloneValidationError(
             "manifest summary does not equal independently recomputed evidence"
@@ -2390,6 +3602,8 @@ def validate_artifact_protocol(root: Path) -> dict[str, object]:
         "original_task_2000_h_system_formal_evidence": "NOT_ESTABLISHED",
         "manifest_self_sha256": declared_self,
         "campaign_identity_sha256": campaign_identity,
+        "priority_cohort_coverage_summary": priority_coverage,
+        "sampling_funnel": sampling_funnel,
         **expected_summary,
     }
 
@@ -2397,19 +3611,16 @@ def validate_artifact_protocol(root: Path) -> dict[str, object]:
 def validate_artifacts(root: Path) -> dict[str, object]:
     """Fail closed until exact-binary causal reruns and formal evidence exist.
 
-    The production no-op checkpoint/restore/rerun mechanism is available and
-    establishes the fidelity mechanism.  Internal consistency, file hashes and
-    native wire IDs still do not prove that 2,000 causal rows came from
-    production execution.  A future formal manifest must bind every I1--I5
-    one-shot baseline/treatment rerun to the actual loaded binary path and
-    SHA-256 plus raw checkpoint and branch-record hashes.  The original-task
-    campaign must then independently establish at least 2,000 complete H_bag /
-    H_system labels and a non-zero H_system cohort.
+    The protocol validator now binds raw native checkpoint/baseline/treatment
+    records to the actual loaded binary and the CSV rows.  A content-addressed
+    record is still not an independent re-execution by the validator.  Formal
+    PASS remains closed until the canonical original-task campaign exists and
+    an independent exact-binary rerun verifier reproduces all accepted rows.
     """
 
     validate_artifact_protocol(root)
     raise CloneValidationError(
         f"{FORMAL_CAUSAL_BLOCKER}: "
-        "the exact-binary no-op fidelity mechanism is available, but no-op "
-        "fidelity alone is not an I1-I5 causal rerun or formal label"
+        "content-addressed native records are protocol evidence, not an "
+        "independent exact-binary reproduction or formal causal PASS"
     )

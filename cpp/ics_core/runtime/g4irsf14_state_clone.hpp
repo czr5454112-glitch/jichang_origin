@@ -105,6 +105,16 @@ class CanonicalFields {
     }
   }
 
+  void signed_integers(
+      std::string_view name,
+      const std::vector<std::int64_t>& values) {
+    begin(name, 'L');
+    append_u64(static_cast<std::uint64_t>(values.size()));
+    for (const std::int64_t value : values) {
+      append_u64(static_cast<std::uint64_t>(value));
+    }
+  }
+
   [[nodiscard]] const std::string& payload() const noexcept { return payload_; }
 
  private:
@@ -312,6 +322,19 @@ struct G4IRSF14CloneBoundary {
   std::vector<int> source_ready_order;
   std::vector<std::uint64_t> pending_merge_request_order;
   std::vector<int> legal_next_edges;
+  std::vector<int> pibt_ready_bag_ids;
+  std::vector<int> pibt_ready_current_nodes;
+  std::vector<std::int64_t> pibt_owner_resources;
+  std::vector<int> pibt_owner_bag_ids;
+  std::vector<int> pibt_candidate_bag_ids;
+  std::vector<int> pibt_candidate_next_nodes;
+  std::vector<std::int64_t> pibt_candidate_edge_resources;
+  std::vector<std::uint64_t>
+      pibt_candidate_expected_fault_generations;
+  std::vector<std::uint64_t>
+      pibt_candidate_required_resource_offsets;
+  std::vector<std::int64_t>
+      pibt_candidate_required_resources;
   G4IRSF14RuntimeStateDigests state;
   std::string runtime_state_sha256;
 
@@ -349,6 +372,83 @@ struct G4IRSF14CloneBoundary {
         !g4irsf14_clone_detail::all_unique(legal_next_edges)) {
       throw std::invalid_argument("clone boundary local ready sets must be unique");
     }
+    const bool pibt_vectors_empty =
+        pibt_ready_bag_ids.empty() &&
+        pibt_ready_current_nodes.empty() &&
+        pibt_owner_resources.empty() &&
+        pibt_owner_bag_ids.empty() &&
+        pibt_candidate_bag_ids.empty() &&
+        pibt_candidate_next_nodes.empty() &&
+        pibt_candidate_edge_resources.empty() &&
+        pibt_candidate_expected_fault_generations.empty() &&
+        pibt_candidate_required_resource_offsets.empty() &&
+        pibt_candidate_required_resources.empty();
+    if (kind == G4IRSF14CloneBoundaryKind::kPIBTReadySlice) {
+      if (!baseline_pibt_enabled || runtime_bag_id < 0 ||
+          pibt_owner_runtime_bag_id != runtime_bag_id ||
+          pibt_ready_bag_ids.empty() ||
+          pibt_owner_resources.empty() ||
+          pibt_candidate_bag_ids.empty() ||
+          pibt_ready_current_nodes.size() !=
+              pibt_ready_bag_ids.size() ||
+          pibt_owner_resources.size() !=
+              pibt_owner_bag_ids.size() ||
+          pibt_candidate_next_nodes.size() !=
+              pibt_candidate_bag_ids.size() ||
+          pibt_candidate_edge_resources.size() !=
+              pibt_candidate_bag_ids.size() ||
+          pibt_candidate_expected_fault_generations.size() !=
+              pibt_candidate_bag_ids.size() ||
+          pibt_candidate_required_resource_offsets.size() !=
+              pibt_candidate_bag_ids.size() + 1U ||
+          pibt_candidate_required_resource_offsets.front() != 0U ||
+          pibt_candidate_required_resource_offsets.back() !=
+              pibt_candidate_required_resources.size() ||
+          !g4irsf14_clone_detail::all_unique(
+              pibt_ready_bag_ids) ||
+          !g4irsf14_clone_detail::all_unique(
+              pibt_owner_resources) ||
+          !g4irsf14_clone_detail::contains(
+              pibt_ready_bag_ids,
+              pibt_owner_runtime_bag_id)) {
+        throw std::invalid_argument(
+            "I5 boundary must bind one complete applicable PIBT slice");
+      }
+      for (const int owner : pibt_owner_bag_ids) {
+        if (!g4irsf14_clone_detail::contains(
+                pibt_ready_bag_ids, owner)) {
+          throw std::invalid_argument(
+              "PIBT owner map references a bag outside the ready slice");
+        }
+      }
+      for (std::size_t index = 0;
+           index < pibt_candidate_bag_ids.size(); ++index) {
+        const auto begin =
+            pibt_candidate_required_resource_offsets[index];
+        const auto end =
+            pibt_candidate_required_resource_offsets[index + 1U];
+        if (pibt_candidate_next_nodes[index] < 0 ||
+            !g4irsf14_clone_detail::contains(
+                pibt_ready_bag_ids,
+                pibt_candidate_bag_ids[index]) ||
+            begin >= end ||
+            end > pibt_candidate_required_resources.size() ||
+            std::find(
+                pibt_candidate_required_resources.begin() +
+                    static_cast<std::ptrdiff_t>(begin),
+                pibt_candidate_required_resources.begin() +
+                    static_cast<std::ptrdiff_t>(end),
+                pibt_candidate_edge_resources[index]) ==
+                pibt_candidate_required_resources.begin() +
+                    static_cast<std::ptrdiff_t>(end)) {
+          throw std::invalid_argument(
+              "PIBT candidate set is not a valid ordered slice");
+        }
+      }
+    } else if (!pibt_vectors_empty) {
+      throw std::invalid_argument(
+          "non-I5 boundary cannot carry PIBT slice state");
+    }
     state.validate();
     g4irsf14_clone_detail::require_sha256("runtime_state_sha256",
                                          runtime_state_sha256);
@@ -365,11 +465,6 @@ struct G4IRSF14CloneBoundary {
   }
 
   [[nodiscard]] std::string pre_outcome_identity_payload() const {
-    if (!std::isfinite(time) || time < 0.0 || event_seq == 0U ||
-        node < 0) {
-      throw std::invalid_argument(
-          "clone identity requires a valid pre-pop event boundary");
-    }
     state.validate();
     g4irsf14_clone_detail::require_sha256(
         "runtime_state_sha256", runtime_state_sha256);
@@ -379,33 +474,7 @@ struct G4IRSF14CloneBoundary {
     }
     g4irsf14_clone_detail::CanonicalFields fields;
     fields.string("schema", kG4IRSF14StateCloneSchema);
-    fields.string("kind", g4irsf14_clone_boundary_kind_name(kind));
-    fields.floating("time", time);
-    fields.unsigned_integer("event_seq", event_seq);
-    fields.integer("node", node);
-    fields.integer("runtime_bag_id", runtime_bag_id);
-    fields.integer("baseline_next_node", baseline_next_node);
-    fields.boolean("baseline_release", baseline_release);
-    fields.boolean("baseline_pibt_enabled", baseline_pibt_enabled);
-    fields.integer("pibt_owner_runtime_bag_id",
-                   pibt_owner_runtime_bag_id);
-    fields.integers("source_ready_order", source_ready_order);
-    fields.unsigned_integers("pending_merge_request_order",
-                             pending_merge_request_order);
-    fields.integers("legal_next_edges", legal_next_edges);
     fields.string("runtime_state_sha256", runtime_state_sha256);
-    fields.boolean("queue_top_not_popped", queue_top_not_popped);
-    fields.boolean("staged_event_sink_empty",
-                   staged_event_sink_empty);
-    fields.integer("runtime_global_scan_count",
-                   runtime_global_scan_count);
-    fields.integer("runtime_future_route_read_count",
-                   runtime_future_route_read_count);
-    fields.integer("runtime_future_schedule_read_count",
-                   runtime_future_schedule_read_count);
-    fields.integer("reservation_depth", reservation_depth);
-    fields.integer("max_selected_edges_per_bag",
-                   max_selected_edges_per_bag);
     return fields.payload();
   }
 
@@ -432,6 +501,29 @@ struct G4IRSF14CloneBoundary {
     fields.unsigned_integers("pending_merge_request_order",
                              pending_merge_request_order);
     fields.integers("legal_next_edges", legal_next_edges);
+    fields.integers("pibt_ready_bag_ids", pibt_ready_bag_ids);
+    fields.integers("pibt_ready_current_nodes",
+                    pibt_ready_current_nodes);
+    fields.signed_integers("pibt_owner_resources",
+                           pibt_owner_resources);
+    fields.integers("pibt_owner_bag_ids",
+                    pibt_owner_bag_ids);
+    fields.integers("pibt_candidate_bag_ids",
+                    pibt_candidate_bag_ids);
+    fields.integers("pibt_candidate_next_nodes",
+                    pibt_candidate_next_nodes);
+    fields.signed_integers(
+        "pibt_candidate_edge_resources",
+        pibt_candidate_edge_resources);
+    fields.unsigned_integers(
+        "pibt_candidate_expected_fault_generations",
+        pibt_candidate_expected_fault_generations);
+    fields.unsigned_integers(
+        "pibt_candidate_required_resource_offsets",
+        pibt_candidate_required_resource_offsets);
+    fields.signed_integers(
+        "pibt_candidate_required_resources",
+        pibt_candidate_required_resources);
     fields.string("runtime_state_sha256", runtime_state_sha256);
     fields.boolean("queue_top_not_popped", queue_top_not_popped);
     fields.boolean("staged_event_sink_empty", staged_event_sink_empty);
@@ -524,9 +616,9 @@ struct G4IRSF14CloneIntervention {
             boundary.kind !=
                 G4IRSF14CloneBoundaryKind::kHoldReleaseOpportunity ||
             runtime_bag_id != boundary.runtime_bag_id ||
-            selected_boolean == boundary.baseline_release) {
+            !boundary.baseline_release || selected_boolean) {
           throw std::invalid_argument(
-              "I4 must only flip hold/release for the boundary bag");
+              "I4 may only change one baseline release into a safe hold");
         }
         return;
 

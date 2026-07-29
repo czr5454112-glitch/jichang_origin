@@ -65,6 +65,25 @@ add_test(
   NAME g4irsf14_state_clone_protocol
   COMMAND test_g4irsf14_state_clone_protocol)
 
+add_executable(
+  test_g4irsf14_causal_intervention
+  cpp/tests/test_g4irsf14_causal_intervention.cpp)
+target_link_libraries(
+  test_g4irsf14_causal_intervention
+  PRIVATE ics_core)
+target_compile_definitions(
+  test_g4irsf14_causal_intervention
+  PRIVATE
+    CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    CZR005_EVENT_RUNTIME_TESTING=1)
+if(MSVC)
+  target_compile_options(
+    test_g4irsf14_causal_intervention PRIVATE /bigobj)
+endif()
+add_test(
+  NAME g4irsf14_causal_intervention
+  COMMAND test_g4irsf14_causal_intervention)
+
 add_executable(test_g4irsf12_runtime_controls cpp/tests/test_g4irsf12_runtime_controls.cpp)
 target_link_libraries(test_g4irsf12_runtime_controls PRIVATE ics_core)
 target_compile_definitions(

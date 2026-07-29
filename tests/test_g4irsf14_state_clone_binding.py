@@ -133,6 +133,21 @@ def test_non_formal_unit_exact_binary_noop_rerun_is_raw_three_way_match() -> Non
     assert source_invariants["requested_count"] == 1
     assert source_invariants["completed_count"] == 1
     assert source_invariants["failed_segment_count"] == 0
+    assert (
+        source_invariants[
+            "g4irsf14_i2_live_eligible_multi_request_boundary_count"
+        ]
+        == 0
+    )
+    assert (
+        source_invariants[
+            "g4irsf14_i5_prefilter_candidate_count"
+        ]
+        >= source_invariants[
+            "g4irsf14_i5_applicable_ready_slice_boundary_count"
+        ]
+        >= 0
+    )
     assert source_invariants["runtime_full_astar_call_count"] == 0
     assert source_invariants["runtime_global_scan_count"] == 0
     assert source_invariants["runtime_future_route_read_count"] == 0

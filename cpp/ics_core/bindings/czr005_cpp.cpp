@@ -3211,6 +3211,10 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["final_active_bag_count"] = summary.final_active_bag_count;
   row["decision_count"] = summary.decision_count;
   row["event_count"] = summary.event_count;
+  row["g4irsf14_i2_live_eligible_multi_request_boundary_count"] =
+      py::int_(
+          summary
+              .g4irsf14_i2_live_eligible_multi_request_boundary_count);
   row["bag_release_event_count"] = summary.bag_release_event_count;
   row["arrive_junction_event_count"] = summary.arrive_junction_event_count;
   row["junction_service_complete_event_count"] = summary.junction_service_complete_event_count;
@@ -3352,6 +3356,11 @@ py::dict g4irsf11_event_runtime_summary_row(
       summary.same_bag_alternative_edge_scan_handoff_count;
   row["bounded_local_pibt_activation_count"] =
       py::int_(summary.bounded_local_pibt_activation_count);
+  row["g4irsf14_i5_prefilter_candidate_count"] =
+      py::int_(summary.g4irsf14_i5_prefilter_candidate_count);
+  row["g4irsf14_i5_applicable_ready_slice_boundary_count"] =
+      py::int_(
+          summary.g4irsf14_i5_applicable_ready_slice_boundary_count);
   row["bounded_local_pibt_applicability_count"] =
       py::int_(summary.bounded_local_pibt_activation_count);
   row["pibt_applicability_count"] =
@@ -4422,6 +4431,15 @@ py::dict g4irsf14_clone_branch_invariants(
   row["completed_count"] = summary.completed_count;
   row["failed_segment_count"] = summary.failed_count;
   row["event_count"] = summary.event_count;
+  row["g4irsf14_i2_live_eligible_multi_request_boundary_count"] =
+      py::int_(
+          summary
+              .g4irsf14_i2_live_eligible_multi_request_boundary_count);
+  row["g4irsf14_i5_prefilter_candidate_count"] =
+      py::int_(summary.g4irsf14_i5_prefilter_candidate_count);
+  row["g4irsf14_i5_applicable_ready_slice_boundary_count"] =
+      py::int_(
+          summary.g4irsf14_i5_applicable_ready_slice_boundary_count);
   row["unsafe_entry_count"] =
       summary.physical_fault_edge_entry_violation_count;
   row["reservation_conflict_count"] =

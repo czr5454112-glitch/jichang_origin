@@ -101,13 +101,13 @@ void test_cross_language_v2_golden_vectors() {
       "C++ state inventory must match the Python v2 binary golden");
   require(
       boundary.clone_group_id ==
-          "6651d8a2f2d69c967f163185899b7257"
-          "03318c23ed16219929c659f259cfd575",
+          "50e7d3160016ac3d1b94a7b90d66f3b"
+          "8b3519e21c07636f744aa6fb7bc000bbd",
       "C++ clone-group content address must match Python");
   require(
       boundary.boundary_sha256() ==
-          "0d798e3b0d42088b7d25c0e1d699f139"
-          "947bd96d2d193dc4e9b50e2fed20c946",
+          "866dcd3e8dc56b3d54366bd65e37ae47"
+          "69ef4126b06065a42895fd3f928c1a6a",
       "C++ boundary digest must match Python");
 
   G4IRSF14CloneIntervention intervention;
@@ -118,8 +118,8 @@ void test_cross_language_v2_golden_vectors() {
   intervention.peer_runtime_bag_id = 102;
   require(
       intervention.intervention_sha256(boundary) ==
-          "8bc39b5db5c37ceb9996054fc8d22fe5"
-          "8f623a939e06cae9686e6c794f565cea",
+          "c7d94bd29067f71061a8f8a426da8671"
+          "af3863cdb5574802dbf61282fa669118",
       "C++ intervention digest must match Python");
 
   boundary.clone_group_id = digest('f');

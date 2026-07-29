@@ -31,6 +31,7 @@
 #include "ics_core/runtime/bounded_local_pibt.hpp"
 #include "ics_core/runtime/destination_merge_grant.hpp"
 #include "ics_core/runtime/expiring_first_edge_credit.hpp"
+#include "ics_core/runtime/g4irsf14_causal_intervention.hpp"
 #include "ics_core/runtime/g4irsf14_state_clone.hpp"
 
 namespace czr005::ics {
@@ -636,6 +637,12 @@ struct EventRuntimeSummary {
   int microphase_runtime_global_scan_count = 0;
   double artificial_batch_delay_seconds = 0.0;
   std::uint64_t destination_merge_arbitration_event_count = 0;
+  std::uint64_t
+      g4irsf14_i2_live_eligible_multi_request_boundary_count = 0;
+  std::uint64_t
+      g4irsf14_i5_prefilter_candidate_count = 0;
+  std::uint64_t
+      g4irsf14_i5_applicable_ready_slice_boundary_count = 0;
   std::uint64_t merge_grant_request_count = 0;
   std::uint64_t merge_grant_issued_count = 0;
   std::uint64_t merge_grant_prepared_count = 0;
@@ -1977,6 +1984,213 @@ class EventDrivenJunctionRuntime {
     return true;
   }
 
+  // Probe one live queue-top event.  The returned opportunities are bound to
+  // the exact pre-pop state and can be replayed only after restoring that
+  // checkpoint into an independently constructed runtime.
+  G4IRSF14CausalStepResult
+  probe_one_event_for_causal_opportunities() {
+    return process_one_event_causal_impl(nullptr);
+  }
+
+  // Apply one content-addressed action treatment while consuming the same
+  // queue-top event.  The directive lives only on this call's stack and is
+  // never copied into config, the event queue, or a runtime checkpoint.
+  G4IRSF14CausalStepResult
+  process_one_event_with_causal_intervention(
+      const G4IRSF14CausalInterventionDirective& directive) {
+    return process_one_event_causal_impl(&directive);
+  }
+
+  // O(1) / one-local-owner prefilter for a multi-million-event census.  A
+  // zero mask means callers can safely use process_one_event() and avoid the
+  // full 18-component checkpoint hash.  Nonzero is intentionally a
+  // conservative candidate hint; the causal probe remains the authority.
+  [[nodiscard]] std::uint32_t
+  peek_causal_candidate_kind_mask() const noexcept {
+    if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+        events_.empty()) {
+      return kG4IRSF14CausalCandidateNone;
+    }
+    const auto& event = events_.top();
+    if (event.type == JunctionEventType::kSourceArbitration) {
+      const auto local = junctions_.find(event.node);
+      return local != junctions_.end() &&
+                     local->second.source_queue.size() >= 2U
+                 ? kG4IRSF14CausalCandidateI1
+                 : kG4IRSF14CausalCandidateNone;
+    }
+    if (event.type == JunctionEventType::kJunctionArbitration) {
+      const auto local = junctions_.find(event.node);
+      return local != junctions_.end() &&
+                     !local->second.queue.empty()
+                 ? kG4IRSF14CausalCandidateI3 |
+                       kG4IRSF14CausalCandidateI4
+                 : kG4IRSF14CausalCandidateNone;
+    }
+    if (event.type ==
+        JunctionEventType::kDestinationMergeArbitration) {
+      const auto controller =
+          destination_merge_controllers_.find(event.node);
+      if (controller ==
+              destination_merge_controllers_.end() ||
+          controller->second.pending_count() == 0U) {
+        return kG4IRSF14CausalCandidateNone;
+      }
+      std::uint32_t mask =
+          controller->second.pending_count() >= 2U
+              ? kG4IRSF14CausalCandidateI2
+              : kG4IRSF14CausalCandidateNone;
+      const auto destination = junctions_.find(event.node);
+      if (config_.local_queue_capacity > 0 &&
+          destination != junctions_.end() &&
+          static_cast<int>(destination->second.queue.size()) +
+                  destination->second.scheduled_incoming >=
+              config_.local_queue_capacity) {
+        mask |= kG4IRSF14CausalCandidateI5;
+      }
+      return mask;
+    }
+    return kG4IRSF14CausalCandidateNone;
+  }
+
+  [[nodiscard]] G4IRSF14CausalHorizonState
+  causal_horizon_state(
+      const std::vector<int>& runtime_bag_ids) const {
+    if (runtime_bag_ids.empty() ||
+        std::set<int>(runtime_bag_ids.begin(),
+                      runtime_bag_ids.end())
+                .size() != runtime_bag_ids.size()) {
+      throw std::invalid_argument(
+          "causal horizon ids must be non-empty and unique");
+    }
+    G4IRSF14CausalHorizonState horizon;
+    horizon.bags.reserve(runtime_bag_ids.size());
+    for (const int runtime_bag_id : runtime_bag_ids) {
+      if (runtime_bag_id < 0) {
+        throw std::invalid_argument(
+            "causal horizon runtime bag id must be non-negative");
+      }
+      G4IRSF14CausalBagHorizonRow row;
+      row.runtime_bag_id = runtime_bag_id;
+      const auto found = bags_.find(runtime_bag_id);
+      if (found != bags_.end()) {
+        row.known = true;
+        row.completed =
+            found->second.status ==
+            event_runtime_detail::BagStatus::kCompleted;
+        row.failed =
+            found->second.status ==
+            event_runtime_detail::BagStatus::kFailed;
+        row.terminal = row.completed || row.failed;
+        row.finish_time = found->second.finish_time;
+        row.total_wait = found->second.total_wait;
+        row.decision_count = found->second.decision_count;
+        row.retry_count = found->second.retry_count;
+      }
+      horizon.terminal_count += row.terminal ? 1 : 0;
+      horizon.completed_count += row.completed ? 1 : 0;
+      horizon.failed_count += row.failed ? 1 : 0;
+      horizon.bags.push_back(row);
+    }
+    horizon.all_terminal =
+        horizon.terminal_count ==
+        static_cast<int>(horizon.bags.size());
+    horizon.all_completed =
+        horizon.completed_count ==
+        static_cast<int>(horizon.bags.size());
+    horizon.validate();
+    return horizon;
+  }
+
+  [[nodiscard]] G4IRSF14CausalHorizonStopState
+  causal_horizon_stop_state(
+      G4IRSF14CloneHorizon horizon,
+      const std::vector<int>& selected_runtime_bag_ids,
+      int merge_node,
+      std::uint64_t start_event_count,
+      std::uint64_t max_local_event_count) const {
+    G4IRSF14CausalHorizonStopState state;
+    state.horizon = horizon;
+    state.cohort =
+        causal_horizon_state(selected_runtime_bag_ids);
+    const std::uint64_t current_event_count =
+        result_.summary.event_count < 0
+            ? 0U
+            : static_cast<std::uint64_t>(
+                  result_.summary.event_count);
+    if (start_event_count > current_event_count) {
+      throw std::invalid_argument(
+          "causal horizon start event exceeds current event count");
+    }
+    state.elapsed_event_count =
+        current_event_count - start_event_count;
+
+    const bool runtime_stopped =
+        runtime_phase_ ==
+            EventDrivenJunctionRuntimePhase::kStopped ||
+        runtime_phase_ ==
+            EventDrivenJunctionRuntimePhase::kFinalized;
+    if (horizon == G4IRSF14CloneHorizon::kLocal) {
+      if (max_local_event_count == 0U) {
+        throw std::invalid_argument(
+            "H_local requires a positive bounded event count");
+      }
+      if (merge_node >= 0) {
+        const auto controller =
+            destination_merge_controllers_.find(merge_node);
+        state.merge_pending_request_count =
+            controller ==
+                    destination_merge_controllers_.end()
+                ? 0
+                : static_cast<int>(
+                      controller->second.pending_count());
+      }
+      if (state.merge_pending_request_count == 0) {
+        state.should_stop = true;
+        state.horizon_complete = true;
+        state.stop_reason =
+            "H_LOCAL_MERGE_QUEUE_EMPTY";
+      } else if (state.elapsed_event_count >=
+                 max_local_event_count) {
+        state.should_stop = true;
+        state.horizon_complete = true;
+        state.stop_reason =
+            "H_LOCAL_BOUNDED_EVENT_COUNT_REACHED";
+      } else if (runtime_stopped) {
+        state.should_stop = true;
+        state.blocked = true;
+        state.stop_reason =
+            "H_LOCAL_RUNTIME_STOPPED_BEFORE_BOUND";
+      }
+    } else if (state.cohort.all_completed) {
+      state.should_stop = true;
+      state.horizon_complete = true;
+      state.stop_reason =
+          horizon ==
+                  G4IRSF14CloneHorizon::kAffectedBag
+              ? "H_BAG_ALL_AFFECTED_COMPLETED"
+              : "H_SYSTEM_SELECTED_COHORT_COMPLETED";
+    } else if (state.cohort.failed_count > 0) {
+      state.should_stop = true;
+      state.blocked = true;
+      state.stop_reason =
+          horizon ==
+                  G4IRSF14CloneHorizon::kAffectedBag
+              ? "H_BAG_AFFECTED_BAG_FAILED"
+              : "H_SYSTEM_SELECTED_COHORT_BAG_FAILED";
+    } else if (runtime_stopped) {
+      state.should_stop = true;
+      state.blocked = true;
+      state.stop_reason =
+          horizon ==
+                  G4IRSF14CloneHorizon::kAffectedBag
+              ? "H_BAG_RUNTIME_STOPPED_BEFORE_COMPLETION"
+              : "H_SYSTEM_RUNTIME_STOPPED_BEFORE_COMPLETION";
+    }
+    state.validate();
+    return state;
+  }
+
   void drain() {
     while (process_one_event()) {
     }
@@ -2115,6 +2329,177 @@ class EventDrivenJunctionRuntime {
   using JunctionState = event_runtime_detail::JunctionState;
   using LocalCalendar = event_runtime_detail::LocalCalendar;
   using RuntimeEvent = event_runtime_detail::RuntimeEvent;
+
+  struct ActiveCausalStep {
+    G4IRSF14CausalStepResult* result = nullptr;
+    const G4IRSF14CausalInterventionDirective* directive =
+        nullptr;
+    RuntimeEvent prepop_event;
+    G4IRSF14RuntimeStateDigests prepop_state;
+    std::string prepop_state_sha256;
+  };
+
+  void require_g4irsf14_causal_frozen_tuple() const {
+    if (canonical_resource_semantics() !=
+            "R3_java_node_window_compatible" ||
+        canonical_scorer_mode() != "S1" ||
+        canonical_pibt_mode() != BoundedLocalPIBTMode::kP2 ||
+        canonical_pressure_mode() != "C0_off" ||
+        canonical_priority_mode() !=
+            BoundedLocalPIBTPriorityMode::kQ0Current ||
+        canonical_event_semantics() !=
+            "E4_batch_plus_destination_merge_request" ||
+        canonical_merge_grant_rule() !=
+            DestinationMergeGrantRule::kM0EarliestKnown ||
+        canonical_admission_mode() != "off") {
+      throw std::logic_error(
+          "Stage 14E causal intervention requires frozen "
+          "R3/S1/P2/C0/Q0/E4/M0");
+    }
+  }
+
+  G4IRSF14CausalStepResult process_one_event_causal_impl(
+      const G4IRSF14CausalInterventionDirective* directive) {
+    require_g4irsf14_causal_frozen_tuple();
+    if (active_causal_step_ != nullptr) {
+      throw std::logic_error(
+          "nested G4IRSF14 causal event processing is forbidden");
+    }
+    if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+        events_.empty()) {
+      throw std::logic_error(
+          "causal intervention requires a live queue-top pre-pop event");
+    }
+    require_checkpoint_safe_boundary();
+
+    G4IRSF14CausalStepResult result;
+    result.treatment_requested = directive != nullptr;
+    const auto state = deterministic_state_digests();
+    const auto state_sha256 = state.aggregate_sha256();
+    result.source_state_sha256 = state_sha256;
+    if (directive != nullptr) {
+      directive->validate();
+      result.requested_boundary_sha256 =
+          directive->boundary.boundary_sha256();
+      result.requested_intervention_sha256 =
+          directive->intervention.intervention_sha256(
+              directive->boundary);
+      const auto& target = directive->boundary;
+      const auto& next = events_.top();
+      if (target.runtime_state_sha256 != state_sha256 ||
+          target.event_seq != next.seq ||
+          !event_runtime_detail::same_timestamp(
+              target.time, next.time) ||
+          target.node != next.node) {
+        throw std::invalid_argument(
+            "causal directive does not address the current queue-top "
+            "pre-pop state");
+      }
+    }
+
+    ActiveCausalStep frame;
+    frame.result = &result;
+    frame.directive = directive;
+    frame.prepop_event = events_.top();
+    frame.prepop_state = state;
+    frame.prepop_state_sha256 = state_sha256;
+    active_causal_step_ = &frame;
+    try {
+      result.event_processed = process_one_event();
+    } catch (...) {
+      active_causal_step_ = nullptr;
+      throw;
+    }
+    active_causal_step_ = nullptr;
+
+    if (directive == nullptr) {
+      result.application_reason =
+          "PROBE_ONLY_NO_ACTION_CHANGED";
+    } else if (!result.intervention_applied) {
+      result.application_reason =
+          result.target_opportunity_observed
+              ? "NOT_APPLICABLE_ACTION_PRECONDITION_FAILED"
+              : "NOT_APPLICABLE_CONTENT_ADDRESSED_OPPORTUNITY_NOT_OBSERVED";
+    }
+    result.validate();
+    return result;
+  }
+
+  G4IRSF14CloneBoundary seal_causal_boundary(
+      G4IRSF14CloneBoundary boundary) const {
+    if (active_causal_step_ == nullptr) {
+      throw std::logic_error(
+          "causal boundary observed outside an active event step");
+    }
+    boundary.time =
+        active_causal_step_->prepop_event.time;
+    boundary.event_seq =
+        active_causal_step_->prepop_event.seq;
+    boundary.state =
+        active_causal_step_->prepop_state;
+    boundary.runtime_state_sha256 =
+        active_causal_step_->prepop_state_sha256;
+    boundary.queue_top_not_popped = true;
+    boundary.staged_event_sink_empty = true;
+    boundary.runtime_global_scan_count = 0;
+    boundary.runtime_future_route_read_count = 0;
+    boundary.runtime_future_schedule_read_count = 0;
+    boundary.reservation_depth = 1;
+    boundary.max_selected_edges_per_bag = 1;
+    boundary.clone_group_id =
+        boundary.expected_clone_group_id();
+    boundary.validate();
+    return boundary;
+  }
+
+  const G4IRSF14CloneIntervention*
+  observe_causal_boundary(
+      G4IRSF14CloneBoundary boundary) {
+    if (active_causal_step_ == nullptr) {
+      return nullptr;
+    }
+    boundary = seal_causal_boundary(
+        std::move(boundary));
+    auto& result = *active_causal_step_->result;
+    const std::string boundary_sha256 =
+        boundary.boundary_sha256();
+    result.observed_opportunities.push_back(boundary);
+    if (active_causal_step_->directive == nullptr ||
+        result.intervention_applied ||
+        boundary_sha256 !=
+            result.requested_boundary_sha256) {
+      return nullptr;
+    }
+    result.target_opportunity_observed = true;
+    return &active_causal_step_->directive->intervention;
+  }
+
+  void mark_causal_action_applied(
+      std::string reason,
+      std::vector<int> affected_runtime_bag_ids) {
+    if (active_causal_step_ == nullptr ||
+        active_causal_step_->directive == nullptr) {
+      throw std::logic_error(
+          "causal action applied without a treatment directive");
+    }
+    auto& result = *active_causal_step_->result;
+    if (result.intervention_applied ||
+        result.changed_action_count != 0) {
+      throw std::logic_error(
+          "content-addressed causal directive is not one-shot");
+    }
+    result.intervention_applied = true;
+    result.changed_action_count = 1;
+    result.application_reason = std::move(reason);
+    std::sort(affected_runtime_bag_ids.begin(),
+              affected_runtime_bag_ids.end());
+    affected_runtime_bag_ids.erase(
+        std::unique(affected_runtime_bag_ids.begin(),
+                    affected_runtime_bag_ids.end()),
+        affected_runtime_bag_ids.end());
+    result.affected_runtime_bag_ids =
+        std::move(affected_runtime_bag_ids);
+  }
 
   class StateFingerprintWriter {
    public:
@@ -3444,11 +3829,49 @@ class EventDrivenJunctionRuntime {
     if (controller.source_queue.empty()) {
       return -1;
     }
-    const std::size_t queue_index =
+    std::size_t queue_index =
         choose_bag(controller.source_queue,
                    time,
                    controller.escape_token_task,
                    priority_comparison_count);
+    if (active_causal_step_ != nullptr &&
+        controller.source_queue.size() >= 2U) {
+      G4IRSF14CloneBoundary boundary;
+      boundary.kind =
+          G4IRSF14CloneBoundaryKind::kSourceArbitration;
+      boundary.node = node;
+      boundary.runtime_bag_id =
+          controller.source_queue[queue_index];
+      boundary.source_ready_order.assign(
+          controller.source_queue.begin(),
+          controller.source_queue.end());
+      if (const auto* intervention =
+              observe_causal_boundary(std::move(boundary));
+          intervention != nullptr) {
+        if (intervention->kind !=
+                G4IRSF14CloneInterventionKind::kSourceOrderSwap ||
+            intervention->runtime_bag_id !=
+                controller.source_queue[queue_index]) {
+          throw std::logic_error(
+              "I1 directive does not swap the baseline source winner");
+        }
+        const auto peer = std::find(
+            controller.source_queue.begin(),
+            controller.source_queue.end(),
+            intervention->peer_runtime_bag_id);
+        if (peer == controller.source_queue.end()) {
+          throw std::logic_error(
+              "I1 peer disappeared from the identical source ready set");
+        }
+        queue_index = static_cast<std::size_t>(
+            std::distance(controller.source_queue.begin(),
+                          peer));
+        mark_causal_action_applied(
+            "APPLIED_I1_SOURCE_ORDER_SWAP_ONE_ACTION",
+            {intervention->runtime_bag_id,
+             intervention->peer_runtime_bag_id});
+      }
+    }
     const int task_id = controller.source_queue[queue_index];
     if (chosen_task != nullptr) {
       *chosen_task = task_id;
@@ -4503,6 +4926,10 @@ class EventDrivenJunctionRuntime {
           MergeGrantReason::kRequestExpired,
           event.time);
     }
+    if (controller.pending_.size() >= 2U) {
+      ++result_.summary
+            .g4irsf14_i2_live_eligible_multi_request_boundary_count;
+    }
     if (controller.pending_.empty()) {
       return;
     }
@@ -4518,6 +4945,56 @@ class EventDrivenJunctionRuntime {
           MergeGrantReason::kRequestExpired,
           event.time);
       return;
+    }
+    if (active_causal_step_ != nullptr &&
+        controller.pending_.size() >= 2U) {
+      G4IRSF14CloneBoundary boundary;
+      boundary.kind =
+          G4IRSF14CloneBoundaryKind::kMergeGrantArbitration;
+      boundary.node = event.node;
+      boundary.runtime_bag_id =
+          selected->request.runtime_bag_id;
+      boundary.pending_merge_request_order.push_back(
+          selected->request.request_id);
+      for (const auto& pending : controller.pending_) {
+        if (pending.request.request_id !=
+            selected->request.request_id) {
+          boundary.pending_merge_request_order.push_back(
+              pending.request.request_id);
+        }
+      }
+      if (const auto* intervention =
+              observe_causal_boundary(std::move(boundary));
+          intervention != nullptr) {
+        if (intervention->kind !=
+                G4IRSF14CloneInterventionKind::
+                    kMergeRequestOrderSwap ||
+            intervention->merge_request_id !=
+                selected->request.request_id) {
+          throw std::logic_error(
+              "I2 directive does not swap the baseline merge winner");
+        }
+        const auto peer = std::find_if(
+            controller.pending_.begin(),
+            controller.pending_.end(),
+            [&](const auto& pending) {
+              return pending.request.request_id ==
+                     intervention->peer_merge_request_id;
+            });
+        if (peer == controller.pending_.end()) {
+          throw std::logic_error(
+              "I2 peer disappeared from the identical merge ready set");
+        }
+        const int baseline_runtime_bag_id =
+            selected->request.runtime_bag_id;
+        const int peer_runtime_bag_id =
+            peer->request.runtime_bag_id;
+        selected = &*peer;
+        mark_causal_action_applied(
+            "APPLIED_I2_MERGE_REQUEST_ORDER_SWAP_ONE_ACTION",
+            {baseline_runtime_bag_id,
+             peer_runtime_bag_id});
+      }
     }
     const DestinationMergeRequest request =
         selected->request;
@@ -5029,10 +5506,12 @@ class EventDrivenJunctionRuntime {
               throw std::logic_error(
                   "post-grant PIBT compensation failed");
             }
-          };
+      };
 
       DispatchResult pibt_dispatch;
       try {
+        ++result_.summary
+              .g4irsf14_i5_prefilter_candidate_count;
         pibt_dispatch =
             try_dispatch_bounded_local_pibt(
                 request.upstream_node,
@@ -8253,6 +8732,78 @@ class EventDrivenJunctionRuntime {
       ++result_.summary.bounded_local_pibt_not_applicable_count;
       return {};
     }
+    if (merge_grant_authority != nullptr) {
+      ++result_.summary
+            .g4irsf14_i5_applicable_ready_slice_boundary_count;
+    }
+    if (active_causal_step_ != nullptr &&
+        merge_grant_authority != nullptr) {
+      G4IRSF14CloneBoundary boundary;
+      boundary.kind =
+          G4IRSF14CloneBoundaryKind::kPIBTReadySlice;
+      boundary.node =
+          active_causal_step_->prepop_event.node;
+      boundary.runtime_bag_id =
+          trigger_runtime_bag_id;
+      boundary.baseline_pibt_enabled = true;
+      boundary.pibt_owner_runtime_bag_id =
+          trigger_runtime_bag_id;
+      boundary.pibt_candidate_required_resource_offsets
+          .push_back(0U);
+      for (const auto& ready : slice.ready_bags) {
+        boundary.pibt_ready_bag_ids.push_back(
+            ready.bag_id);
+        boundary.pibt_ready_current_nodes.push_back(
+            ready.current_node);
+        for (const auto& candidate : ready.candidates) {
+          boundary.pibt_candidate_bag_ids.push_back(
+              ready.bag_id);
+          boundary.pibt_candidate_next_nodes.push_back(
+              candidate.next_node);
+          boundary.pibt_candidate_edge_resources.push_back(
+              candidate.edge_resource);
+          boundary
+              .pibt_candidate_expected_fault_generations
+              .push_back(
+                  candidate.expected_fault_generation);
+          boundary.pibt_candidate_required_resources.insert(
+              boundary.pibt_candidate_required_resources.end(),
+              candidate.required_resources.begin(),
+              candidate.required_resources.end());
+          boundary
+              .pibt_candidate_required_resource_offsets
+              .push_back(static_cast<std::uint64_t>(
+                  boundary
+                      .pibt_candidate_required_resources
+                      .size()));
+        }
+      }
+      for (const auto& owner : slice.owners) {
+        boundary.pibt_owner_resources.push_back(
+            owner.resource);
+        boundary.pibt_owner_bag_ids.push_back(
+            owner.bag_id);
+      }
+      const std::vector<int> affected_slice_bags =
+          boundary.pibt_ready_bag_ids;
+      if (const auto* intervention =
+              observe_causal_boundary(std::move(boundary));
+          intervention != nullptr) {
+        if (intervention->kind !=
+                G4IRSF14CloneInterventionKind::kPIBTTrigger ||
+            intervention->runtime_bag_id !=
+                trigger_runtime_bag_id ||
+            intervention->selected_boolean) {
+          throw std::logic_error(
+              "I5 directive must disable P2 for the exact "
+              "applicable recursive ready slice");
+        }
+        mark_causal_action_applied(
+            "APPLIED_I5_DISABLE_P2_FOR_ONE_EXACT_READY_SLICE",
+            affected_slice_bags);
+        return {};
+      }
+    }
     if (config_.trace_limit != 0 &&
         (config_.trace_limit < 0 ||
          static_cast<int>(result_.pibt_events.size()) <
@@ -9025,6 +9576,99 @@ class EventDrivenJunctionRuntime {
             }
           }
         }
+      }
+    }
+
+    std::vector<int> causal_legal_next_edges;
+    if (active_causal_step_ != nullptr && selected >= 0) {
+      causal_legal_next_edges.reserve(ranking.size());
+      for (const std::size_t candidate_index : ranking) {
+        const auto& candidate =
+            trace.candidates[candidate_index];
+        const bool advertised_policy_block =
+            config_.enable_fault_policy &&
+            candidate.advertised_fault;
+        if (candidate.shield_allowed &&
+            !advertised_policy_block) {
+          causal_legal_next_edges.push_back(
+              candidate.next_node);
+        }
+      }
+      std::sort(causal_legal_next_edges.begin(),
+                causal_legal_next_edges.end());
+      causal_legal_next_edges.erase(
+          std::unique(causal_legal_next_edges.begin(),
+                      causal_legal_next_edges.end()),
+          causal_legal_next_edges.end());
+    }
+
+    if (active_causal_step_ != nullptr &&
+        selected >= 0 &&
+        causal_legal_next_edges.size() >= 2U &&
+        std::find(causal_legal_next_edges.begin(),
+                  causal_legal_next_edges.end(),
+                  selected) !=
+            causal_legal_next_edges.end()) {
+      G4IRSF14CloneBoundary boundary;
+      boundary.kind =
+          G4IRSF14CloneBoundaryKind::
+              kJunctionRouteArbitration;
+      boundary.node = node;
+      boundary.runtime_bag_id = task_id;
+      boundary.baseline_next_node = selected;
+      boundary.legal_next_edges =
+          causal_legal_next_edges;
+      if (const auto* intervention =
+              observe_causal_boundary(std::move(boundary));
+          intervention != nullptr) {
+        if (intervention->kind !=
+                G4IRSF14CloneInterventionKind::kNextEdge ||
+            intervention->runtime_bag_id != task_id ||
+            std::find(causal_legal_next_edges.begin(),
+                      causal_legal_next_edges.end(),
+                      intervention->selected_next_node) ==
+                causal_legal_next_edges.end()) {
+          throw std::logic_error(
+              "I3 directive did not select one legal adjacent edge");
+        }
+        selected = intervention->selected_next_node;
+        selected_reason =
+            "g4irsf14_I3_content_addressed_legal_next_edge";
+        bounded_local_same_bag_fallback_selected = false;
+        mark_causal_action_applied(
+            "APPLIED_I3_LEGAL_NEXT_EDGE_ONE_ACTION",
+            {task_id});
+      }
+    }
+
+    if (active_causal_step_ != nullptr && selected >= 0) {
+      G4IRSF14CloneBoundary boundary;
+      boundary.kind =
+          G4IRSF14CloneBoundaryKind::
+              kHoldReleaseOpportunity;
+      boundary.node = node;
+      boundary.runtime_bag_id = task_id;
+      boundary.baseline_next_node = selected;
+      boundary.baseline_release = true;
+      boundary.legal_next_edges =
+          causal_legal_next_edges;
+      if (const auto* intervention =
+              observe_causal_boundary(std::move(boundary));
+          intervention != nullptr) {
+        if (intervention->kind !=
+                G4IRSF14CloneInterventionKind::kHoldRelease ||
+            intervention->runtime_bag_id != task_id ||
+            intervention->selected_boolean) {
+          throw std::logic_error(
+              "I4 directive may only convert release into hold");
+        }
+        selected = -1;
+        selected_reason =
+            "g4irsf14_I4_content_addressed_safe_hold";
+        bounded_local_same_bag_fallback_selected = false;
+        mark_causal_action_applied(
+            "APPLIED_I4_RELEASE_TO_HOLD_ONE_ACTION",
+            {task_id});
       }
     }
 
@@ -12336,6 +12980,9 @@ class EventDrivenJunctionRuntime {
   const std::map<int, int>*
       staged_destination_known_competitor_counts_ =
           nullptr;
+  // Ephemeral stack-owned treatment frame.  It is intentionally omitted from
+  // CheckpointStorage and every deterministic state digest.
+  ActiveCausalStep* active_causal_step_ = nullptr;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   bool test_pibt_logical_failure_injected_ = false;
   bool test_merge_grant_prepare_failure_injected_ = false;
@@ -13157,6 +13804,11 @@ fingerprint_deterministic_summary(
   writer.i64(summary.microphase_runtime_global_scan_count);
   writer.floating(summary.artificial_batch_delay_seconds);
   writer.u64(summary.destination_merge_arbitration_event_count);
+  writer.u64(
+      summary.g4irsf14_i2_live_eligible_multi_request_boundary_count);
+  writer.u64(summary.g4irsf14_i5_prefilter_candidate_count);
+  writer.u64(
+      summary.g4irsf14_i5_applicable_ready_slice_boundary_count);
   writer.u64(summary.merge_grant_request_count);
   writer.u64(summary.merge_grant_issued_count);
   writer.u64(summary.merge_grant_prepared_count);
@@ -13345,6 +13997,11 @@ EventDrivenJunctionRuntime::compute_replay_hashes_projection() const {
   algorithm.u64(summary.source_arbitration_event_count);
   algorithm.u64(summary.junction_arbitration_event_count);
   algorithm.u64(summary.destination_merge_arbitration_event_count);
+  algorithm.u64(
+      summary.g4irsf14_i2_live_eligible_multi_request_boundary_count);
+  algorithm.u64(summary.g4irsf14_i5_prefilter_candidate_count);
+  algorithm.u64(
+      summary.g4irsf14_i5_applicable_ready_slice_boundary_count);
   algorithm.i64(summary.reservation_conflicts);
   algorithm.i64(summary.physical_fault_edge_entry_violation_count);
   algorithm.i64(summary.runtime_full_astar_calls);
