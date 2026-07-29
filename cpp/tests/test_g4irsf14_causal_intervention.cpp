@@ -360,8 +360,9 @@ void apply_and_finish(
   for (const auto& bag : treatment.current_result().bags) {
     if (std::find(selected_system_bag_ids.begin(),
                   selected_system_bag_ids.end(),
-                  bag.task_id) == selected_system_bag_ids.end()) {
-      selected_system_bag_ids.push_back(bag.task_id);
+                  bag.runtime_bag_id) ==
+        selected_system_bag_ids.end()) {
+      selected_system_bag_ids.push_back(bag.runtime_bag_id);
       break;
     }
   }
