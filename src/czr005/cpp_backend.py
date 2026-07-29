@@ -1358,3 +1358,570 @@ def g4irsf11_event_runtime_from_records(
     payload["loaded_cpp_binary_path"] = binary_path_text
     payload["loaded_cpp_binary_sha256"] = loaded_binary_sha256
     return payload
+
+
+_G4IRSF14_FROZEN_MODEL_SHA256 = (
+    "4a058dee0bdd17e15f67d1943a551822847d0c066ac3cf03a5da71a07731bbca"
+)
+_G4IRSF14_STATE_COMPONENTS = (
+    "event_queue_sha256",
+    "current_time_sha256",
+    "bags_sha256",
+    "source_queues_sha256",
+    "junction_queues_sha256",
+    "local_service_calendars_sha256",
+    "corridor_state_sha256",
+    "scheduled_incoming_sha256",
+    "credits_sha256",
+    "merge_grants_sha256",
+    "fault_state_sha256",
+    "pibt_owner_state_sha256",
+    "deterministic_counters_sha256",
+    "scorer_state_sha256",
+    "result_accumulator_sha256",
+    "current_runtime_hashes_sha256",
+    "congestion_beacons_sha256",
+    "microphase_state_sha256",
+)
+_G4IRSF14_REPLAY_HASHES = (
+    "complete_bags_sha256",
+    "segment_result_sha256",
+    "junction_state_sha256",
+    "algorithm_summary_sha256",
+    "deterministic_result_sha256",
+)
+
+
+def g4irsf14_state_clone_noop_rerun_from_records(
+    *,
+    node_records: Sequence[
+        tuple[int, int, float, int, int, Sequence[int]]
+    ],
+    edge_records: Sequence[tuple[int, int, float, float]],
+    heuristic_time: Sequence[Sequence[float]],
+    bag_records: Sequence[
+        tuple[str, int, float, float, int, int, str]
+    ],
+    preregistered_event_ordinal: int,
+    scorer_model_path: PathLike | None = None,
+    expected_binary_path: PathLike | None = None,
+    search_path: PathLike | None = None,
+) -> dict[str, Any]:
+    """Run an exact-binary, production-runtime no-op checkpoint replay.
+
+    The entrypoint is deliberately narrower than
+    :func:`g4irsf11_event_runtime_from_records`: all online controls are frozen
+    to the audited Stage-D/Stage-E ``R3/S1/P2/C0/Q0/E4/M0`` tuple.  It captures
+    a real queue-top pre-pop checkpoint at the caller-preregistered event
+    ordinal, restores two independently constructed runtimes, and drains the
+    source plus both restored branches to the same terminal horizon.
+
+    This establishes no-op clone fidelity only.  It does not apply I1--I5 and
+    cannot by itself create or validate a causal training label.
+    """
+
+    def strict_integer(value: Any, name: str) -> int:
+        if isinstance(value, bool):
+            raise TypeError(f"{name} must be an integer, not bool")
+        try:
+            return int(operator.index(value))
+        except TypeError as exc:
+            raise TypeError(f"{name} must be an integer") from exc
+
+    def finite_number(value: Any, name: str) -> float:
+        if isinstance(value, bool) or not isinstance(value, Real):
+            raise TypeError(f"{name} must be a numeric scalar, not bool")
+        result = float(value)
+        if not math.isfinite(result):
+            raise ValueError(f"{name} must be finite")
+        return result
+
+    event_ordinal = strict_integer(
+        preregistered_event_ordinal,
+        "preregistered_event_ordinal",
+    )
+    if event_ordinal < 0:
+        raise ValueError(
+            "preregistered_event_ordinal must be non-negative"
+        )
+    if not bag_records:
+        raise ValueError(
+            "state-clone no-op rerun requires at least one original request"
+        )
+
+    normalized_nodes: list[
+        tuple[int, int, float, int, int, list[int]]
+    ] = []
+    for record_index, record in enumerate(node_records):
+        if len(record) != 6:
+            raise ValueError(
+                f"node_records[{record_index}] must contain 6 fields"
+            )
+        location, node_type, service_time, x, y, outgoing = record
+        normalized_nodes.append(
+            (
+                strict_integer(
+                    location, f"node_records[{record_index}].location"
+                ),
+                strict_integer(
+                    node_type, f"node_records[{record_index}].node_type"
+                ),
+                finite_number(
+                    service_time,
+                    f"node_records[{record_index}].service_time",
+                ),
+                strict_integer(x, f"node_records[{record_index}].x"),
+                strict_integer(y, f"node_records[{record_index}].y"),
+                [
+                    strict_integer(
+                        value,
+                        f"node_records[{record_index}].outgoing"
+                        f"[{outgoing_index}]",
+                    )
+                    for outgoing_index, value in enumerate(outgoing)
+                ],
+            )
+        )
+
+    normalized_edges: list[tuple[int, int, float, float]] = []
+    for record_index, record in enumerate(edge_records):
+        if len(record) != 4:
+            raise ValueError(
+                f"edge_records[{record_index}] must contain 4 fields"
+            )
+        start, end, length, speed = record
+        normalized_edges.append(
+            (
+                strict_integer(
+                    start, f"edge_records[{record_index}].start"
+                ),
+                strict_integer(
+                    end, f"edge_records[{record_index}].end"
+                ),
+                finite_number(
+                    length, f"edge_records[{record_index}].length"
+                ),
+                finite_number(
+                    speed, f"edge_records[{record_index}].speed"
+                ),
+            )
+        )
+
+    normalized_heuristic = [
+        [
+            finite_number(
+                value,
+                f"heuristic_time[{row_index}][{column_index}]",
+            )
+            for column_index, value in enumerate(row)
+        ]
+        for row_index, row in enumerate(heuristic_time)
+    ]
+    normalized_bags: list[
+        tuple[str, int, float, float, int, int, str]
+    ] = []
+    for record_index, record in enumerate(bag_records):
+        if len(record) != 7:
+            raise ValueError(
+                f"bag_records[{record_index}] must contain 7 fields"
+            )
+        segment_id, task_id, release, deadline, start, goal, source = (
+            record
+        )
+        if not isinstance(segment_id, str) or not segment_id:
+            raise TypeError(
+                f"bag_records[{record_index}].segment_id must be a "
+                "non-empty string"
+            )
+        if not isinstance(source, str) or not source:
+            raise TypeError(
+                f"bag_records[{record_index}].source must be a "
+                "non-empty string"
+            )
+        normalized_bags.append(
+            (
+                segment_id,
+                strict_integer(
+                    task_id, f"bag_records[{record_index}].task_id"
+                ),
+                finite_number(
+                    release, f"bag_records[{record_index}].release_time"
+                ),
+                finite_number(
+                    deadline, f"bag_records[{record_index}].deadline"
+                ),
+                strict_integer(
+                    start, f"bag_records[{record_index}].start"
+                ),
+                strict_integer(
+                    goal, f"bag_records[{record_index}].goal"
+                ),
+                source,
+            )
+        )
+
+    model_path = (
+        Path(scorer_model_path)
+        if scorer_model_path is not None
+        else ROOT
+        / "artifacts"
+        / "models"
+        / "g4e_risk_calibrated_policy.json"
+    )
+    model_bytes = model_path.read_bytes()
+    model_sha256 = hashlib.sha256(model_bytes).hexdigest()
+    if model_sha256 != _G4IRSF14_FROZEN_MODEL_SHA256:
+        raise ValueError(
+            "frozen G4E model SHA256 mismatch: expected "
+            f"{_G4IRSF14_FROZEN_MODEL_SHA256}, got {model_sha256}"
+        )
+    model = json.loads(model_bytes)
+    if not isinstance(model, dict):
+        raise ValueError("frozen G4E model root must be an object")
+
+    raw_w1 = model.get("w1")
+    raw_b1 = model.get("b1")
+    raw_w2 = model.get("w2")
+    if (
+        not isinstance(raw_w1, list)
+        or len(raw_w1) != 22
+        or any(
+            not isinstance(row, list) or len(row) != 22
+            for row in raw_w1
+        )
+        or not isinstance(raw_b1, list)
+        or len(raw_b1) != 22
+        or not isinstance(raw_w2, list)
+        or len(raw_w2) != 22
+    ):
+        raise ValueError(
+            "frozen G4E dimensions must be w1=22x22, b1=22, w2=22"
+        )
+    scorer_w1 = [
+        [
+            finite_number(
+                value, f"model.w1[{row_index}][{column_index}]"
+            )
+            for column_index, value in enumerate(row)
+        ]
+        for row_index, row in enumerate(raw_w1)
+    ]
+    scorer_b1 = [
+        finite_number(value, f"model.b1[{index}]")
+        for index, value in enumerate(raw_b1)
+    ]
+    scorer_w2 = [
+        finite_number(value, f"model.w2[{index}]")
+        for index, value in enumerate(raw_w2)
+    ]
+    scorer_b2 = finite_number(model.get("b2"), "model.b2")
+    risk_margin = finite_number(
+        model.get("risk_margin_threshold"),
+        "model.risk_margin_threshold",
+    )
+    risk_bottleneck = finite_number(
+        model.get("risk_bottleneck_threshold"),
+        "model.risk_bottleneck_threshold",
+    )
+    if risk_margin != 1.0 or risk_bottleneck != 5.0:
+        raise ValueError(
+            "frozen G4E risk thresholds do not match the audited artifact"
+        )
+
+    module = load_cpp_module(search_path)
+    module_file = getattr(module, "__file__", None)
+    if not module_file:
+        raise CppBackendUnavailable(
+            "loaded C++ module does not expose an on-disk __file__"
+        )
+    loaded_binary_path = Path(module_file).resolve()
+    if expected_binary_path is not None:
+        expected_path = Path(expected_binary_path).resolve()
+        if os.path.normcase(str(loaded_binary_path)) != os.path.normcase(
+            str(expected_path)
+        ):
+            raise CppBackendUnavailable(
+                "loaded C++ binary path does not match "
+                "expected_binary_path: "
+                f"loaded={loaded_binary_path}, expected={expected_path}"
+            )
+    loaded_binary_sha256 = hashlib.sha256(
+        loaded_binary_path.read_bytes()
+    ).hexdigest()
+
+    payload = dict(
+        module.g4irsf14_state_clone_noop_rerun_from_records(
+            normalized_nodes,
+            normalized_edges,
+            normalized_heuristic,
+            normalized_bags,
+            event_ordinal,
+            scorer_w1,
+            scorer_b1,
+            scorer_w2,
+            scorer_b2,
+            risk_margin,
+            risk_bottleneck,
+            model_sha256,
+        )
+    )
+    loaded_binary_sha256_after = hashlib.sha256(
+        loaded_binary_path.read_bytes()
+    ).hexdigest()
+    if loaded_binary_sha256_after != loaded_binary_sha256:
+        raise CppBackendUnavailable(
+            "loaded C++ binary bytes changed during the exact no-op rerun"
+        )
+
+    if payload.get("schema") != (
+        "czr005.g4irsf14.exact_binary_noop_rerun.v1"
+    ):
+        raise RuntimeError(
+            "native no-op rerun returned an unexpected schema"
+        )
+    if payload.get("evidence_scope") != (
+        "NOOP_FIDELITY_MECHANISM_ONLY_NOT_A_CAUSAL_LABEL"
+    ):
+        raise RuntimeError(
+            "native no-op rerun widened its evidence scope"
+        )
+    if payload.get("formal_pass_claimed") is not False:
+        raise RuntimeError(
+            "native no-op rerun must not claim a formal Stage-E pass"
+        )
+    if payload.get("intervention_applied") is not False:
+        raise RuntimeError(
+            "native no-op rerun unexpectedly claims an intervention"
+        )
+    expected_controls = {
+        "resource_semantics": "R3_java_node_window_compatible",
+        "scorer_mode": "S1_frozen_g4e_legal_local_adapter",
+        "pibt_mode": "P2",
+        "admission_mode": "off",
+        "pressure_mode": "off",
+        "priority_mode": "Q0",
+        "event_semantics": (
+            "E4_batch_plus_destination_merge_request"
+        ),
+        "merge_grant_rule": "M0",
+        "scale": 1.0,
+        "reservation_depth": 1,
+        "max_events": 20_000_000,
+        "max_simulation_time": -1.0,
+        "trace_limit": 0,
+        "event_trace_limit": 0,
+    }
+    if payload.get("frozen_controls") != expected_controls:
+        raise RuntimeError(
+            "native no-op rerun drifted from the frozen controls"
+        )
+    state_component_keys = set(_G4IRSF14_STATE_COMPONENTS)
+    source_components = payload.get("state_components")
+    baseline_components = payload.get(
+        "baseline_start_state_components"
+    )
+    clone_components = payload.get("clone_start_state_components")
+    if not all(
+        isinstance(value, dict)
+        and set(value) == state_component_keys
+        for value in (
+            source_components,
+            baseline_components,
+            clone_components,
+        )
+    ):
+        raise RuntimeError(
+            "native no-op rerun returned an incomplete state inventory"
+        )
+    if any(
+        not isinstance(digest, str)
+        or len(digest) != 64
+        or any(character not in "0123456789abcdef" for character in digest)
+        for inventory in (
+            source_components,
+            baseline_components,
+            clone_components,
+        )
+        for digest in inventory.values()
+    ):
+        raise RuntimeError(
+            "native no-op rerun returned an invalid inventory digest"
+        )
+    if not (
+        source_components == baseline_components == clone_components
+    ):
+        raise RuntimeError(
+            "native no-op rerun start-state inventories differ"
+        )
+    runtime_state_sha256 = payload.get("runtime_state_sha256")
+    if (
+        not isinstance(runtime_state_sha256, str)
+        or len(runtime_state_sha256) != 64
+        or any(
+            character not in "0123456789abcdef"
+            for character in runtime_state_sha256
+        )
+        or payload.get("baseline_start_state_sha256")
+        != runtime_state_sha256
+        or payload.get("clone_start_state_sha256")
+        != runtime_state_sha256
+    ):
+        raise RuntimeError(
+            "native no-op rerun start-state aggregate hashes differ"
+        )
+    boundary = payload.get("boundary")
+    if (
+        not isinstance(boundary, dict)
+        or boundary.get("kind") != "queue_top_pre_pop"
+        or boundary.get("processed_event_count") != event_ordinal
+        or boundary.get("runtime_state_sha256")
+        != runtime_state_sha256
+        or boundary.get("queue_top_not_popped") is not True
+        or boundary.get("staged_event_sink_empty") is not True
+    ):
+        raise RuntimeError(
+            "native no-op rerun did not expose the exact pre-pop boundary"
+        )
+
+    replay_hash_keys = set(_G4IRSF14_REPLAY_HASHES)
+    source_hashes = payload.get("source_replay_hashes")
+    baseline_hashes = payload.get("baseline_replay_hashes")
+    clone_hashes = payload.get("clone_replay_hashes")
+    if not all(
+        isinstance(value, dict) and set(value) == replay_hash_keys
+        for value in (source_hashes, baseline_hashes, clone_hashes)
+    ):
+        raise RuntimeError(
+            "native no-op rerun returned an incomplete replay hash set"
+        )
+    if any(
+        not isinstance(digest, str)
+        or len(digest) != 64
+        or any(character not in "0123456789abcdef" for character in digest)
+        for hashes in (source_hashes, baseline_hashes, clone_hashes)
+        for digest in hashes.values()
+    ):
+        raise RuntimeError(
+            "native no-op rerun returned an invalid replay digest"
+        )
+    if not source_hashes == baseline_hashes == clone_hashes:
+        raise RuntimeError(
+            "exact no-op replay fidelity is below 100%"
+        )
+    if payload.get("native_three_way_exact_match") is not True:
+        raise RuntimeError(
+            "native no-op rerun did not attest its raw three-way match"
+        )
+
+    invariant_names = (
+        "source_invariants",
+        "baseline_invariants",
+        "clone_invariants",
+    )
+    invariant_rows = [payload.get(name) for name in invariant_names]
+    if not all(isinstance(row, dict) for row in invariant_rows):
+        raise RuntimeError(
+            "native no-op rerun omitted raw branch invariants"
+        )
+    source_invariants, baseline_invariants, clone_invariants = (
+        invariant_rows
+    )
+    if not (
+        source_invariants
+        == baseline_invariants
+        == clone_invariants
+    ):
+        raise RuntimeError(
+            "no-op replay branches have different raw invariants"
+        )
+    invariants = source_invariants
+    assert isinstance(invariants, dict)
+    requested_count = invariants.get("requested_count")
+    if (
+        not isinstance(requested_count, int)
+        or isinstance(requested_count, bool)
+        or requested_count != len(normalized_bags)
+        or invariants.get("completed_count") != requested_count
+        or invariants.get("failed_segment_count") != 0
+    ):
+        raise RuntimeError(
+            "no-op replay did not complete every requested segment"
+        )
+    zero_gate_fields = (
+        "unsafe_entry_count",
+        "reservation_conflict_count",
+        "runtime_full_astar_call_count",
+        "runtime_global_scan_count",
+        "runtime_future_route_read_count",
+        "runtime_future_schedule_read_count",
+        "teacher_input_count",
+        "priority_teacher_input_count",
+        "scorer_teacher_input_count",
+        "full_future_routes_stored",
+        "two_step_reservation_count",
+        "unresolved_deadlock_count",
+        "merge_grant_final_active_unconsumed",
+        "merge_grant_outstanding_request_count",
+        "merge_grant_stale_arbitration_count",
+        "stale_arbitration_event_count",
+        "artificial_batch_delay_seconds",
+    )
+    if any(invariants.get(name) != 0 for name in zero_gate_fields):
+        raise RuntimeError(
+            "no-op replay violated a zero-valued production hard gate"
+        )
+    lifecycle_dropped_count = invariants.get(
+        "merge_grant_lifecycle_dropped_count"
+    )
+    if (
+        not isinstance(lifecycle_dropped_count, int)
+        or isinstance(lifecycle_dropped_count, bool)
+        or lifecycle_dropped_count < 0
+    ):
+        raise RuntimeError(
+            "no-op replay returned an invalid merge lifecycle drop count"
+        )
+    lifecycle_complete = lifecycle_dropped_count == 0
+    active_state_integrity = (
+        invariants.get("merge_grant_conservation_holds") is True
+        and invariants.get("merge_grant_active_bijection_holds") is True
+        and invariants.get("merge_grant_runtime_owned_capability") is True
+        and invariants.get("merge_grant_exact_slot_no_future_shift") is True
+        and invariants.get("merge_grant_final_active_unconsumed") == 0
+        and invariants.get("merge_grant_outstanding_request_count") == 0
+    )
+    if (
+        invariants.get("merge_grant_lifecycle_complete")
+        is not lifecycle_complete
+        or invariants.get("merge_grant_active_state_integrity_pass")
+        is not active_state_integrity
+        or invariants.get("merge_grant_protocol_integrity_pass")
+        is not (active_state_integrity and lifecycle_complete)
+    ):
+        raise RuntimeError(
+            "no-op replay returned inconsistent merge protocol attestations"
+        )
+    if (
+        invariants.get("bag_future_path_field_present") is not False
+        or invariants.get("reservation_depth") != 1
+        or invariants.get("max_selected_edges_per_bag") not in (0, 1)
+        or invariants.get("event_limit_reached") is not False
+        or invariants.get("time_limit_reached") is not False
+        or invariants.get("merge_grant_conservation_holds") is not True
+        or invariants.get("merge_grant_active_bijection_holds") is not True
+        or invariants.get("merge_grant_runtime_owned_capability") is not True
+        or invariants.get("merge_grant_exact_slot_no_future_shift") is not True
+        or invariants.get("merge_grant_active_state_integrity_pass") is not True
+    ):
+        raise RuntimeError(
+            "no-op replay violated a production safety/control hard gate"
+        )
+
+    binary_path_text = str(loaded_binary_path)
+    payload["loaded_cpp_binary_path"] = binary_path_text
+    payload["loaded_cpp_binary_sha256"] = loaded_binary_sha256
+    payload["binary"] = {
+        "path": binary_path_text,
+        "sha256": loaded_binary_sha256,
+    }
+    return payload

@@ -31,6 +31,7 @@
 #include "ics_core/runtime/bounded_local_pibt.hpp"
 #include "ics_core/runtime/destination_merge_grant.hpp"
 #include "ics_core/runtime/expiring_first_edge_credit.hpp"
+#include "ics_core/runtime/g4irsf14_state_clone.hpp"
 
 namespace czr005::ics {
 
@@ -881,6 +882,31 @@ struct EventDrivenJunctionResult {
   std::vector<DestinationMergeGrantLifecycleRow> merge_grant_lifecycle;
 };
 
+enum class EventDrivenJunctionRuntimePhase {
+  kIdle,
+  kReady,
+  kStopped,
+  kFinalized,
+};
+
+struct EventDrivenJunctionSafeBoundary {
+  JunctionEventType next_event_type =
+      JunctionEventType::kBagRelease;
+  double next_event_time = 0.0;
+  std::uint64_t next_event_seq = 0;
+  int runtime_bag_id = -1;
+  int node = -1;
+  int from_node = -1;
+  int to_node = -1;
+  int active_merge_capability_count = 0;
+  int pending_merge_request_count = 0;
+  int active_physical_fault_edge_count = 0;
+  int queued_bag_count = 0;
+  std::string state_sha256;
+  bool queue_top_not_popped = true;
+  bool staged_event_sink_empty = true;
+};
+
 namespace event_runtime_detail {
 
 constexpr double kEpsilon = 1.0e-9;
@@ -1143,6 +1169,13 @@ class LocalCalendar {
       mix(timestamp_bits(interval.end));
     }
     return hash;
+  }
+
+  template <typename Visitor>
+  void inspect(Visitor&& visitor) const {
+    for (const auto& interval : intervals_) {
+      visitor(interval);
+    }
   }
 
   // Payload lower bound for intervals that are logically active right now.
@@ -1449,6 +1482,17 @@ struct DestinationMergeBagState {
   std::optional<MergeGrantCapability> capability;
 };
 
+struct DestinationMergeBagStateCheckpoint {
+  std::uint64_t junction_queue_generation = 0;
+  std::uint64_t request_generation = 0;
+  std::uint64_t pending_request_id = 0;
+  std::uint64_t pending_lineage = 0;
+  double pending_request_time = -1.0;
+  double first_contention_time = -1.0;
+  double grant_wait_seconds = 0.0;
+  std::optional<MergeGrantCapabilityCheckpoint> capability;
+};
+
 struct G4IRSF14RuntimeState {
   std::unordered_map<int, LocalArbitrationState> local;
   std::unordered_map<int, DestinationMergeArbitrationState>
@@ -1463,13 +1507,170 @@ struct G4IRSF14RuntimeState {
   int current_pibt_owner_count = 0;
 };
 
+struct G4IRSF14RuntimeStateCheckpoint {
+  std::unordered_map<int, LocalArbitrationState> local;
+  std::unordered_map<int, DestinationMergeArbitrationState>
+      destination_merge;
+  std::unordered_map<int, DestinationMergeBagStateCheckpoint>
+      destination_merge_bags;
+  std::uint64_t current_event_seq = 0;
+  bool microphase_floor_active = false;
+  double microphase_floor_time = 0.0;
+  int microphase_floor_priority = -1;
+  int current_pibt_slice_bag_count = 0;
+  int current_pibt_owner_count = 0;
+};
+
+struct PendingMergeDispatch {
+  std::uint64_t request_id = 0;
+  std::uint64_t lineage = 0;
+  int runtime_bag_id = -1;
+  int upstream_node = -1;
+  int destination_node = -1;
+  EventDecisionTraceRow trace;
+};
+
 static_assert(std::is_nothrow_move_constructible_v<RuntimeEvent>);
 static_assert(std::is_nothrow_move_assignable_v<RuntimeEvent>);
 
 }  // namespace event_runtime_detail
 
 class EventDrivenJunctionRuntime {
+ private:
+  struct CheckpointStorage {
+    const Graph* graph_identity = nullptr;
+    std::string graph_sha256;
+    EventDrivenJunctionConfig config;
+    std::optional<EdgeScoreModel> scorer_model;
+    std::map<std::pair<int, int>, int> scorer_static_hops;
+    std::map<std::tuple<int, int, int>, double>
+        pibt_regret_prior;
+    EventDrivenJunctionResult result;
+    std::unordered_map<int, event_runtime_detail::BagState> bags;
+    std::unordered_map<std::string, int> segment_runtime_ids;
+    std::unordered_map<int, event_runtime_detail::JunctionState>
+        junctions;
+    std::unordered_map<long long, event_runtime_detail::LocalCalendar>
+        corridors;
+    std::unordered_map<long long, event_runtime_detail::FaultState>
+        physical_faults;
+    std::unordered_map<long long,
+                       event_runtime_detail::AdvertisedFaultState>
+        advertised_faults;
+    std::unordered_map<int,
+                       event_runtime_detail::CongestionBeaconState>
+        congestion_beacons;
+    std::unordered_map<int,
+        DestinationMergeGrantControllerCheckpoint>
+        destination_merge_controllers;
+    std::unordered_map<std::uint64_t,
+                       event_runtime_detail::PendingMergeDispatch>
+        pending_merge_dispatches;
+    ExpiringFirstEdgeCreditCheckpoint credit_ledger;
+    std::unordered_map<long long, int> directed_inflight_counts;
+    std::unordered_set<int> fault_affected_bags;
+    std::unordered_map<long long, std::set<int>>
+        fault_affected_bags_by_edge;
+    std::unordered_map<int, std::set<std::pair<long long, int>>>
+        fault_instances_by_bag;
+    std::unordered_map<long long, int>
+        active_fault_instance_by_edge;
+    std::map<std::pair<long long, int>, double>
+        repair_time_by_fault_instance;
+    event_runtime_detail::RuntimeEventQueue events;
+    std::optional<
+        event_runtime_detail::G4IRSF14RuntimeStateCheckpoint>
+        g4irsf14_state;
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    bool test_pibt_logical_failure_injected = false;
+    bool test_merge_grant_prepare_failure_injected = false;
+    bool test_merge_grant_advertised_flip_injected = false;
+    bool test_merge_grant_physical_flip_injected = false;
+    bool test_merge_grant_calendar_flip_injected = false;
+    bool test_merge_grant_queue_flip_injected = false;
+    bool test_merge_grant_edge_exit_capability_drop_injected = false;
+    bool test_merge_grant_edge_exit_physical_flip_injected = false;
+    bool test_merge_grant_edge_exit_advertised_flip_injected = false;
+    bool test_merge_grant_edge_exit_calendar_remove_injected = false;
+    bool test_merge_grant_edge_exit_expiry_injected = false;
+    bool test_merge_grant_edge_exit_wrong_owner_injected = false;
+    bool test_merge_grant_edge_exit_wrong_edge_injected = false;
+    bool test_merge_grant_edge_exit_wrong_destination_injected = false;
+    bool
+        test_merge_grant_edge_exit_claimed_request_generation_tamper_injected =
+            false;
+    bool
+        test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected =
+            false;
+    bool
+        test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected =
+            false;
+    bool
+        test_merge_grant_edge_exit_live_queue_generation_advance_injected =
+            false;
+    bool
+        test_merge_grant_edge_exit_live_calendar_generation_advance_injected =
+            false;
+    bool test_pibt_post_commit_failure_injected = false;
+#endif
+    std::uint64_t next_event_seq = 1;
+    std::uint64_t next_decision_id = 1;
+    std::uint64_t next_pibt_activation_id = 1;
+    std::uint64_t next_local_enqueue_sequence = 1;
+    std::uint64_t next_merge_request_lineage = 1;
+    double now = 0.0;
+    double time_limit = 0.0;
+    int active_bag_count = 0;
+    double last_physical_repair_time = -1.0;
+    int active_backlog_at_last_repair = -1;
+    int active_backlog_at_runtime_stop = -1;
+    std::vector<double> waits;
+    std::vector<double> decision_latencies_us;
+    EventDrivenJunctionRuntimePhase phase =
+        EventDrivenJunctionRuntimePhase::kIdle;
+    G4IRSF14RuntimeStateDigests state_digests;
+    std::string state_sha256;
+  };
+
  public:
+  class StateCheckpoint {
+   public:
+    StateCheckpoint(const StateCheckpoint&) = default;
+    StateCheckpoint& operator=(const StateCheckpoint&) = default;
+    StateCheckpoint(StateCheckpoint&&) noexcept = default;
+    StateCheckpoint& operator=(StateCheckpoint&&) noexcept = default;
+
+    [[nodiscard]] const std::string& state_sha256() const {
+      if (storage_ == nullptr) {
+        throw std::logic_error("empty runtime state checkpoint");
+      }
+      return sealed_state_sha256_;
+    }
+
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    void test_corrupt_seal() {
+      if (sealed_state_sha256_.empty()) {
+        sealed_state_sha256_ = "0";
+      } else {
+        sealed_state_sha256_[0] =
+            sealed_state_sha256_[0] == '0' ? '1' : '0';
+      }
+    }
+#endif
+
+   private:
+    friend class EventDrivenJunctionRuntime;
+    StateCheckpoint(
+        std::shared_ptr<const CheckpointStorage> storage,
+        std::string sealed_state_sha256)
+        : storage_(std::move(storage)),
+          sealed_state_sha256_(
+              std::move(sealed_state_sha256)) {}
+
+    std::shared_ptr<const CheckpointStorage> storage_;
+    std::string sealed_state_sha256_;
+  };
+
   explicit EventDrivenJunctionRuntime(const Graph& graph, EventDrivenJunctionConfig config = {})
       : graph_(graph), config_(std::move(config)) {
     validate_config();
@@ -1481,9 +1682,15 @@ class EventDrivenJunctionRuntime {
     initialize_scorer();
   }
 
-  EventDrivenJunctionResult run(const std::vector<EventRuntimeBagRequest>& requests,
-                                const std::vector<EventRuntimeFaultWindow>& fault_windows = {}) {
-    const auto runtime_started = std::chrono::steady_clock::now();
+  void initialize(
+      const std::vector<EventRuntimeBagRequest>& requests,
+      const std::vector<EventRuntimeFaultWindow>& fault_windows = {}) {
+    if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kIdle &&
+        runtime_phase_ != EventDrivenJunctionRuntimePhase::kFinalized) {
+      throw std::logic_error(
+          "event runtime initialize called while a run is active");
+    }
+    runtime_started_ = std::chrono::steady_clock::now();
     reset();
     result_.summary.requested_count = static_cast<int>(requests.size());
     result_.summary.diagnostic_hops = config_.diagnostic_hops;
@@ -1689,25 +1896,105 @@ class EventDrivenJunctionRuntime {
       push_event(std::move(repair));
     }
 
-    const double time_limit = config_.max_simulation_time >= 0.0
-                                  ? config_.max_simulation_time
-                                  : latest_release + 86400.0;
-    while (!events_.empty()) {
-      if (result_.summary.event_count >= config_.max_events) {
-        result_.summary.event_limit_reached = true;
-        break;
-      }
-      auto event = events_.top();
-      events_.pop();
-      if (event.time > time_limit + event_runtime_detail::kEpsilon) {
-        result_.summary.time_limit_reached = true;
-        break;
-      }
-      now_ = event.time;
-      ++result_.summary.event_count;
-      process_event(event);
-    }
+    time_limit_ = config_.max_simulation_time >= 0.0
+                      ? config_.max_simulation_time
+                      : latest_release + 86400.0;
+    runtime_phase_ = events_.empty()
+                         ? EventDrivenJunctionRuntimePhase::kStopped
+                         : EventDrivenJunctionRuntimePhase::kReady;
+  }
 
+  [[nodiscard]] std::optional<EventDrivenJunctionSafeBoundary>
+  peek_safe_boundary() const {
+    if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+        events_.empty()) {
+      return std::nullopt;
+    }
+    require_checkpoint_safe_boundary();
+    const auto& event = events_.top();
+    EventDrivenJunctionSafeBoundary boundary;
+    boundary.next_event_type = event.type;
+    boundary.next_event_time = event.time;
+    boundary.next_event_seq = event.seq;
+    boundary.runtime_bag_id = event.task_id;
+    boundary.node = event.node;
+    boundary.from_node = event.from_node;
+    boundary.to_node = event.to_node;
+    for (const auto& entry : destination_merge_controllers_) {
+      boundary.active_merge_capability_count +=
+          static_cast<int>(
+              entry.second.active_unconsumed_count());
+      boundary.pending_merge_request_count +=
+          static_cast<int>(entry.second.pending_count());
+    }
+    for (const auto& entry : physical_faults_) {
+      if (entry.second.active_count > 0) {
+        ++boundary.active_physical_fault_edge_count;
+      }
+    }
+    for (const auto& entry : junctions_) {
+      boundary.queued_bag_count +=
+          static_cast<int>(entry.second.source_queue.size() +
+                           entry.second.queue.size());
+    }
+    boundary.state_sha256 = deterministic_state_sha256();
+    return boundary;
+  }
+
+  bool process_one_event() {
+    if (runtime_phase_ == EventDrivenJunctionRuntimePhase::kStopped ||
+        runtime_phase_ == EventDrivenJunctionRuntimePhase::kFinalized) {
+      return false;
+    }
+    if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady) {
+      throw std::logic_error(
+          "process_one_event requires an initialized runtime");
+    }
+    require_checkpoint_safe_boundary();
+    if (events_.empty()) {
+      runtime_phase_ = EventDrivenJunctionRuntimePhase::kStopped;
+      return false;
+    }
+    if (result_.summary.event_count >= config_.max_events) {
+      result_.summary.event_limit_reached = true;
+      runtime_phase_ = EventDrivenJunctionRuntimePhase::kStopped;
+      return false;
+    }
+    auto event = events_.top();
+    events_.pop();
+    if (event.time >
+        time_limit_ + event_runtime_detail::kEpsilon) {
+      result_.summary.time_limit_reached = true;
+      runtime_phase_ = EventDrivenJunctionRuntimePhase::kStopped;
+      return false;
+    }
+    now_ = event.time;
+    ++result_.summary.event_count;
+    process_event(event);
+    if (events_.empty()) {
+      runtime_phase_ = EventDrivenJunctionRuntimePhase::kStopped;
+    }
+    return true;
+  }
+
+  void drain() {
+    while (process_one_event()) {
+    }
+  }
+
+  const EventDrivenJunctionResult& finalize() {
+    if (runtime_phase_ == EventDrivenJunctionRuntimePhase::kFinalized) {
+      return result_;
+    }
+    if (runtime_phase_ == EventDrivenJunctionRuntimePhase::kIdle) {
+      throw std::logic_error(
+          "event runtime finalize called before initialize");
+    }
+    if (runtime_phase_ == EventDrivenJunctionRuntimePhase::kReady) {
+      throw std::logic_error(
+          "event runtime finalize requires drain or a hard runtime limit");
+    }
+    require_checkpoint_safe_boundary();
     active_backlog_at_runtime_stop_ = active_bag_count_;
     finalize_incomplete();
     build_bag_results();
@@ -1715,14 +2002,111 @@ class EventDrivenJunctionRuntime {
     build_credit_results();
     finish_summary();
     const std::chrono::duration<double> runtime_elapsed =
-        std::chrono::steady_clock::now() - runtime_started;
+        std::chrono::steady_clock::now() - runtime_started_;
     result_.summary.runtime_seconds = runtime_elapsed.count();
     result_.summary.event_throughput_per_second =
         runtime_elapsed.count() > 0.0
-            ? static_cast<double>(result_.summary.event_count) / runtime_elapsed.count()
+            ? static_cast<double>(result_.summary.event_count) /
+                  runtime_elapsed.count()
             : 0.0;
+    runtime_phase_ = EventDrivenJunctionRuntimePhase::kFinalized;
     return result_;
   }
+
+  EventDrivenJunctionResult run(
+      const std::vector<EventRuntimeBagRequest>& requests,
+      const std::vector<EventRuntimeFaultWindow>& fault_windows = {}) {
+    initialize(requests, fault_windows);
+    drain();
+    return finalize();
+  }
+
+  [[nodiscard]] EventDrivenJunctionRuntimePhase phase() const noexcept {
+    return runtime_phase_;
+  }
+
+  [[nodiscard]] const EventDrivenJunctionResult& current_result() const
+      noexcept {
+    return result_;
+  }
+
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  void test_mutate_final_result_hash_field(
+      std::string_view family) {
+    if (runtime_phase_ !=
+        EventDrivenJunctionRuntimePhase::kFinalized) {
+      throw std::logic_error(
+          "result-hash mutation hook requires finalized runtime");
+    }
+    if (family == "summary") {
+      ++result_.summary.source_admission_attempt_count;
+    } else if (family == "decision") {
+      if (result_.decisions.empty()) {
+        result_.decisions.emplace_back();
+      }
+      result_.decisions.front().scorer_risk_reasons.push_back(
+          "hash-coverage");
+    } else if (family == "fault") {
+      if (result_.fault_events.empty()) {
+        result_.fault_events.emplace_back();
+      }
+      result_.fault_events.front().segment_id += "x";
+    } else if (family == "pibt") {
+      if (result_.pibt_events.empty()) {
+        result_.pibt_events.emplace_back();
+      }
+      ++result_.pibt_events.front()
+            .transaction_action_delta_count;
+    } else if (family == "source_opportunity") {
+      if (result_.source_admission_opportunities.empty()) {
+        result_.source_admission_opportunities.emplace_back();
+      }
+      ++result_.source_admission_opportunities.front()
+            .priority_comparison_count;
+    } else if (family == "junction_opportunity") {
+      if (result_.junction_arbitration_opportunities.empty()) {
+        result_.junction_arbitration_opportunities.emplace_back();
+      }
+      ++result_.junction_arbitration_opportunities.front()
+            .same_time_pending_arrivals;
+    } else if (family == "merge_visibility") {
+      if (result_.merge_request_visibility.empty()) {
+        result_.merge_request_visibility.emplace_back();
+      }
+      result_.merge_request_visibility.front()
+          .later_same_time_competitor_exists =
+          !result_.merge_request_visibility.front()
+               .later_same_time_competitor_exists;
+    } else if (family == "event_seq") {
+      if (result_.event_seq_ordering_audit.empty()) {
+        result_.event_seq_ordering_audit.emplace_back();
+      }
+      result_.event_seq_ordering_audit.front().reason += "x";
+    } else if (family == "arbitration_batch") {
+      if (result_.arbitration_batch_cardinality.empty()) {
+        result_.arbitration_batch_cardinality.emplace_back();
+      }
+      ++result_.arbitration_batch_cardinality.front()
+            .pending_same_time_event_count;
+    } else if (family == "merge_lifecycle") {
+      if (result_.merge_grant_lifecycle.empty()) {
+        result_.merge_grant_lifecycle.emplace_back();
+      }
+      result_.merge_grant_lifecycle.front().wait_age += 1.0;
+    } else {
+      throw std::invalid_argument(
+          "unknown deterministic-result hash family");
+    }
+  }
+#endif
+
+  [[nodiscard]] StateCheckpoint capture_state_checkpoint() const;
+  void restore_state_checkpoint(const StateCheckpoint& checkpoint);
+  [[nodiscard]] G4IRSF14RuntimeStateDigests
+  deterministic_state_digests() const;
+  [[nodiscard]] std::string deterministic_state_sha256() const;
+  [[nodiscard]] G4IRSF14CloneReplayHashes
+  deterministic_replay_hashes() const;
 
  private:
   using BagState = event_runtime_detail::BagState;
@@ -1731,6 +2115,181 @@ class EventDrivenJunctionRuntime {
   using JunctionState = event_runtime_detail::JunctionState;
   using LocalCalendar = event_runtime_detail::LocalCalendar;
   using RuntimeEvent = event_runtime_detail::RuntimeEvent;
+
+  class StateFingerprintWriter {
+   public:
+    explicit StateFingerprintWriter(std::string_view component) {
+      string("czr005.g4irsf14.runtime-state-component.v2");
+      string(component);
+    }
+
+    void boolean(bool value) {
+      payload_.push_back(value ? '\x01' : '\x00');
+    }
+
+    void u64(std::uint64_t value) {
+      for (int shift = 56; shift >= 0; shift -= 8) {
+        payload_.push_back(
+            static_cast<char>((value >> shift) & 0xffU));
+      }
+    }
+
+    void i64(std::int64_t value) {
+      u64(static_cast<std::uint64_t>(value));
+    }
+
+    void floating(double value) {
+      static_assert(sizeof(double) == sizeof(std::uint64_t));
+      std::uint64_t bits = 0;
+      std::memcpy(&bits, &value, sizeof(bits));
+      u64(bits);
+    }
+
+    void string(std::string_view value) {
+      u64(static_cast<std::uint64_t>(value.size()));
+      payload_.append(value);
+    }
+
+    [[nodiscard]] std::string sha256() const {
+      return canonical_map2_detail::sha256_hex(payload_);
+    }
+
+   private:
+    std::string payload_;
+  };
+
+  void require_checkpoint_safe_boundary() const {
+    if (staged_event_sink_ != nullptr ||
+        staged_merge_visibility_sink_ != nullptr ||
+        staged_destination_known_competitor_counts_ != nullptr) {
+      throw std::logic_error(
+          "runtime checkpoint requires an empty transactional event sink");
+    }
+  }
+
+  static void fingerprint_event(
+      StateFingerprintWriter& writer,
+      const RuntimeEvent& event) {
+    writer.i64(static_cast<int>(event.type));
+    writer.floating(event.time);
+    writer.u64(event.seq);
+    writer.i64(event.task_id);
+    writer.i64(event.node);
+    writer.i64(event.from_node);
+    writer.i64(event.to_node);
+    writer.floating(event.service_end);
+    writer.floating(event.message_delay);
+    writer.i64(event.message_generation);
+    writer.u64(event.wakeup_generation);
+    writer.boolean(event.notification);
+    writer.boolean(event.drop_notification);
+    writer.boolean(event.retry);
+    writer.string(event.reason);
+    writer.i64(event.microphase_priority);
+  }
+
+  static void fingerprint_request(
+      StateFingerprintWriter& writer,
+      const EventRuntimeBagRequest& request) {
+    writer.string(request.segment_id);
+    writer.i64(request.task_id);
+    writer.floating(request.release_time);
+    writer.floating(request.deadline);
+    writer.i64(request.start);
+    writer.i64(request.goal);
+    writer.string(request.source);
+    writer.i64(request.runtime_bag_id);
+  }
+
+  static void fingerprint_merge_request(
+      StateFingerprintWriter& writer,
+      const DestinationMergeRequest& request,
+      bool include_identity_snapshot = true) {
+    writer.u64(request.request_id);
+    writer.u64(request.lineage);
+    writer.u64(request.request_generation);
+    writer.u64(request.junction_queue_generation);
+    writer.i64(request.runtime_bag_id);
+    writer.i64(request.task_id);
+    writer.string(request.segment_id);
+    writer.i64(request.upstream_node);
+    writer.i64(request.destination_merge_node);
+    writer.i64(request.requested_directed_edge.from_node);
+    writer.i64(request.requested_directed_edge.to_node);
+    writer.floating(request.request_time);
+    writer.floating(request.fifo_request_time);
+    writer.floating(request.earliest_edge_entry);
+    writer.floating(request.exact_edge_travel_seconds);
+    writer.floating(request.projected_arrival);
+    writer.i64(request.goal);
+    writer.floating(request.route_score);
+    writer.floating(request.static_remaining);
+    writer.floating(request.destination_service_seconds);
+    writer.i64(request.downstream_queue_pressure);
+    writer.floating(request.deadline_slack);
+    writer.floating(request.wait_age);
+    writer.i64(request.task_class_code);
+    writer.i64(request.task_class);
+    writer.boolean(request.storage_leg);
+    writer.floating(request.source_release_age);
+    writer.floating(request.local_queue_age);
+    writer.i64(request.advertised_fault_generation);
+    writer.i64(request.physical_fault_generation);
+    writer.u64(request.destination_calendar_generation);
+    writer.u64(request.enqueue_sequence);
+    writer.floating(request.expiry);
+    writer.boolean(request.lifecycle_segment_id != nullptr);
+    if (request.lifecycle_segment_id != nullptr) {
+      writer.string(*request.lifecycle_segment_id);
+    }
+    writer.boolean(
+        request.lifecycle_request_snapshot != nullptr);
+    if (include_identity_snapshot &&
+        request.lifecycle_request_snapshot != nullptr) {
+      fingerprint_merge_request(
+          writer, *request.lifecycle_request_snapshot, false);
+    }
+  }
+
+  static void fingerprint_capability(
+      StateFingerprintWriter& writer,
+      const MergeGrantCapabilityCheckpoint& capability) {
+    writer.u64(capability.grant_id);
+    writer.u64(capability.request_id);
+    writer.u64(capability.lineage);
+    writer.u64(capability.request_generation);
+    writer.i64(capability.owner_runtime_bag_id);
+    writer.i64(capability.exact_directed_edge.from_node);
+    writer.i64(capability.exact_directed_edge.to_node);
+    writer.i64(capability.destination_node);
+    writer.floating(capability.slot_start);
+    writer.floating(capability.slot_end);
+    writer.floating(capability.issue_time);
+    writer.floating(capability.request_time);
+    writer.floating(capability.expiry);
+    writer.u64(capability.calendar_generation);
+    writer.i64(capability.fault_generation);
+    writer.i64(capability.advertised_fault_generation);
+    writer.i64(static_cast<int>(capability.state));
+    fingerprint_merge_request(writer, capability.request_snapshot);
+  }
+
+  static void fingerprint_deterministic_summary(
+      StateFingerprintWriter& writer,
+      const EventRuntimeSummary& summary);
+
+  G4IRSF14RuntimeStateDigests compute_runtime_state_digests() const;
+  G4IRSF14CloneReplayHashes
+  compute_replay_hashes_projection() const;
+  static event_runtime_detail::G4IRSF14RuntimeStateCheckpoint
+  capture_g4irsf14_state(
+      const event_runtime_detail::G4IRSF14RuntimeState& state);
+  static std::unique_ptr<
+      event_runtime_detail::G4IRSF14RuntimeState>
+  restore_g4irsf14_state(
+      const event_runtime_detail::G4IRSF14RuntimeStateCheckpoint&
+          checkpoint);
+  void validate_merge_capability_bijection() const;
 
   static bool mode_is(const std::string& actual,
                       const std::string& short_name,
@@ -2459,6 +3018,8 @@ class EventDrivenJunctionRuntime {
   }
 
   void reset() {
+    runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
+    time_limit_ = 0.0;
     result_ = {};
     bags_.clear();
     segment_runtime_ids_.clear();
@@ -4719,14 +5280,8 @@ class EventDrivenJunctionRuntime {
     int same_bag_fallback_next = -1;
   };
 
-  struct PendingMergeDispatch {
-    std::uint64_t request_id = 0;
-    std::uint64_t lineage = 0;
-    int runtime_bag_id = -1;
-    int upstream_node = -1;
-    int destination_node = -1;
-    EventDecisionTraceRow trace;
-  };
+  using PendingMergeDispatch =
+      event_runtime_detail::PendingMergeDispatch;
 
   struct PIBTCreditView {
     bool required = false;
@@ -11817,6 +12372,7 @@ class EventDrivenJunctionRuntime {
   std::uint64_t next_local_enqueue_sequence_ = 1;
   std::uint64_t next_merge_request_lineage_ = 1;
   double now_ = 0.0;
+  double time_limit_ = 0.0;
   int active_bag_count_ = 0;
   double last_physical_repair_time_ = -1.0;
   int active_backlog_at_last_repair_ = -1;
@@ -11825,6 +12381,2406 @@ class EventDrivenJunctionRuntime {
   std::vector<double> decision_latencies_us_;
   std::unique_ptr<event_runtime_detail::G4IRSF14RuntimeState>
       g4irsf14_state_;
+  EventDrivenJunctionRuntimePhase runtime_phase_ =
+      EventDrivenJunctionRuntimePhase::kIdle;
+  std::chrono::steady_clock::time_point runtime_started_ =
+      std::chrono::steady_clock::now();
 };
+
+inline event_runtime_detail::G4IRSF14RuntimeStateCheckpoint
+EventDrivenJunctionRuntime::capture_g4irsf14_state(
+    const event_runtime_detail::G4IRSF14RuntimeState& state) {
+  event_runtime_detail::G4IRSF14RuntimeStateCheckpoint checkpoint;
+  checkpoint.local = state.local;
+  checkpoint.destination_merge = state.destination_merge;
+  checkpoint.destination_merge_bags.reserve(
+      state.destination_merge_bags.size());
+  for (const auto& entry : state.destination_merge_bags) {
+    event_runtime_detail::DestinationMergeBagStateCheckpoint item;
+    item.junction_queue_generation =
+        entry.second.junction_queue_generation;
+    item.request_generation = entry.second.request_generation;
+    item.pending_request_id = entry.second.pending_request_id;
+    item.pending_lineage = entry.second.pending_lineage;
+    item.pending_request_time = entry.second.pending_request_time;
+    item.first_contention_time =
+        entry.second.first_contention_time;
+    item.grant_wait_seconds = entry.second.grant_wait_seconds;
+    if (entry.second.capability.has_value()) {
+      item.capability =
+          DestinationMergeGrantCheckpointCodec::capture(
+              *entry.second.capability);
+    }
+    checkpoint.destination_merge_bags.emplace(
+        entry.first, std::move(item));
+  }
+  checkpoint.current_event_seq = state.current_event_seq;
+  checkpoint.microphase_floor_active =
+      state.microphase_floor_active;
+  checkpoint.microphase_floor_time = state.microphase_floor_time;
+  checkpoint.microphase_floor_priority =
+      state.microphase_floor_priority;
+  checkpoint.current_pibt_slice_bag_count =
+      state.current_pibt_slice_bag_count;
+  checkpoint.current_pibt_owner_count =
+      state.current_pibt_owner_count;
+  return checkpoint;
+}
+
+inline std::unique_ptr<
+    event_runtime_detail::G4IRSF14RuntimeState>
+EventDrivenJunctionRuntime::restore_g4irsf14_state(
+    const event_runtime_detail::G4IRSF14RuntimeStateCheckpoint&
+        checkpoint) {
+  auto state = std::make_unique<
+      event_runtime_detail::G4IRSF14RuntimeState>();
+  state->local = checkpoint.local;
+  state->destination_merge = checkpoint.destination_merge;
+  state->destination_merge_bags.reserve(
+      checkpoint.destination_merge_bags.size());
+  for (const auto& entry : checkpoint.destination_merge_bags) {
+    event_runtime_detail::DestinationMergeBagState item;
+    item.junction_queue_generation =
+        entry.second.junction_queue_generation;
+    item.request_generation = entry.second.request_generation;
+    item.pending_request_id = entry.second.pending_request_id;
+    item.pending_lineage = entry.second.pending_lineage;
+    item.pending_request_time = entry.second.pending_request_time;
+    item.first_contention_time =
+        entry.second.first_contention_time;
+    item.grant_wait_seconds = entry.second.grant_wait_seconds;
+    if (entry.second.capability.has_value()) {
+      item.capability.emplace(
+          DestinationMergeGrantCheckpointCodec::restore(
+              *entry.second.capability));
+    }
+    state->destination_merge_bags.emplace(
+        entry.first, std::move(item));
+  }
+  state->current_event_seq = checkpoint.current_event_seq;
+  state->microphase_floor_active =
+      checkpoint.microphase_floor_active;
+  state->microphase_floor_time = checkpoint.microphase_floor_time;
+  state->microphase_floor_priority =
+      checkpoint.microphase_floor_priority;
+  state->current_pibt_slice_bag_count =
+      checkpoint.current_pibt_slice_bag_count;
+  state->current_pibt_owner_count =
+      checkpoint.current_pibt_owner_count;
+  return state;
+}
+
+inline EventDrivenJunctionRuntime::StateCheckpoint
+EventDrivenJunctionRuntime::capture_state_checkpoint() const {
+  if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+      events_.empty()) {
+    throw std::logic_error(
+        "runtime checkpoint requires a live pre-pop event boundary");
+  }
+  require_checkpoint_safe_boundary();
+  auto storage = std::make_shared<CheckpointStorage>();
+  storage->graph_identity = &graph_;
+  storage->graph_sha256 = scorer_graph_fingerprint();
+  storage->config = config_;
+  storage->scorer_model = scorer_model_;
+  storage->scorer_static_hops = scorer_static_hops_;
+  storage->pibt_regret_prior = pibt_regret_prior_;
+  storage->result = result_;
+  storage->bags = bags_;
+  storage->segment_runtime_ids = segment_runtime_ids_;
+  storage->junctions = junctions_;
+  storage->corridors = corridors_;
+  storage->physical_faults = physical_faults_;
+  storage->advertised_faults = advertised_faults_;
+  storage->congestion_beacons = congestion_beacons_;
+  storage->destination_merge_controllers.reserve(
+      destination_merge_controllers_.size());
+  for (const auto& entry : destination_merge_controllers_) {
+    storage->destination_merge_controllers.emplace(
+        entry.first,
+        DestinationMergeGrantCheckpointCodec::capture(
+            entry.second));
+  }
+  storage->pending_merge_dispatches =
+      pending_merge_dispatches_;
+  storage->credit_ledger =
+      credit_ledger_.capture_exact_checkpoint();
+  storage->directed_inflight_counts = directed_inflight_counts_;
+  storage->fault_affected_bags = fault_affected_bags_;
+  storage->fault_affected_bags_by_edge =
+      fault_affected_bags_by_edge_;
+  storage->fault_instances_by_bag = fault_instances_by_bag_;
+  storage->active_fault_instance_by_edge =
+      active_fault_instance_by_edge_;
+  storage->repair_time_by_fault_instance =
+      repair_time_by_fault_instance_;
+  storage->events = events_;
+  if (g4irsf14_state_ != nullptr) {
+    storage->g4irsf14_state =
+        capture_g4irsf14_state(*g4irsf14_state_);
+  }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  storage->test_pibt_logical_failure_injected =
+      test_pibt_logical_failure_injected_;
+  storage->test_merge_grant_prepare_failure_injected =
+      test_merge_grant_prepare_failure_injected_;
+  storage->test_merge_grant_advertised_flip_injected =
+      test_merge_grant_advertised_flip_injected_;
+  storage->test_merge_grant_physical_flip_injected =
+      test_merge_grant_physical_flip_injected_;
+  storage->test_merge_grant_calendar_flip_injected =
+      test_merge_grant_calendar_flip_injected_;
+  storage->test_merge_grant_queue_flip_injected =
+      test_merge_grant_queue_flip_injected_;
+  storage->test_merge_grant_edge_exit_capability_drop_injected =
+      test_merge_grant_edge_exit_capability_drop_injected_;
+  storage->test_merge_grant_edge_exit_physical_flip_injected =
+      test_merge_grant_edge_exit_physical_flip_injected_;
+  storage->test_merge_grant_edge_exit_advertised_flip_injected =
+      test_merge_grant_edge_exit_advertised_flip_injected_;
+  storage->test_merge_grant_edge_exit_calendar_remove_injected =
+      test_merge_grant_edge_exit_calendar_remove_injected_;
+  storage->test_merge_grant_edge_exit_expiry_injected =
+      test_merge_grant_edge_exit_expiry_injected_;
+  storage->test_merge_grant_edge_exit_wrong_owner_injected =
+      test_merge_grant_edge_exit_wrong_owner_injected_;
+  storage->test_merge_grant_edge_exit_wrong_edge_injected =
+      test_merge_grant_edge_exit_wrong_edge_injected_;
+  storage->test_merge_grant_edge_exit_wrong_destination_injected =
+      test_merge_grant_edge_exit_wrong_destination_injected_;
+  storage
+      ->test_merge_grant_edge_exit_claimed_request_generation_tamper_injected =
+      test_merge_grant_edge_exit_claimed_request_generation_tamper_injected_;
+  storage
+      ->test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected =
+      test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected_;
+  storage
+      ->test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected =
+      test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected_;
+  storage
+      ->test_merge_grant_edge_exit_live_queue_generation_advance_injected =
+      test_merge_grant_edge_exit_live_queue_generation_advance_injected_;
+  storage
+      ->test_merge_grant_edge_exit_live_calendar_generation_advance_injected =
+      test_merge_grant_edge_exit_live_calendar_generation_advance_injected_;
+  storage->test_pibt_post_commit_failure_injected =
+      test_pibt_post_commit_failure_injected_;
+#endif
+  storage->next_event_seq = next_event_seq_;
+  storage->next_decision_id = next_decision_id_;
+  storage->next_pibt_activation_id = next_pibt_activation_id_;
+  storage->next_local_enqueue_sequence =
+      next_local_enqueue_sequence_;
+  storage->next_merge_request_lineage =
+      next_merge_request_lineage_;
+  storage->now = now_;
+  storage->time_limit = time_limit_;
+  storage->active_bag_count = active_bag_count_;
+  storage->last_physical_repair_time =
+      last_physical_repair_time_;
+  storage->active_backlog_at_last_repair =
+      active_backlog_at_last_repair_;
+  storage->active_backlog_at_runtime_stop =
+      active_backlog_at_runtime_stop_;
+  storage->waits = waits_;
+  // Kept for exact continuation of in-process diagnostics, but deliberately
+  // excluded from deterministic state/result hashes as wall-clock telemetry.
+  storage->decision_latencies_us = decision_latencies_us_;
+  storage->phase = runtime_phase_;
+  storage->state_digests = compute_runtime_state_digests();
+  storage->state_sha256 =
+      storage->state_digests.aggregate_sha256();
+  return StateCheckpoint(storage, storage->state_sha256);
+}
+
+inline void EventDrivenJunctionRuntime::
+restore_state_checkpoint(const StateCheckpoint& checkpoint) {
+  // A restore attempt is itself a phase boundary.  Fail closed before even
+  // inspecting the supplied checkpoint so a bad seal/graph/phase cannot
+  // leave an already-Ready target able to process its previous event queue.
+  runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
+  staged_event_sink_ = nullptr;
+  staged_merge_visibility_sink_ = nullptr;
+  staged_destination_known_competitor_counts_ = nullptr;
+  try {
+  if (checkpoint.storage_ == nullptr) {
+    throw std::invalid_argument(
+        "cannot restore an empty runtime checkpoint");
+  }
+  const auto& storage = *checkpoint.storage_;
+  g4irsf14_clone_detail::require_sha256(
+      "checkpoint seal", checkpoint.sealed_state_sha256_);
+  storage.state_digests.validate();
+  if (checkpoint.sealed_state_sha256_ != storage.state_sha256 ||
+      storage.state_sha256 !=
+          storage.state_digests.aggregate_sha256()) {
+    throw std::invalid_argument(
+        "runtime checkpoint seal does not bind its state inventory");
+  }
+  if (storage.phase != EventDrivenJunctionRuntimePhase::kReady ||
+      storage.events.empty()) {
+    throw std::invalid_argument(
+        "runtime checkpoint is not a live pre-pop boundary");
+  }
+  if (scorer_graph_fingerprint() != storage.graph_sha256) {
+    throw std::invalid_argument(
+        "runtime checkpoint graph identity mismatch");
+  }
+  config_ = storage.config;
+  validate_config();
+  scorer_model_.reset();
+  scorer_static_hops_.clear();
+  pibt_regret_prior_.clear();
+  initialize_regret_prior();
+  initialize_scorer();
+  if (scorer_model_.has_value() !=
+          storage.scorer_model.has_value() ||
+      scorer_static_hops_ != storage.scorer_static_hops ||
+      pibt_regret_prior_ != storage.pibt_regret_prior) {
+    throw std::invalid_argument(
+        "runtime checkpoint scorer derivation mismatch");
+  }
+  result_ = storage.result;
+  bags_ = storage.bags;
+  segment_runtime_ids_ = storage.segment_runtime_ids;
+  junctions_ = storage.junctions;
+  corridors_ = storage.corridors;
+  physical_faults_ = storage.physical_faults;
+  advertised_faults_ = storage.advertised_faults;
+  congestion_beacons_ = storage.congestion_beacons;
+  destination_merge_controllers_.clear();
+  destination_merge_controllers_.reserve(
+      storage.destination_merge_controllers.size());
+  for (const auto& entry :
+       storage.destination_merge_controllers) {
+    destination_merge_controllers_.emplace(
+        entry.first,
+        DestinationMergeGrantCheckpointCodec::restore(
+            entry.second));
+  }
+  pending_merge_dispatches_ =
+      storage.pending_merge_dispatches;
+  credit_ledger_ =
+      ExpiringFirstEdgeCreditLedger::restore_exact_checkpoint(
+          storage.credit_ledger);
+  directed_inflight_counts_ =
+      storage.directed_inflight_counts;
+  fault_affected_bags_ = storage.fault_affected_bags;
+  fault_affected_bags_by_edge_ =
+      storage.fault_affected_bags_by_edge;
+  fault_instances_by_bag_ = storage.fault_instances_by_bag;
+  active_fault_instance_by_edge_ =
+      storage.active_fault_instance_by_edge;
+  repair_time_by_fault_instance_ =
+      storage.repair_time_by_fault_instance;
+  events_ = storage.events;
+  staged_event_sink_ = nullptr;
+  staged_merge_visibility_sink_ = nullptr;
+  staged_destination_known_competitor_counts_ = nullptr;
+  if (storage.g4irsf14_state.has_value()) {
+    g4irsf14_state_ =
+        restore_g4irsf14_state(*storage.g4irsf14_state);
+  } else {
+    g4irsf14_state_.reset();
+  }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  test_pibt_logical_failure_injected_ =
+      storage.test_pibt_logical_failure_injected;
+  test_merge_grant_prepare_failure_injected_ =
+      storage.test_merge_grant_prepare_failure_injected;
+  test_merge_grant_advertised_flip_injected_ =
+      storage.test_merge_grant_advertised_flip_injected;
+  test_merge_grant_physical_flip_injected_ =
+      storage.test_merge_grant_physical_flip_injected;
+  test_merge_grant_calendar_flip_injected_ =
+      storage.test_merge_grant_calendar_flip_injected;
+  test_merge_grant_queue_flip_injected_ =
+      storage.test_merge_grant_queue_flip_injected;
+  test_merge_grant_edge_exit_capability_drop_injected_ =
+      storage.test_merge_grant_edge_exit_capability_drop_injected;
+  test_merge_grant_edge_exit_physical_flip_injected_ =
+      storage.test_merge_grant_edge_exit_physical_flip_injected;
+  test_merge_grant_edge_exit_advertised_flip_injected_ =
+      storage.test_merge_grant_edge_exit_advertised_flip_injected;
+  test_merge_grant_edge_exit_calendar_remove_injected_ =
+      storage.test_merge_grant_edge_exit_calendar_remove_injected;
+  test_merge_grant_edge_exit_expiry_injected_ =
+      storage.test_merge_grant_edge_exit_expiry_injected;
+  test_merge_grant_edge_exit_wrong_owner_injected_ =
+      storage.test_merge_grant_edge_exit_wrong_owner_injected;
+  test_merge_grant_edge_exit_wrong_edge_injected_ =
+      storage.test_merge_grant_edge_exit_wrong_edge_injected;
+  test_merge_grant_edge_exit_wrong_destination_injected_ =
+      storage.test_merge_grant_edge_exit_wrong_destination_injected;
+  test_merge_grant_edge_exit_claimed_request_generation_tamper_injected_ =
+      storage
+          .test_merge_grant_edge_exit_claimed_request_generation_tamper_injected;
+  test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected_ =
+      storage
+          .test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected;
+  test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected_ =
+      storage
+          .test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected;
+  test_merge_grant_edge_exit_live_queue_generation_advance_injected_ =
+      storage
+          .test_merge_grant_edge_exit_live_queue_generation_advance_injected;
+  test_merge_grant_edge_exit_live_calendar_generation_advance_injected_ =
+      storage
+          .test_merge_grant_edge_exit_live_calendar_generation_advance_injected;
+  test_pibt_post_commit_failure_injected_ =
+      storage.test_pibt_post_commit_failure_injected;
+#endif
+  next_event_seq_ = storage.next_event_seq;
+  next_decision_id_ = storage.next_decision_id;
+  next_pibt_activation_id_ = storage.next_pibt_activation_id;
+  next_local_enqueue_sequence_ =
+      storage.next_local_enqueue_sequence;
+  next_merge_request_lineage_ =
+      storage.next_merge_request_lineage;
+  now_ = storage.now;
+  time_limit_ = storage.time_limit;
+  active_bag_count_ = storage.active_bag_count;
+  last_physical_repair_time_ =
+      storage.last_physical_repair_time;
+  active_backlog_at_last_repair_ =
+      storage.active_backlog_at_last_repair;
+  active_backlog_at_runtime_stop_ =
+      storage.active_backlog_at_runtime_stop;
+  waits_ = storage.waits;
+  decision_latencies_us_ = storage.decision_latencies_us;
+  runtime_phase_ = storage.phase;
+  runtime_started_ = std::chrono::steady_clock::now();
+  require_checkpoint_safe_boundary();
+  validate_merge_capability_bijection();
+  const auto restored_digests = compute_runtime_state_digests();
+  if (restored_digests.aggregate_sha256() !=
+          storage.state_sha256 ||
+      restored_digests.canonical_payload() !=
+          storage.state_digests.canonical_payload()) {
+    throw std::invalid_argument(
+        "runtime checkpoint restore changed deterministic state");
+  }
+  } catch (...) {
+    runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
+    staged_event_sink_ = nullptr;
+    staged_merge_visibility_sink_ = nullptr;
+    staged_destination_known_competitor_counts_ = nullptr;
+    throw;
+  }
+}
+
+inline void EventDrivenJunctionRuntime::
+validate_merge_capability_bijection() const {
+  std::size_t active_controller_grants = 0;
+  for (const auto& entry : destination_merge_controllers_) {
+    active_controller_grants +=
+        entry.second.active_unconsumed_count();
+    for (const auto& active : entry.second.active_) {
+      const auto bag = bags_.find(active.owner_runtime_bag_id);
+      if (bag == bags_.end() ||
+          g4irsf14_state_ == nullptr) {
+        throw std::invalid_argument(
+            "restored active merge grant lacks its bag capability");
+      }
+      const auto merge =
+          g4irsf14_state_->destination_merge_bags.find(
+              active.owner_runtime_bag_id);
+      if (merge ==
+              g4irsf14_state_->destination_merge_bags.end() ||
+          !merge->second.capability.has_value()) {
+        throw std::invalid_argument(
+            "restored active merge grant lacks its bag capability");
+      }
+      const auto& capability = *merge->second.capability;
+      const auto destination =
+          junctions_.find(active.edge.to_node);
+      if (bag->second.status != BagStatus::kInTransit ||
+          bag->second.transit_from != active.edge.from_node ||
+          bag->second.transit_to != active.edge.to_node ||
+          bag->second.transit_merge_grant !=
+              capability.expectation() ||
+          !entry.second.validates_active_capability(capability) ||
+          destination == junctions_.end() ||
+          !destination->second.service_calendar.contains_exact(
+              active.owner_runtime_bag_id,
+              active.slot_start,
+              active.slot_end)) {
+        throw std::invalid_argument(
+            "restored merge grant bag/capability/calendar mismatch");
+      }
+    }
+  }
+  std::size_t bag_capabilities = 0;
+  if (g4irsf14_state_ != nullptr) {
+    for (const auto& entry :
+         g4irsf14_state_->destination_merge_bags) {
+      if (!entry.second.capability.has_value()) {
+        continue;
+      }
+      ++bag_capabilities;
+      const auto& capability = *entry.second.capability;
+      if (capability.owner_runtime_bag_id() != entry.first) {
+        throw std::invalid_argument(
+            "restored merge capability owner/bag mismatch");
+      }
+      const auto controller =
+          destination_merge_controllers_.find(
+              capability.destination_node());
+      if (controller == destination_merge_controllers_.end() ||
+          !controller->second.validates_active_capability(
+              capability)) {
+        throw std::invalid_argument(
+            "restored merge capability lacks its active controller record");
+      }
+    }
+  }
+  if (bag_capabilities != active_controller_grants) {
+    throw std::invalid_argument(
+        "restored merge controller/capability bijection failed");
+  }
+  std::size_t bag_expectations = 0;
+  for (const auto& entry : bags_) {
+    const auto& bag = entry.second;
+    if (!bag.transit_merge_grant.required) {
+      continue;
+    }
+    ++bag_expectations;
+    if (bag.status != BagStatus::kInTransit ||
+        bag.transit_merge_grant.owner_runtime_bag_id !=
+            entry.first ||
+        bag.transit_from !=
+            bag.transit_merge_grant.edge.from_node ||
+        bag.transit_to !=
+            bag.transit_merge_grant.edge.to_node ||
+        g4irsf14_state_ == nullptr) {
+      throw std::invalid_argument(
+          "restored merge expectation is not an exact in-transit bag");
+    }
+    const auto merge =
+        g4irsf14_state_->destination_merge_bags.find(
+            entry.first);
+    if (merge ==
+            g4irsf14_state_->destination_merge_bags.end() ||
+        !merge->second.capability.has_value() ||
+        merge->second.capability->expectation() !=
+            bag.transit_merge_grant) {
+      throw std::invalid_argument(
+          "restored merge expectation lacks its exact capability");
+    }
+    const auto controller =
+        destination_merge_controllers_.find(
+            bag.transit_merge_grant.destination_node);
+    const auto destination =
+        junctions_.find(
+            bag.transit_merge_grant.destination_node);
+    if (controller ==
+            destination_merge_controllers_.end() ||
+        !controller->second.validates_active_capability(
+            *merge->second.capability) ||
+        destination == junctions_.end() ||
+        !destination->second.service_calendar.contains_exact(
+            entry.first,
+            bag.transit_merge_grant.slot_start,
+            bag.transit_merge_grant.slot_end)) {
+      throw std::invalid_argument(
+          "restored merge expectation lacks controller/calendar authority");
+    }
+  }
+  if (bag_expectations != bag_capabilities) {
+    throw std::invalid_argument(
+        "restored merge bag expectation/capability bijection failed");
+  }
+}
+
+inline void EventDrivenJunctionRuntime::
+fingerprint_deterministic_summary(
+    StateFingerprintWriter& writer,
+    const EventRuntimeSummary& summary) {
+  writer.string(summary.resource_semantics_id);
+  writer.string(summary.resource_semantics_echo);
+  writer.string(summary.pressure_mode);
+  writer.string(summary.pressure_mode_echo);
+  writer.string(summary.admission_mode);
+  writer.string(summary.admission_mode_echo);
+  writer.string(summary.framework_mode);
+  writer.string(summary.framework_mode_echo);
+  writer.string(summary.pibt_mode);
+  writer.string(summary.pibt_mode_echo);
+  writer.string(summary.priority_mode);
+  writer.string(summary.priority_mode_echo);
+  writer.string(summary.pibt_preference_mode);
+  writer.string(summary.pibt_preference_mode_echo);
+  writer.string(summary.credit_mode);
+  writer.string(summary.priority_claim_boundary);
+  writer.string(summary.scorer_mode);
+  writer.string(summary.scorer_mode_echo);
+  writer.string(summary.scorer_id);
+  writer.string(summary.scorer_model_sha256);
+  writer.string(summary.scorer_score_direction);
+  writer.string(summary.scorer_claim_boundary);
+  writer.boolean(summary.scorer_out_of_distribution_diagnostic);
+  writer.boolean(summary.scorer_promotion_eligible);
+  writer.boolean(summary.scorer_absolute_node_ids_enabled);
+  writer.boolean(summary.scorer_static_precompute_only);
+  writer.i64(summary.scorer_feature_dim);
+  writer.i64(summary.scorer_explicit_default_feature_count);
+  writer.u64(summary.scorer_decision_evaluation_count);
+  writer.u64(summary.scorer_candidate_evaluation_count);
+  writer.u64(summary.scorer_risk_abstain_count);
+  writer.i64(summary.scorer_teacher_input_count);
+  writer.i64(summary.scorer_future_route_input_count);
+  writer.i64(summary.scorer_future_schedule_input_count);
+  writer.i64(summary.scorer_posthoc_input_count);
+  writer.i64(summary.scorer_runtime_global_scan_count);
+  writer.i64(summary.pibt_max_depth);
+  writer.boolean(summary.pibt_mode_diagnostic_only);
+  writer.boolean(summary.framework_diagnostic_only);
+  writer.string(summary.bounded_local_pibt_claim_boundary);
+  writer.string(summary.first_edge_credit_claim_boundary);
+  writer.floating(summary.entry_headway_seconds);
+  writer.floating(summary.pressure_weight);
+  writer.floating(summary.pressure_age_weight);
+  writer.floating(summary.pressure_distance_bias);
+  writer.floating(summary.credit_validity_seconds);
+  writer.floating(summary.credit_snapshot_max_age_seconds);
+  writer.i64(summary.credit_capacity_per_edge);
+  writer.i64(summary.credit_lifecycle_limit);
+  writer.i64(summary.selective_credit_contention_threshold);
+  writer.i64(summary.pibt_regret_prior_record_count);
+  writer.i64(summary.declared_max_events);
+  writer.floating(summary.declared_max_simulation_time);
+  writer.i64(summary.local_queue_capacity);
+  writer.i64(summary.pibt_max_ready_bags);
+  writer.i64(summary.pibt_max_local_resources);
+  writer.i64(summary.pibt_max_candidates_per_bag);
+  writer.i64(summary.requested_count);
+  writer.i64(summary.completed_count);
+  writer.i64(summary.failed_count);
+  writer.i64(summary.peak_active_bag_count);
+  writer.i64(summary.final_active_bag_count);
+  writer.i64(summary.decision_count);
+  writer.i64(summary.event_count);
+  writer.i64(summary.bag_release_event_count);
+  writer.i64(summary.arrive_junction_event_count);
+  writer.i64(summary.junction_service_complete_event_count);
+  writer.i64(summary.edge_enter_event_count);
+  writer.i64(summary.edge_exit_event_count);
+  writer.i64(summary.fault_event_count);
+  writer.i64(summary.repair_event_count);
+  writer.i64(summary.local_queue_update_event_count);
+  writer.i64(summary.congestion_beacon_update_event_count);
+  writer.u64(summary.source_admission_attempt_count);
+  writer.u64(summary.source_admission_admitted_count);
+  writer.u64(summary.source_admission_local_resource_hold_count);
+  writer.u64(summary.source_admission_downstream_pressure_hold_count);
+  writer.u64(summary.source_admission_beacon_read_count);
+  writer.i64(summary.source_admission_max_observed_downstream_pressure);
+  writer.u64(summary.first_edge_credit_issue_attempt_count);
+  writer.u64(summary.first_edge_credit_issued_count);
+  writer.u64(summary.first_edge_credit_validation_attempt_count);
+  writer.u64(summary.first_edge_credit_validation_success_count);
+  writer.u64(summary.first_edge_credit_bind_attempt_count);
+  writer.u64(summary.first_edge_credit_bound_count);
+  writer.u64(summary.first_edge_credit_consume_attempt_count);
+  writer.u64(summary.first_edge_credit_consumed_count);
+  writer.u64(summary.first_edge_credit_expired_count);
+  writer.u64(summary.first_edge_credit_fault_revocation_count);
+  writer.u64(summary.first_edge_credit_generation_revocation_count);
+  writer.u64(summary.first_edge_credit_invalid_revocation_count);
+  writer.u64(summary.first_edge_credit_duplicate_rejection_count);
+  writer.u64(summary.first_edge_credit_capacity_rejection_count);
+  writer.u64(summary.first_edge_credit_stale_snapshot_rejection_count);
+  writer.u64(summary.first_edge_credit_physical_fault_rejection_count);
+  writer.u64(summary.first_edge_credit_too_early_rejection_count);
+  writer.u64(summary.first_edge_credit_unknown_rejection_count);
+  writer.u64(summary.first_edge_credit_invalid_request_rejection_count);
+  writer.u64(summary.first_edge_credit_lifecycle_dropped_count);
+  writer.u64(summary.first_edge_credit_local_hold_count);
+  writer.u64(summary.first_edge_credit_reissue_count);
+  writer.u64(summary.selective_credit_trigger_count);
+  writer.u64(summary.selective_credit_low_load_bypass_count);
+  writer.u64(summary.selective_credit_merge_trigger_count);
+  writer.u64(summary.selective_credit_contention_trigger_count);
+  writer.i64(summary.first_edge_credit_active_count);
+  writer.i64(summary.first_edge_credit_peak_active_count);
+  writer.i64(summary.first_edge_credit_stored_active_count);
+  writer.i64(summary.first_edge_credit_stored_lifecycle_count);
+  writer.i64(summary.first_edge_credit_lifecycle_limit);
+  writer.i64(summary.first_edge_credit_future_route_count);
+  writer.i64(summary.first_edge_credit_global_scan_count);
+  writer.boolean(summary.first_edge_credit_physical_interlock_bypass);
+  writer.i64(summary.fault_notification_drop_count);
+  writer.i64(summary.physical_fault_window_traversal_count);
+  writer.i64(summary.physical_fault_edge_entry_violation_count);
+  writer.i64(summary.fault_affected_bag_count);
+  writer.i64(summary.fault_target_edge_candidate_exposure_count);
+  writer.i64(summary.fault_target_edge_attempt_count);
+  writer.i64(summary.physical_fault_interlock_rejection_count);
+  writer.i64(summary.physical_fault_interlock_hold_count);
+  writer.i64(summary.physical_fault_interlock_reroute_count);
+  writer.i64(summary.local_fault_policy_action_count);
+  writer.i64(summary.local_fault_policy_hold_count);
+  writer.i64(summary.local_fault_policy_reroute_count);
+  writer.i64(summary.fault_affected_completed_count);
+  writer.floating(summary.fault_recovery_seconds);
+  writer.floating(summary.repair_backlog_slope);
+  writer.boolean(summary.fault_recovery_seconds_available);
+  writer.boolean(summary.repair_backlog_slope_available);
+  writer.string(summary.fault_recovery_metric_semantics);
+  writer.string(summary.repair_backlog_slope_semantics);
+  writer.i64(summary.reservation_conflicts);
+  writer.i64(summary.shield_rejection_count);
+  writer.i64(summary.stale_fault_shield_rejection_count);
+  writer.i64(summary.pibt_lite_handoff_count);
+  writer.i64(summary.same_bag_alternative_edge_scan_handoff_count);
+  writer.u64(summary.bounded_local_pibt_activation_count);
+  writer.u64(summary.bounded_local_pibt_attempt_count);
+  writer.u64(summary.bounded_local_pibt_prepare_count);
+  writer.u64(summary.bounded_local_pibt_validate_count);
+  writer.u64(summary.bounded_local_pibt_commit_count);
+  writer.u64(summary.bounded_local_pibt_wait_for_cycle_count);
+  writer.u64(summary.bounded_local_pibt_handoff_count);
+  writer.u64(summary.bounded_local_pibt_candidate_bound_rejection_count);
+  writer.u64(summary.bounded_local_pibt_candidate_materialization_count);
+  writer.u64(summary.bounded_local_pibt_not_applicable_count);
+  writer.u64(summary.bounded_local_pibt_same_bag_fallback_count);
+  writer.u64(summary.bounded_local_pibt_proposal_batch_count);
+  writer.u64(summary.bounded_local_pibt_proposed_action_count);
+  writer.u64(summary.bounded_local_pibt_committed_batch_count);
+  writer.u64(summary.bounded_local_pibt_committed_action_count);
+  writer.u64(summary.bounded_local_pibt_inherited_action_count);
+  writer.u64(summary.bounded_local_pibt_blocker_move_attempt_count);
+  writer.u64(summary.bounded_local_pibt_backtrack_count);
+  writer.u64(summary.bounded_local_pibt_cycle_guard_count);
+  writer.u64(summary.bounded_local_pibt_rollback_count);
+  writer.u64(summary.bounded_local_pibt_fault_rejection_count);
+  writer.u64(summary.bounded_local_pibt_prepare_rejection_count);
+  writer.u64(summary.bounded_local_pibt_commit_rejection_count);
+  writer.u64(summary.bounded_local_pibt_post_commit_failure_injection_count);
+  writer.u64(summary.bounded_local_pibt_rollback_fingerprint_match_count);
+  writer.u64(
+      summary.bounded_local_pibt_rollback_calendar_generation_match_count);
+  writer.i64(summary.bounded_local_pibt_max_inheritance_depth);
+  writer.i64(summary.bounded_local_pibt_max_slice_bags);
+  writer.i64(summary.bounded_local_pibt_max_slice_resources);
+  writer.i64(summary.bounded_local_pibt_max_candidates_per_bag);
+  writer.i64(summary.bounded_local_pibt_max_transaction_credit_entries);
+  writer.i64(summary.bounded_local_pibt_max_transaction_bag_entries);
+  writer.i64(
+      summary.bounded_local_pibt_max_transaction_junction_scalar_entries);
+  writer.i64(summary.bounded_local_pibt_max_transaction_action_deltas);
+  writer.i64(
+      summary.bounded_local_pibt_max_transaction_calendar_generation_entries);
+  writer.boolean(summary.bounded_local_pibt_classical_completeness_claimed);
+  writer.i64(summary.deadlock_count);
+  writer.i64(summary.resolved_deadlock_count);
+  writer.i64(summary.unresolved_deadlock_count);
+  writer.i64(summary.deadlock_escape_activation_count);
+  writer.i64(summary.starvation_count);
+  writer.i64(summary.loop_count);
+  writer.i64(summary.runtime_full_astar_calls);
+  writer.i64(summary.global_reservation_scan_count);
+  writer.i64(summary.max_edges_selected_per_arrive);
+  writer.i64(summary.max_edges_selected_per_bag_per_decision);
+  writer.i64(summary.max_actions_committed_per_pibt_batch);
+  writer.i64(summary.release_selected_edge_count);
+  writer.i64(summary.max_history_observed);
+  writer.i64(summary.max_junction_queue_length);
+  writer.i64(summary.max_source_queue_length);
+  writer.i64(summary.max_local_calendar_intervals);
+  writer.i64(summary.max_corridor_calendar_intervals);
+  writer.i64(summary.max_same_directed_edge_inflight);
+  writer.i64(summary.max_candidate_count);
+  writer.i64(summary.two_step_reservation_count);
+  writer.i64(summary.diagnostic_hops);
+  writer.i64(summary.decision_trace_seen_count);
+  writer.i64(summary.decision_trace_shard_seen_count);
+  writer.i64(summary.decision_trace_stored_count);
+  writer.i64(summary.hold_trace_stored_count);
+  writer.i64(summary.trace_limit);
+  writer.i64(summary.event_trace_limit);
+  writer.boolean(summary.event_trace_limit_inherited);
+  writer.i64(summary.trace_shard_count);
+  writer.i64(summary.trace_shard_index);
+  writer.floating(summary.max_individual_wait);
+  writer.floating(summary.max_source_queue_delay);
+  writer.floating(summary.fairness_jain);
+  writer.floating(summary.max_deadlock_duration);
+  writer.floating(summary.end_time);
+  writer.boolean(summary.event_limit_reached);
+  writer.boolean(summary.time_limit_reached);
+  writer.boolean(summary.sensor_loss_mode_used);
+  writer.boolean(summary.source_admission_enabled);
+  writer.boolean(summary.fault_policy_enabled);
+  writer.boolean(summary.legacy_pibt_lite_enabled);
+  writer.boolean(summary.decision_trace_truncated);
+  writer.boolean(summary.event_trace_truncated);
+  writer.u64(summary.repaired_task_reentry_count);
+  writer.u64(summary.repaired_task_reentry_boost_cleared_count);
+  writer.i64(summary.priority_teacher_input_count);
+  writer.i64(summary.priority_future_route_input_count);
+  writer.i64(summary.priority_global_scan_count);
+  writer.u64(summary.pibt_preference_candidate_count);
+  writer.u64(summary.pibt_preference_unique_exit_penalty_count);
+  writer.u64(summary.pibt_preference_wait_cycle_penalty_count);
+  writer.u64(summary.pibt_preference_backtrack_penalty_count);
+  writer.u64(summary.pibt_preference_regret_prior_hit_count);
+  writer.string(summary.event_semantics);
+  writer.string(summary.event_semantics_echo);
+  writer.boolean(summary.opportunity_telemetry_enabled);
+  writer.u64(summary.source_arbitration_event_count);
+  writer.u64(summary.junction_arbitration_event_count);
+  writer.u64(summary.stale_arbitration_event_count);
+  writer.u64(summary.superseded_arbitration_event_rejected_count);
+  writer.u64(summary.duplicate_same_time_arbitration_prevented_count);
+  writer.u64(summary.source_same_timestamp_batch_count);
+  writer.u64(summary.junction_same_timestamp_batch_count);
+  writer.i64(summary.max_source_arbitration_batch_size);
+  writer.i64(summary.max_junction_arbitration_batch_size);
+  writer.u64(summary.opportunity_event_queue_inspection_count);
+  writer.u64(summary.source_opportunity_total_count);
+  writer.u64(summary.source_opportunity_stored_count);
+  writer.u64(summary.source_opportunity_dropped_count);
+  writer.u64(summary.junction_opportunity_total_count);
+  writer.u64(summary.junction_opportunity_stored_count);
+  writer.u64(summary.junction_opportunity_dropped_count);
+  writer.u64(summary.merge_visibility_total_count);
+  writer.u64(summary.merge_visibility_stored_count);
+  writer.u64(summary.merge_visibility_dropped_count);
+  writer.u64(summary.event_seq_audit_total_count);
+  writer.u64(summary.event_seq_audit_stored_count);
+  writer.u64(summary.event_seq_audit_dropped_count);
+  writer.u64(summary.arbitration_batch_total_count);
+  writer.u64(summary.arbitration_batch_stored_count);
+  writer.u64(summary.arbitration_batch_dropped_count);
+  writer.u64(summary.fault_generation_commit_recheck_count);
+  writer.i64(summary.microphase_runtime_global_scan_count);
+  writer.floating(summary.artificial_batch_delay_seconds);
+  writer.u64(summary.destination_merge_arbitration_event_count);
+  writer.u64(summary.merge_grant_request_count);
+  writer.u64(summary.merge_grant_issued_count);
+  writer.u64(summary.merge_grant_prepared_count);
+  writer.u64(summary.merge_grant_committed_count);
+  writer.u64(summary.merge_grant_issued_transition_count);
+  writer.u64(summary.merge_grant_prepared_transition_count);
+  writer.u64(summary.merge_grant_committed_transition_count);
+  writer.u64(summary.merge_grant_consumed_count);
+  writer.u64(summary.merge_grant_expired_count);
+  writer.u64(summary.merge_grant_request_expired_count);
+  writer.u64(summary.merge_grant_grant_expired_count);
+  writer.u64(summary.merge_grant_revoked_count);
+  writer.u64(summary.merge_grant_revoked_fault_count);
+  writer.u64(summary.merge_grant_revoked_stale_state_count);
+  writer.u64(summary.merge_grant_revoked_replan_current_edge_count);
+  writer.u64(summary.merge_grant_rolled_back_count);
+  writer.u64(summary.merge_grant_post_commit_revoked_count);
+  writer.u64(summary.merge_grant_post_commit_expired_count);
+  writer.u64(summary.merge_grant_post_commit_rollback_count);
+  writer.u64(summary.merge_grant_exact_slot_busy_count);
+  writer.u64(summary.merge_grant_active_grant_rejection_count);
+  writer.u64(summary.merge_grant_queue_capacity_block_count);
+  writer.u64(summary.merge_grant_contended_loser_retry_count);
+  writer.u64(summary.merge_grant_lifecycle_transition_count);
+  writer.u64(summary.merge_grant_lifecycle_stored_count);
+  writer.u64(summary.merge_grant_lifecycle_dropped_count);
+  writer.u64(summary.merge_grant_terminal_request_count);
+  writer.u64(summary.merge_grant_outstanding_request_count);
+  writer.u64(summary.merge_grant_goal_exempt_bypass_count);
+  writer.u64(summary.merge_grant_stale_arbitration_count);
+  writer.u64(summary.merge_grant_duplicate_wakeup_prevented_count);
+  writer.i64(summary.merge_grant_peak_pending_requests);
+  writer.i64(summary.merge_grant_peak_active_unconsumed);
+  writer.i64(summary.merge_grant_final_active_unconsumed);
+  writer.boolean(summary.merge_grant_conservation_holds);
+  writer.boolean(summary.merge_grant_active_bijection_holds);
+  writer.boolean(summary.merge_grant_runtime_owned_capability);
+  writer.boolean(summary.merge_grant_exact_slot_no_future_shift);
+}
+
+inline G4IRSF14CloneReplayHashes
+EventDrivenJunctionRuntime::compute_replay_hashes_projection() const {
+  StateFingerprintWriter complete("complete_bags");
+  std::vector<const EventRuntimeBagResult*> ordered_bags;
+  ordered_bags.reserve(result_.bags.size());
+  for (const auto& bag : result_.bags) {
+    ordered_bags.push_back(&bag);
+  }
+  std::sort(
+      ordered_bags.begin(), ordered_bags.end(),
+      [](const auto* left, const auto* right) {
+        return std::tie(left->runtime_bag_id, left->segment_id) <
+               std::tie(right->runtime_bag_id, right->segment_id);
+      });
+  complete.u64(ordered_bags.size());
+  for (const auto* bag : ordered_bags) {
+    complete.string(bag->segment_id);
+    complete.i64(bag->task_id);
+    complete.i64(bag->runtime_bag_id);
+    complete.i64(bag->start);
+    complete.i64(bag->goal);
+    complete.i64(bag->final_node);
+    complete.floating(bag->release_time);
+    complete.floating(bag->arrival_time);
+    complete.floating(bag->deadline);
+    complete.string(bag->source);
+    complete.floating(bag->admitted_time);
+    complete.floating(bag->finish_time);
+    complete.floating(bag->source_queue_delay);
+    complete.floating(bag->total_local_wait);
+    complete.floating(bag->junction_queue_wait_seconds);
+    complete.floating(bag->merge_grant_wait_seconds);
+    complete.floating(bag->edge_travel_time_seconds);
+    complete.floating(bag->node_service_time_seconds);
+    complete.floating(bag->loop_extra_time_seconds);
+    complete.floating(bag->goal_completion_time_seconds);
+    complete.i64(bag->decision_count);
+    complete.i64(bag->retry_count);
+    complete.i64(bag->loop_count);
+    complete.boolean(bag->completed);
+    complete.boolean(bag->starved);
+    complete.string(bag->failure_reason);
+    complete.u64(bag->short_history.size());
+    for (const int node : bag->short_history) {
+      complete.i64(node);
+    }
+  }
+
+  StateFingerprintWriter segments("segment_result");
+  std::vector<const EventRuntimeBagResult*> ordered_segments =
+      ordered_bags;
+  std::sort(
+      ordered_segments.begin(), ordered_segments.end(),
+      [](const auto* left, const auto* right) {
+        return std::tie(left->segment_id, left->runtime_bag_id) <
+               std::tie(right->segment_id, right->runtime_bag_id);
+      });
+  segments.u64(ordered_segments.size());
+  for (const auto* bag : ordered_segments) {
+    segments.string(bag->segment_id);
+    segments.i64(bag->task_id);
+    segments.i64(bag->runtime_bag_id);
+    segments.boolean(bag->completed);
+    segments.boolean(bag->starved);
+    segments.i64(bag->final_node);
+    segments.floating(bag->finish_time);
+    segments.floating(bag->goal_completion_time_seconds);
+    segments.floating(bag->source_queue_delay);
+    segments.floating(bag->total_local_wait);
+    segments.floating(bag->junction_queue_wait_seconds);
+    segments.floating(bag->merge_grant_wait_seconds);
+    segments.i64(bag->decision_count);
+    segments.i64(bag->retry_count);
+    segments.i64(bag->loop_count);
+    segments.string(bag->failure_reason);
+  }
+
+  StateFingerprintWriter junctions("junction_state");
+  std::vector<const EventRuntimeJunctionResult*> ordered_junctions;
+  ordered_junctions.reserve(result_.junctions.size());
+  for (const auto& junction : result_.junctions) {
+    ordered_junctions.push_back(&junction);
+  }
+  std::sort(
+      ordered_junctions.begin(), ordered_junctions.end(),
+      [](const auto* left, const auto* right) {
+        return left->node < right->node;
+      });
+  junctions.u64(ordered_junctions.size());
+  for (const auto* junction : ordered_junctions) {
+    junctions.i64(junction->node);
+    junctions.i64(junction->final_source_queue_length);
+    junctions.i64(junction->peak_source_queue_length);
+    junctions.i64(junction->final_junction_queue_length);
+    junctions.i64(junction->peak_junction_queue_length);
+    junctions.i64(
+        junction->final_service_calendar_intervals);
+    junctions.i64(
+        junction->peak_service_calendar_intervals);
+    // final/peak accounted bytes are allocator/layout diagnostics and are
+    // intentionally absent from the deterministic projection.
+    junctions.u64(junction->service_reservation_count);
+    junctions.floating(
+        junction->cumulative_service_reserved_seconds);
+    junctions.floating(
+        junction->first_service_reservation_start_time);
+    junctions.floating(
+        junction->last_service_reservation_end_time);
+    junctions.i64(junction->scheduled_incoming);
+    junctions.floating(junction->next_dispatch_time);
+  }
+
+  const auto& summary = result_.summary;
+  StateFingerprintWriter algorithm("algorithm_summary");
+  fingerprint_deterministic_summary(algorithm, summary);
+  // The following compact legacy projection is retained as an append-only
+  // v2 compatibility suffix; the exhaustive projection above is normative.
+  algorithm.string(summary.resource_semantics_id);
+  algorithm.string(summary.pressure_mode);
+  algorithm.string(summary.admission_mode);
+  algorithm.string(summary.framework_mode);
+  algorithm.string(summary.pibt_mode);
+  algorithm.string(summary.priority_mode);
+  algorithm.string(summary.pibt_preference_mode);
+  algorithm.string(summary.credit_mode);
+  algorithm.string(summary.scorer_mode);
+  algorithm.string(summary.scorer_id);
+  algorithm.string(summary.scorer_model_sha256);
+  algorithm.string(summary.event_semantics);
+  algorithm.i64(summary.requested_count);
+  algorithm.i64(summary.completed_count);
+  algorithm.i64(summary.failed_count);
+  algorithm.i64(summary.peak_active_bag_count);
+  algorithm.i64(summary.final_active_bag_count);
+  algorithm.i64(summary.decision_count);
+  algorithm.i64(summary.event_count);
+  algorithm.i64(summary.bag_release_event_count);
+  algorithm.i64(summary.arrive_junction_event_count);
+  algorithm.i64(summary.junction_service_complete_event_count);
+  algorithm.i64(summary.edge_enter_event_count);
+  algorithm.i64(summary.edge_exit_event_count);
+  algorithm.i64(summary.fault_event_count);
+  algorithm.i64(summary.repair_event_count);
+  algorithm.i64(summary.local_queue_update_event_count);
+  algorithm.i64(summary.congestion_beacon_update_event_count);
+  algorithm.u64(summary.source_arbitration_event_count);
+  algorithm.u64(summary.junction_arbitration_event_count);
+  algorithm.u64(summary.destination_merge_arbitration_event_count);
+  algorithm.i64(summary.reservation_conflicts);
+  algorithm.i64(summary.physical_fault_edge_entry_violation_count);
+  algorithm.i64(summary.runtime_full_astar_calls);
+  algorithm.i64(summary.global_reservation_scan_count);
+  algorithm.i64(summary.priority_future_route_input_count);
+  algorithm.i64(summary.priority_global_scan_count);
+  algorithm.i64(summary.scorer_future_route_input_count);
+  algorithm.i64(summary.scorer_future_schedule_input_count);
+  algorithm.i64(summary.scorer_runtime_global_scan_count);
+  algorithm.i64(summary.microphase_runtime_global_scan_count);
+  algorithm.i64(summary.deadlock_count);
+  algorithm.i64(summary.resolved_deadlock_count);
+  algorithm.i64(summary.unresolved_deadlock_count);
+  algorithm.i64(summary.starvation_count);
+  algorithm.i64(summary.loop_count);
+  algorithm.i64(summary.max_edges_selected_per_arrive);
+  algorithm.i64(
+      summary.max_edges_selected_per_bag_per_decision);
+  algorithm.i64(summary.max_actions_committed_per_pibt_batch);
+  algorithm.u64(summary.bounded_local_pibt_activation_count);
+  algorithm.u64(summary.bounded_local_pibt_attempt_count);
+  algorithm.u64(summary.bounded_local_pibt_commit_count);
+  algorithm.u64(summary.bounded_local_pibt_rollback_count);
+  algorithm.u64(summary.first_edge_credit_issued_count);
+  algorithm.u64(summary.first_edge_credit_consumed_count);
+  algorithm.u64(summary.first_edge_credit_expired_count);
+  algorithm.u64(summary.first_edge_credit_fault_revocation_count);
+  algorithm.u64(
+      summary.first_edge_credit_generation_revocation_count);
+  algorithm.u64(summary.merge_grant_request_count);
+  algorithm.u64(summary.merge_grant_issued_count);
+  algorithm.u64(summary.merge_grant_prepared_count);
+  algorithm.u64(summary.merge_grant_committed_count);
+  algorithm.u64(summary.merge_grant_consumed_count);
+  algorithm.u64(summary.merge_grant_expired_count);
+  algorithm.u64(summary.merge_grant_revoked_count);
+  algorithm.u64(summary.merge_grant_rolled_back_count);
+  algorithm.u64(summary.merge_grant_outstanding_request_count);
+  algorithm.boolean(summary.merge_grant_conservation_holds);
+  algorithm.boolean(summary.merge_grant_active_bijection_holds);
+  algorithm.i64(summary.max_junction_queue_length);
+  algorithm.i64(summary.max_source_queue_length);
+  algorithm.i64(summary.max_local_calendar_intervals);
+  algorithm.i64(summary.max_corridor_calendar_intervals);
+  algorithm.i64(summary.max_same_directed_edge_inflight);
+  algorithm.floating(summary.max_individual_wait);
+  algorithm.floating(summary.max_source_queue_delay);
+  algorithm.floating(summary.fairness_jain);
+  algorithm.floating(summary.max_deadlock_duration);
+  algorithm.floating(summary.end_time);
+  algorithm.boolean(summary.event_limit_reached);
+  algorithm.boolean(summary.time_limit_reached);
+  algorithm.boolean(summary.decision_trace_truncated);
+  algorithm.boolean(summary.event_trace_truncated);
+
+  StateFingerprintWriter deterministic("deterministic_result");
+  deterministic.string(complete.sha256());
+  deterministic.string(segments.sha256());
+  deterministic.string(junctions.sha256());
+  deterministic.string(algorithm.sha256());
+  deterministic.u64(result_.events.size());
+  for (const auto& event : result_.events) {
+    deterministic.u64(event.seq);
+    deterministic.string(event.event);
+    deterministic.floating(event.time);
+    deterministic.i64(event.task_id);
+    deterministic.i64(event.runtime_bag_id);
+    deterministic.string(event.segment_id);
+    deterministic.i64(event.node);
+    deterministic.i64(event.from_node);
+    deterministic.i64(event.to_node);
+    deterministic.string(event.reason);
+    deterministic.i64(event.selected_edge_count);
+  }
+  const auto fingerprint_decisions =
+      [&](const std::vector<EventDecisionTraceRow>& rows) {
+        deterministic.u64(rows.size());
+        for (const auto& row : rows) {
+          deterministic.u64(row.decision_id);
+          deterministic.u64(row.arrive_event_seq);
+          deterministic.floating(row.event_time);
+          deterministic.i64(row.task_id);
+          deterministic.i64(row.runtime_bag_id);
+          deterministic.string(row.segment_id);
+          deterministic.i64(row.current_node);
+          deterministic.i64(row.goal_node);
+          deterministic.i64(row.model_prediction);
+          deterministic.floating(row.model_margin);
+          deterministic.boolean(row.risk_gate_triggered);
+          deterministic.boolean(row.scorer_risk_abstain);
+          deterministic.u64(row.scorer_risk_reasons.size());
+          for (const auto& reason : row.scorer_risk_reasons) {
+            deterministic.string(reason);
+          }
+          deterministic.string(row.scorer_id);
+          deterministic.string(row.scorer_effective_id);
+          deterministic.i64(row.scorer_raw_prediction);
+          deterministic.floating(row.scorer_raw_margin);
+          deterministic.i64(row.fallback_selected_next);
+          deterministic.i64(row.selected_next);
+          deterministic.string(row.decision_source);
+          deterministic.string(row.rule_reason);
+          deterministic.i64(row.junction_queue_length);
+          deterministic.floating(
+              row.junction_next_dispatch_time);
+          deterministic.i64(
+              row.advertised_faulted_outgoing_count);
+          deterministic.floating(
+              row.max_fault_message_age_seconds);
+          deterministic.u64(row.short_history.size());
+          for (const int node : row.short_history) {
+            deterministic.i64(node);
+          }
+          deterministic.boolean(row.full_astar_used);
+          deterministic.string(row.priority_mode);
+          deterministic.string(row.task_class);
+          deterministic.floating(row.priority_slack_seconds);
+          deterministic.floating(row.priority_age_seconds);
+          deterministic.i64(row.priority_local_contention);
+          deterministic.u64(row.priority_fault_generation);
+          deterministic.u64(row.priority_enqueue_sequence);
+          deterministic.string(row.pibt_preference_mode);
+          deterministic.u64(row.candidates.size());
+          for (const auto& candidate : row.candidates) {
+            deterministic.i64(candidate.next_node);
+            deterministic.floating(candidate.static_potential);
+            deterministic.floating(candidate.travel_time);
+            deterministic.i64(candidate.target_queue_length);
+            deterministic.i64(
+                candidate.target_scheduled_incoming);
+            deterministic.floating(
+                candidate.corridor_next_available);
+            deterministic.floating(
+                candidate.target_next_available);
+            deterministic.boolean(candidate.advertised_fault);
+            deterministic.floating(
+                candidate.fault_message_age_seconds);
+            deterministic.i64(candidate.recent_visit_count);
+            deterministic.i64(candidate.two_hop_queue_pressure);
+            deterministic.i64(
+                candidate.current_goal_queue_length);
+            deterministic.i64(
+                candidate.target_goal_queue_length);
+            deterministic.i64(
+                candidate.target_goal_scheduled_incoming);
+            deterministic.floating(
+                candidate.current_goal_max_wait);
+            deterministic.floating(
+                candidate.goal_conditioned_differential);
+            deterministic.floating(
+                candidate.estimated_service_rate);
+            deterministic.floating(
+                candidate.service_weighted_pressure);
+            deterministic.boolean(
+                candidate.first_edge_credit_required);
+            deterministic.boolean(
+                candidate.first_edge_credit_matches);
+            deterministic.boolean(
+                candidate.first_edge_credit_valid);
+            deterministic.floating(
+                candidate.first_edge_credit_slack_seconds);
+            deterministic.floating(candidate.model_score);
+            deterministic.floating(
+                candidate.pre_fault_policy_score);
+            deterministic.floating(candidate.scorer_raw_score);
+            deterministic.floating(
+                candidate.scorer_raw_bottleneck);
+            deterministic.boolean(
+                candidate.scorer_raw_score_available);
+            deterministic.boolean(candidate.shield_allowed);
+            deterministic.string(candidate.shield_reason);
+          }
+        }
+      };
+  fingerprint_decisions(result_.decisions);
+  fingerprint_decisions(result_.hold_attempts);
+  deterministic.u64(result_.fault_events.size());
+  for (const auto& row : result_.fault_events) {
+    deterministic.u64(row.seq);
+    deterministic.string(row.event);
+    deterministic.string(row.phase);
+    deterministic.floating(row.time);
+    deterministic.i64(row.from_node);
+    deterministic.i64(row.to_node);
+    deterministic.i64(row.physical_active_count);
+    deterministic.i64(row.physical_generation);
+    deterministic.i64(row.inflight_traversal_count);
+    deterministic.boolean(row.notification_dropped);
+    deterministic.i64(row.task_id);
+    deterministic.i64(row.runtime_bag_id);
+    deterministic.string(row.segment_id);
+    deterministic.i64(row.current_node);
+    deterministic.i64(row.intended_next_node);
+    deterministic.i64(row.selected_next_node);
+    deterministic.boolean(row.fault_policy_enabled);
+  }
+  deterministic.u64(result_.credit_events.size());
+  for (const auto& row : result_.credit_events) {
+    deterministic.floating(row.time);
+    deterministic.string(row.action);
+    deterministic.string(row.reason);
+    deterministic.u64(row.credit_id);
+    deterministic.i64(row.from_node);
+    deterministic.i64(row.to_node);
+    deterministic.i64(row.goal);
+    deterministic.floating(row.earliest);
+    deterministic.floating(row.latest);
+    deterministic.u64(row.generation);
+    deterministic.floating(row.expiry);
+    deterministic.i64(row.capacity);
+    deterministic.i64(row.owner_or_unbound);
+    deterministic.i64(row.fault_generation);
+    deterministic.string(row.state);
+    deterministic.i64(row.task_id);
+    deterministic.string(row.segment_id);
+  }
+  deterministic.u64(result_.pibt_events.size());
+  for (const auto& row : result_.pibt_events) {
+    deterministic.u64(row.activation_id);
+    deterministic.floating(row.time);
+    deterministic.i64(row.trigger_node);
+    deterministic.i64(row.trigger_runtime_bag_id);
+    deterministic.string(row.mode);
+    deterministic.string(row.outcome);
+    deterministic.string(row.blocker);
+    deterministic.i64(row.local_slice_bag_count);
+    deterministic.i64(row.local_slice_resource_count);
+    deterministic.i64(row.local_slice_candidate_count);
+    deterministic.i64(row.proposed_action_count);
+    deterministic.i64(row.committed_action_count);
+    deterministic.i64(row.inherited_action_count);
+    deterministic.i64(row.max_inheritance_depth);
+    deterministic.i64(row.backtrack_count);
+    deterministic.i64(row.cycle_guard_count);
+    deterministic.i64(row.rollback_count);
+    deterministic.i64(row.transaction_credit_entry_count);
+    deterministic.i64(row.transaction_bag_entry_count);
+    deterministic.i64(
+        row.transaction_junction_scalar_entry_count);
+    deterministic.i64(row.transaction_action_delta_count);
+    deterministic.u64(row.actions.size());
+    for (const auto& action : row.actions) {
+      deterministic.i64(action.bag_id);
+      deterministic.i64(action.from_node);
+      deterministic.i64(action.next_node);
+      deterministic.u64(action.edge_resource);
+      deterministic.u64(action.claimed_resources.size());
+      for (const auto resource : action.claimed_resources) {
+        deterministic.u64(resource);
+      }
+      deterministic.u64(action.expected_fault_generation);
+      deterministic.i64(action.priority_rank);
+      deterministic.i64(action.inheritance_depth);
+      deterministic.boolean(action.inherited);
+      deterministic.floating(action.local_score);
+    }
+  }
+  deterministic.u64(
+      result_.source_admission_opportunities.size());
+  for (const auto& row :
+       result_.source_admission_opportunities) {
+    deterministic.floating(row.event_time);
+    deterministic.u64(row.timestamp_bits);
+    deterministic.i64(row.source_node);
+    deterministic.i64(row.queue_length_before_enqueue);
+    deterministic.i64(row.queue_length_after_enqueue);
+    deterministic.i64(row.queue_length_before_arbitration);
+    deterministic.i64(row.queue_length_after_arbitration);
+    deterministic.i64(row.same_timestamp_release_batch_size);
+    deterministic.i64(
+        row.same_time_pending_source_releases);
+    deterministic.i64(
+        row.same_time_pending_shared_merge_releases);
+    deterministic.i64(row.ready_set_size);
+    deterministic.i64(row.priority_comparison_count);
+    deterministic.i64(row.chosen_task_id);
+    deterministic.i64(row.chosen_runtime_bag_id);
+    deterministic.string(row.chosen_segment_id);
+    deterministic.string(row.queue_discipline);
+    deterministic.u64(row.event_seq);
+    deterministic.u64(row.arbitration_generation);
+    deterministic.boolean(row.batched_arbitration);
+  }
+  deterministic.u64(
+      result_.junction_arbitration_opportunities.size());
+  for (const auto& row :
+       result_.junction_arbitration_opportunities) {
+    deterministic.floating(row.event_time);
+    deterministic.u64(row.timestamp_bits);
+    deterministic.i64(row.junction_node);
+    deterministic.i64(row.queue_length_before_enqueue);
+    deterministic.i64(row.queue_length_after_enqueue);
+    deterministic.i64(row.queue_length_before_arbitration);
+    deterministic.i64(row.queue_length_after_arbitration);
+    deterministic.i64(
+        row.same_timestamp_arrival_batch_size);
+    deterministic.i64(row.same_time_pending_arrivals);
+    deterministic.i64(
+        row.same_time_pending_shared_merge_requests);
+    deterministic.i64(row.ready_set_size);
+    deterministic.i64(row.priority_comparison_count);
+    deterministic.i64(row.pibt_slice_bag_count);
+    deterministic.i64(row.pibt_owner_count);
+    deterministic.i64(row.chosen_task_id);
+    deterministic.i64(row.chosen_runtime_bag_id);
+    deterministic.string(row.chosen_segment_id);
+    deterministic.u64(row.event_seq);
+    deterministic.u64(row.arbitration_generation);
+    deterministic.boolean(row.batched_arbitration);
+  }
+  deterministic.u64(result_.merge_request_visibility.size());
+  for (const auto& row : result_.merge_request_visibility) {
+    deterministic.floating(row.event_time);
+    deterministic.u64(row.timestamp_bits);
+    deterministic.i64(row.destination_node);
+    deterministic.i64(row.upstream_node);
+    deterministic.i64(row.incoming_edge_start);
+    deterministic.i64(row.incoming_edge_end);
+    deterministic.i64(row.requesting_task_id);
+    deterministic.i64(row.requesting_runtime_bag_id);
+    deterministic.string(row.requesting_segment_id);
+    deterministic.floating(row.earliest_arrival);
+    deterministic.floating(row.slot_start);
+    deterministic.floating(row.slot_end);
+    deterministic.i64(row.known_competing_request_count);
+    deterministic.i64(row.later_same_time_competitor_count);
+    deterministic.boolean(
+        row.later_same_time_competitor_exists);
+    deterministic.boolean(row.seq_determined_order);
+    deterministic.u64(row.event_seq);
+  }
+  deterministic.u64(result_.event_seq_ordering_audit.size());
+  for (const auto& row : result_.event_seq_ordering_audit) {
+    deterministic.floating(row.event_time);
+    deterministic.u64(row.timestamp_bits);
+    deterministic.string(row.boundary);
+    deterministic.i64(row.node);
+    deterministic.i64(row.destination_node);
+    deterministic.i64(row.ready_set_size);
+    deterministic.i64(row.priority_comparison_count);
+    deterministic.i64(row.later_same_time_competitor_count);
+    deterministic.i64(row.chosen_runtime_bag_id);
+    deterministic.u64(row.chosen_enqueue_sequence);
+    deterministic.u64(row.event_seq);
+    deterministic.boolean(row.seq_determined_order);
+    deterministic.string(row.reason);
+  }
+  deterministic.u64(
+      result_.arbitration_batch_cardinality.size());
+  for (const auto& row :
+       result_.arbitration_batch_cardinality) {
+    deterministic.floating(row.event_time);
+    deterministic.u64(row.timestamp_bits);
+    deterministic.string(row.boundary);
+    deterministic.i64(row.node);
+    deterministic.i64(row.enqueue_count);
+    deterministic.i64(row.ready_set_size);
+    deterministic.i64(row.pending_same_time_event_count);
+    deterministic.i64(row.chosen_runtime_bag_id);
+    deterministic.u64(row.event_seq);
+    deterministic.u64(row.arbitration_generation);
+  }
+  deterministic.u64(result_.merge_grant_lifecycle.size());
+  for (const auto& row : result_.merge_grant_lifecycle) {
+    deterministic.floating(row.time);
+    deterministic.u64(row.request_id);
+    deterministic.u64(row.grant_id);
+    deterministic.u64(row.lineage);
+    deterministic.u64(row.request_generation);
+    deterministic.u64(row.junction_queue_generation);
+    deterministic.i64(row.runtime_bag_id);
+    deterministic.i64(row.task_id);
+    deterministic.string(
+        row.segment_id == nullptr ? std::string_view{}
+                                  : std::string_view(*row.segment_id));
+    deterministic.i64(row.upstream_node);
+    deterministic.i64(row.destination_node);
+    deterministic.i64(row.edge.from_node);
+    deterministic.i64(row.edge.to_node);
+    deterministic.floating(row.request_time);
+    deterministic.floating(row.fifo_request_time);
+    deterministic.floating(row.earliest_edge_entry);
+    deterministic.floating(row.exact_edge_travel_seconds);
+    deterministic.floating(row.projected_arrival);
+    deterministic.i64(row.goal);
+    deterministic.floating(row.route_score);
+    deterministic.floating(row.static_remaining);
+    deterministic.floating(
+        row.destination_service_seconds);
+    deterministic.i64(row.downstream_queue_pressure);
+    deterministic.floating(row.deadline_slack);
+    deterministic.floating(row.wait_age);
+    deterministic.i64(row.task_class_code);
+    deterministic.i64(row.task_class);
+    deterministic.boolean(row.storage_leg);
+    deterministic.floating(row.source_release_age);
+    deterministic.floating(row.local_queue_age);
+    deterministic.u64(row.enqueue_sequence);
+    deterministic.floating(row.request_expiry);
+    deterministic.floating(row.slot_start);
+    deterministic.floating(row.slot_end);
+    deterministic.floating(row.issue_time);
+    deterministic.floating(row.grant_expiry);
+    deterministic.u64(row.calendar_generation);
+    deterministic.i64(row.fault_generation);
+    deterministic.i64(row.advertised_fault_generation);
+    deterministic.u64(
+        row.observed_claimed_request_generation);
+    deterministic.u64(
+        row.observed_claimed_junction_queue_generation);
+    deterministic.u64(
+        row.observed_claimed_calendar_generation);
+    deterministic.i64(
+        row.observed_claimed_owner_runtime_bag_id);
+    deterministic.i64(row.observed_claimed_edge.from_node);
+    deterministic.i64(row.observed_claimed_edge.to_node);
+    deterministic.i64(
+        row.observed_claimed_destination_node);
+    deterministic.i64(
+        row.observed_event_owner_runtime_bag_id);
+    deterministic.i64(row.observed_event_edge.from_node);
+    deterministic.i64(row.observed_event_edge.to_node);
+    deterministic.i64(row.observed_event_destination_node);
+    deterministic.u64(
+        row.observed_junction_queue_generation);
+    deterministic.u64(row.observed_calendar_generation);
+    deterministic.i64(
+        row.observed_physical_fault_generation);
+    deterministic.i64(
+        row.observed_advertised_fault_generation);
+    deterministic.boolean(row.observed_physical_fault_active);
+    deterministic.boolean(
+        row.observed_exact_calendar_reservation_present);
+    deterministic.i64(static_cast<int>(row.state));
+    deterministic.i64(static_cast<int>(row.reason));
+  }
+
+  return G4IRSF14CloneReplayHashes{
+      complete.sha256(),
+      segments.sha256(),
+      junctions.sha256(),
+      algorithm.sha256(),
+      deterministic.sha256()};
+}
+
+inline G4IRSF14CloneReplayHashes
+EventDrivenJunctionRuntime::deterministic_replay_hashes() const {
+  if (runtime_phase_ !=
+      EventDrivenJunctionRuntimePhase::kFinalized) {
+    throw std::logic_error(
+        "deterministic replay hashes require a finalized horizon");
+  }
+  return compute_replay_hashes_projection();
+}
+
+inline G4IRSF14RuntimeStateDigests
+EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
+  StateFingerprintWriter event_queue("event_queue");
+  auto ordered_events = events_;
+  event_queue.u64(ordered_events.size());
+  while (!ordered_events.empty()) {
+    fingerprint_event(event_queue, ordered_events.top());
+    ordered_events.pop();
+  }
+
+  StateFingerprintWriter current_time("current_time");
+  current_time.i64(static_cast<int>(runtime_phase_));
+  current_time.floating(now_);
+  current_time.floating(time_limit_);
+  current_time.i64(active_bag_count_);
+  current_time.floating(last_physical_repair_time_);
+  current_time.i64(active_backlog_at_last_repair_);
+  current_time.i64(active_backlog_at_runtime_stop_);
+
+  std::vector<int> bag_ids;
+  bag_ids.reserve(bags_.size());
+  for (const auto& entry : bags_) {
+    bag_ids.push_back(entry.first);
+  }
+  std::sort(bag_ids.begin(), bag_ids.end());
+  StateFingerprintWriter bags("bags");
+  bags.u64(bag_ids.size());
+  for (const int id : bag_ids) {
+    const auto& bag = bags_.at(id);
+    bags.i64(id);
+    fingerprint_request(bags, bag.request);
+    bags.i64(static_cast<int>(bag.status));
+    bags.boolean(bag.active_in_runtime);
+    bags.i64(bag.current);
+    bags.i64(bag.transit_from);
+    bags.i64(bag.transit_to);
+    const auto& expected = bag.transit_merge_grant;
+    bags.boolean(expected.required);
+    bags.u64(expected.grant_id);
+    bags.u64(expected.request_id);
+    bags.u64(expected.lineage);
+    bags.u64(expected.request_generation);
+    bags.u64(expected.junction_queue_generation);
+    bags.i64(expected.owner_runtime_bag_id);
+    bags.i64(expected.edge.from_node);
+    bags.i64(expected.edge.to_node);
+    bags.i64(expected.destination_node);
+    bags.floating(expected.slot_start);
+    bags.floating(expected.slot_end);
+    bags.floating(expected.expiry);
+    bags.u64(expected.calendar_generation);
+    bags.i64(expected.physical_fault_generation);
+    bags.i64(expected.advertised_fault_generation);
+    bags.floating(bag.admitted_time);
+    bags.floating(bag.finish_time);
+    bags.floating(bag.source_enqueued_at);
+    bags.floating(bag.junction_enqueued_at);
+    bags.floating(bag.total_wait);
+    bags.floating(bag.junction_queue_wait_seconds);
+    bags.floating(bag.edge_travel_time_seconds);
+    bags.floating(bag.node_service_time_seconds);
+    bags.floating(bag.loop_extra_time_seconds);
+    bags.floating(bag.goal_completion_time_seconds);
+    bags.i64(bag.decision_count);
+    bags.i64(bag.retry_count);
+    bags.i64(bag.loop_count);
+    bags.u64(bag.first_edge_credit_id);
+    bags.boolean(bag.first_edge_credit_consumed);
+    bags.floating(bag.deadlock_started_at);
+    bags.string(bag.failure_reason);
+    bags.u64(bag.history.size());
+    for (const int node : bag.history) {
+      bags.i64(node);
+    }
+    bags.u64(bag.local_enqueue_sequence);
+    bags.u64(bag.fault_priority_generation);
+    bags.boolean(bag.repaired_task_reentry);
+  }
+
+  std::vector<int> junction_ids;
+  junction_ids.reserve(junctions_.size());
+  for (const auto& entry : junctions_) {
+    junction_ids.push_back(entry.first);
+  }
+  std::sort(junction_ids.begin(), junction_ids.end());
+  StateFingerprintWriter source_queues("source_queues");
+  StateFingerprintWriter junction_queues("junction_queues");
+  StateFingerprintWriter local_calendars(
+      "local_service_calendars");
+  StateFingerprintWriter scheduled_incoming(
+      "scheduled_incoming");
+  source_queues.u64(junction_ids.size());
+  junction_queues.u64(junction_ids.size());
+  local_calendars.u64(junction_ids.size());
+  scheduled_incoming.u64(junction_ids.size());
+  for (const int node : junction_ids) {
+    const auto& junction = junctions_.at(node);
+    source_queues.i64(node);
+    source_queues.u64(junction.source_queue.size());
+    for (const int id : junction.source_queue) {
+      source_queues.i64(id);
+    }
+    source_queues.u64(junction.source_wakeup_generation);
+    source_queues.boolean(junction.source_wakeup_pending);
+
+    junction_queues.i64(node);
+    junction_queues.u64(junction.queue.size());
+    for (const int id : junction.queue) {
+      junction_queues.i64(id);
+    }
+    junction_queues.i64(junction.peak_source_queue_length);
+    junction_queues.i64(junction.peak_junction_queue_length);
+    junction_queues.i64(
+        junction.peak_service_calendar_intervals);
+    junction_queues.u64(junction.service_reservation_count);
+    junction_queues.floating(
+        junction.cumulative_service_reserved_seconds);
+    junction_queues.floating(
+        junction.first_service_reservation_start_time);
+    junction_queues.floating(
+        junction.last_service_reservation_end_time);
+    junction_queues.floating(junction.next_dispatch_time);
+    junction_queues.u64(junction.junction_wakeup_generation);
+    junction_queues.boolean(junction.junction_wakeup_pending);
+    junction_queues.i64(junction.escape_token_task);
+
+    local_calendars.i64(node);
+    local_calendars.u64(
+        junction.service_calendar.generation());
+    local_calendars.u64(junction.service_calendar.size());
+    junction.service_calendar.inspect(
+        [&](const auto& interval) {
+          local_calendars.i64(interval.task_id);
+          local_calendars.floating(interval.start);
+          local_calendars.floating(interval.end);
+        });
+
+    scheduled_incoming.i64(node);
+    scheduled_incoming.i64(junction.scheduled_incoming);
+    std::vector<int> goals;
+    goals.reserve(
+        junction.scheduled_incoming_by_goal.size());
+    for (const auto& item :
+         junction.scheduled_incoming_by_goal) {
+      goals.push_back(item.first);
+    }
+    std::sort(goals.begin(), goals.end());
+    scheduled_incoming.u64(goals.size());
+    for (const int goal : goals) {
+      scheduled_incoming.i64(goal);
+      scheduled_incoming.i64(
+          junction.scheduled_incoming_by_goal.at(goal));
+    }
+  }
+
+  std::vector<long long> corridor_ids;
+  corridor_ids.reserve(corridors_.size());
+  for (const auto& entry : corridors_) {
+    corridor_ids.push_back(entry.first);
+  }
+  std::sort(corridor_ids.begin(), corridor_ids.end());
+  StateFingerprintWriter corridors("corridor_state");
+  corridors.u64(corridor_ids.size());
+  for (const auto edge : corridor_ids) {
+    const auto& calendar = corridors_.at(edge);
+    corridors.i64(edge);
+    corridors.u64(calendar.generation());
+    corridors.u64(calendar.size());
+    calendar.inspect([&](const auto& interval) {
+      corridors.i64(interval.task_id);
+      corridors.floating(interval.start);
+      corridors.floating(interval.end);
+    });
+  }
+  std::vector<long long> inflight_edges;
+  inflight_edges.reserve(directed_inflight_counts_.size());
+  for (const auto& entry : directed_inflight_counts_) {
+    inflight_edges.push_back(entry.first);
+  }
+  std::sort(inflight_edges.begin(), inflight_edges.end());
+  scheduled_incoming.u64(inflight_edges.size());
+  for (const auto edge : inflight_edges) {
+    scheduled_incoming.i64(edge);
+    scheduled_incoming.i64(
+        directed_inflight_counts_.at(edge));
+  }
+
+  StateFingerprintWriter credits("credits");
+  // This exact ledger checkpoint binds next_credit_id, active credits,
+  // every derived lookup/expiry index (including equal-expiry order),
+  // counters, lifecycle bound, and lifecycle rows.
+  credits.string(credit_ledger_.exact_state_sha256());
+  const auto& credit_counters = credit_ledger_.counters();
+  credits.u64(credit_counters.issue_attempt_count);
+  credits.u64(credit_counters.issued_count);
+  credits.u64(credit_counters.validation_attempt_count);
+  credits.u64(credit_counters.validation_success_count);
+  credits.u64(credit_counters.bind_attempt_count);
+  credits.u64(credit_counters.bound_count);
+  credits.u64(credit_counters.consume_attempt_count);
+  credits.u64(credit_counters.consumed_count);
+  credits.u64(credit_counters.expired_count);
+  credits.u64(credit_counters.fault_revocation_count);
+  credits.u64(credit_counters.generation_revocation_count);
+  credits.u64(credit_counters.invalid_revocation_count);
+  credits.u64(credit_counters.duplicate_rejection_count);
+  credits.u64(credit_counters.capacity_rejection_count);
+  credits.u64(credit_counters.stale_snapshot_rejection_count);
+  credits.u64(credit_counters.physical_fault_rejection_count);
+  credits.u64(credit_counters.too_early_rejection_count);
+  credits.u64(credit_counters.unknown_credit_rejection_count);
+  credits.u64(credit_counters.invalid_request_rejection_count);
+  credits.u64(credit_counters.lifecycle_dropped_count);
+  credits.i64(credit_counters.active_count);
+  credits.i64(credit_counters.peak_active_count);
+  const auto fingerprint_credit =
+      [&](const FirstEdgeCredit& credit) {
+        credits.u64(credit.credit_id);
+        credits.i64(credit.from_node);
+        credits.i64(credit.to_node);
+        credits.i64(credit.goal);
+        credits.floating(credit.earliest);
+        credits.floating(credit.latest);
+        credits.u64(credit.generation);
+        credits.floating(credit.expiry);
+        credits.i64(credit.capacity);
+        credits.i64(credit.owner_or_unbound);
+        credits.i64(credit.fault_generation);
+        credits.i64(static_cast<int>(credit.state));
+        credits.string(credit.terminal_reason);
+      };
+  credits.u64(credit_ledger_.stored_active_count());
+  for (std::uint64_t id = 1;
+       id <= credit_counters.issued_count; ++id) {
+    const auto* credit = credit_ledger_.find(id);
+    if (credit != nullptr) {
+      fingerprint_credit(*credit);
+    }
+  }
+  credits.u64(credit_ledger_.lifecycle_limit());
+  credits.u64(credit_ledger_.lifecycle().size());
+  for (const auto& row : credit_ledger_.lifecycle()) {
+    credits.floating(row.time);
+    credits.string(row.action);
+    credits.string(row.reason);
+    fingerprint_credit(row.credit);
+  }
+
+  StateFingerprintWriter merge_grants("merge_grants");
+  std::vector<int> merge_nodes;
+  merge_nodes.reserve(destination_merge_controllers_.size());
+  for (const auto& entry : destination_merge_controllers_) {
+    merge_nodes.push_back(entry.first);
+  }
+  std::sort(merge_nodes.begin(), merge_nodes.end());
+  merge_grants.u64(merge_nodes.size());
+  for (const int node : merge_nodes) {
+    const auto checkpoint =
+        DestinationMergeGrantCheckpointCodec::capture(
+            destination_merge_controllers_.at(node));
+    merge_grants.i64(node);
+    merge_grants.i64(checkpoint.destination_node);
+    merge_grants.u64(checkpoint.max_pending_requests);
+    merge_grants.u64(checkpoint.lifecycle_limit);
+    merge_grants.u64(checkpoint.next_request_id);
+    merge_grants.u64(checkpoint.next_grant_id);
+    merge_grants.u64(checkpoint.generation);
+    merge_grants.u64(checkpoint.pending.size());
+    for (const auto& request : checkpoint.pending) {
+      fingerprint_merge_request(merge_grants, request);
+    }
+    merge_grants.u64(checkpoint.active.size());
+    for (const auto& active : checkpoint.active) {
+      merge_grants.u64(active.grant_id);
+      merge_grants.u64(active.request_id);
+      merge_grants.u64(active.lineage);
+      merge_grants.u64(active.request_generation);
+      merge_grants.u64(active.junction_queue_generation);
+      merge_grants.i64(active.owner_runtime_bag_id);
+      merge_grants.i64(active.edge.from_node);
+      merge_grants.i64(active.edge.to_node);
+      merge_grants.floating(active.slot_start);
+      merge_grants.floating(active.slot_end);
+      merge_grants.floating(active.issue_time);
+      merge_grants.floating(active.grant_expiry);
+      merge_grants.u64(active.calendar_generation);
+      merge_grants.i64(active.physical_fault_generation);
+      merge_grants.i64(
+          active.advertised_fault_generation);
+      fingerprint_merge_request(
+          merge_grants, active.request_snapshot);
+    }
+    const auto& counters = checkpoint.counters;
+    merge_grants.u64(counters.request_count);
+    merge_grants.u64(counters.issued_count);
+    merge_grants.u64(counters.prepared_count);
+    merge_grants.u64(counters.committed_count);
+    merge_grants.u64(counters.issued_transition_count);
+    merge_grants.u64(counters.prepared_transition_count);
+    merge_grants.u64(counters.committed_transition_count);
+    merge_grants.u64(counters.consumed_count);
+    merge_grants.u64(counters.expired_count);
+    merge_grants.u64(counters.request_expired_count);
+    merge_grants.u64(counters.grant_expired_count);
+    merge_grants.u64(counters.revoked_count);
+    merge_grants.u64(counters.revoked_fault_count);
+    merge_grants.u64(counters.revoked_stale_state_count);
+    merge_grants.u64(
+        counters.revoked_replan_current_edge_count);
+    merge_grants.u64(counters.rolled_back_count);
+    merge_grants.u64(counters.post_commit_revoked_count);
+    merge_grants.u64(counters.post_commit_expired_count);
+    merge_grants.u64(counters.post_commit_rollback_count);
+    merge_grants.u64(counters.exact_slot_busy_count);
+    merge_grants.u64(counters.active_grant_rejection_count);
+    merge_grants.u64(counters.queue_capacity_block_count);
+    merge_grants.u64(counters.contended_loser_retry_count);
+    merge_grants.u64(counters.lifecycle_transition_count);
+    merge_grants.u64(counters.lifecycle_stored_count);
+    merge_grants.u64(counters.lifecycle_dropped_count);
+    merge_grants.u64(counters.peak_pending_count);
+    merge_grants.u64(counters.peak_active_unconsumed_count);
+    merge_grants.u64(checkpoint.lifecycle.size());
+    for (const auto& row : checkpoint.lifecycle) {
+      merge_grants.floating(row.time);
+      merge_grants.u64(row.request_id);
+      merge_grants.u64(row.grant_id);
+      merge_grants.u64(row.lineage);
+      merge_grants.u64(row.request_generation);
+      merge_grants.u64(row.junction_queue_generation);
+      merge_grants.i64(row.runtime_bag_id);
+      merge_grants.i64(row.task_id);
+      merge_grants.string(
+          row.segment_id == nullptr
+              ? std::string_view{}
+              : std::string_view(*row.segment_id));
+      merge_grants.i64(row.upstream_node);
+      merge_grants.i64(row.destination_node);
+      merge_grants.i64(row.edge.from_node);
+      merge_grants.i64(row.edge.to_node);
+      merge_grants.floating(row.request_time);
+      merge_grants.floating(row.fifo_request_time);
+      merge_grants.floating(row.earliest_edge_entry);
+      merge_grants.floating(row.exact_edge_travel_seconds);
+      merge_grants.floating(row.projected_arrival);
+      merge_grants.i64(row.goal);
+      merge_grants.floating(row.route_score);
+      merge_grants.floating(row.static_remaining);
+      merge_grants.floating(
+          row.destination_service_seconds);
+      merge_grants.i64(row.downstream_queue_pressure);
+      merge_grants.floating(row.deadline_slack);
+      merge_grants.floating(row.wait_age);
+      merge_grants.i64(row.task_class_code);
+      merge_grants.i64(row.task_class);
+      merge_grants.boolean(row.storage_leg);
+      merge_grants.floating(row.source_release_age);
+      merge_grants.floating(row.local_queue_age);
+      merge_grants.u64(row.enqueue_sequence);
+      merge_grants.floating(row.request_expiry);
+      merge_grants.floating(row.slot_start);
+      merge_grants.floating(row.slot_end);
+      merge_grants.floating(row.issue_time);
+      merge_grants.floating(row.grant_expiry);
+      merge_grants.u64(row.calendar_generation);
+      merge_grants.i64(row.fault_generation);
+      merge_grants.i64(row.advertised_fault_generation);
+      merge_grants.u64(
+          row.observed_claimed_request_generation);
+      merge_grants.u64(
+          row.observed_claimed_junction_queue_generation);
+      merge_grants.u64(
+          row.observed_claimed_calendar_generation);
+      merge_grants.i64(
+          row.observed_claimed_owner_runtime_bag_id);
+      merge_grants.i64(
+          row.observed_claimed_edge.from_node);
+      merge_grants.i64(
+          row.observed_claimed_edge.to_node);
+      merge_grants.i64(
+          row.observed_claimed_destination_node);
+      merge_grants.i64(
+          row.observed_event_owner_runtime_bag_id);
+      merge_grants.i64(row.observed_event_edge.from_node);
+      merge_grants.i64(row.observed_event_edge.to_node);
+      merge_grants.i64(
+          row.observed_event_destination_node);
+      merge_grants.u64(
+          row.observed_junction_queue_generation);
+      merge_grants.u64(row.observed_calendar_generation);
+      merge_grants.i64(
+          row.observed_physical_fault_generation);
+      merge_grants.i64(
+          row.observed_advertised_fault_generation);
+      merge_grants.boolean(
+          row.observed_physical_fault_active);
+      merge_grants.boolean(
+          row.observed_exact_calendar_reservation_present);
+      merge_grants.i64(static_cast<int>(row.state));
+      merge_grants.i64(static_cast<int>(row.reason));
+    }
+  }
+  std::vector<std::uint64_t> dispatch_ids;
+  dispatch_ids.reserve(pending_merge_dispatches_.size());
+  for (const auto& entry : pending_merge_dispatches_) {
+    dispatch_ids.push_back(entry.first);
+  }
+  std::sort(dispatch_ids.begin(), dispatch_ids.end());
+  merge_grants.u64(dispatch_ids.size());
+  for (const auto id : dispatch_ids) {
+    const auto& dispatch = pending_merge_dispatches_.at(id);
+    merge_grants.u64(id);
+    merge_grants.u64(dispatch.request_id);
+    merge_grants.u64(dispatch.lineage);
+    merge_grants.i64(dispatch.runtime_bag_id);
+    merge_grants.i64(dispatch.upstream_node);
+    merge_grants.i64(dispatch.destination_node);
+    const auto& trace = dispatch.trace;
+    merge_grants.u64(trace.decision_id);
+    merge_grants.u64(trace.arrive_event_seq);
+    merge_grants.floating(trace.event_time);
+    merge_grants.i64(trace.task_id);
+    merge_grants.i64(trace.runtime_bag_id);
+    merge_grants.string(trace.segment_id);
+    merge_grants.i64(trace.current_node);
+    merge_grants.i64(trace.goal_node);
+    merge_grants.i64(trace.model_prediction);
+    merge_grants.floating(trace.model_margin);
+    merge_grants.boolean(trace.risk_gate_triggered);
+    merge_grants.boolean(trace.scorer_risk_abstain);
+    merge_grants.u64(trace.scorer_risk_reasons.size());
+    for (const auto& reason : trace.scorer_risk_reasons) {
+      merge_grants.string(reason);
+    }
+    merge_grants.string(trace.scorer_id);
+    merge_grants.string(trace.scorer_effective_id);
+    merge_grants.i64(trace.scorer_raw_prediction);
+    merge_grants.floating(trace.scorer_raw_margin);
+    merge_grants.i64(trace.fallback_selected_next);
+    merge_grants.i64(trace.selected_next);
+    merge_grants.string(trace.decision_source);
+    merge_grants.string(trace.rule_reason);
+    merge_grants.i64(trace.junction_queue_length);
+    merge_grants.floating(
+        trace.junction_next_dispatch_time);
+    merge_grants.i64(
+        trace.advertised_faulted_outgoing_count);
+    merge_grants.floating(
+        trace.max_fault_message_age_seconds);
+    merge_grants.u64(trace.short_history.size());
+    for (const int node : trace.short_history) {
+      merge_grants.i64(node);
+    }
+    merge_grants.boolean(trace.full_astar_used);
+    merge_grants.string(trace.priority_mode);
+    merge_grants.string(trace.task_class);
+    merge_grants.floating(trace.priority_slack_seconds);
+    merge_grants.floating(trace.priority_age_seconds);
+    merge_grants.i64(trace.priority_local_contention);
+    merge_grants.u64(trace.priority_fault_generation);
+    merge_grants.u64(trace.priority_enqueue_sequence);
+    merge_grants.string(trace.pibt_preference_mode);
+    merge_grants.u64(trace.candidates.size());
+    for (const auto& candidate : trace.candidates) {
+      merge_grants.i64(candidate.next_node);
+      merge_grants.floating(candidate.static_potential);
+      merge_grants.floating(candidate.travel_time);
+      merge_grants.i64(candidate.target_queue_length);
+      merge_grants.i64(
+          candidate.target_scheduled_incoming);
+      merge_grants.floating(
+          candidate.corridor_next_available);
+      merge_grants.floating(
+          candidate.target_next_available);
+      merge_grants.boolean(candidate.advertised_fault);
+      merge_grants.floating(
+          candidate.fault_message_age_seconds);
+      merge_grants.i64(candidate.recent_visit_count);
+      merge_grants.i64(candidate.two_hop_queue_pressure);
+      merge_grants.i64(
+          candidate.current_goal_queue_length);
+      merge_grants.i64(
+          candidate.target_goal_queue_length);
+      merge_grants.i64(
+          candidate.target_goal_scheduled_incoming);
+      merge_grants.floating(
+          candidate.current_goal_max_wait);
+      merge_grants.floating(
+          candidate.goal_conditioned_differential);
+      merge_grants.floating(
+          candidate.estimated_service_rate);
+      merge_grants.floating(
+          candidate.service_weighted_pressure);
+      merge_grants.boolean(
+          candidate.first_edge_credit_required);
+      merge_grants.boolean(
+          candidate.first_edge_credit_matches);
+      merge_grants.boolean(
+          candidate.first_edge_credit_valid);
+      merge_grants.floating(
+          candidate.first_edge_credit_slack_seconds);
+      merge_grants.floating(candidate.model_score);
+      merge_grants.floating(
+          candidate.pre_fault_policy_score);
+      merge_grants.floating(candidate.scorer_raw_score);
+      merge_grants.floating(
+          candidate.scorer_raw_bottleneck);
+      merge_grants.boolean(
+          candidate.scorer_raw_score_available);
+      merge_grants.boolean(candidate.shield_allowed);
+      merge_grants.string(candidate.shield_reason);
+    }
+  }
+
+  StateFingerprintWriter faults("fault_state");
+  std::vector<long long> fault_edges;
+  fault_edges.reserve(physical_faults_.size());
+  for (const auto& entry : physical_faults_) {
+    fault_edges.push_back(entry.first);
+  }
+  std::sort(fault_edges.begin(), fault_edges.end());
+  faults.u64(fault_edges.size());
+  for (const auto edge : fault_edges) {
+    const auto& state = physical_faults_.at(edge);
+    faults.i64(edge);
+    faults.i64(state.active_count);
+    faults.i64(state.physical_generation);
+  }
+  fault_edges.clear();
+  for (const auto& entry : advertised_faults_) {
+    fault_edges.push_back(entry.first);
+  }
+  std::sort(fault_edges.begin(), fault_edges.end());
+  faults.u64(fault_edges.size());
+  for (const auto edge : fault_edges) {
+    const auto& state = advertised_faults_.at(edge);
+    faults.i64(edge);
+    faults.boolean(state.faulted);
+    faults.i64(state.generation);
+    faults.floating(state.received_at);
+  }
+  std::vector<int> affected(
+      fault_affected_bags_.begin(), fault_affected_bags_.end());
+  std::sort(affected.begin(), affected.end());
+  faults.u64(affected.size());
+  for (const int id : affected) {
+    faults.i64(id);
+  }
+  fault_edges.clear();
+  for (const auto& entry : fault_affected_bags_by_edge_) {
+    fault_edges.push_back(entry.first);
+  }
+  std::sort(fault_edges.begin(), fault_edges.end());
+  faults.u64(fault_edges.size());
+  for (const auto edge : fault_edges) {
+    faults.i64(edge);
+    const auto& ids = fault_affected_bags_by_edge_.at(edge);
+    faults.u64(ids.size());
+    for (const int id : ids) {
+      faults.i64(id);
+    }
+  }
+  std::vector<int> fault_bag_ids;
+  for (const auto& entry : fault_instances_by_bag_) {
+    fault_bag_ids.push_back(entry.first);
+  }
+  std::sort(fault_bag_ids.begin(), fault_bag_ids.end());
+  faults.u64(fault_bag_ids.size());
+  for (const int id : fault_bag_ids) {
+    faults.i64(id);
+    const auto& instances = fault_instances_by_bag_.at(id);
+    faults.u64(instances.size());
+    for (const auto& instance : instances) {
+      faults.i64(instance.first);
+      faults.i64(instance.second);
+    }
+  }
+  fault_edges.clear();
+  for (const auto& entry : active_fault_instance_by_edge_) {
+    fault_edges.push_back(entry.first);
+  }
+  std::sort(fault_edges.begin(), fault_edges.end());
+  faults.u64(fault_edges.size());
+  for (const auto edge : fault_edges) {
+    faults.i64(edge);
+    faults.i64(active_fault_instance_by_edge_.at(edge));
+  }
+  faults.u64(repair_time_by_fault_instance_.size());
+  for (const auto& entry : repair_time_by_fault_instance_) {
+    faults.i64(entry.first.first);
+    faults.i64(entry.first.second);
+    faults.floating(entry.second);
+  }
+
+  StateFingerprintWriter pibt("pibt_owner_state");
+  pibt.boolean(g4irsf14_state_ != nullptr);
+  if (g4irsf14_state_ != nullptr) {
+    pibt.i64(g4irsf14_state_->current_pibt_slice_bag_count);
+    pibt.i64(g4irsf14_state_->current_pibt_owner_count);
+    std::vector<int> merge_bag_ids;
+    for (const auto& entry :
+         g4irsf14_state_->destination_merge_bags) {
+      merge_bag_ids.push_back(entry.first);
+    }
+    std::sort(merge_bag_ids.begin(), merge_bag_ids.end());
+    pibt.u64(merge_bag_ids.size());
+    for (const int id : merge_bag_ids) {
+      const auto& item =
+          g4irsf14_state_->destination_merge_bags.at(id);
+      pibt.i64(id);
+      pibt.u64(item.junction_queue_generation);
+      pibt.u64(item.request_generation);
+      pibt.u64(item.pending_request_id);
+      pibt.u64(item.pending_lineage);
+      pibt.floating(item.pending_request_time);
+      pibt.floating(item.first_contention_time);
+      pibt.floating(item.grant_wait_seconds);
+      pibt.boolean(item.capability.has_value());
+      if (item.capability.has_value()) {
+        fingerprint_capability(
+            pibt,
+            DestinationMergeGrantCheckpointCodec::capture(
+                *item.capability));
+      }
+    }
+  }
+
+  StateFingerprintWriter counters("deterministic_counters");
+  counters.u64(next_event_seq_);
+  counters.u64(next_decision_id_);
+  counters.u64(next_pibt_activation_id_);
+  counters.u64(next_local_enqueue_sequence_);
+  counters.u64(next_merge_request_lineage_);
+  counters.i64(active_bag_count_);
+  counters.u64(segment_runtime_ids_.size());
+  std::vector<std::string> segments;
+  segments.reserve(segment_runtime_ids_.size());
+  for (const auto& entry : segment_runtime_ids_) {
+    segments.push_back(entry.first);
+  }
+  std::sort(segments.begin(), segments.end());
+  for (const auto& segment : segments) {
+    counters.string(segment);
+    counters.i64(segment_runtime_ids_.at(segment));
+  }
+  counters.u64(waits_.size());
+  for (const double wait : waits_) {
+    counters.floating(wait);
+  }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  counters.boolean(test_pibt_logical_failure_injected_);
+  counters.boolean(test_merge_grant_prepare_failure_injected_);
+  counters.boolean(test_merge_grant_advertised_flip_injected_);
+  counters.boolean(test_merge_grant_physical_flip_injected_);
+  counters.boolean(test_merge_grant_calendar_flip_injected_);
+  counters.boolean(test_merge_grant_queue_flip_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_capability_drop_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_physical_flip_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_advertised_flip_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_calendar_remove_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_expiry_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_wrong_owner_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_wrong_edge_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_wrong_destination_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_claimed_request_generation_tamper_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_claimed_queue_generation_tamper_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_claimed_calendar_generation_tamper_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_live_queue_generation_advance_injected_);
+  counters.boolean(
+      test_merge_grant_edge_exit_live_calendar_generation_advance_injected_);
+  counters.boolean(test_pibt_post_commit_failure_injected_);
+#endif
+
+  StateFingerprintWriter scorer("scorer_state");
+  scorer.string(config_.queue_discipline);
+  scorer.string(config_.resource_semantics);
+  scorer.floating(config_.entry_headway_seconds);
+  scorer.string(config_.pressure_mode);
+  scorer.floating(config_.retry_interval);
+  scorer.floating(config_.minimum_service_seconds);
+  scorer.floating(config_.dispatch_headway_seconds);
+  scorer.floating(config_.pressure_weight);
+  scorer.floating(config_.pressure_age_weight);
+  scorer.floating(config_.pressure_distance_bias);
+  scorer.floating(config_.calendar_wait_weight);
+  scorer.floating(config_.history_penalty);
+  scorer.floating(config_.backtrack_penalty);
+  scorer.floating(config_.aging_weight);
+  scorer.floating(config_.starvation_threshold);
+  scorer.i64(config_.history_limit);
+  scorer.i64(config_.max_decisions_per_bag);
+  scorer.i64(config_.max_events);
+  scorer.floating(config_.max_simulation_time);
+  scorer.i64(config_.trace_limit);
+  scorer.boolean(config_.event_trace_limit.has_value());
+  scorer.i64(config_.event_trace_limit.value_or(0));
+  scorer.i64(config_.trace_shard_count);
+  scorer.i64(config_.trace_shard_index);
+  scorer.i64(config_.local_queue_capacity);
+  scorer.i64(config_.deadlock_retry_threshold);
+  scorer.i64(config_.diagnostic_hops);
+  scorer.string(config_.admission_mode);
+  scorer.floating(config_.credit_validity_seconds);
+  scorer.floating(config_.credit_snapshot_max_age_seconds);
+  scorer.i64(config_.credit_capacity_per_edge);
+  scorer.i64(config_.credit_lifecycle_limit);
+  scorer.i64(config_.selective_credit_contention_threshold);
+  scorer.boolean(config_.enable_source_admission);
+  scorer.boolean(config_.enable_backpressure);
+  scorer.string(config_.pibt_mode);
+  scorer.i64(config_.pibt_max_ready_bags);
+  scorer.i64(config_.pibt_max_local_resources);
+  scorer.i64(config_.pibt_max_candidates_per_bag);
+  scorer.string(config_.priority_mode);
+  scorer.string(config_.pibt_preference_mode);
+  scorer.string(config_.scorer_mode);
+  scorer.floating(config_.scorer_b2);
+  scorer.floating(config_.scorer_risk_margin_threshold);
+  scorer.floating(config_.scorer_risk_bottleneck_threshold);
+  scorer.string(config_.scorer_model_sha256);
+  scorer.string(config_.framework_mode);
+  scorer.boolean(config_.enable_pibt_lite);
+  scorer.boolean(config_.enable_deadlock_escape);
+  scorer.boolean(config_.enable_fault_policy);
+  scorer.string(config_.event_semantics);
+  scorer.boolean(config_.enable_opportunity_telemetry);
+  scorer.i64(config_.opportunity_trace_limit);
+  scorer.string(config_.merge_grant_rule);
+  scorer.i64(config_.merge_grant_max_pending_requests);
+  scorer.i64(config_.merge_grant_lifecycle_limit);
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  // Test-build fault switches alter deterministic continuation and therefore
+  // belong to the checkpoint seal even though production builds omit them.
+  scorer.i64(
+      config_.test_pibt_logical_failure_after_staged_actions);
+  scorer.boolean(
+      config_.test_pibt_logical_failure_after_followup_scheduling);
+  scorer.boolean(
+      config_.test_merge_grant_fail_after_calendar_prepare);
+  scorer.boolean(
+      config_.test_merge_grant_flip_advertised_generation_before_commit);
+  scorer.boolean(
+      config_.test_merge_grant_flip_physical_generation_before_commit);
+  scorer.boolean(
+      config_.test_merge_grant_flip_calendar_generation_before_commit);
+  scorer.boolean(
+      config_.test_merge_grant_flip_queue_generation_before_commit);
+  scorer.boolean(
+      config_.test_merge_grant_drop_capability_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_flip_physical_generation_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_flip_advertised_generation_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_remove_calendar_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_expire_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_wrong_owner_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_wrong_edge_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_wrong_destination_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_tamper_claimed_request_generation_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_tamper_claimed_queue_generation_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_tamper_claimed_calendar_generation_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_advance_live_queue_generation_before_edge_exit);
+  scorer.boolean(
+      config_.test_merge_grant_advance_live_calendar_generation_before_edge_exit);
+  scorer.boolean(
+      config_.test_pibt_fail_after_commit_before_publication);
+#endif
+  scorer.u64(config_.scorer_w1.size());
+  for (const auto& row : config_.scorer_w1) {
+    scorer.u64(row.size());
+    for (const double value : row) {
+      scorer.floating(value);
+    }
+  }
+  scorer.u64(config_.scorer_b1.size());
+  for (const double value : config_.scorer_b1) {
+    scorer.floating(value);
+  }
+  scorer.u64(config_.scorer_w2.size());
+  for (const double value : config_.scorer_w2) {
+    scorer.floating(value);
+  }
+  scorer.u64(pibt_regret_prior_.size());
+  for (const auto& entry : pibt_regret_prior_) {
+    scorer.i64(std::get<0>(entry.first));
+    scorer.i64(std::get<1>(entry.first));
+    scorer.i64(std::get<2>(entry.first));
+    scorer.floating(entry.second);
+  }
+  scorer.u64(scorer_static_hops_.size());
+  for (const auto& entry : scorer_static_hops_) {
+    scorer.i64(entry.first.first);
+    scorer.i64(entry.first.second);
+    scorer.i64(entry.second);
+  }
+  scorer.boolean(scorer_model_.has_value());
+
+  const auto replay = compute_replay_hashes_projection();
+  StateFingerprintWriter result_accumulator(
+      "result_accumulator");
+  result_accumulator.string(replay.complete_bags_sha256);
+  result_accumulator.string(replay.segment_result_sha256);
+  result_accumulator.string(replay.junction_state_sha256);
+  result_accumulator.string(replay.algorithm_summary_sha256);
+  result_accumulator.string(replay.deterministic_result_sha256);
+
+  StateFingerprintWriter runtime_hashes(
+      "current_runtime_hashes");
+  runtime_hashes.string(kG4IRSF14StateCloneSchema);
+  runtime_hashes.string(scorer_graph_fingerprint());
+  runtime_hashes.string(canonical_event_semantics());
+  runtime_hashes.string(canonical_resource_semantics());
+  runtime_hashes.string(canonical_admission_mode());
+  runtime_hashes.string(canonical_pibt_mode_name());
+  runtime_hashes.string(canonical_priority_mode_name());
+  runtime_hashes.string(canonical_scorer_mode());
+  runtime_hashes.string(canonical_framework_mode());
+
+  std::vector<int> beacon_nodes;
+  beacon_nodes.reserve(congestion_beacons_.size());
+  for (const auto& entry : congestion_beacons_) {
+    beacon_nodes.push_back(entry.first);
+  }
+  std::sort(beacon_nodes.begin(), beacon_nodes.end());
+  StateFingerprintWriter beacons("congestion_beacons");
+  beacons.u64(beacon_nodes.size());
+  for (const int node : beacon_nodes) {
+    const auto& beacon = congestion_beacons_.at(node);
+    beacons.i64(node);
+    beacons.i64(beacon.queue_length);
+    beacons.i64(beacon.scheduled_incoming);
+    beacons.floating(beacon.service_calendar_reserved_until);
+    beacons.floating(beacon.received_at);
+    beacons.u64(beacon.generation);
+    std::vector<int> goals;
+    for (const auto& entry : beacon.queue_length_by_goal) {
+      goals.push_back(entry.first);
+    }
+    for (const auto& entry :
+         beacon.scheduled_incoming_by_goal) {
+      goals.push_back(entry.first);
+    }
+    std::sort(goals.begin(), goals.end());
+    goals.erase(std::unique(goals.begin(), goals.end()),
+                goals.end());
+    beacons.u64(goals.size());
+    for (const int goal : goals) {
+      beacons.i64(goal);
+      const auto queue =
+          beacon.queue_length_by_goal.find(goal);
+      const auto incoming =
+          beacon.scheduled_incoming_by_goal.find(goal);
+      beacons.i64(
+          queue == beacon.queue_length_by_goal.end()
+              ? 0
+              : queue->second);
+      beacons.i64(
+          incoming ==
+                  beacon.scheduled_incoming_by_goal.end()
+              ? 0
+              : incoming->second);
+    }
+  }
+
+  StateFingerprintWriter microphase("microphase_state");
+  microphase.boolean(g4irsf14_state_ != nullptr);
+  if (g4irsf14_state_ != nullptr) {
+    microphase.u64(g4irsf14_state_->current_event_seq);
+    microphase.boolean(
+        g4irsf14_state_->microphase_floor_active);
+    microphase.floating(
+        g4irsf14_state_->microphase_floor_time);
+    microphase.i64(
+        g4irsf14_state_->microphase_floor_priority);
+    std::vector<int> nodes;
+    for (const auto& entry : g4irsf14_state_->local) {
+      nodes.push_back(entry.first);
+    }
+    std::sort(nodes.begin(), nodes.end());
+    microphase.u64(nodes.size());
+    for (const int node : nodes) {
+      const auto& local = g4irsf14_state_->local.at(node);
+      microphase.i64(node);
+      microphase.floating(local.source_wakeup_time);
+      microphase.floating(local.junction_wakeup_time);
+      microphase.boolean(local.has_last_source_arbitration);
+      microphase.boolean(
+          local.has_last_junction_arbitration);
+      microphase.floating(local.last_source_arbitration_time);
+      microphase.floating(
+          local.last_junction_arbitration_time);
+      microphase.u64(
+          local.last_source_arbitration_generation);
+      microphase.u64(
+          local.last_junction_arbitration_generation);
+      microphase.boolean(local.source_batch_open);
+      microphase.boolean(local.junction_batch_open);
+      microphase.floating(local.source_batch_time);
+      microphase.floating(local.junction_batch_time);
+      microphase.i64(local.source_queue_before_enqueue);
+      microphase.i64(local.source_queue_after_enqueue);
+      microphase.i64(local.junction_queue_before_enqueue);
+      microphase.i64(local.junction_queue_after_enqueue);
+      microphase.i64(local.source_enqueue_count);
+      microphase.i64(local.junction_enqueue_count);
+    }
+    nodes.clear();
+    for (const auto& entry :
+         g4irsf14_state_->destination_merge) {
+      nodes.push_back(entry.first);
+    }
+    std::sort(nodes.begin(), nodes.end());
+    microphase.u64(nodes.size());
+    for (const int node : nodes) {
+      const auto& state =
+          g4irsf14_state_->destination_merge.at(node);
+      microphase.i64(node);
+      microphase.floating(state.wakeup_time);
+      microphase.u64(state.wakeup_generation);
+      microphase.boolean(state.wakeup_pending);
+    }
+  }
+
+  return G4IRSF14RuntimeStateDigests{
+      event_queue.sha256(),
+      current_time.sha256(),
+      bags.sha256(),
+      source_queues.sha256(),
+      junction_queues.sha256(),
+      local_calendars.sha256(),
+      corridors.sha256(),
+      scheduled_incoming.sha256(),
+      credits.sha256(),
+      merge_grants.sha256(),
+      faults.sha256(),
+      pibt.sha256(),
+      counters.sha256(),
+      scorer.sha256(),
+      result_accumulator.sha256(),
+      runtime_hashes.sha256(),
+      beacons.sha256(),
+      microphase.sha256()};
+}
+
+inline G4IRSF14RuntimeStateDigests
+EventDrivenJunctionRuntime::deterministic_state_digests() const {
+  if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+      events_.empty()) {
+    throw std::logic_error(
+        "deterministic state digests require a live pre-pop boundary");
+  }
+  require_checkpoint_safe_boundary();
+  auto digests = compute_runtime_state_digests();
+  digests.validate();
+  return digests;
+}
+
+inline std::string
+EventDrivenJunctionRuntime::deterministic_state_sha256() const {
+  return deterministic_state_digests().aggregate_sha256();
+}
 
 }  // namespace czr005::ics

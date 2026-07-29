@@ -18,6 +18,8 @@
 namespace czr005::ics {
 
 class EventDrivenJunctionRuntime;
+class DestinationMergeGrantController;
+class DestinationMergeGrantCheckpointCodec;
 
 // The merge protocol is intentionally one-hop. It owns no route suffix,
 // global task list, global reservation table, or airport-wide queue view.
@@ -590,6 +592,7 @@ class MergeGrantCapability {
 
  private:
   friend class DestinationMergeGrantController;
+  friend class DestinationMergeGrantCheckpointCodec;
   friend class EventDrivenJunctionRuntime;
 
   MergeGrantCapability(std::uint64_t grant_id,
@@ -777,6 +780,80 @@ struct DestinationMergeGrantCounters {
   std::size_t peak_active_unconsumed_count = 0;
 };
 
+// Offline-only value records for exact state-clone checkpoints.  They do not
+// make the live grant capability or destination controller copyable.  Only
+// DestinationMergeGrantCheckpointCodec can mint a live capability/controller
+// from these records, and restore validates the active-controller bijection
+// before the runtime is allowed to process another event.
+struct MergeGrantCapabilityCheckpoint {
+  std::uint64_t grant_id = 0;
+  std::uint64_t request_id = 0;
+  std::uint64_t lineage = 0;
+  std::uint64_t request_generation = 0;
+  int owner_runtime_bag_id = -1;
+  MergeDirectedEdge exact_directed_edge;
+  int destination_node = -1;
+  double slot_start = 0.0;
+  double slot_end = 0.0;
+  double issue_time = 0.0;
+  double request_time = 0.0;
+  double expiry = 0.0;
+  std::uint64_t calendar_generation = 0;
+  int fault_generation = 0;
+  int advertised_fault_generation = 0;
+  MergeGrantState state = MergeGrantState::kCommitted;
+  DestinationMergeRequest request_snapshot;
+};
+
+struct DestinationMergeActiveGrantCheckpoint {
+  std::uint64_t grant_id = 0;
+  std::uint64_t request_id = 0;
+  std::uint64_t lineage = 0;
+  std::uint64_t request_generation = 0;
+  std::uint64_t junction_queue_generation = 0;
+  int owner_runtime_bag_id = -1;
+  MergeDirectedEdge edge;
+  double slot_start = 0.0;
+  double slot_end = 0.0;
+  double issue_time = 0.0;
+  double grant_expiry = 0.0;
+  std::uint64_t calendar_generation = 0;
+  int physical_fault_generation = 0;
+  int advertised_fault_generation = 0;
+  DestinationMergeRequest request_snapshot;
+};
+
+struct DestinationMergeGrantControllerCheckpoint {
+  int destination_node = -1;
+  std::size_t max_pending_requests = 0;
+  std::size_t lifecycle_limit = 0;
+  std::vector<DestinationMergeRequest> pending;
+  std::vector<DestinationMergeActiveGrantCheckpoint> active;
+  std::vector<DestinationMergeGrantLifecycleRow> lifecycle;
+  DestinationMergeGrantCounters counters;
+  std::uint64_t next_request_id = 1;
+  std::uint64_t next_grant_id = 1;
+  std::uint64_t generation = 0;
+};
+
+class DestinationMergeGrantCheckpointCodec {
+ public:
+  [[nodiscard]] static MergeGrantCapabilityCheckpoint capture(
+      const MergeGrantCapability& capability);
+  [[nodiscard]] static MergeGrantCapability restore(
+      const MergeGrantCapabilityCheckpoint& checkpoint);
+  [[nodiscard]] static DestinationMergeGrantControllerCheckpoint capture(
+      const DestinationMergeGrantController& controller);
+  [[nodiscard]] static DestinationMergeGrantController restore(
+      const DestinationMergeGrantControllerCheckpoint& checkpoint);
+
+ private:
+  [[nodiscard]] static DestinationMergeRequest clone_request(
+      const DestinationMergeRequest& request);
+  [[nodiscard]] static DestinationMergeGrantLifecycleRow clone_lifecycle(
+      const DestinationMergeGrantLifecycleRow& row);
+};
+
 class DestinationMergeGrantController {
  public:
   explicit DestinationMergeGrantController(
@@ -917,6 +994,7 @@ class DestinationMergeGrantController {
 #endif
 
  private:
+  friend class DestinationMergeGrantCheckpointCodec;
   friend class EventDrivenJunctionRuntime;
 
   struct SubmitResult {
@@ -1836,5 +1914,306 @@ class DestinationMergeGrantController {
   std::uint64_t next_grant_id_ = 1;
   std::uint64_t generation_ = 0;
 };
+
+inline DestinationMergeRequest
+DestinationMergeGrantCheckpointCodec::clone_request(
+    const DestinationMergeRequest& request) {
+  DestinationMergeRequest copy = request;
+  if (request.lifecycle_segment_id != nullptr) {
+    copy.lifecycle_segment_id =
+        std::make_shared<const std::string>(
+            *request.lifecycle_segment_id);
+  }
+  copy.lifecycle_request_snapshot.reset();
+  if (request.lifecycle_request_snapshot != nullptr) {
+    DestinationMergeRequest identity =
+        *request.lifecycle_request_snapshot;
+    identity.lifecycle_request_snapshot.reset();
+    if (identity.lifecycle_segment_id != nullptr) {
+      identity.lifecycle_segment_id =
+          std::make_shared<const std::string>(
+              *identity.lifecycle_segment_id);
+    }
+    copy.lifecycle_request_snapshot =
+        std::make_shared<const DestinationMergeRequest>(
+            std::move(identity));
+  }
+  return copy;
+}
+
+inline DestinationMergeGrantLifecycleRow
+DestinationMergeGrantCheckpointCodec::clone_lifecycle(
+    const DestinationMergeGrantLifecycleRow& row) {
+  DestinationMergeGrantLifecycleRow copy = row;
+  if (row.segment_id != nullptr) {
+    copy.segment_id =
+        std::make_shared<const std::string>(*row.segment_id);
+  }
+  return copy;
+}
+
+inline MergeGrantCapabilityCheckpoint
+DestinationMergeGrantCheckpointCodec::capture(
+    const MergeGrantCapability& capability) {
+  MergeGrantCapabilityCheckpoint checkpoint;
+  checkpoint.grant_id = capability.grant_id_;
+  checkpoint.request_id = capability.request_id_;
+  checkpoint.lineage = capability.lineage_;
+  checkpoint.request_generation = capability.request_generation_;
+  checkpoint.owner_runtime_bag_id =
+      capability.owner_runtime_bag_id_;
+  checkpoint.exact_directed_edge =
+      capability.exact_directed_edge_;
+  checkpoint.destination_node = capability.destination_node_;
+  checkpoint.slot_start = capability.slot_start_;
+  checkpoint.slot_end = capability.slot_end_;
+  checkpoint.issue_time = capability.issue_time_;
+  checkpoint.request_time = capability.request_time_;
+  checkpoint.expiry = capability.expiry_;
+  checkpoint.calendar_generation =
+      capability.calendar_generation_;
+  checkpoint.fault_generation = capability.fault_generation_;
+  checkpoint.advertised_fault_generation =
+      capability.advertised_fault_generation_;
+  checkpoint.state = capability.state_;
+  checkpoint.request_snapshot =
+      clone_request(capability.request_snapshot_);
+  return checkpoint;
+}
+
+inline MergeGrantCapability
+DestinationMergeGrantCheckpointCodec::restore(
+    const MergeGrantCapabilityCheckpoint& checkpoint) {
+  const auto& request = checkpoint.request_snapshot;
+  if (checkpoint.grant_id == 0 ||
+      checkpoint.request_id == 0 ||
+      checkpoint.lineage == 0 ||
+      checkpoint.request_generation == 0 ||
+      checkpoint.owner_runtime_bag_id < 0 ||
+      checkpoint.destination_node < 0 ||
+      checkpoint.exact_directed_edge.from_node < 0 ||
+      checkpoint.exact_directed_edge.to_node !=
+          checkpoint.destination_node ||
+      !std::isfinite(checkpoint.slot_start) ||
+      !std::isfinite(checkpoint.slot_end) ||
+      !std::isfinite(checkpoint.issue_time) ||
+      !std::isfinite(checkpoint.request_time) ||
+      !std::isfinite(checkpoint.expiry) ||
+      checkpoint.slot_end <= checkpoint.slot_start ||
+      checkpoint.expiry != checkpoint.slot_end ||
+      checkpoint.state != MergeGrantState::kCommitted ||
+      request.request_id != checkpoint.request_id ||
+      request.lineage != checkpoint.lineage ||
+      request.request_generation !=
+          checkpoint.request_generation ||
+      request.runtime_bag_id !=
+          checkpoint.owner_runtime_bag_id ||
+      request.requested_directed_edge !=
+          checkpoint.exact_directed_edge ||
+      request.destination_merge_node !=
+          checkpoint.destination_node ||
+      request.request_time != checkpoint.request_time ||
+      request.advertised_fault_generation !=
+          checkpoint.advertised_fault_generation) {
+    throw std::invalid_argument(
+        "merge capability checkpoint is inconsistent");
+  }
+  auto capability = MergeGrantCapability(
+      checkpoint.grant_id,
+      clone_request(request),
+      checkpoint.slot_start,
+      checkpoint.slot_end,
+      checkpoint.issue_time,
+      checkpoint.calendar_generation,
+      checkpoint.fault_generation);
+  if (capability.grant_id_ != checkpoint.grant_id ||
+      capability.request_id_ != checkpoint.request_id ||
+      capability.lineage_ != checkpoint.lineage ||
+      capability.request_generation_ !=
+          checkpoint.request_generation ||
+      capability.owner_runtime_bag_id_ !=
+          checkpoint.owner_runtime_bag_id ||
+      capability.exact_directed_edge_ !=
+          checkpoint.exact_directed_edge ||
+      capability.destination_node_ !=
+          checkpoint.destination_node ||
+      capability.expiry_ != checkpoint.expiry ||
+      capability.calendar_generation_ !=
+          checkpoint.calendar_generation ||
+      capability.fault_generation_ !=
+          checkpoint.fault_generation) {
+    throw std::invalid_argument(
+        "merge capability checkpoint failed exact reconstruction");
+  }
+  return capability;
+}
+
+inline DestinationMergeGrantControllerCheckpoint
+DestinationMergeGrantCheckpointCodec::capture(
+    const DestinationMergeGrantController& controller) {
+  DestinationMergeGrantControllerCheckpoint checkpoint;
+  checkpoint.destination_node = controller.destination_node_;
+  checkpoint.max_pending_requests =
+      controller.max_pending_requests_;
+  checkpoint.lifecycle_limit = controller.lifecycle_limit_;
+  checkpoint.pending.reserve(controller.pending_.size());
+  for (const auto& pending : controller.pending_) {
+    checkpoint.pending.push_back(
+        clone_request(pending.request));
+  }
+  checkpoint.active.reserve(controller.active_.size());
+  for (const auto& active : controller.active_) {
+    if (active.request_snapshot == nullptr) {
+      throw std::logic_error(
+          "active merge grant lacks its immutable request identity");
+    }
+    DestinationMergeActiveGrantCheckpoint item;
+    item.grant_id = active.grant_id;
+    item.request_id = active.request_id;
+    item.lineage = active.lineage;
+    item.request_generation = active.request_generation;
+    item.junction_queue_generation =
+        active.junction_queue_generation;
+    item.owner_runtime_bag_id =
+        active.owner_runtime_bag_id;
+    item.edge = active.edge;
+    item.slot_start = active.slot_start;
+    item.slot_end = active.slot_end;
+    item.issue_time = active.issue_time;
+    item.grant_expiry = active.grant_expiry;
+    item.calendar_generation = active.calendar_generation;
+    item.physical_fault_generation =
+        active.physical_fault_generation;
+    item.advertised_fault_generation =
+        active.advertised_fault_generation;
+    item.request_snapshot =
+        clone_request(*active.request_snapshot);
+    checkpoint.active.push_back(std::move(item));
+  }
+  checkpoint.lifecycle.reserve(controller.lifecycle_.size());
+  for (const auto& row : controller.lifecycle_) {
+    checkpoint.lifecycle.push_back(clone_lifecycle(row));
+  }
+  checkpoint.counters = controller.counters_;
+  checkpoint.next_request_id = controller.next_request_id_;
+  checkpoint.next_grant_id = controller.next_grant_id_;
+  checkpoint.generation = controller.generation_;
+  return checkpoint;
+}
+
+inline DestinationMergeGrantController
+DestinationMergeGrantCheckpointCodec::restore(
+    const DestinationMergeGrantControllerCheckpoint& checkpoint) {
+  if (checkpoint.destination_node < 0 ||
+      checkpoint.max_pending_requests == 0 ||
+      checkpoint.lifecycle.size() > checkpoint.lifecycle_limit ||
+      checkpoint.pending.size() >
+          checkpoint.max_pending_requests ||
+      checkpoint.active.size() >
+          checkpoint.max_pending_requests ||
+      checkpoint.next_request_id == 0 ||
+      checkpoint.next_grant_id == 0) {
+    throw std::invalid_argument(
+        "merge controller checkpoint bounds are invalid");
+  }
+  DestinationMergeGrantController controller(
+      checkpoint.destination_node,
+      checkpoint.max_pending_requests,
+      checkpoint.lifecycle_limit);
+  std::set<std::uint64_t> request_ids;
+  std::set<std::uint64_t> grant_ids;
+  for (const auto& pending : checkpoint.pending) {
+    if (pending.destination_merge_node !=
+            checkpoint.destination_node ||
+        pending.request_id == 0 ||
+        !request_ids.insert(pending.request_id).second) {
+      throw std::invalid_argument(
+          "merge controller pending checkpoint is inconsistent");
+    }
+    controller.pending_.push_back(
+        DestinationMergeGrantController::PendingRecord{
+            clone_request(pending)});
+  }
+  for (const auto& active : checkpoint.active) {
+    const auto& request = active.request_snapshot;
+    if (active.grant_id == 0 ||
+        active.request_id == 0 ||
+        active.lineage == 0 ||
+        active.request_generation == 0 ||
+        active.owner_runtime_bag_id < 0 ||
+        active.edge.to_node != checkpoint.destination_node ||
+        active.slot_end <= active.slot_start ||
+        active.grant_expiry != active.slot_end ||
+        request.request_id != active.request_id ||
+        request.lineage != active.lineage ||
+        request.request_generation !=
+            active.request_generation ||
+        request.junction_queue_generation !=
+            active.junction_queue_generation ||
+        request.runtime_bag_id !=
+            active.owner_runtime_bag_id ||
+        request.requested_directed_edge != active.edge ||
+        request.destination_merge_node !=
+            checkpoint.destination_node ||
+        !request_ids.insert(active.request_id).second ||
+        !grant_ids.insert(active.grant_id).second) {
+      throw std::invalid_argument(
+          "merge controller active checkpoint is inconsistent");
+    }
+    auto request_snapshot =
+        std::make_shared<const DestinationMergeRequest>(
+            clone_request(request));
+    controller.active_.push_back(
+        DestinationMergeGrantController::ActiveGrantRecord{
+            active.grant_id,
+            active.request_id,
+            active.lineage,
+            active.request_generation,
+            active.junction_queue_generation,
+            active.owner_runtime_bag_id,
+            active.edge,
+            active.slot_start,
+            active.slot_end,
+            active.issue_time,
+            active.grant_expiry,
+            active.calendar_generation,
+            active.physical_fault_generation,
+            active.advertised_fault_generation,
+            std::move(request_snapshot)});
+  }
+  controller.lifecycle_.clear();
+  controller.lifecycle_.reserve(checkpoint.lifecycle_limit);
+  for (const auto& row : checkpoint.lifecycle) {
+    controller.lifecycle_.push_back(clone_lifecycle(row));
+  }
+  controller.counters_ = checkpoint.counters;
+  controller.next_request_id_ = checkpoint.next_request_id;
+  controller.next_grant_id_ = checkpoint.next_grant_id;
+  controller.generation_ = checkpoint.generation;
+  if (!controller.conservation_holds() ||
+      controller.counters_.peak_pending_count <
+          controller.pending_.size() ||
+      controller.counters_.peak_active_unconsumed_count <
+          controller.active_.size()) {
+    throw std::invalid_argument(
+        "merge controller checkpoint violates conservation");
+  }
+  for (const auto request_id : request_ids) {
+    if (request_id >= controller.next_request_id_) {
+      throw std::invalid_argument(
+          "merge controller next request id is stale");
+    }
+  }
+  for (const auto grant_id : grant_ids) {
+    const auto local_grant_id =
+        grant_id & 0xffffffffULL;
+    if (local_grant_id == 0 ||
+        local_grant_id >= controller.next_grant_id_) {
+      throw std::invalid_argument(
+          "merge controller next grant id is stale");
+    }
+  }
+  return controller;
+}
 
 }  // namespace czr005::ics

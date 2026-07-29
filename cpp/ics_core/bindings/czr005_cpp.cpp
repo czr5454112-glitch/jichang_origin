@@ -4367,6 +4367,443 @@ py::list g4irsf14_arbitration_batch_rows(
   return rows;
 }
 
+py::dict g4irsf14_state_digest_row(
+    const czr005::ics::G4IRSF14RuntimeStateDigests& digests) {
+  digests.validate();
+  py::dict row;
+  row["event_queue_sha256"] = digests.event_queue_sha256;
+  row["current_time_sha256"] = digests.current_time_sha256;
+  row["bags_sha256"] = digests.bags_sha256;
+  row["source_queues_sha256"] = digests.source_queues_sha256;
+  row["junction_queues_sha256"] = digests.junction_queues_sha256;
+  row["local_service_calendars_sha256"] =
+      digests.local_service_calendars_sha256;
+  row["corridor_state_sha256"] = digests.corridor_state_sha256;
+  row["scheduled_incoming_sha256"] =
+      digests.scheduled_incoming_sha256;
+  row["credits_sha256"] = digests.credits_sha256;
+  row["merge_grants_sha256"] = digests.merge_grants_sha256;
+  row["fault_state_sha256"] = digests.fault_state_sha256;
+  row["pibt_owner_state_sha256"] =
+      digests.pibt_owner_state_sha256;
+  row["deterministic_counters_sha256"] =
+      digests.deterministic_counters_sha256;
+  row["scorer_state_sha256"] = digests.scorer_state_sha256;
+  row["result_accumulator_sha256"] =
+      digests.result_accumulator_sha256;
+  row["current_runtime_hashes_sha256"] =
+      digests.current_runtime_hashes_sha256;
+  row["congestion_beacons_sha256"] =
+      digests.congestion_beacons_sha256;
+  row["microphase_state_sha256"] =
+      digests.microphase_state_sha256;
+  return row;
+}
+
+py::dict g4irsf14_replay_hash_row(
+    const czr005::ics::G4IRSF14CloneReplayHashes& hashes) {
+  hashes.validate();
+  py::dict row;
+  row["complete_bags_sha256"] = hashes.complete_bags_sha256;
+  row["segment_result_sha256"] = hashes.segment_result_sha256;
+  row["junction_state_sha256"] = hashes.junction_state_sha256;
+  row["algorithm_summary_sha256"] =
+      hashes.algorithm_summary_sha256;
+  row["deterministic_result_sha256"] =
+      hashes.deterministic_result_sha256;
+  return row;
+}
+
+py::dict g4irsf14_clone_branch_invariants(
+    const czr005::ics::EventDrivenJunctionResult& result) {
+  const auto& summary = result.summary;
+  py::dict row;
+  row["requested_count"] = summary.requested_count;
+  row["completed_count"] = summary.completed_count;
+  row["failed_segment_count"] = summary.failed_count;
+  row["event_count"] = summary.event_count;
+  row["unsafe_entry_count"] =
+      summary.physical_fault_edge_entry_violation_count;
+  row["reservation_conflict_count"] =
+      summary.reservation_conflicts;
+  row["runtime_full_astar_call_count"] =
+      summary.runtime_full_astar_calls;
+  row["runtime_global_scan_count"] =
+      summary.global_reservation_scan_count +
+      summary.priority_global_scan_count +
+      summary.scorer_runtime_global_scan_count +
+      summary.microphase_runtime_global_scan_count +
+      summary.first_edge_credit_global_scan_count;
+  row["runtime_future_route_read_count"] =
+      summary.priority_future_route_input_count +
+      summary.scorer_future_route_input_count +
+      summary.first_edge_credit_future_route_count;
+  row["runtime_future_schedule_read_count"] =
+      summary.scorer_future_schedule_input_count;
+  row["teacher_input_count"] =
+      summary.priority_teacher_input_count +
+      summary.scorer_teacher_input_count;
+  row["priority_teacher_input_count"] =
+      summary.priority_teacher_input_count;
+  row["scorer_teacher_input_count"] =
+      summary.scorer_teacher_input_count;
+  row["full_future_routes_stored"] = 0;
+  row["bag_future_path_field_present"] = false;
+  row["reservation_depth"] = 1;
+  row["max_selected_edges_per_bag"] =
+      summary.max_edges_selected_per_bag_per_decision;
+  row["two_step_reservation_count"] =
+      summary.two_step_reservation_count;
+  row["unresolved_deadlock_count"] =
+      summary.unresolved_deadlock_count;
+  row["event_limit_reached"] = summary.event_limit_reached;
+  row["time_limit_reached"] = summary.time_limit_reached;
+  row["merge_grant_conservation_holds"] =
+      summary.merge_grant_conservation_holds;
+  row["merge_grant_active_bijection_holds"] =
+      summary.merge_grant_active_bijection_holds;
+  row["merge_grant_final_active_unconsumed"] =
+      summary.merge_grant_final_active_unconsumed;
+  row["merge_grant_outstanding_request_count"] =
+      py::int_(summary.merge_grant_outstanding_request_count);
+  row["merge_grant_stale_arbitration_count"] =
+      py::int_(summary.merge_grant_stale_arbitration_count);
+  row["merge_grant_lifecycle_dropped_count"] =
+      py::int_(summary.merge_grant_lifecycle_dropped_count);
+  row["merge_grant_lifecycle_complete"] =
+      summary.merge_grant_lifecycle_dropped_count == 0;
+  row["merge_grant_runtime_owned_capability"] =
+      summary.merge_grant_runtime_owned_capability;
+  row["merge_grant_exact_slot_no_future_shift"] =
+      summary.merge_grant_exact_slot_no_future_shift;
+  const bool merge_grant_active_state_integrity =
+      summary.merge_grant_conservation_holds &&
+      summary.merge_grant_active_bijection_holds &&
+      summary.merge_grant_runtime_owned_capability &&
+      summary.merge_grant_exact_slot_no_future_shift &&
+      summary.merge_grant_final_active_unconsumed == 0 &&
+      summary.merge_grant_outstanding_request_count == 0;
+  row["merge_grant_active_state_integrity_pass"] =
+      merge_grant_active_state_integrity;
+  row["merge_grant_protocol_integrity_pass"] =
+      merge_grant_active_state_integrity &&
+      summary.merge_grant_lifecycle_dropped_count == 0;
+  row["stale_arbitration_event_count"] =
+      py::int_(summary.stale_arbitration_event_count);
+  row["artificial_batch_delay_seconds"] =
+      summary.artificial_batch_delay_seconds;
+  return row;
+}
+
+void require_g4irsf14_clone_branch_hard_gates(
+    const czr005::ics::EventDrivenJunctionResult& result) {
+  const auto& summary = result.summary;
+  const int runtime_global_scan_count =
+      summary.global_reservation_scan_count +
+      summary.priority_global_scan_count +
+      summary.scorer_runtime_global_scan_count +
+      summary.microphase_runtime_global_scan_count +
+      summary.first_edge_credit_global_scan_count;
+  const int runtime_future_route_read_count =
+      summary.priority_future_route_input_count +
+      summary.scorer_future_route_input_count +
+      summary.first_edge_credit_future_route_count;
+  const int runtime_future_schedule_read_count =
+      summary.scorer_future_schedule_input_count;
+  const int teacher_input_count =
+      summary.priority_teacher_input_count +
+      summary.scorer_teacher_input_count;
+  // A bounded passive lifecycle trace may be truncated on the original 1x
+  // workload.  Truncation is reported and compared across all replay
+  // branches, but it cannot invalidate the live protocol state: the trace is
+  // not an input to arbitration, reservation, or grant consumption.
+  const bool merge_active_state_integrity =
+      summary.merge_grant_conservation_holds &&
+      summary.merge_grant_active_bijection_holds &&
+      summary.merge_grant_runtime_owned_capability &&
+      summary.merge_grant_exact_slot_no_future_shift &&
+      summary.merge_grant_final_active_unconsumed == 0 &&
+      summary.merge_grant_outstanding_request_count == 0;
+  if (summary.completed_count != summary.requested_count ||
+      summary.failed_count != 0 ||
+      summary.physical_fault_edge_entry_violation_count != 0 ||
+      summary.reservation_conflicts != 0 ||
+      summary.runtime_full_astar_calls != 0 ||
+      runtime_global_scan_count != 0 ||
+      runtime_future_route_read_count != 0 ||
+      runtime_future_schedule_read_count != 0 ||
+      teacher_input_count != 0 ||
+      summary.max_edges_selected_per_bag_per_decision > 1 ||
+      summary.two_step_reservation_count != 0 ||
+      summary.unresolved_deadlock_count != 0 ||
+      summary.event_limit_reached ||
+      summary.time_limit_reached ||
+      summary.merge_grant_stale_arbitration_count != 0 ||
+      summary.stale_arbitration_event_count != 0 ||
+      summary.artificial_batch_delay_seconds != 0.0 ||
+      !merge_active_state_integrity) {
+    throw std::logic_error(
+        "no-op clone branch violated a production hard gate");
+  }
+}
+
+py::dict g4irsf14_clone_boundary_row(
+    const czr005::ics::EventDrivenJunctionSafeBoundary& boundary,
+    int processed_event_count) {
+  py::dict row;
+  row["kind"] = "queue_top_pre_pop";
+  row["next_event_type"] =
+      czr005::ics::junction_event_name(boundary.next_event_type);
+  row["next_event_time"] = boundary.next_event_time;
+  row["next_event_time_bits"] = py::int_(
+      czr005::ics::event_runtime_detail::timestamp_bits(
+          boundary.next_event_time));
+  row["next_event_seq"] = py::int_(boundary.next_event_seq);
+  row["runtime_bag_id"] = boundary.runtime_bag_id;
+  row["node"] = boundary.node;
+  row["from_node"] = boundary.from_node;
+  row["to_node"] = boundary.to_node;
+  row["active_merge_capability_count"] =
+      boundary.active_merge_capability_count;
+  row["pending_merge_request_count"] =
+      boundary.pending_merge_request_count;
+  row["active_physical_fault_edge_count"] =
+      boundary.active_physical_fault_edge_count;
+  row["queued_bag_count"] = boundary.queued_bag_count;
+  row["processed_event_count"] = processed_event_count;
+  row["runtime_state_sha256"] = boundary.state_sha256;
+  row["queue_top_not_popped"] = boundary.queue_top_not_popped;
+  row["staged_event_sink_empty"] =
+      boundary.staged_event_sink_empty;
+  return row;
+}
+
+py::dict g4irsf14_state_clone_noop_rerun_from_records(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    const std::vector<EventRuntimeBagTuple>& bag_records,
+    const py::object& preregistered_event_ordinal_value,
+    const std::vector<std::vector<double>>& scorer_w1,
+    const std::vector<double>& scorer_b1,
+    const std::vector<double>& scorer_w2,
+    double scorer_b2,
+    double scorer_risk_margin_threshold,
+    double scorer_risk_bottleneck_threshold,
+    const std::string& scorer_model_sha256) {
+  const int preregistered_event_ordinal =
+      strict_python_integer_argument(
+          preregistered_event_ordinal_value,
+          "preregistered_event_ordinal");
+  if (preregistered_event_ordinal < 0) {
+    throw py::value_error(
+        "preregistered_event_ordinal must be non-negative");
+  }
+  if (bag_records.empty()) {
+    throw py::value_error(
+        "state-clone no-op rerun requires at least one original request");
+  }
+
+  const auto graph =
+      graph_from_records(node_records, edge_records, heuristic_time);
+  std::vector<czr005::ics::EventRuntimeBagRequest> requests;
+  requests.reserve(bag_records.size());
+  for (const auto& record : bag_records) {
+    requests.push_back(czr005::ics::EventRuntimeBagRequest{
+        std::get<0>(record),
+        std::get<1>(record),
+        std::get<2>(record),
+        std::get<3>(record),
+        std::get<4>(record),
+        std::get<5>(record),
+        std::get<6>(record)});
+  }
+
+  // This is the frozen Stage-D/Stage-E control tuple.  The no-op fidelity
+  // entrypoint intentionally exposes no knobs that could silently drift it.
+  czr005::ics::EventDrivenJunctionConfig config;
+  config.queue_discipline = "aging";
+  config.retry_interval = 0.25;
+  config.minimum_service_seconds = 1.0e-3;
+  config.dispatch_headway_seconds = 1.0e-3;
+  config.history_limit = 8;
+  config.max_decisions_per_bag = 512;
+  config.max_events = 20000000;
+  config.max_simulation_time = -1.0;
+  config.trace_limit = 0;
+  config.event_trace_limit = 0;
+  config.trace_shard_count = 1;
+  config.trace_shard_index = 0;
+  config.local_queue_capacity = 32;
+  config.deadlock_retry_threshold = 8;
+  config.diagnostic_hops = 2;
+  config.enable_source_admission = false;
+  config.enable_backpressure = false;
+  config.enable_pibt_lite = false;
+  config.enable_deadlock_escape = true;
+  config.enable_fault_policy = true;
+  config.resource_semantics =
+      "R3_java_node_window_compatible";
+  config.entry_headway_seconds = 1.0e-3;
+  config.pressure_mode = "off";
+  config.pressure_weight = 2.0;
+  config.pressure_age_weight = 0.05;
+  config.pressure_distance_bias = 0.25;
+  config.admission_mode = "off";
+  config.credit_validity_seconds = 1.0;
+  config.credit_snapshot_max_age_seconds = 1.0;
+  config.credit_capacity_per_edge = 1;
+  config.credit_lifecycle_limit = 512;
+  config.pibt_mode = "P2";
+  config.pibt_max_ready_bags = 8;
+  config.pibt_max_local_resources = 32;
+  config.pibt_max_candidates_per_bag = 8;
+  config.scorer_mode =
+      "S1_frozen_g4e_legal_local_adapter";
+  config.scorer_w1 = scorer_w1;
+  config.scorer_b1 = scorer_b1;
+  config.scorer_w2 = scorer_w2;
+  config.scorer_b2 = scorer_b2;
+  config.scorer_risk_margin_threshold =
+      scorer_risk_margin_threshold;
+  config.scorer_risk_bottleneck_threshold =
+      scorer_risk_bottleneck_threshold;
+  config.scorer_model_sha256 = scorer_model_sha256;
+  config.framework_mode = "event_loop_one_step";
+  config.priority_mode = "Q0";
+  config.pibt_preference_mode = "current";
+  config.selective_credit_contention_threshold = 1;
+  config.event_semantics =
+      "E4_batch_plus_destination_merge_request";
+  config.enable_opportunity_telemetry = false;
+  config.opportunity_trace_limit = 0;
+  config.merge_grant_rule = "M0";
+  config.merge_grant_max_pending_requests = 256;
+  config.merge_grant_lifecycle_limit = 8192;
+
+  czr005::ics::EventDrivenJunctionRuntime source(graph, config);
+  source.initialize(requests);
+  for (int index = 0; index < preregistered_event_ordinal;
+       ++index) {
+    if (!source.process_one_event()) {
+      throw py::value_error(
+          "preregistered_event_ordinal is not a live pre-pop "
+          "boundary for this workload");
+    }
+  }
+  const auto boundary = source.peek_safe_boundary();
+  if (!boundary.has_value()) {
+    throw py::value_error(
+        "preregistered_event_ordinal resolves after the last "
+        "live pre-pop boundary");
+  }
+  const auto source_inventory =
+      source.deterministic_state_digests();
+  const auto checkpoint = source.capture_state_checkpoint();
+  if (checkpoint.state_sha256() !=
+          source_inventory.aggregate_sha256() ||
+      checkpoint.state_sha256() != boundary->state_sha256) {
+    throw std::logic_error(
+        "captured checkpoint does not bind the observed boundary inventory");
+  }
+
+  czr005::ics::EventDrivenJunctionRuntime baseline(graph, config);
+  czr005::ics::EventDrivenJunctionRuntime clone(graph, config);
+  czr005::ics::G4IRSF14MatchedRuntimeFork<
+      czr005::ics::EventDrivenJunctionRuntime>
+      matched_fork(baseline, clone, checkpoint);
+  const auto baseline_inventory =
+      baseline.deterministic_state_digests();
+  const auto clone_inventory =
+      clone.deterministic_state_digests();
+  if (baseline_inventory.canonical_payload() !=
+          source_inventory.canonical_payload() ||
+      clone_inventory.canonical_payload() !=
+          source_inventory.canonical_payload()) {
+    throw std::logic_error(
+        "independent no-op branches changed the native state inventory");
+  }
+
+  source.drain();
+  baseline.drain();
+  clone.drain();
+  const auto& source_result = source.finalize();
+  const auto& baseline_result = baseline.finalize();
+  const auto& clone_result = clone.finalize();
+  const auto source_hashes = source.deterministic_replay_hashes();
+  const auto baseline_hashes =
+      baseline.deterministic_replay_hashes();
+  const auto clone_hashes = clone.deterministic_replay_hashes();
+  const bool exact_match =
+      source_hashes.exactly_matches(baseline_hashes) &&
+      source_hashes.exactly_matches(clone_hashes);
+  if (!exact_match) {
+    throw std::logic_error(
+        "exact no-op checkpoint replay fidelity is below 100%");
+  }
+  require_g4irsf14_clone_branch_hard_gates(source_result);
+  require_g4irsf14_clone_branch_hard_gates(baseline_result);
+  require_g4irsf14_clone_branch_hard_gates(clone_result);
+
+  py::dict controls;
+  controls["resource_semantics"] =
+      "R3_java_node_window_compatible";
+  controls["scorer_mode"] =
+      "S1_frozen_g4e_legal_local_adapter";
+  controls["pibt_mode"] = "P2";
+  controls["admission_mode"] = "off";
+  controls["pressure_mode"] = "off";
+  controls["priority_mode"] = "Q0";
+  controls["event_semantics"] =
+      "E4_batch_plus_destination_merge_request";
+  controls["merge_grant_rule"] = "M0";
+  controls["scale"] = 1.0;
+  controls["reservation_depth"] = 1;
+  controls["max_events"] = 20000000;
+  controls["max_simulation_time"] = -1.0;
+  controls["trace_limit"] = 0;
+  controls["event_trace_limit"] = 0;
+
+  py::dict payload;
+  payload["schema"] =
+      "czr005.g4irsf14.exact_binary_noop_rerun.v1";
+  payload["evidence_scope"] =
+      "NOOP_FIDELITY_MECHANISM_ONLY_NOT_A_CAUSAL_LABEL";
+  payload["formal_pass_claimed"] = false;
+  payload["intervention_applied"] = false;
+  payload["input_request_count"] =
+      static_cast<int>(requests.size());
+  payload["frozen_controls"] = std::move(controls);
+  payload["boundary"] = g4irsf14_clone_boundary_row(
+      *boundary, preregistered_event_ordinal);
+  payload["runtime_state_sha256"] =
+      checkpoint.state_sha256();
+  payload["state_components"] =
+      g4irsf14_state_digest_row(source_inventory);
+  payload["baseline_start_state_sha256"] =
+      baseline_inventory.aggregate_sha256();
+  payload["baseline_start_state_components"] =
+      g4irsf14_state_digest_row(baseline_inventory);
+  payload["clone_start_state_sha256"] =
+      clone_inventory.aggregate_sha256();
+  payload["clone_start_state_components"] =
+      g4irsf14_state_digest_row(clone_inventory);
+  payload["source_replay_hashes"] =
+      g4irsf14_replay_hash_row(source_hashes);
+  payload["baseline_replay_hashes"] =
+      g4irsf14_replay_hash_row(baseline_hashes);
+  payload["clone_replay_hashes"] =
+      g4irsf14_replay_hash_row(clone_hashes);
+  payload["source_invariants"] =
+      g4irsf14_clone_branch_invariants(source_result);
+  payload["baseline_invariants"] =
+      g4irsf14_clone_branch_invariants(baseline_result);
+  payload["clone_invariants"] =
+      g4irsf14_clone_branch_invariants(clone_result);
+  payload["native_three_way_exact_match"] = exact_match;
+  return payload;
+}
+
 py::dict g4irsf11_event_runtime_from_records(
     const std::vector<NodeRecordTuple>& node_records,
     const std::vector<EdgeRecordTuple>& edge_records,
@@ -5094,6 +5531,21 @@ PYBIND11_MODULE(czr005_cpp, module) {
                  std::string("M1"),
              py::arg("merge_grant_max_pending_requests") = 64,
              py::arg("merge_grant_lifecycle_limit") = 1024);
+  module.def(
+      "g4irsf14_state_clone_noop_rerun_from_records",
+      &g4irsf14_state_clone_noop_rerun_from_records,
+      py::arg("node_records"),
+      py::arg("edge_records"),
+      py::arg("heuristic_time"),
+      py::arg("bag_records"),
+      py::arg("preregistered_event_ordinal"),
+      py::arg("scorer_w1"),
+      py::arg("scorer_b1"),
+      py::arg("scorer_w2"),
+      py::arg("scorer_b2"),
+      py::arg("scorer_risk_margin_threshold"),
+      py::arg("scorer_risk_bottleneck_threshold"),
+      py::arg("scorer_model_sha256"));
   module.def("edge_score_load_summary", &edge_score_load_summary, py::arg("path"));
   module.def("edge_score_native_replay_summary",
              &edge_score_native_replay_summary,

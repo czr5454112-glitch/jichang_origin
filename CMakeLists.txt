@@ -50,6 +50,21 @@ add_test(
   NAME destination_merge_grant_real_map
   COMMAND test_destination_merge_grant_real_map)
 
+add_executable(
+  test_g4irsf14_state_clone_protocol
+  cpp/tests/test_g4irsf14_state_clone_protocol.cpp)
+target_link_libraries(
+  test_g4irsf14_state_clone_protocol
+  PRIVATE ics_core)
+target_compile_definitions(
+  test_g4irsf14_state_clone_protocol
+  PRIVATE
+    CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    CZR005_EVENT_RUNTIME_TESTING=1)
+add_test(
+  NAME g4irsf14_state_clone_protocol
+  COMMAND test_g4irsf14_state_clone_protocol)
+
 add_executable(test_g4irsf12_runtime_controls cpp/tests/test_g4irsf12_runtime_controls.cpp)
 target_link_libraries(test_g4irsf12_runtime_controls PRIVATE ics_core)
 target_compile_definitions(

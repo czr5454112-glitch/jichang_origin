@@ -4,15 +4,20 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <deque>
 #include <limits>
 #include <map>
+#include <set>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include "ics_core/io/canonical_map2_reader.hpp"
 
 namespace czr005::ics {
 
@@ -139,6 +144,30 @@ struct FirstEdgeCreditCounters {
   std::uint64_t lifecycle_dropped_count = 0;
   int active_count = 0;
   int peak_active_count = 0;
+};
+
+struct FirstEdgeCreditIndexCheckpoint {
+  long long key = 0;
+  std::vector<std::uint64_t> credit_ids;
+};
+
+struct FirstEdgeCreditExpiryCheckpoint {
+  double expiry = 0.0;
+  std::uint64_t credit_id = 0;
+};
+
+struct ExpiringFirstEdgeCreditCheckpoint {
+  std::uint64_t next_credit_id = 1;
+  FirstEdgeCreditCounters counters;
+  std::vector<FirstEdgeCredit> active_credits;
+  std::vector<FirstEdgeCreditIndexCheckpoint> active_by_edge;
+  std::vector<FirstEdgeCreditIndexCheckpoint> active_by_destination;
+  std::vector<std::pair<long long, int>> active_capacity_by_edge;
+  std::vector<std::pair<int, std::uint64_t>> active_by_owner;
+  std::vector<FirstEdgeCreditExpiryCheckpoint> expiry_order;
+  std::size_t lifecycle_limit = 0;
+  std::deque<FirstEdgeCreditLifecycleEvent> lifecycle;
+  std::string canonical_sha256;
 };
 
 class ExpiringFirstEdgeCreditLedger {
@@ -538,6 +567,17 @@ class ExpiringFirstEdgeCreditLedger {
            lifecycle_.size() * sizeof(FirstEdgeCreditLifecycleEvent);
   }
 
+  [[nodiscard]] ExpiringFirstEdgeCreditCheckpoint
+  capture_exact_checkpoint() const;
+
+  [[nodiscard]] static ExpiringFirstEdgeCreditLedger
+  restore_exact_checkpoint(
+      const ExpiringFirstEdgeCreditCheckpoint& checkpoint);
+
+  [[nodiscard]] std::string exact_state_sha256() const {
+    return capture_exact_checkpoint().canonical_sha256;
+  }
+
  private:
   static constexpr double kEpsilon = 1.0e-9;
 
@@ -545,6 +585,11 @@ class ExpiringFirstEdgeCreditLedger {
     return (static_cast<long long>(from_node) << 32) ^
            static_cast<unsigned int>(to_node);
   }
+
+  [[nodiscard]] static std::string checkpoint_sha256(
+      const ExpiringFirstEdgeCreditCheckpoint& checkpoint);
+  static void validate_checkpoint(
+      const ExpiringFirstEdgeCreditCheckpoint& checkpoint);
 
   static bool finite(double value) {
     return std::isfinite(value);
@@ -874,5 +919,397 @@ class ExpiringFirstEdgeCreditLedger {
   std::size_t lifecycle_limit_ = 256;
   std::deque<FirstEdgeCreditLifecycleEvent> lifecycle_;
 };
+
+namespace first_edge_credit_checkpoint_detail {
+
+class Writer {
+ public:
+  Writer() {
+    string("czr005.expiring_first_edge_credit.exact_checkpoint.v1");
+  }
+
+  void boolean(bool value) {
+    payload_.push_back(value ? '\x01' : '\x00');
+  }
+
+  void u64(std::uint64_t value) {
+    for (int shift = 56; shift >= 0; shift -= 8) {
+      payload_.push_back(
+          static_cast<char>((value >> shift) & 0xffU));
+    }
+  }
+
+  void i64(std::int64_t value) {
+    u64(static_cast<std::uint64_t>(value));
+  }
+
+  void floating(double value) {
+    std::uint64_t bits = 0;
+    static_assert(sizeof(bits) == sizeof(value));
+    std::memcpy(&bits, &value, sizeof(bits));
+    u64(bits);
+  }
+
+  void string(std::string_view value) {
+    u64(static_cast<std::uint64_t>(value.size()));
+    payload_.append(value);
+  }
+
+  [[nodiscard]] std::string sha256() const {
+    return canonical_map2_detail::sha256_hex(payload_);
+  }
+
+ private:
+  std::string payload_;
+};
+
+inline void fingerprint_credit(Writer& writer,
+                               const FirstEdgeCredit& credit) {
+  writer.u64(credit.credit_id);
+  writer.i64(credit.from_node);
+  writer.i64(credit.to_node);
+  writer.i64(credit.goal);
+  writer.floating(credit.earliest);
+  writer.floating(credit.latest);
+  writer.u64(credit.generation);
+  writer.floating(credit.expiry);
+  writer.i64(credit.capacity);
+  writer.i64(credit.owner_or_unbound);
+  writer.i64(credit.fault_generation);
+  writer.i64(static_cast<int>(credit.state));
+  writer.string(credit.terminal_reason);
+}
+
+inline void fingerprint_counters(
+    Writer& writer,
+    const FirstEdgeCreditCounters& counters) {
+  writer.u64(counters.issue_attempt_count);
+  writer.u64(counters.issued_count);
+  writer.u64(counters.validation_attempt_count);
+  writer.u64(counters.validation_success_count);
+  writer.u64(counters.bind_attempt_count);
+  writer.u64(counters.bound_count);
+  writer.u64(counters.consume_attempt_count);
+  writer.u64(counters.consumed_count);
+  writer.u64(counters.expired_count);
+  writer.u64(counters.fault_revocation_count);
+  writer.u64(counters.generation_revocation_count);
+  writer.u64(counters.invalid_revocation_count);
+  writer.u64(counters.duplicate_rejection_count);
+  writer.u64(counters.capacity_rejection_count);
+  writer.u64(counters.stale_snapshot_rejection_count);
+  writer.u64(counters.physical_fault_rejection_count);
+  writer.u64(counters.too_early_rejection_count);
+  writer.u64(counters.unknown_credit_rejection_count);
+  writer.u64(counters.invalid_request_rejection_count);
+  writer.u64(counters.lifecycle_dropped_count);
+  writer.i64(counters.active_count);
+  writer.i64(counters.peak_active_count);
+}
+
+}  // namespace first_edge_credit_checkpoint_detail
+
+inline std::string
+ExpiringFirstEdgeCreditLedger::checkpoint_sha256(
+    const ExpiringFirstEdgeCreditCheckpoint& checkpoint) {
+  using namespace first_edge_credit_checkpoint_detail;
+  Writer writer;
+  writer.u64(checkpoint.next_credit_id);
+  fingerprint_counters(writer, checkpoint.counters);
+  writer.u64(checkpoint.active_credits.size());
+  for (const auto& credit : checkpoint.active_credits) {
+    fingerprint_credit(writer, credit);
+  }
+  const auto fingerprint_index =
+      [&](const auto& index) {
+        writer.u64(index.size());
+        for (const auto& item : index) {
+          writer.i64(item.key);
+          writer.u64(item.credit_ids.size());
+          for (const auto id : item.credit_ids) {
+            writer.u64(id);
+          }
+        }
+      };
+  fingerprint_index(checkpoint.active_by_edge);
+  fingerprint_index(checkpoint.active_by_destination);
+  writer.u64(checkpoint.active_capacity_by_edge.size());
+  for (const auto& item :
+       checkpoint.active_capacity_by_edge) {
+    writer.i64(item.first);
+    writer.i64(item.second);
+  }
+  writer.u64(checkpoint.active_by_owner.size());
+  for (const auto& item : checkpoint.active_by_owner) {
+    writer.i64(item.first);
+    writer.u64(item.second);
+  }
+  writer.u64(checkpoint.expiry_order.size());
+  for (const auto& item : checkpoint.expiry_order) {
+    writer.floating(item.expiry);
+    writer.u64(item.credit_id);
+  }
+  writer.u64(checkpoint.lifecycle_limit);
+  writer.u64(checkpoint.lifecycle.size());
+  for (const auto& event : checkpoint.lifecycle) {
+    writer.floating(event.time);
+    writer.string(event.action);
+    writer.string(event.reason);
+    fingerprint_credit(writer, event.credit);
+  }
+  return writer.sha256();
+}
+
+inline ExpiringFirstEdgeCreditCheckpoint
+ExpiringFirstEdgeCreditLedger::capture_exact_checkpoint() const {
+  ExpiringFirstEdgeCreditCheckpoint checkpoint;
+  checkpoint.next_credit_id = next_credit_id_;
+  checkpoint.counters = counters_;
+  checkpoint.active_credits.reserve(credits_.size());
+  for (const auto& entry : credits_) {
+    checkpoint.active_credits.push_back(entry.second);
+  }
+  std::sort(
+      checkpoint.active_credits.begin(),
+      checkpoint.active_credits.end(),
+      [](const auto& left, const auto& right) {
+        return left.credit_id < right.credit_id;
+      });
+  checkpoint.active_by_edge.reserve(active_by_edge_.size());
+  for (const auto& entry : active_by_edge_) {
+    FirstEdgeCreditIndexCheckpoint item;
+    item.key = entry.first;
+    item.credit_ids.assign(entry.second.begin(),
+                           entry.second.end());
+    std::sort(item.credit_ids.begin(), item.credit_ids.end());
+    checkpoint.active_by_edge.push_back(std::move(item));
+  }
+  std::sort(
+      checkpoint.active_by_edge.begin(),
+      checkpoint.active_by_edge.end(),
+      [](const auto& left, const auto& right) {
+        return left.key < right.key;
+      });
+  checkpoint.active_by_destination.reserve(
+      active_by_destination_.size());
+  for (const auto& entry : active_by_destination_) {
+    FirstEdgeCreditIndexCheckpoint item;
+    item.key = entry.first;
+    item.credit_ids.assign(entry.second.begin(),
+                           entry.second.end());
+    std::sort(item.credit_ids.begin(), item.credit_ids.end());
+    checkpoint.active_by_destination.push_back(
+        std::move(item));
+  }
+  std::sort(
+      checkpoint.active_by_destination.begin(),
+      checkpoint.active_by_destination.end(),
+      [](const auto& left, const auto& right) {
+        return left.key < right.key;
+      });
+  checkpoint.active_capacity_by_edge.assign(
+      active_capacity_by_edge_.begin(),
+      active_capacity_by_edge_.end());
+  std::sort(checkpoint.active_capacity_by_edge.begin(),
+            checkpoint.active_capacity_by_edge.end());
+  checkpoint.active_by_owner.assign(active_by_owner_.begin(),
+                                    active_by_owner_.end());
+  std::sort(checkpoint.active_by_owner.begin(),
+            checkpoint.active_by_owner.end());
+  checkpoint.expiry_order.reserve(expiry_index_.size());
+  for (const auto& entry : expiry_index_) {
+    checkpoint.expiry_order.push_back(
+        {entry.first, entry.second});
+  }
+  checkpoint.lifecycle_limit = lifecycle_limit_;
+  checkpoint.lifecycle = lifecycle_;
+  checkpoint.canonical_sha256 =
+      checkpoint_sha256(checkpoint);
+  return checkpoint;
+}
+
+inline void ExpiringFirstEdgeCreditLedger::validate_checkpoint(
+    const ExpiringFirstEdgeCreditCheckpoint& checkpoint) {
+  const bool valid_sha256 =
+      checkpoint.canonical_sha256.size() == 64U &&
+      std::all_of(
+          checkpoint.canonical_sha256.begin(),
+          checkpoint.canonical_sha256.end(),
+          [](char byte) {
+            return (byte >= '0' && byte <= '9') ||
+                   (byte >= 'a' && byte <= 'f');
+          });
+  if (!valid_sha256 ||
+      checkpoint.canonical_sha256 !=
+          checkpoint_sha256(checkpoint) ||
+      checkpoint.next_credit_id == 0 ||
+      checkpoint.lifecycle.size() >
+          checkpoint.lifecycle_limit ||
+      checkpoint.counters.active_count !=
+          static_cast<int>(
+              checkpoint.active_credits.size()) ||
+      checkpoint.next_credit_id !=
+          checkpoint.counters.issued_count + 1) {
+    throw std::invalid_argument(
+        "first-edge credit checkpoint header is inconsistent");
+  }
+  std::map<long long, std::vector<std::uint64_t>>
+      expected_edges;
+  std::map<long long, std::vector<std::uint64_t>>
+      expected_destinations;
+  std::map<long long, int> expected_capacities;
+  std::map<int, std::uint64_t> expected_owners;
+  std::map<std::uint64_t, double> expected_expiry;
+  std::uint64_t previous_id = 0;
+  for (const auto& credit : checkpoint.active_credits) {
+    if (credit.credit_id == 0 ||
+        credit.credit_id <= previous_id ||
+        credit.credit_id >= checkpoint.next_credit_id ||
+        (credit.state != FirstEdgeCreditState::kIssued &&
+         credit.state != FirstEdgeCreditState::kBound) ||
+        credit.capacity <= 0 ||
+        !std::isfinite(credit.latest) ||
+        !std::isfinite(credit.expiry)) {
+      throw std::invalid_argument(
+          "first-edge credit checkpoint contains invalid active credit");
+    }
+    previous_id = credit.credit_id;
+    const auto edge =
+        directed_key(credit.from_node, credit.to_node);
+    expected_edges[edge].push_back(credit.credit_id);
+    expected_destinations[credit.to_node].push_back(
+        credit.credit_id);
+    expected_capacities[edge] += credit.capacity;
+    if (credit.owner_or_unbound >= 0 &&
+        !expected_owners
+             .emplace(credit.owner_or_unbound,
+                      credit.credit_id)
+             .second) {
+      throw std::invalid_argument(
+          "first-edge credit checkpoint duplicates an owner");
+    }
+    expected_expiry.emplace(
+        credit.credit_id,
+        std::min(credit.latest, credit.expiry));
+  }
+  const auto validate_index =
+      [&](const auto& actual, const auto& expected,
+          const char* name) {
+        if (actual.size() != expected.size()) {
+          throw std::invalid_argument(
+              std::string(name) + " index size mismatch");
+        }
+        std::size_t position = 0;
+        for (const auto& expected_item : expected) {
+          if (actual[position].key != expected_item.first ||
+              actual[position].credit_ids !=
+                  expected_item.second) {
+            throw std::invalid_argument(
+                std::string(name) + " index content mismatch");
+          }
+          ++position;
+        }
+      };
+  validate_index(checkpoint.active_by_edge,
+                 expected_edges, "edge");
+  validate_index(checkpoint.active_by_destination,
+                 expected_destinations, "destination");
+  if (checkpoint.active_capacity_by_edge.size() !=
+      expected_capacities.size()) {
+    throw std::invalid_argument(
+        "credit capacity index size mismatch");
+  }
+  {
+    std::size_t position = 0;
+    for (const auto& expected : expected_capacities) {
+      if (checkpoint.active_capacity_by_edge[position] !=
+          expected) {
+        throw std::invalid_argument(
+            "credit capacity index content mismatch");
+      }
+      ++position;
+    }
+  }
+  if (checkpoint.active_by_owner.size() !=
+      expected_owners.size()) {
+    throw std::invalid_argument(
+        "credit owner index size mismatch");
+  }
+  {
+    std::size_t position = 0;
+    for (const auto& expected : expected_owners) {
+      if (checkpoint.active_by_owner[position] != expected) {
+        throw std::invalid_argument(
+            "credit owner index content mismatch");
+      }
+      ++position;
+    }
+  }
+  if (checkpoint.expiry_order.size() !=
+      expected_expiry.size()) {
+    throw std::invalid_argument(
+        "credit expiry index size mismatch");
+  }
+  std::set<std::uint64_t> expiry_ids;
+  double previous_expiry =
+      -std::numeric_limits<double>::infinity();
+  for (const auto& item : checkpoint.expiry_order) {
+    const auto expected = expected_expiry.find(item.credit_id);
+    if (expected == expected_expiry.end() ||
+        item.expiry != expected->second ||
+        item.expiry < previous_expiry ||
+        !expiry_ids.insert(item.credit_id).second) {
+      throw std::invalid_argument(
+          "credit expiry index content mismatch");
+    }
+    previous_expiry = item.expiry;
+  }
+}
+
+inline ExpiringFirstEdgeCreditLedger
+ExpiringFirstEdgeCreditLedger::restore_exact_checkpoint(
+    const ExpiringFirstEdgeCreditCheckpoint& checkpoint) {
+  validate_checkpoint(checkpoint);
+  ExpiringFirstEdgeCreditLedger ledger(
+      checkpoint.lifecycle_limit);
+  ledger.next_credit_id_ = checkpoint.next_credit_id;
+  ledger.counters_ = checkpoint.counters;
+  ledger.lifecycle_ = checkpoint.lifecycle;
+  for (const auto& credit : checkpoint.active_credits) {
+    ledger.credits_.emplace(credit.credit_id, credit);
+  }
+  for (const auto& item : checkpoint.active_by_edge) {
+    ledger.active_by_edge_.emplace(
+        item.key,
+        std::unordered_set<std::uint64_t>(
+            item.credit_ids.begin(), item.credit_ids.end()));
+  }
+  for (const auto& item :
+       checkpoint.active_by_destination) {
+    ledger.active_by_destination_.emplace(
+        static_cast<int>(item.key),
+        std::unordered_set<std::uint64_t>(
+            item.credit_ids.begin(), item.credit_ids.end()));
+  }
+  ledger.active_capacity_by_edge_.insert(
+      checkpoint.active_capacity_by_edge.begin(),
+      checkpoint.active_capacity_by_edge.end());
+  ledger.active_by_owner_.insert(
+      checkpoint.active_by_owner.begin(),
+      checkpoint.active_by_owner.end());
+  for (const auto& item : checkpoint.expiry_order) {
+    const auto iterator = ledger.expiry_index_.emplace(
+        item.expiry, item.credit_id);
+    ledger.expiry_by_credit_.emplace(item.credit_id,
+                                     iterator);
+  }
+  const auto restored = ledger.capture_exact_checkpoint();
+  if (restored.canonical_sha256 !=
+      checkpoint.canonical_sha256) {
+    throw std::invalid_argument(
+        "first-edge credit checkpoint failed exact restore");
+  }
+  return ledger;
+}
 
 }  // namespace czr005::ics

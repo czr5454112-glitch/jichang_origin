@@ -15,6 +15,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import subprocess
 import sys
 from typing import Any, Mapping, Sequence
 
@@ -55,6 +56,16 @@ LIFECYCLE_PATH = Path(
 )
 RULE_AB_PATH = Path("outputs/tables/g4irsf14_merge_rule_ab.csv")
 CONFIG_PATH = Path("artifacts/configs/g4irsf14_merge_grant_protocol.json")
+
+# The committed Stage-D document did not record an execution commit.  Do not
+# retroactively invent one: instead, anchor its generation-time source hash
+# commitments to the exact Git blob that first sealed the evidence.  Later
+# phases may legally evolve those source paths without reinterpreting this
+# immutable predecessor against the current working tree.
+STAGE_D_SEAL_COMMIT = "e785eba9fa065bbb4cea49f0855492258431698b"
+STAGE_D_CONFIG_BLOB_SHA256 = (
+    "e36e81bcc4aafa1b3d222fdd0d634dae687fa337d706c7af28c38141585298e4"
+)
 
 SOURCE_PATHS = (
     GENERATOR_PATH,
@@ -459,6 +470,95 @@ def _is_sha256(value: Any) -> bool:
     )
 
 
+def _is_full_git_object_id(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 40
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
+def _run_git(
+    root: Path,
+    arguments: Sequence[str],
+    *,
+    check: bool = True,
+) -> subprocess.CompletedProcess[bytes]:
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(root), *arguments],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+    except OSError as exc:
+        raise ProtocolValidationError(
+            f"cannot execute Git for Stage-D history validation: {exc}"
+        ) from exc
+    if check and completed.returncode != 0:
+        detail = completed.stderr.decode("utf-8", errors="replace").strip()
+        raise ProtocolValidationError(
+            "Stage-D Git history validation failed for "
+            f"{' '.join(arguments)}: {detail[:1000]}"
+        )
+    return completed
+
+
+def _validate_historical_manifest_seal(
+    config: Mapping[str, Any],
+    *,
+    root: Path,
+    seal_commit: str = STAGE_D_SEAL_COMMIT,
+) -> str:
+    """Verify the immutable config against its reviewed ancestor Git blob."""
+
+    require(
+        _is_full_git_object_id(seal_commit),
+        "Stage-D seal commit must be a full lowercase Git object ID",
+    )
+    resolved = _run_git(
+        root,
+        ["rev-parse", "--verify", f"{seal_commit}^{{commit}}"],
+    ).stdout.decode("ascii", errors="strict").strip()
+    require(
+        resolved == seal_commit,
+        "Stage-D seal commit did not resolve canonically",
+    )
+    ancestor = _run_git(
+        root,
+        ["merge-base", "--is-ancestor", seal_commit, "HEAD"],
+        check=False,
+    )
+    require(
+        ancestor.returncode == 0,
+        "Stage-D seal commit is not an ancestor of checked-out HEAD",
+    )
+
+    blob = _run_git(
+        root,
+        ["cat-file", "blob", f"{seal_commit}:{CONFIG_PATH.as_posix()}"],
+    ).stdout
+    require(
+        hashlib.sha256(blob).hexdigest() == STAGE_D_CONFIG_BLOB_SHA256,
+        "historical Stage-D manifest blob hash mismatch",
+    )
+    try:
+        historical = json.loads(blob.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ProtocolValidationError(
+            "historical Stage-D manifest blob is not strict UTF-8 JSON"
+        ) from exc
+    require(
+        isinstance(historical, Mapping),
+        "historical Stage-D manifest blob is not an object",
+    )
+    require(
+        dict(historical) == dict(config),
+        "Stage-D manifest differs from its sealed historical Git blob",
+    )
+    return seal_commit
+
+
 def _expected_runtime_echo(rule: str) -> dict[str, dict[str, Any]]:
     return {
         "summary": {
@@ -673,6 +773,7 @@ def _validate_source_bundle(
     *,
     root: Path,
 ) -> str:
+    _validate_historical_manifest_seal(config, root=root)
     bundle = config.get("source_bundle")
     require(isinstance(bundle, Mapping), "source_bundle missing")
     require(
@@ -684,24 +785,29 @@ def _validate_source_bundle(
     require(isinstance(files, list), "source_bundle.files missing")
     expected_paths = [path.as_posix() for path in SOURCE_PATHS]
     require(
-        [row.get("path") for row in files if isinstance(row, Mapping)]
-        == expected_paths,
+        len(files) == len(expected_paths)
+        and all(isinstance(row, Mapping) for row in files),
+        "source bundle file manifest malformed",
+    )
+    require(
+        [row.get("path") for row in files] == expected_paths,
         "source path manifest drift",
     )
-    expected_files = [
-        {
-            "path": relative.as_posix(),
-            "semantic_sha256": semantic_text_sha256(root / relative),
-        }
-        for relative in SOURCE_PATHS
-    ]
-    require(files == expected_files, "runtime source file hash drift")
+    for index, row in enumerate(files):
+        require(
+            set(row) == {"path", "semantic_sha256"},
+            f"source bundle file row {index} has unexpected fields",
+        )
+        require(
+            _is_sha256(row.get("semantic_sha256")),
+            f"source bundle file row {index} hash malformed",
+        )
     require(
         bundle.get("path_manifest_sha256")
         == canonical_sha256(expected_paths),
         "source path manifest self-hash mismatch",
     )
-    expected_bundle = canonical_sha256(expected_files)
+    expected_bundle = canonical_sha256(files)
     require(
         bundle.get("bundle_sha256") == expected_bundle,
         "source bundle self-hash mismatch",

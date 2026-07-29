@@ -4,6 +4,7 @@ import json
 import hashlib
 from pathlib import Path
 import shutil
+import subprocess
 from typing import Any
 
 import pytest
@@ -395,6 +396,107 @@ def test_committed_production_bundle_validates_independently() -> None:
         "VERIFIED_EXACT_BYTES",
         "SEALED_DIGEST_ONLY",
     }
+
+
+def test_stage_d_source_bundle_is_bound_to_ancestor_manifest_blob() -> None:
+    config = json.loads(
+        (ROOT / validator.CONFIG_PATH).read_text(encoding="utf-8")
+    )
+    assert (
+        validator._validate_historical_manifest_seal(config, root=ROOT)
+        == validator.STAGE_D_SEAL_COMMIT
+    )
+
+
+def test_stage_d_seal_rejects_missing_and_nonancestor_commit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = json.loads(
+        (ROOT / validator.CONFIG_PATH).read_text(encoding="utf-8")
+    )
+    with pytest.raises(
+        validator.ProtocolValidationError,
+        match="Git history validation failed",
+    ):
+        validator._validate_historical_manifest_seal(
+            config,
+            root=ROOT,
+            seal_commit="0" * 40,
+        )
+
+    original = validator._run_git
+
+    def nonancestor(
+        root: Path,
+        arguments: tuple[str, ...] | list[str],
+        *,
+        check: bool = True,
+    ) -> subprocess.CompletedProcess[bytes]:
+        if list(arguments[:2]) == ["merge-base", "--is-ancestor"]:
+            return subprocess.CompletedProcess(
+                args=list(arguments),
+                returncode=1,
+                stdout=b"",
+                stderr=b"",
+            )
+        return original(root, arguments, check=check)
+
+    monkeypatch.setattr(validator, "_run_git", nonancestor)
+    with pytest.raises(
+        validator.ProtocolValidationError,
+        match="not an ancestor",
+    ):
+        validator._validate_historical_manifest_seal(config, root=ROOT)
+
+
+def test_stage_d_seal_rejects_historical_blob_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = json.loads(
+        (ROOT / validator.CONFIG_PATH).read_text(encoding="utf-8")
+    )
+    original = validator._run_git
+
+    def corrupt_blob(
+        root: Path,
+        arguments: tuple[str, ...] | list[str],
+        *,
+        check: bool = True,
+    ) -> subprocess.CompletedProcess[bytes]:
+        completed = original(root, arguments, check=check)
+        if list(arguments[:2]) == ["cat-file", "blob"]:
+            return subprocess.CompletedProcess(
+                args=completed.args,
+                returncode=0,
+                stdout=completed.stdout + b" ",
+                stderr=b"",
+            )
+        return completed
+
+    monkeypatch.setattr(validator, "_run_git", corrupt_blob)
+    with pytest.raises(
+        validator.ProtocolValidationError,
+        match="historical Stage-D manifest blob hash mismatch",
+    ):
+        validator._validate_historical_manifest_seal(config, root=ROOT)
+
+
+def test_stage_d_seal_rejects_forged_rehashed_source_bundle() -> None:
+    config = json.loads(
+        (ROOT / validator.CONFIG_PATH).read_text(encoding="utf-8")
+    )
+    config["source_bundle"]["files"][0]["semantic_sha256"] = "0" * 64
+    config["source_bundle"]["bundle_sha256"] = validator.canonical_sha256(
+        config["source_bundle"]["files"]
+    )
+    unsigned = dict(config)
+    unsigned.pop("self_sha256")
+    config["self_sha256"] = validator.canonical_sha256(unsigned)
+    with pytest.raises(
+        validator.ProtocolValidationError,
+        match="sealed historical Git blob",
+    ):
+        validator._validate_source_bundle(config, root=ROOT)
 
 
 def test_validator_rejects_output_tamper_even_if_csv_remains_parseable(
