@@ -434,3 +434,22 @@
 - 对方向的意义：面向更多站点和订单 schema 时，去中心化 worker 必须对“进入本地
   决策器的实际请求语义”达成一致；把 adapter 后的语义身份作为契约，可避免不同节点
   因字段别名或默认值不同而悄然处理不同 workload。
+
+### NI-028：发布级资源见证必须使用显式 ABI，而不是 ctypes 默认签名
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：修复输入 schema 后，正式 census 在首个内存快照处 fail closed。旧 Windows
+  实现通过 `ctypes.windll` 调用 `GetCurrentProcess`/`GetProcessMemoryInfo`，没有声明
+  64-bit HANDLE、参数和返回类型；在当前 64-bit Python 上真实调用失败。orchestrator
+  的同类 process-tree sampler 因显式声明 Win32 ABI 而可正常工作。
+- 决策：campaign sampler 使用 `WinDLL(..., use_last_error=True)`，并为
+  `GetCurrentProcess` 与 `GetProcessMemoryInfo` 固定 `argtypes`/`restype`；结构字段
+  使用 `wintypes.DWORD` 与指针宽度的 `c_size_t`。新增真实进程取样回归，要求 peak
+  RSS 为正，且可用的 current RSS 不大于 peak RSS。
+- 证据：失败发生在 native scan 调用之前，没有产生 descriptor/label；修复后的
+  Windows 真实 sampler 回归通过；workflow 已加入最小 `windows-latest` ABI job，
+  其远端结果仍待新提交触发。完整 campaign census 仍须在新提交与新 exact manifest
+  上重跑，不能沿用修复前的资源见证。
+- 对方向的意义：去中心化多 worker 的可扩展性结论不仅依赖算法输出，也依赖可信的
+  资源边界；显式 ABI 能避免监控层因平台调用约定而失真，从而让内存 cap、恢复和
+  跨主机执行 profile 成为可审计证据。

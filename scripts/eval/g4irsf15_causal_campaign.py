@@ -1145,10 +1145,12 @@ def _process_memory_snapshot() -> dict[str, Any]:
     """Return current/peak resident memory without an optional dependency."""
 
     if os.name == "nt":
+        from ctypes import wintypes
+
         class ProcessMemoryCounters(ctypes.Structure):
             _fields_ = [
-                ("cb", ctypes.c_ulong),
-                ("PageFaultCount", ctypes.c_ulong),
+                ("cb", wintypes.DWORD),
+                ("PageFaultCount", wintypes.DWORD),
                 ("PeakWorkingSetSize", ctypes.c_size_t),
                 ("WorkingSetSize", ctypes.c_size_t),
                 ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
@@ -1159,10 +1161,22 @@ def _process_memory_snapshot() -> dict[str, Any]:
                 ("PeakPagefileUsage", ctypes.c_size_t),
             ]
 
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        psapi = ctypes.WinDLL("psapi", use_last_error=True)
+        get_current_process = kernel32.GetCurrentProcess
+        get_current_process.argtypes = []
+        get_current_process.restype = wintypes.HANDLE
+        get_memory = psapi.GetProcessMemoryInfo
+        get_memory.argtypes = [
+            wintypes.HANDLE,
+            ctypes.POINTER(ProcessMemoryCounters),
+            wintypes.DWORD,
+        ]
+        get_memory.restype = wintypes.BOOL
         counters = ProcessMemoryCounters()
         counters.cb = ctypes.sizeof(counters)
-        process = ctypes.windll.kernel32.GetCurrentProcess()
-        succeeded = ctypes.windll.psapi.GetProcessMemoryInfo(
+        process = get_current_process()
+        succeeded = get_memory(
             process, ctypes.byref(counters), counters.cb
         )
         _require(bool(succeeded), "WINDOWS_PROCESS_MEMORY_SAMPLE_FAILED")

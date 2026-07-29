@@ -8,6 +8,20 @@ permissions:
   contents: read
 
 jobs:
+  windows-rss-abi:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install minimal G4IRSF15 RSS test dependencies
+        run: python -m pip install -e . pytest==9.1.0
+      - name: Exercise the real Win64 process-memory ABI
+        run: >-
+          python -m pytest -q
+          tests/test_g4irsf15_causal_campaign.py::test_process_memory_snapshot_uses_real_supported_sampler
+
   gate-regressions:
     runs-on: ubuntu-latest
     steps:

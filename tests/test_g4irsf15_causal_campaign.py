@@ -13,6 +13,21 @@ def _sha(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
 
 
+def test_process_memory_snapshot_uses_real_supported_sampler() -> None:
+    snapshot = campaign._process_memory_snapshot()
+    assert snapshot["sampler"] in {
+        "WINDOWS_PSAPI_GET_PROCESS_MEMORY_INFO",
+        "GETRUSAGE_RUSAGE_SELF",
+    }
+    assert isinstance(snapshot["peak_resident_bytes"], int)
+    assert snapshot["peak_resident_bytes"] > 0
+    if snapshot["resident_bytes"] is not None:
+        assert isinstance(snapshot["resident_bytes"], int)
+        assert 0 < snapshot["resident_bytes"] <= snapshot[
+            "peak_resident_bytes"
+        ]
+
+
 def _population() -> list[dict[str, object]]:
     counts = {"I1": 3072, "I3": 2560, "I4": 2560}
     rows: list[dict[str, object]] = []
