@@ -1,5 +1,6 @@
 # G4IRSF14 frozen evidence uses physical byte hashes. Keep these exact
 # checkout encodings independent of each contributor's core.autocrlf setting.
+.gitattributes text eol=lf
 data/processed/maps/map2.json text eol=crlf
 artifacts/models/g4e_risk_calibrated_policy.json text eol=crlf
 legacy/jichang_origin_readonly/inputdata.txt text eol=crlf
@@ -40,3 +41,17 @@ outputs/tables/g4irsf14_event_seq_ordering_audit.csv text eol=lf
 outputs/tables/g4irsf14_junction_arbitration_opportunities.csv text eol=lf
 outputs/tables/g4irsf14_merge_request_visibility.csv text eol=lf
 outputs/tables/g4irsf14_source_admission_opportunities.csv text eol=lf
+
+# All Stage-14 evidence, reports, validators and gates are byte-hash bound.
+# Keep future checkouts portable across Windows and Linux.
+artifacts/datasets/g4irsf14_*.json text eol=lf
+artifacts/configs/g4irsf14_*.json text eol=lf
+artifacts/gates/g4irsf14_*.json text eol=lf
+artifacts/policies/g4irsf14_*.json text eol=lf
+outputs/reports/g4irsf14_*.md text eol=lf
+outputs/tables/g4irsf14_*.csv text eol=lf
+outputs/tables/g4irsf14_*.json text eol=lf
+scripts/eval/g4irsf14_*.py text eol=lf
+scripts/validate_g4irsf14_*.py text eol=lf
+tests/test_g4irsf14_*.py text eol=lf
+.github/workflows/g4irsf11-gate-integrity.yml text eol=lf

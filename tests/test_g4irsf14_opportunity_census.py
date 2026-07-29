@@ -14,6 +14,18 @@ import pytest
 from scripts.eval import g4irsf14_opportunity_census as census
 
 
+def test_provenance_absolute_paths_are_cross_platform() -> None:
+    assert census._is_portable_absolute_path(
+        r"C:\PROGRAMING\czr005\build\python\czr005_cpp.pyd"
+    )
+    assert census._is_portable_absolute_path(
+        "/opt/czr005/build/python/czr005_cpp.so"
+    )
+    assert not census._is_portable_absolute_path(
+        "build/python/czr005_cpp.so"
+    )
+
+
 def _binary_identity(path: Path) -> tuple[str, str]:
     resolved = path.resolve()
     return str(resolved), hashlib.sha256(resolved.read_bytes()).hexdigest()

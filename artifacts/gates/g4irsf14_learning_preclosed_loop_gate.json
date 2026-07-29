@@ -1,0 +1,348 @@
+{
+  "allowed_generalization_controls": [
+    "SHARED_MODEL",
+    "MERGE_SPECIFIC_BIAS",
+    "LOCAL_CONTROLLER_CALIBRATION"
+  ],
+  "blockers": [
+    "ZERO_MATCHED_CAUSAL_TARGET_SUPPORT",
+    "MINIMUM_2000_COMPLETE_INTERVENTIONS_NOT_MET",
+    "NO_TRAIN_VALIDATION_AUDIT_SPLIT",
+    "NO_ELIGIBLE_MODEL_ARTIFACT"
+  ],
+  "causal_label_count": 0,
+  "clone_state_interventions_cross_split_allowed": false,
+  "data_gate": {
+    "candidate_request_completeness": null,
+    "clone_fidelity_exact": true,
+    "complete_intervention_count": 0,
+    "counterfactual_target_support_positive": false,
+    "minimum_complete_intervention_count": 2000,
+    "no_future_runtime_leakage": null,
+    "selected_action_grant_coverage": null,
+    "train_validation_audit_overlap_zero": null
+  },
+  "formal_pass_claimed": false,
+  "generated_by": "scripts/eval/g4irsf14_fail_closed_completion.py",
+  "generation_id": "a8db7027c44c66614ac3f7b04f414b10ce7863f066eebcc901177d9cc1ff363a",
+  "input_identity_sha256": "ae5bed39061e4ad6095d8fd8eea3922b4e5fb5d1c71237d3cd975a69e21f371f",
+  "model_artifacts_generated": [],
+  "offline_metrics": {
+    "admission": null,
+    "merge": null,
+    "route": null
+  },
+  "output_bindings": {
+    "outputs/reports/g4irsf14_learning_data_report.md": {
+      "byte_count": 669,
+      "path": "outputs/reports/g4irsf14_learning_data_report.md",
+      "sha256": "6db43628bc175f2ea16f02fa6d66f49309b9c5e7616cb29fb04aeb0f9a049a9b"
+    },
+    "outputs/reports/g4irsf14_offline_training_report.md": {
+      "byte_count": 429,
+      "path": "outputs/reports/g4irsf14_offline_training_report.md",
+      "sha256": "4b9f564800657f9c11bdc31f7ddbcb0b05b512bd1b1e99f98bfa3a1a3c29be7f"
+    },
+    "outputs/tables/g4irsf14_admission_offline_ab.csv": {
+      "byte_count": 1594,
+      "path": "outputs/tables/g4irsf14_admission_offline_ab.csv",
+      "sha256": "06278797bd7e5443a6be6c6a91e4aa21258d5dda59480c018cfe3a8229768495"
+    },
+    "outputs/tables/g4irsf14_merge_offline_ab.csv": {
+      "byte_count": 2617,
+      "path": "outputs/tables/g4irsf14_merge_offline_ab.csv",
+      "sha256": "b4d2eb065734309e508a46a174624966ca400ff5034f39f9da0b7f46a83067c7"
+    },
+    "outputs/tables/g4irsf14_route_offline_ab.csv": {
+      "byte_count": 1556,
+      "path": "outputs/tables/g4irsf14_route_offline_ab.csv",
+      "sha256": "cd4725ea2f567680979568936b1afca4c1575daee369e29badb691d86555f5db"
+    }
+  },
+  "planned_negative_cohorts": [
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "F2_ALREADY_BETTER_THAN_V2"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "NODES_19_22"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "LATE_BAND"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "SOURCES_5_4_3"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "GOAL_48"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "LOW_CONTENTION"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "UNIQUE_OUTGOING"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "NO_BENEFIT_HOLD"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "P2_NO_BENEFIT_STATES"
+    }
+  ],
+  "planned_split_dimensions": [
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "RAW_BAG"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "TIME_BLOCK"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "SOURCE"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "GOAL"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "JUNCTION_MERGE"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "EBS_DIRECT"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "CAUSAL_INTERVENTION_GROUP"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "READY_SET_SIGNATURE"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "TAIL_NON_TAIL"
+    }
+  ],
+  "required_generalization_ablations": [
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "NO_ABSOLUTE_NODE_ID"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "SHARED_MODEL_ABLATION"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "NODE_SPECIFIC_BIAS_ABLATION"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "HELD_OUT_TIME_SOURCE_GOAL"
+    },
+    {
+      "evaluation_status": "NOT_EVALUATED",
+      "name": "NO_TASK_ID_MEMORY"
+    }
+  ],
+  "runtime_eligible": false,
+  "schema": "czr005.g4irsf14.learning_preclosed_loop_gate.v1",
+  "selected_candidate": null,
+  "self_sha256": "1fcf8d64030c8f64ad06b887c253617e8f0c5ee4f1cc120a0f8fb3688bad2d02",
+  "stage": "I",
+  "status": "FAIL_CLOSED",
+  "threshold_inventory": {
+    "admission": [
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "beneficial_hold_precision",
+        "threshold": ">=0.80"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "harmful_hold_rate",
+        "threshold": "<=0.01"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "outside_target_activation",
+        "threshold": "<=0.02"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "source_wait_offset_by_larger_network_decrease",
+        "threshold": "true"
+      }
+    ],
+    "data": [
+      {
+        "evaluation_status": "PASS",
+        "observed": "100%",
+        "requirement": "clone_fidelity",
+        "threshold": "100%"
+      },
+      {
+        "evaluation_status": "FAIL_CLOSED",
+        "observed": 0,
+        "requirement": "counterfactual_target_support",
+        "threshold": ">0"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "train_validation_audit_overlap",
+        "threshold": "0"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "candidate_request_completeness",
+        "threshold": "100%"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "selected_action_grant_coverage",
+        "threshold": "100%"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "no_future_runtime_leakage",
+        "threshold": "true"
+      }
+    ],
+    "merge": [
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "pairwise_grant_order_accuracy",
+        "threshold": ">=0.75"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "top1_winner_accuracy",
+        "threshold": ">=0.75"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "high_confidence_harmful_order",
+        "threshold": "<=0.01"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "starvation_fairness_violation",
+        "threshold": "=0"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "causal_positive_precision",
+        "threshold": ">=0.80"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "estimated_recovered_mean_seconds_per_bag",
+        "threshold": ">=1.50"
+      }
+    ],
+    "risk_abstention": [
+      {
+        "evaluation_status": "FAIL_CLOSED",
+        "observed": false,
+        "requirement": "causal_support_positive",
+        "threshold": "true"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "confidence_gate",
+        "threshold": "true"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "state_in_distribution",
+        "threshold": "true"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "grant_request_completeness",
+        "threshold": "true"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "fault_generation_current",
+        "threshold": "true"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "exact_f2_or_best_rule_fallback",
+        "threshold": "true"
+      }
+    ],
+    "route": [
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "pairwise_accuracy",
+        "threshold": ">=0.70"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "top1_accuracy",
+        "threshold": ">=0.75"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "high_confidence_harmful",
+        "threshold": "<=0.01"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "ece",
+        "threshold": "<=0.10"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "f2_preserved_outside_target",
+        "threshold": ">=0.98"
+      },
+      {
+        "evaluation_status": "NOT_EVALUATED",
+        "observed": null,
+        "requirement": "positive_causal_precision",
+        "threshold": ">=0.80"
+      }
+    ]
+  },
+  "training_status": "INSUFFICIENT_CAUSAL_DATA_NOT_RUN",
+  "upstream_census_self_sha256": "9d0da238e0bef3aed5cd12b6a713c6e53d1a0156f1b2abd64a31a528088e555d"
+}

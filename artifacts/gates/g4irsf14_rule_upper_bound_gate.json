@@ -1,0 +1,68 @@
+{
+  "blockers": [
+    "ZERO_COMPLETE_H_BAG_H_SYSTEM_CAUSAL_LABELS",
+    "ORIGINAL_TASK_MINIMUM_2000_MATCHED_INTERVENTIONS_NOT_ESTABLISHED"
+  ],
+  "causal_label_count": 0,
+  "causal_upper_bound_seconds_per_bag": null,
+  "diagnostic_only_rule_ids": [
+    "R-M7",
+    "R-S5"
+  ],
+  "eligible_rule_count": 0,
+  "elimination_criteria": [
+    "NON_DRAIN",
+    "HARD_SAFETY_FAIL",
+    "MEAN_LOSS_GT_0_5_SECONDS_PER_BAG_AT_MATCHED_TIER",
+    "P95_LOSS_GT_2_SECONDS",
+    "P99_LOSS_GT_4_SECONDS",
+    "SOURCE_WAIT_GAIN_OFFSET_BY_LARGER_NETWORK_LOSS",
+    "FAIRNESS_OR_STARVATION",
+    "HIDDEN_FUTURE_READ",
+    "NO_EFFECTIVE_ACTION"
+  ],
+  "formal_pass_claimed": false,
+  "generated_by": "scripts/eval/g4irsf14_fail_closed_completion.py",
+  "generation_id": "a8db7027c44c66614ac3f7b04f414b10ce7863f066eebcc901177d9cc1ff363a",
+  "input_identity_sha256": "ae5bed39061e4ad6095d8fd8eea3922b4e5fb5d1c71237d3cd975a69e21f371f",
+  "output_bindings": {
+    "outputs/reports/g4irsf14_rule_upper_bound.md": {
+      "byte_count": 778,
+      "path": "outputs/reports/g4irsf14_rule_upper_bound.md",
+      "sha256": "5c0a6a72dd3ff42d9990e5b36fa2a3db8dab160e245d05cd0d797ca326c9bfe0"
+    },
+    "outputs/tables/g4irsf14_rule_upper_bound_gate.csv": {
+      "byte_count": 5862,
+      "path": "outputs/tables/g4irsf14_rule_upper_bound_gate.csv",
+      "sha256": "caff93fe787f135a06cad1aeaafc3ccf35d5de989fb31a9c1ae13ac22d108d9f"
+    }
+  },
+  "planned_rule_count": 14,
+  "result_label_inventory": [
+    "RULE_NO_GAIN",
+    "RULE_LOCAL_GAIN_ONLY",
+    "RULE_FULL_GAIN_NOT_V2",
+    "RULE_STRICT_V2_WIN"
+  ],
+  "schema": "czr005.g4irsf14.rule_upper_bound_gate.v1",
+  "selected_result_label": null,
+  "self_sha256": "5ca42df2355fbf33291b742913be49eaaafbec3ead498117d812e688bb7edff0",
+  "stage": "F",
+  "stage_d_mechanism_rule_count": 7,
+  "stage_d_observation": {
+    "executed_online_rule_count": 7,
+    "observed_improved_rule_count": 0,
+    "scope": "144_SEGMENT_MECHANISM_ONLY"
+  },
+  "status": "NOT_RUN_UPSTREAM_CAUSAL_GATE",
+  "successive_halving_tiers": [
+    "REAL_MAP_MOTIF",
+    "144",
+    "512",
+    "2048",
+    "8192",
+    "FULL_TOP_LE_3"
+  ],
+  "upper_bound_measured": false,
+  "upstream_census_self_sha256": "9d0da238e0bef3aed5cd12b6a713c6e53d1a0156f1b2abd64a31a528088e555d"
+}

@@ -5,8 +5,8 @@
 - Formal pass claimed: `false`
 - Formal v3 schema claimed: `false`
 - Causal label count: `0`
-- Bundle generation ID: `066f4fbce18d45eef1fb27cee5e26bf5a22365f62dbe0f7f4ebb4a8687aa7aa3`
-- Census self SHA-256: `8f4592c9745058301a0cd4cf4135d0ce003ce031a3ec61af0989fb93efc466a9`
+- Bundle generation ID: `a19c406aa5ea5a501f0ed43f220d3b476ab909986f4de2da24e35a8c970d6d3f`
+- Census self SHA-256: `9d0da238e0bef3aed5cd12b6a713c6e53d1a0156f1b2abd64a31a528088e555d`
 
 This report is a blocker/audit artifact. It does not contain matched causal labels and cannot satisfy the Stage 14E formal promotion gate.
 
@@ -34,9 +34,9 @@ One exact-binary, three-way no-op checkpoint replay established mechanism fideli
 
 | Artifact | SHA-256 |
 |---|---|
-| `outputs/tables/g4irsf14_opportunity_census.json` | `d66ad256c7f6ef7b44642ed1715b9bf01d609e191eba308f21c06367710e56d7` |
-| `outputs/tables/g4irsf14_clone_fidelity.csv` | `1143b4488fce1f6db355c9212a0423757accceabbed69a91a1de10e99fe951b0` |
+| `outputs/tables/g4irsf14_opportunity_census.json` | `365d2a8f860944616f5e7199be2c3c86b3d07dc743ba793b978b0fedf4586de3` |
+| `outputs/tables/g4irsf14_clone_fidelity.csv` | `c1e2e590f9be020ef43671088e3f8feba347b6708917cb09d15e1f9747adb1a5` |
 | `outputs/tables/g4irsf14_causal_interventions.csv` | `283366d74bc021c90a6f3a9a769243a6e7825f0cb3b51b97cde886fe67eb3451` |
-| `outputs/tables/g4irsf14_causal_component_ledger.csv` | `8cc00a2483fc7ac31ab801de9e4c973e090a6f2b4da9cdb8dbd1b9ad797e62b8` |
+| `outputs/tables/g4irsf14_causal_component_ledger.csv` | `f7b05a0b95e2332d6317c64684211b7d9079e74e1f753c4c5ea6b4a3ea29dbd7` |
 
 The clone manifest is published last as the transaction commit marker and binds this report plus every table above.

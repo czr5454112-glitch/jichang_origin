@@ -27,7 +27,7 @@ import struct
 import sys
 import tempfile
 from collections.abc import Callable, Mapping, Sequence
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 
@@ -375,6 +375,15 @@ class OpportunityCensusError(RuntimeError):
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise OpportunityCensusError(message)
+
+
+def _is_portable_absolute_path(value: str) -> bool:
+    """Recognize absolute provenance paths independent of the validator OS."""
+
+    return (
+        PureWindowsPath(value).is_absolute()
+        or PurePosixPath(value).is_absolute()
+    )
 
 
 def canonical_json_bytes(value: Any) -> bytes:
@@ -1907,7 +1916,10 @@ def validate_census_document(
     )
     binary = _mapping(value["binary"], "binary")
     _require(set(binary) == {"path", "sha256"}, "binary inventory mismatch")
-    _require(Path(str(binary["path"])).is_absolute(), "binary path is not absolute")
+    _require(
+        _is_portable_absolute_path(str(binary["path"])),
+        "binary path is not absolute",
+    )
     _require_sha256(binary["sha256"], "binary.sha256")
     source_bundle = _mapping(value["source_bundle"], "source_bundle")
     _require(

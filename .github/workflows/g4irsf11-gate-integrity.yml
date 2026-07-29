@@ -65,7 +65,12 @@ jobs:
           tests/test_g4irsf14_state_clone_binding.py
           tests/test_g4irsf14_state_clone_validation.py
           tests/test_g4irsf14_opportunity_census.py
+          tests/test_g4irsf14_fail_closed_completion.py
       - name: Validate committed decision schema and artifact hashes
         run: python scripts/eval/validate_g4irsf11_committed_artifacts.py
       - name: Validate committed G4IRSF14 merge-grant evidence
         run: python scripts/validate_g4irsf14_merge_grant_artifacts.py
+      - name: Validate deterministic G4IRSF14 fail-closed publication
+        run: python scripts/eval/g4irsf14_fail_closed_completion.py --validate-only
+      - name: Validate committed G4IRSF14 downstream fail-closed completion
+        run: python scripts/validate_g4irsf14_fail_closed_completion.py
