@@ -22,7 +22,7 @@ import posixpath
 import subprocess
 import sys
 from collections import Counter, defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -37,8 +37,8 @@ OFFLINE_TAIL_PATH = Path("outputs/tables/g4irsf13_per_bag_delta.csv")
 DESCRIPTOR_DATASET_PATH = Path(
     "artifacts/datasets/g4irsf15_causal_descriptor_pool.jsonl.zst"
 )
-SKELETON_DATASET_PATH = Path(
-    "artifacts/datasets/g4irsf15_causal_skeleton_population.jsonl.zst"
+SKELETON_DATASET_ROOT = Path(
+    "artifacts/datasets/g4irsf15_causal_skeleton_population"
 )
 DESCRIPTOR_MANIFEST_PATH = Path(
     "artifacts/datasets/g4irsf15_causal_descriptor_manifest.json"
@@ -123,7 +123,7 @@ BUILD_MANIFEST_SCHEMA = (
     "czr005.g4irsf15.exact_binary_build_manifest.v1"
 )
 DESCRIPTOR_MANIFEST_SCHEMA = (
-    "czr005.g4irsf15.causal_descriptor_manifest.v1"
+    "czr005.g4irsf15.causal_descriptor_manifest.v2"
 )
 CHECKPOINT_MANIFEST_SCHEMA = (
     "czr005.g4irsf15.checkpoint_bank_manifest.v1"
@@ -187,6 +187,7 @@ FORMAL_MIN_H_SYSTEM = 128
 FORMAL_MIN_KIND = 512
 DEFAULT_H_SYSTEM_TARGETS_PER_SHARD = 4
 GITHUB_SAFE_ARTIFACT_MAX_BYTES = 95 * 1024 * 1024
+SKELETON_ROWS_PER_SHARD = 200_000
 OUTCOME_FREE_SCREENING_FIELDS = (
     "baseline_release",
     "candidate_action_count",
@@ -269,6 +270,17 @@ def canonical_bytes(value: Any) -> bytes:
 
 def canonical_sha256(value: Any) -> str:
     return hashlib.sha256(canonical_bytes(value)).hexdigest()
+
+
+def canonical_sequence_sha256(values: Iterable[Any]) -> str:
+    digest = hashlib.sha256()
+    digest.update(b"[")
+    for index, value in enumerate(values):
+        if index:
+            digest.update(b",")
+        digest.update(canonical_bytes(value))
+    digest.update(b"]")
+    return digest.hexdigest()
 
 
 def canonical_fields_payload(
@@ -1112,6 +1124,145 @@ def validate_skeleton(row: Mapping[str, Any]) -> None:
     )
 
 
+def validate_skeleton_population_dataset(
+    root: Path,
+    binding: Mapping[str, Any],
+    *,
+    expected_row_count: int,
+) -> tuple[list[dict[str, Any]], set[str], Counter[str]]:
+    """Validate the complete ordered census across deterministic shards."""
+
+    require(
+        binding.get("encoding") == "SHARDED_CANONICAL_JSONL_ZSTD",
+        "SKELETON_DATASET_ENCODING",
+    )
+    rows_per_shard = strict_int(
+        binding.get("rows_per_shard"),
+        "skeleton_population.rows_per_shard",
+        1,
+    )
+    require(
+        rows_per_shard <= SKELETON_ROWS_PER_SHARD,
+        "SKELETON_ROWS_PER_SHARD_EXCEEDS_MAXIMUM",
+    )
+    require(
+        isinstance(expected_row_count, int)
+        and not isinstance(expected_row_count, bool)
+        and expected_row_count > 0,
+        "SKELETON_EXPECTED_ROW_COUNT",
+    )
+    shards = binding.get("shards")
+    expected_shard_count = math.ceil(expected_row_count / rows_per_shard)
+    require(
+        isinstance(shards, list)
+        and len(shards) == expected_shard_count
+        and binding.get("shard_count") == expected_shard_count
+        and binding.get("row_count") == expected_row_count,
+        "SKELETON_SHARD_INVENTORY_COUNT",
+    )
+    expected_paths = [
+        (
+            SKELETON_DATASET_ROOT
+            / f"part-{shard_index:05d}.jsonl.zst"
+        ).as_posix()
+        for shard_index in range(expected_shard_count)
+    ]
+    actual_paths = sorted(
+        path.relative_to(root).as_posix()
+        for path in (root / SKELETON_DATASET_ROOT).glob(
+            "part-*.jsonl.zst"
+        )
+        if path.is_file()
+    )
+    require(
+        actual_paths == expected_paths,
+        "SKELETON_SHARD_DIRECTORY_INVENTORY_DRIFT",
+    )
+
+    digest = hashlib.sha256()
+    digest.update(b"[")
+    total_rows = 0
+    skeletons: list[dict[str, Any]] = []
+    skeleton_ids: set[str] = set()
+    skeleton_groups: set[tuple[str, str]] = set()
+    population_by_kind: Counter[str] = Counter()
+    for shard_index, shard in enumerate(shards):
+        require(
+            isinstance(shard, dict),
+            f"SKELETON_SHARD_NOT_OBJECT:{shard_index}",
+        )
+        expected_relative = (
+            SKELETON_DATASET_ROOT
+            / f"part-{shard_index:05d}.jsonl.zst"
+        ).as_posix()
+        require(
+            shard.get("path") == expected_relative,
+            f"SKELETON_SHARD_PATH_DRIFT:{shard_index}",
+        )
+        path = root / Path(expected_relative)
+        byte_count = publishable_byte_count(
+            path, f"skeleton_population_part_{shard_index:05d}"
+        )
+        require(
+            file_sha256(path) == shard.get("sha256")
+            and byte_count == shard.get("byte_count")
+            and shard.get("row_start") == total_rows,
+            f"SKELETON_SHARD_BINDING_DRIFT:{shard_index}",
+        )
+        rows = zstd_jsonl(path)
+        require(
+            len(rows) == shard.get("row_count")
+            and len(rows) > 0
+            and len(rows) <= rows_per_shard
+            and shard.get("row_end_exclusive")
+            == total_rows + len(rows),
+            f"SKELETON_SHARD_CONTENT_DRIFT:{shard_index}",
+        )
+        if shard_index + 1 < expected_shard_count:
+            require(
+                len(rows) == rows_per_shard,
+                f"SKELETON_NONFINAL_SHARD_NOT_FULL:{shard_index}",
+            )
+        shard_digest = hashlib.sha256()
+        shard_digest.update(b"[")
+        for local_index, skeleton in enumerate(rows):
+            encoded = canonical_bytes(skeleton)
+            if local_index:
+                shard_digest.update(b",")
+            shard_digest.update(encoded)
+            if total_rows:
+                digest.update(b",")
+            digest.update(encoded)
+            validate_skeleton(skeleton)
+            skeleton_id = str(skeleton["skeleton_id"])
+            group = (
+                str(skeleton["kind"]),
+                str(skeleton["population_group_sha256"]),
+            )
+            require(
+                skeleton_id not in skeleton_ids
+                and group not in skeleton_groups,
+                "DUPLICATE_SKELETON_POPULATION",
+            )
+            skeleton_ids.add(skeleton_id)
+            skeleton_groups.add(group)
+            population_by_kind[str(skeleton["kind"])] += 1
+            skeletons.append(skeleton)
+            total_rows += 1
+        shard_digest.update(b"]")
+        require(
+            shard_digest.hexdigest() == shard.get("content_sha256"),
+            f"SKELETON_SHARD_CONTENT_DRIFT:{shard_index}",
+        )
+    digest.update(b"]")
+    require(
+        total_rows == expected_row_count
+        and digest.hexdigest() == binding.get("content_sha256"),
+        "SKELETON_POPULATION_COUNT_OR_HASH_DRIFT",
+    )
+    return skeletons, skeleton_ids, population_by_kind
+
+
 def hash_rank(namespace: str, identifier: str) -> str:
     return hashlib.sha256(f"{namespace}:{identifier}".encode()).hexdigest()
 
@@ -1273,40 +1424,23 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
         isinstance(skeleton_binding, dict),
         "SKELETON_DATASET_BINDING_MISSING",
     )
-    skeleton_path = root / Path(str(skeleton_binding.get("path", "")))
-    require(
-        skeleton_path == root / SKELETON_DATASET_PATH
-        and file_sha256(skeleton_path) == skeleton_binding.get("sha256"),
-        "SKELETON_DATASET_BINDING_DRIFT",
+    expected_population_count = strict_int(
+        scan.get("primary_population_count"),
+        "native_scan_summary.primary_population_count",
+        1,
     )
-    skeletons = zstd_jsonl(skeleton_path)
     require(
-        len(skeletons)
-        == skeleton_binding.get("row_count")
-        == manifest.get("skeleton_population_count")
-        == scan.get("primary_population_count")
-        and canonical_sha256(skeletons)
-        == skeleton_binding.get("content_sha256"),
-        "SKELETON_POPULATION_COUNT_OR_HASH_DRIFT",
+        manifest.get("skeleton_population_count")
+        == expected_population_count,
+        "SKELETON_POPULATION_MANIFEST_COUNT_DRIFT",
     )
-    skeleton_ids: set[str] = set()
-    skeleton_groups: set[tuple[str, str]] = set()
-    population_by_kind: Counter[str] = Counter()
-    for skeleton in skeletons:
-        validate_skeleton(skeleton)
-        skeleton_id = str(skeleton["skeleton_id"])
-        group = (
-            str(skeleton["kind"]),
-            str(skeleton["population_group_sha256"]),
+    skeletons, skeleton_ids, population_by_kind = (
+        validate_skeleton_population_dataset(
+            root,
+            skeleton_binding,
+            expected_row_count=expected_population_count,
         )
-        require(
-            skeleton_id not in skeleton_ids
-            and group not in skeleton_groups,
-            "DUPLICATE_SKELETON_POPULATION",
-        )
-        skeleton_ids.add(skeleton_id)
-        skeleton_groups.add(group)
-        population_by_kind[str(skeleton["kind"])] += 1
+    )
     native_counts = scan.get("population_counts")
     require(
         isinstance(native_counts, dict)

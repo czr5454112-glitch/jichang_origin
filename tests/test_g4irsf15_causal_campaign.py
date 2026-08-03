@@ -379,6 +379,9 @@ def test_zstd_round_trip_is_canonical() -> None:
     rows = [{"a": 1}, {"b": "二"}]
     compressed = campaign._zstd_compress(campaign._jsonl_bytes(rows))
     assert campaign._zstd_decompress_jsonl(compressed) == rows
+    assert campaign._canonical_sequence_sha256(
+        rows
+    ) == campaign._canonical_sha256(rows)
 
 
 def test_split_connects_all_direct_affected_raw_tasks() -> None:

@@ -453,3 +453,22 @@
 - 对方向的意义：去中心化多 worker 的可扩展性结论不仅依赖算法输出，也依赖可信的
   资源边界；显式 ABI 能避免监控层因平台调用约定而失真，从而让内存 cap、恢复和
   跨主机执行 profile 成为可审计证据。
+
+### NI-029：完整 census 应按有序内容分片发布，而不是依赖单个大文件
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：首次完成 747,962 条 skeleton 的正式 census 后，单个 level-9 zstd 文件为
+  136,032,811 bytes，超过 GitHub 100 MiB 硬限制前的 95 MiB 安全门；计算是完整的，
+  但单文件发布拓扑不适合更大订单规模。
+- 决策：descriptor manifest 升级为 v2；完整 population 按固定有序行区间写成编号
+  zstd parts，每块独立绑定 path、SHA、byte count、row start/end/count 与 canonical
+  content SHA，并保留整个有序数组的流式 canonical SHA。独立 validator 要求块编号、
+  连续区间和并集精确一致，拒绝缺块、额外块、换序、重复 skeleton/group 或内容篡改；
+  每个 part 仍必须严格小于 95 MiB。
+- 证据：真实 747,962-row 数据按 200,000 行试分为 4 块，最大块 36,631,949 bytes，
+  总计 135,984,998 bytes；流式全局 SHA 与原 canonical list SHA 等价，顺序/残留块/
+  malformed inventory 回归和完整 108 项聚焦回归通过。正式 v2 census manifest 仍须
+  在本次源码提交后的 exact binary 上重新生成并独立验证，通过后再升级状态。
+- 对方向的意义：这把一个中心化“大证据文件”改造成可并行传输、校验和恢复的有序
+  数据平面；未来不同站点或 worker 可独立持有 census 分区，同时通过全局内容根证明
+  它们属于同一预注册总体，契合去中心化 MAPF 风格框架的扩展路径。

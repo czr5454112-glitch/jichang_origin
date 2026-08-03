@@ -19,6 +19,95 @@ def _sha(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
 
 
+def _valid_skeleton(index: int, kind: str) -> dict[str, object]:
+    skeleton_id = _sha(f"skeleton:{index}")
+    return {
+        "schema": validator.SKELETON_SCHEMA,
+        "kind": kind,
+        "skeleton_id": skeleton_id,
+        "skeleton_selection_sha256": skeleton_id,
+        "population_group_sha256": _sha(f"group:{index}"),
+        "outcome_free": True,
+        "runtime_state_sha256": None,
+        "boundary_sha256": None,
+        "alternative_action_count": 1,
+        "candidate_action_count": 1,
+        "total_legal_action_count": 2,
+        "baseline_action": f"baseline:{index}",
+        "intervention_action": f"treatment:{index}",
+        "sampling": None,
+    }
+
+
+def test_skeleton_population_shards_preserve_complete_ordered_census(
+    tmp_path: Path,
+) -> None:
+    rows = [
+        _valid_skeleton(index, ("I1", "I3", "I4")[index % 3])
+        for index in range(5)
+    ]
+    binding = campaign._publish_skeleton_population(
+        tmp_path, rows, rows_per_shard=2
+    )
+
+    assert binding["encoding"] == "SHARDED_CANONICAL_JSONL_ZSTD"
+    assert binding["shard_count"] == 3
+    assert binding["content_sha256"] == validator.canonical_sha256(rows)
+    assert all(
+        shard["byte_count"] < validator.GITHUB_SAFE_ARTIFACT_MAX_BYTES
+        for shard in binding["shards"]
+    )
+    validated_rows, skeleton_ids, counts = (
+        validator.validate_skeleton_population_dataset(
+            tmp_path, binding, expected_row_count=len(rows)
+        )
+    )
+    assert validated_rows == rows
+    assert skeleton_ids == {str(row["skeleton_id"]) for row in rows}
+    assert counts == {"I1": 2, "I3": 2, "I4": 1}
+
+    stale = (
+        tmp_path
+        / campaign.SKELETON_DATASET_ROOT
+        / "part-99999.jsonl.zst"
+    )
+    stale.write_bytes(b"stale")
+    with pytest.raises(
+        validator.ValidationError,
+        match="SKELETON_SHARD_DIRECTORY_INVENTORY_DRIFT",
+    ):
+        validator.validate_skeleton_population_dataset(
+            tmp_path, binding, expected_row_count=len(rows)
+        )
+    binding = campaign._publish_skeleton_population(
+        tmp_path, rows, rows_per_shard=2
+    )
+    assert not stale.exists()
+
+    reordered = copy.deepcopy(binding)
+    reordered["shards"][0], reordered["shards"][1] = (
+        reordered["shards"][1],
+        reordered["shards"][0],
+    )
+    with pytest.raises(
+        validator.ValidationError,
+        match="SKELETON_SHARD_PATH_DRIFT:0",
+    ):
+        validator.validate_skeleton_population_dataset(
+            tmp_path, reordered, expected_row_count=len(rows)
+        )
+
+    malformed = copy.deepcopy(binding)
+    malformed["shards"][0] = None
+    with pytest.raises(
+        validator.ValidationError,
+        match="SKELETON_SHARD_NOT_OBJECT:0",
+    ):
+        validator.validate_skeleton_population_dataset(
+            tmp_path, malformed, expected_row_count=len(rows)
+        )
+
+
 def test_real_protected_input_schema_reconstructs_native_record_identity() -> None:
     root = Path(__file__).resolve().parents[1]
     with (root / campaign.TASK_PATH).open(

@@ -80,8 +80,8 @@ BUILD_MANIFEST_SCHEMA = (
 DESCRIPTOR_DATASET_PATH = Path(
     "artifacts/datasets/g4irsf15_causal_descriptor_pool.jsonl.zst"
 )
-SKELETON_DATASET_PATH = Path(
-    "artifacts/datasets/g4irsf15_causal_skeleton_population.jsonl.zst"
+SKELETON_DATASET_ROOT = Path(
+    "artifacts/datasets/g4irsf15_causal_skeleton_population"
 )
 DESCRIPTOR_MANIFEST_PATH = Path(
     "artifacts/datasets/g4irsf15_causal_descriptor_manifest.json"
@@ -169,7 +169,7 @@ MATERIALIZATION_SCHEMA = (
 DESCRIPTOR_SCHEMA = "czr005.g4irsf15.causal_target_descriptor.v1"
 PAIR_RUN_SCHEMA = "czr005.g4irsf15.causal_target_pairs.v1"
 DESCRIPTOR_MANIFEST_SCHEMA = (
-    "czr005.g4irsf15.causal_descriptor_manifest.v1"
+    "czr005.g4irsf15.causal_descriptor_manifest.v2"
 )
 CHECKPOINT_MANIFEST_SCHEMA = (
     "czr005.g4irsf15.checkpoint_bank_manifest.v1"
@@ -244,6 +244,7 @@ DEFAULT_FORMAL_SHARD_SIZE = 256
 DEFAULT_PILOT_SHARD_SIZE = 64
 DEFAULT_H_SYSTEM_TARGETS_PER_SHARD = 4
 GITHUB_SAFE_ARTIFACT_MAX_BYTES = 95 * 1024 * 1024
+SKELETON_ROWS_PER_SHARD = 200_000
 
 OUTCOME_FREE_SCREENING_FIELDS = (
     "baseline_release",
@@ -319,6 +320,19 @@ def _canonical_sha256(value: Any) -> str:
     return hashlib.sha256(_canonical_bytes(value)).hexdigest()
 
 
+def _canonical_sequence_sha256(values: Iterable[Any]) -> str:
+    """Hash a canonical JSON array without materializing the whole array."""
+
+    digest = hashlib.sha256()
+    digest.update(b"[")
+    for index, value in enumerate(values):
+        if index:
+            digest.update(b",")
+        digest.update(_canonical_bytes(value))
+    digest.update(b"]")
+    return digest.hexdigest()
+
+
 def _canonical_fields_payload(
     fields: Sequence[tuple[str, str, Any]],
 ) -> bytes:
@@ -378,6 +392,84 @@ def _publishable_byte_count(path: Path, label: str) -> int:
         f"ARTIFACT_APPROACHES_GITHUB_100_MIB_LIMIT:{label}:{size}",
     )
     return size
+
+
+def _skeleton_shard_path(index: int) -> Path:
+    return SKELETON_DATASET_ROOT / f"part-{index:05d}.jsonl.zst"
+
+
+def _publish_skeleton_population(
+    root: Path,
+    population: Sequence[Mapping[str, Any]],
+    *,
+    rows_per_shard: int = SKELETON_ROWS_PER_SHARD,
+) -> dict[str, Any]:
+    """Publish the complete ordered census as deterministic Git-safe shards."""
+
+    _require(bool(population), "EMPTY_SKELETON_POPULATION")
+    _require(
+        isinstance(rows_per_shard, int)
+        and not isinstance(rows_per_shard, bool)
+        and 0 < rows_per_shard <= SKELETON_ROWS_PER_SHARD,
+        "INVALID_SKELETON_ROWS_PER_SHARD",
+    )
+    shards: list[dict[str, Any]] = []
+    declared_paths: set[Path] = set()
+    global_digest = hashlib.sha256()
+    global_digest.update(b"[")
+    global_row_index = 0
+    for shard_index, row_start in enumerate(
+        range(0, len(population), rows_per_shard)
+    ):
+        row_end = min(row_start + rows_per_shard, len(population))
+        rows = population[row_start:row_end]
+        relative = _skeleton_shard_path(shard_index)
+        path = root / relative
+        declared_paths.add(path)
+        shard_digest = hashlib.sha256()
+        shard_digest.update(b"[")
+        jsonl_payload = bytearray()
+        for local_index, row in enumerate(rows):
+            encoded = _canonical_bytes(row)
+            jsonl_payload.extend(encoded)
+            jsonl_payload.extend(b"\n")
+            if local_index:
+                shard_digest.update(b",")
+            shard_digest.update(encoded)
+            if global_row_index:
+                global_digest.update(b",")
+            global_digest.update(encoded)
+            global_row_index += 1
+        shard_digest.update(b"]")
+        compressed = _zstd_compress(bytes(jsonl_payload))
+        _atomic_write(path, compressed)
+        byte_count = _publishable_byte_count(
+            path, f"skeleton_population_part_{shard_index:05d}"
+        )
+        shards.append(
+            {
+                "path": relative.as_posix(),
+                "sha256": hashlib.sha256(compressed).hexdigest(),
+                "byte_count": byte_count,
+                "row_start": row_start,
+                "row_end_exclusive": row_end,
+                "row_count": len(rows),
+                "content_sha256": shard_digest.hexdigest(),
+            }
+        )
+    global_digest.update(b"]")
+    dataset_root = root / SKELETON_DATASET_ROOT
+    for stale in dataset_root.glob("part-*.jsonl.zst"):
+        if stale not in declared_paths:
+            stale.unlink()
+    return {
+        "encoding": "SHARDED_CANONICAL_JSONL_ZSTD",
+        "rows_per_shard": rows_per_shard,
+        "shard_count": len(shards),
+        "row_count": len(population),
+        "content_sha256": global_digest.hexdigest(),
+        "shards": shards,
+    }
 
 
 def _is_sha256(value: Any) -> bool:
@@ -2803,10 +2895,8 @@ def run_scan(
     selected_skeletons, coverage_rows, design = select_descriptor_pool(
         population, pool_size=pool_size
     )
-    skeleton_compressed = _zstd_compress(_jsonl_bytes(population))
-    _atomic_write(root / SKELETON_DATASET_PATH, skeleton_compressed)
-    skeleton_byte_count = _publishable_byte_count(
-        root / SKELETON_DATASET_PATH, "skeleton_population"
+    skeleton_population_binding = _publish_skeleton_population(
+        root, population
     )
     materialization_payload, materialization_binary_identity = (
         _call_exact_binary(
@@ -2968,14 +3058,7 @@ def run_scan(
         "descriptor_population_count": len(population),
         "descriptor_pool_count": len(pool),
         "descriptor_pool_sha256": _canonical_sha256(pool),
-        "skeleton_population_dataset": {
-            "path": SKELETON_DATASET_PATH.as_posix(),
-            "sha256": _file_sha256(root / SKELETON_DATASET_PATH),
-            "byte_count": skeleton_byte_count,
-            "encoding": "CANONICAL_JSONL_ZSTD",
-            "row_count": len(population),
-            "content_sha256": _canonical_sha256(population),
-        },
+        "skeleton_population_dataset": skeleton_population_binding,
         "descriptor_dataset": {
             "path": DESCRIPTOR_DATASET_PATH.as_posix(),
             "sha256": _file_sha256(root / DESCRIPTOR_DATASET_PATH),
