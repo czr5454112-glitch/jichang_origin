@@ -27,6 +27,7 @@ import argparse
 import copy
 import csv
 import ctypes
+import gc
 import hashlib
 import importlib.util
 import io
@@ -2892,12 +2893,45 @@ def run_scan(
         bag_records=auxiliary["bag_records"],
         offline_by_task=offline_by_task,
     )
+    population_count = len(population)
     selected_skeletons, coverage_rows, design = select_descriptor_pool(
         population, pool_size=pool_size
     )
     skeleton_population_binding = _publish_skeleton_population(
         root, population
     )
+    frozen_controls = dict(skeleton_payload["frozen_controls"])
+    native_scan_summary = {
+        key: skeleton_payload[key]
+        for key in (
+            "schema",
+            "evidence_scope",
+            "census_complete",
+            "terminal_finalized",
+            "protected_full_1x_shape",
+            "terminal_invariants",
+            "terminal_replay_hashes",
+            "input_request_count",
+            "input_runtime_cohort_sha256",
+            "h_system_cohort_mapping_sha256",
+            "raw_bag_mapping_sha256",
+            "raw_bag_original_entry_mapping_sha256",
+            "raw_bag_count",
+            "processed_event_count",
+            "candidate_mask_event_count",
+            "false_positive_mask_event_count",
+            "primary_population_count",
+            "sample_rule",
+            "population_counts",
+        )
+    }
+    # Retain only the compact native summary and selected panel before the
+    # second full replay.  Keeping both 747,962-row skeleton/population lists
+    # alive caused avoidable multi-gigabyte pressure during materialization.
+    skeleton_payload.pop("skeletons", None)
+    del skeletons
+    del population
+    gc.collect()
     materialization_payload, materialization_binary_identity = (
         _call_exact_binary(
             root=root,
@@ -2980,31 +3014,8 @@ def run_scan(
                 materialization_binary_identity
             ),
         },
-        "frozen_controls": dict(skeleton_payload["frozen_controls"]),
-        "native_scan_summary": {
-            key: skeleton_payload[key]
-            for key in (
-                "schema",
-                "evidence_scope",
-                "census_complete",
-                "terminal_finalized",
-                "protected_full_1x_shape",
-                "terminal_invariants",
-                "terminal_replay_hashes",
-                "input_request_count",
-                "input_runtime_cohort_sha256",
-                "h_system_cohort_mapping_sha256",
-                "raw_bag_mapping_sha256",
-                "raw_bag_original_entry_mapping_sha256",
-                "raw_bag_count",
-                "processed_event_count",
-                "candidate_mask_event_count",
-                "false_positive_mask_event_count",
-                "primary_population_count",
-                "sample_rule",
-                "population_counts",
-            )
-        },
+        "frozen_controls": frozen_controls,
+        "native_scan_summary": native_scan_summary,
         "native_materialization_summary": {
             key: materialization_payload[key]
             for key in (
@@ -3038,7 +3049,7 @@ def run_scan(
             "strata": design["strata"],
             "coverage_blockers": design["coverage_blockers"],
         },
-        "skeleton_population_count": len(population),
+        "skeleton_population_count": population_count,
         "selected_skeleton_count": len(selected_skeletons),
         "sealed_descriptor_count": len(pool),
         "selected_skeleton_inventory_sha256": _canonical_sha256(
@@ -3055,7 +3066,7 @@ def run_scan(
                 for row in selected_skeletons
             ]
         ),
-        "descriptor_population_count": len(population),
+        "descriptor_population_count": population_count,
         "descriptor_pool_count": len(pool),
         "descriptor_pool_sha256": _canonical_sha256(pool),
         "skeleton_population_dataset": skeleton_population_binding,

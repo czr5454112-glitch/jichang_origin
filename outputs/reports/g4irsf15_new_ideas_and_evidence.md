@@ -472,3 +472,22 @@
 - 对方向的意义：这把一个中心化“大证据文件”改造成可并行传输、校验和恢复的有序
   数据平面；未来不同站点或 worker 可独立持有 census 分区，同时通过全局内容根证明
   它们属于同一预注册总体，契合去中心化 MAPF 风格框架的扩展路径。
+
+### NI-030：descriptor seal 是离线控制面成本，不能混入在线局部决策路径
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：正式 6,144-target materialization 在完成 747,962-row census 四块发布后，
+  30 分钟外层预算仍未完成；进程约 7.3 GB RSS。随后去除非选中事件的重复 skeleton
+  probe，并在第二次 replay 前释放 skeleton/population 大对象；真实直接 benchmark 的
+  RSS 降至约 4.8 GB，但完整 6,144 次 state/boundary seal 在 46 分钟时仍未结束。
+- 本轮决策：不缩小 6,144 预注册面板，不用提前停止换速度。非目标事件改走已有“五项
+  terminal replay hash 与 skeleton probe 完全一致”回归支持的普通 transition；正式
+  artifact-producing scan 使用 90 分钟一次性预算。原生/pybind 11/11 回归通过；被终止
+  的 46 分钟进程仅为不发布 artifact 的 benchmark，population parts 可重建且无 label。
+- 后续改进：把 selected descriptor seal 做成内容寻址的只读分批任务，发布精确并集、
+  无重叠 profile 与统一排序根；或让 runtime 维护可增量更新的 checkpoint/state 摘要，
+  避免每个 selected event 重算全状态 hash。两者都必须先证明与单线程 seal 逐字节等价，
+  本轮不以未经验证的并行实现替换正式证据路径。
+- 对方向的意义：在线去中心化 MAPF 风格路由仍只读取局部状态并提交局部动作；昂贵的
+  全局审计 seal 被明确隔离在离线控制面。下一步扩展订单规模时，应横向扩展证据生成，
+  而不是把中心化全状态哈希开销重新带回在线 runtime。

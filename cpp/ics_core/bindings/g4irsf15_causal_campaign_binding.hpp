@@ -2843,7 +2843,12 @@ inline py::dict materialize_causal_descriptors_from_records(
     const auto selected_ordinal =
         selected[cursor].event_ordinal;
     while (event_ordinal < selected_ordinal) {
-      if (!detail::replay_skeleton_transition(source)) {
+      // The complete census already proved that the lightweight skeleton
+      // probe and the ordinary committed transition have identical terminal
+      // replay hashes.  Materialization needs a full opportunity probe only
+      // at selected ordinals; rebuilding every discarded skeleton here made
+      // a 6,144-target panel repeat almost the whole census data path.
+      if (!source.process_one_event()) {
         throw py::value_error(
             "selected skeleton event_ordinal is after the "
             "last live event");
@@ -3047,7 +3052,11 @@ inline py::dict run_causal_target_pairs_from_records(
     const auto target_ordinal =
         targets[target_cursor].event_ordinal;
     while (source_event_ordinal < target_ordinal) {
-      if (!detail::replay_skeleton_transition(source)) {
+      // Target descriptors seal the ordinals that require the expensive
+      // causal probe.  All intervening events use the equivalent ordinary
+      // transition, avoiding a redundant full skeleton census in every
+      // fresh pair worker.
+      if (!source.process_one_event()) {
         throw py::value_error(
             "target event_ordinal is after the last live event");
       }
