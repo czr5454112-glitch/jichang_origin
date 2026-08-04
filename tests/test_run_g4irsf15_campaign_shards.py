@@ -397,6 +397,108 @@ def test_configured_rss_cap_fails_closed_when_sampling_unavailable(
     )
 
 
+def test_transient_unavailable_rss_sample_is_retried(
+    tmp_path: Path,
+) -> None:
+    root, binary, build_manifest, worker = _campaign_root(
+        tmp_path, shard_count=1
+    )
+    _write_json(
+        root / "fake_behavior.json",
+        {"0": {"delay": 0.2, "return_code": 0}},
+    )
+    calls = 0
+
+    def transient(_pid: int) -> orchestrator.MemorySample:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            return orchestrator.MemorySample(
+                None, None, "FAKE_TRANSIENT_CHILD_EXIT"
+            )
+        return _fake_memory(_pid)
+
+    report = orchestrator.run_campaign_shards(
+        root=root,
+        campaign="pilot",
+        pilot_round=1,
+        binary=binary,
+        build_manifest=build_manifest,
+        workers=1,
+        shard_tokens=["all"],
+        profile_output=root / "outputs/transient_profile.json",
+        worker_script=worker,
+        poll_interval_seconds=0.005,
+        max_process_rss_mib=64.0,
+        memory_sampler=transient,
+        allow_test_memory_sampler=True,
+    )
+
+    assert report["status"] == "COMPLETE"
+    assert report["process_rss_cap"][
+        "unattestable_shard_indices"
+    ] == []
+    row = report["shards"][0]
+    assert row["return_code"] == 0
+    assert row["termination_requested"] is False
+    assert row["rss_sample_count"] == calls
+    assert row["rss_successful_sample_count"] == calls - 1
+
+
+def test_persistent_unavailable_rss_still_fails_after_bounded_retries(
+    tmp_path: Path,
+) -> None:
+    root, binary, build_manifest, worker = _campaign_root(
+        tmp_path, shard_count=1
+    )
+    _write_json(
+        root / "fake_behavior.json",
+        {"0": {"delay": 1.0, "return_code": 0}},
+    )
+    calls = 0
+
+    def persistent_after_first(
+        _pid: int,
+    ) -> orchestrator.MemorySample:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return _fake_memory(_pid)
+        return orchestrator.MemorySample(
+            None, None, "FAKE_PERSISTENT_UNAVAILABLE"
+        )
+
+    report = orchestrator.run_campaign_shards(
+        root=root,
+        campaign="pilot",
+        pilot_round=1,
+        binary=binary,
+        build_manifest=build_manifest,
+        workers=1,
+        shard_tokens=["all"],
+        profile_output=root / "outputs/persistent_profile.json",
+        worker_script=worker,
+        poll_interval_seconds=0.005,
+        max_process_rss_mib=64.0,
+        memory_sampler=persistent_after_first,
+        allow_test_memory_sampler=True,
+    )
+
+    assert report["status"] == "FAILED_PROCESS_RSS_CAP"
+    assert calls >= (
+        1 + orchestrator.RSS_UNAVAILABLE_MAX_ATTEMPTS_PER_CYCLE
+    )
+    assert report["process_rss_cap"][
+        "unattestable_shard_indices"
+    ] == [0]
+    row = report["shards"][0]
+    assert row["orchestration_failure_reason"] == (
+        "PROCESS_RSS_CAP_UNATTESTABLE"
+    )
+    assert row["rss_successful_sample_count"] == 1
+    assert row["termination_requested"] is True
+
+
 def test_worker_count_must_be_positive(tmp_path: Path) -> None:
     root, binary, build_manifest, worker = _campaign_root(tmp_path)
     _write_json(root / "fake_behavior.json", {})

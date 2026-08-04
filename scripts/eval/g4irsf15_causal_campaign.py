@@ -223,7 +223,7 @@ SHARD_SCHEMA = "czr005.g4irsf15.causal_pair_shard.v1"
 LABEL_SCHEMA = "czr005.g4irsf15.causal_label.v1"
 LABEL_MANIFEST_SCHEMA = "czr005.g4irsf15.causal_label_manifest.v2"
 ORCHESTRATOR_PROFILE_SCHEMA = (
-    "czr005.g4irsf15.campaign_shard_orchestrator_profile.v1"
+    "czr005.g4irsf15.campaign_shard_orchestrator_profile.v2"
 )
 ORCHESTRATOR_HEARTBEAT_SCHEMA = (
     "czr005.g4irsf15.campaign_shard_orchestrator_heartbeat.v1"
@@ -233,6 +233,8 @@ ORCHESTRATOR_PROFILE_SET_SCHEMA = (
 )
 MAX_PUBLICATION_PROCESS_RSS_MIB = 65_536.0
 MAX_ORCHESTRATOR_HEARTBEAT_INTERVAL_SECONDS = 60.0
+RSS_UNAVAILABLE_MAX_ATTEMPTS_PER_CYCLE = 3
+RSS_UNAVAILABLE_RETRY_DELAY_SECONDS = 0.0
 PRODUCTION_RSS_METHODS = frozenset(
     {
         "WINDOWS_TOOLHELP32_PROCESS_TREE_GETPROCESSMEMORYINFO",
@@ -4366,7 +4368,8 @@ def _validate_orchestrator_profile(
         and cap.get("policy")
         == (
             "FAIL_CLOSED_STOP_SCHEDULING_TERMINATE_ONLY_"
-            "OFFENDING_WORKER;UNAVAILABLE_SAMPLE_IS_FAILURE"
+            "OFFENDING_WORKER;PERSISTENT_UNAVAILABLE_"
+            "LOGICAL_SAMPLE_IS_FAILURE"
         )
         and cap.get("cap_scope")
         == "PER_SHARD_WORKER_PROCESS_TREE_RESIDENT_BYTES"
@@ -4390,6 +4393,16 @@ def _validate_orchestrator_profile(
             "fail_closed_on_unavailable_process_or_child"
         )
         is True
+        and sampling.get("unavailable_sample_retry")
+        == {
+            "max_attempts_per_cycle": (
+                RSS_UNAVAILABLE_MAX_ATTEMPTS_PER_CYCLE
+            ),
+            "retry_delay_seconds": (
+                RSS_UNAVAILABLE_RETRY_DELAY_SECONDS
+            ),
+            "persistent_unavailability_is_failure": True,
+        }
         and isinstance(publication_contract, dict)
         and publication_contract.get(
             "max_allowed_process_rss_mib"

@@ -645,3 +645,52 @@
   本轮只声明 generation-host strict provenance。
 - 对方向的意义：多站点 planner 需要在不同 checkout 表示下确认“运行的是同一协议”，
   同时对模型与二进制数据保持逐字节一致。拆分两个 root 能让跨站点共识更精确。
+
+### NI-038：进程树资源取证必须容忍短命子进程竞态，但持续不可读仍须 fail closed
+
+- 状态：`RUNTIME_VERIFIED`
+- 失败证据：第一次真实 pilot R1 的 shard 0 在 3.79 秒内取得 63 次底层 RSS 样本，
+  其中 62 次成功，峰值 209,559,552 bytes，远低于 17,179,869,184-byte cap；唯一一次
+  `unavailable` 先触发 orchestrator 终止，随后才记录 `return_code=1`。因此该返回码是
+  Windows `TerminateProcess` 路径的结果，不是 worker 自身先失败，也没有 RSS 超限证据。
+- 根因：exact-build provenance 复核会为 inventory 文件启动大量极短寿命的
+  `git rev-parse`/`git cat-file` 子进程。Toolhelp 先枚举进程树，再逐 PID 调用
+  `GetProcessMemoryInfo`；子进程可在两步之间正常退出，旧实现却把“任一已枚举 child
+  不可读”等同为整棵活进程树不可取证，并在同一瞬时样本上立即终止 worker。
+- 修复：orchestrator profile 升为 v2。每个逻辑采样周期先检查 root 是否已经退出；
+  对仍存活的 root 最多立即重做 3 次完整进程树采样，任一次成功即接纳，3 次都失败且
+  root 仍存活才标记 `PROCESS_RSS_CAP_UNATTESTABLE`。底层 attempt 全部计入 sample count；
+  没有任何成功 RSS 的快速退出仍 fail closed，超过 cap 和持续不可读仍停止调度并终止
+  对应 worker。producer 与独立 validator 都固定并验证重试次数、延迟和持续失败策略。
+- 量化证据：3 秒高频短命子进程实验中，单次采样 309 个逻辑周期有 54 次假不可读
+  （17.48%）；最多 3 次即时重采样的 174 个逻辑周期为 0 次不可读，最多 5 次也为
+  0/182，未显示额外收益，因此选择 3 次、0 ms。transient-recovery、persistent-failure、
+  零样本 fast-exit、cap exceeded、producer/independent contract 篡改等相关回归共
+  72/72 通过。旧失败 profile 仅作为负诊断证据；正式 pilot 必须在新提交的新 exact
+  chain 上重跑，不能把旧 shard 改写成成功。
+- 证据边界：该机制仍是操作系统观测式 RSS 取证，不是内核级 hard limit。若未来要对
+  不受信 worker 提供不可绕过的强制内存边界，应另行评估 Windows Job Object/Linux
+  cgroup，并使用新 profile schema；这不是本轮可信 campaign 的阻断项。
+- 对方向的意义：去中心化 worker 会并发启动本地校验、传输或辅助进程。监控面若把正常
+  子进程 churn 误判为算法失败，规模越大假失败概率越高； bounded retry 把瞬态拓扑变化
+  与持续不可取证分开，同时保留 fail-closed 资源边界，使多 worker/MAPF 风格执行证据
+  能随节点数扩展而不被中心化监控竞态主导。
+
+### NI-039：Git provenance 应批量复核，而不是为每个文件重复创建短命进程
+
+- 状态：`PROPOSED`
+- 发现：当前每个 fresh worker 都必须独立复核 exact manifest，这是正确的信任边界；
+  但逐文件各运行一次 `rev-parse` 和 `cat-file` 同时增加启动时延、重复 Git 对象读取和
+  NI-038 暴露的短命子进程 churn。简单跳过哈希或只信父进程结论会削弱 shard 的独立
+  可审计性，不能作为优化。
+- 候选改进：在单个 worker 内用一次 `git ls-tree -rz` 解析所有 path→object ID，再用
+  单个 `git cat-file --batch` 流读取全部 blob；仍逐项重算 SHA-256/byte count 并与
+  manifest 比较。若引入跨 shard 缓存，缓存必须绑定 generation HEAD、source path-set、
+  repository root 和 validator schema，且每个 worker 在使用前验证不可变签名或内容根。
+- 接纳门：batch 与当前逐项实现对 SHA-1/SHA-256 Git 仓库、CRLF/LF checkout、缺失 path、
+  type 非 blob、换 object ID/blob/path/HEAD 以及并发 source drift 必须逐项等价 fail closed；
+  再以 worker 启动时间、Git 子进程数和 RSS sampler retry 数证明实际收益。本轮先保留为
+  后续优化，不在 pilot 前扩大 provenance 变更面。
+- 对方向的意义：减少的是重复进程和重复对象访问，不是完整性证明。批量内容寻址更接近
+  多站点去中心化节点交换 manifest/root 的方式，可让证据开销随文件集合线性流式增长，
+  而不是被每文件进程启动成本与中心化验证抖动放大。

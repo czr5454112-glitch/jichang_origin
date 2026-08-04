@@ -28,7 +28,7 @@ from typing import Any, Callable, Mapping, Sequence
 
 
 PROFILE_SCHEMA = (
-    "czr005.g4irsf15.campaign_shard_orchestrator_profile.v1"
+    "czr005.g4irsf15.campaign_shard_orchestrator_profile.v2"
 )
 HEARTBEAT_SCHEMA = (
     "czr005.g4irsf15.campaign_shard_orchestrator_heartbeat.v1"
@@ -49,6 +49,8 @@ MAX_PUBLICATION_PROCESS_RSS_MIB = 65_536.0
 MAX_HEARTBEAT_INTERVAL_SECONDS = 60.0
 TERMINATION_GRACE_SECONDS = 5.0
 KILL_REAP_TIMEOUT_SECONDS = 5.0
+RSS_UNAVAILABLE_MAX_ATTEMPTS_PER_CYCLE = 3
+RSS_UNAVAILABLE_RETRY_DELAY_SECONDS = 0.0
 PRODUCTION_RSS_METHODS = frozenset(
     {
         "WINDOWS_TOOLHELP32_PROCESS_TREE_GETPROCESSMEMORYINFO",
@@ -586,8 +588,29 @@ def _update_memory(
     unattestable: list[int] = []
     samples: list[dict[str, Any]] = []
     for shard in active.values():
-        sample = sampler(shard.process.pid)
-        shard.rss_sample_count += 1
+        sample = MemorySample(
+            None, None, "PROCESS_ALREADY_EXITED_BEFORE_SAMPLE"
+        )
+        if shard.process.poll() is None:
+            for attempt in range(
+                RSS_UNAVAILABLE_MAX_ATTEMPTS_PER_CYCLE
+            ):
+                sample = sampler(shard.process.pid)
+                shard.rss_sample_count += 1
+                candidate = sample.peak_resident_bytes
+                if candidate is None:
+                    candidate = sample.current_resident_bytes
+                if (
+                    candidate is not None
+                    or shard.process.poll() is not None
+                ):
+                    break
+                if (
+                    attempt + 1
+                    < RSS_UNAVAILABLE_MAX_ATTEMPTS_PER_CYCLE
+                    and RSS_UNAVAILABLE_RETRY_DELAY_SECONDS > 0.0
+                ):
+                    time.sleep(RSS_UNAVAILABLE_RETRY_DELAY_SECONDS)
         shard.current_resident_bytes = sample.current_resident_bytes
         if sample.current_resident_bytes is not None:
             current_group_total += sample.current_resident_bytes
@@ -1533,6 +1556,15 @@ def run_campaign_shards(
                     PRODUCTION_RSS_METHODS
                 ),
                 "fail_closed_on_unavailable_process_or_child": True,
+                "unavailable_sample_retry": {
+                    "max_attempts_per_cycle": (
+                        RSS_UNAVAILABLE_MAX_ATTEMPTS_PER_CYCLE
+                    ),
+                    "retry_delay_seconds": (
+                        RSS_UNAVAILABLE_RETRY_DELAY_SECONDS
+                    ),
+                    "persistent_unavailability_is_failure": True,
+                },
             },
             "process_rss_cap": {
                 "configured": True,
@@ -1541,7 +1573,8 @@ def run_campaign_shards(
                 "max_process_rss_bytes": max_process_rss_bytes,
                 "policy": (
                     "FAIL_CLOSED_STOP_SCHEDULING_TERMINATE_ONLY_"
-                    "OFFENDING_WORKER;UNAVAILABLE_SAMPLE_IS_FAILURE"
+                    "OFFENDING_WORKER;PERSISTENT_UNAVAILABLE_"
+                    "LOGICAL_SAMPLE_IS_FAILURE"
                 ),
                 "cap_scope": (
                     "PER_SHARD_WORKER_PROCESS_TREE_RESIDENT_BYTES"

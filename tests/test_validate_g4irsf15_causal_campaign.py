@@ -1055,6 +1055,11 @@ def _orchestrator_profile_set_fixture(
                     validator.PRODUCTION_RSS_METHODS
                 ),
                 "fail_closed_on_unavailable_process_or_child": True,
+                "unavailable_sample_retry": {
+                    "max_attempts_per_cycle": 3,
+                    "retry_delay_seconds": 0.0,
+                    "persistent_unavailability_is_failure": True,
+                },
             },
             "process_rss_cap": {
                 "configured": True,
@@ -1063,7 +1068,8 @@ def _orchestrator_profile_set_fixture(
                 "max_process_rss_bytes": cap_bytes,
                 "policy": (
                     "FAIL_CLOSED_STOP_SCHEDULING_TERMINATE_ONLY_"
-                    "OFFENDING_WORKER;UNAVAILABLE_SAMPLE_IS_FAILURE"
+                    "OFFENDING_WORKER;PERSISTENT_UNAVAILABLE_"
+                    "LOGICAL_SAMPLE_IS_FAILURE"
                 ),
                 "cap_scope": (
                     "PER_SHARD_WORKER_PROCESS_TREE_RESIDENT_BYTES"
@@ -1459,6 +1465,7 @@ def test_producer_rejects_overlapping_or_incomplete_profile_coverage(
     ("field", "message"),
     [
         ("cap", "ORCHESTRATOR_RSS_CAP_CONTRACT_DRIFT"),
+        ("retry", "ORCHESTRATOR_MEMORY_SAMPLER_CONTRACT_DRIFT"),
         ("sampler", "ORCHESTRATOR_SHARD_RESULT_FAILURE"),
         ("argv", "ORCHESTRATOR_SHARD_ARGV"),
         ("inventory", "ORCHESTRATOR_PROFILE_INPUT_BINDING_DRIFT"),
@@ -1477,6 +1484,10 @@ def test_portable_profile_validator_rejects_resealed_tamper(
     def mutate(profile: dict[str, object]) -> None:
         if field == "cap":
             profile["process_rss_cap"]["configured"] = False
+        elif field == "retry":
+            profile["memory_sampling"]["unavailable_sample_retry"][
+                "max_attempts_per_cycle"
+            ] = 4
         elif field == "sampler":
             profile["shards"][0]["rss_sample_method"] = "FAKE_RSS"
         elif field == "argv":
@@ -1503,6 +1514,40 @@ def test_portable_profile_validator_rejects_resealed_tamper(
             pilot_round=1,
             plan=plan,
             plan_path=root / validator.PILOT_PLAN_PATH,
+            build_binding=build_binding,
+        )
+
+
+def test_producer_profile_validator_rejects_retry_contract_tamper(
+    tmp_path: Path,
+) -> None:
+    root, plan, build_binding, profile_paths, profile_set = (
+        _orchestrator_profile_set_fixture(tmp_path)
+    )
+
+    def mutate(profile: dict[str, object]) -> None:
+        profile["memory_sampling"]["unavailable_sample_retry"][
+            "persistent_unavailability_is_failure"
+        ] = False
+
+    _reseal_orchestrator_profile_chain(
+        root, profile_set, mutate_profile=mutate
+    )
+    with pytest.raises(
+        campaign.CampaignError,
+        match="ORCHESTRATOR_MEMORY_SAMPLER_CONTRACT_DRIFT",
+    ):
+        campaign._validate_orchestrator_profile_set(
+            root=root,
+            profile_paths=profile_paths,
+            campaign="pilot",
+            pilot_round=1,
+            plan=plan,
+            plan_path=root / validator.PILOT_PLAN_PATH,
+            binary=root / str(build_binding["binary_path"]),
+            build_manifest=(
+                root / str(build_binding["path"])
+            ),
             build_binding=build_binding,
         )
 
