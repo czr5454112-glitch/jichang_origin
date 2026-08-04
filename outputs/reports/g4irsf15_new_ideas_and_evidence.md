@@ -707,3 +707,106 @@
 - 对方向的意义：减少的是重复进程和重复对象访问，不是完整性证明。批量内容寻址更接近
   多站点去中心化节点交换 manifest/root 的方式，可让证据开销随文件集合线性流式增长，
   而不是被每文件进程启动成本与中心化验证抖动放大。
+
+### NI-040：极端局部竞争是 I1 precondition false-positive 风险层，不是充分筛选器
+
+- 状态：`EXPERIMENT_VERIFIED`
+- 决策：唯一允许的 R2 screening revision 使用 outcome-free 局部字段
+  `candidate_action_count >= 100`；阈值只由 R1 聚合诊断选择一次，在 R2 前冻结，不读取
+  descriptor ID、单 target outcome 或因果 label，并保持 source、binary、census 与地址定义不变。
+- R1 证据：该压力层包含 10/37 个 I1 precondition false positives，但也包含 3/27 个完成
+  attempts；过滤后仍有 1,256 个非 R1 I1 replacement candidates，且不删除任何 I3/I4。
+- R2 反证边界：完全不重叠的 64-target replacement panel 中，I1 仍只有 28 个 complete
+  action-changing pairs，另有 36 个 `NOT_APPLICABLE_ACTION_PRECONDITION_FAILED`，未达到每
+  kind 30 的门槛。R1 的 27/64 与 R2 的 28/64 不是随机 A/B，不能把一个 attempt 的差异
+  解释为筛选收益。
+- 结论：该字段可保留为 MAPF 风格 agent 可观察的 stress stratum，但不能替代原子动作
+  提交协议；replacement round 已用尽，不得继续按 outcome 调阈值或静默删除失败地址。
+
+### NI-041：I1 blocked 表示缺少可识别执行支持，不表示 source admission 无效
+
+- 状态：`EXPERIMENT_VERIFIED`
+- 证据：I1 在 R1 为 27/64，在唯一 R2 为 28/64；两轮未完成项全部是动作提交前的
+  `NOT_APPLICABLE_ACTION_PRECONDITION_FAILED`，而非 treatment 执行后的有害结果。R2
+  hard-gate fail 为 0、clone fidelity 为 1.0，但支持量仍低于冻结门槛。
+- 决策：本轮将 I1 标记为 `INTERVENTION_KIND_BLOCKED`，formal 只激活 I3/I4；原 I1
+  的 label 预算按预注册规则重分，使 I3/I4 各为 1,086 attempts、合计 2,172。
+- 边界：formal 最终通过也只能支持冻结 frame 内 I3/I4 的 matched-state 结论，不得外推
+  到 I1、全部 source admission 或完整去中心化调度器。当前证据说明“地址经常未形成已提交
+  动作”，不能据此断言该动作若可提交时无效或有害。
+- 后续候选：下一 source/version 研究 source-owner 维护的 generation-bound capability、
+  lease 或原子 compare-and-commit，使地址解析与动作提交共享局部版本；必须重新 source
+  freeze、exact build 与 pilot，不能热补当前 formal campaign。
+
+### NI-042：H_bag-only replacement panel 可用大 shard 摊销固定 provenance 与进程成本
+
+- 状态：`EXPERIMENT_VERIFIED`
+- 发现：R2 仅有 64 个 I1/H_bag targets。使用 `shard_size=64` 后形成单 shard，733.965 秒
+  完成，峰值 RSS 703,090,688 bytes，1/1 shard 成功且无资源或取证失败。
+- 收益边界：若沿用 R1 的 `shard_size=16`，至少需要 4 个 fresh workers；单 shard 从拓扑
+  上把 source identity、binary/build-manifest 复核、Python/pybind 启动与初始状态 replay
+  的固定次数从至少 4 次降为 1 次。没有执行 size-16 counterfactual，因此不发布虚构的
+  时间加速倍数。
+- 完整性边界：优化未跳过 required hash。单 worker 仍独立完成 source、repository blob、
+  binary、build manifest 与 result validation；减少的是重复进程和固定工作。H_system 仍受
+  每 shard 4-target 内存门限制，本条不能外推为增大 formal dense shard。
+
+### NI-043：formal 并发先做时间轴端点校准，再在同一资源合同下扩到 4 workers
+
+- 状态：`EXPERIMENT_VERIFIED`
+- 计划：formal 固定为 2,172 attempts（I3/I4 各 1,086），其中 H_bag 1,916、H_system
+  256；64 个 contiguous event-ordinal shards，每 shard 最多 4 个 H_system。
+- 端点校准：shard 0 与 63 以单 worker 完成，耗时 306.634/1,127.257 秒，process-group
+  peak RSS 为 1,905,258,496/1,920,446,464 bytes，均无失败。两 shard target 数不同，
+  耗时差不单独归因于 event ordinal；用途是覆盖早期/末期状态并校准 dense 内存量级。
+- 扩并发：四个互斥 bulk profiles 覆盖 shards 1--16、17--32、33--48、49--62，均以
+  4 workers `COMPLETE`；合计 62/62 成功、0 失败，最大 process-group peak 为
+  5,805,199,360 bytes。六个 profile 的 shard 集合互斥且并集精确为 0--63。
+- Finalizer：`PASS_CAUSAL_GATE`；2,172/2,172 预注册 pairs 全部成为 eligible
+  action-changing labels，I3/I4 各 1,086，H_system complete/dense 为 256/256，action
+  changed rate 与 clone fidelity 均为 1.0，hard/safety failures、future leakage、split
+  contamination 均为 0。signed labels 为 beneficial 47、harmful 1,770、neutral 355。
+- 独立验收：发布兼容入口完成全链验证并返回 `PASS_CAUSAL_GATE_VALID`；learning 只对
+  I3/I4 授权。weighted-effect artifact 明确 `population_effect_identified=false`，聚合效应
+  只描述完整 realized panel，不得写成总体平均因果效应。
+- 运行建议：更大 campaign 继续采用“早/晚端点单 worker → 按实测峰值选择 bulk 并发”；
+  当前只证明本机 4 workers 可承载，不证明任意主机、跨机器或网络分布式部署。
+
+### NI-044：冻结后验证修复必须外置为窄兼容层，不能改写 source-bound validator
+
+- 状态：`RUNTIME_VERIFIED`
+- 第一个缺陷：formal plan 按合同记录 `pilot_round=null`，冻结 validator 却在选择 compact
+  path 前执行 `int(null)`；formal namespace 实际完全忽略 round，payload 校验仍要求 null。
+- 第二个缺陷：生成器以 `row_count=len(realized_rows)` 发布 realized sidecar，dense sidecar
+  validator 也接受空列表；6 个 I4/H_system action-changing labels 合法得到零 realized/
+  externality rows 与 typed empty hash `61090c80331138c49fbbfe5abbd96003ad002529606c7225b53df74d05c099d3`，
+  但冻结 `validate_label` 孤立地要求 row_count 至少为 1。
+- 决策：不修改 SHA-256 为 `7e43047065f1d9ec253f2ecf1f0c562af51e849e13749120d3df6516cfdf5615`
+  的冻结 validator，也不重封 source bundle。新增 post-freeze release entry point，只对精确
+  formal schema/campaign/null-round 与上述 6 条、独立重推导出的 I4 空集合标签做进程内
+  兼容；原 plan/label 字节、self hash、payload-null 检查及其余 validator 逻辑均不改变，
+  临时函数绑定通过 `finally` 恢复。
+- 证据：兼容回归 10/10、全部 2,172 labels 快速验证、split/weighted post-collect preflight
+  与最终完整独立验收均通过。完整命令、边界和结果记录于
+  `outputs/reports/g4irsf15_formal_release_validation.md`。
+- 后续：下一 campaign 把显式 formal/pilot 分支与合法 zero-cardinality 分支纳入新冻结
+  validator，再从新 source identity 运行全链；不能把外置兼容层偷偷并入当前 source bundle。
+
+### NI-045：局部代价与稀疏外部性应成为两个独立学习/协调目标
+
+- 状态：`EXPERIMENT_VERIFIED`
+- realized-panel 证据：direct-affected completion delta 总体为 +21.420 秒；I3 为
+  +42.487 秒（clone-bootstrap 95% sensitivity interval [40.500, 44.474]），I4 仅
+  +0.354 秒（[0.171, 0.498]）。I3 的额外成本同时表现为约 +5.260 hops、+35.960 秒
+  edge travel 与 +2.259 秒 merge wait；I4 path/edge/node-service delta 为 0，更接近轻量
+  局部 hold 协调原语。
+- H_system 证据：256 pairs 的 direct-affected completion delta 为 +22.820 秒，但全
+  43,603-segment cohort completion mean delta 仅约 +0.0000495 秒且区间跨零。与此同时
+  144/256 pairs（56.25%）存在非空 externality set，平均 23.090 个 segments、最大 365；
+  I3 平均 39.922，I4 平均 6.258。全 panel 的 deadline-miss delta 为 0。
+- 结论：全系统均值接近零不能替代局部公平性或传播尾部审计。下一阶段的去中心化 MAPF
+  学习器应把“本地动作代价”与“邻域外部性预算/尾部”作为两个目标：I3 与 I4 分开建模，
+  本地 agent 可用 H_bag 快速决策，但高风险动作需要邻域 proof/credit 或稀疏 H_system
+  审计触发；不应重新引入一个读取全局未来的中心化 supervisor。
+- 边界：horizon assignment probability 未建模，HT/Hájek population estimates 被明确
+  禁止；以上均值和区间只量化冻结 realized panel 的机制与敏感性，不能外推全部地址或负载。

@@ -55,3 +55,18 @@ scripts/eval/g4irsf14_*.py text eol=lf
 scripts/validate_g4irsf14_*.py text eol=lf
 tests/test_g4irsf14_*.py text eol=lf
 .github/workflows/g4irsf11-gate-integrity.yml text eol=lf
+
+# Stage-15 source and publication artifacts are byte-hash bound.  Text stays
+# LF across Windows/Linux checkouts; compressed evidence is never transformed.
+artifacts/datasets/g4irsf15_*.json text eol=lf
+artifacts/datasets/g4irsf15_campaign_execution_profiles/** text eol=lf
+outputs/manifests/g4irsf15_*.json text eol=lf
+outputs/reports/g4irsf15_*.md text eol=lf
+outputs/tables/g4irsf15_*.csv text eol=lf
+scripts/eval/g4irsf15_*.py text eol=lf
+scripts/*g4irsf15*.py text eol=lf
+tests/test_*g4irsf15*.py text eol=lf
+cpp/**/g4irsf15_*.hpp text eol=lf
+artifacts/datasets/g4irsf15_*.zst -text
+artifacts/datasets/g4irsf15_causal_skeleton_population/** -text
+artifacts/datasets/g4irsf15_compact_pair_evidence/** -text
