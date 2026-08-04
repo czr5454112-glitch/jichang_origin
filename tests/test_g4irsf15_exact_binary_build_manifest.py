@@ -11,9 +11,11 @@ import pytest
 from scripts.create_g4irsf15_exact_binary_build_manifest import (
     DIRTY_STATE_ALGORITHM,
     INVENTORY_METHOD,
+    REPOSITORY_BINDING_METHOD,
     _canonical_bytes,
     _decode_tlog,
     _input_snapshot,
+    _require_clean_publication_source_state,
     _repo_relative_or_external_absolute,
     _sha256_bytes,
     _target_python_metadata,
@@ -77,9 +79,49 @@ def test_inventory_unions_dependency_scan_and_explicit_headers(
         ["CMakeLists.txt", "cpp/ics_core/binding.cpp", "cpp/ics_core/runtime.hpp"]
     )
     assert inventory["dependency_scan_local_file_count"] == 2
+    assert inventory["repository_binding_method"] == (
+        REPOSITORY_BINDING_METHOD
+    )
+    assert all(
+        row["repository_blob"]["method"]
+        == REPOSITORY_BINDING_METHOD
+        and len(row["repository_blob"]["object_id"]) in {40, 64}
+        for row in inventory["files"]
+    )
     assert inventory["bundle_sha256"] == _sha256_bytes(
         _canonical_bytes(inventory["files"])
     )
+
+
+def test_inventory_separates_checkout_bytes_from_repository_blob(
+    tmp_path: Path,
+) -> None:
+    repo, _ = _fixture_repo(tmp_path)
+    (repo / ".gitattributes").write_text(
+        "CMakeLists.txt text eol=crlf\n",
+        encoding="utf-8",
+    )
+    _git(repo, "add", ".gitattributes")
+    _git(repo, "commit", "-m", "bind checkout eol")
+    checkout_bytes = b"cmake_minimum_required(VERSION 3.20)\r\n"
+    (repo / "CMakeLists.txt").write_bytes(checkout_bytes)
+    _git(repo, "diff", "--exit-code", "--", "CMakeLists.txt")
+
+    inventory = collect_transitive_source_inventory(
+        repo_root=repo,
+        build_dir=repo / "build",
+    )
+    row = next(
+        item
+        for item in inventory["files"]
+        if item["path"] == "CMakeLists.txt"
+    )
+
+    assert row["sha256"] == hashlib.sha256(checkout_bytes).hexdigest()
+    assert row["repository_blob"]["sha256"] == hashlib.sha256(
+        b"cmake_minimum_required(VERSION 3.20)\n"
+    ).hexdigest()
+    assert row["sha256"] != row["repository_blob"]["sha256"]
 
 
 def test_dirty_state_binds_binary_diff_staged_diff_and_untracked_source(
@@ -105,6 +147,14 @@ def test_dirty_state_binds_binary_diff_staged_diff_and_untracked_source(
     )
 
     assert state["algorithm"] == DIRTY_STATE_ALGORITHM
+    source_paths = [
+        tracked.relative_to(repo).as_posix(),
+        untracked.relative_to(repo).as_posix(),
+    ]
+    assert state["source_path_count"] == len(source_paths)
+    assert state["source_paths_sha256"] == _sha256_bytes(
+        _canonical_bytes(sorted(source_paths))
+    )
     assert state["tracked_worktree_diff_sha256"] != hashlib.sha256(b"").hexdigest()
     assert state["staged_diff_sha256"] != hashlib.sha256(b"").hexdigest()
     assert state["untracked_source_files"] == [
@@ -117,6 +167,26 @@ def test_dirty_state_binds_binary_diff_staged_diff_and_untracked_source(
     without_self = dict(state)
     recorded = without_self.pop("state_sha256")
     assert recorded == _sha256_bytes(_canonical_bytes(without_self))
+    with pytest.raises(RuntimeError, match="requires clean"):
+        _require_clean_publication_source_state(state)
+
+
+def test_clean_source_state_is_publication_eligible(tmp_path: Path) -> None:
+    repo, source = _fixture_repo(tmp_path)
+    source_paths = [
+        "CMakeLists.txt",
+        (source / "runtime.hpp").relative_to(repo).as_posix(),
+    ]
+    state = collect_dirty_source_state(
+        repo_root=repo,
+        source_paths=source_paths,
+    )
+
+    _require_clean_publication_source_state(state)
+    assert state["source_path_count"] == len(source_paths)
+    assert state["source_paths_sha256"] == _sha256_bytes(
+        _canonical_bytes(sorted(source_paths))
+    )
 
 
 def test_snapshot_detects_source_change(tmp_path: Path) -> None:

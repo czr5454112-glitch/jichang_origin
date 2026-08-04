@@ -1743,6 +1743,52 @@ def test_git_object_id_accepts_sha1_and_sha256_only(
     assert validator.is_git_object_id(value) is expected
 
 
+def test_repository_blob_binding_is_checkout_eol_independent(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "config", "user.email", "test@example.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "test"],
+        cwd=repo,
+        check=True,
+    )
+    (repo / ".gitattributes").write_text(
+        "sample.txt text eol=crlf\n",
+        encoding="utf-8",
+    )
+    checkout_bytes = b"one\r\ntwo\r\n"
+    (repo / "sample.txt").write_bytes(checkout_bytes)
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "commit", "-m", "fixture"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+    )
+
+    independent = validator.repository_blob_binding(
+        repo,
+        "HEAD",
+        "sample.txt",
+        error="TEST_REPOSITORY_BLOB",
+    )
+    producer = campaign._repository_blob_binding(
+        repo, "HEAD", "sample.txt"
+    )
+
+    assert independent == producer
+    assert independent["method"] == validator.REPOSITORY_BINDING_METHOD
+    assert independent["sha256"] == hashlib.sha256(b"one\ntwo\n").hexdigest()
+    assert independent["sha256"] != hashlib.sha256(checkout_bytes).hexdigest()
+
+
 def test_dense_pair_compacts_and_independently_hydrates_losslessly() -> None:
     pair, compact, reference = _compact_fixture()
     target_key = str(compact["target_key"])

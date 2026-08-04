@@ -76,8 +76,10 @@ DEFAULT_BUILD_MANIFEST_PATH = Path(
     "outputs/manifests/g4irsf15_exact_binary_build_manifest.json"
 )
 BUILD_MANIFEST_SCHEMA = (
-    "czr005.g4irsf15.exact_binary_build_manifest.v1"
+    "czr005.g4irsf15.exact_binary_build_manifest.v2"
 )
+REPOSITORY_BINDING_METHOD = "GIT_REVISION_BLOB_SHA256_V1"
+DIRTY_STATE_ALGORITHM = "GIT_BINARY_DIFF_FULL_INDEX_SCOPED_V2"
 
 DESCRIPTOR_DATASET_PATH = Path(
     "artifacts/datasets/g4irsf15_causal_target_address_frame.jsonl.zst"
@@ -706,6 +708,23 @@ def _git_bytes(root: Path, *arguments: str) -> bytes:
     return process.stdout
 
 
+def _repository_blob_binding(
+    root: Path,
+    revision: str,
+    relative: str,
+) -> dict[str, Any]:
+    object_id = _git_output(
+        root, "rev-parse", "--verify", f"{revision}:{relative}"
+    )
+    blob = _git_bytes(root, "cat-file", "blob", object_id)
+    return {
+        "method": REPOSITORY_BINDING_METHOD,
+        "object_id": object_id,
+        "sha256": hashlib.sha256(blob).hexdigest(),
+        "byte_count": len(blob),
+    }
+
+
 def _dirty_source_state(
     root: Path, transitive_paths: Sequence[str]
 ) -> dict[str, Any]:
@@ -755,8 +774,10 @@ def _dirty_source_state(
             }
         )
     state = {
-        "algorithm": "GIT_BINARY_DIFF_FULL_INDEX_V1",
+        "algorithm": DIRTY_STATE_ALGORITHM,
         "head": _git_output(root, "rev-parse", "HEAD"),
+        "source_path_count": len(normalized),
+        "source_paths_sha256": _canonical_sha256(normalized),
         "tracked_worktree_diff_sha256": hashlib.sha256(tracked).hexdigest(),
         "staged_diff_sha256": hashlib.sha256(staged).hexdigest(),
         "untracked_source_files": untracked,
@@ -810,6 +831,11 @@ def _validate_build_manifest(
         == "CMAKE_DEPENDENCY_SCAN_PLUS_EXPLICIT_HEADERS",
         "BUILD_SOURCE_INVENTORY_METHOD",
     )
+    _require(
+        inventory.get("repository_binding_method")
+        == REPOSITORY_BINDING_METHOD,
+        "BUILD_SOURCE_REPOSITORY_BINDING_METHOD",
+    )
     files = inventory.get("files")
     _require(isinstance(files, list) and files, "BUILD_SOURCE_FILES_MISSING")
     normalized: list[dict[str, Any]] = []
@@ -824,6 +850,11 @@ def _validate_build_manifest(
             _file_sha256(source_path) == binding.get("sha256")
             and source_path.stat().st_size == binding.get("byte_count"),
             f"BUILD_TRANSITIVE_SOURCE_DRIFT:{relative}",
+        )
+        _require(
+            binding.get("repository_blob")
+            == _repository_blob_binding(root, "HEAD", relative),
+            f"BUILD_TRANSITIVE_SOURCE_REPOSITORY_DRIFT:{relative}",
         )
         normalized.append(dict(binding))
     normalized.sort(key=lambda row: row["path"])
@@ -842,10 +873,24 @@ def _validate_build_manifest(
         required_native.issubset(seen),
         "BUILD_TRANSITIVE_INVENTORY_MISSES_REQUIRED_NATIVE_SOURCE",
     )
-    expected_dirty = _dirty_source_state(root, sorted(seen))
+    producer_relative = (
+        "scripts/create_g4irsf15_exact_binary_build_manifest.py"
+    )
+    expected_dirty = _dirty_source_state(
+        root, sorted({*seen, producer_relative})
+    )
     _require(
         manifest.get("dirty_source_state") == expected_dirty,
         "BUILD_DIRTY_SOURCE_STATE_DRIFT",
+    )
+    empty_sha256 = hashlib.sha256(b"").hexdigest()
+    _require(
+        expected_dirty.get("algorithm") == DIRTY_STATE_ALGORITHM
+        and expected_dirty.get("tracked_worktree_diff_sha256")
+        == empty_sha256
+        and expected_dirty.get("staged_diff_sha256") == empty_sha256
+        and expected_dirty.get("untracked_source_files") == [],
+        "BUILD_DIRTY_SOURCE_PUBLICATION_FORBIDDEN",
     )
     toolchain = manifest.get("toolchain")
     _require(isinstance(toolchain, dict), "BUILD_TOOLCHAIN_MISSING")
@@ -965,6 +1010,10 @@ def _validate_build_manifest(
         isinstance(execution, dict)
         and execution.get("clean_first") is True
         and execution.get("source_inventory_unchanged_during_build") is True
+        and execution.get(
+            "source_and_git_identity_unchanged_during_build"
+        )
+        is True
         and isinstance(execution.get("configure"), dict)
         and execution["configure"].get("return_code") == 0
         and execution["configure"].get("argv")
@@ -978,6 +1027,12 @@ def _validate_build_manifest(
     producer = manifest.get("producer")
     _require(isinstance(producer, dict), "BUILD_PRODUCER_MISSING")
     validate_bound_file(producer, field="producer")
+    _require(
+        producer.get("path") == producer_relative
+        and producer.get("repository_blob")
+        == _repository_blob_binding(root, "HEAD", producer_relative),
+        "BUILD_PRODUCER_REPOSITORY_DRIFT",
+    )
     try:
         publication_manifest_path = path.relative_to(root.resolve()).as_posix()
     except ValueError as exc:

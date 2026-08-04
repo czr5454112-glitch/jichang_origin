@@ -160,8 +160,10 @@ RESOLVED_BOUNDARY_KIND = {
     "I4": "hold_release_opportunity",
 }
 BUILD_MANIFEST_SCHEMA = (
-    "czr005.g4irsf15.exact_binary_build_manifest.v1"
+    "czr005.g4irsf15.exact_binary_build_manifest.v2"
 )
+REPOSITORY_BINDING_METHOD = "GIT_REVISION_BLOB_SHA256_V1"
+DIRTY_STATE_ALGORITHM = "GIT_BINARY_DIFF_FULL_INDEX_SCOPED_V2"
 DESCRIPTOR_MANIFEST_SCHEMA = (
     "czr005.g4irsf15.causal_descriptor_manifest.v3"
 )
@@ -393,6 +395,46 @@ def is_git_object_id(value: Any) -> bool:
         and len(value) in {40, 64}
         and all(character in HEX for character in value)
     )
+
+
+def repository_blob_binding(
+    root: Path,
+    revision: str,
+    relative: str,
+    *,
+    error: str,
+) -> dict[str, Any]:
+    object_process = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(root),
+            "rev-parse",
+            "--verify",
+            f"{revision}:{relative}",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    object_id = object_process.stdout.strip()
+    require(
+        object_process.returncode == 0 and is_git_object_id(object_id),
+        error,
+    )
+    blob_process = subprocess.run(
+        ["git", "-C", str(root), "cat-file", "blob", object_id],
+        check=False,
+        capture_output=True,
+    )
+    require(blob_process.returncode == 0, error)
+    return {
+        "method": REPOSITORY_BINDING_METHOD,
+        "object_id": object_id,
+        "sha256": hashlib.sha256(blob_process.stdout).hexdigest(),
+        "byte_count": len(blob_process.stdout),
+    }
 
 
 def producer_path_is_absolute(value: str) -> bool:
@@ -814,6 +856,11 @@ def validate_build_manifest(
         == "CMAKE_DEPENDENCY_SCAN_PLUS_EXPLICIT_HEADERS",
         "BUILD_INVENTORY_MISSING_OR_METHOD_DRIFT",
     )
+    require(
+        inventory.get("repository_binding_method")
+        == REPOSITORY_BINDING_METHOD,
+        "BUILD_REPOSITORY_BINDING_METHOD_DRIFT",
+    )
     files = inventory.get("files")
     require(isinstance(files, list) and files, "BUILD_INVENTORY_FILES")
     normalized: list[dict[str, Any]] = []
@@ -827,21 +874,30 @@ def validate_build_manifest(
         )
         seen_sources.add(relative)
         current = root / relative
+        require(
+            is_sha256(source.get("sha256"))
+            and strict_int(
+                source.get("byte_count"),
+                f"build.source.byte_count:{relative}",
+                1,
+            )
+            > 0,
+            f"BUILD_SOURCE_ROW_DRIFT:{relative}",
+        )
         if strict_host_provenance:
             require(
                 file_sha256(current) == source.get("sha256")
                 and current.stat().st_size == source.get("byte_count"),
                 f"BUILD_SOURCE_CURRENT_DRIFT:{relative}",
             )
-        tree = subprocess.run(
-            ["git", "-C", str(root), "show", f"{build_head}:{relative}"],
-            check=False,
-            capture_output=True,
-        )
         require(
-            tree.returncode == 0
-            and hashlib.sha256(tree.stdout).hexdigest()
-            == source.get("sha256"),
+            source.get("repository_blob")
+            == repository_blob_binding(
+                root,
+                build_head,
+                relative,
+                error=f"BUILD_SOURCE_TREE_DRIFT:{relative}",
+            ),
             f"BUILD_SOURCE_TREE_DRIFT:{relative}",
         )
         normalized.append(dict(source))
@@ -865,10 +921,25 @@ def validate_build_manifest(
     require(isinstance(dirty, dict), "BUILD_DIRTY_STATE_MISSING")
     dirty_projection = dict(dirty)
     declared_dirty = dirty_projection.pop("state_sha256", None)
+    dirty_source_paths = sorted(
+        {
+            *seen_sources,
+            "scripts/create_g4irsf15_exact_binary_build_manifest.py",
+        }
+    )
     require(
         declared_dirty == canonical_sha256(dirty_projection)
         == binding.get("dirty_source_state_sha256")
-        and dirty.get("head") == build_head,
+        and dirty.get("algorithm") == DIRTY_STATE_ALGORITHM
+        and dirty.get("head") == build_head
+        and dirty.get("source_path_count") == len(dirty_source_paths)
+        and dirty.get("source_paths_sha256")
+        == canonical_sha256(dirty_source_paths)
+        and dirty.get("tracked_worktree_diff_sha256")
+        == hashlib.sha256(b"").hexdigest()
+        and dirty.get("staged_diff_sha256")
+        == hashlib.sha256(b"").hexdigest()
+        and dirty.get("untracked_source_files") == [],
         "BUILD_DIRTY_STATE_HASH_DRIFT",
     )
     toolchain = manifest.get("toolchain")
@@ -964,6 +1035,10 @@ def validate_build_manifest(
         and "--clean-first" in build_argv
         and execution.get("clean_first") is True
         and execution.get("source_inventory_unchanged_during_build") is True
+        and execution.get(
+            "source_and_git_identity_unchanged_during_build"
+        )
+        is True
         and execution.get("configure", {}).get("argv") == configure_argv
         and execution.get("build", {}).get("argv") == build_argv
         and execution.get("configure", {}).get("return_code") == 0
@@ -981,11 +1056,6 @@ def validate_build_manifest(
     producer = manifest.get("producer")
     require(isinstance(producer, dict), "BUILD_PRODUCER_RECORD_MISSING")
     producer_relative = str(producer.get("path", ""))
-    producer_tree = subprocess.run(
-        ["git", "-C", str(root), "show", f"{build_head}:{producer_relative}"],
-        check=False,
-        capture_output=True,
-    )
     require(
         producer_relative
         == "scripts/create_g4irsf15_exact_binary_build_manifest.py"
@@ -994,10 +1064,13 @@ def validate_build_manifest(
             producer.get("byte_count"), "build.producer.byte_count", 1
         )
         > 0
-        and producer_tree.returncode == 0
-        and hashlib.sha256(producer_tree.stdout).hexdigest()
-        == producer.get("sha256")
-        and len(producer_tree.stdout) == producer.get("byte_count"),
+        and producer.get("repository_blob")
+        == repository_blob_binding(
+            root,
+            build_head,
+            producer_relative,
+            error="BUILD_PRODUCER_RECORD_DRIFT",
+        ),
         "BUILD_PRODUCER_RECORD_DRIFT",
     )
     if strict_host_provenance:

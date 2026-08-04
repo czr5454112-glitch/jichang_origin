@@ -22,9 +22,10 @@ import sys
 from typing import Any, Iterable, Mapping, Sequence
 
 
-SCHEMA = "czr005.g4irsf15.exact_binary_build_manifest.v1"
-DIRTY_STATE_ALGORITHM = "GIT_BINARY_DIFF_FULL_INDEX_V1"
+SCHEMA = "czr005.g4irsf15.exact_binary_build_manifest.v2"
+DIRTY_STATE_ALGORITHM = "GIT_BINARY_DIFF_FULL_INDEX_SCOPED_V2"
 INVENTORY_METHOD = "CMAKE_DEPENDENCY_SCAN_PLUS_EXPLICIT_HEADERS"
+REPOSITORY_BINDING_METHOD = "GIT_REVISION_BLOB_SHA256_V1"
 SOURCE_SUFFIXES = {".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx", ".inl"}
 
 
@@ -82,6 +83,45 @@ def _run_bytes(
             f"stdout:\n{stdout}\nstderr:\n{stderr}"
         )
     return result
+
+
+def _repository_blob_binding(
+    *,
+    repo_root: Path,
+    revision: str,
+    display_path: str,
+) -> dict[str, Any]:
+    object_id = _run_bytes(
+        ["git", "rev-parse", "--verify", f"{revision}:{display_path}"],
+        cwd=repo_root,
+    ).stdout.decode("ascii").strip()
+    blob = _run_bytes(
+        ["git", "cat-file", "blob", object_id],
+        cwd=repo_root,
+    ).stdout
+    return {
+        "method": REPOSITORY_BINDING_METHOD,
+        "object_id": object_id,
+        "sha256": _sha256_bytes(blob),
+        "byte_count": len(blob),
+    }
+
+
+def _repository_file_row(
+    path: Path,
+    *,
+    display_path: str,
+    repo_root: Path,
+    revision: str = "HEAD",
+) -> dict[str, Any]:
+    return {
+        **_file_row(path, display_path=display_path),
+        "repository_blob": _repository_blob_binding(
+            repo_root=repo_root,
+            revision=revision,
+            display_path=display_path,
+        ),
+    }
 
 
 def _repo_relative(path: Path, repo_root: Path) -> str:
@@ -178,6 +218,7 @@ def collect_transitive_source_inventory(
     *,
     repo_root: Path,
     build_dir: Path,
+    revision: str = "HEAD",
 ) -> dict[str, Any]:
     dependency_inputs = set(_cmake_dependency_paths(build_dir, repo_root))
     explicit_inputs = set(_explicit_local_inputs(repo_root))
@@ -186,11 +227,17 @@ def collect_transitive_source_inventory(
         key=lambda item: _repo_relative(item, repo_root),
     )
     rows = [
-        _file_row(path, display_path=_repo_relative(path, repo_root))
+        _repository_file_row(
+            path,
+            display_path=_repo_relative(path, repo_root),
+            repo_root=repo_root,
+            revision=revision,
+        )
         for path in paths
     ]
     return {
         "method": INVENTORY_METHOD,
+        "repository_binding_method": REPOSITORY_BINDING_METHOD,
         "dependency_scan_local_file_count": len(dependency_inputs),
         "explicit_local_file_count": len(explicit_inputs),
         "files": rows,
@@ -260,12 +307,31 @@ def collect_dirty_source_state(
     state: dict[str, Any] = {
         "algorithm": DIRTY_STATE_ALGORITHM,
         "head": head,
+        "source_path_count": len(ordered_paths),
+        "source_paths_sha256": _sha256_bytes(
+            _canonical_bytes(ordered_paths)
+        ),
         "tracked_worktree_diff_sha256": _sha256_bytes(tracked),
         "staged_diff_sha256": _sha256_bytes(staged),
         "untracked_source_files": untracked_rows,
     }
     state["state_sha256"] = _sha256_bytes(_canonical_bytes(state))
     return state
+
+
+def _require_clean_publication_source_state(
+    state: Mapping[str, Any],
+) -> None:
+    empty_sha256 = _sha256_bytes(b"")
+    if (
+        state.get("tracked_worktree_diff_sha256") != empty_sha256
+        or state.get("staged_diff_sha256") != empty_sha256
+        or state.get("untracked_source_files") != []
+    ):
+        raise RuntimeError(
+            "publication exact build requires clean tracked, staged, and "
+            "untracked source paths"
+        )
 
 
 def _parse_cmake_cache(cache_path: Path) -> dict[str, str]:
@@ -452,7 +518,16 @@ def build_exact_binary_manifest(
             f"reported={reported_pybind11_dir}"
         )
     explicit_inputs = _explicit_local_inputs(repo_root)
-    before = _input_snapshot(explicit_inputs, repo_root)
+    producer = Path(__file__).resolve()
+    build_head = _git_stdout(repo_root, ["rev-parse", "HEAD"]).decode().strip()
+    branch = _git_stdout(
+        repo_root, ["branch", "--show-current"]
+    ).decode().strip()
+    before_paths = sorted(
+        {*explicit_inputs, producer},
+        key=lambda item: _repo_relative(item, repo_root),
+    )
+    before = _input_snapshot(before_paths, repo_root)
 
     configure_argv = [
         str(cmake_path),
@@ -483,23 +558,41 @@ def build_exact_binary_manifest(
     ]
     build_result = _run_bytes(build_argv, cwd=repo_root)
 
-    after_paths = _explicit_local_inputs(repo_root)
+    after_paths = sorted(
+        {*_explicit_local_inputs(repo_root), producer},
+        key=lambda item: _repo_relative(item, repo_root),
+    )
     after = _input_snapshot(after_paths, repo_root)
-    if before != after:
+    after_head = _git_stdout(repo_root, ["rev-parse", "HEAD"]).decode().strip()
+    after_branch = _git_stdout(
+        repo_root, ["branch", "--show-current"]
+    ).decode().strip()
+    if (
+        before != after
+        or build_head != after_head
+        or branch != after_branch
+    ):
         raise RuntimeError(
-            "native source inventory changed while the exact binary was built"
+            "source or Git identity changed while the exact binary was built"
         )
 
     binary_path = _find_binary(build_dir, configuration)
     inventory = collect_transitive_source_inventory(
         repo_root=repo_root,
         build_dir=build_dir,
+        revision=build_head,
     )
-    source_paths = [str(row["path"]) for row in inventory["files"]]
+    source_paths = [
+        *[str(row["path"]) for row in inventory["files"]],
+        _repo_relative(producer, repo_root),
+    ]
     dirty_state = collect_dirty_source_state(
         repo_root=repo_root,
         source_paths=source_paths,
     )
+    if dirty_state["head"] != build_head:
+        raise RuntimeError("Git HEAD changed before dirty source capture")
+    _require_clean_publication_source_state(dirty_state)
 
     cache_path = build_dir / "CMakeCache.txt"
     if not cache_path.is_file():
@@ -511,8 +604,6 @@ def build_exact_binary_manifest(
         raise FileNotFoundError(
             f"recorded C++ compiler does not exist: {compiler_path}"
         )
-    branch = _git_stdout(repo_root, ["branch", "--show-current"]).decode().strip()
-    producer = Path(__file__).resolve()
     manifest: dict[str, Any] = {
         "schema": SCHEMA,
         "status": "COMPLETE",
@@ -524,7 +615,7 @@ def build_exact_binary_manifest(
             ),
         ),
         "git": {
-            "head": dirty_state["head"],
+            "head": build_head,
             "branch": branch,
         },
         "dirty_source_state": dirty_state,
@@ -578,10 +669,13 @@ def build_exact_binary_manifest(
             ),
             "build": _command_evidence(build_argv, build_result),
             "source_inventory_unchanged_during_build": True,
+            "source_and_git_identity_unchanged_during_build": True,
         },
-        "producer": _file_row(
+        "producer": _repository_file_row(
             producer,
             display_path=_repo_relative(producer, repo_root),
+            repo_root=repo_root,
+            revision=build_head,
         ),
         "claim_boundary": (
             "This manifest proves which local source state and toolchain were "

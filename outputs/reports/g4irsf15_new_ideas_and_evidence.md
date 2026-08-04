@@ -515,7 +515,7 @@
   runtime-state、clone group、boundary 和两种 intervention hash 精确相等。Python
   generator 与独立 validator 各自重算 canonical target address、prepopulation group、
   horizon hash 和现场 seal，且覆盖局部字段、cohort、当前 horizon、state component、
-  intervention 以及额外字段注入篡改。当前聚焦 Python 89 项与 Release CTest 11/11
+  intervention 以及额外字段注入篡改。当前聚焦 Python 98 项与 Release CTest 11/11
   全部通过。
 - 证据边界：以上证明的是实现合同、eager/deferred 字节级等价及 fail-closed 行为；
   新提交对应的完整 protected scan、pilot/formal 实跑尚未完成，因此本条不宣称正式
@@ -597,3 +597,51 @@
 - 对方向的意义：去中心化 worker 与跨主机证据链会同时处理 Git identity、内容根和
   状态承诺；明确各命名空间的算法与长度，可避免不同站点把“合法但不同类型的摘要”
   当成损坏证据，也避免为了通过校验而弱化来源祖先关系。
+
+### NI-036：构建字节身份与 Git repository blob 身份必须双重绑定
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：NI-035 修复后 strict validator 正确进入 source-tree 门，但 Windows worktree
+  的 `CMakeLists.txt` 为 5,678 个 checkout 字节，`git show` 返回 5,537 个 repository
+  blob 字节；`core.autocrlf=true` 且历史混合换行使全量 smudge 结果也不是原工作树字节。
+  因此直接要求“本机编译字节 SHA-256 == Git raw blob SHA-256”会把 clean tree 误判为
+  篡改；简单把 LF 全换成 CRLF 同样不可靠。
+- 修复：exact builder 对每个 native source 和 builder producer 同时记录两种身份：
+  原始 checkout `sha256/byte_count` 证明本机实际读取的字节，`repository_blob` 则绑定
+  build HEAD 下 Git object ID、raw blob SHA-256 与 byte count。生产 generator 在同一
+  主机逐项复核两者，并把 builder producer 加入 dirty-source paths；独立 portable
+  validator 通过 Git object database 重算 repository blob，不依赖宿主换行转换，只有
+  `--strict-host-provenance` 时才额外要求 checkout 原始字节相同。正式发布同时要求
+  inventory 与 producer 的 tracked/staged diff 为空且无 untracked source。
+- 合同硬化：manifest 升级为 v2；dirty state 绑定 source path 的精确数量与 canonical
+  path-set SHA，防止 clean 空 diff 掩盖漏记 producer。builder 在 configure 前冻结
+  HEAD、branch、全部 native input 与 producer 原始快照，build 后要求它们逐项不变；
+  任一 source dirty 状态直接拒绝生成 publication `COMPLETE` manifest。
+- 篡改边界：repository blob 行进入 inventory bundle/self hash；换 path、OID、blob
+  内容、工作树源码、builder producer 或 dirty diff 任一项都会 fail closed。该合同
+  不把 EOL 差异忽略成“任意文本等价”，而是分别证明“实际构建字节”与“提交语义内容”。
+- 证据边界：已增加强制 `eol=crlf` 的临时 Git 仓库回归，证明 generator 与独立
+  validator 在 checkout SHA 不同于 blob SHA 时仍对同一 repository binding 达成一致；
+  修复后的 exact build/scan/strict 链仍需重新生成，前两次未接纳 scan 不进入 pilot。
+- 对方向的意义：跨 Windows/Linux worker 时，本地 checkout 表示可以不同，但参与同一
+  去中心化实验的节点必须指向同一提交 blob。双重身份让本机可追责性与跨站点可移植性
+  同时成立，而不是牺牲其中一项来通过校验。
+
+### NI-037：campaign source identity 也应从 raw-only 迁移到双重身份
+
+- 状态：`PROPOSED`
+- 发现：NI-036 修复的是 exact native build inventory 与 builder producer；scan manifest
+  中更宽的 `source_identity`（generator、validator、worker script、模型等）仍以 checkout
+  raw SHA/byte count 为唯一 bundle 行。当前 Windows strict 链可完整复验，但换到 Linux/LF
+  checkout 后，内容相同的文本仍可能在 `SOURCE_DRIFT` 被拒，不能据此宣称整个 campaign
+  已完成跨 EOL portable validation。
+- 候选改进：下一 schema 为每个 tracked source-identity 行加入 generation HEAD 下的
+  `repository_blob`，本机生成端同时保留 raw checkout 身份，portable validator 只用
+  Git blob 复核提交内容，strict-host 再复核 raw；模型或确需逐字节固定的数据文件继续
+  要求 raw SHA 跨平台相同。source bundle 应分别发布 checkout root 与 repository root，
+  不能用一个名称混合两类语义。
+- 接纳门：Windows CRLF 生成 → Linux LF clone 的 scan/pilot/formal 静态复验必须真实通过；
+  同时覆盖 blob/path/HEAD/raw 模型篡改。完成前 NI-026 的 Ubuntu 条件门仍是待验证项，
+  本轮只声明 generation-host strict provenance。
+- 对方向的意义：多站点 planner 需要在不同 checkout 表示下确认“运行的是同一协议”，
+  同时对模型与二进制数据保持逐字节一致。拆分两个 root 能让跨站点共识更精确。
