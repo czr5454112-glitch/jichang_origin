@@ -35,7 +35,7 @@ TASK_PATH = Path("data/processed/tasks/inputdata.jsonl")
 MODEL_PATH = Path("artifacts/models/g4e_risk_calibrated_policy.json")
 OFFLINE_TAIL_PATH = Path("outputs/tables/g4irsf13_per_bag_delta.csv")
 DESCRIPTOR_DATASET_PATH = Path(
-    "artifacts/datasets/g4irsf15_causal_descriptor_pool.jsonl.zst"
+    "artifacts/datasets/g4irsf15_causal_target_address_frame.jsonl.zst"
 )
 SKELETON_DATASET_ROOT = Path(
     "artifacts/datasets/g4irsf15_causal_skeleton_population"
@@ -119,11 +119,51 @@ SKELETON_SCHEMA = "czr005.g4irsf15.causal_skeleton.v1"
 MATERIALIZATION_SCHEMA = (
     "czr005.g4irsf15.causal_descriptor_materialization.v1"
 )
+TARGET_ADDRESS_SCHEMA = "czr005.g4irsf15.causal_target_address.v1"
+TARGET_ADDRESS_HORIZON_SCHEMA = (
+    "czr005.g4irsf15.causal_target_address_horizon.v1"
+)
+PREPOP_EVENT_GROUP_SCHEMA = (
+    "czr005.g4irsf15.prepop_event_group.v1"
+)
+G4IRSF14_STATE_CLONE_SCHEMA = (
+    "czr005.g4irsf14.matched_runtime_state_clone.v2"
+)
+RESOLVED_STATE_COMPONENT_FIELDS = (
+    ("event_queue_sha256", "event_queue"),
+    ("current_time_sha256", "current_time"),
+    ("bags_sha256", "bags"),
+    ("source_queues_sha256", "source_queues"),
+    ("junction_queues_sha256", "junction_queues"),
+    ("local_service_calendars_sha256", "local_service_calendars"),
+    ("corridor_state_sha256", "corridor_state"),
+    ("scheduled_incoming_sha256", "scheduled_incoming"),
+    ("credits_sha256", "credits"),
+    ("merge_grants_sha256", "merge_grants"),
+    ("fault_state_sha256", "fault_state"),
+    ("pibt_owner_state_sha256", "pibt_owner_state"),
+    ("deterministic_counters_sha256", "deterministic_counters"),
+    ("scorer_state_sha256", "scorer_state"),
+    ("result_accumulator_sha256", "result_accumulator"),
+    ("current_runtime_hashes_sha256", "current_runtime_hashes"),
+    ("congestion_beacons_sha256", "congestion_beacons"),
+    ("microphase_state_sha256", "microphase_state"),
+)
+RESOLVED_INTERVENTION_KIND = {
+    "I1": "I1_source_order_swap",
+    "I3": "I3_next_edge",
+    "I4": "I4_hold_release",
+}
+RESOLVED_BOUNDARY_KIND = {
+    "I1": "source_arbitration",
+    "I3": "junction_route_arbitration",
+    "I4": "hold_release_opportunity",
+}
 BUILD_MANIFEST_SCHEMA = (
     "czr005.g4irsf15.exact_binary_build_manifest.v1"
 )
 DESCRIPTOR_MANIFEST_SCHEMA = (
-    "czr005.g4irsf15.causal_descriptor_manifest.v2"
+    "czr005.g4irsf15.causal_descriptor_manifest.v3"
 )
 CHECKPOINT_MANIFEST_SCHEMA = (
     "czr005.g4irsf15.checkpoint_bank_manifest.v1"
@@ -192,16 +232,13 @@ OUTCOME_FREE_SCREENING_FIELDS = (
     "baseline_release",
     "candidate_action_count",
     "coverage_tags",
+    "event_hour_floor",
     "kind",
+    "legal_next_edges",
     "node",
-    "queue_top_not_popped",
-    "reservation_depth",
-    "runtime_future_route_read_count",
-    "runtime_future_schedule_read_count",
-    "runtime_global_scan_count",
     "sampling_stratum_id",
     "selected_boolean",
-    "staged_event_sink_empty",
+    "source_ready_order",
     "total_legal_action_count",
 )
 ANALYSIS_DELTA_METRICS = (
@@ -1015,6 +1052,193 @@ def validate_descriptor(row: Mapping[str, Any]) -> None:
     )
 
 
+def prepop_event_group_sha256(
+    row: Mapping[str, Any], *, input_runtime_cohort_sha256: str
+) -> str:
+    require(
+        is_sha256(input_runtime_cohort_sha256),
+        "TARGET_ADDRESS_COHORT_SHA256_MISSING",
+    )
+    return canonical_sha256(
+        {
+            "schema": PREPOP_EVENT_GROUP_SCHEMA,
+            "input_runtime_cohort_sha256": input_runtime_cohort_sha256,
+            "event_ordinal": strict_int(
+                row.get("event_ordinal"), "target.event_ordinal"
+            ),
+            "event_seq": strict_int(row.get("event_seq"), "target.event_seq", 1),
+            "event_time_bits": strict_int(
+                row.get("event_time_bits"), "target.event_time_bits"
+            ),
+            "node": strict_int(row.get("node"), "target.node"),
+        }
+    )
+
+
+def target_address_horizon_sha256(
+    target_address_id: str, horizon: str
+) -> str:
+    require(is_sha256(target_address_id), "TARGET_ADDRESS_ID_INVALID")
+    require(horizon in {"H_bag", "H_system"}, "TARGET_ADDRESS_HORIZON")
+    return canonical_sha256(
+        {
+            "schema": TARGET_ADDRESS_HORIZON_SCHEMA,
+            "target_address_id": target_address_id,
+            "horizon": horizon,
+        }
+    )
+
+
+def validate_target_address(
+    row: Mapping[str, Any], *, input_runtime_cohort_sha256: str
+) -> None:
+    require(row.get("schema") == TARGET_ADDRESS_SCHEMA, "TARGET_ADDRESS_SCHEMA")
+    address = row.get("target_address_id")
+    require(
+        is_sha256(address)
+        and row.get("descriptor_id") == address
+        and row.get("skeleton_id") == address
+        and row.get("population_selection_sha256") == address
+        and row.get("skeleton_selection_sha256") == address
+        and row.get("sample_sha256") == address
+        and row.get("input_runtime_cohort_sha256")
+        == input_runtime_cohort_sha256
+        and row.get("target_address_id_semantics")
+        == "ALIAS_OF_NATIVE_SKELETON_SELECTION_SHA256",
+        "TARGET_ADDRESS_IDENTITY_DRIFT",
+    )
+    require(row.get("kind") in KINDS, "TARGET_ADDRESS_KIND")
+    event_group = prepop_event_group_sha256(
+        row, input_runtime_cohort_sha256=input_runtime_cohort_sha256
+    )
+    require(
+        row.get("prepop_event_group_sha256") == event_group
+        and row.get("clone_group_id") == event_group,
+        "TARGET_ADDRESS_EVENT_GROUP_DRIFT",
+    )
+    hashes = row.get("target_address_sha256_by_horizon")
+    require(
+        isinstance(hashes, dict)
+        and set(hashes) == {"H_bag", "H_system"}
+        and all(
+            hashes[horizon]
+            == target_address_horizon_sha256(str(address), horizon)
+            for horizon in ("H_bag", "H_system")
+        )
+        and row.get("horizon") == "H_bag"
+        and row.get("target_address_sha256") == hashes["H_bag"],
+        "TARGET_ADDRESS_HORIZON_BINDING_DRIFT",
+    )
+    require(
+        row.get("seal_level") == "LOCAL_PREPOP_ADDRESS"
+        and row.get("full_state_seal") == "DEFERRED_TO_EXECUTED_PAIR"
+        and row.get("runtime_state_sha256") is None
+        and row.get("boundary_sha256") is None
+        and row.get("intervention_sha256") is None
+        and row.get("outcome_free") is True,
+        "TARGET_ADDRESS_EAGER_FULL_SEAL_FORBIDDEN",
+    )
+    for eager_field in (
+        "intervention_sha256_by_horizon",
+        "state_components",
+        "kind_name",
+        "boundary_kind",
+        "queue_top_not_popped",
+        "staged_event_sink_empty",
+        "runtime_global_scan_count",
+        "runtime_future_route_read_count",
+        "runtime_future_schedule_read_count",
+        "reservation_depth",
+        "max_selected_edges_per_bag",
+    ):
+        require(
+            row.get(eager_field) is None,
+            f"TARGET_ADDRESS_EAGER_FULL_SEAL_FORBIDDEN:{eager_field}",
+        )
+    require(
+        row.get("baseline_action") != row.get("intervention_action"),
+        "TARGET_ADDRESS_ACTION_SAME",
+    )
+    sampling = row.get("sampling")
+    require(isinstance(sampling, dict), "TARGET_ADDRESS_SAMPLING_MISSING")
+    N_h = strict_int(sampling.get("N_h"), "target.N_h", 1)
+    n_h = strict_int(sampling.get("n_h"), "target.n_h", 1)
+    pi_h = strict_float(sampling.get("pi_h"), "target.pi_h")
+    weight = strict_float(
+        sampling.get("analysis_weight"), "target.analysis_weight"
+    )
+    require(
+        n_h <= N_h
+        and math.isclose(pi_h, n_h / N_h, rel_tol=0.0, abs_tol=1e-15)
+        and math.isclose(weight, 1.0 / pi_h, rel_tol=1e-12)
+        and sampling.get("cluster_id") == event_group
+        and sampling.get("cluster_bootstrap_unit")
+        == "prepop_event_group_sha256",
+        "TARGET_ADDRESS_SAMPLING_DRIFT",
+    )
+    offline = row.get("offline_sampling_metadata")
+    require(
+        isinstance(offline, dict)
+        and offline.get("must_not_enter_policy_features") is True
+        and offline.get("runtime_only") is False,
+        "TARGET_ADDRESS_OFFLINE_FEATURE_SCOPE_DRIFT",
+    )
+
+
+def expected_target_address_from_skeleton(
+    selected: Mapping[str, Any], *, input_runtime_cohort_sha256: str
+) -> dict[str, Any]:
+    """Independently reconstruct the exact outcome-free address row."""
+
+    expected = dict(selected)
+    address = str(selected.get("skeleton_id", ""))
+    require(is_sha256(address), "EXPECTED_TARGET_ADDRESS_SKELETON_ID")
+    event_group = prepop_event_group_sha256(
+        selected,
+        input_runtime_cohort_sha256=input_runtime_cohort_sha256,
+    )
+    hashes = {
+        horizon: target_address_horizon_sha256(address, horizon)
+        for horizon in ("H_bag", "H_system")
+    }
+    sampling = selected.get("sampling")
+    require(
+        isinstance(sampling, dict),
+        "EXPECTED_TARGET_ADDRESS_SAMPLING_MISSING",
+    )
+    expected_sampling = dict(sampling)
+    expected_sampling["cluster_id"] = event_group
+    expected_sampling["cluster_bootstrap_unit"] = (
+        "prepop_event_group_sha256"
+    )
+    expected.update(
+        {
+            "schema": TARGET_ADDRESS_SCHEMA,
+            "descriptor_id": address,
+            "target_address_id": address,
+            "target_address_id_semantics": (
+                "ALIAS_OF_NATIVE_SKELETON_SELECTION_SHA256"
+            ),
+            "population_selection_sha256": address,
+            "input_runtime_cohort_sha256": (
+                input_runtime_cohort_sha256
+            ),
+            "prepop_event_group_sha256": event_group,
+            "clone_group_id": event_group,
+            "seal_level": "LOCAL_PREPOP_ADDRESS",
+            "full_state_seal": "DEFERRED_TO_EXECUTED_PAIR",
+            "runtime_state_sha256": None,
+            "boundary_sha256": None,
+            "horizon": "H_bag",
+            "target_address_sha256_by_horizon": hashes,
+            "target_address_sha256": hashes["H_bag"],
+            "sample_sha256": address,
+            "sampling": expected_sampling,
+        }
+    )
+    return expected
+
+
 def validate_terminal_invariants(
     invariants: Any, replay_hashes: Any, *, label: str
 ) -> None:
@@ -1383,11 +1607,20 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
         isinstance(binary.get("peak_resident_bytes"), int)
         and binary["peak_resident_bytes"] > 0
         and isinstance(binary.get("skeleton_scan_call"), dict)
-        and isinstance(
-            binary.get("descriptor_materialization_call"), dict
-        ),
+        and binary.get("descriptor_materialization_call") is None
+        and binary.get(
+            "full_state_digest_count_during_target_frame_publication"
+        )
+        == 0,
         "SCAN_RSS_PROFILE_MISSING",
     )
+    controls = manifest.get("frozen_controls")
+    require(isinstance(controls, dict), "SCAN_FROZEN_CONTROLS_MISSING")
+    for name, expected in FROZEN_CONTROLS.items():
+        require(
+            controls.get(name) == expected,
+            f"SCAN_FROZEN_CONTROL_DRIFT:{name}",
+        )
     scan = manifest.get("native_scan_summary")
     require(
         isinstance(scan, dict)
@@ -1396,7 +1629,12 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
         == "OUTCOME_FREE_NATIVE_PREPOP_SKELETON_CENSUS"
         and scan.get("census_complete") is True
         and scan.get("terminal_finalized") is True
-        and scan.get("protected_full_1x_shape") is True,
+        and scan.get("protected_full_1x_shape") is True
+        and scan.get("sealed_descriptor_materialization_required")
+        is False
+        and scan.get("target_address_frame_required") is True
+        and scan.get("full_state_seal_policy")
+        == "DEFERRED_TO_EXECUTED_PAIR",
         "NATIVE_SKELETON_CENSUS_NOT_COMPLETE",
     )
     validate_terminal_invariants(
@@ -1431,6 +1669,7 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
     )
     require(
         manifest.get("skeleton_population_count")
+        == manifest.get("target_address_population_count")
         == expected_population_count,
         "SKELETON_POPULATION_MANIFEST_COUNT_DRIFT",
     )
@@ -1456,17 +1695,23 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
             == population_by_kind[kind],
             f"NATIVE_SKELETON_KIND_COUNT_DRIFT:{kind}",
         )
-    materialization = manifest.get("native_materialization_summary")
+    materialization = manifest.get("target_address_frame_summary")
     require(
         isinstance(materialization, dict)
-        and materialization.get("schema") == MATERIALIZATION_SCHEMA
+        and materialization.get("schema") == TARGET_ADDRESS_SCHEMA
         and materialization.get("evidence_scope")
-        == "SELECTED_NATIVE_PREPOP_BOUNDARY_MATERIALIZATION"
+        == "OUTCOME_FREE_LOCAL_PREPOP_TARGET_FRAME"
         and materialization.get("selected_skeleton_count")
-        == materialization.get("materialized_descriptor_count")
+        == materialization.get("target_address_count")
         == manifest.get("selected_skeleton_count")
-        == manifest.get("sealed_descriptor_count"),
-        "MATERIALIZATION_COUNT_OR_SCOPE_DRIFT",
+        == manifest.get("target_address_count")
+        and materialization.get("full_state_digest_count") == 0
+        and materialization.get("full_state_seal_policy")
+        == "DEFERRED_TO_EXECUTED_PAIR"
+        and materialization.get("false_positive_policy")
+        == "RETAIN_ATTEMPT_IF_ADDRESS_DOES_NOT_RESOLVE_UNIQUELY"
+        and manifest.get("full_state_sealed_descriptor_count") == 0,
+        "TARGET_ADDRESS_FRAME_COUNT_OR_SCOPE_DRIFT",
     )
     require(
         materialization.get("input_request_count") == FULL_SEGMENT_COUNT
@@ -1483,7 +1728,7 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
         == current_protected[
             "raw_bag_original_entry_mapping_sha256"
         ],
-        "MATERIALIZATION_INPUT_BINDING_DRIFT",
+        "TARGET_ADDRESS_INPUT_BINDING_DRIFT",
     )
     offline = manifest.get("offline_sampling_input")
     require(isinstance(offline, dict), "OFFLINE_BINDING_MISSING")
@@ -1493,21 +1738,31 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
         and offline.get("runtime_feature_allowed") is False,
         "OFFLINE_SAMPLING_BINDING_DRIFT",
     )
-    dataset = manifest.get("descriptor_dataset")
-    require(isinstance(dataset, dict), "DESCRIPTOR_DATASET_BINDING_MISSING")
+    dataset = manifest.get("target_address_dataset")
+    require(isinstance(dataset, dict), "TARGET_ADDRESS_DATASET_BINDING_MISSING")
     dataset_path = root / Path(str(dataset.get("path", "")))
-    require(dataset_path == root / DESCRIPTOR_DATASET_PATH, "DESCRIPTOR_DATASET_PATH")
-    require(file_sha256(dataset_path) == dataset.get("sha256"), "DESCRIPTOR_DATASET_HASH")
+    require(dataset_path == root / DESCRIPTOR_DATASET_PATH, "TARGET_ADDRESS_DATASET_PATH")
+    require(
+        file_sha256(dataset_path) == dataset.get("sha256")
+        and dataset.get("encoding") == "CANONICAL_JSONL_ZSTD"
+        and dataset.get("byte_count") == dataset_path.stat().st_size
+        and 0 < dataset_path.stat().st_size < GITHUB_SAFE_ARTIFACT_MAX_BYTES,
+        "TARGET_ADDRESS_DATASET_HASH_OR_STORAGE_DRIFT",
+    )
     rows = zstd_jsonl(dataset_path)
-    require(len(rows) >= 4_096, "DESCRIPTOR_POOL_BELOW_4096")
-    require(len(rows) == manifest.get("descriptor_pool_count"), "POOL_COUNT_DRIFT")
-    require(canonical_sha256(rows) == manifest.get("descriptor_pool_sha256"), "POOL_CONTENT_DRIFT")
+    require(len(rows) >= 4_096, "TARGET_ADDRESS_FRAME_BELOW_4096")
+    require(len(rows) == manifest.get("target_address_frame_count"), "TARGET_ADDRESS_FRAME_COUNT_DRIFT")
+    require(canonical_sha256(rows) == manifest.get("target_address_frame_sha256"), "TARGET_ADDRESS_FRAME_CONTENT_DRIFT")
     seen: set[str] = set()
     seen_selected_skeletons: set[str] = set()
-    clone_kind: set[tuple[str, str]] = set()
     by_stratum: Counter[str] = Counter()
     for row in rows:
-        validate_descriptor(row)
+        validate_target_address(
+            row,
+            input_runtime_cohort_sha256=current_protected[
+                "input_runtime_cohort_sha256"
+            ],
+        )
         descriptor = str(row["descriptor_id"])
         selected_skeleton_id = str(row.get("skeleton_id", ""))
         require(
@@ -1518,11 +1773,24 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
         seen_selected_skeletons.add(selected_skeleton_id)
         require(descriptor not in seen, f"DUPLICATE_DESCRIPTOR:{descriptor}")
         seen.add(descriptor)
-        pair = (str(row["kind"]), str(row["clone_group_id"]))
-        require(pair not in clone_kind, f"DUPLICATE_KIND_CLONE:{pair}")
-        clone_kind.add(pair)
         by_stratum[str(row["sampling"]["sampling_stratum_id"])] += 1
-    strata = manifest.get("sampling_design", {}).get("strata")
+    sampling_design = manifest.get("sampling_design")
+    require(
+        isinstance(sampling_design, dict)
+        and sampling_design.get("name")
+        == "TAIL_ENRICHED_STRATIFIED_DETERMINISTIC_MIN_HASH"
+        and sampling_design.get("randomization_surrogate")
+        == "SHA256_PSEUDORANDOM_ORDER"
+        and sampling_design.get("population_estimation")
+        == "REFERENCE_DESIGN_WEIGHTS_ONLY_NOT_ORIGINAL_POPULATION_ATE"
+        and sampling_design.get("variance_estimation")
+        == (
+            "ACTUAL_DETERMINISTIC_PREPOP_EVENT_GROUP_BOOTSTRAP_"
+            "AT_FORMAL_FINALIZE"
+        ),
+        "TARGET_ADDRESS_SAMPLING_DESIGN_POLICY_DRIFT",
+    )
+    strata = sampling_design.get("strata")
     require(isinstance(strata, dict), "SAMPLING_STRATA_MISSING")
     expected_selected: list[dict[str, Any]] = []
     population_strata: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -1575,7 +1843,7 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
                 ),
                 "cluster_id": skeleton["skeleton_id"],
                 "cluster_bootstrap_unit": (
-                    "skeleton_id_pending_descriptor_materialization"
+                    "skeleton_id_pending_target_address_frame"
                 ),
             }
             expected_selected.append({**skeleton, "sampling": sampling})
@@ -1617,19 +1885,14 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
     for descriptor in rows:
         selected = expected_by_skeleton[str(descriptor["skeleton_id"])]
         require(
-            descriptor.get("population_group_sha256")
-            == selected.get("population_group_sha256")
-            and descriptor.get("kind") == selected.get("kind")
-            and descriptor.get("event_ordinal")
-            == selected.get("event_ordinal"),
-            "MATERIALIZED_DESCRIPTOR_SKELETON_DRIFT",
-        )
-        expected_sampling = dict(selected["sampling"])
-        expected_sampling["cluster_id"] = descriptor["clone_group_id"]
-        expected_sampling["cluster_bootstrap_unit"] = "clone_group_id"
-        require(
-            descriptor.get("sampling") == expected_sampling,
-            "MATERIALIZED_DESCRIPTOR_SAMPLING_DRIFT",
+            descriptor
+            == expected_target_address_from_skeleton(
+                selected,
+                input_runtime_cohort_sha256=current_protected[
+                    "input_runtime_cohort_sha256"
+                ],
+            ),
+            "TARGET_ADDRESS_SKELETON_MATERIALIZATION_DRIFT",
         )
     for stratum, count in by_stratum.items():
         design = strata.get(stratum)
@@ -1760,11 +2023,42 @@ def validate_descriptor_bundle(root: Path) -> tuple[list[dict[str, Any]], dict[s
         checkpoint.get("schema") == CHECKPOINT_MANIFEST_SCHEMA,
         "CHECKPOINT_SCHEMA",
     )
-    require(checkpoint.get("checkpoint_storage") == "NOT_SERIALIZED", "FAKE_DISK_CHECKPOINT")
     require(
-        checkpoint.get("descriptor_manifest_self_sha256")
-        == manifest["self_sha256"],
-        "CHECKPOINT_DESCRIPTOR_BINDING",
+        checkpoint.get("status")
+        == "IMPLEMENTED_AS_NATIVE_OPAQUE_IN_MEMORY_CHECKPOINTS"
+        and checkpoint.get("formal_pass_claimed") is False
+        and checkpoint.get("checkpoint_storage") == "NOT_SERIALIZED"
+        and checkpoint.get("checkpoint_policy")
+        == (
+            "FRESH_PROCESS_DETERMINISTIC_PREFIX_REPLAY_THEN_ONE_OPAQUE_"
+            "IN_MEMORY_CHECKPOINT_PER_TARGET_EVENT_ORDINAL"
+        )
+        and checkpoint.get("runtime_scope")
+        == "OFFLINE_CAMPAIGN_ONLY_NOT_RUNTIME_POLICY"
+        and checkpoint.get("crash_recovery")
+        == "ATOMIC_SHARD_RESUME_REPLAYS_PREFIX_IN_A_FRESH_PROCESS"
+        and checkpoint.get("no_op_fidelity_requirement")
+        == (
+            "EVERY_PAIR_REQUIRES_IDENTICAL_SOURCE_BASELINE_TREATMENT_"
+            "START_STATE_SHA256"
+        )
+        and checkpoint.get("descriptor_manifest_self_sha256")
+        == manifest["self_sha256"]
+        and checkpoint.get("exact_binary_build_manifest")
+        == manifest.get("exact_binary_build_manifest")
+        and checkpoint.get("source_bundle_sha256")
+        == manifest.get("source_identity", {}).get("source_bundle_sha256"),
+        "CHECKPOINT_POLICY_OR_PROVENANCE_BINDING_DRIFT",
+    )
+    checkpoint_binary = checkpoint.get("binary")
+    require(
+        isinstance(checkpoint_binary, dict)
+        and checkpoint_binary.get("path") == binary.get("path")
+        and checkpoint_binary.get("sha256_before")
+        == checkpoint_binary.get("sha256_after")
+        == binary.get("sha256_before")
+        and checkpoint_binary.get("unchanged") is True,
+        "CHECKPOINT_BINARY_BINDING_DRIFT",
     )
     return rows, manifest
 
@@ -1892,8 +2186,8 @@ def validate_screening_revision(
         "skeleton_population_content_sha256": descriptor_manifest[
             "skeleton_population_dataset"
         ]["content_sha256"],
-        "descriptor_pool_sha256": descriptor_manifest[
-            "descriptor_pool_sha256"
+        "target_address_frame_sha256": descriptor_manifest[
+            "target_address_frame_sha256"
         ],
     }
     require(
@@ -2087,7 +2381,11 @@ def validate_plan(
             source = descriptor_by_id.get(target.get("descriptor_id"))
             require(source is not None, "TARGET_NOT_IN_DESCRIPTOR_POOL")
             for field, expected in source.items():
-                if field in {"horizon", "intervention_sha256", "sampling"}:
+                if field in {
+                    "horizon",
+                    "target_address_sha256",
+                    "sampling",
+                }:
                     continue
                 require(
                     target.get(field) == expected,
@@ -2096,9 +2394,12 @@ def validate_plan(
             horizon = target.get("horizon")
             require(horizon in {"H_bag", "H_system"}, "TARGET_HORIZON")
             require(
-                target.get("intervention_sha256")
-                == target.get("intervention_sha256_by_horizon", {}).get(horizon),
-                "TARGET_HORIZON_SHA_NOT_UPDATED",
+                target.get("intervention_sha256") is None
+                and target.get("target_address_sha256")
+                == target.get(
+                    "target_address_sha256_by_horizon", {}
+                ).get(horizon),
+                "TARGET_ADDRESS_HORIZON_SHA_NOT_UPDATED",
             )
             require(
                 target.get("clone_group_id") == source.get("clone_group_id"),
@@ -2137,7 +2438,10 @@ def validate_plan(
             require(
                 target.get("intervention_id") == key
                 and target.get("target_decision_id")
-                == f"{target['boundary_sha256']}:{target['event_seq']}",
+                == (
+                    f"{target['target_address_sha256']}:"
+                    f"{target['event_seq']}"
+                ),
                 "TARGET_DECISION_ID_DRIFT",
             )
             target_rows.append(target)
@@ -2174,9 +2478,10 @@ def validate_plan(
     )
     for target in target_rows:
         sampling = target.get("sampling")
-        sealed = target.get("sealed_pool_sampling")
+        address_frame = target.get("target_address_frame_sampling")
         require(
-            isinstance(sampling, dict) and isinstance(sealed, dict),
+            isinstance(sampling, dict)
+            and isinstance(address_frame, dict),
             "TARGET_ATTEMPT_SAMPLING_MISSING",
         )
         stratum = str(sampling.get("sampling_stratum_id"))
@@ -2184,9 +2489,9 @@ def validate_plan(
         attempt_n = strict_int(
             sampling.get("attempt_n_h"), f"{stratum}.attempt_n_h", 1
         )
-        sealed_n = strict_int(
-            sampling.get("sealed_pool_n_h"),
-            f"{stratum}.sealed_pool_n_h",
+        address_frame_n = strict_int(
+            sampling.get("target_address_frame_n_h"),
+            f"{stratum}.target_address_frame_n_h",
             1,
         )
         frame_n = strict_int(
@@ -2198,8 +2503,8 @@ def validate_plan(
             sampling.get("excluded_before_panel_n_h"),
             f"{stratum}.excluded_before_panel_n_h",
         )
-        pool_pi = strict_float(
-            sampling.get("pool_pi_h"), f"{stratum}.pool_pi_h"
+        frame_pi = strict_float(
+            sampling.get("frame_pi_h"), f"{stratum}.frame_pi_h"
         )
         survival_pi = strict_float(
             sampling.get("post_exclusion_survival_pi_h"),
@@ -2214,17 +2519,21 @@ def validate_plan(
         require(attempt_n == attempt_strata[stratum], "ATTEMPT_n_h_DRIFT")
         require(
             sampling.get("n_h") == attempt_n
-            and excluded_n + frame_n == sealed_n
-            and math.isclose(pool_pi, sealed_n / N_h, abs_tol=1e-15)
+            and excluded_n + frame_n == address_frame_n
             and math.isclose(
-                survival_pi, frame_n / sealed_n, abs_tol=1e-15
+                frame_pi, address_frame_n / N_h, abs_tol=1e-15
+            )
+            and math.isclose(
+                survival_pi,
+                frame_n / address_frame_n,
+                abs_tol=1e-15,
             )
             and math.isclose(
                 stage2_pi, attempt_n / frame_n, abs_tol=1e-15
             )
             and math.isclose(
                 final_pi,
-                pool_pi * survival_pi * stage2_pi,
+                frame_pi * survival_pi * stage2_pi,
                 abs_tol=1e-15,
             )
             and math.isclose(
@@ -2236,9 +2545,10 @@ def validate_plan(
             "ATTEMPT_INCLUSION_PROBABILITY_DRIFT",
         )
         require(
-            sealed.get("N_h") == N_h
-            and sealed.get("n_h") == sampling.get("sealed_pool_n_h"),
-            "SEALED_TO_ATTEMPT_SAMPLING_BINDING",
+            address_frame.get("N_h") == N_h
+            and address_frame.get("n_h")
+            == sampling.get("target_address_frame_n_h"),
+            "TARGET_ADDRESS_FRAME_TO_ATTEMPT_SAMPLING_BINDING",
         )
         require(
             bound_attempt_design["strata"][stratum]
@@ -2247,8 +2557,8 @@ def validate_plan(
                 for key in (
                     "sampling_stratum_id",
                     "N_h",
-                    "sealed_pool_n_h",
-                    "pool_pi_h",
+                    "target_address_frame_n_h",
+                    "frame_pi_h",
                     "excluded_before_panel_n_h",
                     "stage2_frame_n_h",
                     "post_exclusion_survival_pi_h",
@@ -2366,7 +2676,7 @@ def validate_plan(
             preregistration.get("method")
             == (
                 "TARGET_DIVIDED_BY_TWO_SIDED_95_PERCENT_WILSON_LOWER_"
-                "ENDPOINT_CAPPED_AT_SEALED_POST_PILOT_POOL"
+                "ENDPOINT_CAPPED_AT_LOCAL_TARGET_ADDRESS_FRAME"
             )
             and preregistration.get("wilson_interval_convention")
             == (
@@ -3003,6 +3313,10 @@ def validate_shard(
         require(isinstance(pair, dict), "PAIR_NOT_OBJECT")
         require(
             pair.get("descriptor_id") == target.get("descriptor_id")
+            and pair.get("target_address_id")
+            == target.get(
+                "target_address_id", target.get("descriptor_id")
+            )
             and pair.get("kind") == target.get("kind")
             and pair.get("event_ordinal") == target.get("event_ordinal")
             and pair.get("horizon") == target.get("horizon")
@@ -3783,6 +4097,195 @@ def signed_label(value: float) -> str:
     )
 
 
+def runtime_state_sha256_from_components(
+    components: Mapping[str, Any],
+) -> str:
+    require(
+        set(components)
+        == {field for field, _ in RESOLVED_STATE_COMPONENT_FIELDS}
+        and all(is_sha256(value) for value in components.values()),
+        "RESOLVED_STATE_COMPONENTS_INVALID",
+    )
+    return canonical_fields_sha256(
+        [
+            ("schema", "s", G4IRSF14_STATE_CLONE_SCHEMA),
+            *[
+                (canonical_name, "s", components[field])
+                for field, canonical_name in RESOLVED_STATE_COMPONENT_FIELDS
+            ],
+        ]
+    )
+
+
+def clone_group_sha256_from_runtime_state(runtime_state_sha256: str) -> str:
+    require(
+        is_sha256(runtime_state_sha256),
+        "RESOLVED_RUNTIME_STATE_SHA256_INVALID",
+    )
+    return canonical_fields_sha256(
+        [
+            ("schema", "s", G4IRSF14_STATE_CLONE_SCHEMA),
+            ("runtime_state_sha256", "s", runtime_state_sha256),
+        ]
+    )
+
+
+def resolved_intervention_sha256(
+    resolved: Mapping[str, Any], horizon: str
+) -> str:
+    kind = str(resolved.get("kind"))
+    require(
+        kind in RESOLVED_INTERVENTION_KIND
+        and horizon in {"H_bag", "H_system"}
+        and is_sha256(resolved.get("boundary_sha256")),
+        "RESOLVED_INTERVENTION_FIELDS_INVALID",
+    )
+    for field in (
+        "runtime_bag_id",
+        "peer_runtime_bag_id",
+        "selected_next_node",
+    ):
+        require(
+            isinstance(resolved.get(field), int)
+            and not isinstance(resolved.get(field), bool),
+            f"RESOLVED_INTERVENTION_INTEGER_INVALID:{field}",
+        )
+    require(
+        isinstance(resolved.get("selected_boolean"), bool),
+        "RESOLVED_INTERVENTION_BOOLEAN_INVALID",
+    )
+    return canonical_fields_sha256(
+        [
+            ("schema", "s", G4IRSF14_STATE_CLONE_SCHEMA),
+            ("boundary_sha256", "s", resolved["boundary_sha256"]),
+            ("kind", "s", RESOLVED_INTERVENTION_KIND[kind]),
+            ("horizon", "s", horizon),
+            ("runtime_bag_id", "i", resolved["runtime_bag_id"]),
+            ("peer_runtime_bag_id", "i", resolved["peer_runtime_bag_id"]),
+            ("merge_request_id", "u", 0),
+            ("peer_merge_request_id", "u", 0),
+            ("selected_next_node", "i", resolved["selected_next_node"]),
+            ("selected_boolean", "b", resolved["selected_boolean"]),
+        ]
+    )
+
+
+def validate_resolved_execution_descriptor(
+    pair: Mapping[str, Any], target: Mapping[str, Any]
+) -> dict[str, Any]:
+    resolved = pair.get("resolved_execution_descriptor")
+    require(isinstance(resolved, dict), "RESOLVED_DESCRIPTOR_MISSING")
+    require(
+        resolved.get("schema") == DESCRIPTOR_SCHEMA
+        and is_sha256(resolved.get("descriptor_id"))
+        and is_sha256(resolved.get("runtime_state_sha256"))
+        and is_sha256(resolved.get("boundary_sha256"))
+        and is_sha256(resolved.get("clone_group_id")),
+        "RESOLVED_DESCRIPTOR_FULL_SEAL_MISSING",
+    )
+    for field in (
+        "skeleton_id",
+        "population_group_sha256",
+        "population_selection_sha256",
+        "kind",
+        "event_ordinal",
+        "event_seq",
+        "event_time",
+        "event_time_bits",
+        "node",
+        "runtime_bag_id",
+        "peer_runtime_bag_id",
+        "baseline_next_node",
+        "selected_next_node",
+        "baseline_release",
+        "selected_boolean",
+        "source_ready_order",
+        "legal_next_edges",
+        "baseline_action",
+        "intervention_action",
+        "expected_action_change_type",
+        "candidate_action_count",
+        "candidate_action_count_semantics",
+        "alternative_action_count",
+        "total_legal_action_count",
+        "active_merge_capability_count",
+        "pending_merge_request_count",
+        "active_physical_fault_edge_count",
+        "queued_bag_count",
+        "pibt_prefilter_candidate_event",
+        "primary_action_selection",
+    ):
+        require(
+            resolved.get(field) == target.get(field),
+            f"RESOLVED_DESCRIPTOR_LOCAL_ADDRESS_DRIFT:{field}",
+        )
+    hashes = resolved.get("intervention_sha256_by_horizon")
+    state_components = resolved.get("state_components")
+    expected_state_component_keys = {
+        field for field, _ in RESOLVED_STATE_COMPONENT_FIELDS
+    }
+    expected_runtime_state_sha256 = (
+        runtime_state_sha256_from_components(state_components)
+        if isinstance(state_components, dict)
+        else None
+    )
+    horizon = str(target.get("horizon"))
+    require(
+        isinstance(hashes, dict)
+        and set(hashes) == {"H_bag", "H_system"}
+        and resolved.get("descriptor_id") == hashes.get("H_bag")
+        == resolved.get("intervention_sha256")
+        and is_sha256(hashes.get("H_system"))
+        and resolved.get("horizon") == "H_bag"
+        and resolved.get("kind_name")
+        == RESOLVED_INTERVENTION_KIND.get(resolved.get("kind"))
+        and resolved.get("boundary_kind")
+        == RESOLVED_BOUNDARY_KIND.get(resolved.get("kind"))
+        and isinstance(state_components, dict)
+        and set(state_components) == expected_state_component_keys
+        and all(is_sha256(value) for value in state_components.values())
+        and resolved.get("reservation_depth") == 1
+        and resolved.get("max_selected_edges_per_bag") in {0, 1}
+        and resolved.get("runtime_state_sha256")
+        == expected_runtime_state_sha256
+        and resolved.get("clone_group_id")
+        == clone_group_sha256_from_runtime_state(
+            str(expected_runtime_state_sha256)
+        )
+        and hashes.get("H_bag")
+        == resolved_intervention_sha256(resolved, "H_bag")
+        and hashes.get("H_system")
+        == resolved_intervention_sha256(resolved, "H_system")
+        and pair.get("resolved_execution_runtime_state_sha256")
+        == resolved.get("runtime_state_sha256")
+        == pair.get("source_checkpoint_state_sha256")
+        and pair.get("resolved_execution_boundary_sha256")
+        == resolved.get("boundary_sha256")
+        and pair.get("resolved_execution_intervention_sha256")
+        == hashes.get(horizon)
+        and resolved.get("queue_top_not_popped") is True
+        and resolved.get("staged_event_sink_empty") is True,
+        "RESOLVED_DESCRIPTOR_EXECUTION_BINDING_DRIFT",
+    )
+    require(
+        resolved.get("candidate_action_count")
+        == resolved.get("alternative_action_count")
+        and resolved.get("total_legal_action_count")
+        == resolved.get("candidate_action_count") + 1,
+        "RESOLVED_DESCRIPTOR_ACTION_COUNT_DRIFT",
+    )
+    for counter in (
+        "runtime_global_scan_count",
+        "runtime_future_route_read_count",
+        "runtime_future_schedule_read_count",
+    ):
+        require(
+            resolved.get(counter) == 0,
+            f"RESOLVED_DESCRIPTOR_LEAKAGE:{counter}",
+        )
+    return dict(resolved)
+
+
 def action_certificate_valid(
     pair: Mapping[str, Any], target: Mapping[str, Any]
 ) -> bool:
@@ -3794,6 +4297,8 @@ def action_certificate_valid(
         for value in (certificate, baseline_step, treatment_step)
     ):
         return False
+    resolved = validate_resolved_execution_descriptor(pair, target)
+    resolved_hashes = resolved["intervention_sha256_by_horizon"]
     expected_direct = sorted(
         {
             int(target["runtime_bag_id"]),
@@ -3815,9 +4320,9 @@ def action_certificate_valid(
         and treatment_step.get("intervention_applied") is True
         and treatment_step.get("changed_action_count") == 1
         and treatment_step.get("requested_boundary_sha256")
-        == target.get("boundary_sha256")
+        == resolved.get("boundary_sha256")
         and treatment_step.get("requested_intervention_sha256")
-        == target.get("intervention_sha256")
+        == resolved_hashes.get(target.get("horizon"))
         and treatment_step.get("application_reason")
         == certificate.get("application_reason")
         and sorted(treatment_step.get("affected_runtime_bag_ids", []))
@@ -3825,6 +4330,7 @@ def action_certificate_valid(
         and treatment_step.get("source_state_sha256")
         == baseline_step.get("source_state_sha256")
         == pair.get("source_checkpoint_state_sha256")
+        == resolved.get("runtime_state_sha256")
     )
     snapshots_valid = all(
         isinstance(certificate.get(field), list)
@@ -4165,12 +4671,18 @@ def derive_label(
 ) -> dict[str, Any]:
     horizon = str(pair.get("horizon"))
     action_changed = pair.get("action_changed") is True
+    resolved_descriptor = pair.get("resolved_execution_descriptor")
+    resolved_state_sha256 = (
+        resolved_descriptor.get("runtime_state_sha256")
+        if isinstance(resolved_descriptor, dict)
+        else None
+    )
     same_state = (
         pair.get("same_state_start") is True
         and pair.get("baseline_start_state_sha256")
         == pair.get("treatment_start_state_sha256")
         == pair.get("source_checkpoint_state_sha256")
-        == target.get("runtime_state_sha256")
+        == resolved_state_sha256
     )
     certificate = pair.get("committed_action_certificate")
     certificate_valid = action_certificate_valid(pair, target)
@@ -4182,6 +4694,25 @@ def derive_label(
             "descriptor_id": target["descriptor_id"],
             "kind": target["kind"],
             "clone_group_id": target["clone_group_id"],
+            "resolved_execution_descriptor_id": (
+                resolved_descriptor.get("descriptor_id")
+                if isinstance(resolved_descriptor, dict)
+                else None
+            ),
+            "resolved_execution_clone_group_id": (
+                resolved_descriptor.get("clone_group_id")
+                if isinstance(resolved_descriptor, dict)
+                else None
+            ),
+            "resolved_execution_runtime_state_sha256": (
+                resolved_state_sha256
+            ),
+            "resolved_execution_boundary_sha256": (
+                resolved_descriptor.get("boundary_sha256")
+                if isinstance(resolved_descriptor, dict)
+                else None
+            ),
+            "event_ordinal": target["event_ordinal"],
             "horizon": horizon,
             "eligible_causal_label": False,
             "exclusion_reason": pair.get(
@@ -4219,9 +4750,17 @@ def derive_label(
             ),
             "sampling": target.get("sampling"),
             "coverage_tags": target.get("coverage_tags", []),
+            "offline_sampling_metadata": target.get(
+                "offline_sampling_metadata"
+            ),
         }
         label["label_sha256"] = canonical_sha256(label)
         return label
+    require(
+        isinstance(resolved_descriptor, dict),
+        "PAIR_BRANCH_EVIDENCE_WITHOUT_RESOLVED_DESCRIPTOR",
+    )
+    validate_resolved_execution_descriptor(pair, target)
     horizon_complete = (
         pair.get("horizon_complete") is True
         and baseline.get("horizon_complete") is True
@@ -4617,6 +5156,18 @@ def derive_label(
         "descriptor_id": target["descriptor_id"],
         "kind": target["kind"],
         "clone_group_id": target["clone_group_id"],
+        "resolved_execution_descriptor_id": resolved_descriptor[
+            "descriptor_id"
+        ],
+        "resolved_execution_clone_group_id": resolved_descriptor[
+            "clone_group_id"
+        ],
+        "resolved_execution_runtime_state_sha256": resolved_descriptor[
+            "runtime_state_sha256"
+        ],
+        "resolved_execution_boundary_sha256": resolved_descriptor[
+            "boundary_sha256"
+        ],
         "event_ordinal": target["event_ordinal"],
         "horizon": horizon,
         "eligible_causal_label": eligible,
@@ -5352,6 +5903,8 @@ def validate_compact_pair_target_identity(
 ) -> None:
     require(
         pair.get("descriptor_id") == target.get("descriptor_id")
+        and pair.get("target_address_id")
+        == target.get("target_address_id", target.get("descriptor_id"))
         and pair.get("kind") == target.get("kind")
         and pair.get("event_ordinal") == target.get("event_ordinal")
         and pair.get("horizon") == target.get("horizon")
@@ -6959,15 +7512,19 @@ def validate_label(row: Mapping[str, Any]) -> None:
     sampling = row.get("sampling")
     require(isinstance(sampling, dict), "LABEL_SAMPLING_MISSING")
     N_h = strict_int(sampling.get("N_h"), "label.N_h", 1)
-    sealed_n = strict_int(
-        sampling.get("sealed_pool_n_h"), "label.sealed_pool_n_h", 1
+    address_frame_n = strict_int(
+        sampling.get("target_address_frame_n_h"),
+        "label.target_address_frame_n_h",
+        1,
     )
     frame_n = strict_int(
         sampling.get("stage2_frame_n_h"), "label.stage2_frame_n_h", 1
     )
     n_h = strict_int(sampling.get("attempt_n_h"), "label.attempt_n_h", 1)
     require(sampling.get("n_h") == n_h, "LABEL_n_h_DRIFT")
-    pool_pi = strict_float(sampling.get("pool_pi_h"), "label.pool_pi_h")
+    frame_pi = strict_float(
+        sampling.get("frame_pi_h"), "label.frame_pi_h"
+    )
     survival_pi = strict_float(
         sampling.get("post_exclusion_survival_pi_h"),
         "label.post_exclusion_survival_pi_h",
@@ -6977,15 +7534,17 @@ def validate_label(row: Mapping[str, Any]) -> None:
     )
     pi_h = strict_float(sampling.get("pi_h"), "label.pi_h")
     require(
-        0 < n_h <= frame_n <= sealed_n <= N_h
-        and math.isclose(pool_pi, sealed_n / N_h, abs_tol=1e-15)
+        0 < n_h <= frame_n <= address_frame_n <= N_h
         and math.isclose(
-            survival_pi, frame_n / sealed_n, abs_tol=1e-15
+            frame_pi, address_frame_n / N_h, abs_tol=1e-15
+        )
+        and math.isclose(
+            survival_pi, frame_n / address_frame_n, abs_tol=1e-15
         )
         and math.isclose(stage2_pi, n_h / frame_n, abs_tol=1e-15)
         and math.isclose(
             pi_h,
-            pool_pi * survival_pi * stage2_pi,
+            frame_pi * survival_pi * stage2_pi,
             abs_tol=1e-15,
         )
         and math.isclose(
@@ -7323,7 +7882,7 @@ def expected_weighted_effect_analysis(
         "formal_gate_passed": formal_gate_passed,
         "formal_pass_claimed": False,
         "estimand": {
-            "unit": "sealed_causal_descriptor_attempt",
+            "unit": "preregistered_local_target_address_attempt",
             "outcome": (
                 "matched-pair treatment-minus-baseline delta at the "
                 "preregistered assigned horizon"
@@ -8033,8 +8592,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         result = {
             "validation_status": "PASS_DESCRIPTOR_SCAN_VALID",
-            "descriptor_pool_count": len(rows),
-            "population_count": manifest["descriptor_population_count"],
+            "target_address_frame_count": len(rows),
+            "full_state_sealed_descriptor_count": manifest[
+                "full_state_sealed_descriptor_count"
+            ],
+            "population_count": manifest[
+                "target_address_population_count"
+            ],
             "binary_reverified": arguments.binary is not None,
             "host_toolchain_reverified": (
                 arguments.strict_host_provenance

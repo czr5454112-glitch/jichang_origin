@@ -230,6 +230,188 @@ def main() -> None:
             pair, target
         )
 
+    deferred_skeletons = []
+    for skeleton in selected_skeletons:
+        row = dict(skeleton)
+        row["sampling"] = {
+            "sampling_stratum_id": f"{row['kind']}|SMOKE",
+            "N_h": 1,
+            "n_h": 1,
+            "pi_h": 1.0,
+            "analysis_weight": 1.0,
+        }
+        row["offline_sampling_metadata"] = {
+            "runtime_only": False,
+            "must_not_enter_policy_features": True,
+        }
+        deferred_skeletons.append(row)
+    deferred_addresses = g4irsf15._materialize_target_address_frame(
+        deferred_skeletons,
+        protected={
+            "task": {
+                "input_runtime_cohort_sha256": g15_scan[
+                    "input_runtime_cohort_sha256"
+                ]
+            }
+        },
+    )
+    deferred_targets = [
+        g4irsf15._with_horizon(address, "H_bag")
+        for address in deferred_addresses
+    ]
+    deferred_payload = (
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            deferred_targets,
+        )
+    )
+    deferred_pairs = [dict(row) for row in deferred_payload["pairs"]]
+    assert len(deferred_pairs) == len(h_bag_pairs)
+    for eager, deferred, target in zip(
+        h_bag_pairs, deferred_pairs, deferred_targets, strict=True
+    ):
+        assert deferred["pair_status"] == eager["pair_status"]
+        assert deferred["same_state_start"] is True
+        assert deferred["resolved_execution_descriptor"] == eager[
+            "resolved_execution_descriptor"
+        ]
+        assert deferred["resolved_execution_boundary_sha256"] == eager[
+            "resolved_execution_boundary_sha256"
+        ]
+        assert deferred["resolved_execution_runtime_state_sha256"] == eager[
+            "resolved_execution_runtime_state_sha256"
+        ]
+        assert g4irsf15._validate_action_change_certificate(
+            deferred, target
+        )
+
+    unmatched_skeleton = dict(deferred_skeletons[0])
+    unmatched_skeleton["skeleton_id"] = "f" * 64
+    unmatched_skeleton["skeleton_selection_sha256"] = "f" * 64
+    unmatched_target = g4irsf15._with_horizon(
+        g4irsf15._materialize_target_address_frame(
+            [unmatched_skeleton],
+            protected={
+                "task": {
+                    "input_runtime_cohort_sha256": g15_scan[
+                        "input_runtime_cohort_sha256"
+                    ]
+                }
+            },
+        )[0],
+        "H_bag",
+    )
+    unmatched_payload = (
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [unmatched_target],
+        )
+    )
+    unmatched_pair = dict(unmatched_payload["pairs"][0])
+    assert unmatched_pair["pair_status"] == "SCREENING_FALSE_POSITIVE"
+    assert unmatched_pair["false_positive_reason"] == (
+        "CONTENT_ADDRESSED_BOUNDARY_NOT_OBSERVED"
+    )
+    assert unmatched_pair["protected_full_1x_shape"] is False
+
+    tampered_address = dict(deferred_targets[0])
+    tampered_address["source_ready_order"] = [999]
+    try:
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [tampered_address],
+        )
+    except ValueError as exc:
+        assert "local boundary projection" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 deferred address must reject local projection drift"
+        )
+
+    tampered_horizon = dict(deferred_targets[0])
+    tampered_horizon["target_address_sha256"] = "0" * 64
+    try:
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [tampered_horizon],
+        )
+    except ValueError as exc:
+        assert "requested horizon hash drifted" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 deferred address must reject horizon hash drift"
+        )
+
+    tampered_horizon_map = dict(deferred_targets[0])
+    tampered_horizon_map["target_address_sha256_by_horizon"] = dict(
+        tampered_horizon_map["target_address_sha256_by_horizon"]
+    )
+    tampered_horizon_map["target_address_sha256_by_horizon"][
+        "H_system"
+    ] = "0" * 64
+    try:
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [tampered_horizon_map],
+        )
+    except ValueError as exc:
+        assert "horizon hashes drifted" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 deferred address must reject horizon map drift"
+        )
+
+    tampered_eager_seal = dict(deferred_targets[0])
+    tampered_eager_seal["state_components"] = {
+        "event_queue_sha256": "0" * 64
+    }
+    try:
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [tampered_eager_seal],
+        )
+    except ValueError as exc:
+        assert "must not carry eager state_components" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 deferred address must reject eager seal injection"
+        )
+
+    tampered_group = dict(deferred_targets[0])
+    tampered_group["prepop_event_group_sha256"] = "0" * 64
+    tampered_group["clone_group_id"] = "0" * 64
+    try:
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [tampered_group],
+        )
+    except ValueError as exc:
+        assert "pre-pop event group drifted" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 deferred address must reject event-group drift"
+        )
+
+    tampered_cohort = dict(deferred_targets[0])
+    tampered_cohort["input_runtime_cohort_sha256"] = "0" * 64
+    forged_group = g4irsf15._prepop_event_group_sha256(
+        tampered_cohort,
+        input_runtime_cohort_sha256="0" * 64,
+    )
+    tampered_cohort["prepop_event_group_sha256"] = forged_group
+    tampered_cohort["clone_group_id"] = forged_group
+    try:
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [tampered_cohort],
+        )
+    except ValueError as exc:
+        assert "input cohort drifted" in str(exc)
+    else:
+        raise AssertionError(
+            "G4IRSF15 deferred address must reject input cohort drift"
+        )
+
     h_system_target = dict(descriptors[0])
     h_system_target["horizon"] = "H_system"
     h_system_target["intervention_sha256"] = dict(
@@ -251,6 +433,25 @@ def main() -> None:
     assert any(
         reason.endswith("PROTECTED_FULL_1X_SHAPE_MISMATCH")
         for reason in h_system_pair["hard_gate_fail_reasons"]
+    )
+    deferred_h_system_target = g4irsf15._with_horizon(
+        deferred_addresses[0], "H_system"
+    )
+    deferred_h_system_payload = (
+        czr005_cpp.g4irsf15_run_causal_target_pairs_from_records(
+            *small_arguments,
+            [deferred_h_system_target],
+        )
+    )
+    deferred_h_system_pair = dict(deferred_h_system_payload["pairs"][0])
+    assert deferred_h_system_pair["pair_status"] == h_system_pair[
+        "pair_status"
+    ]
+    assert deferred_h_system_pair["resolved_execution_descriptor"] == (
+        h_system_pair["resolved_execution_descriptor"]
+    )
+    assert g4irsf15._validate_action_change_certificate(
+        deferred_h_system_pair, deferred_h_system_target
     )
     for branch_name in ("baseline", "treatment"):
         raw_sidecar = h_system_pair[branch_name][

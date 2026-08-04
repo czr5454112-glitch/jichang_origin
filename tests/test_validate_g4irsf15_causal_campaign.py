@@ -39,6 +39,167 @@ def _valid_skeleton(index: int, kind: str) -> dict[str, object]:
     }
 
 
+def _valid_target_address() -> tuple[dict[str, object], str]:
+    cohort_sha256 = _sha("target-address-input-cohort")
+    address = _sha("target-address")
+    row: dict[str, object] = {
+        "schema": validator.TARGET_ADDRESS_SCHEMA,
+        "descriptor_id": address,
+        "target_address_id": address,
+        "target_address_id_semantics": (
+            "ALIAS_OF_NATIVE_SKELETON_SELECTION_SHA256"
+        ),
+        "skeleton_id": address,
+        "skeleton_selection_sha256": address,
+        "population_selection_sha256": address,
+        "sample_sha256": address,
+        "input_runtime_cohort_sha256": cohort_sha256,
+        "population_group_sha256": _sha("target-address-population"),
+        "kind": "I1",
+        "event_ordinal": 17,
+        "event_seq": 23,
+        "event_time": 1.5,
+        "event_time_bits": 42,
+        "node": 7,
+        "runtime_bag_id": 1,
+        "peer_runtime_bag_id": 2,
+        "baseline_next_node": 8,
+        "selected_next_node": 9,
+        "baseline_release": False,
+        "selected_boolean": True,
+        "source_ready_order": [1, 2],
+        "legal_next_edges": [8, 9],
+        "baseline_action": "RELEASE:1:8",
+        "intervention_action": "RELEASE:1:9",
+        "expected_action_change_type": "NEXT_NODE_CHANGE",
+        "candidate_action_count": 1,
+        "candidate_action_count_semantics": (
+            "ALTERNATIVES_EXCLUDING_BASELINE"
+        ),
+        "alternative_action_count": 1,
+        "total_legal_action_count": 2,
+        "active_merge_capability_count": 0,
+        "pending_merge_request_count": 0,
+        "active_physical_fault_edge_count": 0,
+        "queued_bag_count": 2,
+        "pibt_prefilter_candidate_event": False,
+        "primary_action_selection": (
+            "LOCAL_STABLE_NUMERIC_MIN_PEER_OR_NEXT_NODE_I4_UNIQUE"
+        ),
+        "seal_level": "LOCAL_PREPOP_ADDRESS",
+        "full_state_seal": "DEFERRED_TO_EXECUTED_PAIR",
+        "runtime_state_sha256": None,
+        "boundary_sha256": None,
+        "intervention_sha256": None,
+        "outcome_free": True,
+        "horizon": "H_bag",
+        "offline_sampling_metadata": {
+            "must_not_enter_policy_features": True,
+            "runtime_only": False,
+        },
+    }
+    event_group = validator.prepop_event_group_sha256(
+        row, input_runtime_cohort_sha256=cohort_sha256
+    )
+    hashes = {
+        horizon: validator.target_address_horizon_sha256(address, horizon)
+        for horizon in ("H_bag", "H_system")
+    }
+    row.update(
+        {
+            "prepop_event_group_sha256": event_group,
+            "clone_group_id": event_group,
+            "target_address_sha256_by_horizon": hashes,
+            "target_address_sha256": hashes["H_bag"],
+            "sampling": {
+                "N_h": 10,
+                "n_h": 2,
+                "pi_h": 0.2,
+                "analysis_weight": 5.0,
+                "cluster_id": event_group,
+                "cluster_bootstrap_unit": (
+                    "prepop_event_group_sha256"
+                ),
+            },
+        }
+    )
+    return row, cohort_sha256
+
+
+def _valid_resolved_execution_pair() -> tuple[
+    dict[str, object], dict[str, object]
+]:
+    target, _ = _valid_target_address()
+    boundary_sha256 = _sha("resolved-execution-boundary")
+    resolved = dict(target)
+    state_components = {
+        key: _sha(f"resolved-state-component:{key}")
+        for key in (
+            "event_queue_sha256",
+            "current_time_sha256",
+            "bags_sha256",
+            "source_queues_sha256",
+            "junction_queues_sha256",
+            "local_service_calendars_sha256",
+            "corridor_state_sha256",
+            "scheduled_incoming_sha256",
+            "credits_sha256",
+            "merge_grants_sha256",
+            "fault_state_sha256",
+            "pibt_owner_state_sha256",
+            "deterministic_counters_sha256",
+            "scorer_state_sha256",
+            "result_accumulator_sha256",
+            "current_runtime_hashes_sha256",
+            "congestion_beacons_sha256",
+            "microphase_state_sha256",
+        )
+    }
+    resolved.update(
+        {
+            "schema": validator.DESCRIPTOR_SCHEMA,
+            "boundary_sha256": boundary_sha256,
+            "kind_name": validator.RESOLVED_INTERVENTION_KIND["I1"],
+            "boundary_kind": validator.RESOLVED_BOUNDARY_KIND["I1"],
+            "queue_top_not_popped": True,
+            "staged_event_sink_empty": True,
+            "runtime_global_scan_count": 0,
+            "runtime_future_route_read_count": 0,
+            "runtime_future_schedule_read_count": 0,
+            "state_components": state_components,
+            "reservation_depth": 1,
+            "max_selected_edges_per_bag": 1,
+        }
+    )
+    runtime_state_sha256 = validator.runtime_state_sha256_from_components(
+        state_components
+    )
+    resolved["runtime_state_sha256"] = runtime_state_sha256
+    resolved["clone_group_id"] = (
+        validator.clone_group_sha256_from_runtime_state(
+            runtime_state_sha256
+        )
+    )
+    intervention_hashes = {
+        horizon: validator.resolved_intervention_sha256(
+            resolved, horizon
+        )
+        for horizon in ("H_bag", "H_system")
+    }
+    resolved_id = intervention_hashes["H_bag"]
+    resolved["descriptor_id"] = resolved_id
+    resolved["intervention_sha256"] = resolved_id
+    resolved["intervention_sha256_by_horizon"] = intervention_hashes
+    pair = {
+        "resolved_execution_descriptor": resolved,
+        "resolved_execution_runtime_state_sha256": runtime_state_sha256,
+        "resolved_execution_boundary_sha256": boundary_sha256,
+        "resolved_execution_intervention_sha256": resolved_id,
+        "source_checkpoint_state_sha256": runtime_state_sha256,
+    }
+    return pair, target
+
+
 def test_skeleton_population_shards_preserve_complete_ordered_census(
     tmp_path: Path,
 ) -> None:
@@ -105,6 +266,120 @@ def test_skeleton_population_shards_preserve_complete_ordered_census(
     ):
         validator.validate_skeleton_population_dataset(
             tmp_path, malformed, expected_row_count=len(rows)
+        )
+
+
+def test_deferred_target_address_contract_is_v3_and_valid() -> None:
+    row, cohort_sha256 = _valid_target_address()
+
+    assert validator.DESCRIPTOR_MANIFEST_SCHEMA == (
+        "czr005.g4irsf15.causal_descriptor_manifest.v3"
+    )
+    assert validator.DESCRIPTOR_DATASET_PATH == Path(
+        "artifacts/datasets/"
+        "g4irsf15_causal_target_address_frame.jsonl.zst"
+    )
+    validator.validate_target_address(
+        row, input_runtime_cohort_sha256=cohort_sha256
+    )
+
+
+@pytest.mark.parametrize(
+    ("tamper", "error"),
+    [
+        ("identity", "TARGET_ADDRESS_IDENTITY_DRIFT"),
+        ("event_group", "TARGET_ADDRESS_EVENT_GROUP_DRIFT"),
+        ("horizon", "TARGET_ADDRESS_HORIZON_BINDING_DRIFT"),
+        ("eager_state_seal", "TARGET_ADDRESS_EAGER_FULL_SEAL_FORBIDDEN"),
+        ("eager_components", "TARGET_ADDRESS_EAGER_FULL_SEAL_FORBIDDEN"),
+        ("sampling_cluster", "TARGET_ADDRESS_SAMPLING_DRIFT"),
+    ],
+)
+def test_deferred_target_address_tamper_fails_closed(
+    tamper: str,
+    error: str,
+) -> None:
+    row, cohort_sha256 = _valid_target_address()
+    if tamper == "identity":
+        row["descriptor_id"] = _sha("forged-address-identity")
+    elif tamper == "event_group":
+        row["event_seq"] = int(row["event_seq"]) + 1
+    elif tamper == "horizon":
+        row["target_address_sha256_by_horizon"]["H_system"] = _sha(
+            "forged-horizon-binding"
+        )
+    elif tamper == "eager_state_seal":
+        row["runtime_state_sha256"] = _sha("forbidden-eager-state")
+    elif tamper == "eager_components":
+        row["state_components"] = {
+            "event_queue_sha256": _sha("forbidden-eager-component")
+        }
+    elif tamper == "sampling_cluster":
+        row["sampling"]["cluster_id"] = _sha("forged-cluster")
+    else:  # pragma: no cover - parameter list is exhaustive
+        raise AssertionError(tamper)
+
+    with pytest.raises(validator.ValidationError, match=error):
+        validator.validate_target_address(
+            row, input_runtime_cohort_sha256=cohort_sha256
+        )
+
+
+def test_resolved_execution_descriptor_binds_address_to_onsite_seal() -> None:
+    pair, target = _valid_resolved_execution_pair()
+
+    resolved = validator.validate_resolved_execution_descriptor(pair, target)
+    assert resolved == pair["resolved_execution_descriptor"]
+    assert resolved["runtime_state_sha256"] == pair[
+        "source_checkpoint_state_sha256"
+    ]
+
+    local_drift = copy.deepcopy(pair)
+    local_drift["resolved_execution_descriptor"][
+        "source_ready_order"
+    ].reverse()
+    with pytest.raises(
+        validator.ValidationError,
+        match="RESOLVED_DESCRIPTOR_LOCAL_ADDRESS_DRIFT:source_ready_order",
+    ):
+        validator.validate_resolved_execution_descriptor(
+            local_drift, target
+        )
+
+    seal_drift = copy.deepcopy(pair)
+    seal_drift["resolved_execution_runtime_state_sha256"] = _sha(
+        "forged-resolved-state"
+    )
+    with pytest.raises(
+        validator.ValidationError,
+        match="RESOLVED_DESCRIPTOR_EXECUTION_BINDING_DRIFT",
+    ):
+        validator.validate_resolved_execution_descriptor(
+            seal_drift, target
+        )
+
+    component_drift = copy.deepcopy(pair)
+    component_drift["resolved_execution_descriptor"]["state_components"][
+        "event_queue_sha256"
+    ] = _sha("forged-state-component")
+    with pytest.raises(
+        validator.ValidationError,
+        match="RESOLVED_DESCRIPTOR_EXECUTION_BINDING_DRIFT",
+    ):
+        validator.validate_resolved_execution_descriptor(
+            component_drift, target
+        )
+
+    intervention_drift = copy.deepcopy(pair)
+    intervention_drift["resolved_execution_descriptor"][
+        "intervention_sha256_by_horizon"
+    ]["H_system"] = _sha("forged-h-system-intervention")
+    with pytest.raises(
+        validator.ValidationError,
+        match="RESOLVED_DESCRIPTOR_EXECUTION_BINDING_DRIFT",
+    ):
+        validator.validate_resolved_execution_descriptor(
+            intervention_drift, target
         )
 
 
@@ -187,16 +462,16 @@ def _sampling() -> dict[str, object]:
         "sampling_stratum_id": "I1|TAIL|NO_DIVERGENCE|LOW",
         "N_h": 10,
         "n_h": 2,
-        "sealed_pool_n_h": 5,
+        "target_address_frame_n_h": 5,
         "stage2_frame_n_h": 4,
         "attempt_n_h": 2,
-        "pool_pi_h": 0.5,
+        "frame_pi_h": 0.5,
         "post_exclusion_survival_pi_h": 0.8,
         "stage2_pi_h": 0.5,
         "pi_h": 0.2,
         "analysis_weight": 5.0,
         "cluster_id": _sha("clone"),
-        "cluster_bootstrap_unit": "clone_group_id",
+        "cluster_bootstrap_unit": "prepop_event_group_sha256",
     }
 
 
@@ -419,6 +694,7 @@ def _compact_fixture() -> tuple[
     }
     pair: dict[str, object] = {
         "descriptor_id": descriptor_id,
+        "target_address_id": descriptor_id,
         "kind": "I3",
         "event_ordinal": 17,
         "horizon": "H_system",
@@ -887,6 +1163,7 @@ def _compact_target() -> dict[str, object]:
     return {
         "target_key": f"{descriptor_id}:H_system",
         "descriptor_id": descriptor_id,
+        "target_address_id": descriptor_id,
         "kind": "I3",
         "event_ordinal": 17,
         "horizon": "H_system",
@@ -1462,6 +1739,47 @@ def test_dense_pair_compacts_and_independently_hydrates_losslessly() -> None:
         reference,
         expected_target_key=target_key,
     ) == pair
+    validator.validate_compact_storage_semantics(compact, pair)
+
+
+def test_false_positive_pair_compacts_and_validates_losslessly() -> None:
+    target = _compact_target()
+    pair = {
+        "descriptor_id": target["descriptor_id"],
+        "target_address_id": target["target_address_id"],
+        "kind": target["kind"],
+        "event_ordinal": target["event_ordinal"],
+        "horizon": target["horizon"],
+        "protected_full_1x_shape": True,
+        "resolved_execution_descriptor": None,
+        "same_state_start": False,
+        "pair_status": "SCREENING_FALSE_POSITIVE",
+        "false_positive_reason": "CONTENT_ADDRESSED_BOUNDARY_NOT_OBSERVED",
+        "baseline": None,
+        "treatment": None,
+    }
+    compact, reference = campaign._compact_pair_for_publication(
+        pair,
+        target,
+        None,
+        plan={"self_sha256": _sha("false-positive-plan")},
+        binary_sha256=_sha("false-positive-binary"),
+    )
+    target_key = str(target["target_key"])
+
+    assert reference is None
+    assert compact["compact_storage"] == "INLINE_NATIVE_SMALL_EVIDENCE"
+    assert campaign._hydrate_compact_pair(
+        compact,
+        reference,
+        expected_target_key=target_key,
+    ) == pair
+    assert validator.hydrate_compact_pair(
+        compact,
+        reference,
+        expected_target_key=target_key,
+    ) == pair
+    validator.validate_compact_pair_target_identity(pair, target)
     validator.validate_compact_storage_semantics(compact, pair)
 
 

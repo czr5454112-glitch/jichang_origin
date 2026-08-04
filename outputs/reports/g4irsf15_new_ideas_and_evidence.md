@@ -147,6 +147,10 @@
   第二阶段在 Python 中与受保护的 task/tail 元数据连接，按层记录
   `N_h/n_h/pi_h` 并冻结选中 skeleton；第三遍原生确定性重放，只为选中的
   skeleton 计算完整状态摘要和唯一主动作，生成内容寻址 descriptor。
+- 后续修订：上述“第三遍为全部选中 skeleton eager seal”已被 NI-030 的 90 分钟
+  负结果否定，并由 NI-031 的 target-address frame + executed-pair onsite seal 合同
+  取代；第一遍人口普查和第二阶段 outcome-free 统计选样仍保留。此处作为设计演进
+  记录，不再代表当前生产路径。
 - 必须验证：轻量 skeleton 步骤与正常 no-op 步骤的事件后状态完全一致；人口终止
   必须证明 finalize、43,603 complete、0 failed、无 event-limit；选中 skeleton
   必须在第二遍重放到同一事件并重新成为原生唯一主动作。
@@ -476,18 +480,102 @@
 ### NI-030：descriptor seal 是离线控制面成本，不能混入在线局部决策路径
 
 - 状态：`RUNTIME_VERIFIED`
-- 发现：正式 6,144-target materialization 在完成 747,962-row census 四块发布后，
-  30 分钟外层预算仍未完成；进程约 7.3 GB RSS。随后去除非选中事件的重复 skeleton
-  probe，并在第二次 replay 前释放 skeleton/population 大对象；真实直接 benchmark 的
-  RSS 降至约 4.8 GB，但完整 6,144 次 state/boundary seal 在 46 分钟时仍未结束。
-- 本轮决策：不缩小 6,144 预注册面板，不用提前停止换速度。非目标事件改走已有“五项
-  terminal replay hash 与 skeleton probe 完全一致”回归支持的普通 transition；正式
-  artifact-producing scan 使用 90 分钟一次性预算。原生/pybind 11/11 回归通过；被终止
-  的 46 分钟进程仅为不发布 artifact 的 benchmark，population parts 可重建且无 label。
-- 后续改进：把 selected descriptor seal 做成内容寻址的只读分批任务，发布精确并集、
-  无重叠 profile 与统一排序根；或让 runtime 维护可增量更新的 checkpoint/state 摘要，
-  避免每个 selected event 重算全状态 hash。两者都必须先证明与单线程 seal 逐字节等价，
-  本轮不以未经验证的并行实现替换正式证据路径。
+- 发现：基于提交 `3d027de` 的旧式正式 6,144-target eager materialization 即使完成
+  747,962-row census 四块，
+  并去除非选中事件的重复 skeleton probe、在第二次 replay 前释放 population，仍在
+  5,404 秒外层预算耗尽时没有发布 descriptor manifest、pool、checkpoint 或 coverage。
+  该进程消耗约 88.6 CPU 分钟；早期 working set 约 6.6 GiB，稳定 private bytes 约
+  4.4 GiB。I1/I3/I4 分别选中 1,650/1,789/2,705 个目标；总计 6,144 个目标对应
+  6,137 个不同 event ordinal，只有 7 组同 ordinal 双目标。因此按事件批处理最多仅
+  减少 7 次、约 0.11% 的完整状态遍历，仍需约 6,137 次 seal，不能消除主成本。
+- 根因证据：每次完整 seal 都要复制/排空 event heap，并遍历 43,603 个 bag/history、
+  queue/calendar、corridor、credit、merge grant、fault、counter、scorer、beacon 与
+  microphase 状态；这是全局审计遍历，不是局部动作选择所需的在线信息。90 分钟失败
+  运行留下的四个 census part 只是临时重放副产物，不作为可接纳或可提交的正式证据。
+- 本轮决策：拒绝继续扩大 eager-scan 预算，也不缩小 6,144 预注册目标面板。扫描阶段
+  改为发布 outcome-free 的局部 target address，完整 state/boundary seal 只在某个已
+  预注册 pair 真正执行并唯一匹配现场边界时生成；具体合同与等价证据见 NI-031。
 - 对方向的意义：在线去中心化 MAPF 风格路由仍只读取局部状态并提交局部动作；昂贵的
   全局审计 seal 被明确隔离在离线控制面。下一步扩展订单规模时，应横向扩展证据生成，
   而不是把中心化全状态哈希开销重新带回在线 runtime。
+
+### NI-031：用局部 target address 预注册，完整 G14 seal 延迟到实际执行现场
+
+- 状态：`RUNTIME_VERIFIED`
+- 设计：census/scan 只冻结输入 runtime cohort、event ordinal/seq/time、node、局部
+  ready/legal/action 投影、selection key、prepopulation group 与 H_bag/H_system 两个
+  horizon address hash；明确禁止 runtime-state、boundary、intervention 和 component
+  hash 注入。因此 scan 的完整状态 digest 计数按合同为 0。worker 到达该本地地址后，
+  先按 cohort、事件与局部 population/action 唯一解析；只有唯一匹配才在现场生成原
+  G14 完整 descriptor，并从同一 checkpoint 克隆 baseline/treatment。缺失或多重匹配
+  都作为预注册的 `SCREENING_FALSE_POSITIVE` attempt 留在分母中，绝不静默丢弃或任取
+  第一个候选。
+- 等价证据：native A/B 回归对同一 H_bag/H_system 边界分别执行 legacy eager seal 与
+  deferred resolution，要求 resolved descriptor、18 个状态 component、aggregate
+  runtime-state、clone group、boundary 和两种 intervention hash 精确相等。Python
+  generator 与独立 validator 各自重算 canonical target address、prepopulation group、
+  horizon hash 和现场 seal，且覆盖局部字段、cohort、当前 horizon、state component、
+  intervention 以及额外字段注入篡改。当前聚焦 Python 89 项与 Release CTest 11/11
+  全部通过。
+- 证据边界：以上证明的是实现合同、eager/deferred 字节级等价及 fail-closed 行为；
+  新提交对应的完整 protected scan、pilot/formal 实跑尚未完成，因此本条不宣称正式
+  因果结果或规模 gate 已通过。生产 scan 仍必须从 exact committed binary 生成，并由
+  独立 validator 接纳后才能进入 pilot。
+- 对方向的意义：预注册和分片所需的身份只依赖局部冲突边界，而全局状态证明按实际
+  执行量付费。随着订单数增长，证据成本从“候选目标数 × 全局订单状态”收敛为一次
+  局部 frame 加“实际执行 pair 数 × 完整封印”，更贴近去中心化 MAPF 的局部协商单位。
+
+### NI-032：不可回退的 state generation 可安全复用同一 checkpoint 摘要
+
+- 状态：`PROPOSED`
+- 想法：每个 runtime 维护不可回退的 `state_generation`；任何持久状态变更以及
+  checkpoint restore 都产生新 generation。digest cache 只在
+  `(runtime instance, generation)` 完全相同时复用，因而可消除一个实际 pair 内
+  capture、source probe 与 matched-state 对同一状态的重复全量查询，同时保持旧 G14
+  seal 的字节语义。checkpoint 可携带已验证 digest，但 restore 后必须先核对 checkpoint
+  identity，再把该 digest 绑定到新的当前 generation，禁止恢复旧计数后误用分支缓存。
+- 接纳门：实现前必须列举每条进入 G14 seal 的 mutation path，新增 supervisor/token
+  状态也必须触发 generation；需加入 shadow full-recompute、随机 mutation、restore/
+  branch、clone、fault、no-op 与漏失 invalidation 篡改回归。cache 不确定时必须
+  fail closed 回退全量 seal，不能把普通 SHA 描述为跨不同状态的增量哈希。
+- 本轮边界：本轮没有实现该优化，因为 NI-031 已移除 scan 阶段的主要重复封印，同时
+  保留已审计的 G14 现场 seal；在因果证据链稳定前引入跨所有 mutation path 的缓存，
+  风险高于当前可验证收益。
+- 对方向的意义：若后续 formal pair 数或 cohort 继续增长，这是一项不改变现有证明
+  schema 的低风险优化，可先减少每个 executed pair 的重复审计成本；跨状态的局部
+  内容证明则作为 NI-034 的独立长期协议升级处理。
+
+### NI-033：target-address frame 是局部冲突单元，不等于已完成物理分布式部署
+
+- 状态：`SOURCE_AUDIT_SUPPORTED`
+- 发现：target address 以 node、同一事件的 ready population、合法动作与被选动作
+  描述可干预边界；prepopulation group 把同一局部竞争集合绑定为抽样簇。它天然适合
+  按地址内容根分片、由不同 worker 独立执行，并用缺失/多重解析的显式 attempt 合并。
+- 判断：这已经把原 HCA* 加中心化 supervisor 的“全局候选描述/证据生成”拆成 MAPF
+  风格的局部冲突与协商单元，并让证据平面可横向扩展；但当前 runtime 仍在单进程内
+  重放冻结 cohort，尚未证明跨机器消息传递、异步一致性、网络分区恢复或真正无中心
+  协调。因此文档与结论应称“去中心化就绪的局部决策/证据框架”，不能夸大为已经完成
+  物理分布式系统。
+- 下一步证据：在保持 target-address 与 onsite-seal 合同不变的前提下，原型化多个
+  planner owner 的异步 proposal/commit；比较中心重放与乱序消息、重复消息、节点失联
+  后的最终动作和安全不变量，并测量通信量随局部冲突度而非全局订单数增长。
+- 对方向的意义：明确“算法/证据去中心化”与“部署去中心化”的边界，可让后续工作把
+  精力放在真正缺失的分布式所有权、冲突协议和恢复证明上，同时复用本轮已验证的局部
+  MAPF 地址与因果审计接口。
+
+### NI-034：长期状态证明可迁移到版本化 Merkle/content-addressed 局部状态
+
+- 状态：`PROPOSED`
+- 候选设计：按局部所有权把 destination controller、queue/calendar、corridor、
+  credit/grant、fault、event frontier 与 bag/history 分成稳定叶节点；局部 mutation
+  只重算受影响叶及其到根路径。checkpoint 保存根与内容寻址分区引用，未变化分区可
+  跨 checkpoint、worker 和实验分支去重；执行节点只交换冲突相关叶与证明路径。
+- 迁移边界：新 root 必须使用新 schema/version，不能声称与旧线性 G14 SHA 逐字节
+  相同。迁移期应双重发布 legacy G14 seal 与新 Merkle root，并验证确定性排序、
+  checkpoint restore、跨 worker 合并、缺叶、换序、重放和篡改 fail-closed；只有
+  所有生产 mutation 类型的证据闭合后才允许升级正式门禁。
+- 与 NI-032 的关系：generation cache 是保持旧 G14 字节语义的短期同状态复用；本条
+  是改变证明表示的长期协议升级。两者不应混为“普通 SHA 可跨状态增量更新”。
+- 对方向的意义：局部 agent 可以持有和更新自己的状态叶，而全局根仅承担离线审计与
+  一致性控制。证明成本将更接近发生变化的局部分区数，而不是全局订单数，更适合多站点、
+  更大规划空间和更大订单规模的去中心化 MAPF 风格框架。

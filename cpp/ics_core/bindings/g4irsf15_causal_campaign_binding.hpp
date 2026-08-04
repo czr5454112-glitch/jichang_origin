@@ -39,6 +39,12 @@ inline constexpr const char* kMaterializationSchema =
     "czr005.g4irsf15.causal_descriptor_materialization.v1";
 inline constexpr const char* kDescriptorSchema =
     "czr005.g4irsf15.causal_target_descriptor.v1";
+inline constexpr const char* kTargetAddressSchema =
+    "czr005.g4irsf15.causal_target_address.v1";
+inline constexpr const char* kTargetAddressHorizonSchema =
+    "czr005.g4irsf15.causal_target_address_horizon.v1";
+inline constexpr const char* kPrepopEventGroupSchema =
+    "czr005.g4irsf15.prepop_event_group.v1";
 inline constexpr const char* kPairRunSchema =
     "czr005.g4irsf15.causal_target_pairs.v1";
 
@@ -120,6 +126,19 @@ inline bool strict_bool(const py::handle& value,
   return value.ptr() == Py_True;
 }
 
+inline std::vector<int> strict_int_vector(
+    const py::handle& value, const char* name) {
+  if (!PyList_Check(value.ptr()) && !PyTuple_Check(value.ptr())) {
+    throw py::type_error(std::string(name) + " must be a list of integers");
+  }
+  std::vector<int> result;
+  result.reserve(static_cast<std::size_t>(py::len(value)));
+  for (const py::handle item : py::reinterpret_borrow<py::sequence>(value)) {
+    result.push_back(strict_int(item, name));
+  }
+  return result;
+}
+
 inline bool is_lower_sha256(const std::string& value) {
   return value.size() == 64U &&
          std::all_of(value.begin(), value.end(), [](char ch) {
@@ -136,6 +155,34 @@ inline std::string strict_sha256(const py::handle& value,
                           " must be a lowercase SHA-256 hex digest");
   }
   return converted;
+}
+
+inline std::string prepop_event_group_sha256(
+    const std::string& input_runtime_cohort_sha256,
+    std::uint64_t event_ordinal,
+    std::uint64_t event_seq,
+    std::uint64_t event_time_bits,
+    int node) {
+  const auto json =
+      std::string("{\"event_ordinal\":") +
+      std::to_string(event_ordinal) +
+      ",\"event_seq\":" + std::to_string(event_seq) +
+      ",\"event_time_bits\":" + std::to_string(event_time_bits) +
+      ",\"input_runtime_cohort_sha256\":\"" +
+      input_runtime_cohort_sha256 +
+      "\",\"node\":" + std::to_string(node) +
+      ",\"schema\":\"" + kPrepopEventGroupSchema + "\"}";
+  return ics::canonical_map2_detail::sha256_hex(json);
+}
+
+inline std::string target_address_horizon_sha256(
+    const std::string& target_address_id,
+    const char* horizon) {
+  const auto json =
+      std::string("{\"horizon\":\"") + horizon +
+      "\",\"schema\":\"" + kTargetAddressHorizonSchema +
+      "\",\"target_address_id\":\"" + target_address_id + "\"}";
+  return ics::canonical_map2_detail::sha256_hex(json);
 }
 
 inline ics::Graph graph_from_records(
@@ -1679,6 +1726,7 @@ inline py::dict invariant_row(const InvariantEvidence& evidence) {
 }
 
 struct Target {
+  bool deferred_address = false;
   std::string descriptor_id;
   std::string skeleton_id;
   std::string population_group_sha256;
@@ -1697,17 +1745,28 @@ struct Target {
   int selected_next_node = -1;
   bool baseline_release = false;
   bool selected_boolean = false;
+  std::vector<int> source_ready_order;
+  std::vector<int> legal_next_edges;
+  std::string baseline_action;
+  std::string intervention_action;
+  std::string expected_action_change_type;
+  std::string input_runtime_cohort_sha256;
   Horizon horizon = Horizon::kAffectedBag;
   std::string expected_intervention_sha256;
+  std::string expected_target_address_sha256;
 };
 
 inline Target parse_target(const py::dict& row) {
   const auto schema_item = optional_item(row, "schema");
-  if (schema_item &&
-      strict_string(schema_item, "schema") != kDescriptorSchema) {
+  const auto schema = schema_item
+                          ? strict_string(schema_item, "schema")
+                          : std::string(kDescriptorSchema);
+  if (schema != kDescriptorSchema &&
+      schema != kTargetAddressSchema) {
     throw py::value_error("unsupported G4IRSF15 descriptor schema");
   }
   Target target;
+  target.deferred_address = schema == kTargetAddressSchema;
   target.descriptor_id =
       strict_sha256(required_item(row, "descriptor_id"),
                     "descriptor_id");
@@ -1750,12 +1809,6 @@ inline Target parse_target(const py::dict& row) {
       strict_uint64(required_item(row, "event_time_bits"),
                     "event_time_bits");
   target.node = strict_int(required_item(row, "node"), "node");
-  target.runtime_state_sha256 =
-      strict_sha256(required_item(row, "runtime_state_sha256"),
-                    "runtime_state_sha256");
-  target.boundary_sha256 =
-      strict_sha256(required_item(row, "boundary_sha256"),
-                    "boundary_sha256");
   target.runtime_bag_id =
       strict_int(required_item(row, "runtime_bag_id"),
                  "runtime_bag_id");
@@ -1783,9 +1836,141 @@ inline Target parse_target(const py::dict& row) {
   } else {
     throw py::value_error("horizon must be H_bag or H_system");
   }
-  target.expected_intervention_sha256 =
-      strict_sha256(required_item(row, "intervention_sha256"),
-                    "intervention_sha256");
+  if (target.deferred_address) {
+    const auto target_address_id = strict_sha256(
+        required_item(row, "target_address_id"),
+        "target_address_id");
+    const auto skeleton_selection_sha256 = strict_sha256(
+        required_item(row, "skeleton_selection_sha256"),
+        "skeleton_selection_sha256");
+    const auto sample_sha256 = strict_sha256(
+        required_item(row, "sample_sha256"),
+        "sample_sha256");
+    const auto prepop_event_group = strict_sha256(
+        required_item(row, "prepop_event_group_sha256"),
+        "prepop_event_group_sha256");
+    if (target.descriptor_id != target.skeleton_id ||
+        target_address_id != target.skeleton_id ||
+        skeleton_selection_sha256 != target.skeleton_id ||
+        sample_sha256 != target.skeleton_id ||
+        target.clone_group_id != prepop_event_group) {
+      throw py::value_error(
+          "deferred target address identity aliases disagree");
+    }
+    if (strict_string(required_item(row, "target_address_id_semantics"),
+                      "target_address_id_semantics") !=
+        "ALIAS_OF_NATIVE_SKELETON_SELECTION_SHA256") {
+      throw py::value_error(
+          "deferred target address identity semantics are invalid");
+    }
+    target.input_runtime_cohort_sha256 = strict_sha256(
+        required_item(row, "input_runtime_cohort_sha256"),
+        "input_runtime_cohort_sha256");
+    if (prepop_event_group != prepop_event_group_sha256(
+            target.input_runtime_cohort_sha256,
+            target.event_ordinal, target.event_seq,
+            target.event_time_bits, target.node)) {
+      throw py::value_error(
+          "deferred target address pre-pop event group drifted");
+    }
+    const auto runtime_state = required_item(
+        row, "runtime_state_sha256");
+    const auto boundary = required_item(row, "boundary_sha256");
+    if (!runtime_state.is_none() || !boundary.is_none()) {
+      throw py::value_error(
+          "deferred target address must not carry a full state seal");
+    }
+    for (const char* eager_field : {
+             "intervention_sha256",
+             "intervention_sha256_by_horizon",
+             "state_components",
+             "kind_name",
+             "boundary_kind",
+             "queue_top_not_popped",
+             "staged_event_sink_empty",
+             "runtime_global_scan_count",
+             "runtime_future_route_read_count",
+             "runtime_future_schedule_read_count",
+             "reservation_depth",
+             "max_selected_edges_per_bag"}) {
+      const auto eager_item = optional_item(row, eager_field);
+      if (eager_item && !eager_item.is_none()) {
+        throw py::value_error(
+            std::string("deferred target address must not carry eager ") +
+            eager_field);
+      }
+    }
+    if (strict_string(required_item(row, "seal_level"),
+                      "seal_level") != "LOCAL_PREPOP_ADDRESS" ||
+        strict_string(required_item(row, "full_state_seal"),
+                      "full_state_seal") !=
+            "DEFERRED_TO_EXECUTED_PAIR" ||
+        !strict_bool(required_item(row, "outcome_free"),
+                     "outcome_free")) {
+      throw py::value_error(
+          "deferred target address policy fields are invalid");
+    }
+    target.source_ready_order = strict_int_vector(
+        required_item(row, "source_ready_order"),
+        "source_ready_order");
+    target.legal_next_edges = strict_int_vector(
+        required_item(row, "legal_next_edges"),
+        "legal_next_edges");
+    target.baseline_action = strict_string(
+        required_item(row, "baseline_action"),
+        "baseline_action");
+    target.intervention_action = strict_string(
+        required_item(row, "intervention_action"),
+        "intervention_action");
+    target.expected_action_change_type = strict_string(
+        required_item(row, "expected_action_change_type"),
+        "expected_action_change_type");
+    const auto hashes_item = required_item(
+        row, "target_address_sha256_by_horizon");
+    if (!PyDict_Check(hashes_item.ptr())) {
+      throw py::type_error(
+          "target_address_sha256_by_horizon must be a dict");
+    }
+    const auto hashes =
+        py::reinterpret_borrow<py::dict>(hashes_item);
+    if (py::len(hashes) != 2) {
+      throw py::value_error(
+          "target address must carry exactly H_bag and H_system hashes");
+    }
+    const auto h_bag_sha256 = strict_sha256(
+        required_item(hashes, "H_bag"), "target_address.H_bag");
+    const auto h_system_sha256 = strict_sha256(
+        required_item(hashes, "H_system"), "target_address.H_system");
+    if (h_bag_sha256 != target_address_horizon_sha256(
+                            target_address_id, "H_bag") ||
+        h_system_sha256 != target_address_horizon_sha256(
+                               target_address_id, "H_system")) {
+      throw py::value_error(
+          "deferred target address horizon hashes drifted");
+    }
+    target.expected_target_address_sha256 = strict_sha256(
+        required_item(row, "target_address_sha256"),
+        "target_address_sha256");
+    const auto& expected_horizon_sha256 =
+        target.horizon == Horizon::kAffectedBag
+            ? h_bag_sha256
+            : h_system_sha256;
+    if (target.expected_target_address_sha256 !=
+        expected_horizon_sha256) {
+      throw py::value_error(
+          "deferred target address requested horizon hash drifted");
+    }
+  } else {
+    target.runtime_state_sha256 =
+        strict_sha256(required_item(row, "runtime_state_sha256"),
+                      "runtime_state_sha256");
+    target.boundary_sha256 =
+        strict_sha256(required_item(row, "boundary_sha256"),
+                      "boundary_sha256");
+    target.expected_intervention_sha256 =
+        strict_sha256(required_item(row, "intervention_sha256"),
+                      "intervention_sha256");
+  }
   return target;
 }
 
@@ -1793,10 +1978,6 @@ inline void verify_target_boundary(const Target& target,
                                    const Boundary& boundary) {
   boundary.validate();
   if (kind_index(boundary.kind) != target.kind_index ||
-      boundary.clone_group_id != target.clone_group_id ||
-      boundary.runtime_state_sha256 !=
-          target.runtime_state_sha256 ||
-      boundary.boundary_sha256() != target.boundary_sha256 ||
       boundary.event_seq != target.event_seq ||
       ics::event_runtime_detail::timestamp_bits(boundary.time) !=
           target.event_time_bits ||
@@ -1807,9 +1988,22 @@ inline void verify_target_boundary(const Target& target,
     throw py::value_error(
         "target descriptor does not exactly match the native boundary");
   }
+  if (target.deferred_address) {
+    if (boundary.source_ready_order != target.source_ready_order ||
+        boundary.legal_next_edges != target.legal_next_edges) {
+      throw py::value_error(
+          "deferred target address local boundary projection drifted");
+    }
+  } else if (
+      boundary.clone_group_id != target.clone_group_id ||
+      boundary.runtime_state_sha256 != target.runtime_state_sha256 ||
+      boundary.boundary_sha256() != target.boundary_sha256) {
+    throw py::value_error(
+        "sealed target descriptor full boundary identity drifted");
+  }
 }
 
-inline void verify_target_population(
+inline PopulationCandidate verify_target_population(
     const Target& target,
     const Boundary& boundary,
     const Strata& strata,
@@ -1834,6 +2028,15 @@ inline void verify_target_population(
         "target descriptor is not the replayed native primary "
         "skeleton action");
   }
+  if (target.deferred_address &&
+      (primary->baseline_action != target.baseline_action ||
+       primary->intervention_action != target.intervention_action ||
+       primary->expected_action_change_type !=
+           target.expected_action_change_type)) {
+    throw py::value_error(
+        "deferred target address local action projection drifted");
+  }
+  return *primary;
 }
 
 inline Intervention intervention_for(const Target& target,
@@ -1853,6 +2056,9 @@ inline Intervention intervention_for(const Target& target,
     intervention.selected_boolean = target.selected_boolean;
   }
   intervention.validate_against(boundary);
+  if (target.deferred_address) {
+    return intervention;
+  }
   auto identity_intervention = intervention;
   identity_intervention.horizon = Horizon::kAffectedBag;
   if (target.descriptor_id !=
@@ -2735,7 +2941,10 @@ inline py::dict scan_causal_skeletons_from_records(
   payload["terminal_replay_hashes"] =
       detail::replay_hash_row(terminal_replay_hashes);
   payload["outcome_free"] = true;
-  payload["sealed_descriptor_materialization_required"] = true;
+  payload["sealed_descriptor_materialization_required"] = false;
+  payload["target_address_frame_required"] = true;
+  payload["full_state_seal_policy"] =
+      "DEFERRED_TO_EXECUTED_PAIR";
   payload["frozen_controls"] = detail::frozen_controls_row();
   payload["input_request_count"] =
       static_cast<int>(requests.size());
@@ -3002,11 +3211,14 @@ inline py::dict run_causal_target_pairs_from_records(
       throw py::value_error(
           "duplicate descriptor_id in target batch");
     }
+    const auto uniqueness_id = target.deferred_address
+                                   ? target.descriptor_id
+                                   : target.clone_group_id;
     if (!clone_groups
-             .emplace(target.kind_index, target.clone_group_id)
+             .emplace(target.kind_index, uniqueness_id)
              .second) {
       throw py::value_error(
-          "duplicate (kind, clone_group_id) in target batch");
+          "duplicate native target identity in target batch");
     }
   }
 
@@ -3014,6 +3226,16 @@ inline py::dict run_causal_target_pairs_from_records(
       node_records, edge_records, heuristic_time);
   const auto requests =
       detail::requests_from_records(bag_records);
+  const auto input_runtime_cohort_sha256 =
+      detail::workload_cohort_sha256(requests);
+  for (const auto& target : targets) {
+    if (target.deferred_address &&
+        target.input_runtime_cohort_sha256 !=
+            input_runtime_cohort_sha256) {
+      throw py::value_error(
+          "deferred target address input cohort drifted");
+    }
+  }
   const auto protected_original_entry_times =
       detail::validated_original_entry_times(
           requests, original_entry_times);
@@ -3073,8 +3295,9 @@ inline py::dict run_causal_target_pairs_from_records(
     while (group_end < targets.size() &&
            targets[group_end].event_ordinal ==
                target_ordinal) {
-      if (targets[group_end].runtime_state_sha256 !=
-          source_state_sha256) {
+      if (!targets[group_end].deferred_address &&
+          targets[group_end].runtime_state_sha256 !=
+              source_state_sha256) {
         throw py::value_error(
             "target runtime_state_sha256 does not match replayed "
             "pre-pop checkpoint");
@@ -3098,15 +3321,49 @@ inline py::dict run_causal_target_pairs_from_records(
     for (std::size_t index = target_cursor;
          index < group_end; ++index) {
       const auto& target = targets[index];
-      const auto found = std::find_if(
-          source_probe.observed_opportunities.begin(),
-          source_probe.observed_opportunities.end(),
-          [&](const detail::Boundary& boundary) {
-            return boundary.boundary_sha256() ==
-                   target.boundary_sha256;
-          });
+      auto found = source_probe.observed_opportunities.end();
+      bool ambiguous_address = false;
+      if (target.deferred_address) {
+        for (auto candidate_boundary =
+                 source_probe.observed_opportunities.begin();
+             candidate_boundary !=
+                 source_probe.observed_opportunities.end();
+             ++candidate_boundary) {
+          if (detail::kind_index(candidate_boundary->kind) !=
+              target.kind_index) {
+            continue;
+          }
+          const auto candidate =
+              detail::primary_population_candidate(
+                  detail::skeleton_from_boundary(*candidate_boundary),
+                  source_strata, target.event_ordinal,
+                  pibt_prefilter_candidate_event);
+          if (!candidate.has_value() ||
+              candidate->population_group_sha256 !=
+                  target.population_group_sha256 ||
+              candidate->population_selection_sha256 !=
+                  target.skeleton_id) {
+            continue;
+          }
+          if (found != source_probe.observed_opportunities.end()) {
+            ambiguous_address = true;
+            found = source_probe.observed_opportunities.end();
+            break;
+          }
+          found = candidate_boundary;
+        }
+      } else {
+        found = std::find_if(
+            source_probe.observed_opportunities.begin(),
+            source_probe.observed_opportunities.end(),
+            [&](const detail::Boundary& boundary) {
+              return boundary.boundary_sha256() ==
+                     target.boundary_sha256;
+            });
+      }
       py::dict pair;
       pair["descriptor_id"] = target.descriptor_id;
+      pair["target_address_id"] = target.descriptor_id;
       pair["kind"] = detail::kind_token(target.kind_index);
       pair["event_ordinal"] =
           py::int_(target.event_ordinal);
@@ -3116,8 +3373,19 @@ inline py::dict run_causal_target_pairs_from_records(
               : "H_bag";
       pair["source_checkpoint_state_sha256"] =
           source_state_sha256;
+      pair["protected_full_1x_shape"] =
+          protected_full_1x_shape;
+      pair["resolved_execution_descriptor"] = py::none();
       pair["same_state_start"] = false;
       pair["pair_status"] = "SCREENING_FALSE_POSITIVE";
+      if (ambiguous_address) {
+        pair["false_positive_reason"] =
+            "TARGET_ADDRESS_MATCHED_MULTIPLE_NATIVE_BOUNDARIES";
+        pair["source_probe"] = detail::step_row(source_probe);
+        pairs.append(std::move(pair));
+        ++false_positive_pair_count;
+        continue;
+      }
       if (found == source_probe.observed_opportunities.end()) {
         pair["false_positive_reason"] =
             "CONTENT_ADDRESSED_BOUNDARY_NOT_OBSERVED";
@@ -3128,11 +3396,23 @@ inline py::dict run_causal_target_pairs_from_records(
       }
 
       detail::verify_target_boundary(target, *found);
-      detail::verify_target_population(
+      const auto resolved_population = detail::verify_target_population(
           target, *found, source_strata,
           pibt_prefilter_candidate_event);
+      const auto resolved_descriptor =
+          detail::seal_primary_descriptor(
+              resolved_population, *found, source_strata,
+              pibt_prefilter_candidate_event);
       const auto intervention =
           detail::intervention_for(target, *found);
+      pair["resolved_execution_descriptor"] =
+          detail::descriptor_row(resolved_descriptor);
+      pair["resolved_execution_runtime_state_sha256"] =
+          found->runtime_state_sha256;
+      pair["resolved_execution_boundary_sha256"] =
+          found->boundary_sha256();
+      pair["resolved_execution_intervention_sha256"] =
+          intervention.intervention_sha256(*found);
       ics::G4IRSF14CausalInterventionDirective directive;
       directive.boundary = *found;
       directive.intervention = intervention;
@@ -3359,8 +3639,6 @@ inline py::dict run_causal_target_pairs_from_records(
       }
       pair["hard_gate_fail_reasons"] =
           pair_fail_reasons;
-      pair["protected_full_1x_shape"] =
-          protected_full_1x_shape;
       pair["h_system_cohort_is_all_input_runtime_ids"] =
           target.horizon ==
                   detail::Horizon::kSelectedSystem &&

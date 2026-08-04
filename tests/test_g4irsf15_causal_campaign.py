@@ -28,6 +28,112 @@ def test_process_memory_snapshot_uses_real_supported_sampler() -> None:
         ]
 
 
+def _target_address_skeleton(index: int, kind: str) -> dict[str, object]:
+    skeleton_id = _sha(f"target-address-skeleton:{index}")
+    return {
+        "schema": campaign.SKELETON_SCHEMA,
+        "skeleton_id": skeleton_id,
+        "skeleton_selection_sha256": skeleton_id,
+        "population_group_sha256": _sha(
+            f"target-address-population:{index}"
+        ),
+        "kind": kind,
+        "event_ordinal": 11,
+        "event_seq": 19,
+        "event_time_bits": 23,
+        "node": 7,
+        "runtime_bag_id": index,
+        "peer_runtime_bag_id": index + 1,
+        "baseline_next_node": 8,
+        "selected_next_node": 9,
+        "baseline_release": True,
+        "selected_boolean": False,
+        "source_ready_order": [index, index + 1],
+        "legal_next_edges": [8, 9],
+        "baseline_action": f"BASELINE:{index}",
+        "intervention_action": f"TREATMENT:{index}",
+        "expected_action_change_type": "LOCAL_ACTION_CHANGE",
+        "outcome_free": True,
+        "runtime_state_sha256": None,
+        "boundary_sha256": None,
+        "sampling": {
+            "sampling_stratum_id": f"{kind}|BODY|NO_DIVERGENCE|LOW",
+            "N_h": 10,
+            "n_h": 2,
+            "pi_h": 0.2,
+            "analysis_weight": 5.0,
+        },
+        "offline_sampling_metadata": {
+            "runtime_only": False,
+            "must_not_enter_policy_features": True,
+        },
+    }
+
+
+def test_target_address_frame_defers_full_seals_deterministically() -> None:
+    cohort_sha256 = _sha("target-address-cohort")
+    skeletons = [
+        _target_address_skeleton(1, "I1"),
+        _target_address_skeleton(2, "I3"),
+    ]
+    protected = {
+        "task": {"input_runtime_cohort_sha256": cohort_sha256}
+    }
+
+    first = campaign._materialize_target_address_frame(
+        skeletons, protected=protected
+    )
+    second = campaign._materialize_target_address_frame(
+        skeletons, protected=protected
+    )
+
+    assert first == second
+    assert len(first) == len(skeletons)
+    assert {row["schema"] for row in first} == {
+        campaign.TARGET_ADDRESS_SCHEMA
+    }
+    assert all(
+        row["descriptor_id"]
+        == row["target_address_id"]
+        == row["skeleton_id"]
+        == row["population_selection_sha256"]
+        for row in first
+    )
+    assert all(
+        row["input_runtime_cohort_sha256"] == cohort_sha256
+        and row["runtime_state_sha256"] is None
+        and row["boundary_sha256"] is None
+        and row["full_state_seal"] == "DEFERRED_TO_EXECUTED_PAIR"
+        for row in first
+    )
+    assert first[0]["prepop_event_group_sha256"] == first[1][
+        "prepop_event_group_sha256"
+    ]
+    for row in first:
+        assert row["target_address_sha256_by_horizon"] == {
+            horizon: campaign._target_address_horizon_sha256(
+                str(row["target_address_id"]), horizon
+            )
+            for horizon in ("H_bag", "H_system")
+        }
+        assert row["sampling"]["cluster_id"] == row[
+            "prepop_event_group_sha256"
+        ]
+        assert row["sampling"]["cluster_bootstrap_unit"] == (
+            "prepop_event_group_sha256"
+        )
+
+    eager = dict(skeletons[0])
+    eager["runtime_state_sha256"] = _sha("forbidden-eager-seal")
+    with pytest.raises(
+        campaign.CampaignError,
+        match="TARGET_ADDRESS_SOURCE_SKELETON_NOT_OUTCOME_FREE",
+    ):
+        campaign._materialize_target_address_frame(
+            [eager], protected=protected
+        )
+
+
 def _population() -> list[dict[str, object]]:
     counts = {"I1": 3072, "I3": 2560, "I4": 2560}
     rows: list[dict[str, object]] = []
@@ -166,6 +272,10 @@ def test_formal_plan_uses_4096_attempts_and_unique_h_system_groups(
     targets, preregistration = campaign.preregister_formal_targets(
         descriptor_pool,
         pilot_complete_by_kind={kind: 30 for kind in campaign.KINDS},
+    )
+    assert preregistration["method"] == (
+        "TARGET_DIVIDED_BY_TWO_SIDED_95_PERCENT_WILSON_LOWER_"
+        "ENDPOINT_CAPPED_AT_LOCAL_TARGET_ADDRESS_FRAME"
     )
     assert len(targets) >= 4096
     assert Counter(row["kind"] for row in targets) == Counter(

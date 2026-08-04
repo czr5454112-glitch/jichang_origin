@@ -4,7 +4,8 @@
 The program deliberately separates discovery from intervention:
 
 * ``scan`` performs one outcome-free native pass over the protected original
-  map/task and publishes a deterministic, tail-enriched min-hash frame;
+  map/task and publishes a deterministic, tail-enriched local target-address
+  frame without eagerly hashing the full runtime state for unused targets;
 * ``plan-pilot`` and ``plan-formal`` preregister immutable target/shard plans;
 * ``run-shard`` is a fresh-process worker that replays a contiguous event
   ordinal range and atomically publishes one native matched-pair shard; and
@@ -79,7 +80,7 @@ BUILD_MANIFEST_SCHEMA = (
 )
 
 DESCRIPTOR_DATASET_PATH = Path(
-    "artifacts/datasets/g4irsf15_causal_descriptor_pool.jsonl.zst"
+    "artifacts/datasets/g4irsf15_causal_target_address_frame.jsonl.zst"
 )
 SKELETON_DATASET_ROOT = Path(
     "artifacts/datasets/g4irsf15_causal_skeleton_population"
@@ -168,9 +169,49 @@ MATERIALIZATION_SCHEMA = (
     "czr005.g4irsf15.causal_descriptor_materialization.v1"
 )
 DESCRIPTOR_SCHEMA = "czr005.g4irsf15.causal_target_descriptor.v1"
+TARGET_ADDRESS_SCHEMA = "czr005.g4irsf15.causal_target_address.v1"
+TARGET_ADDRESS_HORIZON_SCHEMA = (
+    "czr005.g4irsf15.causal_target_address_horizon.v1"
+)
+PREPOP_EVENT_GROUP_SCHEMA = (
+    "czr005.g4irsf15.prepop_event_group.v1"
+)
+G4IRSF14_STATE_CLONE_SCHEMA = (
+    "czr005.g4irsf14.matched_runtime_state_clone.v2"
+)
+RESOLVED_STATE_COMPONENT_FIELDS = (
+    ("event_queue_sha256", "event_queue"),
+    ("current_time_sha256", "current_time"),
+    ("bags_sha256", "bags"),
+    ("source_queues_sha256", "source_queues"),
+    ("junction_queues_sha256", "junction_queues"),
+    ("local_service_calendars_sha256", "local_service_calendars"),
+    ("corridor_state_sha256", "corridor_state"),
+    ("scheduled_incoming_sha256", "scheduled_incoming"),
+    ("credits_sha256", "credits"),
+    ("merge_grants_sha256", "merge_grants"),
+    ("fault_state_sha256", "fault_state"),
+    ("pibt_owner_state_sha256", "pibt_owner_state"),
+    ("deterministic_counters_sha256", "deterministic_counters"),
+    ("scorer_state_sha256", "scorer_state"),
+    ("result_accumulator_sha256", "result_accumulator"),
+    ("current_runtime_hashes_sha256", "current_runtime_hashes"),
+    ("congestion_beacons_sha256", "congestion_beacons"),
+    ("microphase_state_sha256", "microphase_state"),
+)
+RESOLVED_INTERVENTION_KIND = {
+    "I1": "I1_source_order_swap",
+    "I3": "I3_next_edge",
+    "I4": "I4_hold_release",
+}
+RESOLVED_BOUNDARY_KIND = {
+    "I1": "source_arbitration",
+    "I3": "junction_route_arbitration",
+    "I4": "hold_release_opportunity",
+}
 PAIR_RUN_SCHEMA = "czr005.g4irsf15.causal_target_pairs.v1"
 DESCRIPTOR_MANIFEST_SCHEMA = (
-    "czr005.g4irsf15.causal_descriptor_manifest.v2"
+    "czr005.g4irsf15.causal_descriptor_manifest.v3"
 )
 CHECKPOINT_MANIFEST_SCHEMA = (
     "czr005.g4irsf15.checkpoint_bank_manifest.v1"
@@ -251,16 +292,13 @@ OUTCOME_FREE_SCREENING_FIELDS = (
     "baseline_release",
     "candidate_action_count",
     "coverage_tags",
+    "event_hour_floor",
     "kind",
+    "legal_next_edges",
     "node",
-    "queue_top_not_popped",
-    "reservation_depth",
-    "runtime_future_route_read_count",
-    "runtime_future_schedule_read_count",
-    "runtime_global_scan_count",
     "sampling_stratum_id",
     "selected_boolean",
-    "staged_event_sink_empty",
+    "source_ready_order",
     "total_legal_action_count",
 )
 
@@ -1492,7 +1530,11 @@ def _validate_skeleton_scan_payload(
     _require(
         payload.get("formal_pass_claimed") is False
         and payload.get("outcome_free") is True
-        and payload.get("sealed_descriptor_materialization_required") is True,
+        and payload.get("sealed_descriptor_materialization_required")
+        is False
+        and payload.get("target_address_frame_required") is True
+        and payload.get("full_state_seal_policy")
+        == "DEFERRED_TO_EXECUTED_PAIR",
         "SKELETON_SCAN_CLAIM_DRIFT",
     )
     _require(
@@ -1764,6 +1806,246 @@ def _validate_materialization_payload(
         "MATERIALIZATION_NOT_ONE_TO_ONE",
     )
     return normalized
+
+
+def _prepop_event_group_sha256(
+    row: Mapping[str, Any], *, input_runtime_cohort_sha256: str
+) -> str:
+    """Bind the local queue-top event without pretending to seal full state."""
+
+    _require(
+        _is_sha256(input_runtime_cohort_sha256),
+        "TARGET_ADDRESS_COHORT_SHA256_MISSING",
+    )
+    return _canonical_sha256(
+        {
+            "schema": PREPOP_EVENT_GROUP_SCHEMA,
+            "input_runtime_cohort_sha256": input_runtime_cohort_sha256,
+            "event_ordinal": _strict_int(
+                row.get("event_ordinal"), "target.event_ordinal", minimum=0
+            ),
+            "event_seq": _strict_int(
+                row.get("event_seq"), "target.event_seq", minimum=1
+            ),
+            "event_time_bits": _strict_int(
+                row.get("event_time_bits"),
+                "target.event_time_bits",
+                minimum=0,
+            ),
+            "node": _strict_int(row.get("node"), "target.node", minimum=0),
+        }
+    )
+
+
+def _target_address_horizon_sha256(
+    target_address_id: str, horizon: str
+) -> str:
+    _require(_is_sha256(target_address_id), "TARGET_ADDRESS_ID_INVALID")
+    _require(horizon in {"H_bag", "H_system"}, "BAD_HORIZON")
+    return _canonical_sha256(
+        {
+            "schema": TARGET_ADDRESS_HORIZON_SCHEMA,
+            "target_address_id": target_address_id,
+            "horizon": horizon,
+        }
+    )
+
+
+def _validate_target_address_row(
+    row: Mapping[str, Any], *, input_runtime_cohort_sha256: str
+) -> None:
+    address = row.get("target_address_id")
+    _require(
+        row.get("schema") == TARGET_ADDRESS_SCHEMA
+        and _is_sha256(address)
+        and row.get("descriptor_id") == address
+        and row.get("skeleton_id") == address
+        and row.get("skeleton_selection_sha256") == address
+        and row.get("population_selection_sha256") == address
+        and row.get("sample_sha256") == address
+        and row.get("input_runtime_cohort_sha256")
+        == input_runtime_cohort_sha256
+        and row.get("target_address_id_semantics")
+        == "ALIAS_OF_NATIVE_SKELETON_SELECTION_SHA256",
+        "TARGET_ADDRESS_IDENTITY_DRIFT",
+    )
+    _require(row.get("kind") in KINDS, "TARGET_ADDRESS_KIND")
+    event_group = _prepop_event_group_sha256(
+        row, input_runtime_cohort_sha256=input_runtime_cohort_sha256
+    )
+    _require(
+        row.get("prepop_event_group_sha256") == event_group
+        and row.get("clone_group_id") == event_group,
+        "TARGET_ADDRESS_EVENT_GROUP_DRIFT",
+    )
+    hashes = row.get("target_address_sha256_by_horizon")
+    _require(
+        isinstance(hashes, dict)
+        and set(hashes) == {"H_bag", "H_system"}
+        and all(
+            hashes[horizon]
+            == _target_address_horizon_sha256(str(address), horizon)
+            for horizon in ("H_bag", "H_system")
+        )
+        and row.get("horizon") == "H_bag"
+        and row.get("target_address_sha256") == hashes["H_bag"],
+        "TARGET_ADDRESS_HORIZON_BINDING_DRIFT",
+    )
+    _require(
+        row.get("seal_level") == "LOCAL_PREPOP_ADDRESS"
+        and row.get("full_state_seal") == "DEFERRED_TO_EXECUTED_PAIR"
+        and row.get("runtime_state_sha256") is None
+        and row.get("boundary_sha256") is None
+        and row.get("intervention_sha256") is None
+        and row.get("outcome_free") is True,
+        "TARGET_ADDRESS_EAGER_FULL_SEAL_FORBIDDEN",
+    )
+    _require(
+        row.get("baseline_action") != row.get("intervention_action"),
+        "TARGET_ADDRESS_ACTION_SAME",
+    )
+    for eager_field in (
+        "intervention_sha256_by_horizon",
+        "state_components",
+        "kind_name",
+        "boundary_kind",
+        "queue_top_not_popped",
+        "staged_event_sink_empty",
+        "runtime_global_scan_count",
+        "runtime_future_route_read_count",
+        "runtime_future_schedule_read_count",
+        "reservation_depth",
+        "max_selected_edges_per_bag",
+    ):
+        _require(
+            row.get(eager_field) is None,
+            f"TARGET_ADDRESS_EAGER_FULL_SEAL_FORBIDDEN:{eager_field}",
+        )
+    sampling = row.get("sampling")
+    _require(isinstance(sampling, dict), "TARGET_ADDRESS_SAMPLING_MISSING")
+    N_h = _strict_int(sampling.get("N_h"), "target.N_h", minimum=1)
+    n_h = _strict_int(sampling.get("n_h"), "target.n_h", minimum=1)
+    pi_h = _strict_float(sampling.get("pi_h"), "target.pi_h")
+    weight = _strict_float(
+        sampling.get("analysis_weight"), "target.analysis_weight"
+    )
+    _require(
+        n_h <= N_h
+        and abs(pi_h - n_h / N_h) <= 1e-15
+        and math.isclose(weight, 1.0 / pi_h, rel_tol=1e-12)
+        and sampling.get("cluster_id") == event_group
+        and sampling.get("cluster_bootstrap_unit")
+        == "prepop_event_group_sha256",
+        "TARGET_ADDRESS_SAMPLING_DRIFT",
+    )
+    offline = row.get("offline_sampling_metadata")
+    _require(
+        isinstance(offline, dict)
+        and offline.get("must_not_enter_policy_features") is True
+        and offline.get("runtime_only") is False,
+        "TARGET_ADDRESS_OFFLINE_FEATURE_SCOPE_DRIFT",
+    )
+
+
+def _materialize_target_address_frame(
+    selected_skeletons: Sequence[Mapping[str, Any]],
+    *,
+    protected: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """Convert frozen native skeletons into outcome-free execution addresses.
+
+    The address intentionally carries no full runtime or G14 boundary seal.
+    Those hashes are resolved only after a preregistered target is actually
+    replayed by the native pair runner, where a missing/non-unique address is
+    retained as a screening false positive.
+    """
+
+    task = protected.get("task")
+    _require(isinstance(task, dict), "TARGET_ADDRESS_PROTECTED_TASK_MISSING")
+    cohort_sha256 = str(task.get("input_runtime_cohort_sha256", ""))
+    _require(_is_sha256(cohort_sha256), "TARGET_ADDRESS_COHORT_BINDING_MISSING")
+    frame: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for source in selected_skeletons:
+        row = dict(source)
+        skeleton_id = row.get("skeleton_id")
+        _require(
+            row.get("schema") == SKELETON_SCHEMA
+            and _is_sha256(skeleton_id)
+            and row.get("skeleton_selection_sha256") == skeleton_id
+            and _is_sha256(row.get("population_group_sha256"))
+            and row.get("runtime_state_sha256") is None
+            and row.get("boundary_sha256") is None
+            and row.get("outcome_free") is True,
+            "TARGET_ADDRESS_SOURCE_SKELETON_NOT_OUTCOME_FREE",
+        )
+        for eager_field in (
+            "intervention_sha256",
+            "intervention_sha256_by_horizon",
+            "state_components",
+            "kind_name",
+            "boundary_kind",
+            "queue_top_not_popped",
+            "staged_event_sink_empty",
+            "runtime_global_scan_count",
+            "runtime_future_route_read_count",
+            "runtime_future_schedule_read_count",
+            "reservation_depth",
+            "max_selected_edges_per_bag",
+        ):
+            _require(
+                row.get(eager_field) is None,
+                f"TARGET_ADDRESS_EAGER_FULL_SEAL_FORBIDDEN:{eager_field}",
+            )
+        target_address_id = str(skeleton_id)
+        _require(target_address_id not in seen, "TARGET_ADDRESS_DUPLICATE")
+        seen.add(target_address_id)
+        event_group = _prepop_event_group_sha256(
+            row, input_runtime_cohort_sha256=cohort_sha256
+        )
+        hashes = {
+            horizon: _target_address_horizon_sha256(
+                target_address_id, horizon
+            )
+            for horizon in ("H_bag", "H_system")
+        }
+        sampling = row.get("sampling")
+        _require(isinstance(sampling, dict), "TARGET_ADDRESS_SAMPLING_MISSING")
+        sampling = dict(sampling)
+        sampling["cluster_id"] = event_group
+        sampling["cluster_bootstrap_unit"] = "prepop_event_group_sha256"
+        row.update(
+            {
+                "schema": TARGET_ADDRESS_SCHEMA,
+                "descriptor_id": target_address_id,
+                "target_address_id": target_address_id,
+                "target_address_id_semantics": (
+                    "ALIAS_OF_NATIVE_SKELETON_SELECTION_SHA256"
+                ),
+                "population_selection_sha256": target_address_id,
+                "input_runtime_cohort_sha256": cohort_sha256,
+                "prepop_event_group_sha256": event_group,
+                "clone_group_id": event_group,
+                "seal_level": "LOCAL_PREPOP_ADDRESS",
+                "full_state_seal": "DEFERRED_TO_EXECUTED_PAIR",
+                "runtime_state_sha256": None,
+                "boundary_sha256": None,
+                "horizon": "H_bag",
+                "target_address_sha256_by_horizon": hashes,
+                "target_address_sha256": hashes["H_bag"],
+                "sample_sha256": target_address_id,
+                "sampling": sampling,
+            }
+        )
+        _validate_target_address_row(
+            row, input_runtime_cohort_sha256=cohort_sha256
+        )
+        frame.append(row)
+    _require(
+        len(frame) == len(selected_skeletons),
+        "TARGET_ADDRESS_FRAME_COUNT_DRIFT",
+    )
+    return frame
 
 
 def _load_offline_rows(root: Path) -> tuple[dict[int, dict[str, str]], str]:
@@ -2098,7 +2380,7 @@ def select_descriptor_pool(
                     "cluster_bootstrap_unit": (
                         "clone_group_id"
                         if row.get("clone_group_id") is not None
-                        else "skeleton_id_pending_descriptor_materialization"
+                        else "skeleton_id_pending_target_address_frame"
                     ),
                 }
                 selected.append(row)
@@ -2216,10 +2498,29 @@ def _target_native_projection(row: Mapping[str, Any]) -> dict[str, Any]:
 def _with_horizon(row: Mapping[str, Any], horizon: str) -> dict[str, Any]:
     _require(horizon in {"H_bag", "H_system"}, "BAD_HORIZON")
     result = dict(row)
-    hashes = result.get("intervention_sha256_by_horizon")
-    _require(isinstance(hashes, dict), "TARGET_HORIZON_HASHES_MISSING")
     result["horizon"] = horizon
-    result["intervention_sha256"] = hashes[horizon]
+    if result.get("schema") == TARGET_ADDRESS_SCHEMA:
+        hashes = result.get("target_address_sha256_by_horizon")
+        _require(
+            isinstance(hashes, dict)
+            and set(hashes) == {"H_bag", "H_system"}
+            and result.get("intervention_sha256_by_horizon") is None,
+            "TARGET_ADDRESS_HORIZON_HASHES_MISSING",
+        )
+        result["target_address_sha256"] = hashes[horizon]
+    elif result.get("schema") == DESCRIPTOR_SCHEMA:
+        # Legacy eager descriptors remain accepted by focused regression
+        # fixtures and the native A/B audit, but are not published by scan.
+        legacy_hashes = result.get("intervention_sha256_by_horizon")
+        _require(
+            isinstance(legacy_hashes, dict)
+            and set(legacy_hashes) == {"H_bag", "H_system"}
+            and result.get("target_address_sha256_by_horizon") is None,
+            "LEGACY_DESCRIPTOR_HORIZON_HASHES_MISSING",
+        )
+        result["intervention_sha256"] = legacy_hashes[horizon]
+    else:
+        raise CampaignError("TARGET_SCHEMA_UNSUPPORTED")
     result["target_key"] = f"{result['descriptor_id']}:{horizon}"
     return result
 
@@ -2531,7 +2832,7 @@ def preregister_formal_targets(
     return targets, {
         "method": (
             "TARGET_DIVIDED_BY_TWO_SIDED_95_PERCENT_WILSON_LOWER_"
-            "ENDPOINT_CAPPED_AT_SEALED_POST_PILOT_POOL"
+            "ENDPOINT_CAPPED_AT_LOCAL_TARGET_ADDRESS_FRAME"
         ),
         "wilson_interval_convention": (
             "TWO_SIDED_95_PERCENT_LOWER_ENDPOINT_"
@@ -2691,38 +2992,42 @@ def attach_attempt_sampling(
         N_h = _strict_int(
             pool_sampling.get("N_h"), f"{stratum}.N_h", minimum=1
         )
-        sealed_n_h = _strict_int(
+        address_frame_n_h = _strict_int(
             pool_sampling.get("n_h"),
-            f"{stratum}.sealed_n_h",
+            f"{stratum}.target_address_frame_n_h",
             minimum=1,
         )
-        pool_pi_h = _strict_float(
-            pool_sampling.get("pi_h"), f"{stratum}.pool_pi_h"
+        frame_pi_h = _strict_float(
+            pool_sampling.get("pi_h"), f"{stratum}.frame_pi_h"
         )
         _require(
-            abs(pool_pi_h - sealed_n_h / N_h) <= 1e-15,
-            f"POOL_PI_DRIFT:{stratum}",
+            abs(frame_pi_h - address_frame_n_h / N_h) <= 1e-15,
+            f"TARGET_ADDRESS_FRAME_PI_DRIFT:{stratum}",
         )
         stage2_frame_n_h = frame_counts[stratum]
         attempt_n_h = counts[stratum]
         _require(
-            0 < attempt_n_h <= stage2_frame_n_h <= sealed_n_h <= N_h,
+            0
+            < attempt_n_h
+            <= stage2_frame_n_h
+            <= address_frame_n_h
+            <= N_h,
             f"ATTEMPT_SAMPLING_COUNT_DRIFT:{stratum}",
         )
         stage2_pi_h = attempt_n_h / stage2_frame_n_h
         post_exclusion_survival_pi_h = (
-            stage2_frame_n_h / sealed_n_h
+            stage2_frame_n_h / address_frame_n_h
         )
         final_pi_h = (
-            pool_pi_h
+            frame_pi_h
             * post_exclusion_survival_pi_h
             * stage2_pi_h
         )
         attempt_sampling = {
             "sampling_stratum_id": stratum,
             "N_h": N_h,
-            "sealed_pool_n_h": sealed_n_h,
-            "pool_pi_h": pool_pi_h,
+            "target_address_frame_n_h": address_frame_n_h,
+            "frame_pi_h": frame_pi_h,
             "excluded_before_panel_n_h": excluded_counts[stratum],
             "stage2_frame_n_h": stage2_frame_n_h,
             "post_exclusion_survival_pi_h": (
@@ -2735,18 +3040,19 @@ def attach_attempt_sampling(
             "analysis_weight": 1.0 / final_pi_h,
             "selection_panel": panel,
             "selection_stages": (
-                "SKELETON_POPULATION_TO_SEALED_POOL_TO_FINAL_ATTEMPT_PANEL"
+                "SKELETON_POPULATION_TO_LOCAL_TARGET_ADDRESS_FRAME_TO_"
+                "FINAL_ATTEMPT_PANEL"
             ),
             "probability_formula": (
-                "pool_pi_h*post_exclusion_survival_pi_h*stage2_pi_h"
+                "frame_pi_h*post_exclusion_survival_pi_h*stage2_pi_h"
             ),
             "stage2_selection_rule": (
                 "PREREGISTERED_FIXED_M_H_PER_STRATUM_DETERMINISTIC_MIN_HASH"
             ),
             "cluster_id": str(row["clone_group_id"]),
-            "cluster_bootstrap_unit": "clone_group_id",
+            "cluster_bootstrap_unit": "prepop_event_group_sha256",
         }
-        row["sealed_pool_sampling"] = dict(pool_sampling)
+        row["target_address_frame_sampling"] = dict(pool_sampling)
         row["sampling"] = attempt_sampling
         result.append(row)
         design[stratum] = {
@@ -2754,8 +3060,8 @@ def attach_attempt_sampling(
             for key in (
                 "sampling_stratum_id",
                 "N_h",
-                "sealed_pool_n_h",
-                "pool_pi_h",
+                "target_address_frame_n_h",
+                "frame_pi_h",
                 "excluded_before_panel_n_h",
                 "stage2_frame_n_h",
                 "post_exclusion_survival_pi_h",
@@ -2775,10 +3081,12 @@ def attach_attempt_sampling(
         "stratum_count": len(design),
         "strata": dict(sorted(design.items())),
         "population_estimation": (
-            "TWO_STAGE_POOL_TIMES_POST_EXCLUSION_STRATUM_PANEL_"
-            "HORVITZ_THOMPSON_READY"
+            "TWO_STAGE_TARGET_ADDRESS_FRAME_TIMES_POST_EXCLUSION_"
+            "STRATUM_PANEL_HORVITZ_THOMPSON_READY"
         ),
-        "variance_estimation": "CLONE_GROUP_CLUSTER_BOOTSTRAP_READY",
+        "variance_estimation": (
+            "PREPOP_EVENT_GROUP_CLUSTER_BOOTSTRAP_READY"
+        ),
     }
 
 
@@ -2801,7 +3109,7 @@ def _read_descriptor_pool(root: Path) -> tuple[list[dict[str, Any]], dict[str, A
         ),
         "DESCRIPTOR_ACTIONABLE_SAMPLE_COVERAGE_MISS",
     )
-    _protected_inputs(root)
+    protected = _protected_inputs(root)
     current_source = _source_identity(root)
     _require(
         current_source["source_bundle_sha256"]
@@ -2814,22 +3122,32 @@ def _read_descriptor_pool(root: Path) -> tuple[list[dict[str, Any]], dict[str, A
         and _file_sha256(root / OFFLINE_TAIL_PATH) == offline.get("sha256"),
         "DESCRIPTOR_OFFLINE_SAMPLING_INPUT_DRIFT",
     )
-    dataset = root / Path(str(manifest["descriptor_dataset"]["path"]))
-    _require(
-        _file_sha256(dataset) == manifest["descriptor_dataset"]["sha256"],
-        "DESCRIPTOR_DATASET_SHA256_DRIFT",
+    dataset = root / Path(
+        str(manifest["target_address_dataset"]["path"])
     )
-    # Descriptor pools are small enough to use a one-shot frame.  Decompression
-    # lives in the independent validator too; here we use the system libzstd.
+    _require(
+        _file_sha256(dataset)
+        == manifest["target_address_dataset"]["sha256"],
+        "TARGET_ADDRESS_DATASET_SHA256_DRIFT",
+    )
+    # Target-address frames are small enough to use a one-shot frame.
     rows = _zstd_decompress_jsonl(dataset.read_bytes())
     _require(
-        len(rows) == manifest.get("descriptor_pool_count"),
-        "DESCRIPTOR_POOL_COUNT_DRIFT",
+        len(rows) == manifest.get("target_address_frame_count"),
+        "TARGET_ADDRESS_FRAME_COUNT_DRIFT",
     )
     _require(
-        _canonical_sha256(rows) == manifest.get("descriptor_pool_sha256"),
-        "DESCRIPTOR_POOL_CONTENT_DRIFT",
+        _canonical_sha256(rows)
+        == manifest.get("target_address_frame_sha256"),
+        "TARGET_ADDRESS_FRAME_CONTENT_DRIFT",
     )
+    for row in rows:
+        _validate_target_address_row(
+            row,
+            input_runtime_cohort_sha256=protected["task"][
+                "input_runtime_cohort_sha256"
+            ],
+        )
     return rows, manifest
 
 
@@ -2897,6 +3215,9 @@ def run_scan(
     selected_skeletons, coverage_rows, design = select_descriptor_pool(
         population, pool_size=pool_size
     )
+    pool = _materialize_target_address_frame(
+        selected_skeletons, protected=protected
+    )
     skeleton_population_binding = _publish_skeleton_population(
         root, population
     )
@@ -2923,40 +3244,30 @@ def run_scan(
             "primary_population_count",
             "sample_rule",
             "population_counts",
+            "sealed_descriptor_materialization_required",
+            "target_address_frame_required",
+            "full_state_seal_policy",
         )
     }
-    # Retain only the compact native summary and selected panel before the
-    # second full replay.  Keeping both 747,962-row skeleton/population lists
-    # alive caused avoidable multi-gigabyte pressure during materialization.
+    # Publication deliberately stops at a local, outcome-free target address.
+    # A full G14 state/boundary seal is resolved only for preregistered targets
+    # that the pair runner actually executes.  This removes thousands of
+    # unused full-state traversals without weakening any causal-label gate.
     skeleton_payload.pop("skeletons", None)
     del skeletons
     del population
+    del native_args
+    del auxiliary
     gc.collect()
-    materialization_payload, materialization_binary_identity = (
-        _call_exact_binary(
-            root=root,
-            binary=binary,
-            function_name=(
-                "g4irsf15_materialize_causal_descriptors_from_records"
-            ),
-            arguments=[*native_args, selected_skeletons],
-        )
-    )
-    pool = _validate_materialization_payload(
-        materialization_payload,
-        selected_skeletons=selected_skeletons,
-        protected=protected,
-    )
     _require(
         skeleton_binary_identity["sha256_before"]
-        == materialization_binary_identity["sha256_before"]
         == build_binding["binary_sha256"],
-        "SCAN_MATERIALIZATION_BINARY_DRIFT",
+        "SCAN_BINARY_DRIFT",
     )
     compressed = _zstd_compress(_jsonl_bytes(pool))
     _atomic_write(root / DESCRIPTOR_DATASET_PATH, compressed)
     descriptor_byte_count = _publishable_byte_count(
-        root / DESCRIPTOR_DATASET_PATH, "descriptor_pool"
+        root / DESCRIPTOR_DATASET_PATH, "target_address_frame"
     )
     coverage_bytes = _csv_bytes(
         coverage_rows,
@@ -2996,41 +3307,44 @@ def run_scan(
         "binary": {
             "path": skeleton_binary_identity["path"],
             "sha256_before": skeleton_binary_identity["sha256_before"],
-            "sha256_after": materialization_binary_identity["sha256_after"],
-            "unchanged": (
-                skeleton_binary_identity["unchanged"]
-                and materialization_binary_identity["unchanged"]
-            ),
-            "elapsed_wall_seconds": (
-                skeleton_binary_identity["elapsed_wall_seconds"]
-                + materialization_binary_identity["elapsed_wall_seconds"]
-            ),
-            "peak_resident_bytes": max(
-                skeleton_binary_identity["peak_resident_bytes"],
-                materialization_binary_identity["peak_resident_bytes"],
-            ),
+            "sha256_after": skeleton_binary_identity["sha256_after"],
+            "unchanged": skeleton_binary_identity["unchanged"],
+            "elapsed_wall_seconds": skeleton_binary_identity[
+                "elapsed_wall_seconds"
+            ],
+            "peak_resident_bytes": skeleton_binary_identity[
+                "peak_resident_bytes"
+            ],
             "skeleton_scan_call": skeleton_binary_identity,
-            "descriptor_materialization_call": (
-                materialization_binary_identity
-            ),
+            "descriptor_materialization_call": None,
+            "full_state_digest_count_during_target_frame_publication": 0,
         },
         "frozen_controls": frozen_controls,
         "native_scan_summary": native_scan_summary,
-        "native_materialization_summary": {
-            key: materialization_payload[key]
-            for key in (
-                "schema",
-                "evidence_scope",
-                "input_request_count",
-                "input_runtime_cohort_sha256",
-                "h_system_cohort_mapping_sha256",
-                "raw_bag_mapping_sha256",
-                "raw_bag_original_entry_mapping_sha256",
-                "raw_bag_count",
-                "selected_skeleton_count",
-                "materialized_descriptor_count",
-                "source_events_replayed",
-            )
+        "target_address_frame_summary": {
+            "schema": TARGET_ADDRESS_SCHEMA,
+            "evidence_scope": "OUTCOME_FREE_LOCAL_PREPOP_TARGET_FRAME",
+            "selected_skeleton_count": len(selected_skeletons),
+            "target_address_count": len(pool),
+            "full_state_digest_count": 0,
+            "full_state_seal_policy": "DEFERRED_TO_EXECUTED_PAIR",
+            "false_positive_policy": (
+                "RETAIN_ATTEMPT_IF_ADDRESS_DOES_NOT_RESOLVE_UNIQUELY"
+            ),
+            "input_request_count": FULL_SEGMENT_COUNT,
+            "input_runtime_cohort_sha256": protected["task"][
+                "input_runtime_cohort_sha256"
+            ],
+            "h_system_cohort_mapping_sha256": protected["task"][
+                "runtime_segment_mapping_sha256"
+            ],
+            "raw_bag_mapping_sha256": protected["task"][
+                "raw_bag_mapping_sha256"
+            ],
+            "raw_bag_original_entry_mapping_sha256": protected["task"][
+                "raw_bag_original_entry_mapping_sha256"
+            ],
+            "raw_bag_count": FULL_RAW_BAG_COUNT,
         },
         "offline_sampling_input": {
             "path": OFFLINE_TAIL_PATH.as_posix(),
@@ -3044,14 +3358,16 @@ def run_scan(
                 "REFERENCE_DESIGN_WEIGHTS_ONLY_NOT_ORIGINAL_POPULATION_ATE"
             ),
             "variance_estimation": (
-                "ACTUAL_DETERMINISTIC_CLONE_GROUP_BOOTSTRAP_AT_FORMAL_FINALIZE"
+                "ACTUAL_DETERMINISTIC_PREPOP_EVENT_GROUP_BOOTSTRAP_"
+                "AT_FORMAL_FINALIZE"
             ),
             "strata": design["strata"],
             "coverage_blockers": design["coverage_blockers"],
         },
         "skeleton_population_count": population_count,
         "selected_skeleton_count": len(selected_skeletons),
-        "sealed_descriptor_count": len(pool),
+        "target_address_count": len(pool),
+        "full_state_sealed_descriptor_count": 0,
         "selected_skeleton_inventory_sha256": _canonical_sha256(
             [
                 {
@@ -3066,11 +3382,11 @@ def run_scan(
                 for row in selected_skeletons
             ]
         ),
-        "descriptor_population_count": population_count,
-        "descriptor_pool_count": len(pool),
-        "descriptor_pool_sha256": _canonical_sha256(pool),
+        "target_address_population_count": population_count,
+        "target_address_frame_count": len(pool),
+        "target_address_frame_sha256": _canonical_sha256(pool),
         "skeleton_population_dataset": skeleton_population_binding,
-        "descriptor_dataset": {
+        "target_address_dataset": {
             "path": DESCRIPTOR_DATASET_PATH.as_posix(),
             "sha256": _file_sha256(root / DESCRIPTOR_DATASET_PATH),
             "byte_count": descriptor_byte_count,
@@ -3105,7 +3421,7 @@ def run_scan(
         "binary": {
             "path": skeleton_binary_identity["path"],
             "sha256_before": skeleton_binary_identity["sha256_before"],
-            "sha256_after": materialization_binary_identity["sha256_after"],
+            "sha256_after": skeleton_binary_identity["sha256_after"],
             "unchanged": True,
         },
         "source_bundle_sha256": source["source_bundle_sha256"],
@@ -3249,8 +3565,8 @@ def _load_screening_revision(
         "skeleton_population_content_sha256": descriptor_manifest[
             "skeleton_population_dataset"
         ]["content_sha256"],
-        "descriptor_pool_sha256": descriptor_manifest[
-            "descriptor_pool_sha256"
+        "target_address_frame_sha256": descriptor_manifest[
+            "target_address_frame_sha256"
         ],
     }
     _require(
@@ -3571,7 +3887,7 @@ def create_plan(
         target = dict(source_target)
         target["intervention_id"] = target["target_key"]
         target["target_decision_id"] = (
-            f"{target['boundary_sha256']}:{target['event_seq']}"
+            f"{target['target_address_sha256']}:{target['event_seq']}"
         )
         target["source_screening_manifest_sha256"] = (
             descriptor_manifest["self_sha256"]
@@ -4490,21 +4806,45 @@ def _validate_plan(plan: Mapping[str, Any], campaign: str) -> None:
             _require(row.get("target_key") == key, "TARGET_KEY_DRIFT")
             _require(key not in seen, f"DUPLICATE_TARGET_KEY:{key}")
             seen.add(str(key))
-            hashes = row.get("intervention_sha256_by_horizon")
-            _require(
-                isinstance(hashes, dict)
-                and row.get("intervention_sha256")
-                == hashes.get(row.get("horizon")),
-                "TARGET_HORIZON_HASH_NOT_UPDATED",
-            )
+            if row.get("schema") == TARGET_ADDRESS_SCHEMA:
+                address = row.get("target_address_id")
+                address_hashes = row.get(
+                    "target_address_sha256_by_horizon"
+                )
+                _require(
+                    _is_sha256(address)
+                    and row.get("descriptor_id") == address
+                    and row.get("skeleton_id") == address
+                    and row.get("population_selection_sha256") == address
+                    and isinstance(address_hashes, dict)
+                    and set(address_hashes) == {"H_bag", "H_system"}
+                    and all(
+                        address_hashes[horizon]
+                        == _target_address_horizon_sha256(
+                            str(address), horizon
+                        )
+                        for horizon in ("H_bag", "H_system")
+                    )
+                    and row.get("target_address_sha256")
+                    == address_hashes.get(row.get("horizon"))
+                    and row.get("intervention_sha256") is None
+                    and row.get("intervention_sha256_by_horizon") is None
+                    and row.get("runtime_state_sha256") is None
+                    and row.get("boundary_sha256") is None,
+                    "TARGET_ADDRESS_HORIZON_HASH_NOT_UPDATED",
+                )
+            else:
+                raise CampaignError(
+                    "PUBLICATION_PLAN_REQUIRES_TARGET_ADDRESS_SCHEMA"
+                )
             sampling = row.get("sampling")
             _require(isinstance(sampling, dict), "TARGET_SAMPLING_MISSING")
             N_h = _strict_int(
                 sampling.get("N_h"), "target.N_h", minimum=1
             )
-            sealed = _strict_int(
-                sampling.get("sealed_pool_n_h"),
-                "target.sealed_pool_n_h",
+            address_frame = _strict_int(
+                sampling.get("target_address_frame_n_h"),
+                "target.target_address_frame_n_h",
                 minimum=1,
             )
             frame = _strict_int(
@@ -4517,8 +4857,8 @@ def _validate_plan(plan: Mapping[str, Any], campaign: str) -> None:
                 "target.attempt_n_h",
                 minimum=1,
             )
-            pool_pi = _strict_float(
-                sampling.get("pool_pi_h"), "target.pool_pi_h"
+            frame_pi = _strict_float(
+                sampling.get("frame_pi_h"), "target.frame_pi_h"
             )
             survival = _strict_float(
                 sampling.get("post_exclusion_survival_pi_h"),
@@ -4531,11 +4871,11 @@ def _validate_plan(plan: Mapping[str, Any], campaign: str) -> None:
                 sampling.get("pi_h"), "target.pi_h"
             )
             _require(
-                0 < attempted_h <= frame <= sealed <= N_h
-                and abs(pool_pi - sealed / N_h) <= 1e-15
-                and abs(survival - frame / sealed) <= 1e-15
+                0 < attempted_h <= frame <= address_frame <= N_h
+                and abs(frame_pi - address_frame / N_h) <= 1e-15
+                and abs(survival - frame / address_frame) <= 1e-15
                 and abs(stage2 - attempted_h / frame) <= 1e-15
-                and abs(final_pi - pool_pi * survival * stage2)
+                and abs(final_pi - frame_pi * survival * stage2)
                 <= 1e-15
                 and abs(
                     _strict_float(
@@ -4598,6 +4938,8 @@ def _validate_pair_run_payload(
         _require(
             isinstance(pair, dict)
             and pair.get("descriptor_id") == target.get("descriptor_id")
+            and pair.get("target_address_id")
+            == target.get("target_address_id", target.get("descriptor_id"))
             and pair.get("kind") == target.get("kind")
             and pair.get("event_ordinal") == target.get("event_ordinal")
             and pair.get("horizon") == target.get("horizon"),
@@ -5599,6 +5941,195 @@ def _signed_label(delta_seconds: float) -> str:
     )
 
 
+def runtime_state_sha256_from_components(
+    components: Mapping[str, Any],
+) -> str:
+    _require(
+        set(components)
+        == {field for field, _ in RESOLVED_STATE_COMPONENT_FIELDS}
+        and all(_is_sha256(value) for value in components.values()),
+        "RESOLVED_STATE_COMPONENTS_INVALID",
+    )
+    return _canonical_fields_sha256(
+        [
+            ("schema", "s", G4IRSF14_STATE_CLONE_SCHEMA),
+            *[
+                (canonical_name, "s", components[field])
+                for field, canonical_name in RESOLVED_STATE_COMPONENT_FIELDS
+            ],
+        ]
+    )
+
+
+def clone_group_sha256_from_runtime_state(runtime_state_sha256: str) -> str:
+    _require(
+        _is_sha256(runtime_state_sha256),
+        "RESOLVED_RUNTIME_STATE_SHA256_INVALID",
+    )
+    return _canonical_fields_sha256(
+        [
+            ("schema", "s", G4IRSF14_STATE_CLONE_SCHEMA),
+            ("runtime_state_sha256", "s", runtime_state_sha256),
+        ]
+    )
+
+
+def resolved_intervention_sha256(
+    resolved: Mapping[str, Any], horizon: str
+) -> str:
+    kind = str(resolved.get("kind"))
+    _require(
+        kind in RESOLVED_INTERVENTION_KIND
+        and horizon in {"H_bag", "H_system"}
+        and _is_sha256(resolved.get("boundary_sha256")),
+        "RESOLVED_INTERVENTION_FIELDS_INVALID",
+    )
+    for field in (
+        "runtime_bag_id",
+        "peer_runtime_bag_id",
+        "selected_next_node",
+    ):
+        _require(
+            isinstance(resolved.get(field), int)
+            and not isinstance(resolved.get(field), bool),
+            f"RESOLVED_INTERVENTION_INTEGER_INVALID:{field}",
+        )
+    _require(
+        isinstance(resolved.get("selected_boolean"), bool),
+        "RESOLVED_INTERVENTION_BOOLEAN_INVALID",
+    )
+    return _canonical_fields_sha256(
+        [
+            ("schema", "s", G4IRSF14_STATE_CLONE_SCHEMA),
+            ("boundary_sha256", "s", resolved["boundary_sha256"]),
+            ("kind", "s", RESOLVED_INTERVENTION_KIND[kind]),
+            ("horizon", "s", horizon),
+            ("runtime_bag_id", "i", resolved["runtime_bag_id"]),
+            ("peer_runtime_bag_id", "i", resolved["peer_runtime_bag_id"]),
+            ("merge_request_id", "u", 0),
+            ("peer_merge_request_id", "u", 0),
+            ("selected_next_node", "i", resolved["selected_next_node"]),
+            ("selected_boolean", "b", resolved["selected_boolean"]),
+        ]
+    )
+
+
+def _validate_resolved_execution_descriptor(
+    pair: Mapping[str, Any], target: Mapping[str, Any]
+) -> dict[str, Any]:
+    resolved = pair.get("resolved_execution_descriptor")
+    _require(isinstance(resolved, dict), "RESOLVED_DESCRIPTOR_MISSING")
+    _require(
+        resolved.get("schema") == DESCRIPTOR_SCHEMA
+        and _is_sha256(resolved.get("descriptor_id"))
+        and _is_sha256(resolved.get("runtime_state_sha256"))
+        and _is_sha256(resolved.get("boundary_sha256"))
+        and _is_sha256(resolved.get("clone_group_id")),
+        "RESOLVED_DESCRIPTOR_FULL_SEAL_MISSING",
+    )
+    for field in (
+        "skeleton_id",
+        "population_group_sha256",
+        "population_selection_sha256",
+        "kind",
+        "event_ordinal",
+        "event_seq",
+        "event_time",
+        "event_time_bits",
+        "node",
+        "runtime_bag_id",
+        "peer_runtime_bag_id",
+        "baseline_next_node",
+        "selected_next_node",
+        "baseline_release",
+        "selected_boolean",
+        "source_ready_order",
+        "legal_next_edges",
+        "baseline_action",
+        "intervention_action",
+        "expected_action_change_type",
+        "candidate_action_count",
+        "candidate_action_count_semantics",
+        "alternative_action_count",
+        "total_legal_action_count",
+        "active_merge_capability_count",
+        "pending_merge_request_count",
+        "active_physical_fault_edge_count",
+        "queued_bag_count",
+        "pibt_prefilter_candidate_event",
+        "primary_action_selection",
+    ):
+        _require(
+            resolved.get(field) == target.get(field),
+            f"RESOLVED_DESCRIPTOR_LOCAL_ADDRESS_DRIFT:{field}",
+        )
+    hashes = resolved.get("intervention_sha256_by_horizon")
+    state_components = resolved.get("state_components")
+    expected_state_component_keys = {
+        field for field, _ in RESOLVED_STATE_COMPONENT_FIELDS
+    }
+    expected_runtime_state_sha256 = (
+        runtime_state_sha256_from_components(state_components)
+        if isinstance(state_components, dict)
+        else None
+    )
+    horizon = str(target.get("horizon"))
+    _require(
+        isinstance(hashes, dict)
+        and set(hashes) == {"H_bag", "H_system"}
+        and resolved.get("descriptor_id") == hashes.get("H_bag")
+        == resolved.get("intervention_sha256")
+        and _is_sha256(hashes.get("H_system"))
+        and resolved.get("horizon") == "H_bag"
+        and resolved.get("kind_name")
+        == RESOLVED_INTERVENTION_KIND.get(resolved.get("kind"))
+        and resolved.get("boundary_kind")
+        == RESOLVED_BOUNDARY_KIND.get(resolved.get("kind"))
+        and isinstance(state_components, dict)
+        and set(state_components) == expected_state_component_keys
+        and all(_is_sha256(value) for value in state_components.values())
+        and resolved.get("reservation_depth") == 1
+        and resolved.get("max_selected_edges_per_bag") in {0, 1}
+        and resolved.get("runtime_state_sha256")
+        == expected_runtime_state_sha256
+        and resolved.get("clone_group_id")
+        == clone_group_sha256_from_runtime_state(
+            str(expected_runtime_state_sha256)
+        )
+        and hashes.get("H_bag")
+        == resolved_intervention_sha256(resolved, "H_bag")
+        and hashes.get("H_system")
+        == resolved_intervention_sha256(resolved, "H_system")
+        and pair.get("resolved_execution_runtime_state_sha256")
+        == resolved.get("runtime_state_sha256")
+        == pair.get("source_checkpoint_state_sha256")
+        and pair.get("resolved_execution_boundary_sha256")
+        == resolved.get("boundary_sha256")
+        and pair.get("resolved_execution_intervention_sha256")
+        == hashes.get(horizon)
+        and resolved.get("queue_top_not_popped") is True
+        and resolved.get("staged_event_sink_empty") is True,
+        "RESOLVED_DESCRIPTOR_EXECUTION_BINDING_DRIFT",
+    )
+    _require(
+        resolved.get("candidate_action_count")
+        == resolved.get("alternative_action_count")
+        and resolved.get("total_legal_action_count")
+        == resolved.get("candidate_action_count") + 1,
+        "RESOLVED_DESCRIPTOR_ACTION_COUNT_DRIFT",
+    )
+    for counter in (
+        "runtime_global_scan_count",
+        "runtime_future_route_read_count",
+        "runtime_future_schedule_read_count",
+    ):
+        _require(
+            resolved.get(counter) == 0,
+            f"RESOLVED_DESCRIPTOR_LEAKAGE:{counter}",
+        )
+    return dict(resolved)
+
+
 def _validate_action_change_certificate(
     pair: Mapping[str, Any],
     target: Mapping[str, Any],
@@ -5611,6 +6142,8 @@ def _validate_action_change_certificate(
         for value in (certificate, baseline_step, treatment_step)
     ):
         return False
+    resolved = _validate_resolved_execution_descriptor(pair, target)
+    resolved_hashes = resolved["intervention_sha256_by_horizon"]
     expected_direct = sorted(
         {
             int(target["runtime_bag_id"]),
@@ -5632,9 +6165,9 @@ def _validate_action_change_certificate(
         and treatment_step.get("intervention_applied") is True
         and treatment_step.get("changed_action_count") == 1
         and treatment_step.get("requested_boundary_sha256")
-        == target.get("boundary_sha256")
+        == resolved.get("boundary_sha256")
         and treatment_step.get("requested_intervention_sha256")
-        == target.get("intervention_sha256")
+        == resolved_hashes.get(target.get("horizon"))
         and treatment_step.get("application_reason")
         == certificate.get("application_reason")
         and sorted(treatment_step.get("affected_runtime_bag_ids", []))
@@ -5643,6 +6176,7 @@ def _validate_action_change_certificate(
         == pair.get("source_checkpoint_state_sha256")
         and baseline_step.get("source_state_sha256")
         == pair.get("source_checkpoint_state_sha256")
+        == resolved.get("runtime_state_sha256")
     )
     snapshot_valid = (
         isinstance(certificate.get("baseline_pre_action_snapshots"), list)
@@ -5998,12 +6532,18 @@ def _label_pair(
 ) -> dict[str, Any]:
     horizon = str(pair.get("horizon"))
     action_changed = pair.get("action_changed") is True
+    resolved_descriptor = pair.get("resolved_execution_descriptor")
+    resolved_state_sha256 = (
+        resolved_descriptor.get("runtime_state_sha256")
+        if isinstance(resolved_descriptor, dict)
+        else None
+    )
     same_state = (
         pair.get("same_state_start") is True
         and pair.get("baseline_start_state_sha256")
         == pair.get("treatment_start_state_sha256")
         == pair.get("source_checkpoint_state_sha256")
-        == target.get("runtime_state_sha256")
+        == resolved_state_sha256
     )
     certificate = pair.get("committed_action_certificate")
     certificate_valid = _validate_action_change_certificate(pair, target)
@@ -6016,6 +6556,24 @@ def _label_pair(
             "descriptor_id": target["descriptor_id"],
             "kind": target["kind"],
             "clone_group_id": target["clone_group_id"],
+            "resolved_execution_descriptor_id": (
+                resolved_descriptor.get("descriptor_id")
+                if isinstance(resolved_descriptor, dict)
+                else None
+            ),
+            "resolved_execution_clone_group_id": (
+                resolved_descriptor.get("clone_group_id")
+                if isinstance(resolved_descriptor, dict)
+                else None
+            ),
+            "resolved_execution_runtime_state_sha256": (
+                resolved_state_sha256
+            ),
+            "resolved_execution_boundary_sha256": (
+                resolved_descriptor.get("boundary_sha256")
+                if isinstance(resolved_descriptor, dict)
+                else None
+            ),
             "event_ordinal": target["event_ordinal"],
             "horizon": horizon,
             "eligible_causal_label": False,
@@ -6060,6 +6618,11 @@ def _label_pair(
         }
         missing_label["label_sha256"] = _canonical_sha256(missing_label)
         return missing_label
+    _require(
+        isinstance(resolved_descriptor, dict),
+        "PAIR_BRANCH_EVIDENCE_WITHOUT_RESOLVED_DESCRIPTOR",
+    )
+    _validate_resolved_execution_descriptor(pair, target)
     horizon_complete = (
         pair.get("horizon_complete") is True
         and baseline.get("horizon_complete") is True
@@ -6481,6 +7044,18 @@ def _label_pair(
         "descriptor_id": target["descriptor_id"],
         "kind": target["kind"],
         "clone_group_id": target["clone_group_id"],
+        "resolved_execution_descriptor_id": resolved_descriptor[
+            "descriptor_id"
+        ],
+        "resolved_execution_clone_group_id": resolved_descriptor[
+            "clone_group_id"
+        ],
+        "resolved_execution_runtime_state_sha256": resolved_descriptor[
+            "runtime_state_sha256"
+        ],
+        "resolved_execution_boundary_sha256": resolved_descriptor[
+            "boundary_sha256"
+        ],
         "event_ordinal": target["event_ordinal"],
         "horizon": horizon,
         "eligible_causal_label": eligible,
@@ -6891,7 +7466,7 @@ def _weighted_effect_analysis(
         "formal_gate_passed": formal_gate_passed,
         "formal_pass_claimed": False,
         "estimand": {
-            "unit": "sealed_causal_descriptor_attempt",
+            "unit": "preregistered_local_target_address_attempt",
             "outcome": (
                 "matched-pair treatment-minus-baseline delta at the "
                 "preregistered assigned horizon"
@@ -8034,6 +8609,10 @@ def _collect_shards(
             _require(
                 pair.get("descriptor_id")
                 == target.get("descriptor_id")
+                and pair.get("target_address_id")
+                == target.get(
+                    "target_address_id", target.get("descriptor_id")
+                )
                 and pair.get("kind") == target.get("kind")
                 and pair.get("event_ordinal")
                 == target.get("event_ordinal")
