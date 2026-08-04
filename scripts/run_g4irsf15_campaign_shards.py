@@ -28,7 +28,7 @@ from typing import Any, Callable, Mapping, Sequence
 
 
 PROFILE_SCHEMA = (
-    "czr005.g4irsf15.campaign_shard_orchestrator_profile.v2"
+    "czr005.g4irsf15.campaign_shard_orchestrator_profile.v3"
 )
 HEARTBEAT_SCHEMA = (
     "czr005.g4irsf15.campaign_shard_orchestrator_heartbeat.v1"
@@ -333,6 +333,7 @@ def _windows_process_tree_pids(root_pid: int) -> list[int]:
     from ctypes import wintypes
 
     toolhelp_snapshot_process = 0x00000002
+    error_no_more_files = 18
     max_path = 260
 
     class ProcessEntry32W(ctypes.Structure):
@@ -397,9 +398,17 @@ def _windows_process_tree_pids(root_pid: int) -> list[int]:
                 process_id
             )
             entry.dwSize = ctypes.sizeof(entry)
+            ctypes.set_last_error(0)
             has_entry = bool(
                 process_next(snapshot, ctypes.byref(entry))
             )
+            if not has_entry:
+                error = ctypes.get_last_error()
+                if error != error_no_more_files:
+                    raise OSError(
+                        error,
+                        "Process32NextW failed before enumeration ended",
+                    )
     finally:
         close_handle(snapshot)
     result: list[int] = []
@@ -417,20 +426,43 @@ def _windows_process_tree_pids(root_pid: int) -> list[int]:
 
 def _windows_process_tree_memory_sample(pid: int) -> MemorySample:
     process_ids = _windows_process_tree_pids(pid)
-    samples = [
-        _windows_process_memory_sample(process_id)
-        for process_id in process_ids
-    ]
-    if not samples or any(
-        sample.current_resident_bytes is None for sample in samples
-    ):
+    root_sample = _windows_process_memory_sample(pid)
+    if root_sample.current_resident_bytes is None:
         return MemorySample(
             None,
             None,
-            "WINDOWS_PROCESS_TREE_RSS_UNAVAILABLE",
+            "WINDOWS_PROCESS_TREE_ROOT_RSS_UNAVAILABLE",
         )
+    readable_samples = [root_sample]
+    unreadable_children: list[int] = []
+    for process_id in process_ids:
+        if process_id == pid:
+            continue
+        sample = _windows_process_memory_sample(process_id)
+        if sample.current_resident_bytes is None:
+            unreadable_children.append(process_id)
+        else:
+            readable_samples.append(sample)
+    if unreadable_children:
+        # Toolhelp returns a PID snapshot, not durable process handles.  A
+        # short-lived child can exit normally between enumeration and
+        # OpenProcess.  Absence from a second, fully completed root-tree
+        # enumeration proves that it is no longer a live member; a child
+        # that remains present but unreadable still fails closed.  Children
+        # created after the initial snapshot belong to the next sample.
+        live_after = set(_windows_process_tree_pids(pid))
+        if any(
+            process_id in live_after
+            for process_id in unreadable_children
+        ):
+            return MemorySample(
+                None,
+                None,
+                "WINDOWS_PROCESS_TREE_LIVE_CHILD_RSS_UNAVAILABLE",
+            )
     current = sum(
-        int(sample.current_resident_bytes) for sample in samples
+        int(sample.current_resident_bytes)
+        for sample in readable_samples
     )
     peaks = [
         (
@@ -438,7 +470,7 @@ def _windows_process_tree_memory_sample(pid: int) -> MemorySample:
             if sample.peak_resident_bytes is not None
             else sample.current_resident_bytes
         )
-        for sample in samples
+        for sample in readable_samples
     ]
     return MemorySample(
         current,
@@ -1555,7 +1587,19 @@ def run_campaign_shards(
                 "required_complete_profile_methods": sorted(
                     PRODUCTION_RSS_METHODS
                 ),
-                "fail_closed_on_unavailable_process_or_child": True,
+                "fail_closed_on_persistent_unavailable_root_or_live_child": (
+                    True
+                ),
+                "windows_child_churn_reconciliation": {
+                    "method": (
+                        "SECOND_COMPLETE_TOOLHELP_ROOT_TREE_ENUMERATION_V1"
+                    ),
+                    "unreadable_root": "FAIL",
+                    "unreadable_child_still_in_root_tree": "FAIL",
+                    "unreadable_child_absent_from_second_complete_root_tree": (
+                        "EXCLUDE_AS_EXITED"
+                    ),
+                },
                 "unavailable_sample_retry": {
                     "max_attempts_per_cycle": (
                         RSS_UNAVAILABLE_MAX_ATTEMPTS_PER_CYCLE

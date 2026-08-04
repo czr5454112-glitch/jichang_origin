@@ -657,18 +657,31 @@
   `git rev-parse`/`git cat-file` 子进程。Toolhelp 先枚举进程树，再逐 PID 调用
   `GetProcessMemoryInfo`；子进程可在两步之间正常退出，旧实现却把“任一已枚举 child
   不可读”等同为整棵活进程树不可取证，并在同一瞬时样本上立即终止 worker。
-- 修复：orchestrator profile 升为 v2。每个逻辑采样周期先检查 root 是否已经退出；
-  对仍存活的 root 最多立即重做 3 次完整进程树采样，任一次成功即接纳，3 次都失败且
-  root 仍存活才标记 `PROCESS_RSS_CAP_UNATTESTABLE`。底层 attempt 全部计入 sample count；
-  没有任何成功 RSS 的快速退出仍 fail closed，超过 cap 和持续不可读仍停止调度并终止
-  对应 worker。producer 与独立 validator 都固定并验证重试次数、延迟和持续失败策略。
+- v2 反例：最多 3 次即时重采样先使真实 1-worker profile 的 4/4 shards 在约 955.6 秒内
+  完成；但随后的 2-worker profile 中，shard 10 启动 0.644 秒后仍连续撞中 3 个短命
+  child。该 shard 已有 6/9 次成功样本、峰值仅 52,609,024 bytes，却被正确按当时合同
+  终止；其余 shards 1/4/7 均自然返回 0。故 bounded retry 是必要缓冲，但不能把正常
+  child churn 与真正不可读的存活进程区分开，v2 profile 不能作为最终 campaign 证据。
+- 最终修复：orchestrator profile 升为 v3。单次 Windows tree sample 显式先读 root；
+  root 不可读立即失败。对初始快照中不可读的 child 只做一次完整二次枚举：若该 PID
+  仍属于 root tree，则判存活 child 不可读；若已离树，则按正常退出从该时点样本剔除。
+  `Process32NextW` 只有以 `ERROR_NO_MORE_FILES` 结束才算完整快照，其他截断错误均抛错，
+  防止把枚举失败伪装成 child 已退出。外层仍保留 3 次、0 ms 逻辑重试，处理 root 退出
+  窗口、snapshot/API 瞬态和仍存活 child 的临时读取失败；底层 attempt 全部计数，零次
+  成功样本、超过 cap 或持续不可读仍 fail closed。producer 与独立 validator 对 v3 schema
+  和重试合同对称校验。
 - 量化证据：3 秒高频短命子进程实验中，单次采样 309 个逻辑周期有 54 次假不可读
   （17.48%）；最多 3 次即时重采样的 174 个逻辑周期为 0 次不可读，最多 5 次也为
-  0/182，未显示额外收益，因此选择 3 次、0 ms。transient-recovery、persistent-failure、
-  零样本 fast-exit、cap exceeded、producer/independent contract 篡改等相关回归共
-  72/72 通过。旧失败 profile 仅作为负诊断证据；正式 pilot 必须在新提交的新 exact
-  chain 上重跑，不能把旧 shard 改写成成功。
-- 证据边界：该机制仍是操作系统观测式 RSS 取证，不是内核级 hard limit。若未来要对
+  0/182，未显示额外收益，因此保留 3 次、0 ms；2-worker 反例则直接推动了 snapshot-aware
+  child 分类。回归分别覆盖 vanished child、仍存活但不可读 child、不可读 root、二次枚举
+  异常、transient recovery、persistent failure、零样本 fast-exit、cap exceeded 以及
+  producer/independent contract 篡改；最终 G4IRSF15 聚焦回归 106/106 通过，另一次真实
+  3 秒 child-churn 压测为 219/219 成功、0 unavailable。v1/v2 profiles 只作为负诊断
+  证据；正式 pilot 必须
+  在 v3 新提交的新 exact chain 上从头重跑，不能把旧 shard 改写成成功。
+- 证据边界：该值是各采样时点“可见存活进程各自 lifetime peak working-set 之和”的最大值，
+  对成功读取的成员偏保守，但不覆盖完全落在采样间隔内、读取前已经退出的 child；因此是
+  操作系统观测式 RSS 取证，不是整个进程树生命周期的连续内核 hard limit。若未来要对
   不受信 worker 提供不可绕过的强制内存边界，应另行评估 Windows Job Object/Linux
   cgroup，并使用新 profile schema；这不是本轮可信 campaign 的阻断项。
 - 对方向的意义：去中心化 worker 会并发启动本地校验、传输或辅助进程。监控面若把正常

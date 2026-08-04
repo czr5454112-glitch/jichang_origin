@@ -698,6 +698,92 @@ def test_process_tree_sample_fails_if_any_enumerated_child_is_unreadable(
     assert linux.peak_resident_bytes is None
 
 
+def test_windows_tree_sample_accepts_only_children_proven_vanished(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    inventories = iter(([10, 11, 12], [10, 12]))
+    monkeypatch.setattr(
+        orchestrator,
+        "_windows_process_tree_pids",
+        lambda _pid: list(next(inventories)),
+    )
+    sampled_pids: list[int] = []
+
+    def sample(pid: int) -> orchestrator.MemorySample:
+        sampled_pids.append(pid)
+        if pid == 10:
+            return orchestrator.MemorySample(100, 120, "DIRECT")
+        if pid == 11:
+            return orchestrator.MemorySample(None, None, "VANISHED")
+        return orchestrator.MemorySample(200, 230, "DIRECT")
+
+    monkeypatch.setattr(
+        orchestrator, "_windows_process_memory_sample", sample
+    )
+    result = orchestrator._windows_process_tree_memory_sample(10)
+
+    assert sampled_pids[0] == 10
+    assert result.current_resident_bytes == 300
+    assert result.peak_resident_bytes == 350
+    assert result.method in orchestrator.PRODUCTION_RSS_METHODS
+
+
+def test_windows_tree_sample_rejects_unreadable_root(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        orchestrator,
+        "_windows_process_tree_pids",
+        lambda _pid: [10, 11],
+    )
+    sampled_pids: list[int] = []
+
+    def sample(pid: int) -> orchestrator.MemorySample:
+        sampled_pids.append(pid)
+        if pid == 10:
+            return orchestrator.MemorySample(None, None, "ROOT_GONE")
+        return orchestrator.MemorySample(200, 230, "DIRECT")
+
+    monkeypatch.setattr(
+        orchestrator, "_windows_process_memory_sample", sample
+    )
+    result = orchestrator._windows_process_tree_memory_sample(10)
+
+    assert sampled_pids == [10]
+    assert result.current_resident_bytes is None
+    assert result.peak_resident_bytes is None
+    assert result.method == "WINDOWS_PROCESS_TREE_ROOT_RSS_UNAVAILABLE"
+
+
+def test_windows_tree_sample_fails_if_vanished_child_check_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls = 0
+
+    def inventories(_pid: int) -> list[int]:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return [10, 11]
+        raise OSError("truncated Toolhelp enumeration")
+
+    monkeypatch.setattr(
+        orchestrator, "_windows_process_tree_pids", inventories
+    )
+    monkeypatch.setattr(
+        orchestrator,
+        "_windows_process_memory_sample",
+        lambda pid: (
+            orchestrator.MemorySample(100, 120, "DIRECT")
+            if pid == 10
+            else orchestrator.MemorySample(None, None, "UNREADABLE")
+        ),
+    )
+
+    with pytest.raises(OSError, match="truncated Toolhelp enumeration"):
+        orchestrator._windows_process_tree_memory_sample(10)
+
+
 def test_termination_escalates_after_bounded_grace_and_reap_timeout() -> None:
     class StubbornProcess:
         def __init__(self) -> None:

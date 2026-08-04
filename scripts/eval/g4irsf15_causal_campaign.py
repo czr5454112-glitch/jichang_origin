@@ -223,7 +223,7 @@ SHARD_SCHEMA = "czr005.g4irsf15.causal_pair_shard.v1"
 LABEL_SCHEMA = "czr005.g4irsf15.causal_label.v1"
 LABEL_MANIFEST_SCHEMA = "czr005.g4irsf15.causal_label_manifest.v2"
 ORCHESTRATOR_PROFILE_SCHEMA = (
-    "czr005.g4irsf15.campaign_shard_orchestrator_profile.v2"
+    "czr005.g4irsf15.campaign_shard_orchestrator_profile.v3"
 )
 ORCHESTRATOR_HEARTBEAT_SCHEMA = (
     "czr005.g4irsf15.campaign_shard_orchestrator_heartbeat.v1"
@@ -4390,9 +4390,20 @@ def _validate_orchestrator_profile(
         and sampling.get("required_complete_profile_methods")
         == sorted(PRODUCTION_RSS_METHODS)
         and sampling.get(
-            "fail_closed_on_unavailable_process_or_child"
+            "fail_closed_on_persistent_unavailable_root_or_live_child"
         )
         is True
+        and sampling.get("windows_child_churn_reconciliation")
+        == {
+            "method": (
+                "SECOND_COMPLETE_TOOLHELP_ROOT_TREE_ENUMERATION_V1"
+            ),
+            "unreadable_root": "FAIL",
+            "unreadable_child_still_in_root_tree": "FAIL",
+            "unreadable_child_absent_from_second_complete_root_tree": (
+                "EXCLUDE_AS_EXITED"
+            ),
+        }
         and sampling.get("unavailable_sample_retry")
         == {
             "max_attempts_per_cycle": (

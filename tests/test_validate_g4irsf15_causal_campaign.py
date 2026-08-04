@@ -1054,7 +1054,19 @@ def _orchestrator_profile_set_fixture(
                 "required_complete_profile_methods": sorted(
                     validator.PRODUCTION_RSS_METHODS
                 ),
-                "fail_closed_on_unavailable_process_or_child": True,
+                "fail_closed_on_persistent_unavailable_root_or_live_child": (
+                    True
+                ),
+                "windows_child_churn_reconciliation": {
+                    "method": (
+                        "SECOND_COMPLETE_TOOLHELP_ROOT_TREE_ENUMERATION_V1"
+                    ),
+                    "unreadable_root": "FAIL",
+                    "unreadable_child_still_in_root_tree": "FAIL",
+                    "unreadable_child_absent_from_second_complete_root_tree": (
+                        "EXCLUDE_AS_EXITED"
+                    ),
+                },
                 "unavailable_sample_retry": {
                     "max_attempts_per_cycle": 3,
                     "retry_delay_seconds": 0.0,
@@ -1466,6 +1478,7 @@ def test_producer_rejects_overlapping_or_incomplete_profile_coverage(
     [
         ("cap", "ORCHESTRATOR_RSS_CAP_CONTRACT_DRIFT"),
         ("retry", "ORCHESTRATOR_MEMORY_SAMPLER_CONTRACT_DRIFT"),
+        ("churn", "ORCHESTRATOR_MEMORY_SAMPLER_CONTRACT_DRIFT"),
         ("sampler", "ORCHESTRATOR_SHARD_RESULT_FAILURE"),
         ("argv", "ORCHESTRATOR_SHARD_ARGV"),
         ("inventory", "ORCHESTRATOR_PROFILE_INPUT_BINDING_DRIFT"),
@@ -1488,6 +1501,10 @@ def test_portable_profile_validator_rejects_resealed_tamper(
             profile["memory_sampling"]["unavailable_sample_retry"][
                 "max_attempts_per_cycle"
             ] = 4
+        elif field == "churn":
+            profile["memory_sampling"][
+                "windows_child_churn_reconciliation"
+            ]["unreadable_root"] = "EXCLUDE"
         elif field == "sampler":
             profile["shards"][0]["rss_sample_method"] = "FAKE_RSS"
         elif field == "argv":
