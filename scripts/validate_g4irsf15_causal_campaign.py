@@ -385,6 +385,16 @@ def is_sha256(value: Any) -> bool:
     )
 
 
+def is_git_object_id(value: Any) -> bool:
+    """Accept canonical SHA-1 or SHA-256 object IDs emitted by Git."""
+
+    return (
+        isinstance(value, str)
+        and len(value) in {40, 64}
+        and all(character in HEX for character in value)
+    )
+
+
 def producer_path_is_absolute(value: str) -> bool:
     return ntpath.isabs(value.replace("/", "\\")) or posixpath.isabs(
         value.replace("\\", "/")
@@ -771,6 +781,10 @@ def validate_build_manifest(
     git_row = manifest.get("git")
     require(isinstance(git_row, dict), "BUILD_GIT_ROW_MISSING")
     build_head = str(git_row.get("head", ""))
+    require(
+        is_git_object_id(build_head),
+        "BUILD_HEAD_NOT_PUBLICATION_ANCESTOR",
+    )
     current_head = subprocess.run(
         ["git", "-C", str(root), "rev-parse", "HEAD"],
         check=True,
@@ -790,7 +804,7 @@ def validate_build_manifest(
         check=False,
     )
     require(
-        is_sha256(build_head) and ancestor.returncode == 0,
+        ancestor.returncode == 0,
         "BUILD_HEAD_NOT_PUBLICATION_ANCESTOR",
     )
     inventory = manifest.get("transitive_source_inventory")

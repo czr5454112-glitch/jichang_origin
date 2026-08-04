@@ -579,3 +579,21 @@
 - 对方向的意义：局部 agent 可以持有和更新自己的状态叶，而全局根仅承担离线审计与
   一致性控制。证明成本将更接近发生变化的局部分区数，而不是全局订单数，更适合多站点、
   更大规划空间和更大订单规模的去中心化 MAPF 风格框架。
+
+### NI-035：provenance validator 必须区分 Git object ID 与内容 SHA-256
+
+- 状态：`RUNTIME_VERIFIED`
+- 发现：提交 `3418de2` 的 fresh exact build 与完整 scan 均成功，但首次 strict scan
+  validator 在 build/publication ancestor 门 fail closed。manifest 的 build HEAD 与
+  当前 HEAD 实际完全相同；失败来自验证器用 64 位 `is_sha256()` 检查标准 Git SHA-1
+  仓库产生的 40 位 commit object ID，导致任何合法祖先都无法进入 `merge-base` 结果门。
+- 修复：新增严格 Git object-ID 判定，只接受小写十六进制 40 位 SHA-1 或 64 位 SHA-256；
+  在调用 `git merge-base --is-ancestor` 前先拒绝空值、错误长度、非十六进制和 option-like
+  输入。artifact/content hash 仍只接受 64 位 SHA-256，二者不再混用。
+- 证据边界：第一次 scan 的 747,962-row census、6,144 地址和零 eager full-state digest
+  是有效诊断证据，但因 strict validator 未完成，不进入 pilot 或正式发布。修复会改变
+  validator/source bundle，故必须从新提交重新 exact build、scan 和严格接纳，不能修改
+  manifest 或绕过祖先门沿用旧产物。
+- 对方向的意义：去中心化 worker 与跨主机证据链会同时处理 Git identity、内容根和
+  状态承诺；明确各命名空间的算法与长度，可避免不同站点把“合法但不同类型的摘要”
+  当成损坏证据，也避免为了通过校验而弱化来源祖先关系。

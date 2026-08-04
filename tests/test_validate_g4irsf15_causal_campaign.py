@@ -1725,6 +1725,24 @@ def test_self_hash_tamper_fails_closed() -> None:
         validator.validate_self_hash(value, "fixture")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("a" * 40, True),
+        ("b" * 64, True),
+        ("a" * 39, False),
+        ("a" * 41, False),
+        ("g" * 40, False),
+        ("--help", False),
+    ],
+)
+def test_git_object_id_accepts_sha1_and_sha256_only(
+    value: str,
+    expected: bool,
+) -> None:
+    assert validator.is_git_object_id(value) is expected
+
+
 def test_dense_pair_compacts_and_independently_hydrates_losslessly() -> None:
     pair, compact, reference = _compact_fixture()
     target_key = str(compact["target_key"])
