@@ -157,6 +157,7 @@ jobs:
               --root "$frozen_root" --scope pilot --round 2
           fi
           if [ -f "$frozen_root/artifacts/datasets/g4irsf15_causal_label_manifest.json" ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py \
-              --root "$frozen_root" --scope formal
+            python scripts/run_g4irsf16_predecessor_formal_validator.py \
+              --root "$frozen_root" \
+              --validator "$frozen_root/scripts/validate_g4irsf15_causal_campaign.py"
           fi
