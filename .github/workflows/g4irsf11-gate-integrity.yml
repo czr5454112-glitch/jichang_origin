@@ -90,6 +90,7 @@ jobs:
           tests/test_g4irsf15_causal_campaign.py
           tests/test_run_g4irsf15_campaign_shards.py
           tests/test_validate_g4irsf15_causal_campaign.py
+          tests/test_validate_g4irsf15_formal_release.py
       - name: Run G4IRSF16 causal-selective and supervisor regressions
         env:
           PYTHONPATH: build-ci/python
@@ -138,7 +139,8 @@ jobs:
             ':(glob)artifacts/**/g4irsf15*' \
             ':(glob)outputs/**/g4irsf15*' \
             ':(glob)scripts/*g4irsf15*' \
-            ':(glob)scripts/**/*g4irsf15*'
+            ':(glob)scripts/**/*g4irsf15*' \
+            tests/test_validate_g4irsf15_formal_release.py
           frozen_root="${RUNNER_TEMP}/g4irsf15-causal-seal"
           git worktree add --detach "$frozen_root" "$seal"
           trap 'git worktree remove --force "$frozen_root"' EXIT
@@ -157,7 +159,6 @@ jobs:
               --root "$frozen_root" --scope pilot --round 2
           fi
           if [ -f "$frozen_root/artifacts/datasets/g4irsf15_causal_label_manifest.json" ]; then
-            python scripts/run_g4irsf16_predecessor_formal_validator.py \
-              --root "$frozen_root" \
-              --validator "$frozen_root/scripts/validate_g4irsf15_causal_campaign.py"
+            python "$frozen_root/scripts/validate_g4irsf15_formal_release.py" \
+              --root "$frozen_root" --scope formal
           fi
