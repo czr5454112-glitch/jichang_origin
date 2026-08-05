@@ -142,6 +142,8 @@ jobs:
           frozen_root="${RUNNER_TEMP}/g4irsf15-causal-seal"
           git worktree add --detach "$frozen_root" "$seal"
           trap 'git worktree remove --force "$frozen_root"' EXIT
+          python scripts/prepare_g4irsf16_predecessor_worktree.py \
+            --root "$frozen_root"
           if [ -f "$frozen_root/artifacts/datasets/g4irsf15_causal_descriptor_manifest.json" ]; then
             python scripts/validate_g4irsf15_causal_campaign.py \
               --root "$frozen_root" --scope scan
