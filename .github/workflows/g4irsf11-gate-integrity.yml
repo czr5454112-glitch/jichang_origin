@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install project and test dependencies
-        run: python -m pip install -e . pytest==9.1.0 pybind11==3.0.3
+        run: python -m pip install -e ".[research]" pytest==9.1.0 pybind11==3.0.3
       - name: Compile G4IRSF11 Python modules
         run: python -m compileall -q src/czr005 scripts/eval scripts/train
       - name: Configure native event-runtime regressions
@@ -43,11 +43,16 @@ jobs:
         run: cmake --build build-ci --config Release --parallel 2
       - name: Run native event-runtime regressions
         run: ctest --test-dir build-ci -C Release --output-on-failure
-      - name: Run fail-closed G4IRSF11 and G4IRSF12 regressions
+      # Phase-A live repository-identity tests are bound to their historical
+      # branch/upstream and do not apply to a successor PR checkout. Committed
+      # evidence and the frozen source transition are validated below.
+      - name: Run current-compatible fail-closed predecessor regressions
         env:
           PYTHONPATH: build-ci/python
         run: >-
           python -m pytest -q
+          --deselect=tests/test_g4irsf12_phase_a.py::test_phase_a_frozen_facts_and_protected_inputs_pass
+          --deselect=tests/test_g4irsf14_phase_a.py::test_phase_start_is_ancestor_and_protected_paths_pass
           tests/test_g4irsf11_fixed_map.py
           tests/test_g4irsf11_gate_integrity.py
           tests/test_g4irsf11_g4irsf10_audit.py
@@ -85,29 +90,75 @@ jobs:
           tests/test_g4irsf15_causal_campaign.py
           tests/test_run_g4irsf15_campaign_shards.py
           tests/test_validate_g4irsf15_causal_campaign.py
+          tests/test_validate_g4irsf15_formal_release.py
+      - name: Run G4IRSF16 causal-selective and supervisor regressions
+        env:
+          PYTHONPATH: build-ci/python
+        run: python -m pytest -q tests/test_g4irsf16_*.py
+      - name: Validate committed G4IRSF16 bindings and full shadow payload
+        run: python scripts/eval/finalize_g4irsf16_decision.py --validate-only
       - name: Validate committed decision schema and artifact hashes
         run: python scripts/eval/validate_g4irsf11_committed_artifacts.py
       - name: Validate committed G4IRSF14 merge-grant evidence
         run: python scripts/validate_g4irsf14_merge_grant_artifacts.py
       - name: Validate deterministic G4IRSF14 fail-closed publication
-        run: python scripts/eval/g4irsf14_fail_closed_completion.py --validate-only
-      - name: Validate immutable G4IRSF14 evidence through G4IRSF15 source transition
-        run: python scripts/validate_g4irsf15_predecessor_source_transition.py
-      - name: Validate committed G4IRSF15 census when published
+        shell: bash
         run: |
-          if [ -f artifacts/datasets/g4irsf15_causal_descriptor_manifest.json ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py --scope scan
-          fi
-      - name: Validate committed G4IRSF15 pilot when published
+          set -euo pipefail
+          frozen_root="${RUNNER_TEMP}/g4irsf14-fail-closed-seal"
+          git worktree add --detach "$frozen_root" 966a063573f0419df1324708db75211c521d59db
+          trap 'git worktree remove --force "$frozen_root"' EXIT
+          (
+            cd "$frozen_root"
+            PYTHONPATH="$frozen_root" \
+              python -m scripts.eval.g4irsf14_fail_closed_completion --validate-only
+          )
+      - name: Validate immutable G4IRSF14 evidence through sealed G4IRSF15 source transition
+        shell: bash
         run: |
-          if [ -f artifacts/datasets/g4irsf15_pilot_causal_result.json ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py --scope pilot --round 1
-          fi
-          if [ -f artifacts/datasets/g4irsf15_pilot_causal_result_round2.json ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py --scope pilot --round 2
-          fi
-      - name: Validate committed G4IRSF15 formal campaign when published
+          set -euo pipefail
+          seal=06a2d06ece617149251c1675c302e3e334a722c3
+          git diff --exit-code "$seal" HEAD -- \
+            outputs/manifests/g4irsf15_g4irsf14_source_transition.json \
+            scripts/create_g4irsf15_predecessor_source_transition.py \
+            scripts/validate_g4irsf15_predecessor_source_transition.py
+          frozen_root="${RUNNER_TEMP}/g4irsf15-transition-seal"
+          git worktree add --detach "$frozen_root" "$seal"
+          trap 'git worktree remove --force "$frozen_root"' EXIT
+          (
+            cd "$frozen_root"
+            PYTHONPATH="$frozen_root" \
+              python -m scripts.validate_g4irsf15_predecessor_source_transition
+          )
+      - name: Validate sealed G4IRSF15 causal campaign
+        shell: bash
         run: |
-          if [ -f artifacts/datasets/g4irsf15_causal_label_manifest.json ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py --scope formal
+          set -euo pipefail
+          seal=8f3106b116f2648b6fa2e30bc8960659739d3a58
+          git diff --exit-code "$seal" HEAD -- \
+            ':(glob)artifacts/**/g4irsf15*' \
+            ':(glob)outputs/**/g4irsf15*' \
+            ':(glob)scripts/*g4irsf15*' \
+            ':(glob)scripts/**/*g4irsf15*' \
+            tests/test_validate_g4irsf15_formal_release.py
+          frozen_root="${RUNNER_TEMP}/g4irsf15-causal-seal"
+          git worktree add --detach "$frozen_root" "$seal"
+          trap 'git worktree remove --force "$frozen_root"' EXIT
+          python scripts/prepare_g4irsf16_predecessor_worktree.py \
+            --root "$frozen_root"
+          if [ -f "$frozen_root/artifacts/datasets/g4irsf15_causal_descriptor_manifest.json" ]; then
+            python scripts/validate_g4irsf15_causal_campaign.py \
+              --root "$frozen_root" --scope scan
+          fi
+          if [ -f "$frozen_root/artifacts/datasets/g4irsf15_pilot_causal_result.json" ]; then
+            python scripts/validate_g4irsf15_causal_campaign.py \
+              --root "$frozen_root" --scope pilot --round 1
+          fi
+          if [ -f "$frozen_root/artifacts/datasets/g4irsf15_pilot_causal_result_round2.json" ]; then
+            python scripts/validate_g4irsf15_causal_campaign.py \
+              --root "$frozen_root" --scope pilot --round 2
+          fi
+          if [ -f "$frozen_root/artifacts/datasets/g4irsf15_causal_label_manifest.json" ]; then
+            python "$frozen_root/scripts/validate_g4irsf15_formal_release.py" \
+              --root "$frozen_root" --scope formal
           fi

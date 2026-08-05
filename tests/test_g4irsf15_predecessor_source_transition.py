@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 import json
 from pathlib import Path
 import shutil
@@ -13,12 +14,14 @@ from scripts import validate_g4irsf15_predecessor_source_transition as validator
 
 
 ROOT = Path(__file__).resolve().parents[1]
-FROZEN_COMMIT = "966a063573f0419df1324708db75211c521d59db"
+PREDECESSOR_COMMIT = "966a063573f0419df1324708db75211c521d59db"
+FROZEN_SUCCESSOR_COMMIT = "8f3106b116f2648b6fa2e30bc8960659739d3a58"
 CHANGED = {
     Path("CMakeLists.txt"),
     Path("cpp/ics_core/bindings/czr005_cpp.cpp"),
     Path("cpp/ics_core/runtime/event_driven_junction.hpp"),
 }
+HISTORICAL_STAGE_E_PATHS = CHANGED | {Path("src/czr005/cpp_backend.py")}
 
 
 def _run(repo: Path, *argv: str) -> bytes:
@@ -31,26 +34,25 @@ def _run(repo: Path, *argv: str) -> bytes:
     ).stdout
 
 
+@lru_cache(maxsize=None)
+def _git_blob(commit: str, relative: Path) -> bytes:
+    return _run(ROOT, "git", "show", f"{commit}:{relative.as_posix()}")
+
+
 def _transition_fixture(tmp_path: Path) -> tuple[Path, Path, str]:
     repo = tmp_path / "bundle"
     for relative in predecessor.REQUIRED_BUNDLE_FILES:
         target = repo / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        if relative in CHANGED:
-            target.write_bytes(
-                _run(
-                    ROOT,
-                    "git",
-                    "show",
-                    f"{FROZEN_COMMIT}:{relative.as_posix()}",
-                )
-            )
-        else:
-            shutil.copyfile(ROOT / relative, target)
+        shutil.copyfile(ROOT / relative, target)
+    for relative in (*HISTORICAL_STAGE_E_PATHS, Path(".gitattributes")):
+        target = repo / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(_git_blob(PREDECESSOR_COMMIT, relative))
     for relative in (creator.GENERATOR_PATH, creator.VALIDATOR_PATH):
         target = repo / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / relative, target)
+        target.write_bytes(_git_blob(FROZEN_SUCCESSOR_COMMIT, relative))
 
     _run(repo, "git", "init")
     _run(repo, "git", "config", "user.name", "transition-test")
@@ -65,7 +67,9 @@ def _transition_fixture(tmp_path: Path) -> tuple[Path, Path, str]:
     predecessor_commit = _run(repo, "git", "rev-parse", "HEAD").decode().strip()
 
     for relative in CHANGED:
-        shutil.copyfile(ROOT / relative, repo / relative)
+        (repo / relative).write_bytes(
+            _git_blob(FROZEN_SUCCESSOR_COMMIT, relative)
+        )
     manifest_path = repo / creator.DEFAULT_OUTPUT
     creator.create_source_transition(
         repo_root=repo,

@@ -1,0 +1,65 @@
+{
+  "final_audit": {
+    "label_support_read_for_authorization": false,
+    "row_count": 208,
+    "row_level_outcomes_used_for_selection": false,
+    "status": "SEALED_NOT_CONSUMED"
+  },
+  "i3_rare_override": {
+    "candidate_complete_campaign_authorized": false,
+    "checks": {
+      "beneficial_calibration_ge_6": false,
+      "beneficial_train_ge_24": false,
+      "beneficial_validation_ge_6": false
+    },
+    "final_audit_gate": "NOT_EVALUATED_SEALED",
+    "risk_veto_training_authorized": true,
+    "status": "I3_REROUTE_MODEL_NOT_AUTHORIZED",
+    "support": {
+      "calibration": {
+        "BENEFICIAL": 3,
+        "HARMFUL": 157,
+        "NEUTRAL": 5
+      },
+      "train": {
+        "BENEFICIAL": 13,
+        "HARMFUL": 623,
+        "NEUTRAL": 18
+      },
+      "validation": {
+        "BENEFICIAL": 3,
+        "HARMFUL": 143,
+        "NEUTRAL": 4
+      }
+    }
+  },
+  "i4_selective_hold": {
+    "checks": {
+      "beneficial_selectable_total_ge_24": false,
+      "calibration_has_beneficial": true,
+      "harmful_selectable_total_ge_128": true,
+      "train_has_beneficial": true,
+      "validation_has_beneficial": true
+    },
+    "status": "NOT_AUTHORIZED",
+    "support": {
+      "calibration": {
+        "BENEFICIAL": 3,
+        "HARMFUL": 104,
+        "NEUTRAL": 46
+      },
+      "train": {
+        "BENEFICIAL": 14,
+        "HARMFUL": 457,
+        "NEUTRAL": 207
+      },
+      "validation": {
+        "BENEFICIAL": 3,
+        "HARMFUL": 111,
+        "NEUTRAL": 50
+      }
+    }
+  },
+  "schema": "czr005.g4irsf16.learning_task_authorization.v1",
+  "selection_policy": "train_fit;calibration_thresholds;validation_promotion;final_audit_sealed"
+}

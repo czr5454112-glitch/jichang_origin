@@ -1,0 +1,60 @@
+{
+  "action_change_observed": true,
+  "canary_pass": true,
+  "early_performance_gates": {
+    "denominator": "raw_bag_original_entry_time_tth",
+    "evaluated": true,
+    "p95_not_over_off_plus_2_seconds": true,
+    "p99_not_over_off_plus_4_seconds": true,
+    "pass": true
+  },
+  "gates": {
+    "activation_trace_complete": true,
+    "artificial_batch_delay_zero": true,
+    "complete_coverage": true,
+    "diagnostic_only_honest": true,
+    "event_limit_not_reached": true,
+    "live_merge_state_integrity": true,
+    "merge_stale_arbitrations_zero": true,
+    "no_future_routes": true,
+    "off_baseline_hard_gates_pass": true,
+    "one_edge_per_arrival": true,
+    "physical_fault_edge_entry_violations_zero": true,
+    "post_commit_rollback_matches_queue_capacity_block": true,
+    "reservation_conflicts_zero": true,
+    "reservation_depth_one": true,
+    "runtime_full_astar_calls_zero": true,
+    "runtime_future_route_reads_zero": true,
+    "runtime_future_schedule_reads_zero": true,
+    "runtime_global_reservation_scans_zero": true,
+    "supervisor_full_astar_calls_zero": true,
+    "supervisor_future_inputs_zero": true,
+    "supervisor_global_scans_zero": true,
+    "supervisor_mode_echo": true,
+    "teacher_inputs_zero": true,
+    "telemetry_untruncated": true,
+    "time_limit_not_reached": true,
+    "two_step_reservations_zero": true,
+    "unresolved_deadlocks_zero": true,
+    "unsafe_edge_entries_zero": true
+  },
+  "merge_lifecycle_telemetry": {
+    "complete": true,
+    "dropped_count": 0,
+    "safety_gate": false,
+    "stored_count": 10407,
+    "transition_count": 10407,
+    "truncated": false
+  },
+  "merge_post_commit_telemetry": {
+    "expired_count": 0,
+    "queue_capacity_block_count": 0,
+    "revoked_count": 0,
+    "rollback_count": 0,
+    "rollback_matches_queue_capacity_block": true,
+    "zero_required": false
+  },
+  "mode": "closed_loop",
+  "safety_pass": true,
+  "segments": 512
+}

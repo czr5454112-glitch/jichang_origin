@@ -3104,6 +3104,151 @@ int strict_python_integer_argument(
   return static_cast<int>(converted);
 }
 
+void validate_g4irsf16_self_sha256(const py::dict& artifact) {
+  if (!artifact.contains("self_sha256") ||
+      !py::isinstance<py::str>(artifact["self_sha256"])) {
+    throw py::value_error("G4IRSF16 artifact self_sha256 missing");
+  }
+  py::dict payload =
+      py::cast<py::dict>(artifact.attr("copy")());
+  const std::string claimed =
+      py::cast<std::string>(payload.attr("pop")("self_sha256"));
+  const py::object json = py::module_::import("json");
+  const py::tuple separators = py::make_tuple(",", ":");
+  const std::string canonical = py::cast<std::string>(
+      json.attr("dumps")(
+          payload,
+          py::arg("ensure_ascii") = false,
+          py::arg("sort_keys") = true,
+          py::arg("separators") = separators,
+          py::arg("allow_nan") = false));
+  const std::string observed =
+      czr005::ics::canonical_map2_detail::sha256_hex(canonical);
+  if (claimed != observed) {
+    throw py::value_error("G4IRSF16 artifact self_sha256 mismatch");
+  }
+}
+
+czr005::ics::G4IRSF16SelectiveLinearModelConfig
+g4irsf16_model_config_from_artifact(
+    const py::dict& artifact) {
+  czr005::ics::G4IRSF16SelectiveLinearModelConfig config;
+  if (artifact.empty()) {
+    return config;
+  }
+  // This validation runs exactly once at binding setup. Native per-decision
+  // inference performs no Python callback.
+  validate_g4irsf16_self_sha256(artifact);
+  const auto section = [&](const char* name) {
+    if (!artifact.contains(name) ||
+        !py::isinstance<py::dict>(artifact[name])) {
+      throw py::value_error(
+          std::string("G4IRSF16 model section missing: ") + name);
+    }
+    return py::reinterpret_borrow<py::dict>(artifact[name]);
+  };
+  const auto required_string = [&](const char* name) {
+    if (!artifact.contains(name) ||
+        !py::isinstance<py::str>(artifact[name])) {
+      throw py::value_error(
+          std::string("G4IRSF16 model string missing: ") + name);
+    }
+    return py::cast<std::string>(artifact[name]);
+  };
+  config.authorized = true;
+  config.self_sha256_verified = true;
+  config.schema = required_string("schema");
+  config.kind = required_string("kind");
+  config.action = required_string("action");
+  config.artifact_sha256 = required_string("self_sha256");
+  if (!artifact.contains("feature_names")) {
+    throw py::value_error("G4IRSF16 feature_names missing");
+  }
+  config.feature_names =
+      py::cast<std::vector<std::string>>(artifact["feature_names"]);
+  const py::dict normalization = section("normalization");
+  const py::dict bounds = section("training_bounds");
+  const py::dict heads = section("heads");
+  const py::dict thresholds = section("thresholds");
+  config.mean =
+      py::cast<std::vector<double>>(normalization["mean"]);
+  config.scale =
+      py::cast<std::vector<double>>(normalization["scale"]);
+  config.feature_min =
+      py::cast<std::vector<double>>(bounds["min"]);
+  config.feature_max =
+      py::cast<std::vector<double>>(bounds["max"]);
+  config.benefit_logit =
+      py::cast<std::vector<std::vector<double>>>(
+          heads["benefit_logit"]);
+  config.harmful_logit =
+      py::cast<std::vector<std::vector<double>>>(
+          heads["harmful_logit"]);
+  config.risk_adjusted_utility_seconds =
+      py::cast<std::vector<std::vector<double>>>(
+          heads["risk_adjusted_utility_seconds"]);
+  config.benefit_probability_lcb_threshold =
+      py::cast<double>(thresholds["benefit_probability_lcb"]);
+  config.harmful_probability_ucb_budget =
+      py::cast<double>(thresholds["harmful_probability_ucb"]);
+  config.utility_lcb_margin_seconds =
+      py::cast<double>(thresholds["utility_lcb_margin_seconds"]);
+  // Native validation is repeated inside EventDrivenJunctionRuntime so direct
+  // pybind callers and the Python wrapper share one fail-closed authority.
+  config.validate();
+  return config;
+}
+
+czr005::ics::G4IRSF16I4DiagnosticRuleConfig
+g4irsf16_i4_rule_config_from_bundle(const py::dict& bundle) {
+  czr005::ics::G4IRSF16I4DiagnosticRuleConfig config;
+  if (bundle.empty()) {
+    return config;
+  }
+  validate_g4irsf16_self_sha256(bundle);
+  const auto require_dict = [](const py::handle& owner,
+                               const char* name) {
+    const auto mapping =
+        py::reinterpret_borrow<py::dict>(owner);
+    if (!mapping.contains(name) ||
+        !py::isinstance<py::dict>(mapping[name])) {
+      throw py::value_error(
+          std::string("G4IRSF16 rule section missing: ") + name);
+    }
+    return py::reinterpret_borrow<py::dict>(mapping[name]);
+  };
+  if (!bundle.contains("schema") ||
+      !bundle.contains("self_sha256") ||
+      !bundle.contains("i4")) {
+    throw py::value_error("G4IRSF16 rule bundle identity missing");
+  }
+  const py::dict i4 = require_dict(bundle, "i4");
+  if (!i4.contains("promotion_authorized") ||
+      !PyBool_Check(i4["promotion_authorized"].ptr()) ||
+      py::cast<bool>(i4["promotion_authorized"]) ||
+      py::cast<std::string>(i4["selected_rule"]) != "H0") {
+    throw py::value_error(
+        "G4IRSF16 diagnostic canary must preserve H0/no-promotion");
+  }
+  const py::dict canary = require_dict(i4, "diagnostic_canary");
+  const py::dict parameters = require_dict(canary, "parameters");
+  config.authorized = true;
+  config.schema = py::cast<std::string>(bundle["schema"]);
+  config.artifact_sha256 =
+      py::cast<std::string>(bundle["self_sha256"]);
+  config.rule = py::cast<std::string>(canary["rule"]);
+  config.authorization =
+      py::cast<std::string>(canary["authorization"]);
+  config.f2_model_margin_max =
+      py::cast<double>(parameters["f2_model_margin_max"]);
+  config.target_queue_length_min =
+      py::cast<double>(parameters["target_queue_length_min"]);
+  config.target_scheduled_incoming_min =
+      py::cast<double>(parameters["target_scheduled_incoming_min"]);
+  config.validate();
+  return config;
+}
+
 py::dict g4irsf11_event_runtime_summary_row(
     const czr005::ics::EventRuntimeSummary& summary,
     bool include_destination_merge_grants,
@@ -3702,6 +3847,18 @@ py::dict g4irsf11_event_runtime_summary_row(
           summary.merge_grant_exact_slot_no_future_shift;
       row["merge_grant_lifecycle_complete"] =
           summary.merge_grant_lifecycle_dropped_count == 0;
+      row["merge_grant_lifecycle_telemetry_truncated"] =
+          summary.merge_grant_lifecycle_dropped_count > 0;
+      row["merge_grant_active_state_integrity_pass"] =
+          summary.merge_grant_conservation_holds &&
+          summary.merge_grant_active_bijection_holds &&
+          summary.merge_grant_runtime_owned_capability &&
+          summary.merge_grant_exact_slot_no_future_shift &&
+          summary.merge_grant_final_active_unconsumed == 0 &&
+          summary.merge_grant_outstanding_request_count == 0;
+      row["merge_grant_post_commit_capacity_compensation_pass"] =
+          summary.merge_grant_post_commit_rollback_count ==
+          summary.merge_grant_queue_capacity_block_count;
       row["merge_grant_protocol_integrity_pass"] =
           summary.merge_grant_conservation_holds &&
           summary.merge_grant_active_bijection_holds &&
@@ -3715,6 +3872,57 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["safe_execution_pass"] = summary.reservation_conflicts == 0 &&
                                  summary.runtime_full_astar_calls == 0 &&
                                  summary.physical_fault_edge_entry_violation_count == 0;
+  if (!summary.g4irsf16_supervisor_mode.empty()) {
+    row["g4irsf16_supervisor_mode"] =
+        summary.g4irsf16_supervisor_mode;
+    row["g4irsf16_policy_kind"] = summary.g4irsf16_policy_kind;
+    row["g4irsf16_i3_model_sha256"] =
+        summary.g4irsf16_i3_model_sha256;
+    row["g4irsf16_i4_model_sha256"] =
+        summary.g4irsf16_i4_model_sha256;
+    row["g4irsf16_i4_policy_id"] =
+        summary.g4irsf16_i4_policy_id;
+    row["g4irsf16_i4_policy_authorization"] =
+        summary.g4irsf16_i4_policy_authorization;
+    row["g4irsf16_diagnostic_only"] =
+        summary.g4irsf16_diagnostic_only;
+    row["g4irsf16_promotion_authorized"] =
+        summary.g4irsf16_promotion_authorized;
+    row["g4irsf16_supervisor_evaluation_count"] = py::int_(
+        summary.g4irsf16_supervisor_evaluation_count);
+    row["g4irsf16_i3_candidate_evaluation_count"] = py::int_(
+        summary.g4irsf16_i3_candidate_evaluation_count);
+    row["g4irsf16_i4_evaluation_count"] = py::int_(
+        summary.g4irsf16_i4_evaluation_count);
+    row["g4irsf16_i3_activation_count"] = py::int_(
+        summary.g4irsf16_i3_activation_count);
+    row["g4irsf16_i4_activation_count"] = py::int_(
+        summary.g4irsf16_i4_activation_count);
+    row["g4irsf16_i3_applied_count"] = py::int_(
+        summary.g4irsf16_i3_applied_count);
+    row["g4irsf16_i4_applied_count"] = py::int_(
+        summary.g4irsf16_i4_applied_count);
+    row["g4irsf16_shadow_proposal_count"] = py::int_(
+        summary.g4irsf16_shadow_proposal_count);
+    row["g4irsf16_action_change_count"] = py::int_(
+        summary.g4irsf16_action_change_count);
+    row["g4irsf16_safe_hold_count"] = py::int_(
+        summary.g4irsf16_safe_hold_count);
+    row["g4irsf16_fault_recovery_count"] = py::int_(
+        summary.g4irsf16_fault_recovery_count);
+    row["g4irsf16_runtime_global_scan_count"] =
+        summary.g4irsf16_runtime_global_scan_count;
+    row["g4irsf16_future_route_input_count"] =
+        summary.g4irsf16_future_route_input_count;
+    row["g4irsf16_future_schedule_input_count"] =
+        summary.g4irsf16_future_schedule_input_count;
+    row["g4irsf16_posthoc_input_count"] =
+        summary.g4irsf16_posthoc_input_count;
+    row["g4irsf16_full_astar_call_count"] =
+        summary.g4irsf16_full_astar_call_count;
+    row["g4irsf16_local_feature_scope"] =
+        "current_node_one_hop_candidates_bounded_history_static_potential";
+  }
   return row;
 }
 
@@ -4057,6 +4265,62 @@ py::list g4irsf11_event_decision_rows(
     row["scorer_raw_fallback_disagreement"] =
         scorer_raw_fallback_disagreement;
     row["candidate_ordering"] = "next_node_ascending";
+    if (decision.g4irsf16_evaluated) {
+      const auto finite_or_none = [](double value) -> py::object {
+        return std::isfinite(value) ? py::cast(value) : py::none();
+      };
+      py::dict supervisor;
+      supervisor["mode"] = decision.g4irsf16_mode;
+      supervisor["baseline_next"] =
+          decision.g4irsf16_baseline_next >= 0
+              ? py::cast(decision.g4irsf16_baseline_next)
+              : py::none();
+      supervisor["proposed_next"] =
+          decision.g4irsf16_proposed_next >= 0
+              ? py::cast(decision.g4irsf16_proposed_next)
+              : py::none();
+      supervisor["proposed_hold"] =
+          decision.g4irsf16_proposed_hold;
+      supervisor["action_changed"] =
+          decision.g4irsf16_action_changed;
+      supervisor["state"] = decision.g4irsf16_state;
+      supervisor["action"] = decision.g4irsf16_action;
+      supervisor["source"] = decision.g4irsf16_source;
+      supervisor["reason"] = decision.g4irsf16_reason;
+      supervisor["node_generation"] =
+          py::int_(decision.g4irsf16_node_generation);
+      supervisor["state_generation"] =
+          py::int_(decision.g4irsf16_state_generation);
+      py::dict i3;
+      i3["candidate"] = decision.g4irsf16_i3_candidate >= 0
+                              ? py::cast(decision.g4irsf16_i3_candidate)
+                              : py::none();
+      i3["activation"] = decision.g4irsf16_i3_activation;
+      i3["benefit_probability_lcb"] =
+          decision.g4irsf16_i3_benefit_lcb;
+      i3["harmful_probability_ucb"] =
+          decision.g4irsf16_i3_harmful_ucb;
+      i3["utility_lcb_seconds"] = finite_or_none(
+          decision.g4irsf16_i3_utility_lcb_seconds);
+      i3["ood"] = decision.g4irsf16_i3_ood;
+      i3["reason"] = decision.g4irsf16_i3_model_reason;
+      py::dict i4;
+      i4["activation"] = decision.g4irsf16_i4_activation;
+      i4["diagnostic_only"] =
+          decision.g4irsf16_i4_diagnostic_only;
+      i4["policy_id"] = decision.g4irsf16_i4_policy_id;
+      i4["benefit_probability_lcb"] =
+          decision.g4irsf16_i4_benefit_lcb;
+      i4["harmful_probability_ucb"] =
+          decision.g4irsf16_i4_harmful_ucb;
+      i4["utility_lcb_seconds"] = finite_or_none(
+          decision.g4irsf16_i4_utility_lcb_seconds);
+      i4["ood"] = decision.g4irsf16_i4_ood;
+      i4["reason"] = decision.g4irsf16_i4_model_reason;
+      supervisor["i3"] = std::move(i3);
+      supervisor["i4"] = std::move(i4);
+      row["g4irsf16_supervisor"] = std::move(supervisor);
+    }
     row["metadata"] = std::move(metadata);
     rows.append(std::move(row));
   }
@@ -4885,7 +5149,11 @@ py::dict g4irsf11_event_runtime_from_records(
     int opportunity_trace_limit,
     const std::string& merge_grant_rule,
     const py::object& merge_grant_max_pending_requests_value,
-    const py::object& merge_grant_lifecycle_limit_value) {
+    const py::object& merge_grant_lifecycle_limit_value,
+    const std::string& g4irsf16_supervisor_mode,
+    const py::dict& g4irsf16_i3_model_artifact,
+    const py::dict& g4irsf16_i4_model_artifact,
+    const py::dict& g4irsf16_rule_bundle) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -5044,6 +5312,17 @@ py::dict g4irsf11_event_runtime_from_records(
       merge_grant_max_pending_requests;
   config.merge_grant_lifecycle_limit =
       merge_grant_lifecycle_limit;
+  config.g4irsf16_supervisor_mode =
+      g4irsf16_supervisor_mode;
+  config.g4irsf16_i3_model =
+      g4irsf16_model_config_from_artifact(
+          g4irsf16_i3_model_artifact);
+  config.g4irsf16_i4_model =
+      g4irsf16_model_config_from_artifact(
+          g4irsf16_i4_model_artifact);
+  config.g4irsf16_i4_diagnostic_rule =
+      g4irsf16_i4_rule_config_from_bundle(
+          g4irsf16_rule_bundle);
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -5259,6 +5538,29 @@ py::dict g4irsf11_event_runtime_from_records(
       trace_context["merge_grant_lifecycle_storage"] =
           "bounded_prefix_transition_rows_with_total_stored_dropped_counters";
     }
+  }
+  if (!result.summary.g4irsf16_supervisor_mode.empty()) {
+    trace_context["g4irsf16_supervisor_mode"] =
+        result.summary.g4irsf16_supervisor_mode;
+    trace_context["g4irsf16_policy_kind"] =
+        result.summary.g4irsf16_policy_kind;
+    trace_context["g4irsf16_diagnostic_only"] =
+        result.summary.g4irsf16_diagnostic_only;
+    trace_context["g4irsf16_promotion_authorized"] =
+        result.summary.g4irsf16_promotion_authorized;
+    trace_context["g4irsf16_i4_policy_id"] =
+        result.summary.g4irsf16_i4_policy_id;
+    trace_context["g4irsf16_model_feature_count"] =
+        static_cast<int>(
+            czr005::ics::kG4IRSF16DeploymentFeatureCount);
+    trace_context["g4irsf16_model_feature_scope"] =
+        "strict_29_id_free_no_downstream_pressure_no_physical_fault";
+    trace_context["g4irsf16_physical_fault_owner"] =
+        "hard_shield_and_supervisor_state_only_never_model_input";
+    trace_context["g4irsf16_i4_hold_semantics"] =
+        "one_natural_service_opportunity_then_same_generation_reevaluation";
+    trace_context["g4irsf16_runtime_global_scan_count"] = 0;
+    trace_context["g4irsf16_future_route_input_count"] = 0;
   }
 
   py::dict payload;
@@ -5551,7 +5853,12 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("merge_grant_rule") =
                  std::string("M1"),
              py::arg("merge_grant_max_pending_requests") = 64,
-             py::arg("merge_grant_lifecycle_limit") = 1024);
+             py::arg("merge_grant_lifecycle_limit") = 1024,
+             py::arg("g4irsf16_supervisor_mode") =
+                 std::string("off"),
+             py::arg("g4irsf16_i3_model_artifact") = py::dict(),
+             py::arg("g4irsf16_i4_model_artifact") = py::dict(),
+             py::arg("g4irsf16_rule_bundle") = py::dict());
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

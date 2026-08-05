@@ -1,0 +1,114 @@
+{
+  "actionable_pivot": {
+    "evidence": {
+      "matched_event_semantics": "E4_batch_plus_destination_merge_request",
+      "network_delta_seconds_per_raw_bag": -0.058517599019971556,
+      "segments": 8192,
+      "source_wait_delta_seconds_per_raw_bag": 0.14955083707635541,
+      "total_mean_delta_seconds_per_raw_bag": 0.09103323805575769
+    },
+    "explanation": "At 8,192 matched E4 segments H5 worsened total mean while network time improved; the loss was carried by source wait. This prioritizes an I1 source-ordering causal campaign over another I3/I4 threshold sweep. It does not authorize an I1 runtime action.",
+    "g2": {
+      "gate_evaluated": false,
+      "reason": "No current G4IRSF16 causal panel establishes that merge/service opportunities have enough beneficial concentration to authorize G2.",
+      "required_gate": "MERGE_SERVICE_CAUSAL_CONCENTRATION_GATE",
+      "status": "BLOCKED_PENDING_CAUSAL_CONCENTRATION_GATE"
+    },
+    "priority": "I1_SOURCE_ORDERING",
+    "status": "ACTIONABLE_HYPOTHESIS_NOT_AUTHORIZATION"
+  },
+  "decision": {
+    "expansion_enabled": false,
+    "final_audit": "SEALED_NOT_CONSUMED",
+    "full_43603_closed_loop_candidate": {
+      "allowed_terminal_path": true,
+      "reason": "The formal offline model gate rejected both deployable selective learning paths; running an unauthorized full-scale candidate would not create valid promotion evidence.",
+      "status": "NOT_RUN_FORMAL_OFFLINE_MODEL_NO_GO"
+    },
+    "learned_expansion": "CLOSED",
+    "offline_learning": "CAUSAL_LEARNING_MODEL_NO_GO",
+    "scale_expansion": "CLOSED",
+    "selected_runtime_policy": "F2_EXACT_H0_R0"
+  },
+  "full_shadow_evidence": {
+    "closed_loop_claim_allowed": false,
+    "model_actions_executed": false,
+    "path": "outputs/reports/g4irsf16_full_shadow.json",
+    "prediction_stream": {
+      "compressed_byte_count": 47417767,
+      "compressed_sha256": "4e1749a96f7207b8ec493b256352c8bb62d50a66380fed0624bcba2aa1830714",
+      "full_stream_scanned": true,
+      "path": "outputs/tables/g4irsf16_shadow_predictions.jsonl.zst",
+      "row_count": 522871,
+      "uncompressed_byte_count": 905011837,
+      "uncompressed_sha256": "5da011df7b82523112ffb96003306b857189a566d22202299ffbd66fc53224a1",
+      "unique_decision_ordinal_count": 522871
+    },
+    "segments": 43603,
+    "status": "PASS_FROZEN_F2_FULL_SHADOW"
+  },
+  "h5_diagnostic_canary": {
+    "authorization": "8192_DIAGNOSTIC_ONLY_NOT_PROMOTED",
+    "claim_boundary": "Safety/plumbing evidence only; H5 is neither learned nor promoted.",
+    "frozen_scorer_sha256": "4a058dee0bdd17e15f67d1943a551822847d0c066ac3cf03a5da71a07731bbca",
+    "hard_gate_ladder_pass": true,
+    "largest_scale_delta_seconds_per_raw_bag": 0.09103323805575769,
+    "largest_scale_interpretation": "MATCHED_E4_H5_MEAN_WORSE_NOT_A_BENEFIT",
+    "largest_scale_segments": 8192,
+    "native_binary_sha256": "c4389d2ce460a8c272d1d9e812f892452747c7a9e773d70b6ffa4141ef7f3402",
+    "promotion_authorized": false,
+    "rule_bundle_self_sha256": "865aabd4115b84361e2c73780a8c77f3fb464b0b41bc0c950b2ce05c0a99c96b"
+  },
+  "mechanism_boundary": {
+    "claim": "Historical E0 means are context only and cannot establish a strict win for an E4 execution.",
+    "cross_mechanism_strict_win_allowed": false,
+    "g4irsf16_labels_shadow_and_canary": "E4_batch_plus_destination_merge_request",
+    "historical_f2_and_v2_safe": "E0",
+    "historical_f2_mean_minutes": 41.514218717973414,
+    "historical_v2_safe_mean_minutes": 41.49530698780892
+  },
+  "model_bindings": {
+    "I3": {
+      "deployment_status": "RISK_VETO_ONLY_DIAGNOSTIC",
+      "model_gate_status": "I3_REROUTE_MODEL_NOT_AUTHORIZED",
+      "path": "artifacts/models/g4irsf16_i3_risk_veto.json",
+      "runtime_action_authorized": false,
+      "self_sha256": "d43706af0826c1ab772559b6549a28cd471efe4085f25f1006537cdff0160cb1"
+    },
+    "I4": {
+      "deployment_status": "SUPPORT_DIAGNOSTIC_ONLY_NOT_AUTHORIZED",
+      "full_shadow_sha_match": true,
+      "model_gate_status": "I4_SELECTIVE_MODEL_NO_GO",
+      "path": "artifacts/models/g4irsf16_i4_d0_calibrated_logistic.json",
+      "self_sha256": "a48d2a344cd0537b9b15cab64fd73bc969e6be9b1182348eb73ba0a2182c17ed",
+      "support_authorization_status": "NOT_AUTHORIZED"
+    },
+    "externality": {
+      "model_gate_status": "DIAGNOSTIC_SMALL_HEAD_NOT_INDEPENDENTLY_PROMOTED",
+      "path": "artifacts/models/g4irsf16_externality_risk_balanced.json",
+      "runtime_action_authorized": false,
+      "self_sha256": "805feecd87ee31b7ebac4d846ba9f03273c7c297b3eddd76048cf631fdf2daf8"
+    }
+  },
+  "offline_evidence": {
+    "final_audit_status": "SEALED_NOT_CONSUMED",
+    "i3_status": "I3_REROUTE_MODEL_NOT_AUTHORIZED",
+    "i4_status": "I4_SELECTIVE_MODEL_NO_GO",
+    "overall_status": "CAUSAL_LEARNING_MODEL_NO_GO",
+    "path": "artifacts/gates/g4irsf16_offline_model_gate.json"
+  },
+  "output_bindings": {
+    "closed_loop_ladder": "outputs/tables/g4irsf16_closed_loop_ladder.csv",
+    "closed_loop_report": "outputs/reports/g4irsf16_closed_loop_ladder.md",
+    "joint_ab": "outputs/tables/g4irsf16_original_scale_joint_ab.csv",
+    "joint_decision_report": "outputs/reports/g4irsf16_original_scale_joint_decision.md"
+  },
+  "schema": "czr005.g4irsf16.final_decision.v1",
+  "status": "CAUSAL_LEARNING_NO_GO_WITH_ACTIONABLE_PIVOT",
+  "supervisor_contract_regression": {
+    "full_closed_loop_performance_claim": false,
+    "path": "outputs/reports/g4irsf16_tail_pibt_fault_contract_summary.json",
+    "scope": "SUPERVISOR_CONTRACT_REGRESSION_NOT_FULL_CLOSED_LOOP_TTH",
+    "status": "PASS"
+  }
+}

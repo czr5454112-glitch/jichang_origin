@@ -1,0 +1,153 @@
+{
+  "externality": {
+    "b1_tail_budget_status": "NOT_EVALUATED_NO_CVAR_UCB_HEAD",
+    "externality_nonempty_ece": 0.19330919966559057,
+    "final_audit": "SEALED_NOT_CONSUMED",
+    "promotion_authorized": false,
+    "risk_budgets": {
+      "B0_conservative": {
+        "cvar95_seconds": 0.5,
+        "externality_probability_ucb": 0.1,
+        "promotion_allowed": true
+      },
+      "B1_balanced": {
+        "cvar95_seconds": 2.0,
+        "externality_probability_ucb": 0.25,
+        "promotion_allowed": true
+      },
+      "B2_permissive_diagnostic": {
+        "cvar95_seconds": 10.0,
+        "externality_probability_ucb": 0.5,
+        "promotion_allowed": false
+      }
+    },
+    "status": "DIAGNOSTIC_SMALL_HEAD_NOT_INDEPENDENTLY_PROMOTED",
+    "validation": {
+      "activation_count": 0,
+      "activation_coverage": 0.0,
+      "beneficial_activation_count": 0,
+      "beneficial_precision": 0.0,
+      "beneficial_recall": 0.0,
+      "direct_benefit_mean_seconds": null,
+      "direct_benefit_sum_seconds": 0.0,
+      "externality_cvar95_max_seconds": null,
+      "externality_cvar95_mean_seconds": null,
+      "harmful_activation_count": 0,
+      "harmful_activation_rate": 0.0,
+      "high_confidence_harmful_precision": 0.0,
+      "neutral_activation_count": 0,
+      "neutral_activation_rate": 0.0,
+      "risk_adjusted_utility_lcb_seconds": null,
+      "risk_adjusted_utility_mean_seconds": null,
+      "risk_adjusted_utility_sum_seconds": 0.0,
+      "row_count": 45,
+      "target_panel_abstention_rate": 1.0
+    }
+  },
+  "final_audit": {
+    "label_support_read_for_authorization": false,
+    "row_count": 208,
+    "row_level_outcomes_used_for_selection": false,
+    "status": "SEALED_NOT_CONSUMED"
+  },
+  "i3_rare_override": {
+    "candidate_complete_campaign_authorized": false,
+    "checks": {
+      "beneficial_calibration_ge_6": false,
+      "beneficial_train_ge_24": false,
+      "beneficial_validation_ge_6": false
+    },
+    "final_audit_gate": "NOT_EVALUATED_SEALED",
+    "risk_veto_training_authorized": true,
+    "status": "I3_REROUTE_MODEL_NOT_AUTHORIZED",
+    "support": {
+      "calibration": {
+        "BENEFICIAL": 3,
+        "HARMFUL": 157,
+        "NEUTRAL": 5
+      },
+      "train": {
+        "BENEFICIAL": 13,
+        "HARMFUL": 623,
+        "NEUTRAL": 18
+      },
+      "validation": {
+        "BENEFICIAL": 3,
+        "HARMFUL": 143,
+        "NEUTRAL": 4
+      }
+    }
+  },
+  "i3_risk_veto": {
+    "status": "TRAINED_DIAGNOSTIC_NOT_AN_OVERRIDE_AUTHORIZATION",
+    "validation": {
+      "activation_count": 1,
+      "activation_coverage": 0.006666666666666667,
+      "beneficial_activation_count": 1,
+      "beneficial_precision": 1.0,
+      "beneficial_recall": 0.3333333333333333,
+      "direct_benefit_mean_seconds": 1.0999999999985448,
+      "direct_benefit_sum_seconds": 1.0999999999985448,
+      "externality_cvar95_max_seconds": 0.7056050000010146,
+      "externality_cvar95_mean_seconds": 0.7056050000010146,
+      "harmful_activation_count": 0,
+      "harmful_activation_rate": 0.0,
+      "high_confidence_harmful_precision": 0.0,
+      "neutral_activation_count": 0,
+      "neutral_activation_rate": 0.0,
+      "risk_adjusted_utility_lcb_seconds": null,
+      "risk_adjusted_utility_mean_seconds": -2.889011152744129,
+      "risk_adjusted_utility_sum_seconds": -2.889011152744129,
+      "row_count": 150,
+      "target_panel_abstention_rate": 0.9933333333333333
+    }
+  },
+  "i4": {
+    "checks": {
+      "activation_support": false,
+      "beneficial_precision": false,
+      "coverage_lower": false,
+      "coverage_upper": true,
+      "ece": true,
+      "harmful_activation_rate": true,
+      "high_confidence_harmful_precision": true,
+      "utility_lcb": false
+    },
+    "deployment_authorized": false,
+    "ece": 0.0032548009038608355,
+    "metrics": {
+      "activation_count": 0,
+      "activation_coverage": 0.0,
+      "beneficial_activation_count": 0,
+      "beneficial_precision": 0.0,
+      "beneficial_recall": 0.0,
+      "direct_benefit_mean_seconds": null,
+      "direct_benefit_sum_seconds": 0.0,
+      "externality_cvar95_max_seconds": null,
+      "externality_cvar95_mean_seconds": null,
+      "harmful_activation_count": 0,
+      "harmful_activation_rate": 0.0,
+      "high_confidence_harmful_precision": 0.0,
+      "neutral_activation_count": 0,
+      "neutral_activation_rate": 0.0,
+      "risk_adjusted_utility_lcb_seconds": null,
+      "risk_adjusted_utility_mean_seconds": null,
+      "risk_adjusted_utility_sum_seconds": 0.0,
+      "row_count": 164,
+      "target_panel_abstention_rate": 1.0
+    },
+    "status": "I4_SELECTIVE_MODEL_NO_GO",
+    "thresholds": {
+      "activation_coverage_max": 0.05,
+      "activation_coverage_min": 0.0025,
+      "beneficial_precision_min": 0.9,
+      "ece_max": 0.08,
+      "harmful_activation_rate_max": 0.005,
+      "high_confidence_harmful_rate_max": 0.005,
+      "risk_adjusted_utility_lcb_min_exclusive": 0.0
+    },
+    "training_authorization_status": "NOT_AUTHORIZED"
+  },
+  "overall_status": "CAUSAL_LEARNING_MODEL_NO_GO",
+  "schema": "czr005.g4irsf16.offline_model_gate.v1"
+}
