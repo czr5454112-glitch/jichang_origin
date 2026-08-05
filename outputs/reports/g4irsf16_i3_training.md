@@ -1,0 +1,5 @@
+# G4IRSF16 I3 risk-veto training
+
+`I3_REROUTE_MODEL_NOT_AUTHORIZED` is binding. A small harmfulness/risk diagnostic was trained, but it cannot authorize an override and no candidate-complete or listwise campaign was started.
+
+Validation diagnostic: `{"activation_count": 1, "activation_coverage": 0.006666666666666667, "beneficial_activation_count": 1, "beneficial_precision": 1.0, "beneficial_recall": 0.3333333333333333, "direct_benefit_mean_seconds": 1.0999999999985448, "direct_benefit_sum_seconds": 1.0999999999985448, "externality_cvar95_max_seconds": 0.7056050000010146, "externality_cvar95_mean_seconds": 0.7056050000010146, "harmful_activation_count": 0, "harmful_activation_rate": 0.0, "high_confidence_harmful_precision": 0.0, "neutral_activation_count": 0, "neutral_activation_rate": 0.0, "risk_adjusted_utility_lcb_seconds": null, "risk_adjusted_utility_mean_seconds": -2.889011152744129, "risk_adjusted_utility_sum_seconds": -2.889011152744129, "row_count": 150, "target_panel_abstention_rate": 0.9933333333333333}`
