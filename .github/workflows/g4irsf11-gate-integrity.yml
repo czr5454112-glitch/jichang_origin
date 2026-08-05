@@ -129,21 +129,32 @@ jobs:
             PYTHONPATH="$frozen_root" \
               python -m scripts.validate_g4irsf15_predecessor_source_transition
           )
-      - name: Validate committed G4IRSF15 census when published
+      - name: Validate sealed G4IRSF15 causal campaign
+        shell: bash
         run: |
-          if [ -f artifacts/datasets/g4irsf15_causal_descriptor_manifest.json ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py --scope scan
-          fi
-      - name: Validate committed G4IRSF15 pilot when published
-        run: |
-          if [ -f artifacts/datasets/g4irsf15_pilot_causal_result.json ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py --scope pilot --round 1
-          fi
-          if [ -f artifacts/datasets/g4irsf15_pilot_causal_result_round2.json ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py --scope pilot --round 2
-          fi
-      - name: Validate committed G4IRSF15 formal campaign when published
-        run: |
-          if [ -f artifacts/datasets/g4irsf15_causal_label_manifest.json ]; then
-            python scripts/validate_g4irsf15_causal_campaign.py --scope formal
-          fi
+          set -euo pipefail
+          seal=8f3106b116f2648b6fa2e30bc8960659739d3a58
+          git diff --exit-code "$seal" HEAD -- \
+            ':(glob)artifacts/**/g4irsf15*' \
+            ':(glob)outputs/**/g4irsf15*' \
+            ':(glob)scripts/*g4irsf15*' \
+            ':(glob)scripts/**/*g4irsf15*'
+          frozen_root="${RUNNER_TEMP}/g4irsf15-causal-seal"
+          git worktree add --detach "$frozen_root" "$seal"
+          trap 'git worktree remove --force "$frozen_root"' EXIT
+          (
+            cd "$frozen_root"
+            export PYTHONPATH="$frozen_root"
+            if [ -f artifacts/datasets/g4irsf15_causal_descriptor_manifest.json ]; then
+              python -m scripts.validate_g4irsf15_causal_campaign --scope scan
+            fi
+            if [ -f artifacts/datasets/g4irsf15_pilot_causal_result.json ]; then
+              python -m scripts.validate_g4irsf15_causal_campaign --scope pilot --round 1
+            fi
+            if [ -f artifacts/datasets/g4irsf15_pilot_causal_result_round2.json ]; then
+              python -m scripts.validate_g4irsf15_causal_campaign --scope pilot --round 2
+            fi
+            if [ -f artifacts/datasets/g4irsf15_causal_label_manifest.json ]; then
+              python -m scripts.validate_g4irsf15_causal_campaign --scope formal
+            fi
+          )
