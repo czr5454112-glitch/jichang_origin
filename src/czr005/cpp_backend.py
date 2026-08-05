@@ -6,6 +6,7 @@ import importlib
 import hashlib
 import json
 import math
+from collections.abc import Mapping
 from numbers import Real
 import operator
 import os
@@ -612,6 +613,10 @@ def g4irsf11_event_runtime_from_records(
     merge_grant_rule: str = "M1",
     merge_grant_max_pending_requests: int = 64,
     merge_grant_lifecycle_limit: int = 1024,
+    g4irsf16_supervisor_mode: str = "off",
+    g4irsf16_i3_model_artifact: Mapping[str, Any] | PathLike | None = None,
+    g4irsf16_i4_model_artifact: Mapping[str, Any] | PathLike | None = None,
+    g4irsf16_rule_bundle: Mapping[str, Any] | PathLike | None = None,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -868,6 +873,92 @@ def g4irsf11_event_runtime_from_records(
         raise ValueError(
             "merge_grant_lifecycle_limit must be non-negative"
         )
+
+    if not isinstance(g4irsf16_supervisor_mode, str):
+        raise TypeError("g4irsf16_supervisor_mode must be a string")
+    if g4irsf16_supervisor_mode not in {"off", "shadow", "closed_loop"}:
+        raise ValueError(
+            "g4irsf16_supervisor_mode must be off, shadow, or closed_loop"
+        )
+
+    def normalized_g4irsf16_artifact(
+        value: Mapping[str, Any] | PathLike | None,
+        name: str,
+    ) -> dict[str, Any]:
+        if value is None:
+            return {}
+        if isinstance(value, (str, os.PathLike)):
+            with Path(value).open("r", encoding="utf-8") as handle:
+                loaded = json.load(handle)
+            if not isinstance(loaded, dict):
+                raise ValueError(f"{name} must contain one JSON object")
+            return loaded
+        if not isinstance(value, Mapping):
+            raise TypeError(f"{name} must be a mapping, path, or None")
+        return dict(value)
+
+    normalized_g4irsf16_i3_model = normalized_g4irsf16_artifact(
+        g4irsf16_i3_model_artifact,
+        "g4irsf16_i3_model_artifact",
+    )
+    normalized_g4irsf16_i4_model = normalized_g4irsf16_artifact(
+        g4irsf16_i4_model_artifact,
+        "g4irsf16_i4_model_artifact",
+    )
+    normalized_g4irsf16_rule_bundle = normalized_g4irsf16_artifact(
+        g4irsf16_rule_bundle,
+        "g4irsf16_rule_bundle",
+    )
+    has_g4irsf16_models = bool(
+        normalized_g4irsf16_i3_model or normalized_g4irsf16_i4_model
+    )
+    has_g4irsf16_rule = bool(normalized_g4irsf16_rule_bundle)
+    if g4irsf16_supervisor_mode == "off":
+        if has_g4irsf16_models or has_g4irsf16_rule:
+            raise ValueError(
+                "G4IRSF16 artifacts require shadow or closed_loop mode"
+            )
+    elif has_g4irsf16_rule:
+        if has_g4irsf16_models:
+            raise ValueError(
+                "G4IRSF16 diagnostic rule and model artifacts are mutually exclusive"
+            )
+        from czr005.g4irsf16.model import validate_self_sha256
+
+        validate_self_sha256(normalized_g4irsf16_rule_bundle)
+        i4_section = normalized_g4irsf16_rule_bundle.get("i4")
+        if (
+            normalized_g4irsf16_rule_bundle.get("schema")
+            != "czr005.g4irsf16.rule_bundle.v1"
+            or not isinstance(i4_section, Mapping)
+            or i4_section.get("promotion_authorized") is not False
+            or i4_section.get("selected_rule") != "H0"
+        ):
+            raise ValueError("G4IRSF16 diagnostic bundle must preserve H0")
+    else:
+        if not (
+            normalized_g4irsf16_i3_model
+            and normalized_g4irsf16_i4_model
+        ):
+            raise ValueError(
+                "G4IRSF16 model mode requires both I3 and I4 artifacts"
+            )
+        if g4irsf16_supervisor_mode == "closed_loop":
+            raise ValueError(
+                "G4IRSF16 learned-model closed_loop is fail-closed because "
+                "the offline promotion gate is NO_GO; use shadow or the "
+                "exact diagnostic-only H5 bundle"
+            )
+        from czr005.g4irsf16.model import SelectiveEnsembleModel
+
+        i3_model = SelectiveEnsembleModel.from_artifact(
+            normalized_g4irsf16_i3_model
+        )
+        i4_model = SelectiveEnsembleModel.from_artifact(
+            normalized_g4irsf16_i4_model
+        )
+        if i3_model.kind != "I3" or i4_model.kind != "I4":
+            raise ValueError("G4IRSF16 I3/I4 model hook mismatch")
 
     uses_destination_merge_grants = event_semantics in {
         "E4",
@@ -1284,6 +1375,17 @@ def g4irsf11_event_runtime_from_records(
             str(merge_grant_rule),
             int(merge_grant_max_pending_requests),
             int(merge_grant_lifecycle_limit),
+        )
+    if g4irsf16_supervisor_mode != "off":
+        if not uses_destination_merge_grants:
+            # G4IRSF16 arguments are append-only after the older merge-grant
+            # defaults, preserving positional compatibility in exact-off mode.
+            native_event_tail += ("M1", 64, 1024)
+        native_event_tail += (
+            str(g4irsf16_supervisor_mode),
+            normalized_g4irsf16_i3_model,
+            normalized_g4irsf16_i4_model,
+            normalized_g4irsf16_rule_bundle,
         )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(

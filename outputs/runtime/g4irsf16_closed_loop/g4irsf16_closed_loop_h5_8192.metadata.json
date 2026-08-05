@@ -1,0 +1,200 @@
+{
+  "artifacts": {
+    "activations": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.activations.jsonl",
+    "bags": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.per_bag_tth.csv",
+    "hard_gates": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.hard_gates.json",
+    "metadata": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.metadata.json",
+    "off_bags": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.off.per_bag_tth.csv",
+    "off_hard_gates": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.off.hard_gates.json",
+    "off_raw_bags": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.off.raw_bag_timings.csv",
+    "off_summary": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.off.summary.json",
+    "paired_tth": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.paired_tth_vs_off.csv",
+    "performance": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.raw_bag_performance.csv",
+    "raw_bags": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.raw_bag_timings.csv",
+    "summary": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.summary.json"
+  },
+  "binary": {
+    "file_name": "czr005_cpp.cp311-win_amd64.pyd",
+    "path": "EXTERNAL_NATIVE_BINARY/czr005_cpp.cp311-win_amd64.pyd",
+    "sha256": "c4389d2ce460a8c272d1d9e812f892452747c7a9e773d70b6ffa4141ef7f3402"
+  },
+  "execution_semantics": "REAL_NATIVE_EVENT_RUNTIME_NOT_OFFLINE_REPLAY",
+  "frozen_scorer_model": {
+    "path": "artifacts/models/g4e_risk_calibrated_policy.json",
+    "sha256": "4a058dee0bdd17e15f67d1943a551822847d0c066ac3cf03a5da71a07731bbca"
+  },
+  "hard_gates": {
+    "action_change_observed": true,
+    "canary_pass": true,
+    "early_performance_gates": {
+      "denominator": "raw_bag_original_entry_time_tth",
+      "evaluated": true,
+      "p95_not_over_off_plus_2_seconds": true,
+      "p99_not_over_off_plus_4_seconds": true,
+      "pass": true
+    },
+    "gates": {
+      "activation_trace_complete": true,
+      "artificial_batch_delay_zero": true,
+      "complete_coverage": true,
+      "diagnostic_only_honest": true,
+      "event_limit_not_reached": true,
+      "live_merge_state_integrity": true,
+      "merge_stale_arbitrations_zero": true,
+      "no_future_routes": true,
+      "off_baseline_hard_gates_pass": true,
+      "one_edge_per_arrival": true,
+      "physical_fault_edge_entry_violations_zero": true,
+      "post_commit_rollback_matches_queue_capacity_block": true,
+      "reservation_conflicts_zero": true,
+      "reservation_depth_one": true,
+      "runtime_full_astar_calls_zero": true,
+      "runtime_future_route_reads_zero": true,
+      "runtime_future_schedule_reads_zero": true,
+      "runtime_global_reservation_scans_zero": true,
+      "supervisor_full_astar_calls_zero": true,
+      "supervisor_future_inputs_zero": true,
+      "supervisor_global_scans_zero": true,
+      "supervisor_mode_echo": true,
+      "teacher_inputs_zero": true,
+      "telemetry_untruncated": true,
+      "time_limit_not_reached": true,
+      "two_step_reservations_zero": true,
+      "unresolved_deadlocks_zero": true,
+      "unsafe_edge_entries_zero": true
+    },
+    "merge_lifecycle_telemetry": {
+      "complete": false,
+      "dropped_count": 100604,
+      "safety_gate": false,
+      "stored_count": 111975,
+      "transition_count": 212579,
+      "truncated": true
+    },
+    "merge_post_commit_telemetry": {
+      "expired_count": 0,
+      "queue_capacity_block_count": 1230,
+      "revoked_count": 0,
+      "rollback_count": 1230,
+      "rollback_matches_queue_capacity_block": true,
+      "zero_required": false
+    },
+    "mode": "closed_loop",
+    "safety_pass": true,
+    "segments": 8192
+  },
+  "mode": "closed_loop",
+  "off_comparison": {
+    "enabled": true,
+    "off_completed_count": 8192,
+    "off_failed_count": 0,
+    "off_hard_gates": {
+      "action_change_observed": null,
+      "gates": {
+        "artificial_batch_delay_zero": true,
+        "complete_coverage": true,
+        "event_limit_not_reached": true,
+        "live_merge_state_integrity": true,
+        "merge_stale_arbitrations_zero": true,
+        "no_future_routes": true,
+        "one_edge_per_arrival": true,
+        "physical_fault_edge_entry_violations_zero": true,
+        "post_commit_rollback_matches_queue_capacity_block": true,
+        "reservation_conflicts_zero": true,
+        "reservation_depth_one": true,
+        "runtime_full_astar_calls_zero": true,
+        "runtime_future_route_reads_zero": true,
+        "runtime_future_schedule_reads_zero": true,
+        "runtime_global_reservation_scans_zero": true,
+        "teacher_inputs_zero": true,
+        "time_limit_not_reached": true,
+        "two_step_reservations_zero": true,
+        "unresolved_deadlocks_zero": true,
+        "unsafe_edge_entries_zero": true
+      },
+      "merge_lifecycle_telemetry": {
+        "complete": false,
+        "dropped_count": 100782,
+        "safety_gate": false,
+        "stored_count": 111910,
+        "transition_count": 212692,
+        "truncated": true
+      },
+      "merge_post_commit_telemetry": {
+        "expired_count": 0,
+        "queue_capacity_block_count": 1231,
+        "revoked_count": 0,
+        "rollback_count": 1231,
+        "rollback_matches_queue_capacity_block": true,
+        "zero_required": false
+      },
+      "mode": "off",
+      "safety_pass": true,
+      "segments": 8192
+    },
+    "paired_tth_path": "outputs/runtime/g4irsf16_closed_loop/g4irsf16_closed_loop_h5_8192.paired_tth_vs_off.csv",
+    "paired_tth_summary": {
+      "improved_bag_count": 141,
+      "paired_complete_count": 8192,
+      "regressed_bag_count": 297,
+      "tth_delta_mean_seconds": 0.054428808593771194,
+      "tth_delta_sum_seconds": 445.8808000001736,
+      "unchanged_bag_count": 7754
+    }
+  },
+  "policy": {
+    "authorization": "8192_DIAGNOSTIC_ONLY_NOT_PROMOTED",
+    "diagnostic_canary": "H5",
+    "promotion_authorized": false,
+    "rule_bundle_identity_semantics": "CANONICAL_JSON_SELF_SHA256",
+    "rule_bundle_path": "artifacts/policies/g4irsf16_best_rule_bundle.json",
+    "rule_bundle_sha256": "865aabd4115b84361e2c73780a8c77f3fb464b0b41bc0c950b2ce05c0a99c96b",
+    "selected_rule": "H0"
+  },
+  "raw_bag_performance": {
+    "candidate": {
+      "java_release_mean_minutes": 4.63641006727228,
+      "network_time_mean_minutes": 4.046381824452081,
+      "original_entry_mean_minutes": 57.390967335351085,
+      "original_entry_p95_seconds": 9531.536286999997,
+      "original_entry_p99_seconds": 11016.294537999998,
+      "source_wait_mean_minutes": 0.5900282428201987,
+      "total_system_time_mean_minutes": 57.390967335351085
+    },
+    "candidate_minus_off": {
+      "java_release_mean_minutes": 0.0015172206342732864,
+      "network_time_mean_minutes": -0.0009752933169995259,
+      "original_entry_mean_minutes": 0.0015172206342626282,
+      "original_entry_p95_seconds": 0.0,
+      "original_entry_p99_seconds": 0.0,
+      "source_wait_mean_minutes": 0.0024925139512725902,
+      "total_system_time_mean_minutes": 0.0015172206342626282
+    },
+    "denominator": "raw_bag_original_entry_time_tth",
+    "early_gate_evaluated": true,
+    "early_gate_pass": true,
+    "off": {
+      "java_release_mean_minutes": 4.634892846638007,
+      "network_time_mean_minutes": 4.047357117769081,
+      "original_entry_mean_minutes": 57.38945011471682,
+      "original_entry_p95_seconds": 9531.536286999997,
+      "original_entry_p99_seconds": 11016.294537999998,
+      "source_wait_mean_minutes": 0.5875357288689261,
+      "total_system_time_mean_minutes": 57.38945011471682
+    },
+    "p95_limit_seconds": 9533.536286999997,
+    "p95_not_over_off_plus_2_seconds": true,
+    "p99_limit_seconds": 11020.294537999998,
+    "p99_not_over_off_plus_4_seconds": true
+  },
+  "schema": "czr005.g4irsf16.closed_loop_canary.v1",
+  "segments": 8192,
+  "status": "PASS",
+  "telemetry": {
+    "action_change_count": 1865,
+    "activation_row_count": 6978,
+    "i4_activation_count": 6978,
+    "i4_applied_count": 1865,
+    "supervisor_evaluation_count": 99011
+  }
+}

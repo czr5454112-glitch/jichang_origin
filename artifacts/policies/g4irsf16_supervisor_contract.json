@@ -1,0 +1,184 @@
+{
+  "schema": "czr005.g4irsf16.supervisor_contract.v1",
+  "status": "IMPLEMENTED_NATIVE_DIAGNOSTIC_CANARY_LEARNED_MODELS_NO_GO",
+  "default_policy": {
+    "policy": "H0_F2_EXACT",
+    "selected_as_frozen_control": true,
+    "learned_promotion_authorized": false,
+    "learned_action_change": false
+  },
+  "runtime_modes": {
+    "off": {
+      "artifacts_allowed": false,
+      "semantics": "EXACT_F2_PATH"
+    },
+    "shadow": {
+      "action_change_allowed": false,
+      "learned_models_allowed_for_diagnostics": true,
+      "promotion_authorized": false
+    },
+    "closed_loop": {
+      "learned_models_allowed": false,
+      "learned_model_failure": "FAIL_CLOSED_CAUSAL_LEARNING_MODEL_NO_GO",
+      "diagnostic_h5_canary_allowed": true,
+      "promotion_authorized": false
+    }
+  },
+  "diagnostic_h5": {
+    "rule_bundle": "artifacts/policies/g4irsf16_best_rule_bundle.json",
+    "rule_bundle_self_sha256": "865aabd4115b84361e2c73780a8c77f3fb464b0b41bc0c950b2ce05c0a99c96b",
+    "authorization": "8192_DIAGNOSTIC_ONLY_NOT_PROMOTED",
+    "selected_rule": "H0",
+    "canary_rule": "H5",
+    "action": "HOLD_ONE_NATURAL_SERVICE_OPPORTUNITY",
+    "parameters": {
+      "f2_model_margin_max": 1.518316644839415,
+      "target_queue_length_min": 0.0,
+      "target_scheduled_incoming_min": 5.0
+    }
+  },
+  "learned_model_gate": {
+    "artifact": "artifacts/gates/g4irsf16_offline_model_gate.json",
+    "overall_status": "CAUSAL_LEARNING_MODEL_NO_GO",
+    "i3_status": "I3_REROUTE_MODEL_NOT_AUTHORIZED",
+    "i4_status": "I4_SELECTIVE_MODEL_NO_GO",
+    "self_sha_is_promotion_authorization": false
+  },
+  "deployment_feature_contract": {
+    "schema": "czr005.g4irsf16.selective_linear_ensemble.v1",
+    "count": 29,
+    "ordered_names": [
+      "deadline_slack_seconds",
+      "wait_age_seconds",
+      "current_queue_length",
+      "target_queue_length",
+      "target_scheduled_incoming",
+      "current_next_available_wait_seconds",
+      "target_next_available_wait_seconds",
+      "alternative_action_count",
+      "total_legal_action_count",
+      "current_node_out_degree",
+      "current_node_type",
+      "current_node_service_seconds",
+      "baseline_edge_travel_seconds",
+      "intervention_edge_travel_seconds",
+      "static_remaining_current_seconds",
+      "static_remaining_baseline_seconds",
+      "static_remaining_intervention_seconds",
+      "static_potential_delta_seconds",
+      "f2_model_margin",
+      "f2_raw_score",
+      "recent_visit_count",
+      "short_history_repeat_count",
+      "storage_in_leg",
+      "storage_out_leg",
+      "direct_leg",
+      "event_hour_sin",
+      "event_hour_cos",
+      "baseline_release",
+      "advertised_fault"
+    ],
+    "forbidden_or_removed": [
+      "downstream_pressure",
+      "has_physical_fault",
+      "task_id",
+      "runtime_bag_id",
+      "node_id_memory",
+      "future_route",
+      "future_schedule",
+      "posthoc_outcome"
+    ],
+    "i4_action_counts": {
+      "alternative_action_count": 1,
+      "total_legal_action_count": 2,
+      "domain": [
+        "F2_RELEASE",
+        "SAFE_HOLD"
+      ]
+    }
+  },
+  "locality_and_safety": {
+    "inputs": "CURRENT_NODE_ONE_HOP_CANDIDATES_BOUNDED_HISTORY_STATIC_POTENTIAL",
+    "runtime_full_astar_allowed": false,
+    "global_reservation_scan_allowed": false,
+    "future_route_or_schedule_input_allowed": false,
+    "physical_fault_owner": "NON_CONFIGURABLE_PHYSICAL_SHIELD_AND_SUPERVISOR",
+    "physical_fault_is_model_input": false,
+    "fault_generation": "PER_BAG_MONOTONIC_SEPARATE_FROM_ONE_EDGE_REPAIR_PRIORITY_BOOST",
+    "fault_or_safe_hold_overrides_selected_edge": true,
+    "reservation_depth": 1,
+    "max_edges_per_decision": 1
+  },
+  "latches_and_commit": {
+    "i4": "AT_MOST_ONE_HOLD_PER_NODE_GENERATION_THEN_REEVALUATE",
+    "i3": "AT_MOST_ONE_LEGAL_ADJACENT_OVERRIDE_PER_SEGMENT",
+    "tokens_consumed_on": [
+      "NEW_DESTINATION_MERGE_REQUEST_COMMIT",
+      "ONE_EDGE_COMMIT",
+      "SCHEDULED_NATURAL_HOLD",
+      "SCHEDULED_SUPERVISOR_SAFE_HOLD"
+    ],
+    "i3_existing_pending_request_counts_as_applied": false,
+    "i3_rejected_request_or_credit_bind_counts_as_change": false
+  },
+  "merge_gate_semantics": {
+    "safety": [
+      "CONSERVATION",
+      "ACTIVE_BIJECTION",
+      "RUNTIME_OWNED_CAPABILITY",
+      "EXACT_SLOT_NO_FUTURE_SHIFT",
+      "FINAL_ACTIVE_UNCONSUMED_ZERO",
+      "OUTSTANDING_REQUEST_ZERO",
+      "STALE_ARBITRATION_ZERO"
+    ],
+    "capacity_compensation": "POST_COMMIT_ROLLBACK_EQUALS_QUEUE_CAPACITY_BLOCK_COUNT",
+    "lifecycle_log_drop": "BOUNDED_TELEMETRY_TRUNCATION_NOT_SAFETY_FAILURE"
+  },
+  "native_canary_evidence": {
+    "denominator": "RAW_BAG_ORIGINAL_ENTRY_TIME_TTH",
+    "early_tail_gates": {
+      "p95_candidate_minus_off_max_seconds": 2.0,
+      "p99_candidate_minus_off_max_seconds": 4.0
+    },
+    "runs": [
+      {
+        "segments": 144,
+        "action_change_count": 19,
+        "p95_delta_seconds": 0.0,
+        "p99_delta_seconds": 0.0,
+        "safety_pass": true,
+        "native_run_after_final_supervisor_fixes": true,
+        "gate_reconciled_without_native_rerun": false
+      },
+      {
+        "segments": 512,
+        "action_change_count": 102,
+        "p95_delta_seconds": 0.0,
+        "p99_delta_seconds": 0.0,
+        "safety_pass": true,
+        "gate_reconciled_without_native_rerun": true
+      },
+      {
+        "segments": 2048,
+        "action_change_count": 515,
+        "p95_delta_seconds": 0.0,
+        "p99_delta_seconds": 0.0,
+        "safety_pass": true,
+        "merge_lifecycle_dropped_count": 2179,
+        "gate_reconciled_without_native_rerun": true
+      },
+      {
+        "segments": 8192,
+        "action_change_count": 1865,
+        "p95_delta_seconds": 0.0,
+        "p99_delta_seconds": 0.0,
+        "safety_pass": true,
+        "post_commit_rollback_count": 1230,
+        "queue_capacity_block_count": 1230,
+        "merge_lifecycle_dropped_count": 100604,
+        "gate_reconciled_without_native_rerun": true
+      }
+    ],
+    "evidence_directory": "outputs/runtime/g4irsf16_closed_loop"
+  }
+}

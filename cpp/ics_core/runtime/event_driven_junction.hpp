@@ -34,6 +34,7 @@
 #include "ics_core/runtime/g4irsf14_causal_intervention.hpp"
 #include "ics_core/runtime/g4irsf14_state_clone.hpp"
 #include "ics_core/runtime/g4irsf15_causal_campaign.hpp"
+#include "ics_core/runtime/g4irsf16_supervisor.hpp"
 
 namespace czr005::ics {
 
@@ -513,6 +514,14 @@ struct EventDrivenJunctionConfig {
   std::string merge_grant_rule = "M1";
   int merge_grant_max_pending_requests = 64;
   int merge_grant_lifecycle_limit = 1024;
+  // G4IRSF16 is append-only and exact-off by default.  Shadow evaluates the
+  // same native local model but never changes an action.  Closed loop may
+  // replace one frozen-F2 edge (I3) or consume one natural service
+  // opportunity (I4); both artifacts must be explicitly authorized.
+  std::string g4irsf16_supervisor_mode = "off";  // off, shadow, closed_loop
+  G4IRSF16SelectiveLinearModelConfig g4irsf16_i3_model;
+  G4IRSF16SelectiveLinearModelConfig g4irsf16_i4_model;
+  G4IRSF16I4DiagnosticRuleConfig g4irsf16_i4_diagnostic_rule;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -616,6 +625,36 @@ struct EventDecisionTraceRow {
   std::uint64_t priority_fault_generation = 0;
   std::uint64_t priority_enqueue_sequence = 0;
   std::string pibt_preference_mode;
+  // Emitted by the Python binding only when G4IRSF16 is not off.
+  bool g4irsf16_evaluated = false;
+  std::string g4irsf16_mode;
+  int g4irsf16_baseline_next = -1;
+  int g4irsf16_proposed_next = -1;
+  bool g4irsf16_proposed_hold = false;
+  bool g4irsf16_action_changed = false;
+  std::string g4irsf16_state;
+  std::string g4irsf16_action;
+  std::string g4irsf16_source;
+  std::string g4irsf16_reason;
+  std::uint64_t g4irsf16_node_generation = 0;
+  std::uint64_t g4irsf16_state_generation = 0;
+  int g4irsf16_i3_candidate = -1;
+  bool g4irsf16_i3_activation = false;
+  double g4irsf16_i3_benefit_lcb = 0.0;
+  double g4irsf16_i3_harmful_ucb = 1.0;
+  double g4irsf16_i3_utility_lcb_seconds =
+      -std::numeric_limits<double>::infinity();
+  bool g4irsf16_i3_ood = true;
+  std::string g4irsf16_i3_model_reason;
+  bool g4irsf16_i4_activation = false;
+  bool g4irsf16_i4_diagnostic_only = false;
+  std::string g4irsf16_i4_policy_id;
+  double g4irsf16_i4_benefit_lcb = 0.0;
+  double g4irsf16_i4_harmful_ucb = 1.0;
+  double g4irsf16_i4_utility_lcb_seconds =
+      -std::numeric_limits<double>::infinity();
+  bool g4irsf16_i4_ood = true;
+  std::string g4irsf16_i4_model_reason;
 };
 
 struct EventRuntimeTraceRow {
@@ -992,6 +1031,32 @@ struct EventRuntimeSummary {
   bool merge_grant_active_bijection_holds = true;
   bool merge_grant_runtime_owned_capability = false;
   bool merge_grant_exact_slot_no_future_shift = false;
+  // G4IRSF16 append-only deployment/audit counters.  Bindings omit them in
+  // exact-off mode so historical payloads stay byte-for-byte compatible.
+  std::string g4irsf16_supervisor_mode;
+  std::string g4irsf16_i3_model_sha256;
+  std::string g4irsf16_i4_model_sha256;
+  std::string g4irsf16_policy_kind;
+  std::string g4irsf16_i4_policy_id;
+  std::string g4irsf16_i4_policy_authorization;
+  bool g4irsf16_diagnostic_only = false;
+  bool g4irsf16_promotion_authorized = false;
+  std::uint64_t g4irsf16_supervisor_evaluation_count = 0;
+  std::uint64_t g4irsf16_i3_candidate_evaluation_count = 0;
+  std::uint64_t g4irsf16_i4_evaluation_count = 0;
+  std::uint64_t g4irsf16_i3_activation_count = 0;
+  std::uint64_t g4irsf16_i4_activation_count = 0;
+  std::uint64_t g4irsf16_i3_applied_count = 0;
+  std::uint64_t g4irsf16_i4_applied_count = 0;
+  std::uint64_t g4irsf16_shadow_proposal_count = 0;
+  std::uint64_t g4irsf16_action_change_count = 0;
+  std::uint64_t g4irsf16_safe_hold_count = 0;
+  std::uint64_t g4irsf16_fault_recovery_count = 0;
+  int g4irsf16_runtime_global_scan_count = 0;
+  int g4irsf16_future_route_input_count = 0;
+  int g4irsf16_future_schedule_input_count = 0;
+  int g4irsf16_posthoc_input_count = 0;
+  int g4irsf16_full_astar_call_count = 0;
 };
 
 struct EventRuntimeJunctionResult {
@@ -1990,6 +2055,19 @@ class EventDrivenJunctionRuntime {
     }
     initialize_regret_prior();
     initialize_scorer();
+    if (g4irsf16_enabled()) {
+      if (!g4irsf16_uses_diagnostic_rule()) {
+        g4irsf16_i3_model_ =
+            std::make_unique<G4IRSF16SelectiveLinearModel>(
+                config_.g4irsf16_i3_model);
+        g4irsf16_i4_model_ =
+            std::make_unique<G4IRSF16SelectiveLinearModel>(
+                config_.g4irsf16_i4_model);
+      }
+      g4irsf16_supervisor_ =
+          std::make_unique<G4IRSF16Supervisor>(
+              g4irsf16_supervisor_config());
+    }
   }
 
   void initialize(
@@ -2018,6 +2096,31 @@ class EventDrivenJunctionRuntime {
         uses_destination_merge_grants();
     result_.summary.merge_grant_exact_slot_no_future_shift =
         uses_destination_merge_grants();
+    if (g4irsf16_enabled()) {
+      result_.summary.g4irsf16_supervisor_mode =
+          canonical_g4irsf16_supervisor_mode();
+      result_.summary.g4irsf16_i3_model_sha256 =
+          config_.g4irsf16_i3_model.artifact_sha256;
+      result_.summary.g4irsf16_i4_model_sha256 =
+          config_.g4irsf16_i4_model.artifact_sha256;
+      if (g4irsf16_uses_diagnostic_rule()) {
+        result_.summary.g4irsf16_policy_kind =
+            "diagnostic_rule";
+        result_.summary.g4irsf16_i4_policy_id =
+            config_.g4irsf16_i4_diagnostic_rule.rule;
+        result_.summary.g4irsf16_i4_policy_authorization =
+            config_.g4irsf16_i4_diagnostic_rule.authorization;
+        result_.summary.g4irsf16_diagnostic_only = true;
+        result_.summary.g4irsf16_promotion_authorized = false;
+        result_.summary.g4irsf16_i4_model_sha256 =
+            config_.g4irsf16_i4_diagnostic_rule.artifact_sha256;
+      } else {
+        result_.summary.g4irsf16_policy_kind =
+            "unpromoted_model_shadow";
+        result_.summary.g4irsf16_diagnostic_only = true;
+        result_.summary.g4irsf16_promotion_authorized = false;
+      }
+    }
     result_.summary.admission_mode = canonical_admission_mode();
     result_.summary.admission_mode_echo = config_.admission_mode;
     result_.summary.source_admission_enabled =
@@ -3267,6 +3370,48 @@ class EventDrivenJunctionRuntime {
     return actual == short_name || actual == full_name;
   }
 
+  std::string canonical_g4irsf16_supervisor_mode() const {
+    if (config_.g4irsf16_supervisor_mode == "off") {
+      return "off";
+    }
+    if (config_.g4irsf16_supervisor_mode == "shadow") {
+      return "shadow";
+    }
+    if (config_.g4irsf16_supervisor_mode == "closed_loop") {
+      return "closed_loop";
+    }
+    throw std::invalid_argument(
+        "g4irsf16_supervisor_mode must be off, shadow, or closed_loop");
+  }
+
+  bool g4irsf16_enabled() const {
+    return canonical_g4irsf16_supervisor_mode() != "off";
+  }
+
+  bool g4irsf16_closed_loop() const {
+    return canonical_g4irsf16_supervisor_mode() == "closed_loop";
+  }
+
+  bool g4irsf16_uses_diagnostic_rule() const noexcept {
+    return config_.g4irsf16_i4_diagnostic_rule.configured();
+  }
+
+  G4IRSF16SupervisorConfig g4irsf16_supervisor_config() const {
+    G4IRSF16SupervisorConfig supervisor;
+    if (!g4irsf16_uses_diagnostic_rule()) {
+      supervisor.i3_min_confidence =
+          config_.g4irsf16_i3_model.benefit_probability_lcb_threshold;
+      supervisor.i3_max_risk =
+          config_.g4irsf16_i3_model.harmful_probability_ucb_budget;
+      supervisor.i4_min_confidence =
+          config_.g4irsf16_i4_model.benefit_probability_lcb_threshold;
+      supervisor.i4_max_risk =
+          config_.g4irsf16_i4_model.harmful_probability_ucb_budget;
+    }
+    supervisor.validate();
+    return supervisor;
+  }
+
   std::string canonical_event_semantics() const {
     if (mode_is(config_.event_semantics,
                 "E0",
@@ -3801,6 +3946,44 @@ class EventDrivenJunctionRuntime {
     (void)canonical_framework_mode();
     (void)canonical_event_semantics();
     (void)canonical_merge_grant_rule();
+    const auto g4irsf16_mode =
+        canonical_g4irsf16_supervisor_mode();
+    if (g4irsf16_mode == "off") {
+      if (config_.g4irsf16_i3_model.configured() ||
+          config_.g4irsf16_i4_model.configured() ||
+          config_.g4irsf16_i3_model.authorized ||
+          config_.g4irsf16_i4_model.authorized ||
+          config_.g4irsf16_i4_diagnostic_rule.configured()) {
+        throw std::invalid_argument(
+            "G4IRSF16 model artifacts require shadow or closed_loop mode");
+      }
+    } else {
+      if (g4irsf16_uses_diagnostic_rule()) {
+        config_.g4irsf16_i4_diagnostic_rule.validate();
+        if (config_.g4irsf16_i3_model.configured() ||
+            config_.g4irsf16_i4_model.configured() ||
+            config_.g4irsf16_i3_model.authorized ||
+            config_.g4irsf16_i4_model.authorized) {
+          throw std::invalid_argument(
+              "G4IRSF16 diagnostic H5 and model artifacts are mutually exclusive");
+        }
+      } else {
+        if (g4irsf16_mode == "closed_loop") {
+          throw std::invalid_argument(
+              "G4IRSF16 learned-model closed_loop is fail-closed: the "
+              "offline promotion gate is NO_GO; use shadow or the exact "
+              "diagnostic-only H5 bundle");
+        }
+        config_.g4irsf16_i3_model.validate();
+        config_.g4irsf16_i4_model.validate();
+        if (config_.g4irsf16_i3_model.kind != "I3" ||
+            config_.g4irsf16_i4_model.kind != "I4") {
+          throw std::invalid_argument(
+              "G4IRSF16 I3/I4 artifacts are bound to the wrong hook");
+        }
+      }
+      (void)g4irsf16_supervisor_config();
+    }
     const auto scorer_mode = canonical_scorer_mode();
     if (!std::isfinite(config_.retry_interval) ||
         !std::isfinite(config_.minimum_service_seconds) ||
@@ -4008,6 +4191,7 @@ class EventDrivenJunctionRuntime {
     fault_instances_by_bag_.clear();
     active_fault_instance_by_edge_.clear();
     repair_time_by_fault_instance_.clear();
+    g4irsf16_physical_fault_generation_by_bag_.clear();
     events_ = {};
     next_event_seq_ = 1;
     next_decision_id_ = 1;
@@ -4048,6 +4232,11 @@ class EventDrivenJunctionRuntime {
     if (g4irsf14_state_ != nullptr) {
       *g4irsf14_state_ =
           event_runtime_detail::G4IRSF14RuntimeState{};
+    }
+    if (g4irsf16_enabled()) {
+      g4irsf16_supervisor_ =
+          std::make_unique<G4IRSF16Supervisor>(
+              g4irsf16_supervisor_config());
     }
     now_ = 0.0;
     active_bag_count_ = 0;
@@ -6935,6 +7124,15 @@ class EventDrivenJunctionRuntime {
             bag.fault_priority_generation,
             static_cast<std::uint64_t>(
                 std::max(0, physical_generation)));
+    if (g4irsf16_enabled()) {
+      auto& generation =
+          g4irsf16_physical_fault_generation_by_bag_[
+              bag.request.runtime_bag_id];
+      generation = std::max(
+          generation,
+          static_cast<std::uint64_t>(
+              std::max(0, physical_generation)));
+    }
     bag.repaired_task_reentry = false;
     fault_affected_bags_.insert(bag.request.runtime_bag_id);
     fault_affected_bags_by_edge_[physical_key].insert(
@@ -9909,6 +10107,11 @@ class EventDrivenJunctionRuntime {
     auto& bag = bags_.at(task_id);
     bool causal_i3_override_selected = false;
     bool causal_i4_natural_hold_selected = false;
+    bool g4irsf16_i3_override_selected = false;
+    bool g4irsf16_i4_natural_hold_selected = false;
+    bool g4irsf16_supervisor_safety_hold_selected = false;
+    std::optional<G4IRSF16DecisionContext> g4irsf16_context;
+    std::optional<G4IRSF16SupervisorDecision> g4irsf16_decision;
     if (bag.decision_count >= config_.max_decisions_per_bag) {
       fail_bag(bag, "max_decisions_exceeded", time);
       controller.queue.erase(controller.queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
@@ -10176,8 +10379,14 @@ class EventDrivenJunctionRuntime {
       }
     }
 
+    if (active_causal_step_ != nullptr && g4irsf16_enabled()) {
+      throw std::logic_error(
+          "G4IRSF16 online supervisor cannot share a G4IRSF14 causal-probe "
+          "runtime; run the causal clone with supervisor mode off");
+    }
     std::vector<int> causal_legal_next_edges;
-    if (active_causal_step_ != nullptr && selected >= 0) {
+    if ((active_causal_step_ != nullptr || g4irsf16_enabled()) &&
+        selected >= 0) {
       causal_legal_next_edges.reserve(ranking.size());
       for (const std::size_t candidate_index : ranking) {
         const auto& candidate =
@@ -10265,6 +10474,273 @@ class EventDrivenJunctionRuntime {
       }
     }
 
+    if (g4irsf16_enabled()) {
+      if (g4irsf16_supervisor_ == nullptr ||
+          (!g4irsf16_uses_diagnostic_rule() &&
+           (g4irsf16_i3_model_ == nullptr ||
+            g4irsf16_i4_model_ == nullptr))) {
+        throw std::logic_error(
+            "G4IRSF16 enabled without native model/supervisor state");
+      }
+      trace.g4irsf16_evaluated = true;
+      trace.g4irsf16_mode =
+          canonical_g4irsf16_supervisor_mode();
+      trace.g4irsf16_baseline_next = selected;
+      trace.g4irsf16_node_generation =
+          static_cast<std::uint64_t>(bag.decision_count);
+
+      G4IRSF16DecisionContext context;
+      context.runtime_bag_id =
+          std::to_string(bag.request.runtime_bag_id);
+      context.segment_id = bag.request.segment_id;
+      context.node = node;
+      // A natural hold does not increment decision_count, so the same
+      // node-generation is consumed on the very next re-evaluation.  A move
+      // increments it, allowing a fresh opportunity only after real progress.
+      context.generation = trace.g4irsf16_node_generation;
+      const auto g4irsf16_fault_generation =
+          g4irsf16_physical_fault_generation_by_bag_.find(
+              bag.request.runtime_bag_id);
+      context.physical_fault_generation =
+          g4irsf16_fault_generation ==
+                  g4irsf16_physical_fault_generation_by_bag_.end()
+              ? 0U
+              : g4irsf16_fault_generation->second;
+      context.f2_action = selected;
+      context.legal_alternatives = causal_legal_next_edges;
+      context.service_opportunity_available = selected >= 0;
+      context.shield_safe = selected >= 0;
+      context.fault_active =
+          selected < 0 && physical_interlock_rejected;
+      context.astar_fallback_requested = false;
+
+      const EventCandidateRecord* baseline = nullptr;
+      if (selected >= 0) {
+        const auto found = std::find_if(
+            trace.candidates.begin(), trace.candidates.end(),
+            [&](const EventCandidateRecord& candidate) {
+              return candidate.next_node == selected;
+            });
+        if (found == trace.candidates.end()) {
+          throw std::logic_error(
+              "G4IRSF16 F2 baseline is absent from local candidates");
+        }
+        baseline = &*found;
+      }
+
+      if (baseline == nullptr) {
+        trace.g4irsf16_i4_model_reason = "NO_F2_BASELINE";
+        trace.g4irsf16_i3_model_reason = "NO_F2_BASELINE";
+      } else if (g4irsf16_uses_diagnostic_rule()) {
+        const auto& rule = config_.g4irsf16_i4_diagnostic_rule;
+        const bool activates = rule.activates(
+            trace.model_margin,
+            baseline->target_queue_length,
+            baseline->target_scheduled_incoming);
+        ++result_.summary.g4irsf16_i4_evaluation_count;
+        trace.g4irsf16_i4_activation = activates;
+        trace.g4irsf16_i4_diagnostic_only = true;
+        trace.g4irsf16_i4_policy_id = rule.rule;
+        trace.g4irsf16_i4_ood = false;
+        trace.g4irsf16_i4_model_reason =
+            activates ? "H5_DIAGNOSTIC_RULE_ACTIVATE"
+                      : "H5_DIAGNOSTIC_RULE_ABSTAIN";
+        trace.g4irsf16_i3_model_reason =
+            "I3_H0_NOT_PROMOTED";
+        context.i4_proposed = activates;
+        context.i4_model_authorized = rule.authorized;
+        context.i4_diagnostic_rule = true;
+        // These are supervisor authorization sentinels, not estimated model
+        // probabilities.  Trace telemetry labels the source diagnostic-only.
+        context.i4_confidence = activates ? 1.0 : 0.0;
+        context.i4_risk = activates ? 0.0 : 1.0;
+        if (activates) {
+          ++result_.summary.g4irsf16_i4_activation_count;
+        }
+      } else {
+        const auto i4_score = g4irsf16_i4_model_->score(
+            g4irsf16_local_features(
+                bag, node, time, trace, *baseline, *baseline,
+                2, true));
+        ++result_.summary.g4irsf16_i4_evaluation_count;
+        trace.g4irsf16_i4_activation = i4_score.activation;
+        trace.g4irsf16_i4_benefit_lcb =
+            i4_score.benefit_probability_lcb;
+        trace.g4irsf16_i4_harmful_ucb =
+            i4_score.harmful_probability_ucb;
+        trace.g4irsf16_i4_utility_lcb_seconds =
+            i4_score.utility_lcb_seconds;
+        trace.g4irsf16_i4_ood = i4_score.ood;
+        trace.g4irsf16_i4_model_reason =
+            i4_score.abstention_reason;
+        context.i4_proposed = i4_score.activation;
+        context.i4_model_authorized =
+            config_.g4irsf16_i4_model.authorized;
+        context.i4_confidence =
+            i4_score.benefit_probability_lcb;
+        context.i4_risk = i4_score.harmful_probability_ucb;
+        if (i4_score.activation) {
+          ++result_.summary.g4irsf16_i4_activation_count;
+          trace.g4irsf16_i3_model_reason =
+              "I4_PRECEDENCE_NOT_EVALUATED";
+        } else {
+          bool have_audit_candidate = false;
+          bool have_activated_candidate = false;
+          int audit_candidate = -1;
+          int activated_candidate = -1;
+          G4IRSF16SelectiveLinearScore audit_score;
+          G4IRSF16SelectiveLinearScore activated_score;
+          const auto better = [](const G4IRSF16SelectiveLinearScore& left,
+                                 int left_node,
+                                 const G4IRSF16SelectiveLinearScore& right,
+                                 int right_node) {
+            return std::tie(left.utility_lcb_seconds,
+                            left.benefit_probability_lcb,
+                            right.harmful_probability_ucb,
+                            right_node) >
+                   std::tie(right.utility_lcb_seconds,
+                            right.benefit_probability_lcb,
+                            left.harmful_probability_ucb,
+                            left_node);
+          };
+          for (const int alternative : causal_legal_next_edges) {
+            if (alternative == selected) {
+              continue;
+            }
+            const auto found = std::find_if(
+                trace.candidates.begin(), trace.candidates.end(),
+                [&](const EventCandidateRecord& candidate) {
+                  return candidate.next_node == alternative;
+                });
+            if (found == trace.candidates.end()) {
+              throw std::logic_error(
+                  "G4IRSF16 legal alternative is absent from candidates");
+            }
+            const auto score = g4irsf16_i3_model_->score(
+                g4irsf16_local_features(
+                    bag, node, time, trace, *baseline, *found,
+                    static_cast<int>(causal_legal_next_edges.size()),
+                    false));
+            ++result_.summary.g4irsf16_i3_candidate_evaluation_count;
+            if (!have_audit_candidate ||
+                better(score, alternative,
+                       audit_score, audit_candidate)) {
+              have_audit_candidate = true;
+              audit_candidate = alternative;
+              audit_score = score;
+            }
+            if (score.activation &&
+                (!have_activated_candidate ||
+                 better(score, alternative,
+                        activated_score, activated_candidate))) {
+              have_activated_candidate = true;
+              activated_candidate = alternative;
+              activated_score = score;
+            }
+          }
+          if (have_activated_candidate) {
+            audit_candidate = activated_candidate;
+            audit_score = activated_score;
+            context.i3_action = activated_candidate;
+            context.i3_model_authorized =
+                config_.g4irsf16_i3_model.authorized;
+            context.i3_confidence =
+                activated_score.benefit_probability_lcb;
+            context.i3_risk =
+                activated_score.harmful_probability_ucb;
+            ++result_.summary.g4irsf16_i3_activation_count;
+          }
+          if (have_audit_candidate) {
+            trace.g4irsf16_i3_candidate = audit_candidate;
+            trace.g4irsf16_i3_activation = audit_score.activation;
+            trace.g4irsf16_i3_benefit_lcb =
+                audit_score.benefit_probability_lcb;
+            trace.g4irsf16_i3_harmful_ucb =
+                audit_score.harmful_probability_ucb;
+            trace.g4irsf16_i3_utility_lcb_seconds =
+                audit_score.utility_lcb_seconds;
+            trace.g4irsf16_i3_ood = audit_score.ood;
+            trace.g4irsf16_i3_model_reason =
+                audit_score.abstention_reason;
+          } else {
+            trace.g4irsf16_i3_model_reason =
+                "NO_LEGAL_I3_ALTERNATIVE";
+          }
+        }
+      }
+
+      auto decision = g4irsf16_supervisor_->evaluate(context);
+      ++result_.summary.g4irsf16_supervisor_evaluation_count;
+      trace.g4irsf16_state =
+          g4irsf16_supervisor_state_name(decision.state);
+      trace.g4irsf16_action =
+          g4irsf16_action_kind_name(decision.action);
+      trace.g4irsf16_source =
+          g4irsf16_action_source_name(decision.source);
+      trace.g4irsf16_reason = decision.reason;
+      trace.g4irsf16_state_generation =
+          decision.state_generation;
+      trace.g4irsf16_proposed_next =
+          decision.selected_next_node;
+      trace.g4irsf16_proposed_hold =
+          decision.state ==
+          G4IRSF16SupervisorState::kI4SelectiveHold;
+      if (decision.state == G4IRSF16SupervisorState::kSafeHold) {
+        ++result_.summary.g4irsf16_safe_hold_count;
+      } else if (decision.state ==
+                 G4IRSF16SupervisorState::kFaultRecovery) {
+        ++result_.summary.g4irsf16_fault_recovery_count;
+      }
+
+      if (!g4irsf16_closed_loop()) {
+        if (decision.state ==
+                G4IRSF16SupervisorState::kI3RareOverride ||
+            decision.state ==
+                G4IRSF16SupervisorState::kI4SelectiveHold) {
+          ++result_.summary.g4irsf16_shadow_proposal_count;
+        }
+      } else if (decision.state ==
+                 G4IRSF16SupervisorState::kI4SelectiveHold) {
+        selected = -1;
+        selected_reason =
+            "g4irsf16_I4_native_selective_natural_hold";
+        bounded_local_same_bag_fallback_selected = false;
+        g4irsf16_i4_natural_hold_selected = true;
+        trace.g4irsf16_action_changed = true;
+      } else if (decision.state ==
+                 G4IRSF16SupervisorState::kI3RareOverride) {
+        if (decision.selected_next_node < 0 ||
+            std::find(causal_legal_next_edges.begin(),
+                      causal_legal_next_edges.end(),
+                      decision.selected_next_node) ==
+                causal_legal_next_edges.end()) {
+          throw std::logic_error(
+              "G4IRSF16 supervisor emitted a non-local I3 edge");
+        }
+        selected = decision.selected_next_node;
+        selected_reason =
+            "g4irsf16_I3_native_rare_legal_next_edge";
+        bounded_local_same_bag_fallback_selected = false;
+        g4irsf16_i3_override_selected = true;
+        trace.g4irsf16_action_changed =
+            selected != trace.g4irsf16_baseline_next;
+      } else if (decision.action ==
+                     G4IRSF16ActionKind::kFaultHold ||
+                 decision.action ==
+                     G4IRSF16ActionKind::kSafeHold) {
+        trace.g4irsf16_action_changed = selected >= 0;
+        selected = -1;
+        selected_reason =
+            decision.action == G4IRSF16ActionKind::kFaultHold
+                ? "g4irsf16_supervisor_fault_hold"
+                : "g4irsf16_supervisor_safe_hold";
+        bounded_local_same_bag_fallback_selected = false;
+        g4irsf16_supervisor_safety_hold_selected = true;
+      }
+      g4irsf16_context = std::move(context);
+      g4irsf16_decision = std::move(decision);
+    }
+
     if (physical_interlock_rejected) {
       if (selected >= 0) {
         ++result_.summary.physical_fault_interlock_reroute_count;
@@ -10335,26 +10811,42 @@ class EventDrivenJunctionRuntime {
           pre_request_state.pending_lineage;
       if (submit_destination_merge_request(
               bag, node, selected, time, trace)) {
+        const auto& post_request_state =
+            destination_merge_bag_state(
+                bag.request.runtime_bag_id);
+        const auto pending =
+            pending_merge_dispatches_.find(
+                post_request_state.pending_request_id);
+        const bool newly_committed =
+            g4irsf15_i3_committed_new_pending_request(
+                pre_request_id,
+                pre_request_lineage,
+                post_request_state.pending_request_id,
+                post_request_state.pending_lineage,
+                pending != pending_merge_dispatches_.end() &&
+                    pending->second.runtime_bag_id ==
+                        task_id &&
+                    pending->second.upstream_node ==
+                        node &&
+                    pending->second.destination_node ==
+                        selected);
+        if (g4irsf16_i3_override_selected &&
+            newly_committed) {
+          if (!g4irsf16_context.has_value() ||
+              !g4irsf16_decision.has_value() ||
+              !g4irsf16_decision->has_token ||
+              !g4irsf16_supervisor_->consume_token(
+                  g4irsf16_decision->token,
+                  *g4irsf16_context)) {
+            throw std::logic_error(
+                "G4IRSF16 I3 merge request lost its action token");
+          }
+          ++result_.summary.g4irsf16_i3_applied_count;
+          ++result_.summary.g4irsf16_action_change_count;
+        } else if (g4irsf16_i3_override_selected) {
+          trace.g4irsf16_action_changed = false;
+        }
         if (causal_i3_override_selected) {
-          const auto& post_request_state =
-              destination_merge_bag_state(
-                  bag.request.runtime_bag_id);
-          const auto pending =
-              pending_merge_dispatches_.find(
-                  post_request_state.pending_request_id);
-          const bool newly_committed =
-              g4irsf15_i3_committed_new_pending_request(
-                  pre_request_id,
-                  pre_request_lineage,
-                  post_request_state.pending_request_id,
-                  post_request_state.pending_lineage,
-                  pending != pending_merge_dispatches_.end() &&
-                      pending->second.runtime_bag_id ==
-                          task_id &&
-                      pending->second.upstream_node ==
-                          node &&
-                      pending->second.destination_node ==
-                          selected);
           if (newly_committed) {
             mark_causal_action_applied(
                 "APPLIED_I3_MERGE_REQUEST_ENQUEUED_ONE_ACTION",
@@ -10363,6 +10855,9 @@ class EventDrivenJunctionRuntime {
         }
         record_decision_latency(decision_started);
         return DispatchResult{task_id, selected, 0, true};
+      }
+      if (g4irsf16_i3_override_selected) {
+        trace.g4irsf16_action_changed = false;
       }
       selected = -1;
       selected_reason = "destination_merge_request_rejected";
@@ -10381,6 +10876,9 @@ class EventDrivenJunctionRuntime {
           bag.first_edge_credit_id,
           credit_use_context(bag, node, selected, time));
       if (!bound.accepted) {
+        if (g4irsf16_i3_override_selected) {
+          trace.g4irsf16_action_changed = false;
+        }
         selected = -1;
         selected_reason = "first_edge_credit_bind_" + bound.reason;
         bag.first_edge_credit_id = 0;
@@ -10393,6 +10891,8 @@ class EventDrivenJunctionRuntime {
     if (selected >= 0) {
       trace.decision_source = local_fault_policy_acted
                                   ? "local_fault_policy"
+                              : g4irsf16_i3_override_selected
+                                  ? "g4irsf16_i3_rare_override"
                               : physical_interlock_rejected
                                   ? "physical_fault_interlock"
                               : bounded_local_same_bag_fallback_selected
@@ -10414,6 +10914,19 @@ class EventDrivenJunctionRuntime {
                ? "frozen_scorer_risk_abstain_exact_s0_fallback;"
                : "") +
           selected_reason;
+      if (g4irsf16_i3_override_selected) {
+        if (!g4irsf16_context.has_value() ||
+            !g4irsf16_decision.has_value() ||
+            !g4irsf16_decision->has_token ||
+            !g4irsf16_supervisor_->consume_token(
+                g4irsf16_decision->token,
+                *g4irsf16_context)) {
+          throw std::logic_error(
+              "G4IRSF16 I3 edge commit lost its action token");
+        }
+        ++result_.summary.g4irsf16_i3_applied_count;
+        ++result_.summary.g4irsf16_action_change_count;
+      }
       dispatch_selected_edge(bag, node, selected, time);
       if (causal_i3_override_selected) {
         mark_causal_action_applied(
@@ -10477,6 +10990,10 @@ class EventDrivenJunctionRuntime {
       ++bag.retry_count;
       trace.decision_source = local_fault_policy_acted
                                   ? "local_fault_policy_hold"
+                              : g4irsf16_i4_natural_hold_selected
+                                  ? "g4irsf16_i4_selective_hold"
+                              : g4irsf16_supervisor_safety_hold_selected
+                                  ? "g4irsf16_supervisor_safety_hold"
                               : physical_interlock_rejected
                                   ? "physical_fault_interlock_hold"
                               : escape_active ? "deadlock_escape_hold" : "local_hold";
@@ -10503,7 +11020,8 @@ class EventDrivenJunctionRuntime {
         }
       }
       const double retry_time =
-          causal_i4_natural_hold_selected
+          (causal_i4_natural_hold_selected ||
+           g4irsf16_i4_natural_hold_selected)
               ? time + std::max(service_duration(node),
                                 config_.dispatch_headway_seconds)
           : std::isfinite(earliest_resource_retry)
@@ -10511,6 +11029,41 @@ class EventDrivenJunctionRuntime {
                          earliest_resource_retry)
               : time + config_.retry_interval;
       schedule_junction_wakeup(node, retry_time);
+      if (g4irsf16_i4_natural_hold_selected) {
+        if (!g4irsf16_context.has_value() ||
+            !g4irsf16_decision.has_value() ||
+            !g4irsf16_decision->has_token ||
+            !g4irsf16_supervisor_->consume_token(
+                g4irsf16_decision->token,
+                *g4irsf16_context)) {
+          throw std::logic_error(
+              "G4IRSF16 I4 natural hold lost its action token");
+        }
+        ++result_.summary.g4irsf16_i4_applied_count;
+        ++result_.summary.g4irsf16_action_change_count;
+      }
+      if (g4irsf16_supervisor_safety_hold_selected) {
+        if (!g4irsf16_decision.has_value() ||
+            !g4irsf16_context.has_value()) {
+          throw std::logic_error(
+              "G4IRSF16 safety hold lost its decision context");
+        }
+        if (g4irsf16_decision->has_token) {
+          if (!g4irsf16_supervisor_->consume_token(
+                  g4irsf16_decision->token,
+                  *g4irsf16_context)) {
+            throw std::logic_error(
+                "G4IRSF16 safety hold lost its action token");
+          }
+        } else if (g4irsf16_decision->action !=
+                   G4IRSF16ActionKind::kFaultHold) {
+          throw std::logic_error(
+              "G4IRSF16 non-fault safety hold lacked an action token");
+        }
+        if (trace.g4irsf16_action_changed) {
+          ++result_.summary.g4irsf16_action_change_count;
+        }
+      }
       if (causal_i4_natural_hold_selected) {
         const auto& local = g4irsf14_local_state(node);
         if (!controller.junction_wakeup_pending ||
@@ -10529,6 +11082,102 @@ class EventDrivenJunctionRuntime {
     append_decision_trace(std::move(trace), selected >= 0);
     record_decision_latency(decision_started);
     return DispatchResult{task_id, selected, selected >= 0 ? 1 : 0, true};
+  }
+
+  std::vector<double> g4irsf16_local_features(
+      const BagState& bag,
+      int current,
+      double time,
+      const EventDecisionTraceRow& trace,
+      const EventCandidateRecord& baseline,
+      const EventCandidateRecord& intervention,
+      int legal_action_count,
+      bool intervention_is_hold) const {
+    // Keep this vector in the exact order frozen by model.py.  Every value is
+    // current-node, one-hop candidate, bounded history, or static map data.
+    // In particular, this function owns no route search and never scans a
+    // global queue/reservation structure.
+    std::vector<double> features;
+    features.reserve(kG4IRSF16DeploymentFeatureCount);
+    const double deadline_slack = bag.request.deadline - time;
+    const double wait_age = std::max(0.0, time - bag.request.release_time);
+    const double current_calendar_wait =
+        std::max(0.0, trace.junction_next_dispatch_time - time);
+    const double target_calendar_wait =
+        std::max(0.0,
+                 intervention.target_next_available - time -
+                     intervention.travel_time);
+    const double current_remaining =
+        static_potential(current, bag.request.goal);
+    const double baseline_remaining =
+        baseline.travel_time + baseline.static_potential;
+    const double intervention_travel =
+        intervention_is_hold ? 0.0 : intervention.travel_time;
+    const double intervention_remaining =
+        intervention_is_hold
+            ? current_remaining
+            : intervention.travel_time + intervention.static_potential;
+    std::set<int> unique_history;
+    for (const int location : bag.history) {
+      unique_history.insert(location);
+    }
+    const double repeat_count =
+        static_cast<double>(bag.history.size() - unique_history.size());
+    const auto has_segment_suffix = [&](const std::string& suffix) {
+      return bag.request.segment_id.size() >= suffix.size() &&
+             bag.request.segment_id.compare(
+                 bag.request.segment_id.size() - suffix.size(),
+                 suffix.size(), suffix) == 0;
+    };
+    const bool storage_in = has_segment_suffix(":storage_in");
+    const bool storage_out = has_segment_suffix(":storage_out");
+    const bool direct = has_segment_suffix(":direct");
+    constexpr double kPi = 3.141592653589793238462643383279502884;
+    const double day_seconds = 24.0 * 3600.0;
+    double day_time = std::fmod(time, day_seconds);
+    if (day_time < 0.0) {
+      day_time += day_seconds;
+    }
+    const double radians = 2.0 * kPi * day_time / day_seconds;
+    features.push_back(deadline_slack);
+    features.push_back(wait_age);
+    features.push_back(static_cast<double>(trace.junction_queue_length));
+    features.push_back(
+        static_cast<double>(intervention.target_queue_length));
+    features.push_back(
+        static_cast<double>(intervention.target_scheduled_incoming));
+    features.push_back(current_calendar_wait);
+    features.push_back(target_calendar_wait);
+    features.push_back(
+        static_cast<double>(std::max(0, legal_action_count - 1)));
+    features.push_back(static_cast<double>(legal_action_count));
+    features.push_back(static_cast<double>(trace.candidates.size()));
+    features.push_back(
+        static_cast<double>(graph_.node(current).node_type));
+    features.push_back(service_duration(current));
+    features.push_back(baseline.travel_time);
+    features.push_back(intervention_travel);
+    features.push_back(current_remaining);
+    features.push_back(baseline_remaining);
+    features.push_back(intervention_remaining);
+    features.push_back(baseline_remaining - intervention_remaining);
+    features.push_back(trace.model_margin);
+    features.push_back(baseline.scorer_raw_score);
+    features.push_back(
+        static_cast<double>(recent_visit_count(bag,
+                                               intervention.next_node)));
+    features.push_back(repeat_count);
+    features.push_back(storage_in ? 1.0 : 0.0);
+    features.push_back(storage_out ? 1.0 : 0.0);
+    features.push_back(direct ? 1.0 : 0.0);
+    features.push_back(std::sin(radians));
+    features.push_back(std::cos(radians));
+    features.push_back(1.0);  // frozen F2 baseline releases at this boundary
+    features.push_back(intervention.advertised_fault ? 1.0 : 0.0);
+    if (features.size() != kG4IRSF16DeploymentFeatureCount) {
+      throw std::logic_error("G4IRSF16 deployment feature order drifted");
+    }
+    return features;
   }
 
   EventCandidateRecord candidate_record(const BagState& bag,
@@ -11403,6 +12052,15 @@ class EventDrivenJunctionRuntime {
                   bag->second.fault_priority_generation,
                   static_cast<std::uint64_t>(
                       physical.physical_generation));
+          if (g4irsf16_enabled()) {
+            auto& generation =
+                g4irsf16_physical_fault_generation_by_bag_[
+                    bag->second.request.runtime_bag_id];
+            generation = std::max(
+                generation,
+                static_cast<std::uint64_t>(
+                    std::max(0, physical.physical_generation)));
+          }
           bag->second.local_enqueue_sequence =
               next_local_enqueue_sequence_++;
           ++result_.summary.repaired_task_reentry_count;
@@ -13595,6 +14253,17 @@ class EventDrivenJunctionRuntime {
   const Graph& graph_;
   EventDrivenJunctionConfig config_;
   std::optional<EdgeScoreModel> scorer_model_;
+  std::unique_ptr<G4IRSF16SelectiveLinearModel>
+      g4irsf16_i3_model_;
+  std::unique_ptr<G4IRSF16SelectiveLinearModel>
+      g4irsf16_i4_model_;
+  std::unique_ptr<G4IRSF16Supervisor>
+      g4irsf16_supervisor_;
+  // This is deliberately separate from BagState::fault_priority_generation:
+  // the priority boost is a one-edge repair token and resets after use,
+  // whereas a supervisor generation must never decrease.
+  std::unordered_map<int, std::uint64_t>
+      g4irsf16_physical_fault_generation_by_bag_;
   std::map<std::pair<int, int>, int> scorer_static_hops_;
   std::map<std::tuple<int, int, int>, double>
       pibt_regret_prior_;
@@ -13767,6 +14436,11 @@ EventDrivenJunctionRuntime::restore_g4irsf14_state(
 
 inline EventDrivenJunctionRuntime::StateCheckpoint
 EventDrivenJunctionRuntime::capture_state_checkpoint() const {
+  if (g4irsf16_enabled()) {
+    throw std::logic_error(
+        "G4IRSF16 online supervisor state is not a G4IRSF14 causal-clone "
+        "checkpoint payload; use a separate exact-off causal runtime");
+  }
   if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
       events_.empty()) {
     throw std::logic_error(

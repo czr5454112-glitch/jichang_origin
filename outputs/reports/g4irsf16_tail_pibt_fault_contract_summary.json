@@ -1,0 +1,49 @@
+{
+  "disclaimer": "Synthetic supervisor state-machine contract regression only; not a full closed-loop run, not TTH evidence, and not a tail-performance or causal-improvement claim.",
+  "evaluation_scope": "SUPERVISOR_CONTRACT_REGRESSION_NOT_FULL_CLOSED_LOOP_TTH",
+  "fault": {
+    "contract_pass": true,
+    "repair_episode_count": 5,
+    "required_cases": [
+      "no_fault",
+      "physical_shield",
+      "delayed_message",
+      "dropped_message",
+      "repair_reopen",
+      "i4_hold_fault",
+      "i3_prepare_fault",
+      "pibt_transaction_fault",
+      "full_astar_request_forbidden"
+    ],
+    "row_count": 9,
+    "stale_generation_rejection_count": 2,
+    "unsafe_entry_count": 0
+  },
+  "invariants": {
+    "full_astar_forbidden": true,
+    "pibt_atomic_all_or_none": true,
+    "repair_reentry_once_per_fault_episode": true,
+    "stale_action_rejected": true,
+    "unsafe_zero": true
+  },
+  "output_files": {
+    "fault_report": "outputs/reports/g4irsf16_fault_regression.md",
+    "fault_table": "outputs/tables/g4irsf16_fault_regression.csv",
+    "summary": "outputs/reports/g4irsf16_tail_pibt_fault_contract_summary.json",
+    "tail_pibt_report": "outputs/reports/g4irsf16_tail_pibt_ab.md",
+    "tail_pibt_table": "outputs/tables/g4irsf16_tail_pibt_ab.csv"
+  },
+  "overall_pass": true,
+  "schema": "czr005.g4irsf16.supervisor_contract_regression.v1",
+  "supervisor_contract_source": "src/czr005/policies/g4irsf16_supervisor.py",
+  "tail_pibt": {
+    "capability_credit_note": "SAFE_HOLD remains a hard supervisor invariant at every tier; T0/T1 safe holds are not credited as tier capabilities.",
+    "case_count_per_tier": 8,
+    "contract_pass": true,
+    "row_count": 32,
+    "strict_pibt_commit_count": 1,
+    "tier_count": 4,
+    "unsafe_entry_count": 0
+  },
+  "unsafe_definition": "Any prepared/committed move while a physical fault is active, any illegal or shield-unsafe edge, any stale-token acceptance, or any partial PIBT batch."
+}

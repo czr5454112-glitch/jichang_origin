@@ -92,6 +92,12 @@ target_compile_definitions(
 add_test(NAME g4irsf12_runtime_controls COMMAND test_g4irsf12_runtime_controls)
 
 add_executable(
+  test_g4irsf16_supervisor
+  cpp/tests/test_g4irsf16_supervisor.cpp)
+target_link_libraries(test_g4irsf16_supervisor PRIVATE ics_core)
+add_test(NAME g4irsf16_supervisor COMMAND test_g4irsf16_supervisor)
+
+add_executable(
   test_bounded_local_pibt_real_map
   cpp/tests/test_bounded_local_pibt_real_map.cpp)
 target_link_libraries(test_bounded_local_pibt_real_map PRIVATE ics_core)

@@ -65,6 +65,49 @@ EventDrivenJunctionConfig test_config() {
   return config;
 }
 
+void enable_g4irsf16_h5(
+    EventDrivenJunctionConfig& config,
+    const std::string& mode) {
+  config.g4irsf16_supervisor_mode = mode;
+  auto& rule = config.g4irsf16_i4_diagnostic_rule;
+  rule.authorized = true;
+  rule.schema = "czr005.g4irsf16.rule_bundle.v1";
+  rule.rule = "H5";
+  rule.authorization = "8192_DIAGNOSTIC_ONLY_NOT_PROMOTED";
+  rule.artifact_sha256 =
+      "865aabd4115b84361e2c73780a8c77f3fb464b0b41bc0c950b2ce05c0a99c96b";
+  rule.f2_model_margin_max = 1.518316644839415;
+  rule.target_queue_length_min = 0.0;
+  rule.target_scheduled_incoming_min = 5.0;
+}
+
+czr005::ics::G4IRSF16SelectiveLinearModelConfig
+g4irsf16_test_model(const std::string& kind) {
+  czr005::ics::G4IRSF16SelectiveLinearModelConfig model;
+  model.authorized = true;
+  model.self_sha256_verified = true;
+  model.schema = czr005::ics::kG4IRSF16SelectiveModelSchema;
+  model.kind = kind;
+  model.action = kind == "I3" ? "MOVE_ONE_EDGE" : "HOLD_ONE_NATURAL_OPPORTUNITY";
+  model.artifact_sha256 = "self-hash-is-integrity-not-promotion";
+  for (const char* name : czr005::ics::g4irsf16_deployment_feature_names()) {
+    model.feature_names.emplace_back(name);
+  }
+  const std::size_t count = czr005::ics::kG4IRSF16DeploymentFeatureCount;
+  model.mean.assign(count, 0.0);
+  model.scale.assign(count, 1.0);
+  model.feature_min.assign(count, -1.0e12);
+  model.feature_max.assign(count, 1.0e12);
+  model.benefit_logit = {std::vector<double>(count + 1U, 0.0)};
+  model.harmful_logit = {std::vector<double>(count + 1U, 0.0)};
+  model.risk_adjusted_utility_seconds = {
+      std::vector<double>(count + 1U, 0.0)};
+  model.benefit_probability_lcb_threshold = 1.0;
+  model.harmful_probability_ucb_budget = 0.0;
+  model.utility_lcb_margin_seconds = 0.0;
+  return model;
+}
+
 std::vector<EventRuntimeBagRequest> burst(int count, int start = 3, int goal = 47) {
   std::vector<EventRuntimeBagRequest> bags;
   for (int index = 0; index < count; ++index) {
@@ -821,6 +864,79 @@ void test_bounded_pibt_sensor_loss_uses_local_fault_handoff(Checks& checks) {
                  "fault-policy-off must still retain the non-configurable physical interlock");
 }
 
+void test_g4irsf16_fault_generation_survives_repair_boost_reset(
+    Checks& checks) {
+  const auto& graph = canonical_graph();
+  auto config = test_config();
+  config.retry_interval = 0.1;
+  config.enable_source_admission = false;
+  enable_g4irsf16_h5(config, "shadow");
+  EventDrivenJunctionRuntime runtime(graph, config);
+  const auto result = runtime.run(
+      {{"g4irsf16-fault-repair", 701, 0.0, 10000.0, 0, 47,
+        "canonical-map2"}},
+      {{0, 6, 0.0, 1.0, 0.25, true}});
+  check_core_invariants(checks, result, 1);
+  checks.require(result.summary.g4irsf16_supervisor_evaluation_count > 0,
+                 "G4IRSF16 fault regression must evaluate the native supervisor");
+  checks.require(result.summary.g4irsf16_fault_recovery_count > 0,
+                 "G4IRSF16 fault regression must observe physical fault recovery");
+  int post_repair_non_fault_decisions = 0;
+  const auto inspect = [&](const auto& rows) {
+    for (const auto& row : rows) {
+      if (!row.g4irsf16_evaluated) {
+        continue;
+      }
+      checks.require(
+          row.g4irsf16_reason !=
+              "stale_physical_fault_generation_rejected",
+          "repair-priority reset must not roll back the supervisor fault generation");
+      if (row.event_time > 1.0 &&
+          row.g4irsf16_state != "FAULT_RECOVERY") {
+        ++post_repair_non_fault_decisions;
+      }
+    }
+  };
+  inspect(result.decisions);
+  inspect(result.hold_attempts);
+  checks.require(post_repair_non_fault_decisions >= 2,
+                 "repaired bag must return to normal G4IRSF16 decisions across later nodes");
+}
+
+void test_g4irsf16_learned_model_closed_loop_is_not_self_authorizing(
+    Checks& checks) {
+  const auto& graph = canonical_graph();
+  auto closed_loop = test_config();
+  closed_loop.g4irsf16_supervisor_mode = "closed_loop";
+  closed_loop.g4irsf16_i3_model = g4irsf16_test_model("I3");
+  closed_loop.g4irsf16_i4_model = g4irsf16_test_model("I4");
+  bool rejected = false;
+  try {
+    EventDrivenJunctionRuntime runtime(graph, closed_loop);
+    (void)runtime;
+  } catch (const std::invalid_argument& error) {
+    rejected = std::string(error.what()).find("NO_GO") !=
+               std::string::npos;
+  }
+  checks.require(
+      rejected,
+      "a self-hashed learned model must not authorize its own closed-loop promotion");
+
+  auto shadow = closed_loop;
+  shadow.g4irsf16_supervisor_mode = "shadow";
+  EventDrivenJunctionRuntime shadow_runtime(graph, shadow);
+  const auto result = shadow_runtime.run(
+      {{"g4irsf16-model-shadow", 702, 0.0, 10000.0, 3, 47,
+        "canonical-map2"}});
+  check_core_invariants(checks, result, 1);
+  checks.require(
+      result.summary.g4irsf16_policy_kind == "unpromoted_model_shadow" &&
+          result.summary.g4irsf16_diagnostic_only &&
+          !result.summary.g4irsf16_promotion_authorized &&
+          result.summary.g4irsf16_action_change_count == 0,
+      "learned-model shadow must remain diagnostic-only and action-inert");
+}
+
 }  // namespace
 
 int main() {
@@ -844,6 +960,8 @@ int main() {
     test_duplicate_original_task_segments_keep_internal_identity(checks);
     test_explicit_sensor_loss_keeps_physical_shield(checks);
     test_bounded_pibt_sensor_loss_uses_local_fault_handoff(checks);
+    test_g4irsf16_fault_generation_survives_repair_boost_reset(checks);
+    test_g4irsf16_learned_model_closed_loop_is_not_self_authorizing(checks);
   } catch (const std::exception& error) {
     ++checks.failures;
     std::cerr << "FAIL: canonical map2 test setup/runtime exception: " << error.what() << '\n';
