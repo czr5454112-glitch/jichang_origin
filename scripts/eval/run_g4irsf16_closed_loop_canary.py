@@ -89,15 +89,30 @@ def _metadata_path(path: Path) -> str:
         return str(resolved)
 
 
+def _portable_binary_name(value: str) -> str:
+    """Extract one file name independent of the host path flavour."""
+
+    normalized = value.replace("\\", "/")
+    file_name = normalized.rsplit("/", 1)[-1]
+    _require(
+        file_name not in {"", ".", ".."} and ":" not in file_name,
+        "binary name is not portable",
+    )
+    return file_name
+
+
 def _published_summary(summary: Mapping[str, Any]) -> dict[str, Any]:
     """Remove machine-local loader paths from portable evidence."""
 
     published = dict(summary)
     loaded_path = published.get("loaded_cpp_binary_path")
     if isinstance(loaded_path, str) and loaded_path:
-        file_name = str(
-            published.get("loaded_cpp_binary_name") or Path(loaded_path).name
+        candidate_name = published.get("loaded_cpp_binary_name") or loaded_path
+        _require(
+            isinstance(candidate_name, str) and bool(candidate_name),
+            "binary name is missing",
         )
+        file_name = _portable_binary_name(candidate_name)
         published["loaded_cpp_binary_path"] = (
             f"EXTERNAL_NATIVE_BINARY/{file_name}"
         )
@@ -943,9 +958,12 @@ def reconcile_existing_evidence(
         binary = dict(binary)
         old_path = binary.get("path")
         file_name = binary.get("file_name")
-        if isinstance(old_path, str) and old_path:
-            file_name = file_name or Path(old_path).name
-        _require(isinstance(file_name, str) and file_name, "binary name is missing")
+        candidate_name = file_name or old_path
+        _require(
+            isinstance(candidate_name, str) and bool(candidate_name),
+            "binary name is missing",
+        )
+        file_name = _portable_binary_name(candidate_name)
         binary["file_name"] = file_name
         binary["path"] = f"EXTERNAL_NATIVE_BINARY/{file_name}"
         metadata["binary"] = binary

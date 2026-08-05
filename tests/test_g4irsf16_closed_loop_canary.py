@@ -170,6 +170,12 @@ def test_rule_bundle_identity_is_canonical_across_checkout_line_endings(
     assert canary._rule_bundle_self_sha256(crlf) == payload["self_sha256"]
 
 
+def test_portable_binary_name_accepts_windows_and_posix_paths() -> None:
+    assert canary._portable_binary_name(r"C:\tmp\private\module.pyd") == "module.pyd"
+    assert canary._portable_binary_name("/tmp/private/module.pyd") == "module.pyd"
+    assert canary._portable_binary_name("module.pyd") == "module.pyd"
+
+
 def test_evidence_reconciliation_is_explicit_and_removes_local_binary_path(
     tmp_path: Path,
 ) -> None:
