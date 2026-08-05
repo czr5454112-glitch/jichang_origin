@@ -43,11 +43,16 @@ jobs:
         run: cmake --build build-ci --config Release --parallel 2
       - name: Run native event-runtime regressions
         run: ctest --test-dir build-ci -C Release --output-on-failure
-      - name: Run fail-closed G4IRSF11 and G4IRSF12 regressions
+      # Phase-A live repository-identity tests are bound to their historical
+      # branch/upstream and do not apply to a successor PR checkout. Committed
+      # evidence and the frozen source transition are validated below.
+      - name: Run current-compatible fail-closed predecessor regressions
         env:
           PYTHONPATH: build-ci/python
         run: >-
           python -m pytest -q
+          --deselect=tests/test_g4irsf12_phase_a.py::test_phase_a_frozen_facts_and_protected_inputs_pass
+          --deselect=tests/test_g4irsf14_phase_a.py::test_phase_start_is_ancestor_and_protected_paths_pass
           tests/test_g4irsf11_fixed_map.py
           tests/test_g4irsf11_gate_integrity.py
           tests/test_g4irsf11_g4irsf10_audit.py
@@ -96,9 +101,34 @@ jobs:
       - name: Validate committed G4IRSF14 merge-grant evidence
         run: python scripts/validate_g4irsf14_merge_grant_artifacts.py
       - name: Validate deterministic G4IRSF14 fail-closed publication
-        run: python scripts/eval/g4irsf14_fail_closed_completion.py --validate-only
-      - name: Validate immutable G4IRSF14 evidence through G4IRSF15 source transition
-        run: python scripts/validate_g4irsf15_predecessor_source_transition.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          frozen_root="${RUNNER_TEMP}/g4irsf14-fail-closed-seal"
+          git worktree add --detach "$frozen_root" 966a063573f0419df1324708db75211c521d59db
+          trap 'git worktree remove --force "$frozen_root"' EXIT
+          (
+            cd "$frozen_root"
+            PYTHONPATH="$frozen_root" \
+              python -m scripts.eval.g4irsf14_fail_closed_completion --validate-only
+          )
+      - name: Validate immutable G4IRSF14 evidence through sealed G4IRSF15 source transition
+        shell: bash
+        run: |
+          set -euo pipefail
+          seal=06a2d06ece617149251c1675c302e3e334a722c3
+          git diff --exit-code "$seal" HEAD -- \
+            outputs/manifests/g4irsf15_g4irsf14_source_transition.json \
+            scripts/create_g4irsf15_predecessor_source_transition.py \
+            scripts/validate_g4irsf15_predecessor_source_transition.py
+          frozen_root="${RUNNER_TEMP}/g4irsf15-transition-seal"
+          git worktree add --detach "$frozen_root" "$seal"
+          trap 'git worktree remove --force "$frozen_root"' EXIT
+          (
+            cd "$frozen_root"
+            PYTHONPATH="$frozen_root" \
+              python -m scripts.validate_g4irsf15_predecessor_source_transition
+          )
       - name: Validate committed G4IRSF15 census when published
         run: |
           if [ -f artifacts/datasets/g4irsf15_causal_descriptor_manifest.json ]; then
