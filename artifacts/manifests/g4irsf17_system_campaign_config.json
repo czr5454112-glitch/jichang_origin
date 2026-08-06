@@ -1,0 +1,70 @@
+{
+  "base_native_controls": {},
+  "binary_path": "build_g4irsf17/python/Release/czr005_cpp.cp311-win_amd64.pyd",
+  "bootstrap_replicates": 2000,
+  "bootstrap_seed": 17017,
+  "campaign_manifest": "artifacts/manifests/g4irsf17_campaign_manifest.json",
+  "candidates": [
+    {
+      "authorization_status": "NOT_AUTHORIZED",
+      "candidate_id": "REPLACE_WITH_AUTHORIZED_G17_POLICY",
+      "locality_contract": {
+        "max_message_hops": 2,
+        "pending_queue_bound": 4,
+        "stores_future_route": false,
+        "uses_global_state": false
+      },
+      "native_controls": {},
+      "notes": "Fill from the Phase D policy decision; NOT_AUTHORIZED candidates are not run.",
+      "policy_family": "learned",
+      "requires_action_change": true
+    }
+  ],
+  "early_mean_tolerance_seconds": 0.0,
+  "event_trace_limit": 0,
+  "fault_loads": [
+    1,
+    4
+  ],
+  "fault_scenarios": "auto",
+  "g2_causal_evidence": "",
+  "g2_mode": "auto",
+  "ladder_segments": [
+    144,
+    512,
+    2048,
+    8192,
+    43603
+  ],
+  "off_native_controls": {
+    "g4irsf16_supervisor_mode": "off"
+  },
+  "reference_scale_tables": [
+    "outputs/tables/g4irsf10_v2_safe_high_flow_matrix.csv"
+  ],
+  "run_32x_smoke": false,
+  "run_fault_8x": false,
+  "run_tracks": [
+    "ladder",
+    "fault",
+    "scale"
+  ],
+  "runstate_root": "outputs/runstate/g4irsf17_system_campaign",
+  "scale_factors": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "scale_requires_full_ladder_pass": true,
+  "schema": "czr005.g4irsf17.system_campaign_config.v1",
+  "smoke_segments": 8192,
+  "tail_tolerance_seconds": 0.0,
+  "timeouts_seconds": {
+    "fault": 7200,
+    "ladder": 7200,
+    "scale": 14400
+  },
+  "trace_limit": 500000
+}

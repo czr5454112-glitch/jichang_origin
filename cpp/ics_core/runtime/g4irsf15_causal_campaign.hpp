@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <optional>
@@ -35,6 +36,14 @@ struct G4IRSF15CausalOpportunitySkeleton {
   int baseline_next_node = -1;
   bool baseline_release = false;
   std::vector<int> source_ready_order;
+  bool g4irsf17_i1_observation_available = false;
+  int g4irsf17_i1_observation_peer_runtime_bag_id = -1;
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      g4irsf17_i1_baseline_observation{};
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      g4irsf17_i1_treatment_observation{};
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      g4irsf17_i1_pairwise_features{};
   std::vector<int> legal_next_edges;
 };
 
@@ -251,6 +260,18 @@ struct G4IRSF15CausalSkeletonStepResult {
           opportunity.source_ready_order.size() < 2U) {
         throw std::invalid_argument(
             "I1 skeleton requires a multi-bag source ready set");
+      }
+      if (opportunity.g4irsf17_i1_observation_available &&
+          (opportunity.kind !=
+               G4IRSF14CloneBoundaryKind::kSourceArbitration ||
+           opportunity.g4irsf17_i1_observation_peer_runtime_bag_id < 0 ||
+           opportunity.g4irsf17_i1_observation_peer_runtime_bag_id ==
+               opportunity.runtime_bag_id ||
+           !g4irsf14_clone_detail::contains(
+               opportunity.source_ready_order,
+               opportunity.g4irsf17_i1_observation_peer_runtime_bag_id))) {
+        throw std::invalid_argument(
+            "G17 I1 skeleton observation does not bind its local peer");
       }
       if (opportunity.kind ==
               G4IRSF14CloneBoundaryKind::kJunctionRouteArbitration &&

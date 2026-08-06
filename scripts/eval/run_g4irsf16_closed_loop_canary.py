@@ -595,6 +595,8 @@ def _run_native(
     mode: str,
     rule_bundle: Path,
     trace_limit: int,
+    enable_g4irsf17_source_wait_telemetry: bool = False,
+    g4irsf17_source_wait_trace_limit: int = 200_000,
 ) -> Mapping[str, Any]:
     from czr005.cpp_backend import g4irsf11_event_runtime_from_records
 
@@ -619,6 +621,12 @@ def _run_native(
         expected_binary_path=binary,
         search_path=binary.parent,
         g4irsf16_supervisor_mode=mode,
+        enable_g4irsf17_source_wait_telemetry=(
+            enable_g4irsf17_source_wait_telemetry
+        ),
+        g4irsf17_source_wait_trace_limit=(
+            g4irsf17_source_wait_trace_limit
+        ),
     )
     if mode != "off":
         request["g4irsf16_rule_bundle"] = rule_bundle

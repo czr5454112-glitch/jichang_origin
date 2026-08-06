@@ -478,6 +478,9 @@ inline ics::EventDrivenJunctionConfig frozen_config(
   config.merge_grant_rule = "M0";
   config.merge_grant_max_pending_requests = 256;
   config.merge_grant_lifecycle_limit = 8192;
+  // Outcome-free, local-only sidecar for I1 model training.  This toggle
+  // records observations but cannot alter source, junction, or merge order.
+  config.enable_g4irsf17_causal_source_features = true;
   return config;
 }
 
@@ -705,9 +708,102 @@ inline Skeleton skeleton_from_boundary(
   skeleton.baseline_release = boundary.baseline_release;
   skeleton.source_ready_order =
       boundary.source_ready_order;
+  skeleton.g4irsf17_i1_observation_available =
+      boundary.g4irsf17_i1_observation_available;
+  skeleton.g4irsf17_i1_observation_peer_runtime_bag_id =
+      boundary.g4irsf17_i1_observation_peer_runtime_bag_id;
+  skeleton.g4irsf17_i1_baseline_observation =
+      boundary.g4irsf17_i1_baseline_observation;
+  skeleton.g4irsf17_i1_treatment_observation =
+      boundary.g4irsf17_i1_treatment_observation;
+  skeleton.g4irsf17_i1_pairwise_features =
+      boundary.g4irsf17_i1_pairwise_features;
   skeleton.legal_next_edges =
       boundary.legal_next_edges;
   return skeleton;
+}
+
+template <typename ObservationOwner>
+inline py::object g4irsf17_i1_observation_pair_row(
+    const ObservationOwner& owner,
+    int expected_peer_runtime_bag_id) {
+  if (!owner.g4irsf17_i1_observation_available) {
+    return py::none();
+  }
+  if (owner.g4irsf17_i1_observation_peer_runtime_bag_id !=
+      expected_peer_runtime_bag_id) {
+    throw std::logic_error(
+        "G17 I1 observation peer disagrees with primary causal action");
+  }
+  const auto candidate_names =
+      ics::g4irsf17_source_candidate_feature_names();
+  const auto context_names =
+      ics::g4irsf17_source_context_feature_names();
+  const auto pairwise_names =
+      ics::g4irsf17_source_pairwise_feature_names();
+  py::list canonical_feature_names;
+  for (const char* name : candidate_names) {
+    canonical_feature_names.append(name);
+  }
+  for (const char* name : context_names) {
+    canonical_feature_names.append(name);
+  }
+  py::list pairwise_feature_names;
+  for (const char* name : pairwise_names) {
+    pairwise_feature_names.append(name);
+  }
+  const auto observation_mapping =
+      [&](const auto& values) {
+    py::dict mapped;
+    for (std::size_t index = 0; index < candidate_names.size(); ++index) {
+      mapped[candidate_names[index]] = values[index];
+    }
+    for (std::size_t index = 0; index < context_names.size(); ++index) {
+      mapped[context_names[index]] =
+          values[candidate_names.size() + index];
+    }
+    return mapped;
+  };
+  const auto vector_row = [&](const auto& values) {
+    py::list row;
+    for (const double value : values) {
+      row.append(value);
+    }
+    return row;
+  };
+  py::dict baseline = observation_mapping(
+      owner.g4irsf17_i1_baseline_observation);
+  py::dict treatment = observation_mapping(
+      owner.g4irsf17_i1_treatment_observation);
+  py::list candidates;
+  candidates.append(baseline);
+  candidates.append(treatment);
+  py::list vectors;
+  vectors.append(vector_row(
+      owner.g4irsf17_i1_baseline_observation));
+  vectors.append(vector_row(
+      owner.g4irsf17_i1_treatment_observation));
+  py::dict row;
+  row["schema"] =
+      "czr005.g4irsf17.i1_pre_action_observation_pair.v1";
+  row["feature_names"] = std::move(canonical_feature_names);
+  row["pairwise_feature_names"] =
+      std::move(pairwise_feature_names);
+  row["candidate_observations"] = std::move(candidates);
+  row["canonical_candidate_observations"] =
+      std::move(vectors);
+  row["baseline_observation"] = std::move(baseline);
+  row["treatment_observation"] = std::move(treatment);
+  row["baseline_candidate_index"] = 0;
+  row["treatment_candidate_index"] = 1;
+  row["pairwise_features"] = vector_row(
+      owner.g4irsf17_i1_pairwise_features);
+  row["runtime_global_scan_count"] = 0;
+  row["runtime_future_route_read_count"] = 0;
+  row["runtime_future_schedule_read_count"] = 0;
+  row["runtime_full_astar_call_count"] = 0;
+  row["identity_fields_are_trace_only"] = true;
+  return std::move(row);
 }
 
 inline py::dict population_candidate_row(
@@ -790,6 +886,12 @@ inline py::dict population_candidate_row(
       candidate.intervention_action;
   row["expected_action_change_type"] =
       candidate.expected_action_change_type;
+  row["observation_pair"] =
+      index == 0
+          ? g4irsf17_i1_observation_pair_row(
+                candidate.skeleton,
+                candidate.peer_runtime_bag_id)
+          : py::object(py::none());
   row["primary_action_selection"] =
       "LOCAL_STABLE_NUMERIC_MIN_PEER_OR_NEXT_NODE_I4_UNIQUE";
   row["outcome_free"] = true;
@@ -918,6 +1020,12 @@ inline py::dict descriptor_row(
       population.intervention_action;
   row["expected_action_change_type"] =
       population.expected_action_change_type;
+  row["observation_pair"] =
+      index == 0
+          ? g4irsf17_i1_observation_pair_row(
+                boundary,
+                descriptor.intervention.peer_runtime_bag_id)
+          : py::object(py::none());
   row["horizon"] = "H_bag";
   row["intervention_sha256"] = descriptor.descriptor_id;
   py::dict horizon_hashes;
@@ -3407,6 +3515,12 @@ inline py::dict run_causal_target_pairs_from_records(
           detail::intervention_for(target, *found);
       pair["resolved_execution_descriptor"] =
           detail::descriptor_row(resolved_descriptor);
+      pair["observation_pair"] =
+          target.kind_index == 0
+              ? detail::g4irsf17_i1_observation_pair_row(
+                    *found,
+                    target.peer_runtime_bag_id)
+              : py::object(py::none());
       pair["resolved_execution_runtime_state_sha256"] =
           found->runtime_state_sha256;
       pair["resolved_execution_boundary_sha256"] =

@@ -1,0 +1,674 @@
+{
+  "baseline_commit": "87de2da583aea8664d2ea219e1ab0629c0c3e590",
+  "branch": "codex/g4irsf17-execution",
+  "final_joint_decision": {
+    "decision": "TERMINAL_WITH_CAPACITY_CENSORING_ACTIONABLE_PIVOT",
+    "next_pivot": "strictly-local just-in-time service-slot arbitration over a bounded pending set",
+    "protocol_amended": true,
+    "reason": "The amended workflow is terminal, but the original 4x fault matrix is capacity-censored and fault advantage is not estimable. A--E promotion/no-go classification is deferred; the next bounded pivot remains actionable.",
+    "scientific_matrix_complete": false,
+    "terminal": true
+  },
+  "formal_default": "F2/H0/R0",
+  "phases": [
+    {
+      "commands": [],
+      "decision": "MINIMAL_REGRESSION_PASS",
+      "hypothesis": "the frozen G16 baseline is a valid starting point",
+      "next_action": "build the native runtime and run targeted G16 regression tests",
+      "phase": "0",
+      "result_paths": [
+        "docs/G4IRSF17_decentralized_mainline_plan.md",
+        "outputs/reports/g4irsf17_campaign_log.md"
+      ],
+      "status": "COMPLETE"
+    },
+    {
+      "commands": [
+        "scripts\\eval\\g4irsf17_campaign.py --root . diagnose-source-wait --telemetry outputs\\runtime\\g4irsf17_source_wait\\g4irsf17_h5_8192.source_wait.json --off-telemetry outputs\\runtime\\g4irsf17_source_wait\\g4irsf17_off_8192.source_wait.json --h5-bags outputs\\runtime\\g4irsf17_source_wait\\g4irsf17_h5_8192.raw_bag_timings.csv --off-bags outputs\\runtime\\g4irsf17_source_wait\\g4irsf17_off_8192.raw_bag_timings.csv --force"
+      ],
+      "decision": "I1_BOUNDED_PILOT_AND_START_G2",
+      "hypothesis": "the H5 source-wait loss can be attributed to mutually exclusive native blockers",
+      "next_action": "Run the bounded I1 pilot, while allocating the next causal budget to destination merge/service-token G2.",
+      "phase": "A",
+      "result_paths": [
+        "outputs/tables/g4irsf17_source_wait_cause_ledger.csv",
+        "outputs/tables/g4irsf17_source_wait_topology_attribution.csv",
+        "outputs/reports/g4irsf17_source_wait_diagnosis.md"
+      ],
+      "status": "COMPLETE"
+    },
+    {
+      "commands": [
+        "scripts\\eval\\g4irsf17_campaign.py --root . plan-i1 --targets artifacts\\datasets\\g4irsf15_causal_target_address_frame.jsonl.zst --h-bag-count 128 --h-system-count 0 --output artifacts\\datasets\\g4irsf17_i1_pilot_plan.json --force",
+        "scripts\\eval\\g4irsf17_campaign.py --root . run-i1 --plan artifacts\\datasets\\g4irsf17_i1_pilot_plan.json --binary build_g4irsf17\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd --chunk-size 16 --force",
+        "scripts\\eval\\g4irsf17_campaign.py --root . run-i1 --plan artifacts\\datasets\\g4irsf17_i1_pilot_plan.json --binary build_g4irsf17\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd --chunk-size 16",
+        "scripts\\eval\\g4irsf17_campaign.py --root . plan-i1 --targets artifacts\\datasets\\g4irsf15_causal_target_address_frame.jsonl.zst --h-bag-count 512 --h-system-count 8 --output artifacts\\datasets\\g4irsf17_i1_expansion_plan.json --force",
+        "scripts\\eval\\g4irsf17_campaign.py --root . run-i1 --plan artifacts\\datasets\\g4irsf17_i1_expansion_plan.json --binary build_g4irsf17\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd --chunk-size 16",
+        "scripts\\eval\\g4irsf17_campaign.py --root . analyse-i1 --pairs artifacts\\datasets\\g4irsf17_i1_causal_pilot.jsonl.zst --plan artifacts\\datasets\\g4irsf17_i1_expansion_plan.json",
+        "scripts\\eval\\g4irsf17_campaign.py --root . aliasing-report --effects outputs\\tables\\g4irsf17_i1_effects.csv"
+      ],
+      "decision": "TRAINED_NOT_AUTHORIZED",
+      "hypothesis": "real source-order interventions plus augmented bounded-local state can support a selective policy",
+      "next_action": "Retain only runtime-realizable features that reduce sign disagreement.",
+      "phase": "B-D",
+      "result_paths": [
+        "artifacts/datasets/g4irsf17_i1_pilot_plan.json",
+        "artifacts/datasets/g4irsf17_i1_expansion_plan.json",
+        "artifacts/datasets/g4irsf17_i1_causal_pilot.jsonl.zst",
+        "outputs/tables/g4irsf17_i1_effects.csv",
+        "outputs/reports/g4irsf17_i1_causal_support.md",
+        "outputs/reports/g4irsf17_state_aliasing_audit.md",
+        "outputs/tables/g4irsf17_feature_ablation.csv",
+        "artifacts/gates/g4irsf17_i1_selective_gate.json",
+        "artifacts/policies/g4irsf17_i1_policy_comparison.json",
+        "artifacts/models/g4irsf17_i1_pairwise_linear.json",
+        "artifacts/models/g4irsf17_i1_tiny_mlp.json",
+        "outputs/tables/g4irsf17_i1_policy_evaluation.csv",
+        "outputs/tables/g4irsf17_i1_bucket_diagnostics.csv",
+        "outputs/reports/g4irsf17_i1_model_decision.md"
+      ],
+      "status": "COMPLETE"
+    },
+    {
+      "commands": [],
+      "decision": "TERMINAL_WITH_CAPACITY_CENSORING_ACTIONABLE_PIVOT",
+      "hypothesis": "the best authorized bounded-local policy can improve or preserve flow while retaining safety, fault recovery and scaling",
+      "next_action": "promote only after matched closed-loop, fault and scale gates",
+      "phase": "E-H",
+      "protocol_amended": true,
+      "result_paths": [
+        "outputs/tables/g4irsf17_closed_loop_ladder.csv",
+        "outputs/reports/g4irsf17_closed_loop_ladder.md",
+        "outputs/tables/g4irsf17_g2_matched_pilot.json",
+        "outputs/reports/g4irsf17_g2_system_track.md",
+        "outputs/tables/g4irsf17_fault_results.csv",
+        "outputs/reports/g4irsf17_native_fault_system_track.md",
+        "outputs/tables/g4irsf17_scale_results.csv",
+        "outputs/profiles/g4irsf17_scale_hotspots.csv",
+        "outputs/reports/g4irsf17_scale_system_track.md",
+        "outputs/reports/g4irsf17_final_system_track.md"
+      ],
+      "scientific_matrix_complete": false,
+      "status": "TERMINAL_WITH_CAPACITY_CENSORING_ACTIONABLE_PIVOT",
+      "workflow_terminal": true
+    }
+  ],
+  "primary_objective": "replace centralized full-route planning with bounded-local one-step source, route and merge control",
+  "resource_policy": "implementation_and_experiments_first",
+  "schema": "czr005.g4irsf17.campaign.v1",
+  "stages": {
+    "closed_loop_ladder": {
+      "decision": "BASELINE_ONLY_NO_AUTHORIZED_CANDIDATE",
+      "outputs": [
+        "outputs/tables/g4irsf17_closed_loop_ladder.csv",
+        "outputs/reports/g4irsf17_closed_loop_ladder.md"
+      ],
+      "phase": "E",
+      "schema": "czr005.g4irsf17.system_campaign_stage.v1",
+      "status": "COMPLETE",
+      "summary": {
+        "candidate_decisions": {},
+        "row_count": 0
+      },
+      "updated_at_utc": "2026-08-06T09:42:48.685173+00:00"
+    },
+    "g2_decision": {
+      "decision": "CURRENT_EAGER_TOKEN_ACTION_SEAM_NO_SUPPORT",
+      "diagnostic_terminal": true,
+      "global_g2_scientific_complete": false,
+      "outputs": [
+        "outputs/tables/g4irsf17_g2_matched_pilot.json",
+        "outputs/reports/g4irsf17_g2_system_track.md"
+      ],
+      "phase": "F",
+      "schema": "czr005.g4irsf17.system_campaign_stage.v1",
+      "status": "CURRENT_EAGER_SEAM_DIAGNOSTIC_COMPLETE",
+      "summary": {
+        "artifact_status": "COMPLETE_MATCHED_SCREEN",
+        "causal_evidence_status": "COMPLETE_MATCHED_SCREEN_NOT_SAME_STATE_CAUSAL",
+        "causal_followup_shortlist_count": 0,
+        "causal_gate_pass": false,
+        "comparison_count": 20,
+        "decision": "CURRENT_EAGER_TOKEN_ACTION_SEAM_NO_SUPPORT",
+        "evidence_scope": "CURRENT_EAGER_TOKEN_ACTION_SEAM",
+        "global_g2_scientific_no_go": false,
+        "hard_safety_pass_count": 20,
+        "i1_attempted_competitive_count": 512,
+        "i1_changed_count": 248,
+        "i1_support_ready": false,
+        "jit_choice_seam_status": "NOT_IMPLEMENTED",
+        "next_pivot": "strictly-local just-in-time service-slot arbitration over a bounded pending set",
+        "reasons": [
+          "All matched M2-M6 screens observed zero exact competitive boundaries.",
+          "The screen is end-to-end matched evidence, not a same-state one-opportunity causal authorization.",
+          "Only the current eager-token seam diagnostic is complete; the bounded JIT choice seam remains unimplemented and is not a global G2 no-go."
+        ],
+        "same_state_causal_opportunity_count": 0,
+        "scope_status": "CURRENT_EAGER_SEAM_DIAGNOSTIC_COMPLETE",
+        "triggered": true
+      },
+      "updated_at_utc": "2026-08-06T09:42:48.687196+00:00"
+    },
+    "i1_analysis": {
+      "attempt": 1,
+      "code_revision": "87de2da583ae",
+      "command": [
+        "scripts\\eval\\g4irsf17_campaign.py",
+        "--root",
+        ".",
+        "analyse-i1",
+        "--pairs",
+        "artifacts\\datasets\\g4irsf17_i1_causal_pilot.jsonl.zst",
+        "--plan",
+        "artifacts\\datasets\\g4irsf17_i1_expansion_plan.json"
+      ],
+      "decision": "PIVOT_TO_G2_I1_FRAME_COVERAGE_NO_GO",
+      "error": null,
+      "finished_at_utc": "2026-08-06T04:38:43.908653+00:00",
+      "inputs": [
+        "artifacts/datasets/g4irsf17_i1_causal_pilot.jsonl.zst"
+      ],
+      "next_action": "The current real I1 frame cannot satisfy the source/leg coverage gate; move the primary causal budget to bounded destination merge/service-token G2.",
+      "outputs": [
+        "outputs/tables/g4irsf17_i1_effects.csv",
+        "outputs/reports/g4irsf17_i1_causal_support.md"
+      ],
+      "started_at_utc": "2026-08-06T04:38:42.623406+00:00",
+      "status": "COMPLETE",
+      "summary": {
+        "action_changed_h_bag_count": 248,
+        "attempted_coverage_ready": false,
+        "attempted_h_bag_opportunity_count": 512,
+        "attempted_leg_type_count": 1,
+        "attempted_source_count": 1,
+        "attempted_time_bucket_count": 18,
+        "beneficial_h_bag_count": 18,
+        "beneficial_leg_type_count": 1,
+        "beneficial_source_count": 1,
+        "beneficial_split_counts": {
+          "calibration": 4,
+          "train": 10,
+          "validation": 4
+        },
+        "beneficial_time_bucket_count": 9,
+        "eligible_h_bag_effect_count": 248,
+        "excluded_h_bag_count": 264,
+        "h_system_attempt_count": 8,
+        "h_system_eligible_count": 8,
+        "h_system_harmful_count": 1,
+        "h_system_max_other_bag_cvar95_harm_seconds": 0.0,
+        "harmful_h_bag_count": 16,
+        "neutral_h_bag_count": 214,
+        "next_action": "The current real I1 frame cannot satisfy the source/leg coverage gate; move the primary causal budget to bounded destination merge/service-token G2.",
+        "pivot_decision": "PIVOT_TO_G2_I1_FRAME_COVERAGE_NO_GO",
+        "support_ready": false
+      }
+    },
+    "i1_paired_execution": {
+      "attempt": 3,
+      "checkpoint_at_utc": "2026-08-06T04:34:06.440615+00:00",
+      "code_revision": "87de2da583ae",
+      "command": [
+        "scripts\\eval\\g4irsf17_campaign.py",
+        "--root",
+        ".",
+        "run-i1",
+        "--plan",
+        "artifacts\\datasets\\g4irsf17_i1_expansion_plan.json",
+        "--binary",
+        "build_g4irsf17\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+        "--chunk-size",
+        "16"
+      ],
+      "decision": "EXPAND_COMPETITIVE_I1_TO_512",
+      "error": null,
+      "finished_at_utc": "2026-08-06T04:34:07.947061+00:00",
+      "inputs": [
+        "artifacts/datasets/g4irsf17_i1_expansion_plan.json"
+      ],
+      "next_action": "Sample targeted under-covered I1 strata up to 512 competitive pairs.",
+      "outputs": [
+        "artifacts/datasets/g4irsf17_i1_causal_pilot.jsonl.zst",
+        "outputs/tables/g4irsf17_i1_effects.csv",
+        "outputs/reports/g4irsf17_i1_causal_support.md"
+      ],
+      "progress": {
+        "completed_chunks": 33,
+        "completed_pairs": 520,
+        "target_pairs": 520,
+        "total_chunks": 33
+      },
+      "started_at_utc": "2026-08-06T04:33:58.714175+00:00",
+      "status": "COMPLETE",
+      "summary": {
+        "action_changed_h_bag_count": 248,
+        "attempted_h_bag_opportunity_count": 512,
+        "beneficial_h_bag_count": 18,
+        "beneficial_leg_type_count": 1,
+        "beneficial_source_count": 1,
+        "beneficial_split_counts": {
+          "calibration": 4,
+          "train": 10,
+          "validation": 4
+        },
+        "beneficial_time_bucket_count": 9,
+        "chunk_count": 33,
+        "eligible_h_bag_effect_count": 248,
+        "excluded_h_bag_count": 264,
+        "executed_pair_count": 0,
+        "h_system_attempt_count": 8,
+        "h_system_eligible_count": 8,
+        "h_system_harmful_count": 1,
+        "h_system_max_other_bag_cvar95_harm_seconds": 0.0,
+        "harmful_h_bag_count": 16,
+        "neutral_h_bag_count": 214,
+        "next_action": "Sample targeted under-covered I1 strata up to 512 competitive pairs.",
+        "pivot_decision": "EXPAND_COMPETITIVE_I1_TO_512",
+        "record_count": 520,
+        "reused_chunk_count": 33,
+        "reused_pair_count": 0,
+        "support_ready": false
+      }
+    },
+    "i1_plan": {
+      "attempt": 2,
+      "code_revision": "87de2da583ae",
+      "command": [
+        "scripts\\eval\\g4irsf17_campaign.py",
+        "--root",
+        ".",
+        "plan-i1",
+        "--targets",
+        "artifacts\\datasets\\g4irsf15_causal_target_address_frame.jsonl.zst",
+        "--h-bag-count",
+        "512",
+        "--h-system-count",
+        "8",
+        "--output",
+        "artifacts\\datasets\\g4irsf17_i1_expansion_plan.json",
+        "--force"
+      ],
+      "decision": "REAL_COMPETITIVE_I1_PANEL_PLANNED",
+      "error": null,
+      "finished_at_utc": "2026-08-06T04:01:53.865229+00:00",
+      "inputs": [
+        "artifacts/datasets/g4irsf15_causal_target_address_frame.jsonl.zst"
+      ],
+      "next_action": "Execute matched H_bag pairs and the bounded H_system subset.",
+      "outputs": [
+        "artifacts/datasets/g4irsf17_i1_expansion_plan.json"
+      ],
+      "started_at_utc": "2026-08-06T04:01:53.608781+00:00",
+      "status": "COMPLETE",
+      "summary": {
+        "coverage": {
+          "leg": [
+            "storage_in_out"
+          ],
+          "queue": [
+            "q17_32",
+            "q33_plus"
+          ],
+          "slack": [
+            "tight"
+          ],
+          "source": [
+            "52"
+          ],
+          "time": [
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9"
+          ]
+        },
+        "coverage_gate": {
+          "min_leg_types": 2,
+          "min_queue_buckets": 2,
+          "min_slack_buckets": 2,
+          "min_sources": 3,
+          "min_time_buckets": 3
+        },
+        "coverage_gate_pass": false,
+        "h_bag_opportunity_count": 512,
+        "h_system_sample_count": 8,
+        "pilot_scale_gate_pass": true,
+        "real_competitive_i1_count": 1648,
+        "source_frame_row_count": 6144,
+        "top2_contract": "baseline=source_ready_order[0]; treatment=source_ready_order[1]",
+        "total_target_count": 520
+      }
+    },
+    "native_fault_campaign": {
+      "decision": "TERMINAL_WITH_CAPACITY_CENSORING",
+      "outputs": [
+        "outputs/tables/g4irsf17_fault_results.csv",
+        "outputs/reports/g4irsf17_native_fault_system_track.md"
+      ],
+      "phase": "G",
+      "schema": "czr005.g4irsf17.system_campaign_stage.v1",
+      "status": "TERMINAL_WITH_CAPACITY_CENSORING",
+      "summary": {
+        "capacity_completed_segments": 10093,
+        "capacity_event_cap": 20000000,
+        "capacity_evidence_job_id": "scale__e4_off__4x",
+        "capacity_requested_segments": 174412,
+        "evaluable_fail_count": 1,
+        "evaluable_pass_count": 10,
+        "evaluable_row_count": 11,
+        "evidence_reused_count": 1,
+        "executed_row_count": 11,
+        "fault_advantage_4x": "NOT_ESTIMABLE",
+        "not_run_control_censored_count": 10,
+        "original_1x_matrix_complete": true,
+        "original_4x_matrix_complete": false,
+        "planned_row_count": 22,
+        "protocol_status": "AMENDED",
+        "row_count": 22,
+        "scientific_matrix_complete": false,
+        "terminal": true,
+        "track": "TERMINAL_WITH_CAPACITY_CENSORING",
+        "workflow_terminal": true
+      },
+      "updated_at_utc": "2026-08-06T09:42:48.690277+00:00"
+    },
+    "phase0_validation": {
+      "decision": "MINIMAL_REGRESSION_PASS",
+      "outputs": [
+        "docs/G4IRSF17_decentralized_mainline_plan.md",
+        "outputs/reports/g4irsf17_campaign_log.md"
+      ],
+      "phase": "0",
+      "schema": "czr005.g4irsf17.system_campaign_stage.v1",
+      "status": "COMPLETE",
+      "summary": {
+        "ctest_command": "ctest --output-on-failure (focused native suite)",
+        "ctest_passed_test_count": 14,
+        "evidence_kind": "REPRODUCIBLE_MINIMAL_BASELINE_REGRESSION",
+        "pytest_command": "pytest -q tests -k g4irsf16 (bound to the rebuilt native module)",
+        "pytest_passed_test_count": 112
+      },
+      "updated_at_utc": "2026-08-06T09:42:48.696345+00:00"
+    },
+    "scale_benchmark": {
+      "decision": "COMPLETE",
+      "outputs": [
+        "outputs/tables/g4irsf17_scale_results.csv",
+        "outputs/reports/g4irsf17_scale_system_track.md",
+        "outputs/profiles/g4irsf17_scale_hotspots.csv"
+      ],
+      "phase": "H",
+      "schema": "czr005.g4irsf17.system_campaign_stage.v1",
+      "status": "COMPLETE",
+      "summary": {
+        "optimization_decision": "VERIFIED_EVENT_QUEUE_RESERVE_MICRO_OPT",
+        "profile_row_count": 5,
+        "queue_fields_available_row_count": 1,
+        "queue_peak_bound_supported": false,
+        "queue_telemetry_status": "PARTIAL_PER_NODE_QUEUE_PEAKS",
+        "required_scale_row_count": 5,
+        "row_count": 5
+      },
+      "updated_at_utc": "2026-08-06T09:42:48.692296+00:00"
+    },
+    "source_wait_diagnosis": {
+      "attempt": 1,
+      "code_revision": "87de2da583ae",
+      "command": [
+        "scripts\\eval\\g4irsf17_campaign.py",
+        "--root",
+        ".",
+        "diagnose-source-wait",
+        "--telemetry",
+        "outputs\\runtime\\g4irsf17_source_wait\\g4irsf17_h5_8192.source_wait.json",
+        "--off-telemetry",
+        "outputs\\runtime\\g4irsf17_source_wait\\g4irsf17_off_8192.source_wait.json",
+        "--h5-bags",
+        "outputs\\runtime\\g4irsf17_source_wait\\g4irsf17_h5_8192.raw_bag_timings.csv",
+        "--off-bags",
+        "outputs\\runtime\\g4irsf17_source_wait\\g4irsf17_off_8192.raw_bag_timings.csv",
+        "--force"
+      ],
+      "decision": "I1_BOUNDED_PILOT_AND_START_G2",
+      "error": null,
+      "finished_at_utc": "2026-08-06T01:48:03.559424+00:00",
+      "inputs": [
+        "outputs/runtime/g4irsf17_source_wait/g4irsf17_h5_8192.source_wait.json",
+        "outputs/runtime/g4irsf17_source_wait/g4irsf17_h5_8192.raw_bag_timings.csv",
+        "outputs/runtime/g4irsf17_source_wait/g4irsf17_off_8192.raw_bag_timings.csv",
+        "outputs/runtime/g4irsf17_source_wait/g4irsf17_off_8192.source_wait.json"
+      ],
+      "next_action": "Run the bounded I1 pilot, while allocating the next causal budget to destination merge/service-token G2.",
+      "outputs": [
+        "outputs/tables/g4irsf17_source_wait_cause_ledger.csv",
+        "outputs/tables/g4irsf17_source_wait_topology_attribution.csv",
+        "outputs/reports/g4irsf17_source_wait_diagnosis.md"
+      ],
+      "started_at_utc": "2026-08-06T01:47:59.337197+00:00",
+      "status": "COMPLETE",
+      "summary": {
+        "additional_wait_affected_bag_count": 184,
+        "downstream_backpressure_share": 1.0,
+        "fault_recovery_or_other_share": 0.0,
+        "matched_bag_count": 4898,
+        "native_telemetry_event_count": 16776,
+        "network_improved_bag_count": 207,
+        "network_time_delta_mean_seconds_per_raw_bag": -0.05851759901997272,
+        "network_time_delta_total_seconds": -286.6191999998264,
+        "next_action": "Run the bounded I1 pilot, while allocating the next causal budget to destination merge/service-token G2.",
+        "pivot_decision": "I1_BOUNDED_PILOT_AND_START_G2",
+        "positive_additional_source_wait_seconds": 732.5,
+        "reason_positive_additional_seconds": {
+          "DESTINATION_MERGE_TOKEN": 732.5,
+          "SOURCE_SERVICE_NOT_READY": 0.0
+        },
+        "same_bag_network_improvement_source_regression_count": 79,
+        "same_bag_tradeoff_share_of_source_regressions": 0.42934782608695654,
+        "source_local_orderable_share": 0.0,
+        "source_wait_delta_mean_seconds_per_raw_bag": 0.1495508370763577,
+        "source_wait_delta_total_seconds": 732.5,
+        "source_wait_regressed_bag_count": 184,
+        "telemetry_positive_wait_coverage": 1.0,
+        "topology_top10": [
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 704.0,
+            "blocker_node": "29",
+            "h5_native_wait_seconds": 65671.25,
+            "leg_type": "storage_out",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 704.0,
+            "off_native_wait_seconds": 64967.25,
+            "positive_additional_wait_share": 0.9610921501706484,
+            "rank_within_aggregation": 1,
+            "reason": "DESTINATION_MERGE_TOKEN",
+            "source_node": "52",
+            "time_bucket": "6"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 22.25,
+            "blocker_node": "40",
+            "h5_native_wait_seconds": 11270.25,
+            "leg_type": "storage_out",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 22.25,
+            "off_native_wait_seconds": 11248.0,
+            "positive_additional_wait_share": 0.03037542662116041,
+            "rank_within_aggregation": 2,
+            "reason": "DESTINATION_MERGE_TOKEN",
+            "source_node": "52",
+            "time_bucket": "6"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 6.25,
+            "blocker_node": "29",
+            "h5_native_wait_seconds": 7433.25,
+            "leg_type": "storage_out",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 6.25,
+            "off_native_wait_seconds": 7427.0,
+            "positive_additional_wait_share": 0.008532423208191127,
+            "rank_within_aggregation": 3,
+            "reason": "DESTINATION_MERGE_TOKEN",
+            "source_node": "52",
+            "time_bucket": "5"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 0.0,
+            "blocker_node": "29",
+            "h5_native_wait_seconds": 14822.0,
+            "leg_type": "storage_out",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 0.0,
+            "off_native_wait_seconds": 14822.0,
+            "positive_additional_wait_share": 0.0,
+            "rank_within_aggregation": 4,
+            "reason": "DESTINATION_MERGE_TOKEN",
+            "source_node": "52",
+            "time_bucket": "7"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 0.0,
+            "blocker_node": "40",
+            "h5_native_wait_seconds": 1847.75,
+            "leg_type": "storage_out",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 0.0,
+            "off_native_wait_seconds": 1847.75,
+            "positive_additional_wait_share": 0.0,
+            "rank_within_aggregation": 5,
+            "reason": "DESTINATION_MERGE_TOKEN",
+            "source_node": "52",
+            "time_bucket": "7"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 0.0,
+            "blocker_node": "40",
+            "h5_native_wait_seconds": 342.0,
+            "leg_type": "storage_out",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 0.0,
+            "off_native_wait_seconds": 342.0,
+            "positive_additional_wait_share": 0.0,
+            "rank_within_aggregation": 6,
+            "reason": "DESTINATION_MERGE_TOKEN",
+            "source_node": "52",
+            "time_bucket": "5"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 0.0,
+            "blocker_node": "52",
+            "h5_native_wait_seconds": 137.5,
+            "leg_type": "unknown",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 0.0,
+            "off_native_wait_seconds": 137.5,
+            "positive_additional_wait_share": 0.0,
+            "rank_within_aggregation": 7,
+            "reason": "SOURCE_SERVICE_NOT_READY",
+            "source_node": "52",
+            "time_bucket": "8"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 0.0,
+            "blocker_node": "52",
+            "h5_native_wait_seconds": 16144.25,
+            "leg_type": "unknown",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 0.0,
+            "off_native_wait_seconds": 16144.25,
+            "positive_additional_wait_share": 0.0,
+            "rank_within_aggregation": 8,
+            "reason": "SOURCE_SERVICE_NOT_READY",
+            "source_node": "52",
+            "time_bucket": "7"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 0.0,
+            "blocker_node": "52",
+            "h5_native_wait_seconds": 2.5,
+            "leg_type": "unknown",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 0.0,
+            "off_native_wait_seconds": 2.5,
+            "positive_additional_wait_share": 0.0,
+            "rank_within_aggregation": 9,
+            "reason": "SOURCE_SERVICE_NOT_READY",
+            "source_node": "52",
+            "time_bucket": "9"
+          },
+          {
+            "aggregation": "SOURCE_BLOCKER_TIME_LEG",
+            "attributed_positive_additional_wait_seconds": 0.0,
+            "blocker_node": "52",
+            "h5_native_wait_seconds": 48884.5,
+            "leg_type": "unknown",
+            "matched_bag_count": 1,
+            "native_reason_wait_delta_seconds": 0.0,
+            "off_native_wait_seconds": 48884.5,
+            "positive_additional_wait_share": 0.0,
+            "rank_within_aggregation": 10,
+            "reason": "SOURCE_SERVICE_NOT_READY",
+            "source_node": "52",
+            "time_bucket": "6"
+          }
+        ],
+        "tth_delta_mean_seconds_per_raw_bag": 0.09103323805638498,
+        "tth_delta_total_seconds": 445.8808000001736
+      }
+    },
+    "state_aliasing": {
+      "attempt": 3,
+      "code_revision": "87de2da583ae",
+      "command": [
+        "scripts\\eval\\g4irsf17_campaign.py",
+        "--root",
+        ".",
+        "aliasing-report",
+        "--effects",
+        "outputs\\tables\\g4irsf17_i1_effects.csv"
+      ],
+      "decision": "CANONICAL_ABLATION_COMPLETE_LEGACY_29_UNAVAILABLE",
+      "error": null,
+      "finished_at_utc": "2026-08-06T04:54:34.936825+00:00",
+      "inputs": [
+        "outputs/tables/g4irsf17_i1_effects.csv"
+      ],
+      "next_action": "Retain only runtime-realizable features that reduce sign disagreement.",
+      "outputs": [
+        "outputs/reports/g4irsf17_state_aliasing_audit.md",
+        "outputs/tables/g4irsf17_feature_ablation.csv"
+      ],
+      "started_at_utc": "2026-08-06T04:54:34.506529+00:00",
+      "status": "COMPLETE",
+      "summary": {
+        "ablation_row_count": 4,
+        "status": "CANONICAL_ABLATION_COMPLETE_LEGACY_29_UNAVAILABLE"
+      }
+    }
+  },
+  "updated_at_utc": "2026-08-06T09:42:48.699633+00:00"
+}

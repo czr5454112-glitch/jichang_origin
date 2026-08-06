@@ -1,0 +1,194 @@
+{
+  "arms": {
+    "h5": {
+      "hard_gates": {
+        "action_change_observed": true,
+        "gates": {
+          "artificial_batch_delay_zero": true,
+          "complete_coverage": true,
+          "diagnostic_only_honest": true,
+          "event_limit_not_reached": true,
+          "live_merge_state_integrity": true,
+          "merge_stale_arbitrations_zero": true,
+          "no_future_routes": true,
+          "one_edge_per_arrival": true,
+          "physical_fault_edge_entry_violations_zero": true,
+          "post_commit_rollback_matches_queue_capacity_block": true,
+          "reservation_conflicts_zero": true,
+          "reservation_depth_one": true,
+          "runtime_full_astar_calls_zero": true,
+          "runtime_future_route_reads_zero": true,
+          "runtime_future_schedule_reads_zero": true,
+          "runtime_global_reservation_scans_zero": true,
+          "supervisor_full_astar_calls_zero": true,
+          "supervisor_future_inputs_zero": true,
+          "supervisor_global_scans_zero": true,
+          "supervisor_mode_echo": true,
+          "teacher_inputs_zero": true,
+          "time_limit_not_reached": true,
+          "two_step_reservations_zero": true,
+          "unresolved_deadlocks_zero": true,
+          "unsafe_edge_entries_zero": true
+        },
+        "merge_lifecycle_telemetry": {
+          "complete": false,
+          "dropped_count": 100604,
+          "safety_gate": false,
+          "stored_count": 111975,
+          "transition_count": 212579,
+          "truncated": true
+        },
+        "merge_post_commit_telemetry": {
+          "expired_count": 0,
+          "queue_capacity_block_count": 1230,
+          "revoked_count": 0,
+          "rollback_count": 1230,
+          "rollback_matches_queue_capacity_block": true,
+          "zero_required": false
+        },
+        "mode": "closed_loop",
+        "safety_pass": true,
+        "segments": 8192
+      },
+      "interval_count": 8402,
+      "mode": "closed_loop",
+      "reason_bag_seconds": {
+        "DESTINATION_MERGE_TOKEN": 101386.5,
+        "DESTINATION_QUEUE_CAPACITY": 0.0,
+        "FIRST_EDGE_CREDIT_UNAVAILABLE": 0.0,
+        "OTHER_EXPLICIT_REASON": 0.0,
+        "PHYSICAL_FAULT_OR_GENERATION": 0.0,
+        "PIBT_OR_RECOVERY_TRANSACTION": 0.0,
+        "SOURCE_SERVICE_NOT_READY": 72011.0,
+        "SUPERVISOR_HOLD": 0.0
+      },
+      "segments": 8192,
+      "wait_bag_seconds": 173397.5
+    },
+    "off": {
+      "hard_gates": {
+        "action_change_observed": null,
+        "gates": {
+          "artificial_batch_delay_zero": true,
+          "complete_coverage": true,
+          "event_limit_not_reached": true,
+          "live_merge_state_integrity": true,
+          "merge_stale_arbitrations_zero": true,
+          "no_future_routes": true,
+          "one_edge_per_arrival": true,
+          "physical_fault_edge_entry_violations_zero": true,
+          "post_commit_rollback_matches_queue_capacity_block": true,
+          "reservation_conflicts_zero": true,
+          "reservation_depth_one": true,
+          "runtime_full_astar_calls_zero": true,
+          "runtime_future_route_reads_zero": true,
+          "runtime_future_schedule_reads_zero": true,
+          "runtime_global_reservation_scans_zero": true,
+          "teacher_inputs_zero": true,
+          "time_limit_not_reached": true,
+          "two_step_reservations_zero": true,
+          "unresolved_deadlocks_zero": true,
+          "unsafe_edge_entries_zero": true
+        },
+        "merge_lifecycle_telemetry": {
+          "complete": false,
+          "dropped_count": 100782,
+          "safety_gate": false,
+          "stored_count": 111910,
+          "transition_count": 212692,
+          "truncated": true
+        },
+        "merge_post_commit_telemetry": {
+          "expired_count": 0,
+          "queue_capacity_block_count": 1231,
+          "revoked_count": 0,
+          "rollback_count": 1231,
+          "rollback_matches_queue_capacity_block": true,
+          "zero_required": false
+        },
+        "mode": "off",
+        "safety_pass": true,
+        "segments": 8192
+      },
+      "interval_count": 8374,
+      "mode": "off",
+      "reason_bag_seconds": {
+        "DESTINATION_MERGE_TOKEN": 100654.0,
+        "DESTINATION_QUEUE_CAPACITY": 0.0,
+        "FIRST_EDGE_CREDIT_UNAVAILABLE": 0.0,
+        "OTHER_EXPLICIT_REASON": 0.0,
+        "PHYSICAL_FAULT_OR_GENERATION": 0.0,
+        "PIBT_OR_RECOVERY_TRANSACTION": 0.0,
+        "SOURCE_SERVICE_NOT_READY": 72011.0,
+        "SUPERVISOR_HOLD": 0.0
+      },
+      "segments": 8192,
+      "wait_bag_seconds": 172665.0
+    }
+  },
+  "artifacts": {
+    "h5_raw_bags": "outputs/runtime/g4irsf17_source_wait/g4irsf17_h5_8192.raw_bag_timings.csv",
+    "h5_telemetry": "outputs/runtime/g4irsf17_source_wait/g4irsf17_h5_8192.source_wait.json",
+    "off_raw_bags": "outputs/runtime/g4irsf17_source_wait/g4irsf17_off_8192.raw_bag_timings.csv",
+    "off_telemetry": "outputs/runtime/g4irsf17_source_wait/g4irsf17_off_8192.source_wait.json"
+  },
+  "binary": "build_g4irsf17/python/Release/czr005_cpp.cp311-win_amd64.pyd",
+  "next_command": "python scripts/eval/g4irsf17_campaign.py diagnose-source-wait --telemetry outputs/runtime/g4irsf17_source_wait/g4irsf17_h5_8192.source_wait.json --off-telemetry outputs/runtime/g4irsf17_source_wait/g4irsf17_off_8192.source_wait.json --h5-bags outputs/runtime/g4irsf17_source_wait/g4irsf17_h5_8192.raw_bag_timings.csv --off-bags outputs/runtime/g4irsf17_source_wait/g4irsf17_off_8192.raw_bag_timings.csv --force",
+  "publication": {
+    "committed_compact_evidence": [
+      "outputs/tables/g4irsf17_source_wait_cause_ledger.csv",
+      "outputs/tables/g4irsf17_source_wait_topology_attribution.csv",
+      "outputs/reports/g4irsf17_source_wait_diagnosis.md"
+    ],
+    "note": "Raw telemetry and resumable runstate stay local and are not distributed with the repository; the listed CSV/report outputs are the compact committable evidence.",
+    "raw_runtime_artifacts": "LOCAL_ONLY_NOT_DISTRIBUTED",
+    "raw_runtime_patterns": [
+      "outputs/runtime/g4irsf17_source_wait/*.source_wait.json",
+      "outputs/runtime/g4irsf17_source_wait/*.raw_bag_timings.csv",
+      "outputs/runstate/**"
+    ]
+  },
+  "raw_bag_timing": {
+    "h5": {
+      "comparison_eligible": true,
+      "complete_raw_bag_count": 4898,
+      "completed_segment_count": 8192,
+      "completion_rate": 1.0,
+      "denominator_scope": "selected raw task_id population; every selected protected segment; primary metrics require complete selected-prefix drainage",
+      "java_release_mean_minutes": 4.63641006727228,
+      "network_time_mean_minutes": 4.046381824452081,
+      "original_entry_mean_minutes": 57.390967335351085,
+      "original_entry_p95_seconds": 9531.536286999997,
+      "original_entry_p99_seconds": 11016.294537999998,
+      "primary_denominator": "original_entry_time_tth",
+      "selected_raw_bag_count": 4898,
+      "selected_segment_count": 8192,
+      "source_wait_mean_minutes": 0.5900282428201987,
+      "survivor_metric_comparison_allowed": false,
+      "survivor_original_entry_mean_minutes": 57.390967335351085,
+      "total_system_time_mean_minutes": 57.390967335351085
+    },
+    "off": {
+      "comparison_eligible": true,
+      "complete_raw_bag_count": 4898,
+      "completed_segment_count": 8192,
+      "completion_rate": 1.0,
+      "denominator_scope": "selected raw task_id population; every selected protected segment; primary metrics require complete selected-prefix drainage",
+      "java_release_mean_minutes": 4.634892846638007,
+      "network_time_mean_minutes": 4.047357117769081,
+      "original_entry_mean_minutes": 57.38945011471682,
+      "original_entry_p95_seconds": 9531.536286999997,
+      "original_entry_p99_seconds": 11016.294537999998,
+      "primary_denominator": "original_entry_time_tth",
+      "selected_raw_bag_count": 4898,
+      "selected_segment_count": 8192,
+      "source_wait_mean_minutes": 0.5875357288689261,
+      "survivor_metric_comparison_allowed": false,
+      "survivor_original_entry_mean_minutes": 57.38945011471682,
+      "total_system_time_mean_minutes": 57.38945011471682
+    }
+  },
+  "schema": "czr005.g4irsf17.source_wait_collection_manifest.v1",
+  "segments": 8192,
+  "status": "PASS"
+}

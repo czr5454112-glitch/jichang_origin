@@ -1,0 +1,824 @@
+{
+  "artifact_role": "PRE_EXECUTION_PLANNING_SNAPSHOT",
+  "created_at_utc": "2026-08-06T03:04:30.508722+00:00",
+  "delta_convention": "candidate_minus_matched_e4_off; negative_time_is_better",
+  "excluded_candidates": [
+    {
+      "candidate_id": "REPLACE_WITH_AUTHORIZED_G17_POLICY",
+      "reason": "OFFLINE_NOT_AUTHORIZED"
+    }
+  ],
+  "g2_decision": {
+    "causal_evidence_status": "MISSING",
+    "causal_gate_pass": false,
+    "decision": "G2_PIVOT_TRIGGERED_PILOT_REQUIRED",
+    "downstream_backpressure_share": 1.0,
+    "i1_attempted_competitive_count": 0,
+    "i1_changed_count": 0,
+    "i1_support_ready": false,
+    "reasons": [
+      "downstream backpressure share is 100.00% (>=50%)",
+      "upstream campaign pivot requests G2 (I1_BOUNDED_PILOT_AND_START_G2)"
+    ],
+    "triggered": true
+  },
+  "included_candidates": [],
+  "status_note": "Planning-time G2 and authorization fields are immutable provenance, not current execution status; use the campaign manifest and system-track reports for current conclusions.",
+  "jobs": [
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "ladder__e4_off__144",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": null,
+      "segments": 144,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "ladder"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "ladder__e4_off__512",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": null,
+      "segments": 512,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "ladder"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "ladder__e4_off__2048",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": null,
+      "segments": 2048,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "ladder"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "ladder__e4_off__8192",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": null,
+      "segments": 8192,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "ladder"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "ladder__e4_off__43603",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": null,
+      "segments": 43603,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "ladder"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "no_fault",
+        "duration_seconds": 300.0,
+        "edges": [],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "no_fault"
+      },
+      "job_id": "fault__e4_off__1x__no_fault",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "single_noncritical_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "Reachability-preserving alternate-outgoing edge distinct from the selected merge-incoming scenario; on this map it also enters a different merge.",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "noncritical_edge"
+      },
+      "job_id": "fault__e4_off__1x__noncritical_edge",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "single_critical_bottleneck",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            4,
+            17
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "critical_bottleneck"
+      },
+      "job_id": "fault__e4_off__1x__critical_bottleneck",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "merge_edge_or_node",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            8
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "merge_incoming_edge"
+      },
+      "job_id": "fault__e4_off__1x__merge_incoming_edge",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "source_first_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            0,
+            6
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "source_first_edge"
+      },
+      "job_id": "fault__e4_off__1x__source_first_edge",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "ebs_related_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            52,
+            29
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "ebs_outgoing_edge"
+      },
+      "job_id": "fault__e4_off__1x__ebs_outgoing_edge",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "two_nonadjacent_faults",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            1,
+            7
+          ],
+          [
+            3,
+            16
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "dual_disjoint"
+      },
+      "job_id": "fault__e4_off__1x__dual_disjoint",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "two_propagating_faults",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            0,
+            6
+          ],
+          [
+            6,
+            8
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "dual_interacting"
+      },
+      "job_id": "fault__e4_off__1x__dual_interacting",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "delayed_beacon",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            8
+          ]
+        ],
+        "message_delay_seconds": 20.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "delayed_beacon"
+      },
+      "job_id": "fault__e4_off__1x__delayed_beacon",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "dropped_intermediate_beacon",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            8
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": true,
+        "onset_fraction": 0.35,
+        "scenario_id": "dropped_intermediate_beacon"
+      },
+      "job_id": "fault__e4_off__1x__dropped_intermediate_beacon",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "repair_after_fault",
+        "duration_seconds": 97.0,
+        "edges": [
+          [
+            4,
+            17
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "repair_reopen"
+      },
+      "job_id": "fault__e4_off__1x__repair_reopen",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "no_fault",
+        "duration_seconds": 300.0,
+        "edges": [],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "no_fault"
+      },
+      "job_id": "fault__e4_off__4x__no_fault",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "single_noncritical_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "Reachability-preserving alternate-outgoing edge distinct from the selected merge-incoming scenario; on this map it also enters a different merge.",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "noncritical_edge"
+      },
+      "job_id": "fault__e4_off__4x__noncritical_edge",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "single_critical_bottleneck",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            4,
+            17
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "critical_bottleneck"
+      },
+      "job_id": "fault__e4_off__4x__critical_bottleneck",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "merge_edge_or_node",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            8
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "merge_incoming_edge"
+      },
+      "job_id": "fault__e4_off__4x__merge_incoming_edge",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "source_first_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            0,
+            6
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "source_first_edge"
+      },
+      "job_id": "fault__e4_off__4x__source_first_edge",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "ebs_related_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            52,
+            29
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "ebs_outgoing_edge"
+      },
+      "job_id": "fault__e4_off__4x__ebs_outgoing_edge",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "two_nonadjacent_faults",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            1,
+            7
+          ],
+          [
+            3,
+            16
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "dual_disjoint"
+      },
+      "job_id": "fault__e4_off__4x__dual_disjoint",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "two_propagating_faults",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            0,
+            6
+          ],
+          [
+            6,
+            8
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "dual_interacting"
+      },
+      "job_id": "fault__e4_off__4x__dual_interacting",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "delayed_beacon",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            8
+          ]
+        ],
+        "message_delay_seconds": 20.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "delayed_beacon"
+      },
+      "job_id": "fault__e4_off__4x__delayed_beacon",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "dropped_intermediate_beacon",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            8
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": true,
+        "onset_fraction": 0.35,
+        "scenario_id": "dropped_intermediate_beacon"
+      },
+      "job_id": "fault__e4_off__4x__dropped_intermediate_beacon",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": {
+        "category": "repair_after_fault",
+        "duration_seconds": 97.0,
+        "edges": [
+          [
+            4,
+            17
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "repair_reopen"
+      },
+      "job_id": "fault__e4_off__4x__repair_reopen",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 7200.0,
+      "trace_profile": "bounded",
+      "track": "fault"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "scale__e4_off__1x",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 1,
+      "segments": null,
+      "timeout_seconds": 14400.0,
+      "trace_profile": "bounded",
+      "track": "scale"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "scale__e4_off__2x",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 2,
+      "segments": null,
+      "timeout_seconds": 14400.0,
+      "trace_profile": "bounded",
+      "track": "scale"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "scale__e4_off__4x",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 4,
+      "segments": null,
+      "timeout_seconds": 14400.0,
+      "trace_profile": "bounded",
+      "track": "scale"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "scale__e4_off__8x",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 8,
+      "segments": null,
+      "timeout_seconds": 14400.0,
+      "trace_profile": "bounded",
+      "track": "scale"
+    },
+    {
+      "candidate_id": "E4_OFF",
+      "fault_scenario": null,
+      "job_id": "scale__e4_off__16x",
+      "locality_contract": {},
+      "max_segments": -1,
+      "native_controls": {},
+      "policy_family": "off",
+      "requires_action_change": false,
+      "scale": 16,
+      "segments": null,
+      "timeout_seconds": 14400.0,
+      "trace_profile": "bounded",
+      "track": "scale"
+    }
+  ],
+  "schema": "czr005.g4irsf17.system_campaign_plan.v1"
+}

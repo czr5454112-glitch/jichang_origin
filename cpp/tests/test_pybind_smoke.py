@@ -168,6 +168,20 @@ def main() -> None:
         )
         for kind in ("I1", "I3", "I4")
     ]
+    i1_observation = selected_skeletons[0]["observation_pair"]
+    assert i1_observation[
+        "schema"
+    ] == "czr005.g4irsf17.i1_pre_action_observation_pair.v1"
+    assert len(i1_observation["candidate_observations"]) == 2
+    assert all(
+        len(item) == 39
+        for item in i1_observation["canonical_candidate_observations"]
+    )
+    assert len(i1_observation["pairwise_features"]) == 39
+    assert i1_observation["runtime_global_scan_count"] == 0
+    assert i1_observation["runtime_future_route_read_count"] == 0
+    assert i1_observation["runtime_future_schedule_read_count"] == 0
+    assert i1_observation["runtime_full_astar_call_count"] == 0
     try:
         czr005_cpp.g4irsf15_materialize_causal_descriptors_from_records(
             *bad_arguments,
@@ -192,6 +206,9 @@ def main() -> None:
         row["runtime_state_sha256"] and row["boundary_sha256"]
         for row in descriptors
     )
+    assert descriptors[0]["observation_pair"] == i1_observation
+    assert descriptors[1]["observation_pair"] is None
+    assert descriptors[2]["observation_pair"] is None
 
     h_bag_targets = []
     for descriptor in descriptors:
@@ -221,6 +238,9 @@ def main() -> None:
     )
     h_bag_pairs = [dict(row) for row in h_bag_payload["pairs"]]
     assert len(h_bag_pairs) == 3
+    assert h_bag_pairs[0]["observation_pair"] == i1_observation
+    assert h_bag_pairs[1]["observation_pair"] is None
+    assert h_bag_pairs[2]["observation_pair"] is None
     for pair, target in zip(h_bag_pairs, h_bag_targets, strict=True):
         assert pair["pair_status"] == "ACTION_CHANGED_HORIZON_COMPLETE"
         assert pair["action_changed"] is True

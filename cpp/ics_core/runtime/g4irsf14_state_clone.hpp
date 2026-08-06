@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -17,6 +18,7 @@
 #include <vector>
 
 #include "ics_core/io/canonical_map2_reader.hpp"
+#include "ics_core/runtime/g4irsf17_source_policy.hpp"
 
 namespace czr005::ics {
 
@@ -320,6 +322,17 @@ struct G4IRSF14CloneBoundary {
   bool baseline_pibt_enabled = false;
   int pibt_owner_runtime_bag_id = -1;
   std::vector<int> source_ready_order;
+  // Outcome-free G17 sidecar for the exact G15 I1 baseline/primary-peer
+  // action.  It is intentionally excluded from the content address: these
+  // observations are training inputs, never action identity.
+  bool g4irsf17_i1_observation_available = false;
+  int g4irsf17_i1_observation_peer_runtime_bag_id = -1;
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      g4irsf17_i1_baseline_observation{};
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      g4irsf17_i1_treatment_observation{};
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      g4irsf17_i1_pairwise_features{};
   std::vector<std::uint64_t> pending_merge_request_order;
   std::vector<int> legal_next_edges;
   std::vector<int> pibt_ready_bag_ids;
@@ -371,6 +384,52 @@ struct G4IRSF14CloneBoundary {
         !g4irsf14_clone_detail::all_unique(pending_merge_request_order) ||
         !g4irsf14_clone_detail::all_unique(legal_next_edges)) {
       throw std::invalid_argument("clone boundary local ready sets must be unique");
+    }
+    if (g4irsf17_i1_observation_available) {
+      const auto all_finite = [](const auto& values) {
+        return std::all_of(values.begin(), values.end(),
+                           [](double value) {
+                             return std::isfinite(value);
+                           });
+      };
+      if (kind != G4IRSF14CloneBoundaryKind::kSourceArbitration ||
+          runtime_bag_id < 0 ||
+          g4irsf17_i1_observation_peer_runtime_bag_id < 0 ||
+          g4irsf17_i1_observation_peer_runtime_bag_id == runtime_bag_id ||
+          !g4irsf14_clone_detail::contains(
+              source_ready_order,
+              g4irsf17_i1_observation_peer_runtime_bag_id) ||
+          !all_finite(g4irsf17_i1_baseline_observation) ||
+          !all_finite(g4irsf17_i1_treatment_observation) ||
+          !all_finite(g4irsf17_i1_pairwise_features)) {
+        throw std::invalid_argument(
+            "G17 I1 observation sidecar is not a valid local pair");
+      }
+      for (std::size_t index = 0;
+           index < kG4IRSF17SourceCandidateFeatureCount; ++index) {
+        if (std::abs(g4irsf17_i1_pairwise_features[index] -
+                     (g4irsf17_i1_treatment_observation[index] -
+                      g4irsf17_i1_baseline_observation[index])) >
+            1.0e-9) {
+          throw std::invalid_argument(
+              "G17 I1 pairwise candidate delta drifted");
+        }
+      }
+      for (std::size_t index = kG4IRSF17SourceCandidateFeatureCount;
+           index < kG4IRSF17SourcePairwiseFeatureCount; ++index) {
+        if (std::abs(g4irsf17_i1_baseline_observation[index] -
+                     g4irsf17_i1_treatment_observation[index]) >
+                1.0e-9 ||
+            std::abs(g4irsf17_i1_pairwise_features[index] -
+                     g4irsf17_i1_baseline_observation[index]) >
+                1.0e-9) {
+          throw std::invalid_argument(
+              "G17 I1 shared local context drifted");
+        }
+      }
+    } else if (g4irsf17_i1_observation_peer_runtime_bag_id != -1) {
+      throw std::invalid_argument(
+          "G17 I1 observation peer exists without an observation");
     }
     const bool pibt_vectors_empty =
         pibt_ready_bag_ids.empty() &&
