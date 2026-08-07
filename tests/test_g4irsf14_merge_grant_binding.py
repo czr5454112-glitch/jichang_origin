@@ -379,10 +379,22 @@ def test_e4_rejects_non_p2_pibt_mode(pibt_mode: str) -> None:
         _e4_run(pibt_mode=pibt_mode)
 
 
-@pytest.mark.parametrize("scorer_mode", ["S0", "S2", "S3", "S4"])
-def test_e4_rejects_non_s1_scorer(scorer_mode: str) -> None:
-    with pytest.raises(ValueError, match="frozen S1"):
-        _e4_run(scorer_mode=scorer_mode)
+@pytest.mark.parametrize("scorer_mode", ["S2", "S3", "S4"])
+def test_e4_accepts_existing_decentralized_scorers(
+    scorer_mode: str,
+) -> None:
+    payload = _e4_run(scorer_mode=scorer_mode)
+    summary = payload["summary"]
+    assert summary["scorer_mode"] == scorer_mode
+    assert summary["completed_count"] == 2
+    assert summary["failed_count"] == 0
+    assert summary["merge_grant_protocol_integrity_pass"] is True
+    _assert_merge_conservation(summary)
+
+
+def test_e4_still_rejects_s0_scorer() -> None:
+    with pytest.raises(ValueError, match="S1/S2/S3/S4"):
+        _e4_run(scorer_mode="S0")
 
 
 @pytest.mark.parametrize("priority_mode", ["Q1", "Q2", "Q3"])
@@ -503,7 +515,7 @@ def test_merge_rule_requires_string() -> None:
     [
         ({"resource_semantics": "R2"}, "frozen R3"),
         ({"pibt_mode": "P1"}, "frozen P2"),
-        ({"scorer_mode": "S0"}, "frozen S1"),
+        ({"scorer_mode": "S0"}, "S1/S2/S3/S4"),
         ({"priority_mode": "Q1"}, "frozen Q0"),
         (
             {"admission_mode": "expiring_first_edge_credit"},

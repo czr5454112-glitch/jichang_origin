@@ -1558,6 +1558,38 @@ enum class EventDrivenJunctionRuntimePhase {
   kFinalized,
 };
 
+// O(1) live state used by long-running capacity jobs.  This deliberately
+// exposes only counters already maintained by the event loop: taking a
+// heartbeat must not inspect the event heap, queues, bags, or candidate rows.
+struct EventRuntimeProgressSnapshot {
+  EventDrivenJunctionRuntimePhase phase =
+      EventDrivenJunctionRuntimePhase::kIdle;
+  double simulated_time = 0.0;
+  std::size_t event_heap_size = 0;
+  int requested_count = 0;
+  int released_count = 0;
+  int completed_count = 0;
+  int failed_count = 0;
+  int active_bag_count = 0;
+  int event_count = 0;
+  int bag_release_event_count = 0;
+  int arrive_junction_event_count = 0;
+  int junction_service_complete_event_count = 0;
+  int edge_enter_event_count = 0;
+  int edge_exit_event_count = 0;
+  int fault_event_count = 0;
+  int repair_event_count = 0;
+  int local_queue_update_event_count = 0;
+  int congestion_beacon_update_event_count = 0;
+  std::uint64_t source_admission_attempt_count = 0;
+  std::uint64_t source_admission_admitted_count = 0;
+  std::uint64_t source_admission_hold_count = 0;
+  std::uint64_t stale_arbitration_event_count = 0;
+  std::uint64_t merge_retry_count = 0;
+  std::uint64_t duplicate_wakeup_count = 0;
+  std::uint64_t coalesced_wakeup_count = 0;
+};
+
 struct EventDrivenJunctionSafeBoundary {
   JunctionEventType next_event_type =
       JunctionEventType::kBagRelease;
@@ -3195,6 +3227,54 @@ class EventDrivenJunctionRuntime {
 
   [[nodiscard]] EventDrivenJunctionRuntimePhase phase() const noexcept {
     return runtime_phase_;
+  }
+
+  [[nodiscard]] EventRuntimeProgressSnapshot progress_snapshot() const
+      noexcept {
+    EventRuntimeProgressSnapshot snapshot;
+    snapshot.phase = runtime_phase_;
+    snapshot.simulated_time = now_;
+    snapshot.event_heap_size = events_.size();
+    snapshot.requested_count = result_.summary.requested_count;
+    snapshot.released_count = result_.summary.bag_release_event_count;
+    snapshot.completed_count = result_.summary.completed_count;
+    snapshot.failed_count = result_.summary.failed_count;
+    snapshot.active_bag_count = active_bag_count_;
+    snapshot.event_count = result_.summary.event_count;
+    snapshot.bag_release_event_count =
+        result_.summary.bag_release_event_count;
+    snapshot.arrive_junction_event_count =
+        result_.summary.arrive_junction_event_count;
+    snapshot.junction_service_complete_event_count =
+        result_.summary.junction_service_complete_event_count;
+    snapshot.edge_enter_event_count =
+        result_.summary.edge_enter_event_count;
+    snapshot.edge_exit_event_count =
+        result_.summary.edge_exit_event_count;
+    snapshot.fault_event_count = result_.summary.fault_event_count;
+    snapshot.repair_event_count = result_.summary.repair_event_count;
+    snapshot.local_queue_update_event_count =
+        result_.summary.local_queue_update_event_count;
+    snapshot.congestion_beacon_update_event_count =
+        result_.summary.congestion_beacon_update_event_count;
+    snapshot.source_admission_attempt_count =
+        result_.summary.source_admission_attempt_count;
+    snapshot.source_admission_admitted_count =
+        result_.summary.source_admission_admitted_count;
+    snapshot.source_admission_hold_count =
+        result_.summary.source_admission_local_resource_hold_count +
+        result_.summary.source_admission_downstream_pressure_hold_count;
+    snapshot.stale_arbitration_event_count =
+        result_.summary.stale_arbitration_event_count +
+        result_.summary.merge_grant_stale_arbitration_count +
+        result_.summary.merge_grant_stale_wakeup_count;
+    snapshot.merge_retry_count =
+        result_.summary.merge_grant_contended_loser_retry_count;
+    snapshot.duplicate_wakeup_count =
+        result_.summary.merge_grant_duplicate_wakeup_prevented_count;
+    snapshot.coalesced_wakeup_count =
+        result_.summary.merge_grant_wakeup_coalesced_count;
+    return snapshot;
   }
 
   [[nodiscard]] const EventDrivenJunctionResult& current_result() const
@@ -15742,6 +15822,7 @@ class EventDrivenJunctionRuntime {
   void complete_bag(BagState& bag, double time) {
     deactivate_bag(bag);
     bag.status = BagStatus::kCompleted;
+    ++result_.summary.completed_count;
     bag.finish_time = time;
     bag.goal_completion_time_seconds =
         std::max(0.0, time - bag.request.release_time);
@@ -15758,6 +15839,7 @@ class EventDrivenJunctionRuntime {
     }
     deactivate_bag(bag);
     bag.status = BagStatus::kFailed;
+    ++result_.summary.failed_count;
     bag.failure_reason = reason;
     if (bag.deadlock_started_at >= 0.0) {
       ++result_.summary.unresolved_deadlock_count;
@@ -15942,13 +16024,6 @@ class EventDrivenJunctionRuntime {
 
   void finish_summary() {
     result_.summary.final_active_bag_count = active_bag_count_;
-    for (const auto& entry : bags_) {
-      if (entry.second.status == BagStatus::kCompleted) {
-        ++result_.summary.completed_count;
-      } else {
-        ++result_.summary.failed_count;
-      }
-    }
     if (!waits_.empty()) {
       double sum = 0.0;
       double squared_sum = 0.0;

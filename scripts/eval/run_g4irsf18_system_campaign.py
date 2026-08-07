@@ -779,6 +779,13 @@ def execute_job(
     unsupported = sorted(set(controls) - set(signature.parameters))
     _require(not unsupported, f"native wrapper lacks learned controls: {unsupported}")
     request.update(controls)
+    if request.get("scorer_mode") in {
+        "S3_shortest_potential_only",
+        "S4_queue_aware_rule_only",
+    }:
+        # S3/S4 are model-free Route rules.  The backend deliberately rejects
+        # a model path for them, while S1/S2 still require the frozen artifact.
+        request.pop("scorer_model_path", None)
 
     wall_start = time.perf_counter()
     cpu_start = time.process_time()

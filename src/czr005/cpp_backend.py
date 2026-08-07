@@ -713,6 +713,8 @@ def g4irsf11_event_runtime_from_records(
     g4irsf18_merge_coverage_cap: float = 0.05,
     g4irsf18_merge_max_overrides_per_segment: int = 2,
     g4irsf18_merge_kill_switch: bool = False,
+    bounded_wall_seconds: float = -1.0,
+    bounded_check_every_events: int = 65_536,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -901,6 +903,18 @@ def g4irsf11_event_runtime_from_records(
     max_simulation_time = strict_finite_number(
         max_simulation_time, "max_simulation_time"
     )
+    bounded_wall_seconds = strict_finite_number(
+        bounded_wall_seconds, "bounded_wall_seconds"
+    )
+    if bounded_wall_seconds != -1.0 and bounded_wall_seconds <= 0.0:
+        raise ValueError(
+            "bounded_wall_seconds must be -1 (disabled) or positive"
+        )
+    bounded_check_every_events = strict_integer(
+        bounded_check_every_events, "bounded_check_every_events"
+    )
+    if bounded_check_every_events <= 0:
+        raise ValueError("bounded_check_every_events must be positive")
     scale = strict_finite_number(scale, "scale")
     entry_headway_seconds = strict_finite_number(
         entry_headway_seconds, "entry_headway_seconds"
@@ -1221,10 +1235,16 @@ def g4irsf11_event_runtime_from_records(
         if scorer_mode not in {
             "S1",
             "S1_frozen_g4e_legal_local_adapter",
+            "S2",
+            "S2_frozen_g4e_without_absolute_node_ids",
+            "S3",
+            "S3_shortest_potential_only",
+            "S4",
+            "S4_queue_aware_rule_only",
         }:
             raise ValueError(
-                "E4 destination merge grants require the frozen S1 "
-                "G4E legal-local scorer"
+                "E4 destination merge grants require an existing "
+                "S1/S2/S3/S4 legal-local scorer"
             )
         if priority_mode not in {"Q0", "current_f2"}:
             raise ValueError(
@@ -1684,6 +1704,39 @@ def g4irsf11_event_runtime_from_records(
             float(g4irsf18_merge_coverage_cap),
             int(g4irsf18_merge_max_overrides_per_segment),
             bool(g4irsf18_merge_kill_switch),
+        )
+    if bounded_wall_seconds > 0.0:
+        # A bounded call targets the G19 ABI, so materialize the complete
+        # append-only tail once.  Default unbounded calls retain their exact
+        # historical positional shape and remain compatible with older pyds.
+        native_event_tail = (
+            str(event_semantics),
+            bool(enable_opportunity_telemetry),
+            int(opportunity_trace_limit),
+            str(merge_grant_rule),
+            int(merge_grant_max_pending_requests),
+            int(merge_grant_lifecycle_limit),
+            str(g4irsf16_supervisor_mode),
+            normalized_g4irsf16_i3_model,
+            normalized_g4irsf16_i4_model,
+            normalized_g4irsf16_rule_bundle,
+            bool(enable_g4irsf17_source_wait_telemetry),
+            int(g4irsf17_source_wait_trace_limit),
+            str(g4irsf17_source_policy_mode),
+            normalized_g4irsf17_source_policy,
+            int(g4irsf17_source_policy_trace_limit),
+            canonical_merge_grant_timing_mode,
+            str(g4irsf18_merge_policy_mode),
+            normalized_g4irsf18_merge_policy,
+            bool(g4irsf18_merge_research_closed_loop_authorized),
+            bool(g4irsf18_merge_fixed_research_workload),
+            bool(g4irsf18_merge_production_closed_loop_authorized),
+            bool(g4irsf18_merge_offline_gate_passed),
+            float(g4irsf18_merge_coverage_cap),
+            int(g4irsf18_merge_max_overrides_per_segment),
+            bool(g4irsf18_merge_kill_switch),
+            float(bounded_wall_seconds),
+            int(bounded_check_every_events),
         )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
