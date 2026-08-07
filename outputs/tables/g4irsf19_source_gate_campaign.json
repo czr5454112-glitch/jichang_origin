@@ -1,0 +1,1098 @@
+{
+  "arms": [
+    {
+      "admission_mode": "off",
+      "arm_id": "A0",
+      "enable_backpressure": false,
+      "enable_source_admission": false,
+      "expected_admission_mode": "off",
+      "expected_pressure_mode": "C0_off",
+      "pressure_mode": "off"
+    },
+    {
+      "admission_mode": "legacy_unbound",
+      "arm_id": "A1",
+      "enable_backpressure": true,
+      "enable_source_admission": true,
+      "expected_admission_mode": "legacy_unbound",
+      "expected_pressure_mode": "C1_absolute_downstream_queue_penalty",
+      "pressure_mode": "absolute_downstream_queue_penalty"
+    },
+    {
+      "admission_mode": "legacy_unbound",
+      "arm_id": "A2",
+      "enable_backpressure": true,
+      "enable_source_admission": true,
+      "expected_admission_mode": "legacy_unbound",
+      "expected_pressure_mode": "C2_goal_conditioned_differential",
+      "pressure_mode": "goal_conditioned_differential"
+    }
+  ],
+  "binary": {
+    "mtime_ns": 1786089111815352300,
+    "path": "C:\\PROGRAMING\\czr005\\.g4irsf19_worktree\\build_g4irsf19_native\\python\\czr005_cpp.cp311-win_amd64.pyd",
+    "size_bytes": 2323968
+  },
+  "cases": [
+    {
+      "arms": {
+        "A0": {
+          "arm": {
+            "admission_mode": "off",
+            "arm_id": "A0",
+            "enable_backpressure": false,
+            "enable_source_admission": false,
+            "expected_admission_mode": "off",
+            "expected_pressure_mode": "C0_off",
+            "pressure_mode": "off"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": 0,
+            "distinct_selected_bag_count": 0,
+            "distinct_selected_segment_count": 0,
+            "observed_hold_interval_count": 0,
+            "observed_wait_interval_count": 62,
+            "raw_interval_rows_persisted": false,
+            "status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 72,
+            "event_count": 14122,
+            "events_per_raw_bag": 196.13888888888889,
+            "mean_tth_seconds": 10212.380695319443,
+            "p95_tth_seconds": 11436.12360435,
+            "raw_bag_count": 72,
+            "requested_segments": 144,
+            "source_wait_mean_seconds": 1.2743055555555556
+          },
+          "resources": {
+            "cpu_seconds": 0.078125,
+            "wall_seconds": 0.08778519998304546
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 144,
+            "source_admission_attempt_count": 144,
+            "source_admission_beacon_read_count": 0,
+            "source_admission_downstream_pressure_hold_count": 0,
+            "source_admission_hold_retry_count": 0,
+            "source_admission_local_resource_hold_count": 0,
+            "source_admission_max_observed_downstream_pressure": 0
+          },
+          "status": "COMPLETE"
+        },
+        "A1": {
+          "arm": {
+            "admission_mode": "legacy_unbound",
+            "arm_id": "A1",
+            "enable_backpressure": true,
+            "enable_source_admission": true,
+            "expected_admission_mode": "legacy_unbound",
+            "expected_pressure_mode": "C1_absolute_downstream_queue_penalty",
+            "pressure_mode": "absolute_downstream_queue_penalty"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": 30,
+            "distinct_selected_bag_count": 12,
+            "distinct_selected_segment_count": 12,
+            "observed_hold_interval_count": 30,
+            "observed_wait_interval_count": 92,
+            "raw_interval_rows_persisted": false,
+            "status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 72,
+            "event_count": 14138,
+            "events_per_raw_bag": 196.36111111111111,
+            "mean_tth_seconds": 10212.381233930553,
+            "p95_tth_seconds": 11436.12360435,
+            "raw_bag_count": 72,
+            "requested_segments": 144,
+            "source_wait_mean_seconds": 1.5729166666666667
+          },
+          "resources": {
+            "cpu_seconds": 0.078125,
+            "wall_seconds": 0.08800119999796152
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 144,
+            "source_admission_attempt_count": 174,
+            "source_admission_beacon_read_count": 264,
+            "source_admission_downstream_pressure_hold_count": 30,
+            "source_admission_hold_retry_count": 30,
+            "source_admission_local_resource_hold_count": 0,
+            "source_admission_max_observed_downstream_pressure": 5
+          },
+          "status": "COMPLETE"
+        },
+        "A2": {
+          "arm": {
+            "admission_mode": "legacy_unbound",
+            "arm_id": "A2",
+            "enable_backpressure": true,
+            "enable_source_admission": true,
+            "expected_admission_mode": "legacy_unbound",
+            "expected_pressure_mode": "C2_goal_conditioned_differential",
+            "pressure_mode": "goal_conditioned_differential"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": 30,
+            "distinct_selected_bag_count": 12,
+            "distinct_selected_segment_count": 12,
+            "observed_hold_interval_count": 30,
+            "observed_wait_interval_count": 92,
+            "raw_interval_rows_persisted": false,
+            "status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 72,
+            "event_count": 14138,
+            "events_per_raw_bag": 196.36111111111111,
+            "mean_tth_seconds": 10212.381233930553,
+            "p95_tth_seconds": 11436.12360435,
+            "raw_bag_count": 72,
+            "requested_segments": 144,
+            "source_wait_mean_seconds": 1.5729166666666667
+          },
+          "resources": {
+            "cpu_seconds": 0.09375,
+            "wall_seconds": 0.08917299995664507
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 144,
+            "source_admission_attempt_count": 174,
+            "source_admission_beacon_read_count": 264,
+            "source_admission_downstream_pressure_hold_count": 30,
+            "source_admission_hold_retry_count": 30,
+            "source_admission_local_resource_hold_count": 0,
+            "source_admission_max_observed_downstream_pressure": 5
+          },
+          "status": "COMPLETE"
+        }
+      },
+      "binary": {
+        "mtime_ns": 1786089111815352300,
+        "path": "C:\\PROGRAMING\\czr005\\.g4irsf19_worktree\\build_g4irsf19_native\\python\\czr005_cpp.cp311-win_amd64.pyd",
+        "size_bytes": 2323968
+      },
+      "case": {
+        "case_id": "prefix_144",
+        "kind": "prefix",
+        "prefix_segments": 144,
+        "scale": 1,
+        "telemetry_mode": "evidence_trace"
+      },
+      "comparisons": [
+        {
+          "baseline_arm": "A0",
+          "baseline_hard_safety_pass": true,
+          "baseline_status": "COMPLETE",
+          "treatment_arm": "A1",
+          "treatment_hard_safety_pass": true,
+          "treatment_minus_baseline": {
+            "event_count": 16.0,
+            "mean_tth_seconds": 0.000538611109732301,
+            "p95_tth_seconds": 0.0,
+            "source_wait_mean_seconds": 0.29861111111111116
+          },
+          "treatment_status": "COMPLETE"
+        },
+        {
+          "baseline_arm": "A0",
+          "baseline_hard_safety_pass": true,
+          "baseline_status": "COMPLETE",
+          "treatment_arm": "A2",
+          "treatment_hard_safety_pass": true,
+          "treatment_minus_baseline": {
+            "event_count": 16.0,
+            "mean_tth_seconds": 0.000538611109732301,
+            "p95_tth_seconds": 0.0,
+            "source_wait_mean_seconds": 0.29861111111111116
+          },
+          "treatment_status": "COMPLETE"
+        }
+      ],
+      "input": {
+        "protocol": "protected_first_n_file_order",
+        "scale": 1,
+        "segments": 144,
+        "smoke_capped": false,
+        "topology_changed": false,
+        "tth_denominator": "original_entry_time_tth"
+      },
+      "runtime_contract": {
+        "capacity_trace_disabled": false,
+        "event_semantics": "E4_batch_plus_destination_merge_request",
+        "merge_rule": "M3",
+        "merge_timing": "jit_fair_aging_deadline",
+        "native_runtime_changed": false,
+        "new_model_trained": false,
+        "pibt_mode": "P2",
+        "priority_mode": "Q0",
+        "raw_source_wait_rows_persisted": false,
+        "resource_semantics": "R3_java_node_window_compatible",
+        "route_scorer": "S4_queue_aware_rule_only"
+      },
+      "schema": "czr005.g4irsf19.source_gate_case_result.v1",
+      "status": "COMPLETE",
+      "telemetry_limit": 500000
+    },
+    {
+      "arms": {
+        "A0": {
+          "arm": {
+            "admission_mode": "off",
+            "arm_id": "A0",
+            "enable_backpressure": false,
+            "enable_source_admission": false,
+            "expected_admission_mode": "off",
+            "expected_pressure_mode": "C0_off",
+            "pressure_mode": "off"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": 2,
+            "distinct_selected_bag_count": 1,
+            "distinct_selected_segment_count": 1,
+            "observed_hold_interval_count": 2,
+            "observed_wait_interval_count": 240,
+            "raw_interval_rows_persisted": false,
+            "status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 256,
+            "event_count": 50383,
+            "events_per_raw_bag": 196.80859375,
+            "mean_tth_seconds": 8816.347362785154,
+            "p95_tth_seconds": 11175.843132499998,
+            "raw_bag_count": 256,
+            "requested_segments": 512,
+            "source_wait_mean_seconds": 3.126953125
+          },
+          "resources": {
+            "cpu_seconds": 0.265625,
+            "wall_seconds": 0.2745262000244111
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 512,
+            "source_admission_attempt_count": 514,
+            "source_admission_beacon_read_count": 0,
+            "source_admission_downstream_pressure_hold_count": 0,
+            "source_admission_hold_retry_count": 2,
+            "source_admission_local_resource_hold_count": 2,
+            "source_admission_max_observed_downstream_pressure": 0
+          },
+          "status": "COMPLETE"
+        },
+        "A1": {
+          "arm": {
+            "admission_mode": "legacy_unbound",
+            "arm_id": "A1",
+            "enable_backpressure": true,
+            "enable_source_admission": true,
+            "expected_admission_mode": "legacy_unbound",
+            "expected_pressure_mode": "C1_absolute_downstream_queue_penalty",
+            "pressure_mode": "absolute_downstream_queue_penalty"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": 137,
+            "distinct_selected_bag_count": 47,
+            "distinct_selected_segment_count": 47,
+            "observed_hold_interval_count": 137,
+            "observed_wait_interval_count": 375,
+            "raw_interval_rows_persisted": false,
+            "status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 256,
+            "event_count": 50621,
+            "events_per_raw_bag": 197.73828125,
+            "mean_tth_seconds": 8816.441934425779,
+            "p95_tth_seconds": 11176.475534999998,
+            "raw_bag_count": 256,
+            "requested_segments": 512,
+            "source_wait_mean_seconds": 3.8837890625
+          },
+          "resources": {
+            "cpu_seconds": 0.296875,
+            "wall_seconds": 0.2931320999050513
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 512,
+            "source_admission_attempt_count": 649,
+            "source_admission_beacon_read_count": 959,
+            "source_admission_downstream_pressure_hold_count": 137,
+            "source_admission_hold_retry_count": 137,
+            "source_admission_local_resource_hold_count": 0,
+            "source_admission_max_observed_downstream_pressure": 5
+          },
+          "status": "COMPLETE"
+        },
+        "A2": {
+          "arm": {
+            "admission_mode": "legacy_unbound",
+            "arm_id": "A2",
+            "enable_backpressure": true,
+            "enable_source_admission": true,
+            "expected_admission_mode": "legacy_unbound",
+            "expected_pressure_mode": "C2_goal_conditioned_differential",
+            "pressure_mode": "goal_conditioned_differential"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": 137,
+            "distinct_selected_bag_count": 47,
+            "distinct_selected_segment_count": 47,
+            "observed_hold_interval_count": 137,
+            "observed_wait_interval_count": 375,
+            "raw_interval_rows_persisted": false,
+            "status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 256,
+            "event_count": 50621,
+            "events_per_raw_bag": 197.73828125,
+            "mean_tth_seconds": 8816.441934425779,
+            "p95_tth_seconds": 11176.475534999998,
+            "raw_bag_count": 256,
+            "requested_segments": 512,
+            "source_wait_mean_seconds": 3.8837890625
+          },
+          "resources": {
+            "cpu_seconds": 0.296875,
+            "wall_seconds": 0.2988264999585226
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 512,
+            "source_admission_attempt_count": 649,
+            "source_admission_beacon_read_count": 959,
+            "source_admission_downstream_pressure_hold_count": 137,
+            "source_admission_hold_retry_count": 137,
+            "source_admission_local_resource_hold_count": 0,
+            "source_admission_max_observed_downstream_pressure": 5
+          },
+          "status": "COMPLETE"
+        }
+      },
+      "binary": {
+        "mtime_ns": 1786089111815352300,
+        "path": "C:\\PROGRAMING\\czr005\\.g4irsf19_worktree\\build_g4irsf19_native\\python\\czr005_cpp.cp311-win_amd64.pyd",
+        "size_bytes": 2323968
+      },
+      "case": {
+        "case_id": "prefix_512",
+        "kind": "prefix",
+        "prefix_segments": 512,
+        "scale": 1,
+        "telemetry_mode": "evidence_trace"
+      },
+      "comparisons": [
+        {
+          "baseline_arm": "A0",
+          "baseline_hard_safety_pass": true,
+          "baseline_status": "COMPLETE",
+          "treatment_arm": "A1",
+          "treatment_hard_safety_pass": true,
+          "treatment_minus_baseline": {
+            "event_count": 238.0,
+            "mean_tth_seconds": 0.09457164062405354,
+            "p95_tth_seconds": 0.6324024999994435,
+            "source_wait_mean_seconds": 0.7568359375
+          },
+          "treatment_status": "COMPLETE"
+        },
+        {
+          "baseline_arm": "A0",
+          "baseline_hard_safety_pass": true,
+          "baseline_status": "COMPLETE",
+          "treatment_arm": "A2",
+          "treatment_hard_safety_pass": true,
+          "treatment_minus_baseline": {
+            "event_count": 238.0,
+            "mean_tth_seconds": 0.09457164062405354,
+            "p95_tth_seconds": 0.6324024999994435,
+            "source_wait_mean_seconds": 0.7568359375
+          },
+          "treatment_status": "COMPLETE"
+        }
+      ],
+      "input": {
+        "protocol": "protected_first_n_file_order",
+        "scale": 1,
+        "segments": 512,
+        "smoke_capped": false,
+        "topology_changed": false,
+        "tth_denominator": "original_entry_time_tth"
+      },
+      "runtime_contract": {
+        "capacity_trace_disabled": false,
+        "event_semantics": "E4_batch_plus_destination_merge_request",
+        "merge_rule": "M3",
+        "merge_timing": "jit_fair_aging_deadline",
+        "native_runtime_changed": false,
+        "new_model_trained": false,
+        "pibt_mode": "P2",
+        "priority_mode": "Q0",
+        "raw_source_wait_rows_persisted": false,
+        "resource_semantics": "R3_java_node_window_compatible",
+        "route_scorer": "S4_queue_aware_rule_only"
+      },
+      "schema": "czr005.g4irsf19.source_gate_case_result.v1",
+      "status": "COMPLETE",
+      "telemetry_limit": 500000
+    },
+    {
+      "arms": {
+        "A0": {
+          "arm": {
+            "admission_mode": "off",
+            "arm_id": "A0",
+            "enable_backpressure": false,
+            "enable_source_admission": false,
+            "expected_admission_mode": "off",
+            "expected_pressure_mode": "C0_off",
+            "pressure_mode": "off"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": null,
+            "distinct_selected_bag_count": null,
+            "distinct_selected_segment_count": null,
+            "observed_hold_interval_count": null,
+            "observed_wait_interval_count": null,
+            "raw_interval_rows_persisted": false,
+            "status": "NOT_COLLECTED_CAPACITY_MODE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 57012,
+            "event_count": 11388415,
+            "events_per_raw_bag": 199.75470076475128,
+            "mean_tth_seconds": 337.8427087630685,
+            "p95_tth_seconds": 960.0039999999972,
+            "raw_bag_count": 57012,
+            "requested_segments": 87206,
+            "source_wait_mean_seconds": 54.66635532870273
+          },
+          "resources": {
+            "cpu_seconds": 62.734375,
+            "wall_seconds": 64.0666994000785
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 87206,
+            "source_admission_attempt_count": 146150,
+            "source_admission_beacon_read_count": 0,
+            "source_admission_downstream_pressure_hold_count": 0,
+            "source_admission_hold_retry_count": 58944,
+            "source_admission_local_resource_hold_count": 58944,
+            "source_admission_max_observed_downstream_pressure": 0
+          },
+          "status": "COMPLETE"
+        },
+        "A1": {
+          "arm": {
+            "admission_mode": "legacy_unbound",
+            "arm_id": "A1",
+            "enable_backpressure": true,
+            "enable_source_admission": true,
+            "expected_admission_mode": "legacy_unbound",
+            "expected_pressure_mode": "C1_absolute_downstream_queue_penalty",
+            "pressure_mode": "absolute_downstream_queue_penalty"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": null,
+            "distinct_selected_bag_count": null,
+            "distinct_selected_segment_count": null,
+            "observed_hold_interval_count": null,
+            "observed_wait_interval_count": null,
+            "raw_interval_rows_persisted": false,
+            "status": "NOT_COLLECTED_CAPACITY_MODE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 57012,
+            "event_count": 11344482,
+            "events_per_raw_bag": 198.98410860871397,
+            "mean_tth_seconds": 345.60651989055015,
+            "p95_tth_seconds": 1052.1164999999944,
+            "raw_bag_count": 57012,
+            "requested_segments": 87206,
+            "source_wait_mean_seconds": 66.52591121167474
+          },
+          "resources": {
+            "cpu_seconds": 61.328125,
+            "wall_seconds": 62.77074820001144
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 87206,
+            "source_admission_attempt_count": 174989,
+            "source_admission_beacon_read_count": 178776,
+            "source_admission_downstream_pressure_hold_count": 57528,
+            "source_admission_hold_retry_count": 87783,
+            "source_admission_local_resource_hold_count": 30255,
+            "source_admission_max_observed_downstream_pressure": 32
+          },
+          "status": "COMPLETE"
+        },
+        "A2": {
+          "arm": {
+            "admission_mode": "legacy_unbound",
+            "arm_id": "A2",
+            "enable_backpressure": true,
+            "enable_source_admission": true,
+            "expected_admission_mode": "legacy_unbound",
+            "expected_pressure_mode": "C2_goal_conditioned_differential",
+            "pressure_mode": "goal_conditioned_differential"
+          },
+          "hard_safety": {
+            "gates": {
+              "all_segments_completed": true,
+              "conflict_zero": true,
+              "deadlock_zero": true,
+              "event_limit_not_reached": true,
+              "failed_zero": true,
+              "full_astar_zero": true,
+              "full_cie_zero": true,
+              "future_route_zero": true,
+              "future_routes_not_stored": true,
+              "future_schedule_zero": true,
+              "global_scan_zero": true,
+              "time_limit_not_reached": true,
+              "unsafe_zero": true
+            },
+            "pass": true
+          },
+          "hold_observation": {
+            "claim_boundary": "A distinct HOLD opportunity is one unique observed source-generation, selected-bag and blocker-state key. Retry counters may revisit the same key; HOLD defers admission and is not a bag route/action mutation.",
+            "distinct_hold_opportunity_count": null,
+            "distinct_selected_bag_count": null,
+            "distinct_selected_segment_count": null,
+            "observed_hold_interval_count": null,
+            "observed_wait_interval_count": null,
+            "raw_interval_rows_persisted": false,
+            "status": "NOT_COLLECTED_CAPACITY_MODE"
+          },
+          "metrics": {
+            "complete_raw_bag_count": 57012,
+            "event_count": 11407989,
+            "events_per_raw_bag": 200.09803199326458,
+            "mean_tth_seconds": 342.7799272433882,
+            "p95_tth_seconds": 1000.5389999999958,
+            "raw_bag_count": 57012,
+            "requested_segments": 87206,
+            "source_wait_mean_seconds": 58.779011436188874
+          },
+          "resources": {
+            "cpu_seconds": 60.921875,
+            "wall_seconds": 62.5001718000276
+          },
+          "source_counters": {
+            "source_admission_admitted_count": 87206,
+            "source_admission_attempt_count": 176081,
+            "source_admission_beacon_read_count": 156669,
+            "source_admission_downstream_pressure_hold_count": 35385,
+            "source_admission_hold_retry_count": 88875,
+            "source_admission_local_resource_hold_count": 53490,
+            "source_admission_max_observed_downstream_pressure": 32
+          },
+          "status": "COMPLETE"
+        }
+      },
+      "binary": {
+        "mtime_ns": 1786089111815352300,
+        "path": "C:\\PROGRAMING\\czr005\\.g4irsf19_worktree\\build_g4irsf19_native\\python\\czr005_cpp.cp311-win_amd64.pyd",
+        "size_bytes": 2323968
+      },
+      "case": {
+        "case_id": "scale_2x",
+        "kind": "scale",
+        "prefix_segments": null,
+        "scale": 2,
+        "telemetry_mode": "capacity"
+      },
+      "comparisons": [
+        {
+          "baseline_arm": "A0",
+          "baseline_hard_safety_pass": true,
+          "baseline_status": "COMPLETE",
+          "treatment_arm": "A1",
+          "treatment_hard_safety_pass": true,
+          "treatment_minus_baseline": {
+            "event_count": -43933.0,
+            "mean_tth_seconds": 7.763811127481631,
+            "p95_tth_seconds": 92.11249999999723,
+            "source_wait_mean_seconds": 11.85955588297201
+          },
+          "treatment_status": "COMPLETE"
+        },
+        {
+          "baseline_arm": "A0",
+          "baseline_hard_safety_pass": true,
+          "baseline_status": "COMPLETE",
+          "treatment_arm": "A2",
+          "treatment_hard_safety_pass": true,
+          "treatment_minus_baseline": {
+            "event_count": 19574.0,
+            "mean_tth_seconds": 4.9372184803197,
+            "p95_tth_seconds": 40.534999999998604,
+            "source_wait_mean_seconds": 4.112656107486146
+          },
+          "treatment_status": "COMPLETE"
+        }
+      ],
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 2,
+        "segments": 87206,
+        "smoke_capped": false,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "runtime_contract": {
+        "capacity_trace_disabled": true,
+        "event_semantics": "E4_batch_plus_destination_merge_request",
+        "merge_rule": "M3",
+        "merge_timing": "jit_fair_aging_deadline",
+        "native_runtime_changed": false,
+        "new_model_trained": false,
+        "pibt_mode": "P2",
+        "priority_mode": "Q0",
+        "raw_source_wait_rows_persisted": false,
+        "resource_semantics": "R3_java_node_window_compatible",
+        "route_scorer": "S4_queue_aware_rule_only"
+      },
+      "schema": "czr005.g4irsf19.source_gate_case_result.v1",
+      "status": "COMPLETE",
+      "telemetry_limit": 500000
+    }
+  ],
+  "rows": [
+    {
+      "admission_mode": "off",
+      "arm_id": "A0",
+      "case_id": "prefix_144",
+      "delta_events_vs_a0": null,
+      "delta_mean_tth_vs_a0_seconds": null,
+      "delta_source_wait_vs_a0_seconds": null,
+      "distinct_hold_opportunity_count": 0,
+      "distinct_selected_bag_count": 0,
+      "enable_backpressure": false,
+      "enable_source_admission": false,
+      "event_count": 14122,
+      "hard_safety_pass": true,
+      "hold_observation_status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE",
+      "kind": "prefix",
+      "mean_tth_seconds": 10212.380695319443,
+      "observed_hold_interval_count": 0,
+      "observed_wait_interval_count": 62,
+      "p95_tth_seconds": 11436.12360435,
+      "prefix_segments": 144,
+      "pressure_mode": "off",
+      "scale": 1,
+      "source_admission_admitted_count": 144,
+      "source_admission_attempt_count": 144,
+      "source_admission_downstream_pressure_hold_count": 0,
+      "source_admission_hold_retry_count": 0,
+      "source_admission_local_resource_hold_count": 0,
+      "source_wait_mean_seconds": 1.2743055555555556,
+      "status": "COMPLETE",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "admission_mode": "legacy_unbound",
+      "arm_id": "A1",
+      "case_id": "prefix_144",
+      "delta_events_vs_a0": 16.0,
+      "delta_mean_tth_vs_a0_seconds": 0.000538611109732301,
+      "delta_source_wait_vs_a0_seconds": 0.29861111111111116,
+      "distinct_hold_opportunity_count": 30,
+      "distinct_selected_bag_count": 12,
+      "enable_backpressure": true,
+      "enable_source_admission": true,
+      "event_count": 14138,
+      "hard_safety_pass": true,
+      "hold_observation_status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE",
+      "kind": "prefix",
+      "mean_tth_seconds": 10212.381233930553,
+      "observed_hold_interval_count": 30,
+      "observed_wait_interval_count": 92,
+      "p95_tth_seconds": 11436.12360435,
+      "prefix_segments": 144,
+      "pressure_mode": "absolute_downstream_queue_penalty",
+      "scale": 1,
+      "source_admission_admitted_count": 144,
+      "source_admission_attempt_count": 174,
+      "source_admission_downstream_pressure_hold_count": 30,
+      "source_admission_hold_retry_count": 30,
+      "source_admission_local_resource_hold_count": 0,
+      "source_wait_mean_seconds": 1.5729166666666667,
+      "status": "COMPLETE",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "admission_mode": "legacy_unbound",
+      "arm_id": "A2",
+      "case_id": "prefix_144",
+      "delta_events_vs_a0": 16.0,
+      "delta_mean_tth_vs_a0_seconds": 0.000538611109732301,
+      "delta_source_wait_vs_a0_seconds": 0.29861111111111116,
+      "distinct_hold_opportunity_count": 30,
+      "distinct_selected_bag_count": 12,
+      "enable_backpressure": true,
+      "enable_source_admission": true,
+      "event_count": 14138,
+      "hard_safety_pass": true,
+      "hold_observation_status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE",
+      "kind": "prefix",
+      "mean_tth_seconds": 10212.381233930553,
+      "observed_hold_interval_count": 30,
+      "observed_wait_interval_count": 92,
+      "p95_tth_seconds": 11436.12360435,
+      "prefix_segments": 144,
+      "pressure_mode": "goal_conditioned_differential",
+      "scale": 1,
+      "source_admission_admitted_count": 144,
+      "source_admission_attempt_count": 174,
+      "source_admission_downstream_pressure_hold_count": 30,
+      "source_admission_hold_retry_count": 30,
+      "source_admission_local_resource_hold_count": 0,
+      "source_wait_mean_seconds": 1.5729166666666667,
+      "status": "COMPLETE",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "admission_mode": "off",
+      "arm_id": "A0",
+      "case_id": "prefix_512",
+      "delta_events_vs_a0": null,
+      "delta_mean_tth_vs_a0_seconds": null,
+      "delta_source_wait_vs_a0_seconds": null,
+      "distinct_hold_opportunity_count": 2,
+      "distinct_selected_bag_count": 1,
+      "enable_backpressure": false,
+      "enable_source_admission": false,
+      "event_count": 50383,
+      "hard_safety_pass": true,
+      "hold_observation_status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE",
+      "kind": "prefix",
+      "mean_tth_seconds": 8816.347362785154,
+      "observed_hold_interval_count": 2,
+      "observed_wait_interval_count": 240,
+      "p95_tth_seconds": 11175.843132499998,
+      "prefix_segments": 512,
+      "pressure_mode": "off",
+      "scale": 1,
+      "source_admission_admitted_count": 512,
+      "source_admission_attempt_count": 514,
+      "source_admission_downstream_pressure_hold_count": 0,
+      "source_admission_hold_retry_count": 2,
+      "source_admission_local_resource_hold_count": 2,
+      "source_wait_mean_seconds": 3.126953125,
+      "status": "COMPLETE",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "admission_mode": "legacy_unbound",
+      "arm_id": "A1",
+      "case_id": "prefix_512",
+      "delta_events_vs_a0": 238.0,
+      "delta_mean_tth_vs_a0_seconds": 0.09457164062405354,
+      "delta_source_wait_vs_a0_seconds": 0.7568359375,
+      "distinct_hold_opportunity_count": 137,
+      "distinct_selected_bag_count": 47,
+      "enable_backpressure": true,
+      "enable_source_admission": true,
+      "event_count": 50621,
+      "hard_safety_pass": true,
+      "hold_observation_status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE",
+      "kind": "prefix",
+      "mean_tth_seconds": 8816.441934425779,
+      "observed_hold_interval_count": 137,
+      "observed_wait_interval_count": 375,
+      "p95_tth_seconds": 11176.475534999998,
+      "prefix_segments": 512,
+      "pressure_mode": "absolute_downstream_queue_penalty",
+      "scale": 1,
+      "source_admission_admitted_count": 512,
+      "source_admission_attempt_count": 649,
+      "source_admission_downstream_pressure_hold_count": 137,
+      "source_admission_hold_retry_count": 137,
+      "source_admission_local_resource_hold_count": 0,
+      "source_wait_mean_seconds": 3.8837890625,
+      "status": "COMPLETE",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "admission_mode": "legacy_unbound",
+      "arm_id": "A2",
+      "case_id": "prefix_512",
+      "delta_events_vs_a0": 238.0,
+      "delta_mean_tth_vs_a0_seconds": 0.09457164062405354,
+      "delta_source_wait_vs_a0_seconds": 0.7568359375,
+      "distinct_hold_opportunity_count": 137,
+      "distinct_selected_bag_count": 47,
+      "enable_backpressure": true,
+      "enable_source_admission": true,
+      "event_count": 50621,
+      "hard_safety_pass": true,
+      "hold_observation_status": "COMPLETE_OBSERVED_WAIT_STATE_CAPTURE",
+      "kind": "prefix",
+      "mean_tth_seconds": 8816.441934425779,
+      "observed_hold_interval_count": 137,
+      "observed_wait_interval_count": 375,
+      "p95_tth_seconds": 11176.475534999998,
+      "prefix_segments": 512,
+      "pressure_mode": "goal_conditioned_differential",
+      "scale": 1,
+      "source_admission_admitted_count": 512,
+      "source_admission_attempt_count": 649,
+      "source_admission_downstream_pressure_hold_count": 137,
+      "source_admission_hold_retry_count": 137,
+      "source_admission_local_resource_hold_count": 0,
+      "source_wait_mean_seconds": 3.8837890625,
+      "status": "COMPLETE",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "admission_mode": "off",
+      "arm_id": "A0",
+      "case_id": "scale_2x",
+      "delta_events_vs_a0": null,
+      "delta_mean_tth_vs_a0_seconds": null,
+      "delta_source_wait_vs_a0_seconds": null,
+      "distinct_hold_opportunity_count": null,
+      "distinct_selected_bag_count": null,
+      "enable_backpressure": false,
+      "enable_source_admission": false,
+      "event_count": 11388415,
+      "hard_safety_pass": true,
+      "hold_observation_status": "NOT_COLLECTED_CAPACITY_MODE",
+      "kind": "scale",
+      "mean_tth_seconds": 337.8427087630685,
+      "observed_hold_interval_count": null,
+      "observed_wait_interval_count": null,
+      "p95_tth_seconds": 960.0039999999972,
+      "prefix_segments": null,
+      "pressure_mode": "off",
+      "scale": 2,
+      "source_admission_admitted_count": 87206,
+      "source_admission_attempt_count": 146150,
+      "source_admission_downstream_pressure_hold_count": 0,
+      "source_admission_hold_retry_count": 58944,
+      "source_admission_local_resource_hold_count": 58944,
+      "source_wait_mean_seconds": 54.66635532870273,
+      "status": "COMPLETE",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "admission_mode": "legacy_unbound",
+      "arm_id": "A1",
+      "case_id": "scale_2x",
+      "delta_events_vs_a0": -43933.0,
+      "delta_mean_tth_vs_a0_seconds": 7.763811127481631,
+      "delta_source_wait_vs_a0_seconds": 11.85955588297201,
+      "distinct_hold_opportunity_count": null,
+      "distinct_selected_bag_count": null,
+      "enable_backpressure": true,
+      "enable_source_admission": true,
+      "event_count": 11344482,
+      "hard_safety_pass": true,
+      "hold_observation_status": "NOT_COLLECTED_CAPACITY_MODE",
+      "kind": "scale",
+      "mean_tth_seconds": 345.60651989055015,
+      "observed_hold_interval_count": null,
+      "observed_wait_interval_count": null,
+      "p95_tth_seconds": 1052.1164999999944,
+      "prefix_segments": null,
+      "pressure_mode": "absolute_downstream_queue_penalty",
+      "scale": 2,
+      "source_admission_admitted_count": 87206,
+      "source_admission_attempt_count": 174989,
+      "source_admission_downstream_pressure_hold_count": 57528,
+      "source_admission_hold_retry_count": 87783,
+      "source_admission_local_resource_hold_count": 30255,
+      "source_wait_mean_seconds": 66.52591121167474,
+      "status": "COMPLETE",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "admission_mode": "legacy_unbound",
+      "arm_id": "A2",
+      "case_id": "scale_2x",
+      "delta_events_vs_a0": 19574.0,
+      "delta_mean_tth_vs_a0_seconds": 4.9372184803197,
+      "delta_source_wait_vs_a0_seconds": 4.112656107486146,
+      "distinct_hold_opportunity_count": null,
+      "distinct_selected_bag_count": null,
+      "enable_backpressure": true,
+      "enable_source_admission": true,
+      "event_count": 11407989,
+      "hard_safety_pass": true,
+      "hold_observation_status": "NOT_COLLECTED_CAPACITY_MODE",
+      "kind": "scale",
+      "mean_tth_seconds": 342.7799272433882,
+      "observed_hold_interval_count": null,
+      "observed_wait_interval_count": null,
+      "p95_tth_seconds": 1000.5389999999958,
+      "prefix_segments": null,
+      "pressure_mode": "goal_conditioned_differential",
+      "scale": 2,
+      "source_admission_admitted_count": 87206,
+      "source_admission_attempt_count": 176081,
+      "source_admission_downstream_pressure_hold_count": 35385,
+      "source_admission_hold_retry_count": 88875,
+      "source_admission_local_resource_hold_count": 53490,
+      "source_wait_mean_seconds": 58.779011436188874,
+      "status": "COMPLETE",
+      "telemetry_mode": "capacity"
+    }
+  ],
+  "schema": "czr005.g4irsf19.source_gate_campaign.v1",
+  "status": "COMPLETE"
+}

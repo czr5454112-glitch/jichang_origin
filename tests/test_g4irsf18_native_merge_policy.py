@@ -82,6 +82,55 @@ def test_wrapper_materializes_g18_append_only_tail(
     )
 
 
+def test_wrapper_materializes_complete_g19_bounded_tail(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    common, captured = _fake_common(monkeypatch)
+    cpp_backend.g4irsf11_event_runtime_from_records(
+        **common,
+        bounded_wall_seconds=0.01,
+        bounded_check_every_events=7,
+    )
+    args = captured[0]
+    assert len(args) == 82
+    assert args[-12:] == (
+        "jit_fair_aging_deadline",
+        "off",
+        {},
+        False,
+        False,
+        False,
+        False,
+        0.05,
+        2,
+        False,
+        0.01,
+        7,
+    )
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "error"),
+    [
+        ({"bounded_wall_seconds": 0.0}, ValueError),
+        ({"bounded_wall_seconds": float("inf")}, ValueError),
+        ({"bounded_check_every_events": 0}, ValueError),
+        ({"bounded_check_every_events": True}, TypeError),
+    ],
+)
+def test_wrapper_rejects_invalid_g19_bounds(
+    monkeypatch: pytest.MonkeyPatch,
+    kwargs: dict[str, object],
+    error: type[Exception],
+) -> None:
+    common, _captured = _fake_common(monkeypatch)
+    with pytest.raises(error):
+        cpp_backend.g4irsf11_event_runtime_from_records(
+            **common,
+            **kwargs,
+        )
+
+
 def test_research_arm_is_explicit_fixed_workload_and_never_production() -> None:
     arm, note = system_campaign.load_learned_arm(
         ROOT / "artifacts/manifests/g4irsf18_j7_native_research_arm.json"

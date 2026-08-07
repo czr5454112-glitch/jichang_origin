@@ -5901,6 +5901,67 @@ py::dict g4irsf14_state_clone_noop_rerun_from_records(
   return payload;
 }
 
+py::dict g4irsf19_progress_row(
+    const czr005::ics::EventRuntimeProgressSnapshot& snapshot,
+    double wall_seconds) {
+  py::dict row;
+  row["schema"] = "czr005.g4irsf19.runtime_progress.v1";
+  switch (snapshot.phase) {
+    case czr005::ics::EventDrivenJunctionRuntimePhase::kIdle:
+      row["phase"] = "IDLE";
+      break;
+    case czr005::ics::EventDrivenJunctionRuntimePhase::kReady:
+      row["phase"] = "READY";
+      break;
+    case czr005::ics::EventDrivenJunctionRuntimePhase::kStopped:
+      row["phase"] = "STOPPED";
+      break;
+    case czr005::ics::EventDrivenJunctionRuntimePhase::kFinalized:
+      row["phase"] = "FINALIZED";
+      break;
+  }
+  row["wall_seconds"] = wall_seconds;
+  row["simulated_time"] = snapshot.simulated_time;
+  row["requested_bags"] = snapshot.requested_count;
+  row["released_bags"] = snapshot.released_count;
+  row["completed_bags"] = snapshot.completed_count;
+  row["failed_bags"] = snapshot.failed_count;
+  row["terminal_bags"] =
+      snapshot.completed_count + snapshot.failed_count;
+  row["current_backlog"] = snapshot.active_bag_count;
+  row["event_total"] = snapshot.event_count;
+  row["heap_size"] = snapshot.event_heap_size;
+  py::dict event_types;
+  event_types["bag_release"] = snapshot.bag_release_event_count;
+  event_types["arrive_junction"] =
+      snapshot.arrive_junction_event_count;
+  event_types["junction_service_complete"] =
+      snapshot.junction_service_complete_event_count;
+  event_types["edge_enter"] = snapshot.edge_enter_event_count;
+  event_types["edge_exit"] = snapshot.edge_exit_event_count;
+  event_types["fault"] = snapshot.fault_event_count;
+  event_types["repair"] = snapshot.repair_event_count;
+  event_types["local_queue_update"] =
+      snapshot.local_queue_update_event_count;
+  event_types["congestion_beacon_update"] =
+      snapshot.congestion_beacon_update_event_count;
+  row["event_type_counts"] = std::move(event_types);
+  row["source_admission_attempt_count"] =
+      snapshot.source_admission_attempt_count;
+  row["source_admission_admitted_count"] =
+      snapshot.source_admission_admitted_count;
+  row["source_admission_hold_count"] =
+      snapshot.source_admission_hold_count;
+  row["stale_event_count"] =
+      snapshot.stale_arbitration_event_count;
+  py::dict retries;
+  retries["merge_contended_loser"] = snapshot.merge_retry_count;
+  row["retry_count_by_reason"] = std::move(retries);
+  row["duplicate_wakeup_count"] = snapshot.duplicate_wakeup_count;
+  row["coalesced_event_count"] = snapshot.coalesced_wakeup_count;
+  return row;
+}
+
 py::dict g4irsf11_event_runtime_from_records(
     const std::vector<NodeRecordTuple>& node_records,
     const std::vector<EdgeRecordTuple>& edge_records,
@@ -5982,7 +6043,9 @@ py::dict g4irsf11_event_runtime_from_records(
     bool g4irsf18_merge_offline_gate_passed,
     double g4irsf18_merge_coverage_cap,
     const py::object& g4irsf18_merge_max_overrides_per_segment,
-    bool g4irsf18_merge_kill_switch) {
+    bool g4irsf18_merge_kill_switch,
+    double bounded_wall_seconds,
+    int bounded_check_every_events) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6048,13 +6111,29 @@ py::dict g4irsf11_event_runtime_from_records(
         "E4 destination merge grants require the frozen P2 bounded-local "
         "PIBT mode");
   }
+  const bool destination_merge_scorer_allowed =
+      scorer_mode == "S1" ||
+      scorer_mode == "S1_frozen_g4e_legal_local_adapter" ||
+      scorer_mode == "S2" ||
+      scorer_mode == "S2_frozen_g4e_without_absolute_node_ids" ||
+      scorer_mode == "S3" ||
+      scorer_mode == "S3_shortest_potential_only" ||
+      scorer_mode == "S4" ||
+      scorer_mode == "S4_queue_aware_rule_only";
   if (requested_destination_merge_grants &&
-      scorer_mode != "S1" &&
-      scorer_mode !=
-          "S1_frozen_g4e_legal_local_adapter") {
+      !destination_merge_scorer_allowed) {
     throw std::invalid_argument(
-        "E4 destination merge grants require the frozen S1 G4E "
+        "E4 destination merge grants require an existing S1/S2/S3/S4 "
         "legal-local scorer");
+  }
+  if (!std::isfinite(bounded_wall_seconds) ||
+      (bounded_wall_seconds != -1.0 && bounded_wall_seconds <= 0.0)) {
+    throw py::value_error(
+        "bounded_wall_seconds must be -1 (disabled) or positive");
+  }
+  if (bounded_check_every_events <= 0) {
+    throw py::value_error(
+        "bounded_check_every_events must be positive");
   }
   if (requested_destination_merge_grants &&
       priority_mode != "Q0" &&
@@ -6201,7 +6280,73 @@ py::dict g4irsf11_event_runtime_from_records(
   }
 
   czr005::ics::EventDrivenJunctionRuntime runtime(graph, config);
-  const auto result = runtime.run(requests, faults);
+  const auto wall_started = std::chrono::steady_clock::now();
+  const auto wall_elapsed = [&wall_started]() {
+    return std::chrono::duration<double>(
+               std::chrono::steady_clock::now() - wall_started)
+        .count();
+  };
+  runtime.initialize(requests, faults);
+  std::vector<std::pair<double, czr005::ics::EventRuntimeProgressSnapshot>>
+      progress_history;
+  double next_progress_wall_seconds = 5.0;
+  bool bounded_progress = false;
+  if (bounded_wall_seconds > 0.0) {
+    const double elapsed = wall_elapsed();
+    progress_history.emplace_back(elapsed, runtime.progress_snapshot());
+    bounded_progress = elapsed >= bounded_wall_seconds;
+  }
+  while (!bounded_progress && runtime.process_one_event()) {
+    if (bounded_wall_seconds <= 0.0 ||
+        runtime.current_result().summary.event_count %
+                bounded_check_every_events !=
+            0) {
+      continue;
+    }
+    const double elapsed = wall_elapsed();
+    if (elapsed >= next_progress_wall_seconds) {
+      progress_history.emplace_back(elapsed, runtime.progress_snapshot());
+      next_progress_wall_seconds =
+          5.0 * (std::floor(elapsed / 5.0) + 1.0);
+    }
+    bounded_progress = elapsed >= bounded_wall_seconds;
+  }
+  if (bounded_progress &&
+      runtime.phase() ==
+          czr005::ics::EventDrivenJunctionRuntimePhase::kReady) {
+    const double elapsed = wall_elapsed();
+    const auto progress = runtime.progress_snapshot();
+    if (progress_history.empty() ||
+        progress_history.back().second.event_count != progress.event_count) {
+      progress_history.emplace_back(elapsed, progress);
+    }
+    py::list history_rows;
+    for (const auto& entry : progress_history) {
+      history_rows.append(g4irsf19_progress_row(entry.second, entry.first));
+    }
+    py::dict payload;
+    payload["execution_status"] = "BOUNDED_PROGRESS";
+    payload["stop_reason"] = "WALL_LIMIT";
+    payload["bounded_wall_seconds"] = bounded_wall_seconds;
+    payload["bounded_check_every_events"] =
+        bounded_check_every_events;
+    payload["progress"] =
+        g4irsf19_progress_row(progress, elapsed);
+    payload["progress_history"] = std::move(history_rows);
+    py::dict summary = g4irsf11_event_runtime_summary_row(
+        runtime.current_result().summary,
+        requested_destination_merge_grants,
+        merge_grant_rule,
+        merge_grant_max_pending_requests,
+        merge_grant_lifecycle_limit);
+    summary["runtime_seconds"] = elapsed;
+    summary["end_time"] = progress.simulated_time;
+    summary["final_active_bag_count"] = progress.active_bag_count;
+    summary["bounded_progress"] = true;
+    payload["summary"] = std::move(summary);
+    return payload;
+  }
+  const auto& result = runtime.finalize();
   py::dict trace_context;
   trace_context["schema_id"] = "czr005.g4irsf11.decision_trace.v1";
   trace_context["scenario"] = scenario;
@@ -6866,7 +7011,9 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("g4irsf18_merge_offline_gate_passed") = false,
              py::arg("g4irsf18_merge_coverage_cap") = 0.05,
              py::arg("g4irsf18_merge_max_overrides_per_segment") = 2,
-             py::arg("g4irsf18_merge_kill_switch") = false);
+             py::arg("g4irsf18_merge_kill_switch") = false,
+             py::arg("bounded_wall_seconds") = -1.0,
+             py::arg("bounded_check_every_events") = 65536);
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,
