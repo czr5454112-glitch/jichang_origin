@@ -1,0 +1,632 @@
+{
+  "arms": [
+    {
+      "arm_id": "J0_F2_EAGER",
+      "learned": false,
+      "merge_rule": "M1",
+      "native_controls": {},
+      "production_closed_loop_authorized": false,
+      "research_closed_loop_authorized": false,
+      "timing_mode": "eager"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "learned": false,
+      "merge_rule": "M1",
+      "native_controls": {},
+      "production_closed_loop_authorized": false,
+      "research_closed_loop_authorized": false,
+      "timing_mode": "jit_fifo"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "learned": false,
+      "merge_rule": "M3",
+      "native_controls": {},
+      "production_closed_loop_authorized": false,
+      "research_closed_loop_authorized": false,
+      "timing_mode": "jit_fair_aging_deadline"
+    }
+  ],
+  "fault_prefix_segments": 8192,
+  "fault_scenarios": [
+    {
+      "category": "single_noncritical_edge",
+      "duration_seconds": 300.0,
+      "edges": [
+        [
+          6,
+          12
+        ]
+      ],
+      "message_delay_seconds": 0.0,
+      "notes": "Narrow G18 regression over the G17 reachability-preserving edge: fault plus repair must preserve pending requests and any exact physically in-flight destination lease.",
+      "notification_dropped": false,
+      "onset_fraction": 0.35,
+      "scenario_id": "pending_inflight_repair"
+    },
+    {
+      "calibration": {
+        "attempt": 1,
+        "destination_node": 12,
+        "maximum_attempts": 3,
+        "observed_event_time": 16961.01816,
+        "observed_projected_arrival": 16971.01816,
+        "selection": "observed_flight_window_midpoint",
+        "source_arm_id": "J1_F2_JIT_FIFO",
+        "source_candidate_request_id": 2081,
+        "source_opportunity_id": 2081,
+        "source_scenario_id": "pending_inflight_repair",
+        "upstream_node": 6
+      },
+      "category": "single_noncritical_edge",
+      "duration_seconds": 300.0,
+      "edges": [
+        [
+          6,
+          12
+        ]
+      ],
+      "message_delay_seconds": 0.0,
+      "notes": "Evidence-directed exact-lease regression on edge (6,12). The fault onset is the midpoint of the observed J1 request-2081 flight window [16961.01816, 16971.01816].",
+      "notification_dropped": false,
+      "onset_fraction": 0.35,
+      "onset_time": 16966.01816,
+      "scenario_id": "inflight_exact_lease_repair",
+      "validation_target": "inflight_exact_lease"
+    }
+  ],
+  "full_scale_factors": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "input_contract": {
+    "fault": "protected_8192_prefix_plus_real_map_fault_repair_window",
+    "ladder": "protected_first_n_file_order",
+    "scale": "g4irsf10_distribution_preserving_fixed_map_resample"
+  },
+  "jobs": [
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__s144",
+      "max_segments": -1,
+      "prefix_segments": 144,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__s144",
+      "max_segments": -1,
+      "prefix_segments": 144,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__s144",
+      "max_segments": -1,
+      "prefix_segments": 144,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__s512",
+      "max_segments": -1,
+      "prefix_segments": 512,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__s512",
+      "max_segments": -1,
+      "prefix_segments": 512,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__s512",
+      "max_segments": -1,
+      "prefix_segments": 512,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__s2048",
+      "max_segments": -1,
+      "prefix_segments": 2048,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__s2048",
+      "max_segments": -1,
+      "prefix_segments": 2048,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__s2048",
+      "max_segments": -1,
+      "prefix_segments": 2048,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__s43603",
+      "max_segments": -1,
+      "prefix_segments": 43603,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__s43603",
+      "max_segments": -1,
+      "prefix_segments": 43603,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__s43603",
+      "max_segments": -1,
+      "prefix_segments": 43603,
+      "scale": 1,
+      "stage": "ladder",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__1x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 1,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__1x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 1,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__1x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 1,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__2x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 2,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__2x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 2,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__2x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 2,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__4x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 4,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__4x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 4,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__4x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 4,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__8x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 8,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__8x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 8,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__8x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 8,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__16x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 16,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__16x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 16,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__16x_full",
+      "max_segments": -1,
+      "prefix_segments": null,
+      "scale": 16,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": null,
+      "job_id": "j0_f2_eager__32x_smoke8192",
+      "max_segments": 8192,
+      "prefix_segments": null,
+      "scale": 32,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": null,
+      "job_id": "j1_f2_jit_fifo__32x_smoke8192",
+      "max_segments": 8192,
+      "prefix_segments": null,
+      "scale": 32,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": null,
+      "job_id": "j2_f2_jit_fair_aging_deadline__32x_smoke8192",
+      "max_segments": 8192,
+      "prefix_segments": null,
+      "scale": 32,
+      "stage": "scale",
+      "telemetry_mode": "capacity"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": {
+        "category": "single_noncritical_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "Narrow G18 regression over the G17 reachability-preserving edge: fault plus repair must preserve pending requests and any exact physically in-flight destination lease.",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "pending_inflight_repair"
+      },
+      "job_id": "j0_f2_eager__fault__pending_inflight_repair__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "fault",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": {
+        "category": "single_noncritical_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "Narrow G18 regression over the G17 reachability-preserving edge: fault plus repair must preserve pending requests and any exact physically in-flight destination lease.",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "pending_inflight_repair"
+      },
+      "job_id": "j1_f2_jit_fifo__fault__pending_inflight_repair__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "fault",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": {
+        "category": "single_noncritical_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "Narrow G18 regression over the G17 reachability-preserving edge: fault plus repair must preserve pending requests and any exact physically in-flight destination lease.",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "scenario_id": "pending_inflight_repair"
+      },
+      "job_id": "j2_f2_jit_fair_aging_deadline__fault__pending_inflight_repair__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "fault",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J0_F2_EAGER",
+      "fault_scenario": {
+        "calibration": {
+          "attempt": 1,
+          "destination_node": 12,
+          "maximum_attempts": 3,
+          "observed_event_time": 16961.01816,
+          "observed_projected_arrival": 16971.01816,
+          "selection": "observed_flight_window_midpoint",
+          "source_arm_id": "J1_F2_JIT_FIFO",
+          "source_candidate_request_id": 2081,
+          "source_opportunity_id": 2081,
+          "source_scenario_id": "pending_inflight_repair",
+          "upstream_node": 6
+        },
+        "category": "single_noncritical_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "Evidence-directed exact-lease regression on edge (6,12). The fault onset is the midpoint of the observed J1 request-2081 flight window [16961.01816, 16971.01816].",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "onset_time": 16966.01816,
+        "scenario_id": "inflight_exact_lease_repair",
+        "validation_target": "inflight_exact_lease"
+      },
+      "job_id": "j0_f2_eager__fault__inflight_exact_lease_repair__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "fault",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J1_F2_JIT_FIFO",
+      "fault_scenario": {
+        "calibration": {
+          "attempt": 1,
+          "destination_node": 12,
+          "maximum_attempts": 3,
+          "observed_event_time": 16961.01816,
+          "observed_projected_arrival": 16971.01816,
+          "selection": "observed_flight_window_midpoint",
+          "source_arm_id": "J1_F2_JIT_FIFO",
+          "source_candidate_request_id": 2081,
+          "source_opportunity_id": 2081,
+          "source_scenario_id": "pending_inflight_repair",
+          "upstream_node": 6
+        },
+        "category": "single_noncritical_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "Evidence-directed exact-lease regression on edge (6,12). The fault onset is the midpoint of the observed J1 request-2081 flight window [16961.01816, 16971.01816].",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "onset_time": 16966.01816,
+        "scenario_id": "inflight_exact_lease_repair",
+        "validation_target": "inflight_exact_lease"
+      },
+      "job_id": "j1_f2_jit_fifo__fault__inflight_exact_lease_repair__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "fault",
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "arm_id": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+      "fault_scenario": {
+        "calibration": {
+          "attempt": 1,
+          "destination_node": 12,
+          "maximum_attempts": 3,
+          "observed_event_time": 16961.01816,
+          "observed_projected_arrival": 16971.01816,
+          "selection": "observed_flight_window_midpoint",
+          "source_arm_id": "J1_F2_JIT_FIFO",
+          "source_candidate_request_id": 2081,
+          "source_opportunity_id": 2081,
+          "source_scenario_id": "pending_inflight_repair",
+          "upstream_node": 6
+        },
+        "category": "single_noncritical_edge",
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notes": "Evidence-directed exact-lease regression on edge (6,12). The fault onset is the midpoint of the observed J1 request-2081 flight window [16961.01816, 16971.01816].",
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "onset_time": 16966.01816,
+        "scenario_id": "inflight_exact_lease_repair",
+        "validation_target": "inflight_exact_lease"
+      },
+      "job_id": "j2_f2_jit_fair_aging_deadline__fault__inflight_exact_lease_repair__s8192",
+      "max_segments": -1,
+      "prefix_segments": 8192,
+      "scale": 1,
+      "stage": "fault",
+      "telemetry_mode": "evidence_trace"
+    }
+  ],
+  "ladder_segments": [
+    144,
+    512,
+    2048,
+    8192,
+    43603
+  ],
+  "learned_arm": {
+    "arm_id": "JX_LEARNED_MERGE_RESERVED",
+    "reason": "NO_EXPLICIT_LEARNED_ARM_CONFIG"
+  },
+  "schema": "czr005.g4irsf18.system_campaign_plan.v1",
+  "smoke_32x_segments": 8192,
+  "smoke_scale": 32,
+  "telemetry_contract": {
+    "capacity": "43603 ladder plus every full-scale and 32x smoke job",
+    "capacity_opportunity_telemetry_enabled": false,
+    "evidence_trace": "ladder prefixes <=8192 and narrow fault regression",
+    "evidence_trace_limit": 500000
+  }
+}
