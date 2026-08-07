@@ -1,0 +1,131 @@
+{
+  "candidate_row_count": 293,
+  "counterfactual": {
+    "full_system_clone": false,
+    "future_arrivals_simulated": false,
+    "realized_outcomes_used": false,
+    "scope": "fixed bounded local pending set",
+    "weights": {
+      "bounded_peer_wait": 0.35,
+      "deadline_lateness": 2.0,
+      "local_event_work": 0.05,
+      "own_completion": 1.0,
+      "starvation_delay": 0.15
+    }
+  },
+  "dataset_path": "artifacts/datasets/g4irsf18_merge_local_counterfactual.jsonl.zst",
+  "duplicate_policy": "exact same-time/local-state opportunities across traces collapsed before split",
+  "exclusions": {
+    "duplicate_state_across_traces": 13,
+    "identity_only_local_state": 0,
+    "non_teacher_timing_mode": 0,
+    "over_bounded_horizon": 0,
+    "singleton": 7829
+  },
+  "feature_names": [
+    "arrival_lag_seconds",
+    "arrival_lead_seconds",
+    "deadline_slack_seconds",
+    "wait_age_seconds",
+    "destination_service_seconds",
+    "downstream_queue_pressure",
+    "local_route_score",
+    "static_remaining_seconds",
+    "task_class_code",
+    "task_class_priority",
+    "storage_leg",
+    "local_candidate_count",
+    "wait_age_minus_set_mean_seconds",
+    "deadline_slack_minus_set_mean_seconds",
+    "service_minus_set_mean_seconds",
+    "pressure_minus_set_mean",
+    "route_score_minus_set_mean",
+    "arrival_lag_minus_set_mean_seconds"
+  ],
+  "feature_saturation": {
+    "arrival_lag_seconds": [
+      0.0,
+      86400.0
+    ],
+    "arrival_lead_seconds": [
+      0.0,
+      86400.0
+    ],
+    "deadline_slack_seconds": [
+      -86400.0,
+      86400.0
+    ],
+    "destination_service_seconds": [
+      0.0,
+      3600.0
+    ],
+    "downstream_queue_pressure": [
+      0.0,
+      4096.0
+    ],
+    "local_route_score": [
+      -1000000.0,
+      1000000.0
+    ],
+    "static_remaining_seconds": [
+      0.0,
+      86400.0
+    ],
+    "storage_leg": [
+      0.0,
+      1.0
+    ],
+    "task_class_code": [
+      -64.0,
+      64.0
+    ],
+    "task_class_priority": [
+      -64.0,
+      64.0
+    ],
+    "wait_age_seconds": [
+      0.0,
+      86400.0
+    ]
+  },
+  "grouping_key": [
+    "source_trace",
+    "opportunity_id"
+  ],
+  "metadata_only_trace_fields": [
+    "opportunity_id",
+    "destination_node",
+    "controller_generation",
+    "baseline_winner_request_id",
+    "chosen_winner_request_id",
+    "candidate_request_id",
+    "upstream_node",
+    "baseline_winner",
+    "chosen_winner"
+  ],
+  "opportunity_count": 138,
+  "realized_native_performance_is_report_only": true,
+  "schema": "czr005.g4irsf18.merge_learning_dataset_manifest.v1",
+  "source_traces": [
+    {
+      "job_id": "j2_f2_jit_fair_aging_deadline__s2048",
+      "path": "outputs/runtime/g4irsf18_jit_campaign/j2_f2_jit_fair_aging_deadline__s2048.opportunities.jsonl.zst",
+      "stored_candidate_rows": 6562,
+      "timing_mode": "jit_fair_aging_deadline"
+    },
+    {
+      "job_id": "j2_f2_jit_fair_aging_deadline__s512",
+      "path": "outputs/runtime/g4irsf18_jit_campaign/j2_f2_jit_fair_aging_deadline__s512.opportunities.jsonl.zst",
+      "stored_candidate_rows": 1587,
+      "timing_mode": "jit_fair_aging_deadline"
+    }
+  ],
+  "split_opportunity_counts": {
+    "audit": 27,
+    "train": 84,
+    "validation": 27
+  },
+  "split_unit": "whole opportunity; no candidate row crosses a split",
+  "status": "REAL_NATIVE_TRACE_ONLY",
+  "teacher_target_is_metadata_only": true
+}
