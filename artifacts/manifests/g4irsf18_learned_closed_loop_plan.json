@@ -1,0 +1,142 @@
+{
+  "artifact_path": "artifacts/models/g4irsf18_j7_teacher_cf_affine.json",
+  "design": {
+    "control": "J2_F2_JIT_FAIR_AGING_DEADLINE",
+    "fixed_research_workload": true,
+    "learned": "J7_TEACHER_CF_AFFINE",
+    "max_overrides_per_segment": 2,
+    "offline_production_gate_passed": false,
+    "paired_on_same_prefix_and_native_binary": true,
+    "production_closed_loop_authorized": false,
+    "score_only_is_not_ownership": true
+  },
+  "jobs": [
+    {
+      "coverage_cap": 0.0,
+      "job_id": "j2_control__s144",
+      "kind": "control",
+      "matched_control_job_id": null,
+      "prefix_segments": 144,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 1.0,
+      "job_id": "j7_learned__s144__smoke__c100",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s144",
+      "prefix_segments": 144,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.0,
+      "job_id": "j2_control__s512",
+      "kind": "control",
+      "matched_control_job_id": null,
+      "prefix_segments": 512,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.1,
+      "job_id": "j7_learned__s512__c010",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s512",
+      "prefix_segments": 512,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.0,
+      "job_id": "j2_control__s2048",
+      "kind": "control",
+      "matched_control_job_id": null,
+      "prefix_segments": 2048,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.05,
+      "job_id": "j7_learned__s2048__c005",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s2048",
+      "prefix_segments": 2048,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.25,
+      "job_id": "j7_learned__s2048__c025",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s2048",
+      "prefix_segments": 2048,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.5,
+      "job_id": "j7_learned__s2048__c050",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s2048",
+      "prefix_segments": 2048,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.8,
+      "job_id": "j7_learned__s2048__c080",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s2048",
+      "prefix_segments": 2048,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 1.0,
+      "job_id": "j7_learned__s2048__c100",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s2048",
+      "prefix_segments": 2048,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.0,
+      "job_id": "j2_control__s8192",
+      "kind": "control",
+      "matched_control_job_id": null,
+      "prefix_segments": 8192,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 1.0,
+      "job_id": "j7_learned__s8192__c100",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s8192",
+      "prefix_segments": 8192,
+      "telemetry_mode": "evidence_trace"
+    },
+    {
+      "coverage_cap": 0.0,
+      "job_id": "j2_control__s43603",
+      "kind": "control",
+      "matched_control_job_id": null,
+      "prefix_segments": 43603,
+      "telemetry_mode": "capacity"
+    },
+    {
+      "coverage_cap": 1.0,
+      "job_id": "j7_learned__s43603__c100",
+      "kind": "learned",
+      "matched_control_job_id": "j2_control__s43603",
+      "prefix_segments": 43603,
+      "telemetry_mode": "capacity"
+    }
+  ],
+  "schema": "czr005.g4irsf18.learned_closed_loop_plan.v1",
+  "telemetry_contract": {
+    "capacity_opportunity_telemetry_enabled": false,
+    "capacity_prefixes": [
+      43603
+    ],
+    "core_native_counters_retained_in_both_modes": true,
+    "evidence_trace_limit": 200000,
+    "evidence_trace_prefixes": [
+      144,
+      512,
+      2048,
+      8192
+    ]
+  }
+}

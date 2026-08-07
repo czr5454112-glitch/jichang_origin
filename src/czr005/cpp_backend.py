@@ -703,6 +703,16 @@ def g4irsf11_event_runtime_from_records(
     g4irsf17_source_policy_mode: str = "off",
     g4irsf17_source_policy_artifact: Mapping[str, Any] | PathLike | None = None,
     g4irsf17_source_policy_trace_limit: int = 200_000,
+    merge_grant_timing_mode: str = "eager",
+    g4irsf18_merge_policy_mode: str = "off",
+    g4irsf18_merge_policy_artifact: Mapping[str, Any] | PathLike | None = None,
+    g4irsf18_merge_research_closed_loop_authorized: bool = False,
+    g4irsf18_merge_fixed_research_workload: bool = False,
+    g4irsf18_merge_production_closed_loop_authorized: bool = False,
+    g4irsf18_merge_offline_gate_passed: bool = False,
+    g4irsf18_merge_coverage_cap: float = 0.05,
+    g4irsf18_merge_max_overrides_per_segment: int = 2,
+    g4irsf18_merge_kill_switch: bool = False,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -802,6 +812,52 @@ def g4irsf11_event_runtime_from_records(
     if g4irsf17_source_policy_mode not in {"off", "shadow", "closed_loop"}:
         raise ValueError(
             "g4irsf17_source_policy_mode must be off, shadow, or closed_loop"
+        )
+    if not isinstance(g4irsf18_merge_policy_mode, str):
+        raise TypeError("g4irsf18_merge_policy_mode must be a string")
+    if g4irsf18_merge_policy_mode not in {
+        "off",
+        "shadow",
+        "research_closed_loop",
+        "production_closed_loop",
+    }:
+        raise ValueError(
+            "g4irsf18_merge_policy_mode must be off, shadow, "
+            "research_closed_loop, or production_closed_loop"
+        )
+    g4irsf18_merge_research_closed_loop_authorized = strict_bool(
+        g4irsf18_merge_research_closed_loop_authorized,
+        "g4irsf18_merge_research_closed_loop_authorized",
+    )
+    g4irsf18_merge_fixed_research_workload = strict_bool(
+        g4irsf18_merge_fixed_research_workload,
+        "g4irsf18_merge_fixed_research_workload",
+    )
+    g4irsf18_merge_production_closed_loop_authorized = strict_bool(
+        g4irsf18_merge_production_closed_loop_authorized,
+        "g4irsf18_merge_production_closed_loop_authorized",
+    )
+    g4irsf18_merge_offline_gate_passed = strict_bool(
+        g4irsf18_merge_offline_gate_passed,
+        "g4irsf18_merge_offline_gate_passed",
+    )
+    g4irsf18_merge_kill_switch = strict_bool(
+        g4irsf18_merge_kill_switch,
+        "g4irsf18_merge_kill_switch",
+    )
+    g4irsf18_merge_coverage_cap = strict_finite_number(
+        g4irsf18_merge_coverage_cap,
+        "g4irsf18_merge_coverage_cap",
+    )
+    if not 0.0 <= g4irsf18_merge_coverage_cap <= 1.0:
+        raise ValueError("g4irsf18_merge_coverage_cap must be in [0, 1]")
+    g4irsf18_merge_max_overrides_per_segment = strict_integer(
+        g4irsf18_merge_max_overrides_per_segment,
+        "g4irsf18_merge_max_overrides_per_segment",
+    )
+    if g4irsf18_merge_max_overrides_per_segment < 0:
+        raise ValueError(
+            "g4irsf18_merge_max_overrides_per_segment must be non-negative"
         )
     merge_grant_max_pending_requests = strict_integer(
         merge_grant_max_pending_requests,
@@ -975,6 +1031,27 @@ def g4irsf11_event_runtime_from_records(
         raise ValueError(
             "merge_grant_rule must be M0, M1, M2, M3, M4, M5, or M6"
         )
+    if not isinstance(merge_grant_timing_mode, str):
+        raise TypeError("merge_grant_timing_mode must be a string")
+    merge_grant_timing_aliases = {
+        "eager": "eager",
+        "J0": "eager",
+        "J0_F2_EAGER": "eager",
+        "jit_fifo": "jit_fifo",
+        "J1": "jit_fifo",
+        "J1_F2_JIT_FIFO": "jit_fifo",
+        "jit_fair_aging_deadline": "jit_fair_aging_deadline",
+        "J2": "jit_fair_aging_deadline",
+        "J2_F2_JIT_FAIR_AGING_DEADLINE": "jit_fair_aging_deadline",
+    }
+    if merge_grant_timing_mode not in merge_grant_timing_aliases:
+        raise ValueError(
+            "merge_grant_timing_mode must be eager, jit_fifo, or "
+            "jit_fair_aging_deadline"
+        )
+    canonical_merge_grant_timing_mode = merge_grant_timing_aliases[
+        merge_grant_timing_mode
+    ]
     if merge_grant_max_pending_requests <= 0:
         raise ValueError(
             "merge_grant_max_pending_requests must be positive"
@@ -1022,6 +1099,10 @@ def g4irsf11_event_runtime_from_records(
     normalized_g4irsf17_source_policy = normalized_g4irsf16_artifact(
         g4irsf17_source_policy_artifact,
         "g4irsf17_source_policy_artifact",
+    )
+    normalized_g4irsf18_merge_policy = normalized_g4irsf16_artifact(
+        g4irsf18_merge_policy_artifact,
+        "g4irsf18_merge_policy_artifact",
     )
     if g4irsf17_source_policy_mode == "off":
         if normalized_g4irsf17_source_policy:
@@ -1089,10 +1170,35 @@ def g4irsf11_event_runtime_from_records(
         "E4",
         "E4_batch_plus_destination_merge_request",
     }
+    g4irsf18_merge_policy_enabled = g4irsf18_merge_policy_mode != "off"
+    if not g4irsf18_merge_policy_enabled:
+        if (
+            normalized_g4irsf18_merge_policy
+            or g4irsf18_merge_research_closed_loop_authorized
+            or g4irsf18_merge_fixed_research_workload
+            or g4irsf18_merge_production_closed_loop_authorized
+            or g4irsf18_merge_offline_gate_passed
+            or g4irsf18_merge_kill_switch
+            or g4irsf18_merge_coverage_cap != 0.05
+            or g4irsf18_merge_max_overrides_per_segment != 2
+        ):
+            raise ValueError(
+                "G4IRSF18 merge artifact and runtime controls require "
+                "shadow, research_closed_loop, or production_closed_loop"
+            )
+    elif (
+        not uses_destination_merge_grants
+        or canonical_merge_grant_timing_mode != "jit_fair_aging_deadline"
+    ):
+        raise ValueError(
+            "G4IRSF18 learned merge policy requires E4 with "
+            "jit_fair_aging_deadline (J2) timing"
+        )
     if not uses_destination_merge_grants and (
         merge_grant_rule != "M1"
         or merge_grant_max_pending_requests != 64
         or merge_grant_lifecycle_limit != 1024
+        or canonical_merge_grant_timing_mode != "eager"
     ):
         raise ValueError(
             "merge grant controls are only valid with E4 destination "
@@ -1545,6 +1651,39 @@ def g4irsf11_event_runtime_from_records(
             str(g4irsf17_source_policy_mode),
             normalized_g4irsf17_source_policy,
             int(g4irsf17_source_policy_trace_limit),
+        )
+    if canonical_merge_grant_timing_mode != "eager":
+        # G18 follows the complete G16/G17 append-only tail.  Materialise only
+        # missing exact defaults so the default eager call remains byte-for-
+        # byte compatible with older native modules.
+        if not merge_tail_materialized:
+            native_event_tail += ("M1", 64, 1024)
+            merge_tail_materialized = True
+        if (
+            g4irsf16_supervisor_mode == "off"
+            and not enable_g4irsf17_source_wait_telemetry
+            and g4irsf17_source_policy_mode == "off"
+        ):
+            native_event_tail += ("off", {}, {}, {})
+        if (
+            not enable_g4irsf17_source_wait_telemetry
+            and g4irsf17_source_policy_mode == "off"
+        ):
+            native_event_tail += (False, 200_000)
+        if g4irsf17_source_policy_mode == "off":
+            native_event_tail += ("off", {}, 200_000)
+        native_event_tail += (canonical_merge_grant_timing_mode,)
+    if g4irsf18_merge_policy_enabled:
+        native_event_tail += (
+            str(g4irsf18_merge_policy_mode),
+            normalized_g4irsf18_merge_policy,
+            bool(g4irsf18_merge_research_closed_loop_authorized),
+            bool(g4irsf18_merge_fixed_research_workload),
+            bool(g4irsf18_merge_production_closed_loop_authorized),
+            bool(g4irsf18_merge_offline_gate_passed),
+            float(g4irsf18_merge_coverage_cap),
+            int(g4irsf18_merge_max_overrides_per_segment),
+            bool(g4irsf18_merge_kill_switch),
         )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(

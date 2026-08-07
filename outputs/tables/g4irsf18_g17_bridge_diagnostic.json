@@ -1,0 +1,111 @@
+{
+  "binary": "C:\\PROGRAMING\\czr005\\build_g17_agent_pybind_latest\\python\\czr005_cpp.cp311-win_amd64.pyd",
+  "blocker": "The requested native module cannot accept the three G17 source-policy arguments. Exact 39D proposals and action mutations are therefore unobservable on this binary.",
+  "claim_boundary": "Control safety/TTH is measured. This is not 39D native parity, a learned closed loop, or production authorization.",
+  "control_runs": [
+    {
+      "complete_task_count": 72,
+      "cpu_seconds": 1.15625,
+      "hard_safety": {
+        "checks": {
+          "all_segments_complete": true,
+          "no_full_astar": true,
+          "no_global_scan": true,
+          "no_physical_fault_entry": true,
+          "no_reservation_conflict": true,
+          "no_unresolved_deadlock": true,
+          "within_event_cap": true
+        },
+        "observed": {
+          "completed_count": 144,
+          "event_count": 14969,
+          "failed_count": 0,
+          "global_reservation_scan_count": 0,
+          "physical_fault_edge_entry_violation_count": 0,
+          "requested_count": 144,
+          "reservation_conflicts": 0,
+          "runtime_full_astar_calls": 0,
+          "unresolved_deadlock_count": 0
+        },
+        "pass": true
+      },
+      "input_protocol": "protected_first_n_file_order",
+      "mean_network_seconds": 224.25387124999878,
+      "mean_source_wait_seconds": 1.2743055555555556,
+      "mean_tth_seconds": 10212.42233934722,
+      "p95_tth_seconds": 11436.12360435,
+      "p99_tth_seconds": 11543.1984448,
+      "segments": 144,
+      "source_wait_telemetry": {
+        "interval_dropped_count": 0,
+        "interval_stored_count": 62,
+        "interval_total_count": 62,
+        "wait_bag_seconds": 91.75,
+        "wait_seconds": 15.5
+      },
+      "task_count": 72,
+      "tth_denominator": "original_entry_time_tth",
+      "wall_seconds": 1.2641173000447452
+    },
+    {
+      "complete_task_count": 256,
+      "cpu_seconds": 5.203125,
+      "hard_safety": {
+        "checks": {
+          "all_segments_complete": true,
+          "no_full_astar": true,
+          "no_global_scan": true,
+          "no_physical_fault_entry": true,
+          "no_reservation_conflict": true,
+          "no_unresolved_deadlock": true,
+          "within_event_cap": true
+        },
+        "observed": {
+          "completed_count": 512,
+          "event_count": 54469,
+          "failed_count": 0,
+          "global_reservation_scan_count": 0,
+          "physical_fault_edge_entry_violation_count": 0,
+          "requested_count": 512,
+          "reservation_conflicts": 0,
+          "runtime_full_astar_calls": 0,
+          "unresolved_deadlock_count": 0
+        },
+        "pass": true
+      },
+      "input_protocol": "protected_first_n_file_order",
+      "mean_network_seconds": 228.76652433593617,
+      "mean_source_wait_seconds": 3.126953125,
+      "mean_tth_seconds": 8816.72193442578,
+      "p95_tth_seconds": 11183.227207499996,
+      "p99_tth_seconds": 11755.365823,
+      "segments": 512,
+      "source_wait_telemetry": {
+        "interval_dropped_count": 0,
+        "interval_stored_count": 240,
+        "interval_total_count": 240,
+        "wait_bag_seconds": 800.5,
+        "wait_seconds": 60.0
+      },
+      "task_count": 256,
+      "tth_denominator": "original_entry_time_tth",
+      "wall_seconds": 5.278024700004607
+    }
+  ],
+  "native_interface": {
+    "g4irsf17_source_policy_abi_available": false,
+    "last_supported_g17_tail": "g4irsf17_source_wait_trace_limit"
+  },
+  "published_production_authorization": {
+    "authorized": false,
+    "runtime_closed_loop_authorized": false,
+    "unchanged": true
+  },
+  "research_closed_loop": {
+    "executed": false,
+    "requested": true
+  },
+  "schema": "czr005.g4irsf18.g17_research_bridge_diagnostic.v1",
+  "shadow_runs": [],
+  "status": "BLOCKED_ABI_MISSING_SOURCE_POLICY_TAIL"
+}

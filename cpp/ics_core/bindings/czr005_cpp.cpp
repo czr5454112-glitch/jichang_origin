@@ -3079,6 +3079,26 @@ std::string canonical_merge_grant_rule_for_binding(
       "merge_grant_rule must be M0, M1, M2, M3, M4, M5, or M6");
 }
 
+std::string canonical_merge_grant_timing_mode_for_binding(
+    const std::string& timing_mode) {
+  if (timing_mode == "eager" || timing_mode == "J0" ||
+      timing_mode == "J0_F2_EAGER") {
+    return "eager";
+  }
+  if (timing_mode == "jit_fifo" || timing_mode == "J1" ||
+      timing_mode == "J1_F2_JIT_FIFO") {
+    return "jit_fifo";
+  }
+  if (timing_mode == "jit_fair_aging_deadline" ||
+      timing_mode == "J2" ||
+      timing_mode == "J2_F2_JIT_FAIR_AGING_DEADLINE") {
+    return "jit_fair_aging_deadline";
+  }
+  throw std::invalid_argument(
+      "merge_grant_timing_mode must be eager, jit_fifo, or "
+      "jit_fair_aging_deadline");
+}
+
 int strict_python_integer_argument(
     const py::handle& value,
     const char* name) {
@@ -3835,6 +3855,34 @@ py::dict g4irsf11_event_runtime_summary_row(
           py::int_(
               summary
                   .merge_grant_duplicate_wakeup_prevented_count);
+      row["merge_grant_timing_mode"] =
+          summary.merge_grant_timing_mode;
+      row["merge_grant_service_opportunity_count"] =
+          py::int_(summary.merge_grant_service_opportunity_count);
+      row["merge_grant_multi_candidate_opportunity_count"] =
+          py::int_(
+              summary.merge_grant_multi_candidate_opportunity_count);
+      row["merge_grant_true_competition_count"] =
+          py::int_(summary.merge_grant_true_competition_count);
+      row["merge_grant_order_mutation_count"] =
+          py::int_(summary.merge_grant_order_mutation_count);
+      row["merge_grant_candidate_total_count"] =
+          py::int_(summary.merge_grant_candidate_total_count);
+      row["merge_grant_wakeup_scheduled_count"] =
+          py::int_(summary.merge_grant_wakeup_scheduled_count);
+      row["merge_grant_wakeup_coalesced_count"] =
+          py::int_(summary.merge_grant_wakeup_coalesced_count);
+      row["merge_grant_stale_wakeup_count"] =
+          py::int_(summary.merge_grant_stale_wakeup_count);
+      row["merge_grant_opportunity_trace_total_count"] =
+          py::int_(
+              summary.merge_grant_opportunity_trace_total_count);
+      row["merge_grant_opportunity_trace_stored_count"] =
+          py::int_(
+              summary.merge_grant_opportunity_trace_stored_count);
+      row["merge_grant_opportunity_trace_dropped_count"] =
+          py::int_(
+              summary.merge_grant_opportunity_trace_dropped_count);
       row["merge_grant_peak_pending_requests"] =
           summary.merge_grant_peak_pending_requests;
       row["merge_grant_peak_active_unconsumed"] =
@@ -4005,6 +4053,102 @@ py::dict g4irsf11_event_runtime_summary_row(
         summary.g4irsf17_source_policy_future_schedule_input_count;
     row["g4irsf17_source_policy_full_astar_call_count"] =
         summary.g4irsf17_source_policy_full_astar_call_count;
+  }
+  if (!summary.g4irsf18_merge_policy_mode.empty()) {
+    row["g4irsf18_merge_policy_mode"] =
+        summary.g4irsf18_merge_policy_mode;
+    row["g4irsf18_merge_policy_schema"] =
+        summary.g4irsf18_merge_policy_schema;
+    row["g4irsf18_merge_policy_family"] =
+        summary.g4irsf18_merge_policy_family;
+    row["g4irsf18_merge_feature_contract"] =
+        summary.g4irsf18_merge_feature_contract;
+    row["g4irsf18_merge_artifact_valid"] =
+        summary.g4irsf18_merge_artifact_valid;
+    row["g4irsf18_merge_artifact_production_closed_loop_authorized"] =
+        summary
+            .g4irsf18_merge_artifact_production_closed_loop_authorized;
+    row["g4irsf18_merge_research_closed_loop_authorized"] =
+        summary.g4irsf18_merge_research_closed_loop_authorized;
+    row["g4irsf18_merge_fixed_research_workload"] =
+        summary.g4irsf18_merge_fixed_research_workload;
+    row["g4irsf18_merge_production_closed_loop_authorized"] =
+        summary.g4irsf18_merge_production_closed_loop_authorized;
+    row["g4irsf18_merge_offline_gate_passed"] =
+        summary.g4irsf18_merge_offline_gate_passed;
+    row["g4irsf18_merge_coverage_cap"] =
+        summary.g4irsf18_merge_coverage_cap;
+    row["g4irsf18_merge_max_overrides_per_segment"] =
+        summary.g4irsf18_merge_max_overrides_per_segment;
+    row["g4irsf18_merge_kill_switch_configured"] =
+        summary.g4irsf18_merge_kill_switch_configured;
+    row["g4irsf18_merge_kill_switch_tripped"] =
+        summary.g4irsf18_merge_kill_switch_tripped;
+    row["g4irsf18_merge_kill_switch_reason"] =
+        summary.g4irsf18_merge_kill_switch_reason;
+    row["g4irsf18_merge_model_opportunity_count"] = py::int_(
+        summary.g4irsf18_merge_model_opportunity_count);
+    row["g4irsf18_merge_model_eligible_count"] = py::int_(
+        summary.g4irsf18_merge_model_eligible_count);
+    row["g4irsf18_merge_model_proposal_count"] = py::int_(
+        summary.g4irsf18_merge_model_proposal_count);
+    row["g4irsf18_merge_model_applied_count"] = py::int_(
+        summary.g4irsf18_merge_model_applied_count);
+    row["g4irsf18_merge_distinct_action_mutation_count"] = py::int_(
+        summary.g4irsf18_merge_distinct_action_mutation_count);
+    row["g4irsf18_merge_model_ood_count"] = py::int_(
+        summary.g4irsf18_merge_model_ood_count);
+    row["g4irsf18_merge_model_invalid_count"] = py::int_(
+        summary.g4irsf18_merge_model_invalid_count);
+    row["g4irsf18_merge_model_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_model_fallback_count);
+    row["g4irsf18_merge_j2_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_j2_fallback_count);
+    row["g4irsf18_merge_tie_fifo_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_tie_fifo_fallback_count);
+    row["g4irsf18_merge_shadow_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_shadow_fallback_count);
+    row["g4irsf18_merge_authorization_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_authorization_fallback_count);
+    row["g4irsf18_merge_coverage_cap_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_coverage_cap_fallback_count);
+    row["g4irsf18_merge_override_cap_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_override_cap_fallback_count);
+    row["g4irsf18_merge_starvation_guard_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_starvation_guard_fallback_count);
+    row["g4irsf18_merge_kill_switch_trip_count"] = py::int_(
+        summary.g4irsf18_merge_kill_switch_trip_count);
+    row["g4irsf18_merge_kill_switch_fallback_count"] = py::int_(
+        summary.g4irsf18_merge_kill_switch_fallback_count);
+    row["g4irsf18_merge_model_ownership_count"] = py::int_(
+        summary.g4irsf18_merge_model_ownership_count);
+    row["g4irsf18_merge_coverage_eligible_seen_count"] = py::int_(
+        summary.g4irsf18_merge_coverage_eligible_seen_count);
+    row["g4irsf18_merge_model_ownership_rate"] =
+        summary.g4irsf18_merge_model_eligible_count == 0
+            ? 0.0
+            : static_cast<double>(
+                  summary.g4irsf18_merge_model_ownership_count) /
+                  static_cast<double>(
+                      summary.g4irsf18_merge_model_eligible_count);
+    row["g4irsf18_merge_runtime_global_scan_count"] =
+        summary.g4irsf18_merge_runtime_global_scan_count;
+    row["g4irsf18_merge_future_route_input_count"] =
+        summary.g4irsf18_merge_future_route_input_count;
+    row["g4irsf18_merge_future_schedule_input_count"] =
+        summary.g4irsf18_merge_future_schedule_input_count;
+    row["g4irsf18_merge_full_astar_call_count"] =
+        summary.g4irsf18_merge_full_astar_call_count;
+    row["g4irsf18_merge_production_promotion_authorized"] =
+        summary
+            .g4irsf18_merge_artifact_production_closed_loop_authorized &&
+        summary.g4irsf18_merge_production_closed_loop_authorized &&
+        summary.g4irsf18_merge_offline_gate_passed;
+    row["g4irsf18_merge_deployment_status"] =
+        summary
+                .g4irsf18_merge_artifact_production_closed_loop_authorized
+            ? "runtime_gated_not_self_authorized"
+            : "research_fixed_workload_only_not_promoted";
   }
   return row;
 }
@@ -4290,6 +4434,110 @@ g4irsf17_source_policy_config_from_artifact(
         required(envelope, "upper"));
   }
   config.validate();
+  return config;
+}
+
+czr005::ics::G4IRSF18MergeLinearPolicyConfig
+g4irsf18_merge_policy_config_from_artifact(
+    const std::string& mode,
+    const py::dict& artifact,
+    bool research_closed_loop_authorized,
+    bool fixed_research_workload,
+    bool production_closed_loop_authorized,
+    bool offline_gate_passed,
+    double coverage_cap,
+    const py::object& max_overrides_per_segment_value,
+    bool kill_switch) {
+  czr005::ics::G4IRSF18MergeLinearPolicyConfig config;
+  config.mode = mode;
+  config.research_closed_loop_authorized =
+      research_closed_loop_authorized;
+  config.fixed_research_workload = fixed_research_workload;
+  config.production_closed_loop_authorized =
+      production_closed_loop_authorized;
+  config.offline_gate_passed = offline_gate_passed;
+  config.coverage_cap = coverage_cap;
+  config.max_overrides_per_segment = strict_python_integer_argument(
+      max_overrides_per_segment_value,
+      "g4irsf18_merge_max_overrides_per_segment");
+  config.kill_switch = kill_switch;
+  if (!artifact.empty()) {
+    const auto optional_string = [&](const char* name,
+                                     std::string& target) {
+      if (!artifact.contains(name)) {
+        return;
+      }
+      if (!py::isinstance<py::str>(artifact[name])) {
+        throw py::type_error(
+            std::string("G4IRSF18 artifact field must be string: ") + name);
+      }
+      target = py::cast<std::string>(artifact[name]);
+    };
+    const auto optional_bool = [&](const char* name, bool& target) {
+      if (!artifact.contains(name)) {
+        return;
+      }
+      if (!py::isinstance<py::bool_>(artifact[name])) {
+        throw py::type_error(
+            std::string("G4IRSF18 artifact field must be bool: ") + name);
+      }
+      target = py::cast<bool>(artifact[name]);
+    };
+    optional_string("schema", config.schema);
+    optional_string("family", config.family);
+    optional_string("feature_contract", config.feature_contract);
+    optional_string("score_direction", config.score_direction);
+    optional_string("tie_break", config.tie_break);
+    optional_string("tie_break_scope", config.tie_break_scope);
+    optional_string("ood_fallback", config.ood_fallback);
+    optional_string("authorization", config.authorization);
+    optional_bool("identity_features_used", config.identity_features_used);
+    optional_bool("outcome_features_used", config.outcome_features_used);
+    optional_bool(
+        "production_closed_loop_authorized",
+        config.artifact_production_closed_loop_authorized);
+    if (artifact.contains("feature_names")) {
+      config.feature_names = py::cast<std::vector<std::string>>(
+          artifact["feature_names"]);
+    }
+    if (artifact.contains("mean")) {
+      config.mean = py::cast<std::vector<double>>(artifact["mean"]);
+    }
+    if (artifact.contains("scale")) {
+      config.scale = py::cast<std::vector<double>>(artifact["scale"]);
+    }
+    if (artifact.contains("weights")) {
+      config.weights = py::cast<std::vector<double>>(artifact["weights"]);
+    }
+    if (artifact.contains("feature_lower")) {
+      config.feature_lower = py::cast<std::vector<double>>(
+          artifact["feature_lower"]);
+    }
+    if (artifact.contains("feature_upper")) {
+      config.feature_upper = py::cast<std::vector<double>>(
+          artifact["feature_upper"]);
+    }
+    if (artifact.contains("bias")) {
+      if (PyBool_Check(artifact["bias"].ptr()) ||
+          (!py::isinstance<py::float_>(artifact["bias"]) &&
+           !py::isinstance<py::int_>(artifact["bias"]))) {
+        throw py::type_error("G4IRSF18 artifact bias must be numeric, not bool");
+      }
+      config.bias = py::cast<double>(artifact["bias"]);
+    }
+    if (artifact.contains("starvation_policy") &&
+        py::isinstance<py::dict>(artifact["starvation_policy"])) {
+      const auto starvation =
+          py::reinterpret_borrow<py::dict>(artifact["starvation_policy"]);
+      if (starvation.contains("threshold_seconds")) {
+        config.starvation_threshold_seconds =
+            py::cast<double>(starvation["threshold_seconds"]);
+      }
+    }
+  }
+  // Structural/semantic artifact mismatch is deliberately not raised here:
+  // native telemetry records INVALID_ARTIFACT and the action falls back to J2.
+  config.validate_controls();
   return config;
 }
 
@@ -5085,6 +5333,75 @@ py::list g4irsf14_merge_visibility_rows(
   return rows;
 }
 
+py::list g4irsf18_merge_service_opportunity_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeMergeServiceOpportunityRow>& events) {
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["opportunity_id"] = py::int_(event.opportunity_id);
+    row["event_time"] = event.event_time;
+    row["destination_node"] = event.destination_node;
+    row["controller_generation"] =
+        py::int_(event.controller_generation);
+    row["timing_mode"] = event.timing_mode;
+    row["candidate_count"] = event.candidate_count;
+    row["baseline_winner_request_id"] =
+        py::int_(event.baseline_winner_request_id);
+    row["chosen_winner_request_id"] =
+        py::int_(event.chosen_winner_request_id);
+    row["candidate_request_id"] =
+        py::int_(event.candidate_request_id);
+    row["upstream_node"] = event.upstream_node;
+    row["projected_arrival"] = event.projected_arrival;
+    row["deadline_slack"] = event.deadline_slack;
+    row["wait_age"] = event.wait_age;
+    row["destination_service_seconds"] =
+        event.destination_service_seconds;
+    row["downstream_queue_pressure"] =
+        event.downstream_queue_pressure;
+    row["route_score"] = event.route_score;
+    row["static_remaining"] = event.static_remaining;
+    row["task_class_code"] = event.task_class_code;
+    row["task_class"] = event.task_class;
+    row["storage_leg"] = event.storage_leg;
+    row["baseline_winner"] = event.baseline_winner;
+    row["chosen_winner"] = event.chosen_winner;
+    if (!event.model_policy_mode.empty()) {
+      row["model_policy_mode"] = event.model_policy_mode;
+      row["model_feature_contract"] = event.model_feature_contract;
+      row["model_reason"] = event.model_reason;
+      row["model_evaluated"] = event.model_evaluated;
+      row["model_score_available"] = event.model_score_available;
+      row["model_score"] = event.model_score;
+      row["model_proposed"] = event.model_proposed;
+      row["model_applied"] = event.model_applied;
+      row["model_chosen"] = event.model_chosen;
+      row["model_out_of_distribution"] =
+          event.model_out_of_distribution;
+      row["model_invalid"] = event.model_invalid;
+      row["model_fallback"] = event.model_fallback;
+      row["model_baseline_request_id"] =
+          py::int_(event.model_baseline_request_id);
+      row["model_proposed_request_id"] =
+          py::int_(event.model_proposed_request_id);
+      py::list feature_names;
+      for (const char* name :
+           czr005::ics::g4irsf18_merge_feature_names()) {
+        feature_names.append(name);
+      }
+      row["model_feature_names"] = std::move(feature_names);
+      py::list features;
+      for (const double value : event.model_features) {
+        features.append(value);
+      }
+      row["model_features"] = std::move(features);
+    }
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
 py::list g4irsf14_event_seq_audit_rows(
     const std::vector<
         czr005::ics::EventRuntimeEventSeqAuditRow>& events) {
@@ -5655,7 +5972,17 @@ py::dict g4irsf11_event_runtime_from_records(
     int g4irsf17_source_wait_trace_limit,
     const std::string& g4irsf17_source_policy_mode,
     const py::dict& g4irsf17_source_policy_artifact,
-    int g4irsf17_source_policy_trace_limit) {
+    int g4irsf17_source_policy_trace_limit,
+    const std::string& merge_grant_timing_mode,
+    const std::string& g4irsf18_merge_policy_mode,
+    const py::dict& g4irsf18_merge_policy_artifact,
+    bool g4irsf18_merge_research_closed_loop_authorized,
+    bool g4irsf18_merge_fixed_research_workload,
+    bool g4irsf18_merge_production_closed_loop_authorized,
+    bool g4irsf18_merge_offline_gate_passed,
+    double g4irsf18_merge_coverage_cap,
+    const py::object& g4irsf18_merge_max_overrides_per_segment,
+    bool g4irsf18_merge_kill_switch) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -5670,6 +5997,19 @@ py::dict g4irsf11_event_runtime_from_records(
       event_semantics == "E4" ||
       event_semantics ==
           "E4_batch_plus_destination_merge_request";
+  const std::string canonical_merge_grant_timing_mode =
+      canonical_merge_grant_timing_mode_for_binding(
+          merge_grant_timing_mode);
+  const bool g4irsf18_merge_policy_enabled =
+      g4irsf18_merge_policy_mode != "off";
+  if (g4irsf18_merge_policy_enabled &&
+      (!requested_destination_merge_grants ||
+       canonical_merge_grant_timing_mode !=
+           "jit_fair_aging_deadline")) {
+    throw py::value_error(
+        "G4IRSF18 learned merge policy requires E4 with "
+        "jit_fair_aging_deadline (J2) timing");
+  }
   if (merge_grant_max_pending_requests <= 0) {
     throw py::value_error(
         "merge_grant_max_pending_requests must be positive");
@@ -5681,7 +6021,8 @@ py::dict g4irsf11_event_runtime_from_records(
   if (!requested_destination_merge_grants &&
       (merge_grant_rule != "M1" ||
        merge_grant_max_pending_requests != 64 ||
-       merge_grant_lifecycle_limit != 1024)) {
+       merge_grant_lifecycle_limit != 1024 ||
+       canonical_merge_grant_timing_mode != "eager")) {
     throw py::value_error(
         "merge grant controls are only valid with E4 destination "
         "merge-request semantics");
@@ -5810,6 +6151,8 @@ py::dict g4irsf11_event_runtime_from_records(
       enable_opportunity_telemetry;
   config.opportunity_trace_limit = opportunity_trace_limit;
   config.merge_grant_rule = merge_grant_rule;
+  config.merge_grant_timing_mode =
+      canonical_merge_grant_timing_mode;
   config.merge_grant_max_pending_requests =
       merge_grant_max_pending_requests;
   config.merge_grant_lifecycle_limit =
@@ -5835,6 +6178,17 @@ py::dict g4irsf11_event_runtime_from_records(
           g4irsf17_source_policy_artifact);
   config.g4irsf17_source_policy_trace_limit =
       g4irsf17_source_policy_trace_limit;
+  config.g4irsf18_merge_policy =
+      g4irsf18_merge_policy_config_from_artifact(
+          g4irsf18_merge_policy_mode,
+          g4irsf18_merge_policy_artifact,
+          g4irsf18_merge_research_closed_loop_authorized,
+          g4irsf18_merge_fixed_research_workload,
+          g4irsf18_merge_production_closed_loop_authorized,
+          g4irsf18_merge_offline_gate_passed,
+          g4irsf18_merge_coverage_cap,
+          g4irsf18_merge_max_overrides_per_segment,
+          g4irsf18_merge_kill_switch);
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -6033,6 +6387,8 @@ py::dict g4irsf11_event_runtime_from_records(
           canonical_merge_grant_rule_for_binding(merge_grant_rule);
       trace_context["merge_grant_rule_echo"] =
           merge_grant_rule;
+      trace_context["merge_grant_timing_mode"] =
+          result.summary.merge_grant_timing_mode;
       trace_context["merge_grant_max_pending_requests"] =
           merge_grant_max_pending_requests;
       trace_context["merge_grant_lifecycle_limit"] =
@@ -6049,6 +6405,10 @@ py::dict g4irsf11_event_runtime_from_records(
           "diagnostic_subset_of_junction_queue_wait_not_additive";
       trace_context["merge_grant_lifecycle_storage"] =
           "bounded_prefix_transition_rows_with_total_stored_dropped_counters";
+      trace_context["merge_grant_service_opportunity_scope"] =
+          "destination_local_one_hop_pending_requests_eligible_for_exact_slot";
+      trace_context["merge_grant_jit_wakeup_semantics"] =
+          "one_generation_checked_coalesced_timer_per_destination_merge";
     }
   }
   if (!result.summary.g4irsf16_supervisor_mode.empty()) {
@@ -6135,6 +6495,48 @@ py::dict g4irsf11_event_runtime_from_records(
     trace_context["g4irsf17_source_policy_trace_limit"] =
         g4irsf17_source_policy_trace_limit;
   }
+  if (!result.summary.g4irsf18_merge_policy_mode.empty()) {
+    trace_context["g4irsf18_merge_policy_schema"] =
+        result.summary.g4irsf18_merge_policy_schema;
+    trace_context["g4irsf18_merge_policy_family"] =
+        result.summary.g4irsf18_merge_policy_family;
+    trace_context["g4irsf18_merge_feature_contract"] =
+        result.summary.g4irsf18_merge_feature_contract;
+    trace_context["g4irsf18_merge_policy_mode"] =
+        result.summary.g4irsf18_merge_policy_mode;
+    trace_context["g4irsf18_merge_score_direction"] =
+        "higher_is_better";
+    trace_context["g4irsf18_merge_tie_break"] =
+        "fifo_only_for_finite_in_contract_equal_score";
+    trace_context["g4irsf18_merge_ood_fallback"] = "J2";
+    trace_context["g4irsf18_merge_starvation_guard_seconds"] = 120.0;
+    trace_context["g4irsf18_merge_candidate_scope"] =
+        "current_destination_local_legal_exact_slot_JIT_set_2_to_16";
+    trace_context["g4irsf18_merge_authorization_order"] =
+        "kill_switch;starvation_guard;artifact_contract;OOD;shadow_or_"
+        "runtime_grant;finite_tie_fifo;coverage_cap;segment_override_cap";
+    trace_context["g4irsf18_merge_identity_semantics"] =
+        "request_bag_task_segment_identity_is_trace_only_never_model_input";
+    trace_context["g4irsf18_merge_research_evidence_status"] =
+        "fixed_workload_candidate_native_parity_required_not_promoted";
+    trace_context["g4irsf18_merge_production_promotion_authorized"] =
+        result.summary
+                .g4irsf18_merge_artifact_production_closed_loop_authorized &&
+        result.summary
+            .g4irsf18_merge_production_closed_loop_authorized &&
+        result.summary.g4irsf18_merge_offline_gate_passed;
+    py::list feature_names;
+    for (const char* name :
+         czr005::ics::g4irsf18_merge_feature_names()) {
+      feature_names.append(name);
+    }
+    trace_context["g4irsf18_merge_feature_names"] =
+        std::move(feature_names);
+    trace_context["g4irsf18_merge_runtime_global_scan_count"] = 0;
+    trace_context["g4irsf18_merge_future_route_input_count"] = 0;
+    trace_context["g4irsf18_merge_future_schedule_input_count"] = 0;
+    trace_context["g4irsf18_merge_full_astar_call_count"] = 0;
+  }
 
   py::dict payload;
   payload["summary"] = g4irsf11_event_runtime_summary_row(
@@ -6188,6 +6590,9 @@ py::dict g4irsf11_event_runtime_from_records(
       payload["merge_grant_lifecycle"] =
           g4irsf14_merge_grant_lifecycle_rows(
               result.merge_grant_lifecycle);
+      payload["merge_service_opportunities"] =
+          g4irsf18_merge_service_opportunity_rows(
+              result.merge_service_opportunities);
     }
   }
   payload["trace_context"] = std::move(trace_context);
@@ -6447,7 +6852,21 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("g4irsf17_source_policy_mode") =
                  std::string("off"),
              py::arg("g4irsf17_source_policy_artifact") = py::dict(),
-             py::arg("g4irsf17_source_policy_trace_limit") = 200000);
+             py::arg("g4irsf17_source_policy_trace_limit") = 200000,
+             py::arg("merge_grant_timing_mode") =
+                 std::string("eager"),
+             py::arg("g4irsf18_merge_policy_mode") =
+                 std::string("off"),
+             py::arg("g4irsf18_merge_policy_artifact") = py::dict(),
+             py::arg(
+                 "g4irsf18_merge_research_closed_loop_authorized") = false,
+             py::arg("g4irsf18_merge_fixed_research_workload") = false,
+             py::arg(
+                 "g4irsf18_merge_production_closed_loop_authorized") = false,
+             py::arg("g4irsf18_merge_offline_gate_passed") = false,
+             py::arg("g4irsf18_merge_coverage_cap") = 0.05,
+             py::arg("g4irsf18_merge_max_overrides_per_segment") = 2,
+             py::arg("g4irsf18_merge_kill_switch") = false);
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,
