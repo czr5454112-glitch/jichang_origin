@@ -1,0 +1,452 @@
+{
+  "claim_boundary": "Replica throughput and deterministic execution benchmark only; identical replicas are not independent learning support.",
+  "design": {
+    "independent_learning_support_claimed": false,
+    "one_fresh_process_per_pair_job": true,
+    "pair_order": [
+      "J2/S1",
+      "J2/S2"
+    ],
+    "replicas_are_identical_workload_repeats": true,
+    "same_g18_ladder_prefix_within_pair": true,
+    "worker_count_does_not_change_jobs": true
+  },
+  "jobs": [
+    {
+      "baseline": {
+        "arm": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "fault_scenario": null,
+          "job_id": "g19_replica_000__baseline__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S1"
+      },
+      "job_id": "g19_pair_replica_000__s2048",
+      "plan_index": 0,
+      "prefix_segments": 2048,
+      "replica_id": "replica_000",
+      "treatment": {
+        "arm": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S2_frozen_g4e_without_absolute_node_ids"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "fault_scenario": null,
+          "job_id": "g19_replica_000__treatment__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S2"
+      }
+    },
+    {
+      "baseline": {
+        "arm": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "fault_scenario": null,
+          "job_id": "g19_replica_001__baseline__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S1"
+      },
+      "job_id": "g19_pair_replica_001__s2048",
+      "plan_index": 1,
+      "prefix_segments": 2048,
+      "replica_id": "replica_001",
+      "treatment": {
+        "arm": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S2_frozen_g4e_without_absolute_node_ids"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "fault_scenario": null,
+          "job_id": "g19_replica_001__treatment__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S2"
+      }
+    },
+    {
+      "baseline": {
+        "arm": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "fault_scenario": null,
+          "job_id": "g19_replica_002__baseline__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S1"
+      },
+      "job_id": "g19_pair_replica_002__s2048",
+      "plan_index": 2,
+      "prefix_segments": 2048,
+      "replica_id": "replica_002",
+      "treatment": {
+        "arm": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S2_frozen_g4e_without_absolute_node_ids"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "fault_scenario": null,
+          "job_id": "g19_replica_002__treatment__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S2"
+      }
+    },
+    {
+      "baseline": {
+        "arm": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "fault_scenario": null,
+          "job_id": "g19_replica_003__baseline__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S1"
+      },
+      "job_id": "g19_pair_replica_003__s2048",
+      "plan_index": 3,
+      "prefix_segments": 2048,
+      "replica_id": "replica_003",
+      "treatment": {
+        "arm": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S2_frozen_g4e_without_absolute_node_ids"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "fault_scenario": null,
+          "job_id": "g19_replica_003__treatment__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S2"
+      }
+    },
+    {
+      "baseline": {
+        "arm": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "fault_scenario": null,
+          "job_id": "g19_replica_004__baseline__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S1"
+      },
+      "job_id": "g19_pair_replica_004__s2048",
+      "plan_index": 4,
+      "prefix_segments": 2048,
+      "replica_id": "replica_004",
+      "treatment": {
+        "arm": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S2_frozen_g4e_without_absolute_node_ids"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "fault_scenario": null,
+          "job_id": "g19_replica_004__treatment__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S2"
+      }
+    },
+    {
+      "baseline": {
+        "arm": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "fault_scenario": null,
+          "job_id": "g19_replica_005__baseline__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S1"
+      },
+      "job_id": "g19_pair_replica_005__s2048",
+      "plan_index": 5,
+      "prefix_segments": 2048,
+      "replica_id": "replica_005",
+      "treatment": {
+        "arm": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S2_frozen_g4e_without_absolute_node_ids"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "fault_scenario": null,
+          "job_id": "g19_replica_005__treatment__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S2"
+      }
+    },
+    {
+      "baseline": {
+        "arm": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "fault_scenario": null,
+          "job_id": "g19_replica_006__baseline__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S1"
+      },
+      "job_id": "g19_pair_replica_006__s2048",
+      "plan_index": 6,
+      "prefix_segments": 2048,
+      "replica_id": "replica_006",
+      "treatment": {
+        "arm": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S2_frozen_g4e_without_absolute_node_ids"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "fault_scenario": null,
+          "job_id": "g19_replica_006__treatment__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S2"
+      }
+    },
+    {
+      "baseline": {
+        "arm": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S1_BASELINE",
+          "fault_scenario": null,
+          "job_id": "g19_replica_007__baseline__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S1"
+      },
+      "job_id": "g19_pair_replica_007__s2048",
+      "plan_index": 7,
+      "prefix_segments": 2048,
+      "replica_id": "replica_007",
+      "treatment": {
+        "arm": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "learned": false,
+          "merge_rule": "M3",
+          "native_controls": {
+            "scorer_mode": "S2_frozen_g4e_without_absolute_node_ids"
+          },
+          "production_closed_loop_authorized": false,
+          "research_closed_loop_authorized": false,
+          "timing_mode": "jit_fair_aging_deadline"
+        },
+        "job": {
+          "arm_id": "G19_J2_S2_TREATMENT",
+          "fault_scenario": null,
+          "job_id": "g19_replica_007__treatment__s2048",
+          "max_segments": -1,
+          "prefix_segments": 2048,
+          "scale": 1,
+          "stage": "ladder",
+          "telemetry_mode": "evidence_trace"
+        },
+        "label": "J2/S2"
+      }
+    }
+  ],
+  "prefix_segments": 2048,
+  "replica_count": 8,
+  "schema": "czr005.g4irsf19.rollout_farm_plan.v1",
+  "status": "FIXED_REPLICA_BENCHMARK_PLAN"
+}
