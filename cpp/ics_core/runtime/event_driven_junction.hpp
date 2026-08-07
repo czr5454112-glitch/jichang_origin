@@ -37,6 +37,7 @@
 #include "ics_core/runtime/g4irsf15_causal_campaign.hpp"
 #include "ics_core/runtime/g4irsf16_supervisor.hpp"
 #include "ics_core/runtime/g4irsf17_source_policy.hpp"
+#include "ics_core/runtime/g4irsf18_merge_policy.hpp"
 
 namespace czr005::ics {
 
@@ -580,6 +581,10 @@ struct EventDrivenJunctionConfig {
   // M7 is diagnostic-only and M8/M9 are fail-closed until a validated model
   // artifact is explicitly wired into this runtime.
   std::string merge_grant_rule = "M1";
+  // G18 timing is append-only. "eager" preserves the exact G17/E4 request-
+  // arrival arbitration path. JIT modes retain a bounded local pending set
+  // and arbitrate only when the destination exposes a natural service slot.
+  std::string merge_grant_timing_mode = "eager";
   int merge_grant_max_pending_requests = 64;
   int merge_grant_lifecycle_limit = 1024;
   // G4IRSF16 is append-only and exact-off by default.  Shadow evaluates the
@@ -599,6 +604,10 @@ struct EventDrivenJunctionConfig {
   // shadow/closed_loop inspect only a fixed K=2/4 local candidate set.
   G4IRSF17SourcePolicyConfig g4irsf17_source_policy;
   int g4irsf17_source_policy_trace_limit = 200000;
+  // G18 learned merge control is restricted to E4/J2's already legal local
+  // candidate set.  The artifact can propose an ordering, while these
+  // independent runtime grants decide whether it may own an action.
+  G4IRSF18MergeLinearPolicyConfig g4irsf18_merge_policy;
   // Internal causal-data sidecar capture.  The production default is exact
   // off; G15's frozen census enables it without changing any runtime action.
   bool enable_g4irsf17_causal_source_features = false;
@@ -1108,6 +1117,18 @@ struct EventRuntimeSummary {
   std::uint64_t merge_grant_goal_exempt_bypass_count = 0;
   std::uint64_t merge_grant_stale_arbitration_count = 0;
   std::uint64_t merge_grant_duplicate_wakeup_prevented_count = 0;
+  std::string merge_grant_timing_mode;
+  std::uint64_t merge_grant_service_opportunity_count = 0;
+  std::uint64_t merge_grant_multi_candidate_opportunity_count = 0;
+  std::uint64_t merge_grant_true_competition_count = 0;
+  std::uint64_t merge_grant_order_mutation_count = 0;
+  std::uint64_t merge_grant_candidate_total_count = 0;
+  std::uint64_t merge_grant_wakeup_scheduled_count = 0;
+  std::uint64_t merge_grant_wakeup_coalesced_count = 0;
+  std::uint64_t merge_grant_stale_wakeup_count = 0;
+  std::uint64_t merge_grant_opportunity_trace_total_count = 0;
+  std::uint64_t merge_grant_opportunity_trace_stored_count = 0;
+  std::uint64_t merge_grant_opportunity_trace_dropped_count = 0;
   int merge_grant_peak_pending_requests = 0;
   int merge_grant_peak_active_unconsumed = 0;
   int merge_grant_final_active_unconsumed = 0;
@@ -1174,6 +1195,45 @@ struct EventRuntimeSummary {
   int g4irsf17_source_policy_future_route_input_count = 0;
   int g4irsf17_source_policy_future_schedule_input_count = 0;
   int g4irsf17_source_policy_full_astar_call_count = 0;
+  // G4IRSF18 fields are emitted only while the learned merge policy is on.
+  std::string g4irsf18_merge_policy_mode;
+  std::string g4irsf18_merge_policy_schema;
+  std::string g4irsf18_merge_policy_family;
+  std::string g4irsf18_merge_feature_contract;
+  bool g4irsf18_merge_artifact_valid = false;
+  bool g4irsf18_merge_artifact_production_closed_loop_authorized = false;
+  bool g4irsf18_merge_research_closed_loop_authorized = false;
+  bool g4irsf18_merge_fixed_research_workload = false;
+  bool g4irsf18_merge_production_closed_loop_authorized = false;
+  bool g4irsf18_merge_offline_gate_passed = false;
+  double g4irsf18_merge_coverage_cap = 0.0;
+  int g4irsf18_merge_max_overrides_per_segment = 0;
+  bool g4irsf18_merge_kill_switch_configured = false;
+  bool g4irsf18_merge_kill_switch_tripped = false;
+  std::string g4irsf18_merge_kill_switch_reason;
+  std::uint64_t g4irsf18_merge_model_opportunity_count = 0;
+  std::uint64_t g4irsf18_merge_model_eligible_count = 0;
+  std::uint64_t g4irsf18_merge_model_proposal_count = 0;
+  std::uint64_t g4irsf18_merge_model_applied_count = 0;
+  std::uint64_t g4irsf18_merge_distinct_action_mutation_count = 0;
+  std::uint64_t g4irsf18_merge_model_ood_count = 0;
+  std::uint64_t g4irsf18_merge_model_invalid_count = 0;
+  std::uint64_t g4irsf18_merge_model_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_j2_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_tie_fifo_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_shadow_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_authorization_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_coverage_cap_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_override_cap_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_starvation_guard_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_kill_switch_trip_count = 0;
+  std::uint64_t g4irsf18_merge_kill_switch_fallback_count = 0;
+  std::uint64_t g4irsf18_merge_model_ownership_count = 0;
+  std::uint64_t g4irsf18_merge_coverage_eligible_seen_count = 0;
+  int g4irsf18_merge_runtime_global_scan_count = 0;
+  int g4irsf18_merge_future_route_input_count = 0;
+  int g4irsf18_merge_future_schedule_input_count = 0;
+  int g4irsf18_merge_full_astar_call_count = 0;
 };
 
 struct EventRuntimeJunctionResult {
@@ -1394,6 +1454,50 @@ struct EventRuntimeMergeVisibilityRow {
   std::uint64_t event_seq = 0;
 };
 
+// One bounded row per candidate at a real G18 JIT service opportunity.  IDs
+// are trace identity only; every scored value is captured from the same
+// destination-local one-hop pending request and contains no outcome, route
+// suffix, global task scan, or future schedule.
+struct EventRuntimeMergeServiceOpportunityRow {
+  std::uint64_t opportunity_id = 0;
+  double event_time = 0.0;
+  int destination_node = -1;
+  std::uint64_t controller_generation = 0;
+  std::string timing_mode;
+  int candidate_count = 0;
+  std::uint64_t baseline_winner_request_id = 0;
+  std::uint64_t chosen_winner_request_id = 0;
+  std::uint64_t candidate_request_id = 0;
+  int upstream_node = -1;
+  double projected_arrival = 0.0;
+  double deadline_slack = 0.0;
+  double wait_age = 0.0;
+  double destination_service_seconds = 0.0;
+  int downstream_queue_pressure = 0;
+  double route_score = 0.0;
+  double static_remaining = 0.0;
+  int task_class_code = 4;
+  int task_class = 0;
+  bool storage_leg = false;
+  bool baseline_winner = false;
+  bool chosen_winner = false;
+  std::string model_policy_mode;
+  std::string model_feature_contract;
+  std::string model_reason;
+  bool model_evaluated = false;
+  bool model_score_available = false;
+  double model_score = 0.0;
+  bool model_proposed = false;
+  bool model_applied = false;
+  bool model_chosen = false;
+  bool model_out_of_distribution = false;
+  bool model_invalid = false;
+  bool model_fallback = false;
+  std::uint64_t model_baseline_request_id = 0;
+  std::uint64_t model_proposed_request_id = 0;
+  std::array<double, kG4IRSF18MergeFeatureCount> model_features{};
+};
+
 struct EventRuntimeEventSeqAuditRow {
   double event_time = 0.0;
   std::uint64_t timestamp_bits = 0;
@@ -1440,6 +1544,8 @@ struct EventDrivenJunctionResult {
       g4irsf17_source_policy_decisions;
   std::vector<EventRuntimeJunctionOpportunityRow> junction_arbitration_opportunities;
   std::vector<EventRuntimeMergeVisibilityRow> merge_request_visibility;
+  std::vector<EventRuntimeMergeServiceOpportunityRow>
+      merge_service_opportunities;
   std::vector<EventRuntimeEventSeqAuditRow> event_seq_ordering_audit;
   std::vector<EventRuntimeArbitrationBatchRow> arbitration_batch_cardinality;
   std::vector<DestinationMergeGrantLifecycleRow> merge_grant_lifecycle;
@@ -2194,6 +2300,7 @@ struct DestinationMergeBagState {
   double pending_request_time = -1.0;
   double first_contention_time = -1.0;
   double grant_wait_seconds = 0.0;
+  int g4irsf18_merge_override_count = 0;
   // Minted only by a valid EDGE_ENTER that observes the exact committed
   // capability at its original fault generations while the edge is healthy.
   bool exact_grant_edge_entry_observed = false;
@@ -2208,6 +2315,7 @@ struct DestinationMergeBagStateCheckpoint {
   double pending_request_time = -1.0;
   double first_contention_time = -1.0;
   double grant_wait_seconds = 0.0;
+  int g4irsf18_merge_override_count = 0;
   bool exact_grant_edge_entry_observed = false;
   std::optional<MergeGrantCapabilityCheckpoint> capability;
 };
@@ -2462,6 +2570,44 @@ class EventDrivenJunctionRuntime {
         uses_destination_merge_grants();
     result_.summary.merge_grant_exact_slot_no_future_shift =
         uses_destination_merge_grants();
+    result_.summary.merge_grant_timing_mode =
+        destination_merge_grant_timing_mode_name(
+            canonical_merge_grant_timing_mode());
+    if (g4irsf18_merge_policy_enabled()) {
+      const auto& policy = config_.g4irsf18_merge_policy;
+      result_.summary.g4irsf18_merge_policy_mode = policy.mode;
+      result_.summary.g4irsf18_merge_policy_schema = policy.schema;
+      result_.summary.g4irsf18_merge_policy_family = policy.family;
+      result_.summary.g4irsf18_merge_feature_contract =
+          kG4IRSF18MergeFeatureContract;
+      result_.summary.g4irsf18_merge_artifact_valid =
+          policy.artifact_valid();
+      result_.summary
+          .g4irsf18_merge_artifact_production_closed_loop_authorized =
+          policy.artifact_production_closed_loop_authorized;
+      result_.summary
+          .g4irsf18_merge_research_closed_loop_authorized =
+          policy.research_closed_loop_authorized;
+      result_.summary.g4irsf18_merge_fixed_research_workload =
+          policy.fixed_research_workload;
+      result_.summary
+          .g4irsf18_merge_production_closed_loop_authorized =
+          policy.production_closed_loop_authorized;
+      result_.summary.g4irsf18_merge_offline_gate_passed =
+          policy.offline_gate_passed;
+      result_.summary.g4irsf18_merge_coverage_cap =
+          policy.coverage_cap;
+      result_.summary.g4irsf18_merge_max_overrides_per_segment =
+          policy.max_overrides_per_segment;
+      result_.summary.g4irsf18_merge_kill_switch_configured =
+          policy.kill_switch;
+      if (policy.kill_switch) {
+        result_.summary.g4irsf18_merge_kill_switch_tripped = true;
+        result_.summary.g4irsf18_merge_kill_switch_reason =
+            "EXPLICIT_RUNTIME_KILL_SWITCH";
+        result_.summary.g4irsf18_merge_kill_switch_trip_count = 1;
+      }
+    }
     if (g4irsf16_enabled()) {
       result_.summary.g4irsf16_supervisor_mode =
           canonical_g4irsf16_supervisor_mode();
@@ -3326,8 +3472,10 @@ class EventDrivenJunctionRuntime {
         canonical_pressure_mode() != "C0_off" ||
         canonical_priority_mode() !=
             BoundedLocalPIBTPriorityMode::kQ0Current ||
-        canonical_event_semantics() !=
-            "E4_batch_plus_destination_merge_request" ||
+         canonical_event_semantics() !=
+             "E4_batch_plus_destination_merge_request" ||
+        canonical_merge_grant_timing_mode() !=
+            DestinationMergeGrantTimingMode::kEager ||
         canonical_merge_grant_rule() !=
             DestinationMergeGrantRule::kM0EarliestKnown ||
         canonical_admission_mode() != "off") {
@@ -3847,6 +3995,47 @@ class EventDrivenJunctionRuntime {
            "E4_batch_plus_destination_merge_request";
   }
 
+  bool g4irsf18_merge_policy_enabled() const noexcept {
+    return config_.g4irsf18_merge_policy.enabled();
+  }
+
+  DestinationMergeGrantTimingMode
+  canonical_merge_grant_timing_mode() const {
+    if (config_.merge_grant_timing_mode == "eager" ||
+        config_.merge_grant_timing_mode == "J0" ||
+        config_.merge_grant_timing_mode == "J0_F2_EAGER") {
+      return DestinationMergeGrantTimingMode::kEager;
+    }
+    if (config_.merge_grant_timing_mode == "jit_fifo" ||
+        config_.merge_grant_timing_mode == "J1" ||
+        config_.merge_grant_timing_mode == "J1_F2_JIT_FIFO") {
+      return DestinationMergeGrantTimingMode::kJitFifo;
+    }
+    if (config_.merge_grant_timing_mode ==
+            "jit_fair_aging_deadline" ||
+        config_.merge_grant_timing_mode == "J2" ||
+        config_.merge_grant_timing_mode ==
+            "J2_F2_JIT_FAIR_AGING_DEADLINE") {
+      return DestinationMergeGrantTimingMode::
+          kJitFairAgingDeadline;
+    }
+    throw std::invalid_argument(
+        "merge_grant_timing_mode must be eager, jit_fifo, or "
+        "jit_fair_aging_deadline");
+  }
+
+  bool uses_jit_destination_merge_grants() const {
+    return uses_destination_merge_grants() &&
+           canonical_merge_grant_timing_mode() !=
+               DestinationMergeGrantTimingMode::kEager;
+  }
+
+  DestinationMergeGrantRule effective_merge_grant_rule() const {
+    return destination_merge_grant_rule_for_timing(
+        canonical_merge_grant_timing_mode(),
+        canonical_merge_grant_rule());
+  }
+
   DestinationMergeGrantRule canonical_merge_grant_rule() const {
     if (config_.merge_grant_rule == "M0" ||
         config_.merge_grant_rule ==
@@ -4331,7 +4520,23 @@ class EventDrivenJunctionRuntime {
     (void)canonical_pibt_preference_mode();
     (void)canonical_framework_mode();
     (void)canonical_event_semantics();
+    (void)canonical_merge_grant_timing_mode();
     (void)canonical_merge_grant_rule();
+    config_.g4irsf18_merge_policy.validate_controls();
+    if (g4irsf18_merge_policy_enabled() &&
+        (!uses_destination_merge_grants() ||
+         canonical_merge_grant_timing_mode() !=
+             DestinationMergeGrantTimingMode::kJitFairAgingDeadline)) {
+      throw std::invalid_argument(
+          "G4IRSF18 learned merge policy requires E4 destination merge "
+          "grants with jit_fair_aging_deadline (J2) timing");
+    }
+    if (g4irsf18_merge_policy_enabled() &&
+        std::abs(config_.starvation_threshold - 120.0) > 1.0e-12) {
+      throw std::invalid_argument(
+          "G4IRSF18 J7 merge artifact requires the authoritative 120-second "
+          "J2 starvation guard");
+    }
     const auto g4irsf16_mode =
         canonical_g4irsf16_supervisor_mode();
     if (g4irsf16_mode == "off") {
@@ -4521,6 +4726,12 @@ class EventDrivenJunctionRuntime {
       throw std::invalid_argument(
           "merge grant pending bound must be positive and lifecycle bound "
           "must be non-negative");
+    }
+    if (!uses_destination_merge_grants() &&
+        canonical_merge_grant_timing_mode() !=
+            DestinationMergeGrantTimingMode::kEager) {
+      throw std::invalid_argument(
+          "JIT merge timing is only valid with E4 destination merge grants");
     }
     if (uses_destination_merge_grants() &&
         canonical_resource_semantics() !=
@@ -6433,6 +6644,463 @@ class EventDrivenJunctionRuntime {
         .first->second;
   }
 
+  [[nodiscard]] double jit_destination_merge_ready_time(
+      const DestinationMergeRequest& request,
+      double now) const {
+    const auto destination =
+        junctions_.find(request.destination_merge_node);
+    if (destination == junctions_.end()) {
+      return std::numeric_limits<double>::infinity();
+    }
+    const double arrival =
+        now + request.exact_edge_travel_seconds;
+    const double service_start =
+        destination->second.service_calendar.earliest_start(
+            arrival, request.destination_service_seconds);
+    return std::max(
+        now,
+        service_start - request.exact_edge_travel_seconds);
+  }
+
+  [[nodiscard]] double next_jit_destination_merge_ready_time(
+      const DestinationMergeGrantController& controller,
+      double now) const {
+    double ready = std::numeric_limits<double>::infinity();
+    for (const auto& pending : controller.pending_) {
+      ready = std::min(
+          ready,
+          jit_destination_merge_ready_time(pending.request, now));
+    }
+    return ready;
+  }
+
+  void refresh_jit_destination_merge_pending(
+      DestinationMergeGrantController& controller,
+      double now) {
+    if (!uses_jit_destination_merge_grants()) {
+      return;
+    }
+    auto destination = junctions_.find(controller.destination_node());
+    if (destination == junctions_.end()) {
+      return;
+    }
+    const auto calendar_generation =
+        destination->second.service_calendar.generation();
+    const int pressure =
+        static_cast<int>(destination->second.queue.size()) +
+        destination->second.scheduled_incoming;
+    bool changed = false;
+    for (auto& pending : controller.pending_) {
+      auto& request = pending.request;
+      const auto bag = bags_.find(request.runtime_bag_id);
+      const double ready =
+          jit_destination_merge_ready_time(request, now);
+      request.request_time = now;
+      request.earliest_edge_entry = now;
+      request.projected_arrival =
+          now + request.exact_edge_travel_seconds;
+      request.destination_calendar_generation =
+          calendar_generation;
+      request.downstream_queue_pressure = pressure;
+      request.wait_age = destination_merge_request_age(request, now);
+      if (bag != bags_.end()) {
+        request.deadline_slack =
+            bag->second.request.deadline >= 0.0
+                ? bag->second.request.deadline - now
+                : std::numeric_limits<double>::max();
+        request.source_release_age =
+            std::max(0.0, now - bag->second.request.release_time);
+        request.local_queue_age =
+            std::max(0.0, now - bag->second.junction_enqueued_at);
+      }
+      request.expiry = std::max(
+          now + config_.retry_interval,
+          std::isfinite(ready)
+              ? ready + config_.retry_interval
+              : now + config_.retry_interval);
+      DestinationMergeRequest identity = request;
+      identity.lifecycle_request_snapshot.reset();
+      request.lifecycle_request_snapshot =
+          std::make_shared<const DestinationMergeRequest>(
+              std::move(identity));
+      changed = true;
+    }
+    if (changed) {
+      ++controller.generation_;
+    }
+  }
+
+  void schedule_next_jit_destination_merge_opportunity(
+      DestinationMergeGrantController& controller,
+      double now,
+      bool allow_immediate) {
+    if (!uses_jit_destination_merge_grants() ||
+        controller.pending_.empty()) {
+      return;
+    }
+    refresh_jit_destination_merge_pending(controller, now);
+    const double ready =
+        next_jit_destination_merge_ready_time(controller, now);
+    if (!std::isfinite(ready) ||
+        (!allow_immediate &&
+         ready <= now + event_runtime_detail::kEpsilon)) {
+      return;
+    }
+    schedule_destination_merge_wakeup(
+        controller.destination_node(), ready);
+  }
+
+  struct G4IRSF18MergeRuntimeDecision {
+    DestinationMergeGrantController::PendingRecord* j2_baseline = nullptr;
+    DestinationMergeGrantController::PendingRecord* proposed = nullptr;
+    DestinationMergeGrantController::PendingRecord* chosen = nullptr;
+    G4IRSF18MergeFeatureBatch feature_batch;
+    std::vector<double> scores;
+    std::string reason = "OFF";
+    bool evaluated = false;
+    bool proposal_available = false;
+    bool applied = false;
+    bool out_of_distribution = false;
+    bool invalid = false;
+    bool fallback = false;
+  };
+
+  G4IRSF18MergeRuntimeDecision decide_g4irsf18_merge_policy(
+      const std::vector<
+          DestinationMergeGrantController::PendingRecord*>& candidates,
+      DestinationMergeGrantController::PendingRecord* fifo_baseline,
+      DestinationMergeGrantController::PendingRecord* j2_baseline,
+      double event_time) {
+    G4IRSF18MergeRuntimeDecision decision;
+    decision.j2_baseline = j2_baseline;
+    decision.chosen = j2_baseline;
+    if (!g4irsf18_merge_policy_enabled()) {
+      return decision;
+    }
+
+    auto& summary = result_.summary;
+    const auto& policy = config_.g4irsf18_merge_policy;
+    ++summary.g4irsf18_merge_model_opportunity_count;
+    if (candidates.size() < 2U) {
+      decision.reason = "SINGLETON_J2_NO_MODEL";
+      return decision;
+    }
+    ++summary.g4irsf18_merge_model_eligible_count;
+
+    std::vector<const DestinationMergeRequest*> requests;
+    requests.reserve(candidates.size());
+    for (const auto* candidate : candidates) {
+      requests.push_back(&candidate->request);
+    }
+    decision.feature_batch =
+        g4irsf18_merge_feature_batch(requests, event_time);
+    decision.out_of_distribution =
+        decision.feature_batch.out_of_distribution;
+    decision.invalid = decision.feature_batch.invalid;
+
+    if (!summary.g4irsf18_merge_kill_switch_tripped &&
+        (summary.reservation_conflicts > 0 ||
+         summary.physical_fault_edge_entry_violation_count > 0)) {
+      summary.g4irsf18_merge_kill_switch_tripped = true;
+      summary.g4irsf18_merge_kill_switch_reason =
+          "RUNTIME_SAFETY_COUNTER_TRIP";
+      ++summary.g4irsf18_merge_kill_switch_trip_count;
+    }
+    const auto j2_fallback =
+        [&](const char* reason, std::uint64_t* reason_counter) {
+          decision.chosen = j2_baseline;
+          decision.fallback = true;
+          decision.reason = reason;
+          ++summary.g4irsf18_merge_model_fallback_count;
+          ++summary.g4irsf18_merge_j2_fallback_count;
+          if (reason_counter != nullptr) {
+            ++*reason_counter;
+          }
+        };
+    if (summary.g4irsf18_merge_kill_switch_tripped) {
+      j2_fallback(
+          "KILL_SWITCH_J2_FALLBACK",
+          &summary.g4irsf18_merge_kill_switch_fallback_count);
+      return decision;
+    }
+    const bool starvation_guard =
+        std::any_of(
+            candidates.begin(), candidates.end(),
+            [&](const auto* candidate) {
+              return destination_merge_request_age(
+                         candidate->request, event_time) +
+                         event_runtime_detail::kEpsilon >=
+                     config_.starvation_threshold;
+            });
+    if (starvation_guard) {
+      j2_fallback(
+          "STARVATION_GUARD_J2_FALLBACK",
+          &summary.g4irsf18_merge_starvation_guard_fallback_count);
+      return decision;
+    }
+    if (!policy.artifact_valid()) {
+      decision.invalid = true;
+      ++summary.g4irsf18_merge_model_invalid_count;
+      j2_fallback(
+          "INVALID_ARTIFACT_J2_FALLBACK",
+          nullptr);
+      return decision;
+    }
+    if (decision.feature_batch.invalid) {
+      ++summary.g4irsf18_merge_model_invalid_count;
+      if (decision.feature_batch.out_of_distribution) {
+        ++summary.g4irsf18_merge_model_ood_count;
+      }
+      j2_fallback(
+          "INVALID_LOCAL_FEATURE_J2_FALLBACK",
+          nullptr);
+      return decision;
+    }
+    if (decision.feature_batch.out_of_distribution) {
+      ++summary.g4irsf18_merge_model_ood_count;
+      j2_fallback(
+          "OOD_LOCAL_FEATURE_J2_FALLBACK",
+          nullptr);
+      return decision;
+    }
+
+    decision.scores.reserve(candidates.size());
+    for (const auto& row : decision.feature_batch.rows) {
+      const double score = policy.score(row.values);
+      if (!std::isfinite(score)) {
+        decision.invalid = true;
+        ++summary.g4irsf18_merge_model_invalid_count;
+        j2_fallback(
+            "NONFINITE_SCORE_J2_FALLBACK",
+            nullptr);
+        return decision;
+      }
+      decision.scores.push_back(score);
+    }
+    decision.evaluated = true;
+    const auto best_score = std::max_element(
+        decision.scores.begin(), decision.scores.end());
+    const std::size_t best_index = static_cast<std::size_t>(
+        std::distance(decision.scores.begin(), best_score));
+    const bool score_tie =
+        std::count_if(
+            decision.scores.begin(), decision.scores.end(),
+            [&](double score) {
+              return std::abs(score - *best_score) <= 1.0e-12;
+            }) > 1;
+    decision.proposed = score_tie ? fifo_baseline : candidates[best_index];
+    decision.proposal_available = true;
+    ++summary.g4irsf18_merge_model_proposal_count;
+
+    if (policy.shadow()) {
+      j2_fallback(
+          "SHADOW_J2_FALLBACK",
+          &summary.g4irsf18_merge_shadow_fallback_count);
+      return decision;
+    }
+    const bool authorized =
+        (policy.research_closed_loop() &&
+         policy.research_closed_loop_authorized &&
+         policy.fixed_research_workload) ||
+        (policy.production_closed_loop() &&
+         policy.artifact_production_closed_loop_authorized &&
+         policy.production_closed_loop_authorized &&
+         policy.offline_gate_passed);
+    if (!authorized) {
+      j2_fallback(
+          "RUNTIME_AUTHORIZATION_J2_FALLBACK",
+          &summary.g4irsf18_merge_authorization_fallback_count);
+      return decision;
+    }
+    if (score_tie) {
+      decision.chosen = fifo_baseline;
+      decision.fallback = true;
+      decision.reason = "MODEL_SCORE_TIE_FIFO_FALLBACK";
+      ++summary.g4irsf18_merge_model_fallback_count;
+      ++summary.g4irsf18_merge_tie_fifo_fallback_count;
+      return decision;
+    }
+
+    ++summary.g4irsf18_merge_coverage_eligible_seen_count;
+    const auto coverage_allowance = static_cast<std::uint64_t>(std::floor(
+        static_cast<double>(
+            summary.g4irsf18_merge_coverage_eligible_seen_count) *
+            policy.coverage_cap +
+        1.0e-12));
+    if (summary.g4irsf18_merge_model_applied_count >=
+        coverage_allowance) {
+      j2_fallback(
+          "COVERAGE_CAP_J2_FALLBACK",
+          &summary.g4irsf18_merge_coverage_cap_fallback_count);
+      return decision;
+    }
+
+    const bool action_mutation =
+        decision.proposed->request.request_id !=
+        j2_baseline->request.request_id;
+    auto bag_state =
+        g4irsf14_state_->destination_merge_bags.find(
+            decision.proposed->request.runtime_bag_id);
+    if (bag_state == g4irsf14_state_->destination_merge_bags.end()) {
+      decision.invalid = true;
+      ++summary.g4irsf18_merge_model_invalid_count;
+      j2_fallback(
+          "MISSING_LOCAL_OWNER_STATE_J2_FALLBACK",
+          nullptr);
+      return decision;
+    }
+    if (action_mutation &&
+        bag_state->second.g4irsf18_merge_override_count >=
+            policy.max_overrides_per_segment) {
+      j2_fallback(
+          "SEGMENT_OVERRIDE_CAP_J2_FALLBACK",
+          &summary.g4irsf18_merge_override_cap_fallback_count);
+      return decision;
+    }
+
+    decision.chosen = decision.proposed;
+    decision.applied = true;
+    decision.reason = action_mutation
+                          ? "MODEL_APPLIED_OVERRIDE"
+                          : "MODEL_APPLIED_SAME_AS_J2";
+    ++summary.g4irsf18_merge_model_applied_count;
+    ++summary.g4irsf18_merge_model_ownership_count;
+    if (action_mutation) {
+      ++summary.g4irsf18_merge_distinct_action_mutation_count;
+      ++bag_state->second.g4irsf18_merge_override_count;
+    }
+    return decision;
+  }
+
+  void append_jit_merge_service_opportunity(
+      std::uint64_t opportunity_id,
+      double event_time,
+      int destination_node,
+      std::uint64_t controller_generation,
+      const std::vector<
+          DestinationMergeGrantController::PendingRecord*>& candidates,
+      const DestinationMergeRequest& baseline,
+      const DestinationMergeRequest& chosen,
+      const G4IRSF18MergeRuntimeDecision* model_decision) {
+    if (!config_.enable_opportunity_telemetry &&
+        !g4irsf18_merge_policy_enabled()) {
+      return;
+    }
+    const auto timing = destination_merge_grant_timing_mode_name(
+        canonical_merge_grant_timing_mode());
+    const auto limit = static_cast<std::size_t>(
+        config_.opportunity_trace_limit);
+    const std::size_t remaining =
+        result_.merge_service_opportunities.size() < limit
+            ? limit - result_.merge_service_opportunities.size()
+            : 0;
+    result_.merge_service_opportunities.reserve(
+        result_.merge_service_opportunities.size() +
+        std::min(remaining, candidates.size()));
+    for (std::size_t candidate_index = 0;
+         candidate_index < candidates.size(); ++candidate_index) {
+      const auto* candidate = candidates[candidate_index];
+      ++result_.summary
+            .merge_grant_opportunity_trace_total_count;
+      if (result_.merge_service_opportunities.size() >= limit) {
+        ++result_.summary
+              .merge_grant_opportunity_trace_dropped_count;
+        continue;
+      }
+      const auto& request = candidate->request;
+      EventRuntimeMergeServiceOpportunityRow row;
+      row.opportunity_id = opportunity_id;
+      row.event_time = event_time;
+      row.destination_node = destination_node;
+      row.controller_generation = controller_generation;
+      row.timing_mode = timing;
+      row.candidate_count = static_cast<int>(candidates.size());
+      row.baseline_winner_request_id = baseline.request_id;
+      row.chosen_winner_request_id = chosen.request_id;
+      row.candidate_request_id = request.request_id;
+      row.upstream_node = request.upstream_node;
+      row.projected_arrival = request.projected_arrival;
+      row.deadline_slack = request.deadline_slack;
+      row.wait_age = destination_merge_request_age(
+          request, event_time);
+      row.destination_service_seconds =
+          request.destination_service_seconds;
+      row.downstream_queue_pressure =
+          request.downstream_queue_pressure;
+      row.route_score = request.route_score;
+      row.static_remaining = request.static_remaining;
+      row.task_class_code = request.task_class_code;
+      row.task_class = request.task_class;
+      row.storage_leg = request.storage_leg;
+      row.baseline_winner =
+          request.request_id == baseline.request_id;
+      row.chosen_winner =
+          request.request_id == chosen.request_id;
+      if (model_decision != nullptr) {
+        row.model_policy_mode =
+            config_.g4irsf18_merge_policy.mode;
+        row.model_feature_contract = kG4IRSF18MergeFeatureContract;
+        row.model_reason = model_decision->reason;
+        row.model_evaluated = model_decision->evaluated;
+        row.model_score_available =
+            candidate_index < model_decision->scores.size();
+        if (row.model_score_available) {
+          row.model_score = model_decision->scores[candidate_index];
+        }
+        row.model_proposed =
+            model_decision->proposed != nullptr &&
+            request.request_id ==
+                model_decision->proposed->request.request_id;
+        row.model_applied =
+            model_decision->applied && row.model_proposed;
+        row.model_chosen =
+            model_decision->chosen != nullptr &&
+            request.request_id ==
+                model_decision->chosen->request.request_id;
+        row.model_out_of_distribution =
+            model_decision->out_of_distribution;
+        row.model_invalid = model_decision->invalid;
+        row.model_fallback = model_decision->fallback;
+        row.model_baseline_request_id =
+            model_decision->j2_baseline == nullptr
+                ? 0
+                : model_decision->j2_baseline->request.request_id;
+        row.model_proposed_request_id =
+            model_decision->proposed == nullptr
+                ? 0
+                : model_decision->proposed->request.request_id;
+        if (candidate_index <
+            model_decision->feature_batch.rows.size()) {
+          row.model_features =
+              model_decision->feature_batch.rows[candidate_index].values;
+        }
+      }
+      result_.merge_service_opportunities.push_back(
+          std::move(row));
+      ++result_.summary
+            .merge_grant_opportunity_trace_stored_count;
+    }
+  }
+
+  [[nodiscard]] bool junction_has_unrepresented_merge_work(
+      const JunctionState& junction) const noexcept {
+    if (!uses_jit_destination_merge_grants() ||
+        g4irsf14_state_ == nullptr) {
+      return !junction.queue.empty();
+    }
+    for (const int runtime_bag_id : junction.queue) {
+      const auto state =
+          g4irsf14_state_->destination_merge_bags.find(
+              runtime_bag_id);
+      if (state ==
+              g4irsf14_state_->destination_merge_bags.end() ||
+          state->second.pending_request_id == 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool submit_destination_merge_request(
       BagState& bag,
       int upstream_node,
@@ -6527,6 +7195,15 @@ class EventDrivenJunctionRuntime {
     request.enqueue_sequence =
         bag.local_enqueue_sequence;
     request.expiry = time + config_.retry_interval;
+    if (uses_jit_destination_merge_grants()) {
+      const double ready =
+          jit_destination_merge_ready_time(request, time);
+      if (std::isfinite(ready)) {
+        request.expiry = std::max(
+            request.expiry,
+            ready + config_.retry_interval);
+      }
+    }
 
     auto& controller =
         destination_merge_controller(destination_node);
@@ -6578,8 +7255,13 @@ class EventDrivenJunctionRuntime {
     if (bag_merge.first_contention_time < 0.0) {
       bag_merge.first_contention_time = time;
     }
-    schedule_destination_merge_wakeup(
-        destination_node, time);
+    if (uses_jit_destination_merge_grants()) {
+      schedule_next_jit_destination_merge_opportunity(
+          controller, time, true);
+    } else {
+      schedule_destination_merge_wakeup(
+          destination_node, time);
+    }
     return true;
   }
 
@@ -6699,6 +7381,12 @@ class EventDrivenJunctionRuntime {
           std::move(pending->second.trace), false);
       pending_merge_dispatches_.erase(pending);
     }
+    if (uses_jit_destination_merge_grants() &&
+        bag_found != bags_.end()) {
+      schedule_junction_wakeup(
+          request.upstream_node,
+          time + config_.retry_interval);
+    }
   }
 
   void reject_all_destination_merge_requests(
@@ -6758,6 +7446,12 @@ class EventDrivenJunctionRuntime {
           std::move(pending->second.trace), false);
       pending_merge_dispatches_.erase(pending);
     }
+    if (uses_jit_destination_merge_grants() &&
+        bag_found != bags_.end()) {
+      schedule_junction_wakeup(
+          request.upstream_node,
+          time + config_.retry_interval);
+    }
   }
 
   void process_destination_merge_arbitration(
@@ -6766,6 +7460,7 @@ class EventDrivenJunctionRuntime {
         g4irsf14_state_ == nullptr) {
       ++result_.summary
             .merge_grant_stale_arbitration_count;
+      ++result_.summary.merge_grant_stale_wakeup_count;
       return;
     }
     auto state_found =
@@ -6781,6 +7476,7 @@ class EventDrivenJunctionRuntime {
             event.time)) {
       ++result_.summary
             .merge_grant_stale_arbitration_count;
+      ++result_.summary.merge_grant_stale_wakeup_count;
       return;
     }
     state_found->second.wakeup_pending = false;
@@ -6792,9 +7488,32 @@ class EventDrivenJunctionRuntime {
         controller_found->second.pending_.empty()) {
       ++result_.summary
             .merge_grant_stale_arbitration_count;
+      ++result_.summary.merge_grant_stale_wakeup_count;
       return;
     }
     auto& controller = controller_found->second;
+    const bool jit_timing = uses_jit_destination_merge_grants();
+    const auto reschedule_destination_merge_after_rejection =
+        [&](bool wait_for_resource_change) {
+          if (controller.pending_count() == 0) {
+            return;
+          }
+          if (jit_timing) {
+            schedule_next_jit_destination_merge_opportunity(
+                controller,
+                event.time,
+                !wait_for_resource_change);
+          } else {
+            schedule_destination_merge_wakeup(
+                event.node, event.time);
+          }
+        };
+    if (jit_timing) {
+      auto& destination = junctions_[event.node];
+      destination.service_calendar.purge(event.time);
+      refresh_jit_destination_merge_pending(
+          controller, event.time);
+    }
     const std::size_t pending_count =
         controller.pending_.size();
 
@@ -6809,7 +7528,8 @@ class EventDrivenJunctionRuntime {
     result_.hold_attempts.reserve(
         result_.hold_attempts.size() +
         pending_count);
-    if (config_.enable_opportunity_telemetry) {
+    if (config_.enable_opportunity_telemetry ||
+        g4irsf18_merge_policy_enabled()) {
       result_.merge_request_visibility.reserve(
           result_.merge_request_visibility.size() + 1);
       result_.event_seq_ordering_audit.reserve(
@@ -6819,6 +7539,18 @@ class EventDrivenJunctionRuntime {
     std::vector<DestinationMergeRequest>
         expired_requests;
     expired_requests.reserve(pending_count);
+    struct InvalidJitPendingRequest {
+      DestinationMergeRequest request;
+      MergeGrantState state =
+          MergeGrantState::kRevokedStaleState;
+      MergeGrantReason reason =
+          MergeGrantReason::kOwnerStateChanged;
+    };
+    std::vector<InvalidJitPendingRequest>
+        invalid_jit_requests;
+    if (jit_timing) {
+      invalid_jit_requests.reserve(pending_count);
+    }
     for (const auto& pending :
          controller.pending_) {
       if (pending.request.expiry +
@@ -6826,6 +7558,76 @@ class EventDrivenJunctionRuntime {
           event.time) {
         expired_requests.push_back(
             pending.request);
+        continue;
+      }
+      if (!jit_timing) {
+        continue;
+      }
+      const auto& request = pending.request;
+      const auto bag = bags_.find(request.runtime_bag_id);
+      if (bag == bags_.end() ||
+          bag->second.status != BagStatus::kJunctionQueue ||
+          bag->second.current != request.upstream_node) {
+        invalid_jit_requests.push_back(
+            InvalidJitPendingRequest{
+                request,
+                MergeGrantState::kRevokedStaleState,
+                MergeGrantReason::kOwnerStateChanged});
+        continue;
+      }
+      const auto bag_merge =
+          g4irsf14_state_->destination_merge_bags.find(
+              request.runtime_bag_id);
+      const auto& upstream =
+          junctions_.at(request.upstream_node);
+      if (bag_merge ==
+              g4irsf14_state_->destination_merge_bags.end() ||
+          bag_merge->second.pending_request_id !=
+              request.request_id ||
+          bag_merge->second.pending_lineage !=
+              request.lineage ||
+          bag_merge->second.request_generation !=
+              request.request_generation ||
+          bag_merge->second.junction_queue_generation !=
+              request.junction_queue_generation ||
+          std::find(upstream.queue.begin(),
+                    upstream.queue.end(),
+                    request.runtime_bag_id) ==
+              upstream.queue.end()) {
+        invalid_jit_requests.push_back(
+            InvalidJitPendingRequest{
+                request,
+                MergeGrantState::kRevokedStaleState,
+                MergeGrantReason::kQueueGenerationChanged});
+        continue;
+      }
+      const long long directed =
+          event_runtime_detail::directed_key(
+              request.upstream_node,
+              request.destination_merge_node);
+      const auto physical = physical_faults_.find(directed);
+      const auto advertised = advertised_faults_.find(directed);
+      const int physical_generation =
+          physical == physical_faults_.end()
+              ? 0
+              : physical->second.physical_generation;
+      const bool physical_active =
+          physical != physical_faults_.end() &&
+          physical->second.active_count > 0;
+      const int advertised_generation =
+          advertised == advertised_faults_.end()
+              ? 0
+              : advertised->second.generation;
+      if (physical_active ||
+          physical_generation !=
+              request.physical_fault_generation ||
+          advertised_generation !=
+              request.advertised_fault_generation) {
+        invalid_jit_requests.push_back(
+            InvalidJitPendingRequest{
+                request,
+                MergeGrantState::kRevokedFault,
+                MergeGrantReason::kFaultGenerationChanged});
       }
     }
     for (const auto& expired :
@@ -6837,6 +7639,14 @@ class EventDrivenJunctionRuntime {
           MergeGrantReason::kRequestExpired,
           event.time);
     }
+    for (const auto& invalid : invalid_jit_requests) {
+      reject_destination_merge_request(
+          controller,
+          invalid.request,
+          invalid.state,
+          invalid.reason,
+          event.time);
+    }
     if (controller.pending_.size() >= 2U) {
       ++result_.summary
             .g4irsf14_i2_live_eligible_multi_request_boundary_count;
@@ -6845,10 +7655,132 @@ class EventDrivenJunctionRuntime {
       return;
     }
 
-    auto* selected =
-        controller.select(canonical_merge_grant_rule(),
-                          event.time,
-                          config_.starvation_threshold);
+    std::vector<DestinationMergeGrantController::PendingRecord*>
+        jit_candidates;
+    DestinationMergeGrantController::PendingRecord*
+        jit_fifo_baseline = nullptr;
+    G4IRSF18MergeRuntimeDecision g4irsf18_model_decision;
+    const G4IRSF18MergeRuntimeDecision*
+        g4irsf18_model_decision_ptr = nullptr;
+    DestinationMergeGrantController::PendingRecord* selected = nullptr;
+    if (jit_timing) {
+      auto& destination = junctions_[event.node];
+      const bool queue_has_room =
+          config_.local_queue_capacity <= 0 ||
+          static_cast<int>(destination.queue.size()) +
+                  destination.scheduled_incoming <
+              config_.local_queue_capacity;
+      if (queue_has_room && controller.active_capacity_available()) {
+        jit_candidates.reserve(controller.pending_.size());
+        for (auto& pending : controller.pending_) {
+          const double slot_start =
+              event.time +
+              pending.request.exact_edge_travel_seconds;
+          const double slot_end =
+              slot_start +
+              pending.request.destination_service_seconds;
+          if (destination.service_calendar.available(
+                  slot_start,
+                  slot_end,
+                  pending.request.runtime_bag_id) &&
+              !controller.has_overlapping_active_slot(
+                  slot_start, slot_end)) {
+            jit_candidates.push_back(&pending);
+          }
+        }
+      }
+      if (jit_candidates.empty()) {
+        schedule_next_jit_destination_merge_opportunity(
+            controller, event.time, false);
+        return;
+      }
+      const auto choose =
+          [&](DestinationMergeGrantRule rule) {
+            DestinationMergeGrantController::PendingRecord* best = nullptr;
+            for (auto* candidate : jit_candidates) {
+              if (best == nullptr ||
+                  destination_merge_request_less(
+                      rule,
+                      candidate->request,
+                      best->request,
+                      event.time,
+                      config_.starvation_threshold)) {
+                best = candidate;
+              }
+            }
+            return best;
+          };
+      jit_fifo_baseline =
+          choose(DestinationMergeGrantRule::kM1Fifo);
+      selected = choose(effective_merge_grant_rule());
+      if (g4irsf18_merge_policy_enabled()) {
+        auto* jit_j2_baseline =
+            choose(DestinationMergeGrantRule::kM3DeadlineAging);
+        g4irsf18_model_decision =
+            decide_g4irsf18_merge_policy(
+                jit_candidates,
+                jit_fifo_baseline,
+                jit_j2_baseline,
+                event.time);
+        g4irsf18_model_decision_ptr =
+            &g4irsf18_model_decision;
+        selected = g4irsf18_model_decision.chosen;
+      }
+      const auto opportunity_id =
+          ++result_.summary
+                .merge_grant_service_opportunity_count;
+      result_.summary.merge_grant_candidate_total_count +=
+          jit_candidates.size();
+      if (jit_candidates.size() > 1U) {
+        ++result_.summary
+              .merge_grant_multi_candidate_opportunity_count;
+      }
+      const double selected_slot_start =
+          event.time +
+          selected->request.exact_edge_travel_seconds;
+      const double selected_slot_end =
+          selected_slot_start +
+          selected->request.destination_service_seconds;
+      std::size_t overlapping_candidate_count = 0;
+      for (const auto* candidate : jit_candidates) {
+        const double candidate_start =
+            event.time +
+            candidate->request.exact_edge_travel_seconds;
+        const double candidate_end =
+            candidate_start +
+            candidate->request.destination_service_seconds;
+        if (candidate_start <
+                    selected_slot_end -
+                        event_runtime_detail::kEpsilon &&
+            selected_slot_start <
+                    candidate_end -
+                        event_runtime_detail::kEpsilon) {
+          ++overlapping_candidate_count;
+        }
+      }
+      if (overlapping_candidate_count > 1U) {
+        ++result_.summary.merge_grant_true_competition_count;
+      }
+      if (jit_candidates.size() > 1U &&
+          selected->request.request_id !=
+          jit_fifo_baseline->request.request_id) {
+        ++result_.summary.merge_grant_order_mutation_count;
+      }
+      append_jit_merge_service_opportunity(
+          opportunity_id,
+          event.time,
+          event.node,
+          controller.generation(),
+          jit_candidates,
+          jit_fifo_baseline->request,
+          selected->request,
+          g4irsf18_model_decision_ptr);
+    } else {
+      selected =
+          controller.select(canonical_merge_grant_rule(),
+                            event.time,
+                            config_.starvation_threshold);
+    }
     if (selected == nullptr) {
       reject_all_destination_merge_requests(
           controller,
@@ -6922,10 +7854,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRevokedStaleState,
           MergeGrantReason::kOwnerStateChanged,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(false);
       return;
     }
     auto& bag = bag_found->second;
@@ -6950,10 +7879,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRevokedStaleState,
           MergeGrantReason::kQueueGenerationChanged,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(false);
       return;
     }
 
@@ -7000,10 +7926,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRevokedFault,
           MergeGrantReason::kFaultGenerationChanged,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(false);
       return;
     }
 
@@ -7018,10 +7941,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRevokedStaleState,
           MergeGrantReason::kCalendarGenerationChanged,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(false);
       return;
     }
     const bool queue_capacity_blocked =
@@ -7038,10 +7958,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRolledBack,
           MergeGrantReason::kQueueCapacityBlock,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(true);
       return;
     }
 
@@ -7061,10 +7978,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRolledBack,
           MergeGrantReason::kActiveGrantExists,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(true);
       return;
     }
     auto prepared =
@@ -7080,10 +7994,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRolledBack,
           MergeGrantReason::kExactSlotBusy,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(true);
       return;
     }
 
@@ -7097,10 +8008,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRevokedStaleState,
           MergeGrantReason::kOwnerStateChanged,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(false);
       return;
     }
 
@@ -7114,7 +8022,9 @@ class EventDrivenJunctionRuntime {
     winner_pending->second.trace.rule_reason =
         std::string(
             destination_merge_grant_rule_name(
-                canonical_merge_grant_rule())) +
+                jit_timing
+                    ? effective_merge_grant_rule()
+                    : canonical_merge_grant_rule())) +
         "_exact_R3_slot_runtime_owned_capability";
 
     std::vector<DestinationMergeRequest> losers;
@@ -7125,6 +8035,9 @@ class EventDrivenJunctionRuntime {
     for (const auto& remaining : controller.pending_) {
       if (remaining.request.request_id ==
           request.request_id) {
+        continue;
+      }
+      if (jit_timing) {
         continue;
       }
       losers.push_back(remaining.request);
@@ -7336,10 +8249,7 @@ class EventDrivenJunctionRuntime {
               ? MergeGrantReason::kFaultGenerationChanged
               : MergeGrantReason::kQueueGenerationChanged,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(false);
       return;
     }
     if (destination.service_calendar.generation() !=
@@ -7354,10 +8264,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRevokedStaleState,
           MergeGrantReason::kCalendarGenerationChanged,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(false);
       return;
     }
 
@@ -7374,10 +8281,7 @@ class EventDrivenJunctionRuntime {
           MergeGrantState::kRevokedStaleState,
           MergeGrantReason::kCalendarGenerationChanged,
           event.time);
-      if (controller.pending_count() > 0) {
-        schedule_destination_merge_wakeup(
-            event.node, event.time);
-      }
+      reschedule_destination_merge_after_rejection(false);
       return;
     }
 
@@ -7462,9 +8366,19 @@ class EventDrivenJunctionRuntime {
         publish_prepared_decision_trace_noexcept(
             std::move(winner_pending->second.trace), false);
         pending_merge_dispatches_.erase(winner_pending);
+        if (jit_timing) {
+          schedule_junction_wakeup(
+              request.upstream_node,
+              event.time + config_.retry_interval);
+        }
         if (controller.pending_count() > 0) {
-          schedule_destination_merge_wakeup(
-              event.node, event.time);
+          if (jit_timing) {
+            schedule_next_jit_destination_merge_opportunity(
+                controller, event.time, false);
+          } else {
+            schedule_destination_merge_wakeup(
+                event.node, event.time);
+          }
         }
         return;
       }
@@ -7488,6 +8402,10 @@ class EventDrivenJunctionRuntime {
             MergeGrantState::kRolledBack,
             MergeGrantReason::kContendedLoserRetry,
             event.time);
+      }
+      if (jit_timing && controller.pending_count() > 0) {
+        schedule_next_jit_destination_merge_opportunity(
+            controller, event.time, true);
       }
       return;
     }
@@ -7580,6 +8498,10 @@ class EventDrivenJunctionRuntime {
           MergeGrantReason::kContendedLoserRetry,
           event.time);
     }
+    if (jit_timing && controller.pending_count() > 0) {
+      schedule_next_jit_destination_merge_opportunity(
+          controller, event.time, true);
+    }
   }
 
   void dispatch_junction_once(const RuntimeEvent& event,
@@ -7669,7 +8591,8 @@ class EventDrivenJunctionRuntime {
                            : (event.retry ? "junction_retry"
                                           : "junction_arrival"),
                        dispatch.selected_edge_count);
-    if (!controller.queue.empty() && !controller.junction_wakeup_pending) {
+    if (junction_has_unrepresented_merge_work(controller) &&
+        !controller.junction_wakeup_pending) {
       schedule_junction_wakeup(event.node, event.time + config_.retry_interval);
     }
   }
@@ -13413,8 +14336,17 @@ class EventDrivenJunctionRuntime {
                        event.from_node,
                        event.to_node,
                        event.reason.empty() ? "bounded_local_congestion_summary"
-                                            : event.reason,
+                                             : event.reason,
                        0);
+    if (uses_jit_destination_merge_grants()) {
+      const auto merge =
+          destination_merge_controllers_.find(event.node);
+      if (merge != destination_merge_controllers_.end() &&
+          merge->second.pending_count() > 0) {
+        schedule_next_jit_destination_merge_opportunity(
+            merge->second, event.time, true);
+      }
+    }
   }
 
   void process_passive_event(const RuntimeEvent& event, const std::string& default_reason) {
@@ -13471,6 +14403,15 @@ class EventDrivenJunctionRuntime {
                          event.message_generation,
                          0,
                          false);
+      if (uses_jit_destination_merge_grants()) {
+        const auto merge =
+            destination_merge_controllers_.find(event.to_node);
+        if (merge != destination_merge_controllers_.end() &&
+            merge->second.pending_count() > 0) {
+          schedule_destination_merge_wakeup(
+              event.to_node, event.time);
+        }
+      }
       return;
     }
 
@@ -13602,6 +14543,15 @@ class EventDrivenJunctionRuntime {
       push_event(std::move(notification));
     }
     schedule_junction_wakeup(event.from_node, event.time);
+    if (uses_jit_destination_merge_grants()) {
+      const auto merge =
+          destination_merge_controllers_.find(event.to_node);
+      if (merge != destination_merge_controllers_.end() &&
+          merge->second.pending_count() > 0) {
+        schedule_destination_merge_wakeup(
+            event.to_node, event.time);
+      }
+    }
     append_event_trace(event,
                        -1,
                        event.from_node,
@@ -14470,11 +15420,13 @@ class EventDrivenJunctionRuntime {
               state.wakeup_time, time)) {
         ++result_.summary
               .merge_grant_duplicate_wakeup_prevented_count;
+        ++result_.summary.merge_grant_wakeup_coalesced_count;
         return;
       }
       if (time >
           state.wakeup_time -
               event_runtime_detail::kEpsilon) {
+        ++result_.summary.merge_grant_wakeup_coalesced_count;
         return;
       }
     }
@@ -14482,6 +15434,7 @@ class EventDrivenJunctionRuntime {
     state.wakeup_time = time;
     const auto generation =
         ++state.wakeup_generation;
+    ++result_.summary.merge_grant_wakeup_scheduled_count;
     schedule(
         JunctionEventType::kDestinationMergeArbitration,
         time,
@@ -15515,6 +16468,14 @@ class EventDrivenJunctionRuntime {
         sizeof(EventRuntimeJunctionOpportunityRow);
     accounted += result_.merge_request_visibility.capacity() *
                  sizeof(EventRuntimeMergeVisibilityRow);
+    accounted += result_.merge_service_opportunities.capacity() *
+                 sizeof(EventRuntimeMergeServiceOpportunityRow);
+    for (const auto& row : result_.merge_service_opportunities) {
+      accounted += row.timing_mode.capacity() * sizeof(char);
+      accounted += row.model_policy_mode.capacity() * sizeof(char);
+      accounted += row.model_feature_contract.capacity() * sizeof(char);
+      accounted += row.model_reason.capacity() * sizeof(char);
+    }
     accounted += result_.event_seq_ordering_audit.capacity() *
                  sizeof(EventRuntimeEventSeqAuditRow);
     accounted +=
@@ -15878,6 +16839,8 @@ EventDrivenJunctionRuntime::capture_g4irsf14_state(
     item.first_contention_time =
         entry.second.first_contention_time;
     item.grant_wait_seconds = entry.second.grant_wait_seconds;
+    item.g4irsf18_merge_override_count =
+        entry.second.g4irsf18_merge_override_count;
     item.exact_grant_edge_entry_observed =
         entry.second.exact_grant_edge_entry_observed;
     if (entry.second.capability.has_value()) {
@@ -15923,6 +16886,8 @@ EventDrivenJunctionRuntime::restore_g4irsf14_state(
     item.first_contention_time =
         entry.second.first_contention_time;
     item.grant_wait_seconds = entry.second.grant_wait_seconds;
+    item.g4irsf18_merge_override_count =
+        entry.second.g4irsf18_merge_override_count;
     item.exact_grant_edge_entry_observed =
         entry.second.exact_grant_edge_entry_observed;
     if (entry.second.capability.has_value()) {
@@ -16676,6 +17641,18 @@ fingerprint_deterministic_summary(
   writer.u64(summary.merge_grant_goal_exempt_bypass_count);
   writer.u64(summary.merge_grant_stale_arbitration_count);
   writer.u64(summary.merge_grant_duplicate_wakeup_prevented_count);
+  writer.string(summary.merge_grant_timing_mode);
+  writer.u64(summary.merge_grant_service_opportunity_count);
+  writer.u64(summary.merge_grant_multi_candidate_opportunity_count);
+  writer.u64(summary.merge_grant_true_competition_count);
+  writer.u64(summary.merge_grant_order_mutation_count);
+  writer.u64(summary.merge_grant_candidate_total_count);
+  writer.u64(summary.merge_grant_wakeup_scheduled_count);
+  writer.u64(summary.merge_grant_wakeup_coalesced_count);
+  writer.u64(summary.merge_grant_stale_wakeup_count);
+  writer.u64(summary.merge_grant_opportunity_trace_total_count);
+  writer.u64(summary.merge_grant_opportunity_trace_stored_count);
+  writer.u64(summary.merge_grant_opportunity_trace_dropped_count);
   writer.i64(summary.merge_grant_peak_pending_requests);
   writer.i64(summary.merge_grant_peak_active_unconsumed);
   writer.i64(summary.merge_grant_final_active_unconsumed);
@@ -16683,6 +17660,50 @@ fingerprint_deterministic_summary(
   writer.boolean(summary.merge_grant_active_bijection_holds);
   writer.boolean(summary.merge_grant_runtime_owned_capability);
   writer.boolean(summary.merge_grant_exact_slot_no_future_shift);
+  if (!summary.g4irsf18_merge_policy_mode.empty()) {
+    writer.string(summary.g4irsf18_merge_policy_mode);
+    writer.string(summary.g4irsf18_merge_policy_schema);
+    writer.string(summary.g4irsf18_merge_policy_family);
+    writer.string(summary.g4irsf18_merge_feature_contract);
+    writer.boolean(summary.g4irsf18_merge_artifact_valid);
+    writer.boolean(
+        summary
+            .g4irsf18_merge_artifact_production_closed_loop_authorized);
+    writer.boolean(
+        summary.g4irsf18_merge_research_closed_loop_authorized);
+    writer.boolean(summary.g4irsf18_merge_fixed_research_workload);
+    writer.boolean(
+        summary.g4irsf18_merge_production_closed_loop_authorized);
+    writer.boolean(summary.g4irsf18_merge_offline_gate_passed);
+    writer.floating(summary.g4irsf18_merge_coverage_cap);
+    writer.i64(summary.g4irsf18_merge_max_overrides_per_segment);
+    writer.boolean(summary.g4irsf18_merge_kill_switch_configured);
+    writer.boolean(summary.g4irsf18_merge_kill_switch_tripped);
+    writer.string(summary.g4irsf18_merge_kill_switch_reason);
+    writer.u64(summary.g4irsf18_merge_model_opportunity_count);
+    writer.u64(summary.g4irsf18_merge_model_eligible_count);
+    writer.u64(summary.g4irsf18_merge_model_proposal_count);
+    writer.u64(summary.g4irsf18_merge_model_applied_count);
+    writer.u64(summary.g4irsf18_merge_distinct_action_mutation_count);
+    writer.u64(summary.g4irsf18_merge_model_ood_count);
+    writer.u64(summary.g4irsf18_merge_model_invalid_count);
+    writer.u64(summary.g4irsf18_merge_model_fallback_count);
+    writer.u64(summary.g4irsf18_merge_j2_fallback_count);
+    writer.u64(summary.g4irsf18_merge_tie_fifo_fallback_count);
+    writer.u64(summary.g4irsf18_merge_shadow_fallback_count);
+    writer.u64(summary.g4irsf18_merge_authorization_fallback_count);
+    writer.u64(summary.g4irsf18_merge_coverage_cap_fallback_count);
+    writer.u64(summary.g4irsf18_merge_override_cap_fallback_count);
+    writer.u64(summary.g4irsf18_merge_starvation_guard_fallback_count);
+    writer.u64(summary.g4irsf18_merge_kill_switch_trip_count);
+    writer.u64(summary.g4irsf18_merge_kill_switch_fallback_count);
+    writer.u64(summary.g4irsf18_merge_model_ownership_count);
+    writer.u64(summary.g4irsf18_merge_coverage_eligible_seen_count);
+    writer.i64(summary.g4irsf18_merge_runtime_global_scan_count);
+    writer.i64(summary.g4irsf18_merge_future_route_input_count);
+    writer.i64(summary.g4irsf18_merge_future_schedule_input_count);
+    writer.i64(summary.g4irsf18_merge_full_astar_call_count);
+  }
 }
 
 inline G4IRSF14CloneReplayHashes
@@ -17170,6 +18191,50 @@ EventDrivenJunctionRuntime::compute_replay_hashes_projection() const {
         row.later_same_time_competitor_exists);
     deterministic.boolean(row.seq_determined_order);
     deterministic.u64(row.event_seq);
+  }
+  deterministic.u64(result_.merge_service_opportunities.size());
+  for (const auto& row : result_.merge_service_opportunities) {
+    deterministic.u64(row.opportunity_id);
+    deterministic.floating(row.event_time);
+    deterministic.i64(row.destination_node);
+    deterministic.u64(row.controller_generation);
+    deterministic.string(row.timing_mode);
+    deterministic.i64(row.candidate_count);
+    deterministic.u64(row.baseline_winner_request_id);
+    deterministic.u64(row.chosen_winner_request_id);
+    deterministic.u64(row.candidate_request_id);
+    deterministic.i64(row.upstream_node);
+    deterministic.floating(row.projected_arrival);
+    deterministic.floating(row.deadline_slack);
+    deterministic.floating(row.wait_age);
+    deterministic.floating(row.destination_service_seconds);
+    deterministic.i64(row.downstream_queue_pressure);
+    deterministic.floating(row.route_score);
+    deterministic.floating(row.static_remaining);
+    deterministic.i64(row.task_class_code);
+    deterministic.i64(row.task_class);
+    deterministic.boolean(row.storage_leg);
+    deterministic.boolean(row.baseline_winner);
+    deterministic.boolean(row.chosen_winner);
+    if (!row.model_policy_mode.empty()) {
+      deterministic.string(row.model_policy_mode);
+      deterministic.string(row.model_feature_contract);
+      deterministic.string(row.model_reason);
+      deterministic.boolean(row.model_evaluated);
+      deterministic.boolean(row.model_score_available);
+      deterministic.floating(row.model_score);
+      deterministic.boolean(row.model_proposed);
+      deterministic.boolean(row.model_applied);
+      deterministic.boolean(row.model_chosen);
+      deterministic.boolean(row.model_out_of_distribution);
+      deterministic.boolean(row.model_invalid);
+      deterministic.boolean(row.model_fallback);
+      deterministic.u64(row.model_baseline_request_id);
+      deterministic.u64(row.model_proposed_request_id);
+      for (const double feature : row.model_features) {
+        deterministic.floating(feature);
+      }
+    }
   }
   deterministic.u64(result_.event_seq_ordering_audit.size());
   for (const auto& row : result_.event_seq_ordering_audit) {
@@ -17914,6 +18979,9 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
       pibt.floating(item.pending_request_time);
       pibt.floating(item.first_contention_time);
       pibt.floating(item.grant_wait_seconds);
+      if (g4irsf18_merge_policy_enabled()) {
+        pibt.i64(item.g4irsf18_merge_override_count);
+      }
       pibt.boolean(item.exact_grant_edge_entry_observed);
       pibt.boolean(item.capability.has_value());
       if (item.capability.has_value()) {
@@ -18038,8 +19106,49 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
   scorer.boolean(config_.enable_opportunity_telemetry);
   scorer.i64(config_.opportunity_trace_limit);
   scorer.string(config_.merge_grant_rule);
+  scorer.string(config_.merge_grant_timing_mode);
   scorer.i64(config_.merge_grant_max_pending_requests);
   scorer.i64(config_.merge_grant_lifecycle_limit);
+  if (config_.g4irsf18_merge_policy.enabled()) {
+    const auto& policy = config_.g4irsf18_merge_policy;
+    scorer.string(policy.mode);
+    scorer.string(policy.schema);
+    scorer.string(policy.family);
+    scorer.string(policy.feature_contract);
+    scorer.string(policy.score_direction);
+    scorer.string(policy.tie_break);
+    scorer.string(policy.tie_break_scope);
+    scorer.string(policy.ood_fallback);
+    scorer.string(policy.authorization);
+    scorer.u64(policy.feature_names.size());
+    for (const auto& name : policy.feature_names) {
+      scorer.string(name);
+    }
+    const auto write_values = [&](const std::vector<double>& values) {
+      scorer.u64(values.size());
+      for (const double value : values) {
+        scorer.floating(value);
+      }
+    };
+    write_values(policy.mean);
+    write_values(policy.scale);
+    write_values(policy.weights);
+    write_values(policy.feature_lower);
+    write_values(policy.feature_upper);
+    scorer.floating(policy.bias);
+    scorer.floating(policy.starvation_threshold_seconds);
+    scorer.boolean(policy.identity_features_used);
+    scorer.boolean(policy.outcome_features_used);
+    scorer.boolean(
+        policy.artifact_production_closed_loop_authorized);
+    scorer.boolean(policy.research_closed_loop_authorized);
+    scorer.boolean(policy.fixed_research_workload);
+    scorer.boolean(policy.production_closed_loop_authorized);
+    scorer.boolean(policy.offline_gate_passed);
+    scorer.floating(policy.coverage_cap);
+    scorer.i64(policy.max_overrides_per_segment);
+    scorer.boolean(policy.kill_switch);
+  }
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Test-build fault switches alter deterministic continuation and therefore
   // belong to the checkpoint seal even though production builds omit them.

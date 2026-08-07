@@ -353,6 +353,43 @@ enum class DestinationMergeGrantRule {
   kM6ThesisLocal,
 };
 
+// G18 separates *when* a destination merge arbitrates from the local rule
+// used to rank a ready set.  Eager is the exact G17/E4 compatibility path.
+// The two JIT modes retain requests in the bounded destination-owned pending
+// set until a real one-hop service opportunity exists.
+enum class DestinationMergeGrantTimingMode {
+  kEager,
+  kJitFifo,
+  kJitFairAgingDeadline,
+};
+
+inline const char* destination_merge_grant_timing_mode_name(
+    DestinationMergeGrantTimingMode mode) noexcept {
+  switch (mode) {
+    case DestinationMergeGrantTimingMode::kEager:
+      return "eager";
+    case DestinationMergeGrantTimingMode::kJitFifo:
+      return "jit_fifo";
+    case DestinationMergeGrantTimingMode::kJitFairAgingDeadline:
+      return "jit_fair_aging_deadline";
+  }
+  return "eager";
+}
+
+inline DestinationMergeGrantRule destination_merge_grant_rule_for_timing(
+    DestinationMergeGrantTimingMode mode,
+    DestinationMergeGrantRule eager_rule) noexcept {
+  switch (mode) {
+    case DestinationMergeGrantTimingMode::kEager:
+      return eager_rule;
+    case DestinationMergeGrantTimingMode::kJitFifo:
+      return DestinationMergeGrantRule::kM1Fifo;
+    case DestinationMergeGrantTimingMode::kJitFairAgingDeadline:
+      return DestinationMergeGrantRule::kM3DeadlineAging;
+  }
+  return eager_rule;
+}
+
 inline const char* destination_merge_grant_rule_name(
     DestinationMergeGrantRule rule) noexcept {
   switch (rule) {

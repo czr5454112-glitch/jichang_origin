@@ -51,6 +51,20 @@ add_test(
   COMMAND test_destination_merge_grant_real_map)
 
 add_executable(
+  test_g4irsf18_jit_destination_merge
+  cpp/tests/test_g4irsf18_jit_destination_merge.cpp)
+target_link_libraries(
+  test_g4irsf18_jit_destination_merge
+  PRIVATE ics_core)
+if(MSVC)
+  target_compile_options(
+    test_g4irsf18_jit_destination_merge PRIVATE /bigobj)
+endif()
+add_test(
+  NAME g4irsf18_jit_destination_merge
+  COMMAND test_g4irsf18_jit_destination_merge)
+
+add_executable(
   test_g4irsf14_state_clone_protocol
   cpp/tests/test_g4irsf14_state_clone_protocol.cpp)
 target_link_libraries(

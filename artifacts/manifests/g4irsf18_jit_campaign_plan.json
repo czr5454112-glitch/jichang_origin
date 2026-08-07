@@ -1,0 +1,126 @@
+{
+  "design": {
+    "locality": "one destination merge and adjacent incoming requests only",
+    "matched_controls": "same input/release stream; only timing mode/rule differ",
+    "score_only_is_not_control": true,
+    "topology": "fixed canonical real airport map",
+    "variants": [
+      {
+        "merge_rule": "M1",
+        "timing_mode": "eager",
+        "variant_id": "J0_F2_EAGER"
+      },
+      {
+        "merge_rule": "M1",
+        "timing_mode": "jit_fifo",
+        "variant_id": "J1_F2_JIT_FIFO"
+      },
+      {
+        "merge_rule": "M3",
+        "timing_mode": "jit_fair_aging_deadline",
+        "variant_id": "J2_F2_JIT_FAIR_AGING_DEADLINE"
+      }
+    ]
+  },
+  "full_scales": [],
+  "jobs": [
+    {
+      "job_id": "j0_f2_eager__s144",
+      "prefix_segments": 144,
+      "scale": 1,
+      "variant_id": "J0_F2_EAGER"
+    },
+    {
+      "job_id": "j1_f2_jit_fifo__s144",
+      "prefix_segments": 144,
+      "scale": 1,
+      "variant_id": "J1_F2_JIT_FIFO"
+    },
+    {
+      "job_id": "j2_f2_jit_fair_aging_deadline__s144",
+      "prefix_segments": 144,
+      "scale": 1,
+      "variant_id": "J2_F2_JIT_FAIR_AGING_DEADLINE"
+    },
+    {
+      "job_id": "j0_f2_eager__s512",
+      "prefix_segments": 512,
+      "scale": 1,
+      "variant_id": "J0_F2_EAGER"
+    },
+    {
+      "job_id": "j1_f2_jit_fifo__s512",
+      "prefix_segments": 512,
+      "scale": 1,
+      "variant_id": "J1_F2_JIT_FIFO"
+    },
+    {
+      "job_id": "j2_f2_jit_fair_aging_deadline__s512",
+      "prefix_segments": 512,
+      "scale": 1,
+      "variant_id": "J2_F2_JIT_FAIR_AGING_DEADLINE"
+    },
+    {
+      "job_id": "j0_f2_eager__s2048",
+      "prefix_segments": 2048,
+      "scale": 1,
+      "variant_id": "J0_F2_EAGER"
+    },
+    {
+      "job_id": "j1_f2_jit_fifo__s2048",
+      "prefix_segments": 2048,
+      "scale": 1,
+      "variant_id": "J1_F2_JIT_FIFO"
+    },
+    {
+      "job_id": "j2_f2_jit_fair_aging_deadline__s2048",
+      "prefix_segments": 2048,
+      "scale": 1,
+      "variant_id": "J2_F2_JIT_FAIR_AGING_DEADLINE"
+    },
+    {
+      "job_id": "j0_f2_eager__s8192",
+      "prefix_segments": 8192,
+      "scale": 1,
+      "variant_id": "J0_F2_EAGER"
+    },
+    {
+      "job_id": "j1_f2_jit_fifo__s8192",
+      "prefix_segments": 8192,
+      "scale": 1,
+      "variant_id": "J1_F2_JIT_FIFO"
+    },
+    {
+      "job_id": "j2_f2_jit_fair_aging_deadline__s8192",
+      "prefix_segments": 8192,
+      "scale": 1,
+      "variant_id": "J2_F2_JIT_FAIR_AGING_DEADLINE"
+    },
+    {
+      "job_id": "j0_f2_eager__s43603",
+      "prefix_segments": 43603,
+      "scale": 1,
+      "variant_id": "J0_F2_EAGER"
+    },
+    {
+      "job_id": "j1_f2_jit_fifo__s43603",
+      "prefix_segments": 43603,
+      "scale": 1,
+      "variant_id": "J1_F2_JIT_FIFO"
+    },
+    {
+      "job_id": "j2_f2_jit_fair_aging_deadline__s43603",
+      "prefix_segments": 43603,
+      "scale": 1,
+      "variant_id": "J2_F2_JIT_FAIR_AGING_DEADLINE"
+    }
+  ],
+  "prefixes": [
+    144,
+    512,
+    2048,
+    8192,
+    43603
+  ],
+  "schema": "czr005.g4irsf18.jit_campaign_plan.v1"
+}
