@@ -140,3 +140,61 @@ decision), not more nominal ownership. Selection should retain the existing
 local feature contract, starvation guard, per-segment cap, kill switch and J2
 fallback, and include an event-cost penalty because the full-scale result shows
 that small queue-time improvements can coexist with modest event amplification.
+
+### Separate decentralized parallelism from simulator parallelism
+
+**Verified source fact.** The legacy `ICS_PathFinding.java` task loop removes
+one unfinished task, runs `Astar.research`, writes the resulting full route into
+the shared constraint table, and only then processes the next task. The current
+native G18 runtime removes that full-route dependency from local merge control,
+but its simulator still pops one event at a time from one global priority heap;
+there is no single-runtime worker pool or multi-thread speedup yet.
+
+**Verified structural evidence.** Destination merge state is already owned and
+versioned per destination, pending state is capped, grants are short exact
+leases, and events can be staged before deterministic publication. Historical
+same-timestamp instrumentation also observed source release batches as large as
+310 at the 8,192 tier. This establishes coincident trace records and potential
+batching work, but 310 is not a measured decision frontier, separable width or
+speedup.
+
+**New method direction.** `g4irsf18_bolt_mapf_parallel_method.md` records
+**BOLT-MAPF**, bounded one-hop lease-based temporal coordination for
+decentralized lifelong MAPF, and **BOLT-P**, a proposed deterministic parallel
+execution protocol. BOLT-P freezes a time/microphase frontier, builds bounded
+resource footprints, computes independent proposals concurrently, and then
+validates and commits in original event order. Conflicts are recomputed or use
+the existing hold/retry/fault-revoke paths; worker completion order never
+selects an action.
+
+**Evidence-first progression.** Before adding threads, first screen stored
+traces, then instrument a live frontier with microphase, event sequence,
+frontier epoch, parent causality, complete dynamic resource keys and sampled
+compute/commit CPU. Route `P=1` through a snapshot/proposal path only where both
+executable width and material compute share are observed; only then test
+`P=2/4/8` at 1x/2x. Reopen 4x after separating event/heap cost, commit
+serialization, resource conflicts and physical backlog. This direction does
+not promote J7 and does not claim current multi-core or linear scaling.
+
+**Verified M0 result.** The complete protected 8,192 J7 trace contains 28,352
+stored candidate rows, zero dropped rows and 27,153 merge opportunities. The
+screening script groups rows by exact timestamp bits and uses role-unified
+junction, request and directed-edge keys for local scoring only. Across all
+merge opportunities, just six rows (0.022%) belong to a bucket with a greedy
+local-scoring pack above one. All 935 multi-candidate opportunities have pack
+width one. This single-trace proxy has no microphase, event sequence, frontier
+epoch, parent causality or full dynamic footprint, so it is not runtime
+concurrency evidence. Together with the current light 18D affine scorer, it
+makes a merge-only `P=4/8` pool a low-priority candidate until CPU share is
+measured; it does not exclude benefit under other loads or heavier models.
+Next measure Source/Route live width and event-category cost, and benchmark
+process-isolated rollout generation over non-overlapping workload slices, load
+tiers, fault cases and counterfactual pairs.
+
+**Learning contract for future packs.** Execution packing must remain metadata,
+not a sampling filter: conflicting and hot-owner opportunities stay in the
+dataset. Flattened inference retains per-opportunity offsets/masks so relative
+features, group means, OOD checks, ties and argmax never cross owners. New
+replica data should be split by workload, time block and resource episode, with
+matched baseline/treatment pairs kept together and original sampling weights
+restored after rare-mutation oversampling.

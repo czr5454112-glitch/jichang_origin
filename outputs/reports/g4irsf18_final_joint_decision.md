@@ -92,20 +92,39 @@ the artifact, runtime grant, and offline promotion gate.
 
 ## Recorded next ideas
 
-The evidence suggests three concrete follow-ups, in order:
+The evidence suggests four concrete follow-ups, in order:
 
-1. Target route/admission at the 2x source-wait knee with local candidate sets,
+1. Instrument BOLT-P before adding threads. Merge M0 is a complete but static
+   trace proxy: all 935 multi-candidate 8,192-trace opportunities have
+   exact-bit local-scoring pack width one after destination/upstream roles are
+   unified into the live junction namespace. The trace lacks microphase, event
+   sequence, frontier epoch, parent causality and complete dynamic footprints,
+   so this is not runtime concurrency proof. Given the single trace and light
+   affine scorer, a merge-only `P=4/8` pool is a low-priority engineering
+   candidate, not a performance theorem. Measure Source/Route live width,
+   event-category CPU, hot-owner skew and proposal/commit cost at 1x/2x; also
+   benchmark process-isolated data generation over non-overlapping workloads.
+   Implement immutable parallel proposals only where both executable width and
+   material compute share are observed, with one deterministic commit lane.
+2. Target route/admission at the 2x source-wait knee with local candidate sets,
    bounded counterfactual horizons, and a small set of full-system externality
-   pairs. This is more likely to affect the dominant delay than another merge
-   scorer.
-2. Allocate merge research coverage using a shadow
+   pairs. Expose bounded read/write resource keys from the start so this new
+   action seam is both causally useful and BOLT-P-ready.
+3. Allocate merge research coverage using a shadow
    `will_change_J2_action` gate. Uniform coverage produced only 154 distinct
    changes from 3,500 ownership decisions; causal-action density is the useful
    budget, not nominal ownership.
-3. Add sampled event-loop/queue profiling, periodic progress snapshots, and a
+4. Add sampled event-loop/queue profiling, periodic progress snapshots, and a
    resumable worker before rerunning 4x. This should identify observer cost,
    retry/wakeup amplification, queue-operation complexity, or true capacity
    saturation without raising the event cap or retaining full traces.
+
+The complete method, resource-conflict contract and staged `P=1/2/4/8`
+validation path are recorded in
+`outputs/reports/g4irsf18_bolt_mapf_parallel_method.md`. It distinguishes
+deployment-side concurrent local owners from simulator-side parallel discrete
+event execution; neither is used to rewrite the current G18 production or
+learning decision.
 
 Two small regression additions are useful but non-blocking: a real pending-cap
 overflow/retry/drain fixture, and a direct native test for missing research grant
