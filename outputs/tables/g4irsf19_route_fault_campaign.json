@@ -1,0 +1,202 @@
+{
+  "design": {
+    "baseline": {
+      "arm_id": "J2_S1_ROUTE_BASELINE",
+      "learned": false,
+      "merge_rule": "M3",
+      "native_controls": {
+        "scorer_mode": "S1_frozen_g4e_legal_local_adapter"
+      },
+      "production_closed_loop_authorized": false,
+      "research_closed_loop_authorized": false,
+      "timing_mode": "jit_fair_aging_deadline"
+    },
+    "input": "protected_first_8192_file_order",
+    "merge_and_timing": "G18 J2 / M3",
+    "only_changed_control": "scorer_mode",
+    "raw_opportunity_rows_persisted": 0,
+    "treatment": {
+      "arm_id": "J2_S4_ROUTE_TREATMENT",
+      "learned": false,
+      "merge_rule": "M3",
+      "native_controls": {
+        "scorer_mode": "S4_queue_aware_rule_only"
+      },
+      "production_closed_loop_authorized": false,
+      "research_closed_loop_authorized": false,
+      "timing_mode": "jit_fair_aging_deadline"
+    }
+  },
+  "failed_requirements": [],
+  "scenario_count": 2,
+  "scenarios": [
+    {
+      "baseline": {
+        "algorithmic_safety_pass": true,
+        "completed_count": 8192,
+        "cpu_seconds": 88.921875,
+        "event_count": 886956,
+        "failed_count": 0,
+        "fault_affected_bag_count": 10,
+        "fault_affected_completed_count": 10,
+        "fault_event_count": 1,
+        "fault_recovery_available": true,
+        "fault_recovery_seconds": 65.27225554999677,
+        "hard_safety_pass": true,
+        "mean_tth_seconds": 3439.2840460438915,
+        "merge_grant_wait_mean_seconds": 2.128296149449158,
+        "network_time_mean_seconds": 238.97947480195626,
+        "notification_drop_count": 0,
+        "notification_update_event_count": 361290,
+        "p95_tth_seconds": 9527.676140999993,
+        "p99_tth_seconds": 11014.033238099995,
+        "physical_fault_entry_violation_count": 0,
+        "repair_event_count": 1,
+        "source_wait_mean_seconds": 35.031135157207025,
+        "status": "COMPLETE",
+        "wall_seconds": 91.63855100004002
+      },
+      "fault": {
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "onset_time": null
+      },
+      "paired_gates": {
+        "both_fault_and_repair_events_observed": true,
+        "both_hard_safety_pass": true,
+        "both_recovery_metrics_available": true,
+        "both_zero_physical_fault_entry_violations": true
+      },
+      "scenario_id": "pending_inflight_repair",
+      "treatment": {
+        "algorithmic_safety_pass": true,
+        "completed_count": 8192,
+        "cpu_seconds": 88.484375,
+        "event_count": 883687,
+        "failed_count": 0,
+        "fault_affected_bag_count": 10,
+        "fault_affected_completed_count": 10,
+        "fault_event_count": 1,
+        "fault_recovery_available": true,
+        "fault_recovery_seconds": 65.27225554999677,
+        "hard_safety_pass": true,
+        "mean_tth_seconds": 3437.4898853231894,
+        "merge_grant_wait_mean_seconds": 2.014457692936343,
+        "network_time_mean_seconds": 237.41127365659085,
+        "notification_drop_count": 0,
+        "notification_update_event_count": 359950,
+        "p95_tth_seconds": 9525.799782999993,
+        "p99_tth_seconds": 10998.164154499991,
+        "physical_fault_entry_violation_count": 0,
+        "repair_event_count": 1,
+        "source_wait_mean_seconds": 34.80517558187015,
+        "status": "COMPLETE",
+        "wall_seconds": 91.21212180005386
+      },
+      "treatment_minus_baseline": {
+        "event_count": -3269.0,
+        "fault_recovery_seconds": 0.0,
+        "mean_tth_seconds": -1.7941607207021661,
+        "merge_grant_wait_mean_seconds": -0.11383845651281499,
+        "network_time_mean_seconds": -1.568201145365407,
+        "notification_drop_count": 0.0,
+        "notification_update_event_count": -1340.0,
+        "physical_fault_entry_violation_count": 0.0,
+        "source_wait_mean_seconds": -0.22595957533687283
+      }
+    },
+    {
+      "baseline": {
+        "algorithmic_safety_pass": true,
+        "completed_count": 8192,
+        "cpu_seconds": 88.0,
+        "event_count": 886932,
+        "failed_count": 0,
+        "fault_affected_bag_count": 3,
+        "fault_affected_completed_count": 3,
+        "fault_event_count": 1,
+        "fault_recovery_available": true,
+        "fault_recovery_seconds": 67.65127999999822,
+        "hard_safety_pass": true,
+        "mean_tth_seconds": 3439.2840460438915,
+        "merge_grant_wait_mean_seconds": 2.128386980400567,
+        "network_time_mean_seconds": 238.97947480195626,
+        "notification_drop_count": 0,
+        "notification_update_event_count": 361283,
+        "p95_tth_seconds": 9527.676140999993,
+        "p99_tth_seconds": 11014.033238099995,
+        "physical_fault_entry_violation_count": 0,
+        "repair_event_count": 1,
+        "source_wait_mean_seconds": 35.031135157207025,
+        "status": "COMPLETE",
+        "wall_seconds": 90.13315370003693
+      },
+      "fault": {
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "message_delay_seconds": 0.0,
+        "notification_dropped": false,
+        "onset_fraction": 0.35,
+        "onset_time": 16966.01816
+      },
+      "paired_gates": {
+        "both_fault_and_repair_events_observed": true,
+        "both_hard_safety_pass": true,
+        "both_recovery_metrics_available": true,
+        "both_zero_physical_fault_entry_violations": true
+      },
+      "scenario_id": "inflight_exact_lease_repair",
+      "treatment": {
+        "algorithmic_safety_pass": true,
+        "completed_count": 8192,
+        "cpu_seconds": 90.625,
+        "event_count": 883663,
+        "failed_count": 0,
+        "fault_affected_bag_count": 3,
+        "fault_affected_completed_count": 3,
+        "fault_event_count": 1,
+        "fault_recovery_available": true,
+        "fault_recovery_seconds": 67.65127999999822,
+        "hard_safety_pass": true,
+        "mean_tth_seconds": 3437.4898853231894,
+        "merge_grant_wait_mean_seconds": 2.014548523887752,
+        "network_time_mean_seconds": 237.41127365659085,
+        "notification_drop_count": 0,
+        "notification_update_event_count": 359943,
+        "p95_tth_seconds": 9525.799782999993,
+        "p99_tth_seconds": 10998.164154499991,
+        "physical_fault_entry_violation_count": 0,
+        "repair_event_count": 1,
+        "source_wait_mean_seconds": 34.80517558187015,
+        "status": "COMPLETE",
+        "wall_seconds": 93.35568710009102
+      },
+      "treatment_minus_baseline": {
+        "event_count": -3269.0,
+        "fault_recovery_seconds": 0.0,
+        "mean_tth_seconds": -1.7941607207021661,
+        "merge_grant_wait_mean_seconds": -0.11383845651281499,
+        "network_time_mean_seconds": -1.568201145365407,
+        "notification_drop_count": 0.0,
+        "notification_update_event_count": -1340.0,
+        "physical_fault_entry_violation_count": 0.0,
+        "source_wait_mean_seconds": -0.22595957533687283
+      }
+    }
+  ],
+  "schema": "czr005.g4irsf19.route_fault_campaign.v1",
+  "status": "COMPLETE"
+}
