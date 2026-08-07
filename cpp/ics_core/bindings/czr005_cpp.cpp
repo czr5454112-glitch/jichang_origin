@@ -3767,6 +3767,10 @@ py::dict g4irsf11_event_runtime_summary_row(
               summary.merge_grant_committed_transition_count);
       row["merge_grant_consumed_count"] =
           py::int_(summary.merge_grant_consumed_count);
+      row["merge_grant_inflight_fault_generation_recovery_count"] =
+          py::int_(
+              summary
+                  .merge_grant_inflight_fault_generation_recovery_count);
       row["merge_grant_expired_count"] =
           py::int_(summary.merge_grant_expired_count);
       row["merge_grant_request_expired_count"] =
@@ -3923,7 +3927,370 @@ py::dict g4irsf11_event_runtime_summary_row(
     row["g4irsf16_local_feature_scope"] =
         "current_node_one_hop_candidates_bounded_history_static_potential";
   }
+  if (summary.g4irsf17_source_wait_telemetry_enabled) {
+    row["g4irsf17_source_wait_telemetry_enabled"] = true;
+    row["g4irsf17_source_wait_interval_total_count"] = py::int_(
+        summary.g4irsf17_source_wait_interval_total_count);
+    row["g4irsf17_source_wait_interval_stored_count"] = py::int_(
+        summary.g4irsf17_source_wait_interval_stored_count);
+    row["g4irsf17_source_wait_interval_dropped_count"] = py::int_(
+        summary.g4irsf17_source_wait_interval_dropped_count);
+    row["g4irsf17_source_wait_seconds"] =
+        summary.g4irsf17_source_wait_seconds;
+    row["g4irsf17_source_wait_bag_seconds"] =
+        summary.g4irsf17_source_wait_bag_seconds;
+    py::dict reason_interval_counts;
+    py::dict reason_seconds;
+    py::dict reason_bag_seconds;
+    for (std::size_t index = 0;
+         index < czr005::ics::kG4IRSF17SourceWaitReasonCount;
+         ++index) {
+      const auto reason = static_cast<
+          czr005::ics::G4IRSF17SourceWaitReason>(index);
+      const char* name =
+          czr005::ics::g4irsf17_source_wait_reason_name(reason);
+      reason_interval_counts[name] = py::int_(
+          summary.g4irsf17_source_wait_reason_interval_counts[index]);
+      reason_seconds[name] =
+          summary.g4irsf17_source_wait_reason_seconds[index];
+      reason_bag_seconds[name] =
+          summary.g4irsf17_source_wait_reason_bag_seconds[index];
+    }
+    row["g4irsf17_source_wait_reason_interval_counts"] =
+        std::move(reason_interval_counts);
+    row["g4irsf17_source_wait_reason_seconds"] =
+        std::move(reason_seconds);
+    row["g4irsf17_source_wait_reason_bag_seconds"] =
+        std::move(reason_bag_seconds);
+    row["g4irsf17_source_wait_runtime_global_scan_count"] =
+        summary.g4irsf17_source_wait_runtime_global_scan_count;
+  }
+  if (!summary.g4irsf17_source_policy_mode.empty()) {
+    row["g4irsf17_source_policy_mode"] =
+        summary.g4irsf17_source_policy_mode;
+    row["g4irsf17_source_policy_kind"] =
+        summary.g4irsf17_source_policy_kind;
+    row["g4irsf17_source_policy_artifact_set_id"] =
+        summary.g4irsf17_source_policy_artifact_set_id;
+    row["g4irsf17_source_policy_authorized"] =
+        summary.g4irsf17_source_policy_authorized;
+    row["g4irsf17_source_policy_runtime_closed_loop_authorized"] =
+        summary
+            .g4irsf17_source_policy_runtime_closed_loop_authorized;
+    row["g4irsf17_source_policy_top_k"] =
+        summary.g4irsf17_source_policy_top_k;
+    row["g4irsf17_source_policy_evaluation_count"] = py::int_(
+        summary.g4irsf17_source_policy_evaluation_count);
+    row["g4irsf17_source_policy_change_proposal_count"] = py::int_(
+        summary.g4irsf17_source_policy_change_proposal_count);
+    row["g4irsf17_source_policy_activation_count"] = py::int_(
+        summary.g4irsf17_source_policy_activation_count);
+    row["g4irsf17_source_policy_abstention_count"] = py::int_(
+        summary.g4irsf17_source_policy_abstention_count);
+    row["g4irsf17_source_policy_ood_abstention_count"] = py::int_(
+        summary.g4irsf17_source_policy_ood_abstention_count);
+    row["g4irsf17_source_policy_supervisor_abstention_count"] = py::int_(
+        summary.g4irsf17_source_policy_supervisor_abstention_count);
+    row["g4irsf17_source_policy_trace_total_count"] = py::int_(
+        summary.g4irsf17_source_policy_trace_total_count);
+    row["g4irsf17_source_policy_trace_stored_count"] = py::int_(
+        summary.g4irsf17_source_policy_trace_stored_count);
+    row["g4irsf17_source_policy_trace_dropped_count"] = py::int_(
+        summary.g4irsf17_source_policy_trace_dropped_count);
+    row["g4irsf17_source_policy_runtime_global_scan_count"] =
+        summary.g4irsf17_source_policy_runtime_global_scan_count;
+    row["g4irsf17_source_policy_future_route_input_count"] =
+        summary.g4irsf17_source_policy_future_route_input_count;
+    row["g4irsf17_source_policy_future_schedule_input_count"] =
+        summary.g4irsf17_source_policy_future_schedule_input_count;
+    row["g4irsf17_source_policy_full_astar_call_count"] =
+        summary.g4irsf17_source_policy_full_astar_call_count;
+  }
   return row;
+}
+
+czr005::ics::G4IRSF17SourcePolicyConfig
+g4irsf17_source_policy_config_from_artifact(
+    const std::string& mode, const py::dict& artifact) {
+  czr005::ics::G4IRSF17SourcePolicyConfig config;
+  config.mode = mode;
+  if (artifact.empty()) {
+    config.validate();
+    return config;
+  }
+  const auto required = [&](const py::dict& owner,
+                            const char* name) -> py::handle {
+    if (!owner.contains(name)) {
+      throw py::value_error(
+          std::string("G4IRSF17 source policy field missing: ") + name);
+    }
+    return owner[name];
+  };
+  const auto required_string = [&](const py::dict& owner,
+                                   const char* name) {
+    const auto value = required(owner, name);
+    if (!py::isinstance<py::str>(value)) {
+      throw py::type_error(
+          std::string("G4IRSF17 source policy field must be string: ") +
+          name);
+    }
+    return py::cast<std::string>(value);
+  };
+  const auto required_bool = [&](const py::dict& owner,
+                                 const char* name) {
+    const auto value = required(owner, name);
+    if (!py::isinstance<py::bool_>(value)) {
+      throw py::type_error(
+          std::string("G4IRSF17 source policy field must be bool: ") +
+          name);
+    }
+    return py::cast<bool>(value);
+  };
+  const auto required_dict = [&](const py::dict& owner,
+                                 const char* name) {
+    const auto value = required(owner, name);
+    if (!py::isinstance<py::dict>(value)) {
+      throw py::type_error(
+          std::string("G4IRSF17 source policy field must be object: ") +
+          name);
+    }
+    return py::reinterpret_borrow<py::dict>(value);
+  };
+
+  // Unlike the frozen G16 artifact loader, this lightweight schema does not
+  // require a self-hash.  Authorization is an explicit scientific decision,
+  // and native validation is about feature order and fail-closed gates.
+  config.schema = required_string(artifact, "schema");
+  config.kind = required_string(artifact, "kind");
+  config.authorized = required_bool(artifact, "authorized");
+  if (artifact.contains("runtime_closed_loop_authorized")) {
+    config.runtime_closed_loop_authorized =
+        required_bool(artifact, "runtime_closed_loop_authorized");
+  }
+  config.supervisor_authorized =
+      required_bool(artifact, "supervisor_authorized");
+  config.top_k = strict_python_integer_argument(
+      required(artifact, "top_k"), "g4irsf17 source policy top_k");
+  if (artifact.contains("starvation_age_seconds")) {
+    config.starvation_age_seconds =
+        py::cast<double>(artifact["starvation_age_seconds"]);
+  }
+  if (artifact.contains("aging_cap_seconds")) {
+    config.aging_cap_seconds =
+        py::cast<double>(artifact["aging_cap_seconds"]);
+  }
+  if (config.kind == "pairwise_linear_selective") {
+    config.feature_names = py::cast<std::vector<std::string>>(
+        required(artifact, "feature_names"));
+    config.weights = py::cast<std::vector<double>>(
+        required(artifact, "weights"));
+    config.bias = py::cast<double>(required(artifact, "bias"));
+    config.feature_lower = py::cast<std::vector<double>>(
+        required(artifact, "feature_lower"));
+    config.feature_upper = py::cast<std::vector<double>>(
+        required(artifact, "feature_upper"));
+    const py::dict evidence = required_dict(artifact, "evidence");
+    const py::dict thresholds = required_dict(artifact, "thresholds");
+    config.benefit_probability_lcb = py::cast<double>(
+        required(evidence, "benefit_probability_lcb"));
+    config.harmful_probability_ucb = py::cast<double>(
+        required(evidence, "harmful_probability_ucb"));
+    config.utility_lcb_seconds = py::cast<double>(
+        required(evidence, "utility_lcb_seconds"));
+    config.calibration_ece =
+        py::cast<double>(required(evidence, "calibration_ece"));
+    config.benefit_probability_lcb_min = py::cast<double>(
+        required(thresholds, "benefit_probability_lcb_min"));
+    config.harmful_probability_ucb_max = py::cast<double>(
+        required(thresholds, "harmful_probability_ucb_max"));
+    config.utility_lcb_min_seconds = py::cast<double>(
+        required(thresholds, "utility_lcb_min_seconds"));
+    config.calibration_ece_max = py::cast<double>(
+        required(thresholds, "calibration_ece_max"));
+  } else if (config.kind == "pairwise_ensemble_selective") {
+    const py::dict pairwise =
+        required_dict(artifact, "pairwise_artifact");
+    const py::dict gate = required_dict(artifact, "gate_artifact");
+    if (required_string(pairwise, "schema") !=
+            czr005::ics::kG4IRSF17PairwiseEnsembleSchema ||
+        required_string(gate, "schema") !=
+            czr005::ics::kG4IRSF17SelectiveGateSchema) {
+      throw py::value_error(
+          "G4IRSF17 trainer pairwise/gate schema mismatch");
+    }
+    config.artifact_set_id =
+        required_string(artifact, "artifact_set_id");
+    const std::string pairwise_artifact_set_id =
+        required_string(pairwise, "artifact_set_id");
+    const std::string gate_artifact_set_id =
+        required_string(gate, "artifact_set_id");
+    if (config.artifact_set_id.empty() ||
+        config.artifact_set_id != pairwise_artifact_set_id ||
+        config.artifact_set_id != gate_artifact_set_id) {
+      throw py::value_error(
+          "G4IRSF17 wrapper/pairwise/gate artifact_set_id mismatch");
+    }
+    if (required_bool(pairwise, "identity_features_used") ||
+        required_bool(pairwise, "outcome_features_used") ||
+        required_bool(gate, "identity_features_used")) {
+      throw py::value_error(
+          "G4IRSF17 runtime artifact must exclude identity/outcome inputs");
+    }
+    const bool gate_offline_authorized =
+        required_bool(gate, "authorized");
+    const bool gate_runtime_authorized =
+        required_bool(gate, "runtime_closed_loop_authorized");
+    if (config.authorized != gate_offline_authorized ||
+        config.runtime_closed_loop_authorized !=
+            gate_runtime_authorized) {
+      throw py::value_error(
+          "G4IRSF17 adapter authorization disagrees with gate artifact");
+    }
+    const py::dict calibration =
+        required_dict(gate, "calibration");
+    if (!required_bool(calibration, "available")) {
+      throw py::value_error(
+          "G4IRSF17 pairwise ensemble requires calibrated export");
+    }
+    config.calibration_ece = py::cast<double>(
+        required(calibration, "promotion_ece"));
+    const py::dict selector = required_dict(gate, "selector");
+    config.benefit_probability_lcb_min = py::cast<double>(
+        required(selector, "benefit_probability_lcb_min"));
+    config.harmful_probability_ucb_max = py::cast<double>(
+        required(selector, "harm_probability_ucb_max"));
+    config.utility_lcb_min_seconds = py::cast<double>(
+        required(selector, "utility_lcb_min_seconds"));
+    config.calibration_ece_max = py::cast<double>(
+        required(selector, "calibration_ece_max"));
+    config.lower_quantile =
+        py::cast<double>(required(selector, "lower_quantile"));
+    config.upper_quantile =
+        py::cast<double>(required(selector, "upper_quantile"));
+    const int exported_ensemble_size = strict_python_integer_argument(
+        required(selector, "ensemble_size"),
+        "g4irsf17 selector ensemble_size");
+    config.minimum_ensemble_size = 3;
+    if (!required_bool(selector,
+                       "supervisor_authorization_required") ||
+        !required_bool(selector, "ood_abstention_required")) {
+      throw py::value_error(
+          "G4IRSF17 ensemble requires supervisor and OOD abstention gates");
+    }
+
+    const auto parse_linear_members =
+        [&](const char* field)
+        -> std::vector<
+            czr005::ics::G4IRSF17StandardizedLinearMember> {
+      const auto value = required(pairwise, field);
+      if (!py::isinstance<py::list>(value) &&
+          !py::isinstance<py::tuple>(value)) {
+        throw py::type_error(
+            std::string("G4IRSF17 ensemble field must be list: ") +
+            field);
+      }
+      std::vector<
+          czr005::ics::G4IRSF17StandardizedLinearMember> members;
+      for (const py::handle item :
+           py::reinterpret_borrow<py::sequence>(value)) {
+        if (!py::isinstance<py::dict>(item)) {
+          throw py::type_error(
+              "G4IRSF17 ensemble member must be an object");
+        }
+        const auto member =
+            py::reinterpret_borrow<py::dict>(item);
+        if (required_bool(member, "identity_features_used")) {
+          throw py::value_error(
+              "G4IRSF17 ensemble member used identity features");
+        }
+        czr005::ics::G4IRSF17StandardizedLinearMember parsed;
+        parsed.family = required_string(member, "family");
+        if (member.contains("objective")) {
+          parsed.objective = required_string(member, "objective");
+        }
+        parsed.feature_names =
+            py::cast<std::vector<std::string>>(
+                required(member, "feature_names"));
+        parsed.mean = py::cast<std::vector<double>>(
+            required(member, "mean"));
+        parsed.scale = py::cast<std::vector<double>>(
+            required(member, "scale"));
+        parsed.weights = py::cast<std::vector<double>>(
+            required(member, "weights"));
+        parsed.bias = py::cast<double>(required(member, "bias"));
+        members.push_back(std::move(parsed));
+      }
+      return members;
+    };
+    const auto parse_calibrators =
+        [&](const char* field)
+        -> std::vector<czr005::ics::G4IRSF17PlattCalibrator> {
+      const auto value = required(pairwise, field);
+      if (!py::isinstance<py::list>(value) &&
+          !py::isinstance<py::tuple>(value)) {
+        throw py::type_error(
+            std::string("G4IRSF17 calibrator field must be list: ") +
+            field);
+      }
+      std::vector<czr005::ics::G4IRSF17PlattCalibrator> calibrators;
+      for (const py::handle item :
+           py::reinterpret_borrow<py::sequence>(value)) {
+        if (!py::isinstance<py::dict>(item)) {
+          throw py::type_error(
+              "G4IRSF17 calibrator must be an object");
+        }
+        const auto calibrator =
+            py::reinterpret_borrow<py::dict>(item);
+        if (required_string(calibrator, "family") !=
+            "platt_logistic") {
+          throw py::value_error(
+              "G4IRSF17 calibrator family must be platt_logistic");
+        }
+        calibrators.push_back(
+            czr005::ics::G4IRSF17PlattCalibrator{
+                py::cast<double>(required(calibrator, "slope")),
+                py::cast<double>(required(calibrator, "intercept"))});
+      }
+      return calibrators;
+    };
+    config.benefit_members =
+        parse_linear_members("benefit_members");
+    config.harmful_members =
+        parse_linear_members("harm_members");
+    config.utility_members =
+        parse_linear_members("utility_members");
+    config.benefit_calibrators =
+        parse_calibrators("benefit_calibrators");
+    config.harmful_calibrators =
+        parse_calibrators("harm_calibrators");
+    if (exported_ensemble_size !=
+            static_cast<int>(config.benefit_members.size()) ||
+        config.harmful_members.size() !=
+            config.benefit_members.size() ||
+        config.utility_members.size() !=
+            config.benefit_members.size()) {
+      throw py::value_error(
+          "G4IRSF17 selector/model ensemble sizes disagree");
+    }
+    config.utility_residual_q05_seconds = py::cast<double>(
+        required(pairwise, "utility_residual_q05_seconds"));
+    const py::dict envelope =
+        required_dict(pairwise, "ood_envelope");
+    if (required_string(envelope, "family") !=
+            "quantile_feature_envelope" ||
+        required_bool(envelope, "identity_features_used")) {
+      throw py::value_error(
+          "G4IRSF17 OOD envelope schema/identity contract mismatch");
+    }
+    config.feature_names = py::cast<std::vector<std::string>>(
+        required(envelope, "feature_names"));
+    config.feature_lower = py::cast<std::vector<double>>(
+        required(envelope, "lower"));
+    config.feature_upper = py::cast<std::vector<double>>(
+        required(envelope, "upper"));
+  }
+  config.validate();
+  return config;
 }
 
 py::list g4irsf11_event_runtime_bag_rows(
@@ -4463,6 +4830,136 @@ py::list g4irsf12_event_runtime_pibt_rows(
       actions.append(std::move(action_row));
     }
     row["actions"] = std::move(actions);
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf17_source_wait_blocker_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeSourceWaitBlockerRow>& events) {
+  // Identity fields below are emitted for trace correlation only.
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["interval_ordinal"] = py::int_(event.interval_ordinal);
+    row["reason"] = event.reason;
+    row["reason_precedence"] = event.reason_precedence;
+    row["source_node"] = event.source_node;
+    row["blocker_node"] = event.blocker_node;
+    row["blocker_resource"] = event.blocker_resource;
+    row["blocker_resource_from_node"] =
+        event.blocker_resource_from_node;
+    row["blocker_resource_to_node"] =
+        event.blocker_resource_to_node;
+    row["source_generation"] = py::int_(event.source_generation);
+    row["blocker_generation"] = py::int_(event.blocker_generation);
+    row["wait_start_time"] = event.wait_start_time;
+    row["wait_end_time"] = event.wait_end_time;
+    row["wait_seconds"] = event.wait_seconds;
+    row["affected_bag_count"] = event.affected_bag_count;
+    row["wait_bag_seconds"] = event.wait_bag_seconds;
+    row["selected_task_id"] = event.selected_task_id;
+    row["selected_runtime_bag_id"] =
+        event.selected_runtime_bag_id;
+    row["selected_segment_id"] = event.selected_segment_id;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf17_source_policy_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeG4IRSF17SourcePolicyRow>& events) {
+  py::list rows;
+  const auto candidate_names =
+      czr005::ics::g4irsf17_source_candidate_feature_names();
+  const auto context_names =
+      czr005::ics::g4irsf17_source_context_feature_names();
+  const auto pairwise_names =
+      czr005::ics::g4irsf17_source_pairwise_feature_names();
+  for (const auto& event : events) {
+    py::dict row;
+    row["schema"] = "czr005.g4irsf17.source_front_decision.v1";
+    row["decision_ordinal"] = py::int_(event.decision_ordinal);
+    row["event_time"] = event.event_time;
+    row["source_node"] = event.source_node;
+    row["mode"] = event.mode;
+    row["kind"] = event.kind;
+    row["artifact_set_id"] = event.artifact_set_id;
+    row["top_k"] = event.top_k;
+    row["source_queue_length"] = event.source_queue_length;
+    row["source_generation"] = py::int_(event.source_generation);
+    row["candidate_queue_indices"] = event.candidate_queue_indices;
+    row["candidate_task_ids"] = event.candidate_task_ids;
+    row["candidate_runtime_bag_ids"] = event.candidate_runtime_bag_ids;
+    row["candidate_segment_ids"] = event.candidate_segment_ids;
+    py::list candidate_feature_names;
+    for (const char* name : candidate_names) {
+      candidate_feature_names.append(name);
+    }
+    row["candidate_feature_names"] = std::move(candidate_feature_names);
+    py::list context_feature_names;
+    for (const char* name : context_names) {
+      context_feature_names.append(name);
+    }
+    row["context_feature_names"] = std::move(context_feature_names);
+    py::list pairwise_feature_names;
+    for (const char* name : pairwise_names) {
+      pairwise_feature_names.append(name);
+    }
+    row["pairwise_feature_names"] = std::move(pairwise_feature_names);
+
+    py::list context_features;
+    for (const double value : event.context_features) {
+      context_features.append(value);
+    }
+    row["context_features"] = context_features;
+    row["shared_context_features"] = context_features;
+    py::list pairwise_features;
+    for (const double value : event.pairwise_features) {
+      pairwise_features.append(value);
+    }
+    row["pairwise_features"] = std::move(pairwise_features);
+
+    py::list candidate_features;
+    py::list canonical_candidate_observations;
+    for (const auto& values : event.candidate_features) {
+      py::list candidate;
+      py::list canonical;
+      for (const double value : values) {
+        candidate.append(value);
+        canonical.append(value);
+      }
+      for (const double value : event.context_features) {
+        canonical.append(value);
+      }
+      candidate_features.append(std::move(candidate));
+      canonical_candidate_observations.append(std::move(canonical));
+    }
+    row["candidate_features"] = std::move(candidate_features);
+    row["canonical_candidate_observations"] =
+        std::move(canonical_candidate_observations);
+    row["baseline_candidate_index"] = event.baseline_candidate_index;
+    row["proposed_candidate_index"] = event.proposed_candidate_index;
+    row["treatment_candidate_index"] = event.treatment_candidate_index;
+    row["chosen_candidate_index"] = event.chosen_candidate_index;
+    row["baseline_queue_index"] = event.baseline_queue_index;
+    row["treatment_queue_index"] = event.treatment_queue_index;
+    row["proposed_queue_index"] = event.proposed_queue_index;
+    row["chosen_queue_index"] = event.chosen_queue_index;
+    row["activated"] = event.activated;
+    row["out_of_distribution"] = event.out_of_distribution;
+    row["supervisor_authorized"] = event.supervisor_authorized;
+    row["reason"] = event.reason;
+    row["model_score"] = event.model_score;
+    row["benefit_probability_lcb"] =
+        event.benefit_probability_lcb;
+    row["harmful_probability_ucb"] =
+        event.harmful_probability_ucb;
+    row["utility_lcb_seconds"] = event.utility_lcb_seconds;
+    row["calibration_ece"] = event.calibration_ece;
+    row["identity_fields_are_trace_only"] = true;
     rows.append(std::move(row));
   }
   return rows;
@@ -5153,7 +5650,12 @@ py::dict g4irsf11_event_runtime_from_records(
     const std::string& g4irsf16_supervisor_mode,
     const py::dict& g4irsf16_i3_model_artifact,
     const py::dict& g4irsf16_i4_model_artifact,
-    const py::dict& g4irsf16_rule_bundle) {
+    const py::dict& g4irsf16_rule_bundle,
+    bool enable_g4irsf17_source_wait_telemetry,
+    int g4irsf17_source_wait_trace_limit,
+    const std::string& g4irsf17_source_policy_mode,
+    const py::dict& g4irsf17_source_policy_artifact,
+    int g4irsf17_source_policy_trace_limit) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -5323,6 +5825,16 @@ py::dict g4irsf11_event_runtime_from_records(
   config.g4irsf16_i4_diagnostic_rule =
       g4irsf16_i4_rule_config_from_bundle(
           g4irsf16_rule_bundle);
+  config.enable_g4irsf17_source_wait_telemetry =
+      enable_g4irsf17_source_wait_telemetry;
+  config.g4irsf17_source_wait_trace_limit =
+      g4irsf17_source_wait_trace_limit;
+  config.g4irsf17_source_policy =
+      g4irsf17_source_policy_config_from_artifact(
+          g4irsf17_source_policy_mode,
+          g4irsf17_source_policy_artifact);
+  config.g4irsf17_source_policy_trace_limit =
+      g4irsf17_source_policy_trace_limit;
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -5562,6 +6074,67 @@ py::dict g4irsf11_event_runtime_from_records(
     trace_context["g4irsf16_runtime_global_scan_count"] = 0;
     trace_context["g4irsf16_future_route_input_count"] = 0;
   }
+  if (result.summary.g4irsf17_source_wait_telemetry_enabled) {
+    trace_context["g4irsf17_source_wait_schema_id"] =
+        "czr005.g4irsf17.source_wait_blocker.v1";
+    trace_context["g4irsf17_source_wait_interval_semantics"] =
+        "between_adjacent_real_source_admission_evaluations_or_runtime_stop";
+    trace_context["g4irsf17_source_wait_additive_metrics"] =
+        "wait_seconds_and_queue_weighted_wait_bag_seconds";
+    trace_context["g4irsf17_source_wait_identity_semantics"] =
+        "selected_bag_identity_is_trace_only_never_policy_or_model_input";
+    trace_context["g4irsf17_source_wait_blocker_scope"] =
+        "source_local_state_plus_sorted_outgoing_one_hop_beacons";
+    trace_context["g4irsf17_source_wait_reason_precedence"] =
+        "PHYSICAL_FAULT_OR_GENERATION>SUPERVISOR_HOLD>"
+        "PIBT_OR_RECOVERY_TRANSACTION>DESTINATION_QUEUE_CAPACITY>"
+        "DESTINATION_MERGE_TOKEN>FIRST_EDGE_CREDIT_UNAVAILABLE>"
+        "SOURCE_SERVICE_NOT_READY>OTHER_EXPLICIT_REASON";
+    trace_context["g4irsf17_source_wait_runtime_global_scan_count"] =
+        result.summary.g4irsf17_source_wait_runtime_global_scan_count;
+    trace_context["g4irsf17_source_wait_trace_limit"] =
+        g4irsf17_source_wait_trace_limit;
+  }
+  if (!result.summary.g4irsf17_source_policy_mode.empty()) {
+    trace_context["g4irsf17_source_policy_schema"] =
+        czr005::ics::kG4IRSF17SourcePolicySchema;
+    trace_context["g4irsf17_source_decision_schema"] =
+        "czr005.g4irsf17.source_front_decision.v1";
+    trace_context["g4irsf17_source_policy_mode"] =
+        result.summary.g4irsf17_source_policy_mode;
+    trace_context["g4irsf17_source_policy_kind"] =
+        result.summary.g4irsf17_source_policy_kind;
+    trace_context["g4irsf17_source_policy_artifact_set_id"] =
+        result.summary.g4irsf17_source_policy_artifact_set_id;
+    trace_context["g4irsf17_source_policy_top_k"] =
+        result.summary.g4irsf17_source_policy_top_k;
+    trace_context["g4irsf17_source_policy_candidate_scope"] =
+        "baseline_winner_plus_fifo_prefix_peers_fixed_K2_or_K4_same_source";
+    trace_context["g4irsf17_source_policy_context_scope"] =
+        "source_local_bounded_60s_counters_plus_max_four_sorted_one_hop_"
+        "TTL_beacons_and_beacon_carried_two_hop_scalar";
+    trace_context["g4irsf17_source_policy_identity_semantics"] =
+        "task_bag_segment_and_node_identity_are_trace_only_never_model_inputs";
+    trace_context["g4irsf17_source_policy_feature_count"] =
+        static_cast<int>(
+            czr005::ics::kG4IRSF17SourcePairwiseFeatureCount);
+    py::list feature_names;
+    for (const char* name :
+         czr005::ics::g4irsf17_source_pairwise_feature_names()) {
+      feature_names.append(name);
+    }
+    trace_context["g4irsf17_source_policy_feature_names"] =
+        std::move(feature_names);
+    trace_context["g4irsf17_source_policy_gate_order"] =
+        "explicit_artifact_authorization;runtime_supervisor;OOD;calibration;"
+        "benefit_LCB;harm_UCB;utility_LCB;closed_loop_else_Q0_F2";
+    trace_context["g4irsf17_source_policy_runtime_global_scan_count"] = 0;
+    trace_context["g4irsf17_source_policy_future_route_input_count"] = 0;
+    trace_context["g4irsf17_source_policy_future_schedule_input_count"] = 0;
+    trace_context["g4irsf17_source_policy_full_astar_call_count"] = 0;
+    trace_context["g4irsf17_source_policy_trace_limit"] =
+        g4irsf17_source_policy_trace_limit;
+  }
 
   py::dict payload;
   payload["summary"] = g4irsf11_event_runtime_summary_row(
@@ -5585,6 +6158,16 @@ py::dict g4irsf11_event_runtime_from_records(
       g4irsf12_event_runtime_credit_rows(result.credit_events);
   payload["pibt_events"] =
       g4irsf12_event_runtime_pibt_rows(result.pibt_events);
+  if (result.summary.g4irsf17_source_wait_telemetry_enabled) {
+    payload["g4irsf17_source_wait_blockers"] =
+        g4irsf17_source_wait_blocker_rows(
+            result.g4irsf17_source_wait_blockers);
+  }
+  if (!result.summary.g4irsf17_source_policy_mode.empty()) {
+    payload["g4irsf17_source_policy_decisions"] =
+        g4irsf17_source_policy_rows(
+            result.g4irsf17_source_policy_decisions);
+  }
   if (g4irsf14_extensions_enabled) {
     payload["source_admission_opportunities"] =
         g4irsf14_source_opportunity_rows(
@@ -5858,7 +6441,13 @@ PYBIND11_MODULE(czr005_cpp, module) {
                  std::string("off"),
              py::arg("g4irsf16_i3_model_artifact") = py::dict(),
              py::arg("g4irsf16_i4_model_artifact") = py::dict(),
-             py::arg("g4irsf16_rule_bundle") = py::dict());
+             py::arg("g4irsf16_rule_bundle") = py::dict(),
+             py::arg("enable_g4irsf17_source_wait_telemetry") = false,
+             py::arg("g4irsf17_source_wait_trace_limit") = 200000,
+             py::arg("g4irsf17_source_policy_mode") =
+                 std::string("off"),
+             py::arg("g4irsf17_source_policy_artifact") = py::dict(),
+             py::arg("g4irsf17_source_policy_trace_limit") = 200000);
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

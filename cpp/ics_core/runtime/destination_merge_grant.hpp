@@ -140,6 +140,7 @@ enum class MergeGrantReason {
   kInjectedPrepareRollback,
   kContendedLoserRetry,
   kConsumedAtDestinationEntry,
+  kConsumedAtDestinationEntryAfterInflightFaultGenerationChange,
 };
 
 inline const char* merge_grant_reason_name(
@@ -175,6 +176,9 @@ inline const char* merge_grant_reason_name(
       return "contended_loser_retry";
     case MergeGrantReason::kConsumedAtDestinationEntry:
       return "consumed_at_destination_entry";
+    case MergeGrantReason::
+        kConsumedAtDestinationEntryAfterInflightFaultGenerationChange:
+      return "consumed_at_destination_entry_after_inflight_fault_generation_change";
   }
   return "unknown";
 }
@@ -299,6 +303,12 @@ struct DestinationMergeGrantConsumeContext {
   int current_physical_fault_generation = 0;
   int current_advertised_fault_generation = 0;
   bool exact_destination_calendar_reservation_present = false;
+  // This proof is minted only by the EDGE_ENTER handler after it observes the
+  // exact committed capability at the same physical/advertised generations
+  // and an inactive physical edge.  A synthetic generation mutation at exit
+  // cannot create either proof bit.
+  bool exact_grant_edge_entry_observed = false;
+  bool local_inflight_fault_instance_observed = false;
 };
 
 struct DestinationMergeGrantObservedState {
@@ -321,6 +331,7 @@ struct DestinationMergeGrantObservedState {
 
 enum class DestinationMergeGrantConsumeResult {
   kConsumed,
+  kConsumedAfterInflightFaultGenerationChange,
   kActiveGrantMissing,
   kCapabilityMissing,
   kIdentityMismatch,
@@ -758,6 +769,10 @@ struct DestinationMergeGrantCounters {
   std::uint64_t prepared_transition_count = 0;
   std::uint64_t committed_transition_count = 0;
   std::uint64_t consumed_count = 0;
+  // A strict subset of consumed_count.  The stale generation capability is
+  // terminalized, while its exact owner/slot service lease remains in place
+  // for a bag that was already physically in flight.
+  std::uint64_t inflight_fault_generation_recovery_count = 0;
   std::uint64_t expired_count = 0;
   std::uint64_t request_expired_count = 0;
   std::uint64_t grant_expired_count = 0;
@@ -907,6 +922,60 @@ class DestinationMergeGrantController {
   lifecycle() const noexcept {
     return lifecycle_;
   }
+  [[nodiscard]] double oldest_pending_age(double now) const noexcept {
+    double result = 0.0;
+    for (const auto& pending : pending_) {
+      result = std::max(
+          result,
+          std::max(0.0, now - pending.request.fifo_request_time));
+    }
+    return result;
+  }
+  [[nodiscard]] int recent_incoming_grants(
+      double now, double window_seconds = 60.0) const noexcept {
+    int result = 0;
+    const double lower = now - window_seconds;
+    for (auto row = lifecycle_.rbegin(); row != lifecycle_.rend(); ++row) {
+      if (row->time < lower) {
+        break;
+      }
+      if (row->state == MergeGrantState::kCommitted) {
+        ++result;
+      }
+    }
+    return result;
+  }
+  [[nodiscard]] int recent_incoming_grant_imbalance(
+      double now, double window_seconds = 60.0) const {
+    std::vector<std::pair<int, int>> by_upstream;
+    const double lower = now - window_seconds;
+    for (auto row = lifecycle_.rbegin(); row != lifecycle_.rend(); ++row) {
+      if (row->time < lower) {
+        break;
+      }
+      if (row->state != MergeGrantState::kCommitted) {
+        continue;
+      }
+      auto found = std::find_if(
+          by_upstream.begin(), by_upstream.end(), [&](const auto& item) {
+            return item.first == row->upstream_node;
+          });
+      if (found == by_upstream.end()) {
+        by_upstream.emplace_back(row->upstream_node, 1);
+      } else {
+        ++found->second;
+      }
+    }
+    if (by_upstream.size() < 2U) {
+      return 0;
+    }
+    const auto bounds = std::minmax_element(
+        by_upstream.begin(), by_upstream.end(), [](const auto& left,
+                                                   const auto& right) {
+          return left.second < right.second;
+        });
+    return bounds.second->second - bounds.first->second;
+  }
   [[nodiscard]] bool conservation_holds() const noexcept {
     return counters_.request_count ==
                counters_.committed_count +
@@ -917,6 +986,8 @@ class DestinationMergeGrantController {
            counters_.committed_count ==
                counters_.consumed_count +
                    active_.size() &&
+           counters_.inflight_fault_generation_recovery_count <=
+               counters_.consumed_count &&
            counters_.lifecycle_transition_count ==
                counters_.lifecycle_stored_count +
                    counters_.lifecycle_dropped_count;
@@ -1492,6 +1563,33 @@ class DestinationMergeGrantController {
       ++generation_;
       return result;
     };
+    const auto consume =
+        [&](DestinationMergeGrantConsumeResult result,
+            MergeGrantReason reason,
+            bool inflight_fault_recovery)
+            -> DestinationMergeGrantConsumeResult {
+      append_lifecycle_noexcept(
+          *active->request_snapshot,
+          active->grant_id,
+          MergeGrantState::kConsumed,
+          reason,
+          context.now,
+          active->slot_start,
+          active->slot_end,
+          active->calendar_generation,
+          active->physical_fault_generation,
+          active->issue_time,
+          active->grant_expiry,
+          &observed);
+      grant->state_ = MergeGrantState::kConsumed;
+      active_.erase(active);
+      ++counters_.consumed_count;
+      if (inflight_fault_recovery) {
+        ++counters_.inflight_fault_generation_recovery_count;
+      }
+      ++generation_;
+      return result;
+    };
 
     if (!context.expected.required) {
       return terminalize(
@@ -1617,19 +1715,10 @@ class DestinationMergeGrantController {
           MergeGrantReason::
               kGrantExpiredAtDestinationEntry);
     }
-    if (context.physical_fault_active ||
-        context.current_physical_fault_generation !=
-            context.expected
-                .physical_fault_generation ||
-        context.current_advertised_fault_generation !=
-            context.expected
-                .advertised_fault_generation) {
-      return terminalize(
-          DestinationMergeGrantConsumeResult::
-              kFaultGenerationChanged,
-          MergeGrantState::kRevokedFault,
-          MergeGrantReason::kFaultGenerationChanged);
-    }
+    // The exact owner/slot lease is a hard gate for both ordinary consume
+    // and in-flight fault recovery.  Check it before the live generation
+    // comparison so a missing calendar reservation can never be hidden by a
+    // simultaneous fault-generation change.
     if (!context
              .exact_destination_calendar_reservation_present) {
       return terminalize(
@@ -1638,25 +1727,40 @@ class DestinationMergeGrantController {
           MergeGrantState::kRevokedStaleState,
           MergeGrantReason::kCalendarGenerationChanged);
     }
-
-    append_lifecycle_noexcept(
-        *active->request_snapshot,
-        active->grant_id,
-        MergeGrantState::kConsumed,
+    if (context.physical_fault_active ||
+        context.current_physical_fault_generation !=
+            context.expected
+                .physical_fault_generation ||
+        context.current_advertised_fault_generation !=
+            context.expected
+                .advertised_fault_generation) {
+      // A physical fault that begins only after the exact EDGE_ENTER does not
+      // retroactively make that physical traversal illegal.  Retire the stale
+      // generation capability, but consume its still-exact destination lease
+      // so the already in-flight bag may continue into local service.  Both
+      // proof bits are runtime-local and neither can be inferred from a raw
+      // generation mismatch.
+      if (context.exact_grant_edge_entry_observed &&
+          context.local_inflight_fault_instance_observed &&
+          context.current_physical_fault_generation !=
+              context.expected.physical_fault_generation) {
+        return consume(
+            DestinationMergeGrantConsumeResult::
+                kConsumedAfterInflightFaultGenerationChange,
+            MergeGrantReason::
+                kConsumedAtDestinationEntryAfterInflightFaultGenerationChange,
+            true);
+      }
+      return terminalize(
+          DestinationMergeGrantConsumeResult::
+              kFaultGenerationChanged,
+          MergeGrantState::kRevokedFault,
+          MergeGrantReason::kFaultGenerationChanged);
+    }
+    return consume(
+        DestinationMergeGrantConsumeResult::kConsumed,
         MergeGrantReason::kConsumedAtDestinationEntry,
-        context.now,
-        active->slot_start,
-        active->slot_end,
-        active->calendar_generation,
-        active->physical_fault_generation,
-        active->issue_time,
-        active->grant_expiry,
-        &observed);
-    grant->state_ = MergeGrantState::kConsumed;
-    active_.erase(active);
-    ++counters_.consumed_count;
-    ++generation_;
-    return DestinationMergeGrantConsumeResult::kConsumed;
+        false);
   }
 
   bool rollback_committed_noexcept(

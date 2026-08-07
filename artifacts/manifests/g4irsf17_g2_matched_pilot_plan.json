@@ -1,0 +1,207 @@
+{
+  "bootstrap_replicates": 2000,
+  "causal_authorization": {
+    "authorized": false,
+    "reason": "Each rule is a separate end-to-end native execution. Runtime state may diverge after the first changed grant, so this artifact is not a same-checkpoint, one-opportunity causal comparison and cannot authorize a G2 policy for the closed-loop ladder.",
+    "same_state_causal_opportunity_count": 0
+  },
+  "design": {
+    "bootstrap_seed_is_analysis_only": true,
+    "event_semantics": "E4_batch_plus_destination_merge_request",
+    "fixed_control_source": "g4irsf14_opportunity_census.FROZEN_RUNTIME_CONTROLS",
+    "input_protocol": "protected_first_n_file_order",
+    "manipulated_control": "merge_grant_rule",
+    "matched_baseline_rule": "M1",
+    "native_runtime_stochastic": false,
+    "passive_opportunity_telemetry": true,
+    "supervisor_mode": "off"
+  },
+  "evidence_kind": "MATCHED_SYSTEM_LOCAL_RULE_SCREEN_NOT_SAME_STATE_CAUSAL",
+  "jobs": [
+    {
+      "bootstrap_seed": 18457,
+      "job_id": "g2_s144_m1",
+      "rule": "M1",
+      "rule_name": "fifo",
+      "segments": 144
+    },
+    {
+      "bootstrap_seed": 18458,
+      "job_id": "g2_s144_m2",
+      "rule": "M2",
+      "rule_name": "earliest_projected_arrival",
+      "segments": 144
+    },
+    {
+      "bootstrap_seed": 18459,
+      "job_id": "g2_s144_m3",
+      "rule": "M3",
+      "rule_name": "deadline_aging",
+      "segments": 144
+    },
+    {
+      "bootstrap_seed": 18460,
+      "job_id": "g2_s144_m4",
+      "rule": "M4",
+      "rule_name": "fairness_progress",
+      "segments": 144
+    },
+    {
+      "bootstrap_seed": 18461,
+      "job_id": "g2_s144_m5",
+      "rule": "M5",
+      "rule_name": "local_externality",
+      "segments": 144
+    },
+    {
+      "bootstrap_seed": 18462,
+      "job_id": "g2_s144_m6",
+      "rule": "M6",
+      "rule_name": "thesis_local",
+      "segments": 144
+    },
+    {
+      "bootstrap_seed": 22137,
+      "job_id": "g2_s512_m1",
+      "rule": "M1",
+      "rule_name": "fifo",
+      "segments": 512
+    },
+    {
+      "bootstrap_seed": 22138,
+      "job_id": "g2_s512_m2",
+      "rule": "M2",
+      "rule_name": "earliest_projected_arrival",
+      "segments": 512
+    },
+    {
+      "bootstrap_seed": 22139,
+      "job_id": "g2_s512_m3",
+      "rule": "M3",
+      "rule_name": "deadline_aging",
+      "segments": 512
+    },
+    {
+      "bootstrap_seed": 22140,
+      "job_id": "g2_s512_m4",
+      "rule": "M4",
+      "rule_name": "fairness_progress",
+      "segments": 512
+    },
+    {
+      "bootstrap_seed": 22141,
+      "job_id": "g2_s512_m5",
+      "rule": "M5",
+      "rule_name": "local_externality",
+      "segments": 512
+    },
+    {
+      "bootstrap_seed": 22142,
+      "job_id": "g2_s512_m6",
+      "rule": "M6",
+      "rule_name": "thesis_local",
+      "segments": 512
+    },
+    {
+      "bootstrap_seed": 37497,
+      "job_id": "g2_s2048_m1",
+      "rule": "M1",
+      "rule_name": "fifo",
+      "segments": 2048
+    },
+    {
+      "bootstrap_seed": 37498,
+      "job_id": "g2_s2048_m2",
+      "rule": "M2",
+      "rule_name": "earliest_projected_arrival",
+      "segments": 2048
+    },
+    {
+      "bootstrap_seed": 37499,
+      "job_id": "g2_s2048_m3",
+      "rule": "M3",
+      "rule_name": "deadline_aging",
+      "segments": 2048
+    },
+    {
+      "bootstrap_seed": 37500,
+      "job_id": "g2_s2048_m4",
+      "rule": "M4",
+      "rule_name": "fairness_progress",
+      "segments": 2048
+    },
+    {
+      "bootstrap_seed": 37501,
+      "job_id": "g2_s2048_m5",
+      "rule": "M5",
+      "rule_name": "local_externality",
+      "segments": 2048
+    },
+    {
+      "bootstrap_seed": 37502,
+      "job_id": "g2_s2048_m6",
+      "rule": "M6",
+      "rule_name": "thesis_local",
+      "segments": 2048
+    },
+    {
+      "bootstrap_seed": 98937,
+      "job_id": "g2_s8192_m1",
+      "rule": "M1",
+      "rule_name": "fifo",
+      "segments": 8192
+    },
+    {
+      "bootstrap_seed": 98938,
+      "job_id": "g2_s8192_m2",
+      "rule": "M2",
+      "rule_name": "earliest_projected_arrival",
+      "segments": 8192
+    },
+    {
+      "bootstrap_seed": 98939,
+      "job_id": "g2_s8192_m3",
+      "rule": "M3",
+      "rule_name": "deadline_aging",
+      "segments": 8192
+    },
+    {
+      "bootstrap_seed": 98940,
+      "job_id": "g2_s8192_m4",
+      "rule": "M4",
+      "rule_name": "fairness_progress",
+      "segments": 8192
+    },
+    {
+      "bootstrap_seed": 98941,
+      "job_id": "g2_s8192_m5",
+      "rule": "M5",
+      "rule_name": "local_externality",
+      "segments": 8192
+    },
+    {
+      "bootstrap_seed": 98942,
+      "job_id": "g2_s8192_m6",
+      "rule": "M6",
+      "rule_name": "thesis_local",
+      "segments": 8192
+    }
+  ],
+  "opportunity_trace_limit": 250000,
+  "plan_id": "g4irsf17_g2_matched_144_512_2048_8192_m1_m2_m3_m4_m5_m6_v1",
+  "rules": [
+    "M1",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6"
+  ],
+  "schema": "czr005.g4irsf17.g2_matched_pilot_plan.v1",
+  "segments": [
+    144,
+    512,
+    2048,
+    8192
+  ]
+}

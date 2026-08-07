@@ -23,6 +23,87 @@ ROOT = Path(__file__).resolve().parents[2]
 PathLike = str | os.PathLike[str]
 
 
+def g4irsf17_pairwise_ensemble_source_policy_artifact(
+    pairwise_artifact: Mapping[str, Any] | PathLike,
+    gate_artifact: Mapping[str, Any] | PathLike,
+    *,
+    top_k: int = 2,
+    supervisor_authorized: bool = False,
+) -> dict[str, Any]:
+    """Adapt transparent Phase-D exports to the native source-front schema.
+
+    Offline authorization and native closed-loop authorization stay separate:
+    the returned bundle copies ``runtime_closed_loop_authorized`` from the
+    gate artifact and never infers or upgrades it.
+    """
+
+    def load_mapping(
+        value: Mapping[str, Any] | PathLike, name: str
+    ) -> dict[str, Any]:
+        if isinstance(value, (str, os.PathLike)):
+            with Path(value).open("r", encoding="utf-8") as handle:
+                loaded = json.load(handle)
+            if not isinstance(loaded, dict):
+                raise ValueError(f"{name} must contain one JSON object")
+            return loaded
+        if not isinstance(value, Mapping):
+            raise TypeError(f"{name} must be a mapping or JSON path")
+        return dict(value)
+
+    pairwise = load_mapping(pairwise_artifact, "pairwise_artifact")
+    gate = load_mapping(gate_artifact, "gate_artifact")
+    if pairwise.get("schema") != "czr005.g4irsf17.i1_pairwise_ensemble.v1":
+        raise ValueError("unsupported G4IRSF17 pairwise ensemble schema")
+    if gate.get("schema") != "czr005.g4irsf17.i1_selective_gate.v1":
+        raise ValueError("unsupported G4IRSF17 selective gate schema")
+    def artifact_set_id(value: Any, name: str) -> str:
+        if not isinstance(value, str) or not value:
+            raise TypeError(f"{name} must be a non-empty string")
+        if len(value) > 160 or any(ord(character) <= 0x20 for character in value):
+            raise ValueError(f"{name} must be a compact readable identifier")
+        return value
+
+    pairwise_set_id = artifact_set_id(
+        pairwise.get("artifact_set_id"),
+        "pairwise_artifact.artifact_set_id",
+    )
+    gate_set_id = artifact_set_id(
+        gate.get("artifact_set_id"),
+        "gate_artifact.artifact_set_id",
+    )
+    if pairwise_set_id != gate_set_id:
+        raise ValueError(
+            "G4IRSF17 pairwise/gate artifact_set_id mismatch; "
+            "artifacts from different training runs cannot be combined"
+        )
+    for name in ("authorized", "runtime_closed_loop_authorized"):
+        if not isinstance(gate.get(name), bool):
+            raise TypeError(f"gate_artifact.{name} must be bool")
+    if not isinstance(supervisor_authorized, bool):
+        raise TypeError("supervisor_authorized must be bool")
+    if isinstance(top_k, bool):
+        raise TypeError("top_k must be an integer, not bool")
+    try:
+        normalized_top_k = int(operator.index(top_k))
+    except TypeError as exc:
+        raise TypeError("top_k must be an integer") from exc
+    if normalized_top_k not in {2, 4}:
+        raise ValueError("top_k must be 2 or 4")
+    return {
+        "schema": "czr005.g4irsf17.source_policy.v1",
+        "kind": "pairwise_ensemble_selective",
+        "artifact_set_id": pairwise_set_id,
+        "authorized": gate["authorized"],
+        "runtime_closed_loop_authorized": gate[
+            "runtime_closed_loop_authorized"
+        ],
+        "supervisor_authorized": supervisor_authorized,
+        "top_k": normalized_top_k,
+        "pairwise_artifact": pairwise,
+        "gate_artifact": gate,
+    }
+
+
 class CppBackendUnavailable(ImportError):
     """Raised when the C++ extension module cannot be imported."""
 
@@ -617,6 +698,11 @@ def g4irsf11_event_runtime_from_records(
     g4irsf16_i3_model_artifact: Mapping[str, Any] | PathLike | None = None,
     g4irsf16_i4_model_artifact: Mapping[str, Any] | PathLike | None = None,
     g4irsf16_rule_bundle: Mapping[str, Any] | PathLike | None = None,
+    enable_g4irsf17_source_wait_telemetry: bool = False,
+    g4irsf17_source_wait_trace_limit: int = 200_000,
+    g4irsf17_source_policy_mode: str = "off",
+    g4irsf17_source_policy_artifact: Mapping[str, Any] | PathLike | None = None,
+    g4irsf17_source_policy_trace_limit: int = 200_000,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -693,6 +779,30 @@ def g4irsf11_event_runtime_from_records(
     opportunity_trace_limit = strict_integer(
         opportunity_trace_limit, "opportunity_trace_limit"
     )
+    enable_g4irsf17_source_wait_telemetry = strict_bool(
+        enable_g4irsf17_source_wait_telemetry,
+        "enable_g4irsf17_source_wait_telemetry",
+    )
+    g4irsf17_source_wait_trace_limit = strict_integer(
+        g4irsf17_source_wait_trace_limit,
+        "g4irsf17_source_wait_trace_limit",
+    )
+    if g4irsf17_source_wait_trace_limit < 0:
+        raise ValueError(
+            "g4irsf17_source_wait_trace_limit must be non-negative"
+        )
+    g4irsf17_source_policy_trace_limit = strict_integer(
+        g4irsf17_source_policy_trace_limit,
+        "g4irsf17_source_policy_trace_limit",
+    )
+    if g4irsf17_source_policy_trace_limit < 0:
+        raise ValueError(
+            "g4irsf17_source_policy_trace_limit must be non-negative"
+        )
+    if g4irsf17_source_policy_mode not in {"off", "shadow", "closed_loop"}:
+        raise ValueError(
+            "g4irsf17_source_policy_mode must be off, shadow, or closed_loop"
+        )
     merge_grant_max_pending_requests = strict_integer(
         merge_grant_max_pending_requests,
         "merge_grant_max_pending_requests",
@@ -909,6 +1019,21 @@ def g4irsf11_event_runtime_from_records(
         g4irsf16_rule_bundle,
         "g4irsf16_rule_bundle",
     )
+    normalized_g4irsf17_source_policy = normalized_g4irsf16_artifact(
+        g4irsf17_source_policy_artifact,
+        "g4irsf17_source_policy_artifact",
+    )
+    if g4irsf17_source_policy_mode == "off":
+        if normalized_g4irsf17_source_policy:
+            raise ValueError(
+                "G4IRSF17 source policy artifact requires shadow or "
+                "closed_loop mode"
+            )
+    elif not normalized_g4irsf17_source_policy:
+        raise ValueError(
+            "G4IRSF17 shadow/closed_loop mode requires one explicit "
+            "source policy artifact"
+        )
     has_g4irsf16_models = bool(
         normalized_g4irsf16_i3_model or normalized_g4irsf16_i4_model
     )
@@ -1376,16 +1501,50 @@ def g4irsf11_event_runtime_from_records(
             int(merge_grant_max_pending_requests),
             int(merge_grant_lifecycle_limit),
         )
+    merge_tail_materialized = uses_destination_merge_grants
     if g4irsf16_supervisor_mode != "off":
         if not uses_destination_merge_grants:
             # G4IRSF16 arguments are append-only after the older merge-grant
             # defaults, preserving positional compatibility in exact-off mode.
             native_event_tail += ("M1", 64, 1024)
+            merge_tail_materialized = True
         native_event_tail += (
             str(g4irsf16_supervisor_mode),
             normalized_g4irsf16_i3_model,
             normalized_g4irsf16_i4_model,
             normalized_g4irsf16_rule_bundle,
+        )
+    if enable_g4irsf17_source_wait_telemetry:
+        # G17 follows the G16 positional tail.  Materialise intervening
+        # defaults only when this opt-in telemetry is requested, so calls to
+        # older exact binaries and the G17 disabled path remain unchanged.
+        if not merge_tail_materialized:
+            native_event_tail += ("M1", 64, 1024)
+            merge_tail_materialized = True
+        if g4irsf16_supervisor_mode == "off":
+            native_event_tail += ("off", {}, {}, {})
+        native_event_tail += (
+            True,
+            int(g4irsf17_source_wait_trace_limit),
+        )
+    if g4irsf17_source_policy_mode != "off":
+        # The policy follows the G17 wait-telemetry tail.  Intervening exact
+        # defaults are materialized only for this opt-in path, retaining the
+        # old positional call for mode=off (including older native binaries).
+        if not merge_tail_materialized:
+            native_event_tail += ("M1", 64, 1024)
+            merge_tail_materialized = True
+        if (
+            g4irsf16_supervisor_mode == "off"
+            and not enable_g4irsf17_source_wait_telemetry
+        ):
+            native_event_tail += ("off", {}, {}, {})
+        if not enable_g4irsf17_source_wait_telemetry:
+            native_event_tail += (False, 200_000)
+        native_event_tail += (
+            str(g4irsf17_source_policy_mode),
+            normalized_g4irsf17_source_policy,
+            int(g4irsf17_source_policy_trace_limit),
         )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(

@@ -16,19 +16,21 @@ from scripts import validate_g4irsf14_fail_closed_completion as validator
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 PREDECESSOR_SOURCE_COMMIT = "966a063573f0419df1324708db75211c521d59db"
-HISTORICAL_REQUIRED_PATHS = {
-    Path(".gitattributes"),
-    Path("CMakeLists.txt"),
-    Path("cpp/ics_core/bindings/czr005_cpp.cpp"),
-    Path("cpp/ics_core/runtime/event_driven_junction.hpp"),
-    Path("src/czr005/cpp_backend.py"),
-}
+HISTORICAL_SOURCE_PATHS = frozenset(
+    (*validator.STAGE_E_SOURCE_PATHS, validator.HASH_POLICY_PATH)
+)
 
 
 @lru_cache(maxsize=None)
-def _git_blob(commit: str, relative: Path) -> bytes:
+def _git_checkout_blob(commit: str, relative: Path) -> bytes:
     return subprocess.run(
-        ["git", "show", f"{commit}:{relative.as_posix()}"],
+        [
+            "git",
+            "cat-file",
+            "--filters",
+            f"--path={relative.as_posix()}",
+            f"{commit}:{relative.as_posix()}",
+        ],
         cwd=REPOSITORY_ROOT,
         check=True,
         stdout=subprocess.PIPE,
@@ -40,8 +42,10 @@ def _copy_bundle(destination: Path) -> Path:
     for relative in validator.REQUIRED_BUNDLE_FILES:
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        if relative in HISTORICAL_REQUIRED_PATHS:
-            target.write_bytes(_git_blob(PREDECESSOR_SOURCE_COMMIT, relative))
+        if relative in HISTORICAL_SOURCE_PATHS:
+            target.write_bytes(
+                _git_checkout_blob(PREDECESSOR_SOURCE_COMMIT, relative)
+            )
         else:
             source = REPOSITORY_ROOT / relative
             assert source.is_file(), relative.as_posix()
@@ -223,6 +227,16 @@ def test_valid_bundle_is_portable_and_does_not_resolve_recorded_binary(
     assert result["output_count"] == 24
     assert result["selected_candidate_id"] is None
     assert result["scale_execution_count"] == 0
+
+
+def test_bundle_uses_recorded_predecessor_not_successor_runtime(
+    bundle_root: Path,
+) -> None:
+    relative = Path("cpp/ics_core/runtime/destination_merge_grant.hpp")
+    historical = _git_checkout_blob(PREDECESSOR_SOURCE_COMMIT, relative)
+
+    assert (bundle_root / relative).read_bytes() == historical
+    assert (REPOSITORY_ROOT / relative).read_bytes() != historical
 
 
 def test_stage_e_recorded_source_checkout_drift_is_rejected(

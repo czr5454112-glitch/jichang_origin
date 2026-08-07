@@ -1,0 +1,311 @@
+{
+  "artifact_set_id": "g4irsf17-i1-seed17-rows256-4811ccb5-4b96-4df0-bfae-45714c6d2c95",
+  "authorization_scope": "offline_candidate_for_supervised_shadow",
+  "authorized": false,
+  "calibration": {
+    "available": true,
+    "beneficial_count": 3,
+    "benefit_ece": 0.014766542014359342,
+    "fit_partition": "task_group.calibration",
+    "harm_ece": 0.0006519004706716236,
+    "harmful_count": 2,
+    "promotion_ece": 0.06149306456870962,
+    "row_count": 40,
+    "utility_residual_q05_seconds": -0.5355212316685392,
+    "validation_evaluation": {
+      "benefit_ece": 0.06149306456870962,
+      "harm_ece": 0.007752614633152868,
+      "partition": "task_group.validation",
+      "row_count": 34
+    }
+  },
+  "final_audit": {
+    "consumed": false,
+    "row_count": 23
+  },
+  "identity_features_used": false,
+  "input_summary": {
+    "alternative_candidate_index": 1,
+    "baseline_candidate_index": 0,
+    "candidate_count_per_row": 2,
+    "final_audit_outcomes_parsed": false,
+    "ids_used_as_model_features": false,
+    "input_row_count": 520,
+    "rejected_row_count": 264,
+    "rejection_reasons": {
+      "CAUSAL_EFFECT_NOT_ELIGIBLE": 264
+    },
+    "valid_feature_effect_row_count": 256
+  },
+  "promotion_checks": {
+    "activated_utility": false,
+    "beneficial_precision": false,
+    "calibration": true,
+    "final_audit_sealed": true,
+    "h_system_externality_evidence": true,
+    "harmful_activation_rate": true,
+    "harmful_recall": true,
+    "learned_not_worse_than_localized_rule": true,
+    "ood_abstention": true,
+    "support": false,
+    "task_group_hard_split": true,
+    "validation_activation_support": false
+  },
+  "promotion_observed": {
+    "activated_utility_mean": 0.0,
+    "beneficial_precision": 0.0,
+    "calibration_ece": 0.06149306456870962,
+    "h_system_externality_row_count": 8,
+    "harmful_activation_rate": 0.0,
+    "harmful_recall": 1.0,
+    "ood_activation_count": 0,
+    "ood_rate": 0.17647058823529413,
+    "ood_row_count": 6,
+    "selective_minus_localized_rule_mean_utility_seconds": 0.0,
+    "validation_activation_count": 0
+  },
+  "promotion_required": {
+    "activated_utility_mean": 0.0,
+    "beneficial_precision": 0.9,
+    "calibration_ece": 0.08,
+    "h_system_externality_row_count": 1,
+    "harmful_activation_rate": 0.05,
+    "harmful_recall": 0.95,
+    "ood_activation_count": 0,
+    "selective_minus_localized_rule_mean_utility_seconds": 0.0,
+    "validation_activation_count": 1
+  },
+  "reason_codes": [
+    "PROMOTION_SUPPORT_FAILED",
+    "PROMOTION_VALIDATION_ACTIVATION_SUPPORT_FAILED",
+    "PROMOTION_BENEFICIAL_PRECISION_FAILED",
+    "PROMOTION_ACTIVATED_UTILITY_FAILED"
+  ],
+  "runtime_closed_loop_authorized": false,
+  "schema": "czr005.g4irsf17.i1_selective_gate.v1",
+  "selector": {
+    "benefit_probability_lcb_min": 0.6,
+    "calibration_ece_max": 0.08,
+    "ensemble_size": 5,
+    "harm_probability_ucb_max": 0.05,
+    "lower_quantile": 0.05,
+    "ood_abstention_required": true,
+    "supervisor_authorization_required": true,
+    "upper_quantile": 0.95,
+    "utility_lcb_min_seconds": 0.0
+  },
+  "split_summary": {
+    "by_selection_split": {
+      "calibration": {
+        "beneficial_count": 3,
+        "h_system_externality_evidence_count": 0,
+        "harmful_count": 2,
+        "neutral_count": 35,
+        "row_count": 40,
+        "source_group_count": 1,
+        "task_group_count": 40,
+        "utility_scope_counts": {
+          "BOUNDED_DIRECT_SWAP_COHORT": 40
+        }
+      },
+      "final_audit": {
+        "beneficial_count": null,
+        "h_system_externality_evidence_count": 0,
+        "harmful_count": null,
+        "neutral_count": null,
+        "row_count": 23,
+        "source_group_count": 1,
+        "task_group_count": 23,
+        "utility_scope_counts": {
+          "BOUNDED_DIRECT_SWAP_COHORT": 23
+        }
+      },
+      "train": {
+        "beneficial_count": 10,
+        "h_system_externality_evidence_count": 7,
+        "harmful_count": 10,
+        "neutral_count": 139,
+        "row_count": 159,
+        "source_group_count": 1,
+        "task_group_count": 152,
+        "utility_scope_counts": {
+          "BOUNDED_DIRECT_SWAP_COHORT": 152,
+          "H_SYSTEM_EXTERNALITY_AUDIT": 7
+        }
+      },
+      "validation": {
+        "beneficial_count": 2,
+        "h_system_externality_evidence_count": 1,
+        "harmful_count": 2,
+        "neutral_count": 30,
+        "row_count": 34,
+        "source_group_count": 1,
+        "task_group_count": 33,
+        "utility_scope_counts": {
+          "BOUNDED_DIRECT_SWAP_COHORT": 33,
+          "H_SYSTEM_EXTERNALITY_AUDIT": 1
+        }
+      }
+    },
+    "diagnostic_views": [
+      "source_held_out",
+      "time_held_out"
+    ],
+    "final_audit": {
+      "consumed": false,
+      "row_count": 23
+    },
+    "selection_view": "task_group",
+    "split_keys_are_model_inputs": false,
+    "task_group_overlap_count": 0
+  },
+  "status": "TRAINED_NOT_AUTHORIZED",
+  "support": {
+    "by_selection_split": {
+      "calibration": {
+        "beneficial_count": 3,
+        "h_system_externality_evidence_count": 0,
+        "harmful_count": 2,
+        "neutral_count": 35,
+        "row_count": 40,
+        "source_group_count": 1,
+        "task_group_count": 40,
+        "utility_scope_counts": {
+          "BOUNDED_DIRECT_SWAP_COHORT": 40
+        }
+      },
+      "final_audit": {
+        "beneficial_count": null,
+        "h_system_externality_evidence_count": 0,
+        "harmful_count": null,
+        "neutral_count": null,
+        "row_count": 23,
+        "source_group_count": 1,
+        "task_group_count": 23,
+        "utility_scope_counts": {
+          "BOUNDED_DIRECT_SWAP_COHORT": 23
+        }
+      },
+      "train": {
+        "beneficial_count": 10,
+        "h_system_externality_evidence_count": 7,
+        "harmful_count": 10,
+        "neutral_count": 139,
+        "row_count": 159,
+        "source_group_count": 1,
+        "task_group_count": 152,
+        "utility_scope_counts": {
+          "BOUNDED_DIRECT_SWAP_COHORT": 152,
+          "H_SYSTEM_EXTERNALITY_AUDIT": 7
+        }
+      },
+      "validation": {
+        "beneficial_count": 2,
+        "h_system_externality_evidence_count": 1,
+        "harmful_count": 2,
+        "neutral_count": 30,
+        "row_count": 34,
+        "source_group_count": 1,
+        "task_group_count": 33,
+        "utility_scope_counts": {
+          "BOUNDED_DIRECT_SWAP_COHORT": 33,
+          "H_SYSTEM_EXTERNALITY_AUDIT": 1
+        }
+      }
+    },
+    "checks": {
+      "beneficial_calibration": false,
+      "beneficial_legs": false,
+      "beneficial_sources": false,
+      "beneficial_time_buckets": true,
+      "beneficial_train": false,
+      "beneficial_validation": false,
+      "harmful_calibration": false,
+      "harmful_train": false,
+      "harmful_validation": false
+    },
+    "observed": {
+      "beneficial_calibration": 3,
+      "beneficial_legs": 1,
+      "beneficial_sources": 1,
+      "beneficial_time_buckets": 8,
+      "beneficial_train": 10,
+      "beneficial_validation": 2,
+      "h_bag_training_rows": 225,
+      "h_system_externality_rows": 8,
+      "harmful_calibration": 2,
+      "harmful_legs": 1,
+      "harmful_sources": 1,
+      "harmful_time_buckets": 7,
+      "harmful_train": 10,
+      "harmful_validation": 2
+    },
+    "pass": false,
+    "required": {
+      "beneficial_calibration": 8,
+      "beneficial_legs": 2,
+      "beneficial_sources": 3,
+      "beneficial_time_buckets": 3,
+      "beneficial_train": 32,
+      "beneficial_validation": 8,
+      "harmful_calibration": 4,
+      "harmful_train": 16,
+      "harmful_validation": 4
+    }
+  },
+  "training_config": {
+    "benefit_probability_lcb_min": 0.6,
+    "calibrator_epochs": 600,
+    "ensemble_size": 5,
+    "harm_probability_ucb_max": 0.05,
+    "maximum_calibration_ece": 0.08,
+    "maximum_harmful_activation_rate": 0.05,
+    "minimum_activated_utility_seconds": 0.0,
+    "minimum_beneficial_calibration": 8,
+    "minimum_beneficial_legs": 2,
+    "minimum_beneficial_precision": 0.9,
+    "minimum_beneficial_sources": 3,
+    "minimum_beneficial_time_buckets": 3,
+    "minimum_beneficial_train": 32,
+    "minimum_beneficial_validation": 8,
+    "minimum_h_system_rows": 1,
+    "minimum_harmful_calibration": 4,
+    "minimum_harmful_recall": 0.95,
+    "minimum_harmful_train": 16,
+    "minimum_harmful_validation": 4,
+    "minimum_validation_activations": 1,
+    "mlp_epochs": 350,
+    "mlp_hidden_dim": 8,
+    "mlp_l2": 0.0001,
+    "mlp_learning_rate": 0.03,
+    "pairwise_epochs": 350,
+    "pairwise_l2": 0.001,
+    "pairwise_learning_rate": 0.05,
+    "seed": 17,
+    "split_fractions": [
+      0.6,
+      0.15,
+      0.15,
+      0.1
+    ],
+    "time_block_seconds": 3600.0,
+    "utility_l2": 0.001,
+    "utility_tolerance_seconds": 1e-09
+  },
+  "training_label_contract": {
+    "BOUNDED_DIRECT_SWAP_COHORT": {
+      "can_authorize_runtime_closed_loop": false,
+      "deadline_miss_penalty_seconds": 3600.0,
+      "definition": "-(two direct affected bags' TTH delta sum + 3600s * max(0, deadline miss delta))",
+      "eligible_for_training_and_calibration": true,
+      "provides_full_system_externality_evidence": false,
+      "required_direct_bag_count": 2
+    },
+    "H_SYSTEM_EXTERNALITY_AUDIT": {
+      "can_authorize_runtime_closed_loop": false,
+      "eligible_for_training_and_calibration": true,
+      "provides_full_system_externality_evidence": true,
+      "required_for_offline_shadow_authorization": true
+    }
+  }
+}

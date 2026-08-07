@@ -21,7 +21,9 @@ CHANGED = {
     Path("cpp/ics_core/bindings/czr005_cpp.cpp"),
     Path("cpp/ics_core/runtime/event_driven_junction.hpp"),
 }
-HISTORICAL_STAGE_E_PATHS = CHANGED | {Path("src/czr005/cpp_backend.py")}
+HISTORICAL_SOURCE_PATHS = frozenset(
+    (*predecessor.STAGE_E_SOURCE_PATHS, predecessor.HASH_POLICY_PATH)
+)
 
 
 def _run(repo: Path, *argv: str) -> bytes:
@@ -39,16 +41,27 @@ def _git_blob(commit: str, relative: Path) -> bytes:
     return _run(ROOT, "git", "show", f"{commit}:{relative.as_posix()}")
 
 
+@lru_cache(maxsize=None)
+def _git_checkout_blob(commit: str, relative: Path) -> bytes:
+    return _run(
+        ROOT,
+        "git",
+        "cat-file",
+        "--filters",
+        f"--path={relative.as_posix()}",
+        f"{commit}:{relative.as_posix()}",
+    )
+
+
 def _transition_fixture(tmp_path: Path) -> tuple[Path, Path, str]:
     repo = tmp_path / "bundle"
     for relative in predecessor.REQUIRED_BUNDLE_FILES:
         target = repo / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / relative, target)
-    for relative in (*HISTORICAL_STAGE_E_PATHS, Path(".gitattributes")):
-        target = repo / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(_git_blob(PREDECESSOR_COMMIT, relative))
+        if relative in HISTORICAL_SOURCE_PATHS:
+            target.write_bytes(_git_checkout_blob(PREDECESSOR_COMMIT, relative))
+        else:
+            shutil.copyfile(ROOT / relative, target)
     for relative in (creator.GENERATOR_PATH, creator.VALIDATOR_PATH):
         target = repo / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -98,6 +111,17 @@ def test_transition_reconstructs_and_validates_immutable_predecessor(
     assert result["status"] == "PASS"
     assert result["predecessor_causal_label_count"] == 0
     assert result["changed_path_count"] == 3
+
+
+def test_transition_does_not_import_later_successor_runtime(
+    tmp_path: Path,
+) -> None:
+    repo, _, _ = _transition_fixture(tmp_path)
+    relative = Path("cpp/ics_core/runtime/destination_merge_grant.hpp")
+    historical = _git_checkout_blob(PREDECESSOR_COMMIT, relative)
+
+    assert (repo / relative).read_bytes() == historical
+    assert (ROOT / relative).read_bytes() != historical
 
 
 def test_successor_source_tamper_is_rejected_even_if_manifest_is_unchanged(

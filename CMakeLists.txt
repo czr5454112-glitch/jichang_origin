@@ -98,6 +98,38 @@ target_link_libraries(test_g4irsf16_supervisor PRIVATE ics_core)
 add_test(NAME g4irsf16_supervisor COMMAND test_g4irsf16_supervisor)
 
 add_executable(
+  test_g4irsf17_source_wait_telemetry
+  cpp/tests/test_g4irsf17_source_wait_telemetry.cpp)
+target_link_libraries(
+  test_g4irsf17_source_wait_telemetry PRIVATE ics_core)
+target_compile_definitions(
+  test_g4irsf17_source_wait_telemetry
+  PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+if(MSVC)
+  target_compile_options(
+    test_g4irsf17_source_wait_telemetry PRIVATE /bigobj)
+endif()
+add_test(
+  NAME g4irsf17_source_wait_telemetry
+  COMMAND test_g4irsf17_source_wait_telemetry)
+
+add_executable(
+  test_g4irsf17_source_policy
+  cpp/tests/test_g4irsf17_source_policy.cpp)
+target_link_libraries(
+  test_g4irsf17_source_policy PRIVATE ics_core)
+target_compile_definitions(
+  test_g4irsf17_source_policy
+  PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+if(MSVC)
+  target_compile_options(
+    test_g4irsf17_source_policy PRIVATE /bigobj)
+endif()
+add_test(
+  NAME g4irsf17_source_policy
+  COMMAND test_g4irsf17_source_policy)
+
+add_executable(
   test_bounded_local_pibt_real_map
   cpp/tests/test_bounded_local_pibt_real_map.cpp)
 target_link_libraries(test_bounded_local_pibt_real_map PRIVATE ics_core)

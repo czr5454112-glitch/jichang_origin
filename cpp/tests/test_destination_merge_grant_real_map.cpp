@@ -1378,6 +1378,101 @@ void test_task_class_code_mapping(Checks& checks) {
       "new/on-path semantics independently of the M6 rank");
 }
 
+void test_inflight_fault_generation_local_recovery(
+    Checks& checks,
+    const RealEqualTravelMerge& motif) {
+  checks.require(
+      motif.travel > 3.0 * kTolerance,
+      "real-map recovery fixture must expose a nonzero in-flight window");
+  auto requests = contested_requests(motif, false);
+  requests.resize(1);
+  requests.front().segment_id =
+      "edge-exit-inflight-fault-recovery";
+  requests.front().task_id = 46999;
+
+  const double edge_entry_time = 2.0;
+  const double fault_time =
+      edge_entry_time + motif.travel / 3.0;
+  const double repair_time =
+      edge_entry_time + 2.0 * motif.travel / 3.0;
+  EventRuntimeFaultWindow fault;
+  fault.start = motif.upstream_a;
+  fault.end = motif.destination;
+  fault.fault_time = fault_time;
+  fault.repair_time = repair_time;
+  fault.message_delay = 0.0;
+  fault.drop_notification = false;
+
+  EventDrivenJunctionRuntime runtime(
+      canonical_map2().graph, e4_config());
+  const auto result = runtime.run(requests, {fault});
+  check_runtime_hard_gates(checks, result, 1);
+
+  checks.require(
+      result.summary.physical_fault_window_traversal_count == 1 &&
+          result.summary.physical_fault_edge_entry_violation_count == 0 &&
+          result.summary.fault_affected_bag_count == 1 &&
+          result.summary.fault_affected_completed_count == 1,
+      "a fault beginning after exact EDGE_ENTER must be recorded as one "
+      "grandfathered in-flight exposure, never an unsafe entry");
+  checks.require(
+      result.summary
+                  .merge_grant_inflight_fault_generation_recovery_count ==
+              1 &&
+          result.summary.merge_grant_consumed_count == 1 &&
+          result.summary.merge_grant_committed_count == 1 &&
+          result.summary.merge_grant_revoked_fault_count == 0 &&
+          result.summary.repaired_task_reentry_count == 1,
+      "the exact already-entered bag must consume its still-valid local "
+      "destination lease through the bounded in-flight recovery path");
+  checks.require(
+      result.summary.fault_recovery_seconds_available &&
+          result.summary.runtime_full_astar_calls == 0 &&
+          result.summary.global_reservation_scan_count == 0 &&
+          result.summary.two_step_reservation_count == 0 &&
+          result.summary.priority_future_route_input_count == 0 &&
+          result.summary.priority_global_scan_count == 0,
+      "in-flight recovery must retain exact fault-instance evidence without "
+      "adding A*, future-route input, or global scans");
+
+  const auto recovered = std::find_if(
+      result.merge_grant_lifecycle.begin(),
+      result.merge_grant_lifecycle.end(),
+      [&](const auto& row) {
+        return row.task_id == requests.front().task_id &&
+               row.state == MergeGrantState::kConsumed &&
+               row.reason ==
+                   MergeGrantReason::
+                       kConsumedAtDestinationEntryAfterInflightFaultGenerationChange;
+      });
+  checks.require(
+      recovered != result.merge_grant_lifecycle.end() &&
+          recovered->edge ==
+              czr005::ics::MergeDirectedEdge{
+                  motif.upstream_a, motif.destination} &&
+          recovered->observed_exact_calendar_reservation_present &&
+          recovered->observed_physical_fault_generation >
+              recovered->fault_generation &&
+          !recovered->observed_physical_fault_active,
+      "recovery lifecycle evidence must bind the exact edge/slot and a true "
+      "fault generation that was repaired before destination entry");
+  const auto recovered_audit = std::find_if(
+      result.fault_events.begin(),
+      result.fault_events.end(),
+      [&](const auto& row) {
+        return row.task_id == requests.front().task_id &&
+               row.from_node == motif.upstream_a &&
+               row.to_node == motif.destination &&
+               row.phase ==
+                   "destination_merge_inflight_fault_generation_recovered";
+      });
+  checks.require(
+      recovered_audit != result.fault_events.end() &&
+          recovered_audit->physical_active_count == 0 &&
+          recovered_audit->physical_generation >= 2,
+      "fault audit must expose the exact repaired-before-exit recovery event");
+}
+
 void test_edge_exit_fail_closed_matrix(
     Checks& checks,
     const RealEqualTravelMerge& motif) {
@@ -1508,7 +1603,10 @@ void test_edge_exit_fail_closed_matrix(
                     .merge_grant_committed_transition_count ==
                 1 &&
             result.summary.merge_grant_committed_count == 0 &&
-            result.summary.merge_grant_consumed_count == 0,
+            result.summary.merge_grant_consumed_count == 0 &&
+            result.summary
+                    .merge_grant_inflight_fault_generation_recovery_count ==
+                0,
         case_name +
             " must terminalize the post-commit grant with no ghost "
             "active authority");
@@ -2263,6 +2361,8 @@ int main() {
   test_advertised_generation_precommit_recheck(
       checks, motif);
   test_selected_request_recheck_matrix(
+      checks, motif);
+  test_inflight_fault_generation_local_recovery(
       checks, motif);
   test_edge_exit_fail_closed_matrix(
       checks, motif);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cstddef>
@@ -35,6 +36,7 @@
 #include "ics_core/runtime/g4irsf14_state_clone.hpp"
 #include "ics_core/runtime/g4irsf15_causal_campaign.hpp"
 #include "ics_core/runtime/g4irsf16_supervisor.hpp"
+#include "ics_core/runtime/g4irsf17_source_policy.hpp"
 
 namespace czr005::ics {
 
@@ -57,6 +59,72 @@ enum class JunctionEventType {
   kJunctionArbitration,
   kDestinationMergeArbitration,
 };
+
+// G4IRSF17 source-wait attribution is deliberately a small canonical enum,
+// rather than a free-form policy label.  The enum is used only for causal
+// telemetry; it is never exposed to the scorer as an ID/codebook feature.
+enum class G4IRSF17SourceWaitReason : std::uint8_t {
+  kSourceServiceNotReady = 0,
+  kFirstEdgeCreditUnavailable = 1,
+  kDestinationQueueCapacity = 2,
+  kDestinationMergeToken = 3,
+  kPhysicalFaultOrGeneration = 4,
+  kSupervisorHold = 5,
+  kPIBTOrRecoveryTransaction = 6,
+  kOtherExplicitReason = 7,
+};
+
+inline constexpr std::size_t kG4IRSF17SourceWaitReasonCount = 8;
+
+inline const char* g4irsf17_source_wait_reason_name(
+    G4IRSF17SourceWaitReason reason) noexcept {
+  switch (reason) {
+    case G4IRSF17SourceWaitReason::kSourceServiceNotReady:
+      return "SOURCE_SERVICE_NOT_READY";
+    case G4IRSF17SourceWaitReason::kFirstEdgeCreditUnavailable:
+      return "FIRST_EDGE_CREDIT_UNAVAILABLE";
+    case G4IRSF17SourceWaitReason::kDestinationQueueCapacity:
+      return "DESTINATION_QUEUE_CAPACITY";
+    case G4IRSF17SourceWaitReason::kDestinationMergeToken:
+      return "DESTINATION_MERGE_TOKEN";
+    case G4IRSF17SourceWaitReason::kPhysicalFaultOrGeneration:
+      return "PHYSICAL_FAULT_OR_GENERATION";
+    case G4IRSF17SourceWaitReason::kSupervisorHold:
+      return "SUPERVISOR_HOLD";
+    case G4IRSF17SourceWaitReason::kPIBTOrRecoveryTransaction:
+      return "PIBT_OR_RECOVERY_TRANSACTION";
+    case G4IRSF17SourceWaitReason::kOtherExplicitReason:
+      return "OTHER_EXPLICIT_REASON";
+  }
+  return "OTHER_EXPLICIT_REASON";
+}
+
+// Lower ranks win whenever one bounded local observation exposes several
+// blockers.  Concrete safety/root causes precede wrapper capabilities; source
+// service is evaluated first by the real admission path and therefore never
+// competes with downstream observations in this function.
+inline constexpr int g4irsf17_source_wait_reason_precedence(
+    G4IRSF17SourceWaitReason reason) noexcept {
+  switch (reason) {
+    case G4IRSF17SourceWaitReason::kPhysicalFaultOrGeneration:
+      return 0;
+    case G4IRSF17SourceWaitReason::kSupervisorHold:
+      return 1;
+    case G4IRSF17SourceWaitReason::kPIBTOrRecoveryTransaction:
+      return 2;
+    case G4IRSF17SourceWaitReason::kDestinationQueueCapacity:
+      return 3;
+    case G4IRSF17SourceWaitReason::kDestinationMergeToken:
+      return 4;
+    case G4IRSF17SourceWaitReason::kFirstEdgeCreditUnavailable:
+      return 5;
+    case G4IRSF17SourceWaitReason::kSourceServiceNotReady:
+      return 6;
+    case G4IRSF17SourceWaitReason::kOtherExplicitReason:
+      return 7;
+  }
+  return 7;
+}
 
 inline const char* junction_event_name(JunctionEventType type) {
   switch (type) {
@@ -522,6 +590,18 @@ struct EventDrivenJunctionConfig {
   G4IRSF16SelectiveLinearModelConfig g4irsf16_i3_model;
   G4IRSF16SelectiveLinearModelConfig g4irsf16_i4_model;
   G4IRSF16I4DiagnosticRuleConfig g4irsf16_i4_diagnostic_rule;
+  // Append-only G17 diagnostics.  Disabled is the exact G16 payload/runtime
+  // path; enabling records only real source-admission holds and bounded
+  // one-hop causal state.
+  bool enable_g4irsf17_source_wait_telemetry = false;
+  int g4irsf17_source_wait_trace_limit = 200000;
+  // Independent source-front control. Off is the exact compatibility path;
+  // shadow/closed_loop inspect only a fixed K=2/4 local candidate set.
+  G4IRSF17SourcePolicyConfig g4irsf17_source_policy;
+  int g4irsf17_source_policy_trace_limit = 200000;
+  // Internal causal-data sidecar capture.  The production default is exact
+  // off; G15's frozen census enables it without changing any runtime action.
+  bool enable_g4irsf17_causal_source_features = false;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -996,6 +1076,10 @@ struct EventRuntimeSummary {
   std::uint64_t
       merge_grant_committed_transition_count = 0;
   std::uint64_t merge_grant_consumed_count = 0;
+  // Strict subset of consumed grants: the exact lease was retained for a
+  // physically in-flight bag after a post-entry fault generation change.
+  std::uint64_t
+      merge_grant_inflight_fault_generation_recovery_count = 0;
   std::uint64_t merge_grant_expired_count = 0;
   std::uint64_t merge_grant_request_expired_count = 0;
   std::uint64_t merge_grant_grant_expired_count = 0;
@@ -1057,6 +1141,39 @@ struct EventRuntimeSummary {
   int g4irsf16_future_schedule_input_count = 0;
   int g4irsf16_posthoc_input_count = 0;
   int g4irsf16_full_astar_call_count = 0;
+  // G4IRSF17 fields are omitted by the Python binding while telemetry is off.
+  bool g4irsf17_source_wait_telemetry_enabled = false;
+  std::uint64_t g4irsf17_source_wait_interval_total_count = 0;
+  std::uint64_t g4irsf17_source_wait_interval_stored_count = 0;
+  std::uint64_t g4irsf17_source_wait_interval_dropped_count = 0;
+  double g4irsf17_source_wait_seconds = 0.0;
+  double g4irsf17_source_wait_bag_seconds = 0.0;
+  std::array<std::uint64_t, kG4IRSF17SourceWaitReasonCount>
+      g4irsf17_source_wait_reason_interval_counts{};
+  std::array<double, kG4IRSF17SourceWaitReasonCount>
+      g4irsf17_source_wait_reason_seconds{};
+  std::array<double, kG4IRSF17SourceWaitReasonCount>
+      g4irsf17_source_wait_reason_bag_seconds{};
+  int g4irsf17_source_wait_runtime_global_scan_count = 0;
+  std::string g4irsf17_source_policy_mode;
+  std::string g4irsf17_source_policy_kind;
+  std::string g4irsf17_source_policy_artifact_set_id;
+  bool g4irsf17_source_policy_authorized = false;
+  bool g4irsf17_source_policy_runtime_closed_loop_authorized = false;
+  int g4irsf17_source_policy_top_k = 0;
+  std::uint64_t g4irsf17_source_policy_evaluation_count = 0;
+  std::uint64_t g4irsf17_source_policy_change_proposal_count = 0;
+  std::uint64_t g4irsf17_source_policy_activation_count = 0;
+  std::uint64_t g4irsf17_source_policy_abstention_count = 0;
+  std::uint64_t g4irsf17_source_policy_ood_abstention_count = 0;
+  std::uint64_t g4irsf17_source_policy_supervisor_abstention_count = 0;
+  std::uint64_t g4irsf17_source_policy_trace_total_count = 0;
+  std::uint64_t g4irsf17_source_policy_trace_stored_count = 0;
+  std::uint64_t g4irsf17_source_policy_trace_dropped_count = 0;
+  int g4irsf17_source_policy_runtime_global_scan_count = 0;
+  int g4irsf17_source_policy_future_route_input_count = 0;
+  int g4irsf17_source_policy_future_schedule_input_count = 0;
+  int g4irsf17_source_policy_full_astar_call_count = 0;
 };
 
 struct EventRuntimeJunctionResult {
@@ -1167,6 +1284,73 @@ struct EventRuntimeSourceOpportunityRow {
   bool batched_arbitration = false;
 };
 
+// A row closes one actual interval between two source-admission evaluations
+// (or between the final evaluation and runtime stop).  affected_bag_count is
+// constant over the interval because every source enqueue/dequeue itself
+// triggers another evaluation; wait_bag_seconds is therefore additive.
+struct EventRuntimeSourceWaitBlockerRow {
+  std::uint64_t interval_ordinal = 0;
+  std::string reason;
+  int reason_precedence = 0;
+  int source_node = -1;
+  int blocker_node = -1;
+  std::string blocker_resource;
+  int blocker_resource_from_node = -1;
+  int blocker_resource_to_node = -1;
+  std::uint64_t source_generation = 0;
+  std::uint64_t blocker_generation = 0;
+  double wait_start_time = 0.0;
+  double wait_end_time = 0.0;
+  double wait_seconds = 0.0;
+  int affected_bag_count = 0;
+  double wait_bag_seconds = 0.0;
+  // Identity is trace-only and is never consumed by admission/scoring.
+  int selected_task_id = -1;
+  int selected_runtime_bag_id = -1;
+  std::string selected_segment_id;
+};
+
+struct EventRuntimeG4IRSF17SourcePolicyRow {
+  std::uint64_t decision_ordinal = 0;
+  double event_time = 0.0;
+  int source_node = -1;
+  std::string mode;
+  std::string kind;
+  std::string artifact_set_id;
+  int top_k = 0;
+  int source_queue_length = 0;
+  std::uint64_t source_generation = 0;
+  std::vector<int> candidate_queue_indices;
+  // Identity is trace-only and is never part of the numeric observation.
+  std::vector<int> candidate_task_ids;
+  std::vector<int> candidate_runtime_bag_ids;
+  std::vector<std::string> candidate_segment_ids;
+  std::vector<std::array<double,
+                         kG4IRSF17SourceCandidateFeatureCount>>
+      candidate_features;
+  std::array<double, kG4IRSF17SourceContextFeatureCount>
+      context_features{};
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      pairwise_features{};
+  int baseline_candidate_index = 0;
+  int treatment_candidate_index = 0;
+  int proposed_candidate_index = 0;
+  int chosen_candidate_index = 0;
+  int baseline_queue_index = 0;
+  int treatment_queue_index = 0;
+  int proposed_queue_index = 0;
+  int chosen_queue_index = 0;
+  bool activated = false;
+  bool out_of_distribution = false;
+  bool supervisor_authorized = false;
+  std::string reason;
+  double model_score = 0.0;
+  double benefit_probability_lcb = 0.0;
+  double harmful_probability_ucb = 1.0;
+  double utility_lcb_seconds = 0.0;
+  double calibration_ece = 1.0;
+};
+
 struct EventRuntimeJunctionOpportunityRow {
   double event_time = 0.0;
   std::uint64_t timestamp_bits = 0;
@@ -1250,6 +1434,10 @@ struct EventDrivenJunctionResult {
   std::vector<EventRuntimeCreditAuditRow> credit_events;
   std::vector<EventRuntimePIBTAuditRow> pibt_events;
   std::vector<EventRuntimeSourceOpportunityRow> source_admission_opportunities;
+  std::vector<EventRuntimeSourceWaitBlockerRow>
+      g4irsf17_source_wait_blockers;
+  std::vector<EventRuntimeG4IRSF17SourcePolicyRow>
+      g4irsf17_source_policy_decisions;
   std::vector<EventRuntimeJunctionOpportunityRow> junction_arbitration_opportunities;
   std::vector<EventRuntimeMergeVisibilityRow> merge_request_visibility;
   std::vector<EventRuntimeEventSeqAuditRow> event_seq_ordering_audit;
@@ -1593,6 +1781,100 @@ static_assert(
     std::is_nothrow_move_constructible_v<
         LocalCalendar::PreparedExactReservation>);
 
+enum class G4IRSF17SourceWaitResource : std::uint8_t {
+  kSourceServiceCalendar,
+  kSourceLocalQueue,
+  kFirstEdgeCredit,
+  kDestinationQueue,
+  kDestinationMergeToken,
+  kPhysicalEdge,
+  kSupervisorState,
+  kPIBTOrRecoveryTransaction,
+  kOtherLocalResource,
+};
+
+inline const char* g4irsf17_source_wait_resource_name(
+    G4IRSF17SourceWaitResource resource) noexcept {
+  switch (resource) {
+    case G4IRSF17SourceWaitResource::kSourceServiceCalendar:
+      return "SOURCE_SERVICE_CALENDAR";
+    case G4IRSF17SourceWaitResource::kSourceLocalQueue:
+      return "SOURCE_LOCAL_QUEUE";
+    case G4IRSF17SourceWaitResource::kFirstEdgeCredit:
+      return "FIRST_EDGE_CREDIT";
+    case G4IRSF17SourceWaitResource::kDestinationQueue:
+      return "DESTINATION_QUEUE";
+    case G4IRSF17SourceWaitResource::kDestinationMergeToken:
+      return "DESTINATION_MERGE_TOKEN";
+    case G4IRSF17SourceWaitResource::kPhysicalEdge:
+      return "PHYSICAL_DIRECTED_EDGE";
+    case G4IRSF17SourceWaitResource::kSupervisorState:
+      return "LOCAL_SUPERVISOR_STATE";
+    case G4IRSF17SourceWaitResource::kPIBTOrRecoveryTransaction:
+      return "LOCAL_PIBT_OR_RECOVERY_TRANSACTION";
+    case G4IRSF17SourceWaitResource::kOtherLocalResource:
+      return "OTHER_BOUNDED_LOCAL_RESOURCE";
+  }
+  return "OTHER_BOUNDED_LOCAL_RESOURCE";
+}
+
+struct G4IRSF17SourceBlockerObservation {
+  bool valid = false;
+  G4IRSF17SourceWaitReason reason =
+      G4IRSF17SourceWaitReason::kOtherExplicitReason;
+  G4IRSF17SourceWaitResource resource =
+      G4IRSF17SourceWaitResource::kOtherLocalResource;
+  int blocker_node = -1;
+  int resource_from_node = -1;
+  int resource_to_node = -1;
+  std::uint64_t blocker_generation = 0;
+
+  void consider(G4IRSF17SourceWaitReason candidate_reason,
+                G4IRSF17SourceWaitResource candidate_resource,
+                int candidate_blocker_node,
+                int candidate_resource_from_node,
+                int candidate_resource_to_node,
+                std::uint64_t candidate_generation) noexcept {
+    const auto candidate_key = std::make_tuple(
+        g4irsf17_source_wait_reason_precedence(candidate_reason),
+        candidate_blocker_node,
+        static_cast<int>(candidate_resource),
+        candidate_resource_from_node,
+        candidate_resource_to_node,
+        candidate_generation);
+    const auto current_key = std::make_tuple(
+        g4irsf17_source_wait_reason_precedence(reason),
+        blocker_node,
+        static_cast<int>(resource),
+        resource_from_node,
+        resource_to_node,
+        blocker_generation);
+    if (!valid || candidate_key < current_key) {
+      valid = true;
+      reason = candidate_reason;
+      resource = candidate_resource;
+      blocker_node = candidate_blocker_node;
+      resource_from_node = candidate_resource_from_node;
+      resource_to_node = candidate_resource_to_node;
+      blocker_generation = candidate_generation;
+    }
+  }
+};
+
+struct G4IRSF17ActiveSourceWait {
+  G4IRSF17SourceBlockerObservation blocker;
+  double started_at = 0.0;
+  std::uint64_t source_generation = 0;
+  int affected_bag_count = 0;
+  int selected_runtime_bag_id = -1;
+};
+
+struct G4IRSF17LocalBlockerState {
+  bool valid = false;
+  G4IRSF17SourceBlockerObservation blocker;
+  std::uint64_t generation = 0;
+};
+
 enum class BagStatus {
   kPendingRelease,
   kSourceQueue,
@@ -1655,12 +1937,21 @@ struct JunctionState {
   bool source_wakeup_pending = false;
   bool junction_wakeup_pending = false;
   int escape_token_task = -1;
+  std::uint64_t g4irsf17_source_generation = 0;
+  std::optional<G4IRSF17ActiveSourceWait>
+      g4irsf17_active_source_wait;
+  G4IRSF17LocalBlockerState g4irsf17_local_blocker;
+  G4IRSF17SourceTemporalState g4irsf17_source_temporal;
 
   [[nodiscard]] std::size_t current_local_state_accounted_bytes() const noexcept {
     // std::deque does not expose retained block capacity, so live element
     // payload is the strongest portable lower bound available here.
     return sizeof(JunctionState) + source_queue.size() * sizeof(int) +
            queue.size() * sizeof(int) +
+           (g4irsf17_source_temporal.releases.timestamps.size() +
+            g4irsf17_source_temporal.admissions.timestamps.size() +
+            g4irsf17_source_temporal.service_completions.timestamps.size()) *
+               sizeof(double) +
            service_calendar.dynamic_interval_capacity_accounted_bytes();
   }
 
@@ -1713,7 +2004,56 @@ struct CongestionBeaconState {
   double service_calendar_reserved_until = 0.0;
   double received_at = 0.0;
   std::uint64_t generation = 0;
+  G4IRSF17LocalBlockerState g4irsf17_local_blocker;
+  int g4irsf17_merge_pending_request_count = 0;
+  int g4irsf17_merge_active_grant_count = 0;
+  std::uint64_t g4irsf17_merge_generation = 0;
+  double g4irsf17_estimated_service_rate_60s = 0.0;
+  double g4irsf17_drain_slope_60s = 0.0;
+  double g4irsf17_one_hop_ttl_pressure = 0.0;
+  double g4irsf17_merge_oldest_request_age_seconds = 0.0;
+  double g4irsf17_recent_incoming_grants_60s = 0.0;
+  double g4irsf17_incoming_grant_imbalance_60s = 0.0;
 };
+
+constexpr std::size_t align_accounted_size(std::size_t value,
+                                           std::size_t alignment) noexcept {
+  return ((value + alignment - 1U) / alignment) * alignment;
+}
+
+// The accounted-byte scalar is part of the frozen telemetry-off payload.
+// These offsets recover the pre-G17 object footprints even though the new
+// state is append-only in the live C++ layouts.
+inline constexpr std::size_t kPreG4IRSF17JunctionStateBytes =
+    align_accounted_size(
+        offsetof(JunctionState, g4irsf17_source_generation),
+        alignof(JunctionState));
+inline constexpr std::size_t kPreG4IRSF17CongestionBeaconStateBytes =
+    align_accounted_size(
+        offsetof(CongestionBeaconState, g4irsf17_local_blocker),
+        alignof(CongestionBeaconState));
+inline constexpr std::size_t kG4IRSF17JunctionStateExtensionBytes =
+    sizeof(JunctionState) - kPreG4IRSF17JunctionStateBytes;
+inline constexpr std::size_t kPreG4IRSF17SummaryBytes =
+    align_accounted_size(
+        offsetof(EventRuntimeSummary,
+                 g4irsf17_source_wait_telemetry_enabled),
+        alignof(EventRuntimeSummary));
+inline constexpr std::size_t kG4IRSF17SummaryExtensionBytes =
+    sizeof(EventRuntimeSummary) - kPreG4IRSF17SummaryBytes;
+inline constexpr std::size_t kG4IRSF17ConfigExtensionBytes =
+    sizeof(bool) + (alignof(int) - sizeof(bool)) + sizeof(int) +
+    sizeof(G4IRSF17SourcePolicyConfig) + sizeof(int)
+#ifndef CZR005_EVENT_RUNTIME_TESTING
+    + (alignof(G4IRSF17SourcePolicyConfig) - sizeof(int))
+#endif
+    ;
+inline constexpr std::size_t kG4IRSF17ResultExtensionBytes =
+    kG4IRSF17SummaryExtensionBytes +
+    sizeof(std::vector<EventRuntimeSourceWaitBlockerRow>) +
+    sizeof(std::vector<EventRuntimeG4IRSF17SourcePolicyRow>);
+inline constexpr std::size_t kG4IRSF17RuntimeExtensionBytes =
+    kG4IRSF17ConfigExtensionBytes + kG4IRSF17ResultExtensionBytes;
 
 struct RuntimeEvent {
   JunctionEventType type = JunctionEventType::kBagRelease;
@@ -1854,6 +2194,9 @@ struct DestinationMergeBagState {
   double pending_request_time = -1.0;
   double first_contention_time = -1.0;
   double grant_wait_seconds = 0.0;
+  // Minted only by a valid EDGE_ENTER that observes the exact committed
+  // capability at its original fault generations while the edge is healthy.
+  bool exact_grant_edge_entry_observed = false;
   std::optional<MergeGrantCapability> capability;
 };
 
@@ -1865,6 +2208,7 @@ struct DestinationMergeBagStateCheckpoint {
   double pending_request_time = -1.0;
   double first_contention_time = -1.0;
   double grant_wait_seconds = 0.0;
+  bool exact_grant_edge_entry_observed = false;
   std::optional<MergeGrantCapabilityCheckpoint> capability;
 };
 
@@ -2081,6 +2425,11 @@ class EventDrivenJunctionRuntime {
     runtime_started_ = std::chrono::steady_clock::now();
     reset();
     result_.summary.requested_count = static_cast<int>(requests.size());
+    // Initialization publishes one release event per request before the
+    // runtime starts draining.  Reserve that known lower bound once so the
+    // priority queue does not repeatedly relocate RuntimeEvent strings while
+    // loading large fixed-map scale inputs.  Capacity never affects ordering.
+    events_.reserve(requests.size() + 2 * fault_windows.size());
     result_.summary.diagnostic_hops = config_.diagnostic_hops;
     result_.summary.trace_limit = config_.trace_limit;
     result_.summary.event_trace_limit = effective_event_trace_limit();
@@ -2092,6 +2441,23 @@ class EventDrivenJunctionRuntime {
     result_.summary.event_semantics_echo = config_.event_semantics;
     result_.summary.opportunity_telemetry_enabled =
         config_.enable_opportunity_telemetry;
+    result_.summary.g4irsf17_source_wait_telemetry_enabled =
+        config_.enable_g4irsf17_source_wait_telemetry;
+    if (g4irsf17_source_policy_enabled()) {
+      result_.summary.g4irsf17_source_policy_mode =
+          config_.g4irsf17_source_policy.mode;
+      result_.summary.g4irsf17_source_policy_kind =
+          config_.g4irsf17_source_policy.kind;
+      result_.summary.g4irsf17_source_policy_artifact_set_id =
+          config_.g4irsf17_source_policy.artifact_set_id;
+      result_.summary.g4irsf17_source_policy_authorized =
+          config_.g4irsf17_source_policy.authorized;
+      result_.summary
+          .g4irsf17_source_policy_runtime_closed_loop_authorized =
+          config_.g4irsf17_source_policy.runtime_closed_loop_authorized;
+      result_.summary.g4irsf17_source_policy_top_k =
+          config_.g4irsf17_source_policy.top_k;
+    }
     result_.summary.merge_grant_runtime_owned_capability =
         uses_destination_merge_grants();
     result_.summary.merge_grant_exact_slot_no_future_shift =
@@ -3139,6 +3505,16 @@ class EventDrivenJunctionRuntime {
           boundary.baseline_release;
       skeleton.source_ready_order =
           std::move(boundary.source_ready_order);
+      skeleton.g4irsf17_i1_observation_available =
+          boundary.g4irsf17_i1_observation_available;
+      skeleton.g4irsf17_i1_observation_peer_runtime_bag_id =
+          boundary.g4irsf17_i1_observation_peer_runtime_bag_id;
+      skeleton.g4irsf17_i1_baseline_observation =
+          boundary.g4irsf17_i1_baseline_observation;
+      skeleton.g4irsf17_i1_treatment_observation =
+          boundary.g4irsf17_i1_treatment_observation;
+      skeleton.g4irsf17_i1_pairwise_features =
+          boundary.g4irsf17_i1_pairwise_features;
       skeleton.legal_next_edges =
           std::move(boundary.legal_next_edges);
       active_causal_step_->skeleton_result
@@ -3390,6 +3766,16 @@ class EventDrivenJunctionRuntime {
 
   bool g4irsf16_closed_loop() const {
     return canonical_g4irsf16_supervisor_mode() == "closed_loop";
+  }
+
+  bool g4irsf17_source_policy_enabled() const noexcept {
+    return config_.g4irsf17_source_policy.enabled();
+  }
+
+  bool g4irsf17_extensions_enabled() const noexcept {
+    return config_.enable_g4irsf17_source_wait_telemetry ||
+           g4irsf17_source_policy_enabled() ||
+           config_.enable_g4irsf17_causal_source_features;
   }
 
   bool g4irsf16_uses_diagnostic_rule() const noexcept {
@@ -4002,6 +4388,15 @@ class EventDrivenJunctionRuntime {
         config_.pressure_distance_bias < 0.0) {
       throw std::invalid_argument("event runtime pressure weights must be non-negative");
     }
+    if (config_.g4irsf17_source_wait_trace_limit < 0) {
+      throw std::invalid_argument(
+          "g4irsf17_source_wait_trace_limit must be non-negative");
+    }
+    config_.g4irsf17_source_policy.validate();
+    if (config_.g4irsf17_source_policy_trace_limit < 0) {
+      throw std::invalid_argument(
+          "g4irsf17_source_policy_trace_limit must be non-negative");
+    }
     if (!std::isfinite(config_.credit_validity_seconds) ||
         !std::isfinite(config_.credit_snapshot_max_age_seconds) ||
         config_.credit_validity_seconds <= 0.0 ||
@@ -4486,6 +4881,10 @@ class EventDrivenJunctionRuntime {
       bag.source_enqueued_at = event.time;
       bag.local_enqueue_sequence = next_local_enqueue_sequence_++;
       controller.source_queue.push_back(event.task_id);
+      if (g4irsf17_source_policy_enabled() ||
+          config_.enable_g4irsf17_causal_source_features) {
+        controller.g4irsf17_source_temporal.releases.record(event.time);
+      }
       update_queue_maxima(controller);
       observe_source_enqueue(event.node, event.time);
       schedule_passive(JunctionEventType::kLocalQueueUpdate,
@@ -4592,22 +4991,480 @@ class EventDrivenJunctionRuntime {
     }
   }
 
+  void g4irsf17_close_source_wait_interval(int source_node,
+                                           double end_time) {
+    if (!config_.enable_g4irsf17_source_wait_telemetry) {
+      return;
+    }
+    auto found = junctions_.find(source_node);
+    if (found == junctions_.end() ||
+        !found->second.g4irsf17_active_source_wait.has_value()) {
+      return;
+    }
+    const auto active =
+        *found->second.g4irsf17_active_source_wait;
+    found->second.g4irsf17_active_source_wait.reset();
+    const double seconds =
+        std::max(0.0, end_time - active.started_at);
+    if (seconds <= event_runtime_detail::kEpsilon) {
+      return;
+    }
+
+    EventRuntimeSourceWaitBlockerRow row;
+    row.interval_ordinal =
+        result_.summary.g4irsf17_source_wait_interval_total_count + 1;
+    row.reason =
+        g4irsf17_source_wait_reason_name(active.blocker.reason);
+    row.reason_precedence =
+        g4irsf17_source_wait_reason_precedence(active.blocker.reason);
+    row.source_node = source_node;
+    row.blocker_node = active.blocker.blocker_node;
+    row.blocker_resource = g4irsf17_source_wait_resource_name(
+        active.blocker.resource);
+    row.blocker_resource_from_node =
+        active.blocker.resource_from_node;
+    row.blocker_resource_to_node =
+        active.blocker.resource_to_node;
+    row.source_generation = active.source_generation;
+    row.blocker_generation =
+        active.blocker.blocker_generation;
+    row.wait_start_time = active.started_at;
+    row.wait_end_time = end_time;
+    row.wait_seconds = seconds;
+    row.affected_bag_count = active.affected_bag_count;
+    row.wait_bag_seconds =
+        seconds * static_cast<double>(active.affected_bag_count);
+    row.selected_runtime_bag_id =
+        active.selected_runtime_bag_id;
+    const auto bag = bags_.find(active.selected_runtime_bag_id);
+    if (bag != bags_.end()) {
+      row.selected_task_id = bag->second.request.task_id;
+      row.selected_segment_id = bag->second.request.segment_id;
+    }
+
+    ++result_.summary.g4irsf17_source_wait_interval_total_count;
+    result_.summary.g4irsf17_source_wait_seconds += seconds;
+    result_.summary.g4irsf17_source_wait_bag_seconds +=
+        row.wait_bag_seconds;
+    const auto reason_index =
+        static_cast<std::size_t>(active.blocker.reason);
+    ++result_.summary
+          .g4irsf17_source_wait_reason_interval_counts[reason_index];
+    result_.summary.g4irsf17_source_wait_reason_seconds[reason_index] +=
+        seconds;
+    result_.summary
+        .g4irsf17_source_wait_reason_bag_seconds[reason_index] +=
+        row.wait_bag_seconds;
+    if (result_.g4irsf17_source_wait_blockers.size() <
+        static_cast<std::size_t>(
+            config_.g4irsf17_source_wait_trace_limit)) {
+      ++result_.summary.g4irsf17_source_wait_interval_stored_count;
+      result_.g4irsf17_source_wait_blockers.push_back(
+          std::move(row));
+    } else {
+      ++result_.summary.g4irsf17_source_wait_interval_dropped_count;
+    }
+  }
+
+  void g4irsf17_open_source_wait_interval(
+      int source_node,
+      double start_time,
+      std::uint64_t source_generation,
+      int selected_runtime_bag_id,
+      const event_runtime_detail::G4IRSF17SourceBlockerObservation& blocker) {
+    if (!config_.enable_g4irsf17_source_wait_telemetry) {
+      return;
+    }
+    auto& controller = junctions_[source_node];
+    event_runtime_detail::G4IRSF17ActiveSourceWait active;
+    active.blocker = blocker;
+    if (!active.blocker.valid) {
+      active.blocker.consider(
+          G4IRSF17SourceWaitReason::kOtherExplicitReason,
+          event_runtime_detail::G4IRSF17SourceWaitResource::
+              kOtherLocalResource,
+          source_node,
+          source_node,
+          source_node,
+          source_generation);
+    }
+    active.started_at = start_time;
+    active.source_generation = source_generation;
+    active.affected_bag_count =
+        static_cast<int>(controller.source_queue.size());
+    active.selected_runtime_bag_id = selected_runtime_bag_id;
+    controller.g4irsf17_active_source_wait = std::move(active);
+  }
+
+  void g4irsf17_set_local_blocker(
+      int node,
+      event_runtime_detail::G4IRSF17SourceBlockerObservation blocker) {
+    if (!g4irsf17_extensions_enabled()) {
+      return;
+    }
+    auto& state = junctions_[node].g4irsf17_local_blocker;
+    ++state.generation;
+    state.valid = true;
+    blocker.valid = true;
+    state.blocker = std::move(blocker);
+  }
+
+  void g4irsf17_clear_local_blocker(int node) noexcept {
+    if (!g4irsf17_extensions_enabled()) {
+      return;
+    }
+    const auto found = junctions_.find(node);
+    if (found == junctions_.end()) {
+      return;
+    }
+    auto& state = found->second.g4irsf17_local_blocker;
+    ++state.generation;
+    state.valid = false;
+    state.blocker = {};
+  }
+
+  int g4irsf17_source_leg_priority(const BagState& bag) const noexcept {
+    const auto has_suffix = [&](const char* suffix) {
+      const std::string value(suffix);
+      return bag.request.segment_id.size() >= value.size() &&
+             bag.request.segment_id.compare(
+                 bag.request.segment_id.size() - value.size(),
+                 value.size(), value) == 0;
+    };
+    // Only a fixed semantic suffix is decoded.  The segment identity itself
+    // is never supplied to the model and cannot become a codebook.
+    if (has_suffix(":direct")) {
+      return 2;
+    }
+    if (has_suffix(":storage_out")) {
+      return 1;
+    }
+    if (has_suffix(":storage_in")) {
+      return -1;
+    }
+    return 0;
+  }
+
+  G4IRSF17SourceCandidateObservation
+  g4irsf17_source_candidate_observation(
+      const BagState& bag, int local_rank, double time) const noexcept {
+    G4IRSF17SourceCandidateObservation observation;
+    observation.local_rank = local_rank;
+    observation.deadline_slack_seconds = g4irsf17_finite_clip(
+        bag.request.deadline >= 0.0
+            ? bag.request.deadline - time
+            : 86400.0,
+        -86400.0,
+        86400.0);
+    observation.wait_age_seconds = g4irsf17_finite_clip(
+        std::max(0.0, time - bag.source_enqueued_at),
+        0.0,
+        86400.0);
+    observation.leg_priority = g4irsf17_source_leg_priority(bag);
+    observation.repair_priority = bag.repaired_task_reentry;
+    return observation;
+  }
+
+  G4IRSF17SourceContextObservation
+  g4irsf17_source_context_observation(
+      int node,
+      double time,
+      std::uint64_t source_generation,
+      const BagState& baseline_bag,
+      event_runtime_detail::JunctionState& controller) {
+    G4IRSF17SourceContextObservation context;
+    const double queue_length =
+        static_cast<double>(controller.source_queue.size());
+    const double source_capacity =
+        static_cast<double>(
+            config_.local_queue_capacity > 0
+                ? config_.local_queue_capacity
+                : std::max<std::size_t>(1U,
+                                        controller.source_queue.size()));
+    context.source_queue_length = queue_length;
+    context.source_queue_capacity = source_capacity;
+    context.source_queue_utilization =
+        std::min(1.0, queue_length / source_capacity);
+    auto& temporal = controller.g4irsf17_source_temporal;
+    context.source_queue_generation_delta =
+        static_cast<double>(std::min<std::uint64_t>(
+            4096U,
+            source_generation >= temporal.last_observed_source_generation
+                ? source_generation -
+                      temporal.last_observed_source_generation
+                : 0U));
+    temporal.last_observed_source_generation = source_generation;
+    context.release_count_10s = temporal.releases.count(time, 10.0);
+    context.release_count_30s = temporal.releases.count(time, 30.0);
+    context.release_count_60s = temporal.releases.count(time, 60.0);
+    context.admission_count_10s = temporal.admissions.count(time, 10.0);
+    context.admission_count_30s = temporal.admissions.count(time, 30.0);
+    context.admission_count_60s = temporal.admissions.count(time, 60.0);
+    context.queue_slope_10s =
+        (context.release_count_10s - context.admission_count_10s) / 10.0;
+    context.queue_slope_30s =
+        (context.release_count_30s - context.admission_count_30s) / 30.0;
+    context.queue_slope_60s =
+        (context.release_count_60s - context.admission_count_60s) / 60.0;
+
+    if (baseline_bag.first_edge_credit_id != 0) {
+      const auto* credit =
+          credit_ledger_.find(baseline_bag.first_edge_credit_id);
+      if (credit != nullptr) {
+        context.first_edge_credit_slack_seconds =
+            g4irsf17_finite_clip(
+                std::min(credit->latest, credit->expiry) - time,
+                -3600.0,
+                3600.0);
+      }
+    }
+
+    auto outgoing = graph_.outgoing(node);
+    std::sort(outgoing.begin(), outgoing.end());
+    if (outgoing.size() > 4U) {
+      outgoing.resize(4U);
+    }
+    const event_runtime_detail::CongestionBeaconState* selected = nullptr;
+    int selected_pressure = -1;
+    std::uint64_t merge_generation = 0;
+    for (const int downstream : outgoing) {
+      const auto found = congestion_beacons_.find(downstream);
+      if (found == congestion_beacons_.end() ||
+          time - found->second.received_at >
+              60.0 + event_runtime_detail::kEpsilon) {
+        continue;
+      }
+      const int pressure = found->second.queue_length +
+                           found->second.scheduled_incoming;
+      context.one_hop_ttl_pressure = std::max(
+          context.one_hop_ttl_pressure,
+          static_cast<double>(pressure));
+      context.two_hop_ttl_pressure = std::max(
+          context.two_hop_ttl_pressure,
+          found->second.g4irsf17_one_hop_ttl_pressure);
+      context.merge_pending_count = std::max(
+          context.merge_pending_count,
+          static_cast<double>(
+              found->second.g4irsf17_merge_pending_request_count));
+      context.merge_oldest_request_age_seconds = std::max(
+          context.merge_oldest_request_age_seconds,
+          found->second.g4irsf17_merge_oldest_request_age_seconds);
+      context.recent_incoming_grants_60s = std::max(
+          context.recent_incoming_grants_60s,
+          found->second.g4irsf17_recent_incoming_grants_60s);
+      context.incoming_grant_imbalance_60s = std::max(
+          context.incoming_grant_imbalance_60s,
+          found->second.g4irsf17_incoming_grant_imbalance_60s);
+      merge_generation = std::max(
+          merge_generation, found->second.g4irsf17_merge_generation);
+      if (pressure > selected_pressure) {
+        selected_pressure = pressure;
+        selected = &found->second;
+      }
+    }
+    context.merge_token_generation_delta =
+        static_cast<double>(std::min<std::uint64_t>(
+            4096U,
+            merge_generation >= temporal.last_observed_merge_generation
+                ? merge_generation - temporal.last_observed_merge_generation
+                : 0U));
+    temporal.last_observed_merge_generation = merge_generation;
+    if (selected != nullptr) {
+      context.target_queue_length = selected->queue_length;
+      const double target_capacity =
+          static_cast<double>(
+              config_.local_queue_capacity > 0
+                  ? config_.local_queue_capacity
+                  : std::max(1, selected_pressure));
+      context.target_queue_capacity = target_capacity;
+      context.target_queue_utilization = std::min(
+          1.0, static_cast<double>(selected_pressure) / target_capacity);
+      context.target_scheduled_incoming = selected->scheduled_incoming;
+      context.estimated_service_rate_60s =
+          selected->g4irsf17_estimated_service_rate_60s;
+      context.drain_slope_60s = selected->g4irsf17_drain_slope_60s;
+      context.service_weighted_pressure =
+          static_cast<double>(selected_pressure) /
+          std::max(1.0 / 60.0,
+                   context.estimated_service_rate_60s);
+      context.time_to_next_service_opportunity_seconds =
+          std::max(0.0,
+                   selected->service_calendar_reserved_until - time);
+    }
+    return context;
+  }
+
+  bool g4irsf17_source_supervisor_authorized(
+      const event_runtime_detail::JunctionState& controller) const noexcept {
+    if (active_causal_step_ != nullptr || controller.escape_token_task >= 0) {
+      return false;
+    }
+    if (!controller.g4irsf17_local_blocker.valid) {
+      return true;
+    }
+    const auto reason = controller.g4irsf17_local_blocker.blocker.reason;
+    return reason != G4IRSF17SourceWaitReason::kPhysicalFaultOrGeneration &&
+           reason != G4IRSF17SourceWaitReason::kSupervisorHold &&
+           reason !=
+               G4IRSF17SourceWaitReason::kPIBTOrRecoveryTransaction;
+  }
+
+  std::size_t g4irsf17_apply_source_policy(
+      int node,
+      double time,
+      std::uint64_t source_generation,
+      std::size_t baseline_queue_index,
+      event_runtime_detail::JunctionState& controller,
+      const G4IRSF17SourceContextObservation& context) {
+    if (!g4irsf17_source_policy_enabled() ||
+        controller.source_queue.size() < 2U) {
+      return baseline_queue_index;
+    }
+    const auto& policy = config_.g4irsf17_source_policy;
+    std::vector<std::size_t> queue_indices;
+    queue_indices.reserve(static_cast<std::size_t>(policy.top_k));
+    queue_indices.push_back(baseline_queue_index);
+    for (std::size_t index = 0;
+         index < controller.source_queue.size() &&
+         queue_indices.size() < static_cast<std::size_t>(policy.top_k);
+         ++index) {
+      if (index != baseline_queue_index) {
+        queue_indices.push_back(index);
+      }
+    }
+
+    std::vector<G4IRSF17SourceCandidateObservation> candidates;
+    candidates.reserve(queue_indices.size());
+    for (std::size_t rank = 0; rank < queue_indices.size(); ++rank) {
+      candidates.push_back(g4irsf17_source_candidate_observation(
+          bags_.at(controller.source_queue[queue_indices[rank]]),
+          static_cast<int>(rank),
+          time));
+    }
+    const auto decision = g4irsf17_decide_source_front(
+        policy,
+        candidates,
+        context,
+        g4irsf17_source_supervisor_authorized(controller));
+
+    ++result_.summary.g4irsf17_source_policy_evaluation_count;
+    if (decision.proposed_index != 0) {
+      ++result_.summary.g4irsf17_source_policy_change_proposal_count;
+    }
+    if (decision.activated) {
+      ++result_.summary.g4irsf17_source_policy_activation_count;
+    } else {
+      ++result_.summary.g4irsf17_source_policy_abstention_count;
+    }
+    if (decision.out_of_distribution) {
+      ++result_.summary.g4irsf17_source_policy_ood_abstention_count;
+    }
+    if (decision.reason == "SUPERVISOR_GATE") {
+      ++result_.summary
+            .g4irsf17_source_policy_supervisor_abstention_count;
+    }
+
+    EventRuntimeG4IRSF17SourcePolicyRow row;
+    row.decision_ordinal =
+        ++result_.summary.g4irsf17_source_policy_trace_total_count;
+    row.event_time = time;
+    row.source_node = node;
+    row.mode = policy.mode;
+    row.kind = policy.kind;
+    row.artifact_set_id = policy.artifact_set_id;
+    row.top_k = policy.top_k;
+    row.source_queue_length =
+        static_cast<int>(controller.source_queue.size());
+    row.source_generation = source_generation;
+    row.baseline_candidate_index = 0;
+    row.treatment_candidate_index = decision.treatment_index;
+    row.proposed_candidate_index = decision.proposed_index;
+    row.chosen_candidate_index = decision.chosen_index;
+    row.baseline_queue_index =
+        static_cast<int>(queue_indices[0]);
+    row.treatment_queue_index = static_cast<int>(
+        queue_indices[static_cast<std::size_t>(decision.treatment_index)]);
+    row.proposed_queue_index = static_cast<int>(
+        queue_indices[static_cast<std::size_t>(decision.proposed_index)]);
+    row.chosen_queue_index = static_cast<int>(
+        queue_indices[static_cast<std::size_t>(decision.chosen_index)]);
+    row.activated = decision.activated;
+    row.out_of_distribution = decision.out_of_distribution;
+    row.supervisor_authorized = decision.supervisor_authorized;
+    row.reason = decision.reason;
+    row.model_score = decision.model_score;
+    row.benefit_probability_lcb =
+        decision.benefit_probability_lcb;
+    row.harmful_probability_ucb =
+        decision.harmful_probability_ucb;
+    row.utility_lcb_seconds = decision.utility_lcb_seconds;
+    row.calibration_ece = decision.calibration_ece;
+    row.context_features = context.values();
+    row.pairwise_features = decision.pairwise_features;
+    const auto& baseline = candidates[0];
+    for (std::size_t index = 0; index < candidates.size(); ++index) {
+      const auto queue_index = queue_indices[index];
+      const auto& bag =
+          bags_.at(controller.source_queue[queue_index]);
+      row.candidate_queue_indices.push_back(
+          static_cast<int>(queue_index));
+      row.candidate_task_ids.push_back(bag.request.task_id);
+      row.candidate_runtime_bag_ids.push_back(
+          bag.request.runtime_bag_id);
+      row.candidate_segment_ids.push_back(bag.request.segment_id);
+      row.candidate_features.push_back(
+          candidates[index].features_relative_to(baseline));
+    }
+    if (result_.g4irsf17_source_policy_decisions.size() <
+        static_cast<std::size_t>(
+            config_.g4irsf17_source_policy_trace_limit)) {
+      ++result_.summary.g4irsf17_source_policy_trace_stored_count;
+      result_.g4irsf17_source_policy_decisions.push_back(
+          std::move(row));
+    } else {
+      ++result_.summary.g4irsf17_source_policy_trace_dropped_count;
+    }
+    return queue_indices[static_cast<std::size_t>(decision.chosen_index)];
+  }
+
   int try_admit_source(
       int node,
       double time,
       int* chosen_task = nullptr,
       int* priority_comparison_count = nullptr) {
     auto& controller = junctions_[node];
+    g4irsf17_close_source_wait_interval(node, time);
     controller.service_calendar.purge(time);
     controller.observe_local_state();
     if (controller.source_queue.empty()) {
       return -1;
     }
+    const std::uint64_t source_generation =
+        g4irsf17_extensions_enabled()
+            ? ++controller.g4irsf17_source_generation
+            : 0;
     std::size_t queue_index =
         choose_bag(controller.source_queue,
                    time,
                    controller.escape_token_task,
                    priority_comparison_count);
+    std::optional<G4IRSF17SourceContextObservation>
+        g4irsf17_pre_action_context;
+    if (controller.source_queue.size() >= 2U &&
+        (g4irsf17_source_policy_enabled() ||
+         config_.enable_g4irsf17_causal_source_features)) {
+      g4irsf17_pre_action_context.emplace(
+          g4irsf17_source_context_observation(
+              node, time, source_generation,
+              bags_.at(controller.source_queue[queue_index]),
+              controller));
+    }
+    if (g4irsf17_source_policy_enabled() &&
+        g4irsf17_pre_action_context.has_value()) {
+      queue_index = g4irsf17_apply_source_policy(
+          node, time, source_generation, queue_index, controller,
+          *g4irsf17_pre_action_context);
+    }
     bool causal_i1_swap_selected = false;
     int causal_i1_baseline_runtime_bag_id = -1;
     int causal_i1_peer_runtime_bag_id = -1;
@@ -4622,6 +5479,45 @@ class EventDrivenJunctionRuntime {
       boundary.source_ready_order.assign(
           controller.source_queue.begin(),
           controller.source_queue.end());
+      if (config_.enable_g4irsf17_causal_source_features &&
+          g4irsf17_pre_action_context.has_value()) {
+        const int baseline_runtime_bag_id =
+            controller.source_queue[queue_index];
+        int peer_runtime_bag_id =
+            std::numeric_limits<int>::max();
+        for (const int candidate_runtime_bag_id :
+             controller.source_queue) {
+          if (candidate_runtime_bag_id != baseline_runtime_bag_id) {
+            peer_runtime_bag_id = std::min(
+                peer_runtime_bag_id,
+                candidate_runtime_bag_id);
+          }
+        }
+        if (peer_runtime_bag_id !=
+            std::numeric_limits<int>::max()) {
+          const auto baseline_observation =
+              g4irsf17_source_candidate_observation(
+                  bags_.at(baseline_runtime_bag_id), 0, time);
+          const auto treatment_observation =
+              g4irsf17_source_candidate_observation(
+                  bags_.at(peer_runtime_bag_id), 1, time);
+          boundary.g4irsf17_i1_observation_available = true;
+          boundary.g4irsf17_i1_observation_peer_runtime_bag_id =
+              peer_runtime_bag_id;
+          boundary.g4irsf17_i1_baseline_observation =
+              g4irsf17_canonical_source_observation(
+                  baseline_observation, baseline_observation,
+                  *g4irsf17_pre_action_context);
+          boundary.g4irsf17_i1_treatment_observation =
+              g4irsf17_canonical_source_observation(
+                  treatment_observation, baseline_observation,
+                  *g4irsf17_pre_action_context);
+          boundary.g4irsf17_i1_pairwise_features =
+              g4irsf17_pairwise_features(
+                  treatment_observation, baseline_observation,
+                  *g4irsf17_pre_action_context);
+        }
+      }
       if (const auto* intervention =
               observe_causal_boundary(std::move(boundary));
           intervention != nullptr) {
@@ -4658,15 +5554,52 @@ class EventDrivenJunctionRuntime {
     const double duration = service_duration(node);
     ++result_.summary.source_admission_attempt_count;
     const bool queue_has_room = config_.local_queue_capacity <= 0 ||
-                                static_cast<int>(controller.queue.size()) < config_.local_queue_capacity;
-    if (!queue_has_room || !controller.service_calendar.available(time, time + duration, task_id)) {
+                                 static_cast<int>(controller.queue.size()) < config_.local_queue_capacity;
+    if (!queue_has_room) {
+      event_runtime_detail::G4IRSF17SourceBlockerObservation blocker;
+      if (controller.g4irsf17_local_blocker.valid) {
+        blocker = controller.g4irsf17_local_blocker.blocker;
+        blocker.blocker_generation =
+            controller.g4irsf17_local_blocker.generation;
+      } else {
+        blocker.consider(
+            G4IRSF17SourceWaitReason::kOtherExplicitReason,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kSourceLocalQueue,
+            node,
+            node,
+            node,
+            controller.service_calendar.generation());
+      }
       ++result_.summary.source_admission_local_resource_hold_count;
+      g4irsf17_open_source_wait_interval(
+          node, time, source_generation, task_id, blocker);
+      return -1;
+    }
+    if (!controller.service_calendar.available(
+            time, time + duration, task_id)) {
+      event_runtime_detail::G4IRSF17SourceBlockerObservation blocker;
+      blocker.consider(
+          G4IRSF17SourceWaitReason::kSourceServiceNotReady,
+          event_runtime_detail::G4IRSF17SourceWaitResource::
+              kSourceServiceCalendar,
+          node,
+          node,
+          node,
+          controller.service_calendar.generation());
+      ++result_.summary.source_admission_local_resource_hold_count;
+      g4irsf17_open_source_wait_interval(
+          node, time, source_generation, task_id, blocker);
       return -1;
     }
     const auto admission_mode = canonical_admission_mode();
+    event_runtime_detail::G4IRSF17SourceBlockerObservation blocker;
     if (admission_mode == "legacy_unbound" &&
-        !downstream_admission_ready(bag, node, time, duration)) {
+        !downstream_admission_ready(
+            bag, node, time, duration, &blocker)) {
       ++result_.summary.source_admission_downstream_pressure_hold_count;
+      g4irsf17_open_source_wait_interval(
+          node, time, source_generation, task_id, blocker);
       return -1;
     }
     const bool first_edge_credit_required =
@@ -4677,10 +5610,13 @@ class EventDrivenJunctionRuntime {
                                   node,
                                   time,
                                   time + duration,
-                                  false)) {
+                                  false,
+                                  &blocker)) {
       ++result_.summary.source_admission_downstream_pressure_hold_count;
       ++result_.summary.first_edge_credit_local_hold_count;
       request_one_hop_credit_snapshot_refresh(node, time);
+      g4irsf17_open_source_wait_interval(
+          node, time, source_generation, task_id, blocker);
       return -1;
     }
     if (node == bag.request.goal) {
@@ -4691,7 +5627,24 @@ class EventDrivenJunctionRuntime {
     controller.record_service_reservation(time, time + duration);
     update_calendar_maxima(controller, nullptr);
     controller.source_queue.erase(controller.source_queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
+    if (g4irsf17_source_policy_enabled() ||
+        config_.enable_g4irsf17_causal_source_features) {
+      controller.g4irsf17_source_temporal.admissions.record(time);
+    }
     controller.observe_local_state();
+    if (!controller.source_queue.empty()) {
+      event_runtime_detail::G4IRSF17SourceBlockerObservation service_blocker;
+      service_blocker.consider(
+          G4IRSF17SourceWaitReason::kSourceServiceNotReady,
+          event_runtime_detail::G4IRSF17SourceWaitResource::
+              kSourceServiceCalendar,
+          node,
+          node,
+          node,
+          controller.service_calendar.generation());
+      g4irsf17_open_source_wait_interval(
+          node, time, source_generation, -1, service_blocker);
+    }
     bag.status = BagStatus::kInService;
     bag.current = node;
     bag.admitted_time = time;
@@ -4729,16 +5682,29 @@ class EventDrivenJunctionRuntime {
   bool downstream_admission_ready(const BagState& bag,
                                   int node,
                                   double time,
-                                  double source_service_duration) {
+                                  double source_service_duration,
+                                  event_runtime_detail::
+                                      G4IRSF17SourceBlockerObservation*
+                                          blocker = nullptr) {
     if (node == bag.request.goal) {
       return true;
     }
-    const auto& outgoing = graph_.outgoing(node);
+    std::vector<int> outgoing = graph_.outgoing(node);
+    std::sort(outgoing.begin(), outgoing.end());
     bool ready = false;
+    event_runtime_detail::G4IRSF17SourceBlockerObservation observed;
     for (const int downstream : outgoing) {
       ++result_.summary.source_admission_beacon_read_count;
       const auto snapshot = congestion_beacons_.find(downstream);
       if (snapshot == congestion_beacons_.end()) {
+        observed.consider(
+            G4IRSF17SourceWaitReason::kPhysicalFaultOrGeneration,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kPhysicalEdge,
+            downstream,
+            node,
+            downstream,
+            0);
         continue;
       }
       int pressure = snapshot->second.queue_length +
@@ -4786,10 +5752,90 @@ class EventDrivenJunctionRuntime {
       const bool downstream_queue_ready =
           config_.local_queue_capacity <= 0 ||
           pressure < config_.local_queue_capacity;
-      ready = ready ||
-              (physical_edge_ready && local_corridor_ready &&
-               downstream_calendar_ready &&
-               downstream_queue_ready);
+      const bool edge_ready =
+          physical_edge_ready && local_corridor_ready &&
+          downstream_calendar_ready && downstream_queue_ready;
+      ready = ready || edge_ready;
+      if (edge_ready) {
+        continue;
+      }
+      if (!physical_edge_ready) {
+        observed.consider(
+            G4IRSF17SourceWaitReason::kPhysicalFaultOrGeneration,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kPhysicalEdge,
+            downstream,
+            node,
+            downstream,
+            static_cast<std::uint64_t>(
+                physical->second.physical_generation));
+      }
+      if (snapshot->second.g4irsf17_local_blocker.valid) {
+        const auto& local =
+            snapshot->second.g4irsf17_local_blocker;
+        observed.consider(
+            local.blocker.reason,
+            local.blocker.resource,
+            local.blocker.blocker_node,
+            local.blocker.resource_from_node,
+            local.blocker.resource_to_node,
+            local.generation);
+      }
+      if (!downstream_queue_ready) {
+        observed.consider(
+            G4IRSF17SourceWaitReason::kDestinationQueueCapacity,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kDestinationQueue,
+            downstream,
+            node,
+            downstream,
+            snapshot->second.generation);
+      }
+      if (!downstream_calendar_ready) {
+        const bool merge_token =
+            graph_.incoming_degree(downstream) > 1 ||
+            snapshot->second.g4irsf17_merge_pending_request_count > 0 ||
+            snapshot->second.g4irsf17_merge_active_grant_count > 0;
+        observed.consider(
+            merge_token
+                ? G4IRSF17SourceWaitReason::kDestinationMergeToken
+                : G4IRSF17SourceWaitReason::kOtherExplicitReason,
+            merge_token
+                ? event_runtime_detail::G4IRSF17SourceWaitResource::
+                      kDestinationMergeToken
+                : event_runtime_detail::G4IRSF17SourceWaitResource::
+                      kOtherLocalResource,
+            downstream,
+            node,
+            downstream,
+            merge_token
+                ? snapshot->second.g4irsf17_merge_generation
+                : snapshot->second.generation);
+      }
+      if (!local_corridor_ready) {
+        observed.consider(
+            G4IRSF17SourceWaitReason::kOtherExplicitReason,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kOtherLocalResource,
+            downstream,
+            node,
+            downstream,
+            corridors_[resource_corridor_key(node, downstream)]
+                .generation());
+      }
+    }
+    if (!ready && blocker != nullptr) {
+      if (!observed.valid) {
+        observed.consider(
+            G4IRSF17SourceWaitReason::kOtherExplicitReason,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kOtherLocalResource,
+            node,
+            node,
+            node,
+            0);
+      }
+      *blocker = observed;
     }
     return ready;
   }
@@ -4943,7 +5989,10 @@ class EventDrivenJunctionRuntime {
                                 int node,
                                 double time,
                                 double earliest_entry,
-                                bool dispatch_retry) {
+                                bool dispatch_retry,
+                                event_runtime_detail::
+                                    G4IRSF17SourceBlockerObservation*
+                                        blocker = nullptr) {
     if (bag.first_edge_credit_consumed || node == bag.request.goal) {
       return true;
     }
@@ -4968,6 +6017,15 @@ class EventDrivenJunctionRuntime {
       double score = 0.0;
       FirstEdgeCreditIssueRequest request;
     };
+    event_runtime_detail::G4IRSF17SourceBlockerObservation observed;
+    observed.consider(
+        G4IRSF17SourceWaitReason::kFirstEdgeCreditUnavailable,
+        event_runtime_detail::G4IRSF17SourceWaitResource::
+            kFirstEdgeCredit,
+        node,
+        node,
+        node,
+        credit_ledger_.counters().issue_attempt_count);
     std::vector<CandidateOffer> offers;
     std::vector<int> outgoing = graph_.outgoing(node);
     std::sort(outgoing.begin(), outgoing.end());
@@ -5083,12 +6141,73 @@ class EventDrivenJunctionRuntime {
               config_.credit_snapshot_max_age_seconds +
                   event_runtime_detail::kEpsilon;
       if (!snapshot_usable || physical_active) {
+        observed.consider(
+            G4IRSF17SourceWaitReason::kPhysicalFaultOrGeneration,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kPhysicalEdge,
+            downstream,
+            node,
+            downstream,
+            physical_active
+                ? static_cast<std::uint64_t>(fault_generation)
+                : (snapshot == congestion_beacons_.end()
+                       ? 0
+                       : snapshot->second.generation));
         const auto rejected = credit_ledger_.issue(request);
         (void)rejected;
         continue;
       }
       if (!local_corridor_ready || !downstream_calendar_ready ||
           !downstream_queue_ready) {
+        if (snapshot != congestion_beacons_.end() &&
+            snapshot->second.g4irsf17_local_blocker.valid) {
+          const auto& local =
+              snapshot->second.g4irsf17_local_blocker;
+          observed.consider(
+              local.blocker.reason,
+              local.blocker.resource,
+              local.blocker.blocker_node,
+              local.blocker.resource_from_node,
+              local.blocker.resource_to_node,
+              local.generation);
+        }
+        if (!downstream_queue_ready) {
+          observed.consider(
+              G4IRSF17SourceWaitReason::kDestinationQueueCapacity,
+              event_runtime_detail::G4IRSF17SourceWaitResource::
+                  kDestinationQueue,
+              downstream,
+              node,
+              downstream,
+              snapshot == congestion_beacons_.end()
+                  ? 0
+                  : snapshot->second.generation);
+        }
+        if (!downstream_calendar_ready) {
+          const bool merge_token =
+              graph_.incoming_degree(downstream) > 1 ||
+              (snapshot != congestion_beacons_.end() &&
+               (snapshot->second
+                        .g4irsf17_merge_pending_request_count > 0 ||
+                snapshot->second.g4irsf17_merge_active_grant_count > 0));
+          observed.consider(
+              merge_token
+                  ? G4IRSF17SourceWaitReason::kDestinationMergeToken
+                  : G4IRSF17SourceWaitReason::kOtherExplicitReason,
+              merge_token
+                  ? event_runtime_detail::G4IRSF17SourceWaitResource::
+                        kDestinationMergeToken
+                  : event_runtime_detail::G4IRSF17SourceWaitResource::
+                        kOtherLocalResource,
+              downstream,
+              node,
+              downstream,
+              snapshot == congestion_beacons_.end()
+                  ? 0
+                  : (merge_token
+                         ? snapshot->second.g4irsf17_merge_generation
+                         : snapshot->second.generation));
+        }
         continue;
       }
 
@@ -5140,6 +6259,9 @@ class EventDrivenJunctionRuntime {
       }
       return true;
     }
+    if (blocker != nullptr) {
+      *blocker = observed;
+    }
     return false;
   }
 
@@ -5172,6 +6294,11 @@ class EventDrivenJunctionRuntime {
     // never contributes simulated service time.
     found->second.node_service_time_seconds +=
         service_duration(event.node);
+    if (g4irsf17_source_policy_enabled() ||
+        config_.enable_g4irsf17_causal_source_features) {
+      junctions_[event.node]
+          .g4irsf17_source_temporal.service_completions.record(event.time);
+    }
     schedule(JunctionEventType::kArriveJunction,
              event.time,
              event.task_id,
@@ -6266,6 +7393,7 @@ class EventDrivenJunctionRuntime {
             physical_generation);
     bag_merge.capability.emplace(
         std::move(capability));
+    bag_merge.exact_grant_edge_entry_observed = false;
 
     if (queue_capacity_blocked) {
       const auto rollback_grant_and_calendar =
@@ -6419,6 +7547,7 @@ class EventDrivenJunctionRuntime {
     upstream.queue.erase(queue_owner);
     ++bag_merge.junction_queue_generation;
     upstream.observe_local_state();
+    g4irsf17_clear_local_blocker(request.upstream_node);
     upstream.next_dispatch_time =
         event.time +
         config_.dispatch_headway_seconds;
@@ -6469,18 +7598,24 @@ class EventDrivenJunctionRuntime {
             ? &priority_comparison_count
             : nullptr;
     int bounded_local_same_bag_fallback_next = -1;
+    bool bounded_local_pibt_attempted = false;
     // E4 phase 5a is ordinary destination-merge request publication. PIBT
     // must not pre-emptively order that queue; it remains available only
     // after a destination-owned winner/capability exists and an exceptional
     // local blocker requires an atomic handoff.
     if (!uses_destination_merge_grants() &&
         canonical_pibt_mode() != BoundedLocalPIBTMode::kP0) {
+      const auto activation_count_before =
+          result_.summary.bounded_local_pibt_activation_count;
       dispatch =
           try_dispatch_bounded_local_pibt(
               event.node,
               event.time,
               event.seq,
               comparison_counter);
+      bounded_local_pibt_attempted =
+          result_.summary.bounded_local_pibt_activation_count >
+          activation_count_before;
       bounded_local_same_bag_fallback_next =
           dispatch.same_bag_fallback_next;
     }
@@ -6490,7 +7625,8 @@ class EventDrivenJunctionRuntime {
           event.time,
           event.seq,
           bounded_local_same_bag_fallback_next,
-          comparison_counter);
+          comparison_counter,
+          bounded_local_pibt_attempted);
     }
     const int pibt_slice_bag_count =
         g4irsf14_state_ == nullptr
@@ -6507,6 +7643,9 @@ class EventDrivenJunctionRuntime {
                                 pibt_owner_count,
                                 priority_comparison_count,
                                 batched_arbitration);
+    if (dispatch.selected_edge_count > 0) {
+      g4irsf17_clear_local_blocker(event.node);
+    }
     schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
                      event.time,
                      dispatch.task_id >= 0 ? dispatch.task_id : event.task_id,
@@ -6616,6 +7755,7 @@ class EventDrivenJunctionRuntime {
     double pending_request_time = -1.0;
     double first_contention_time = -1.0;
     double grant_wait_seconds = 0.0;
+    bool exact_grant_edge_entry_observed = false;
     bool capability_present = false;
     DestinationMergeGrantExpectation
         capability_identity;
@@ -7118,7 +8258,9 @@ class EventDrivenJunctionRuntime {
 
   void mark_fault_exposure(BagState& bag,
                            long long physical_key,
-                           int physical_generation) {
+                           int physical_generation,
+                           std::optional<int> exact_fault_instance =
+                               std::nullopt) {
     bag.fault_priority_generation =
         std::max(
             bag.fault_priority_generation,
@@ -7139,12 +8281,92 @@ class EventDrivenJunctionRuntime {
         bag.request.runtime_bag_id);
     const auto active_instance =
         active_fault_instance_by_edge_.find(physical_key);
-    if (active_instance != active_fault_instance_by_edge_.end()) {
+    if (exact_fault_instance.has_value()) {
+      fault_instances_by_bag_[bag.request.runtime_bag_id].insert(
+          {physical_key, *exact_fault_instance});
+    } else if (active_instance != active_fault_instance_by_edge_.end()) {
       fault_instances_by_bag_[bag.request.runtime_bag_id].insert(
           {physical_key, active_instance->second});
     }
     result_.summary.fault_affected_bag_count =
         static_cast<int>(fault_affected_bags_.size());
+  }
+
+  [[nodiscard]] bool local_inflight_fault_instance_observed(
+      long long physical_key,
+      int entry_physical_generation,
+      int current_physical_generation) const noexcept {
+    if (entry_physical_generation < 0 ||
+        current_physical_generation <= entry_physical_generation ||
+        entry_physical_generation == std::numeric_limits<int>::max()) {
+      return false;
+    }
+    const auto active = active_fault_instance_by_edge_.find(physical_key);
+    if (active != active_fault_instance_by_edge_.end() &&
+        active->second > entry_physical_generation &&
+        active->second <= current_physical_generation) {
+      return true;
+    }
+    const auto repaired = repair_time_by_fault_instance_.lower_bound(
+        {physical_key, entry_physical_generation + 1});
+    return repaired != repair_time_by_fault_instance_.end() &&
+           repaired->first.first == physical_key &&
+           repaired->first.second <= current_physical_generation;
+  }
+
+  void mark_inflight_fault_generation_recovery(
+      BagState& bag,
+      long long physical_key,
+      int entry_physical_generation,
+      int current_physical_generation,
+      bool physical_fault_active) {
+    bool repaired_instance_observed = false;
+    if (entry_physical_generation != std::numeric_limits<int>::max()) {
+      for (auto repaired = repair_time_by_fault_instance_.lower_bound(
+               {physical_key, entry_physical_generation + 1});
+           repaired != repair_time_by_fault_instance_.end() &&
+           repaired->first.first == physical_key &&
+           repaired->first.second <= current_physical_generation;
+           ++repaired) {
+        mark_fault_exposure(
+            bag,
+            physical_key,
+            current_physical_generation,
+            repaired->first.second);
+        repaired_instance_observed = true;
+      }
+    }
+    const auto active = active_fault_instance_by_edge_.find(physical_key);
+    if (active != active_fault_instance_by_edge_.end() &&
+        active->second > entry_physical_generation &&
+        active->second <= current_physical_generation) {
+      mark_fault_exposure(
+          bag,
+          physical_key,
+          current_physical_generation,
+          active->second);
+    }
+    // A fault repaired before edge exit was not yet associated with this bag
+    // at repair-message time.  Mint the same one-edge repaired priority token
+    // now that the exact in-flight exposure has been proven.
+    if (!physical_fault_active && repaired_instance_observed &&
+        !bag.repaired_task_reentry) {
+      bag.repaired_task_reentry = true;
+      bag.fault_priority_generation = std::max(
+          bag.fault_priority_generation,
+          static_cast<std::uint64_t>(
+              std::max(0, current_physical_generation)));
+      if (g4irsf16_enabled()) {
+        auto& generation = g4irsf16_physical_fault_generation_by_bag_[
+            bag.request.runtime_bag_id];
+        generation = std::max(
+            generation,
+            static_cast<std::uint64_t>(
+                std::max(0, current_physical_generation)));
+      }
+      bag.local_enqueue_sequence = next_local_enqueue_sequence_++;
+      ++result_.summary.repaired_task_reentry_count;
+    }
   }
 
   void clear_consumed_repair_reentry_boost(
@@ -8312,6 +9534,7 @@ class EventDrivenJunctionRuntime {
     mix(counters.prepared_transition_count);
     mix(counters.committed_transition_count);
     mix(counters.consumed_count);
+    mix(counters.inflight_fault_generation_recovery_count);
     mix(counters.expired_count);
     mix(counters.request_expired_count);
     mix(counters.grant_expired_count);
@@ -8588,6 +9811,8 @@ class EventDrivenJunctionRuntime {
               merge->second.first_contention_time;
           saved_merge.grant_wait_seconds =
               merge->second.grant_wait_seconds;
+          saved_merge.exact_grant_edge_entry_observed =
+              merge->second.exact_grant_edge_entry_observed;
           saved_merge.capability_present =
               merge->second.capability.has_value();
           if (saved_merge.capability_present) {
@@ -9057,6 +10282,8 @@ class EventDrivenJunctionRuntime {
                 entry.second.first_contention_time ||
             merge->second.grant_wait_seconds !=
                 entry.second.grant_wait_seconds ||
+            merge->second.exact_grant_edge_entry_observed !=
+                entry.second.exact_grant_edge_entry_observed ||
             merge->second.capability.has_value() !=
                 entry.second.capability_present ||
             (entry.second.capability_present &&
@@ -10059,6 +11286,7 @@ class EventDrivenJunctionRuntime {
             clear_consumed_repair_reentry_boost(
                 bag->second);
           }
+          g4irsf17_clear_local_blocker(action.from_node);
         }
       }();
       return DispatchResult{
@@ -10087,7 +11315,8 @@ class EventDrivenJunctionRuntime {
       double time,
       std::uint64_t arrive_event_seq,
       int bounded_local_same_bag_fallback_next = -1,
-      int* priority_comparison_count = nullptr) {
+      int* priority_comparison_count = nullptr,
+      bool bounded_local_pibt_attempted = false) {
     auto& controller = junctions_[node];
     if (controller.queue.empty()) {
       return {};
@@ -10853,6 +12082,22 @@ class EventDrivenJunctionRuntime {
                 {task_id});
           }
         }
+        event_runtime_detail::G4IRSF17SourceBlockerObservation
+            merge_blocker;
+        const auto destination_controller =
+            destination_merge_controllers_.find(selected);
+        merge_blocker.consider(
+            G4IRSF17SourceWaitReason::kDestinationMergeToken,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kDestinationMergeToken,
+            selected,
+            node,
+            selected,
+            destination_controller ==
+                    destination_merge_controllers_.end()
+                ? 0
+                : destination_controller->second.generation());
+        g4irsf17_set_local_blocker(node, std::move(merge_blocker));
         record_decision_latency(decision_started);
         return DispatchResult{task_id, selected, 0, true};
       }
@@ -11077,6 +12322,99 @@ class EventDrivenJunctionRuntime {
             "APPLIED_I4_SAFE_HOLD_UNTIL_NEXT_JUNCTION_SERVICE_OPPORTUNITY",
             {task_id});
       }
+
+      event_runtime_detail::G4IRSF17SourceBlockerObservation local_blocker;
+      const int predicted_blocker_node =
+          physical_interlock_intended_next >= 0
+              ? physical_interlock_intended_next
+          : pre_policy_prediction >= 0
+              ? pre_policy_prediction
+              : trace.model_prediction;
+      if (physical_interlock_rejected ||
+          (local_fault_policy_acted && selected < 0) ||
+          selected_reason == "advertised_fault_hold") {
+        std::uint64_t generation = 0;
+        if (predicted_blocker_node >= 0) {
+          const auto physical = physical_faults_.find(
+              event_runtime_detail::directed_key(
+                  node, predicted_blocker_node));
+          if (physical != physical_faults_.end()) {
+            generation = static_cast<std::uint64_t>(
+                physical->second.physical_generation);
+          }
+        }
+        local_blocker.consider(
+            G4IRSF17SourceWaitReason::kPhysicalFaultOrGeneration,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kPhysicalEdge,
+            predicted_blocker_node >= 0 ? predicted_blocker_node : node,
+            node,
+            predicted_blocker_node,
+            generation);
+      }
+      if (causal_i4_natural_hold_selected ||
+          g4irsf16_i4_natural_hold_selected ||
+          g4irsf16_supervisor_safety_hold_selected) {
+        local_blocker.consider(
+            G4IRSF17SourceWaitReason::kSupervisorHold,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kSupervisorState,
+            node,
+            node,
+            node,
+            static_cast<std::uint64_t>(bag.decision_count));
+      }
+      if (bounded_local_pibt_attempted || escape_active) {
+        local_blocker.consider(
+            G4IRSF17SourceWaitReason::kPIBTOrRecoveryTransaction,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kPIBTOrRecoveryTransaction,
+            node,
+            node,
+            node,
+            static_cast<std::uint64_t>(bag.retry_count));
+      }
+      if (selected_reason == "destination_queue_full") {
+        local_blocker.consider(
+            G4IRSF17SourceWaitReason::kDestinationQueueCapacity,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kDestinationQueue,
+            predicted_blocker_node >= 0 ? predicted_blocker_node : node,
+            node,
+            predicted_blocker_node,
+            static_cast<std::uint64_t>(bag.retry_count));
+      }
+      if (selected_reason == "destination_merge_request_rejected") {
+        local_blocker.consider(
+            G4IRSF17SourceWaitReason::kDestinationMergeToken,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kDestinationMergeToken,
+            predicted_blocker_node >= 0 ? predicted_blocker_node : node,
+            node,
+            predicted_blocker_node,
+            static_cast<std::uint64_t>(bag.retry_count));
+      }
+      if (first_edge_credit_required && !first_edge_credit_ready) {
+        local_blocker.consider(
+            G4IRSF17SourceWaitReason::kFirstEdgeCreditUnavailable,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kFirstEdgeCredit,
+            node,
+            node,
+            first_edge_credit_to,
+            static_cast<std::uint64_t>(bag.retry_count));
+      }
+      if (!local_blocker.valid) {
+        local_blocker.consider(
+            G4IRSF17SourceWaitReason::kOtherExplicitReason,
+            event_runtime_detail::G4IRSF17SourceWaitResource::
+                kOtherLocalResource,
+            node,
+            node,
+            predicted_blocker_node,
+            static_cast<std::uint64_t>(bag.retry_count));
+      }
+      g4irsf17_set_local_blocker(node, std::move(local_blocker));
     }
 
     append_decision_trace(std::move(trace), selected >= 0);
@@ -11576,6 +12914,37 @@ class EventDrivenJunctionRuntime {
                            0,
                            false);
       }
+      if (uses_destination_merge_grants() &&
+          found->second.transit_merge_grant.required) {
+        auto& merge_state = destination_merge_bag_state(
+            found->second.request.runtime_bag_id);
+        const auto& expected = found->second.transit_merge_grant;
+        const auto advertised = advertised_faults_.find(key);
+        const int physical_generation =
+            physical == physical_faults_.end()
+                ? 0
+                : physical->second.physical_generation;
+        const int advertised_generation =
+            advertised == advertised_faults_.end()
+                ? 0
+                : advertised->second.generation;
+        const auto controller =
+            destination_merge_controllers_.find(expected.destination_node);
+        // This is the only minting point for the recovery proof.  It binds
+        // the real in-transit bag, exact edge, live unique capability,
+        // controller record, healthy physical entry, and both original fault
+        // generations before any later fault can occur.
+        merge_state.exact_grant_edge_entry_observed =
+            (physical == physical_faults_.end() ||
+             physical->second.active_count == 0) &&
+            physical_generation == expected.physical_fault_generation &&
+            advertised_generation == expected.advertised_fault_generation &&
+            merge_state.capability.has_value() &&
+            merge_state.capability->expectation() == expected &&
+            controller != destination_merge_controllers_.end() &&
+            controller->second.validates_active_capability(
+                *merge_state.capability);
+      }
     }
     process_passive_event(event, "one_step_corridor_entry");
   }
@@ -11588,6 +12957,7 @@ class EventDrivenJunctionRuntime {
       return;
     }
     auto& bag = found->second;
+    bool inflight_fault_generation_recovered = false;
     const long long directed =
         event_runtime_detail::directed_key(event.from_node, event.to_node);
     const auto inflight = directed_inflight_counts_.find(directed);
@@ -11775,6 +13145,13 @@ class EventDrivenJunctionRuntime {
             advertised == advertised_faults_.end()
                 ? 0
                 : advertised->second.generation;
+        context.exact_grant_edge_entry_observed =
+            merge_state.exact_grant_edge_entry_observed;
+        context.local_inflight_fault_instance_observed =
+            local_inflight_fault_instance_observed(
+                directed,
+                expected.physical_fault_generation,
+                context.current_physical_fault_generation);
         const auto destination =
             junctions_.find(expected.destination_node);
         context.current_calendar_generation =
@@ -11802,10 +13179,32 @@ class EventDrivenJunctionRuntime {
                           ? &*merge_state.capability
                           : nullptr,
                       context);
+        inflight_fault_generation_recovered =
+            consumed == DestinationMergeGrantConsumeResult::
+                            kConsumedAfterInflightFaultGenerationChange;
+        if (inflight_fault_generation_recovered) {
+          mark_inflight_fault_generation_recovery(
+              bag,
+              directed,
+              expected.physical_fault_generation,
+              context.current_physical_fault_generation,
+              context.physical_fault_active);
+          append_fault_audit(
+              event,
+              "destination_merge_inflight_fault_generation_recovered",
+              physical == physical_faults_.end()
+                  ? 0
+                  : physical->second.active_count,
+              context.current_physical_fault_generation,
+              1,
+              false);
+        }
         merge_state.capability.reset();
+        merge_state.exact_grant_edge_entry_observed = false;
         bag.transit_merge_grant = {};
         if (consumed !=
-            DestinationMergeGrantConsumeResult::kConsumed) {
+                DestinationMergeGrantConsumeResult::kConsumed &&
+            !inflight_fault_generation_recovered) {
           auto target = junctions_.find(event.to_node);
           if (target != junctions_.end()) {
             target->second.service_calendar.erase_exact(
@@ -11894,7 +13293,9 @@ class EventDrivenJunctionRuntime {
                        event.to_node,
                        event.from_node,
                        event.to_node,
-                       "edge_traversal_complete",
+                       inflight_fault_generation_recovered
+                           ? "edge_traversal_complete_after_inflight_fault_generation_recovery"
+                           : "edge_traversal_complete",
                        0);
   }
 
@@ -11920,6 +13321,10 @@ class EventDrivenJunctionRuntime {
     controller.service_calendar.purge(event.time);
     controller.observe_local_state();
     auto& beacon = congestion_beacons_[event.node];
+    const int previous_pressure =
+        beacon.queue_length + beacon.scheduled_incoming;
+    const double previous_received_at = beacon.received_at;
+    const bool had_previous_snapshot = beacon.generation > 0;
     beacon.queue_length = static_cast<int>(controller.queue.size());
     beacon.scheduled_incoming = controller.scheduled_incoming;
     beacon.queue_length_by_goal.clear();
@@ -11933,6 +13338,68 @@ class EventDrivenJunctionRuntime {
         controller.scheduled_incoming_by_goal;
     beacon.service_calendar_reserved_until =
         controller.service_calendar.reserved_until(event.time);
+    if (g4irsf17_extensions_enabled()) {
+      beacon.g4irsf17_local_blocker =
+          controller.g4irsf17_local_blocker;
+      beacon.g4irsf17_estimated_service_rate_60s =
+          static_cast<double>(
+              controller.g4irsf17_source_temporal
+                  .service_completions.count(event.time, 60.0)) /
+          60.0;
+      const int current_pressure =
+          beacon.queue_length + beacon.scheduled_incoming;
+      const double elapsed = event.time - previous_received_at;
+      beacon.g4irsf17_drain_slope_60s =
+          had_previous_snapshot && elapsed > event_runtime_detail::kEpsilon &&
+                  elapsed <= 60.0 + event_runtime_detail::kEpsilon
+              ? static_cast<double>(previous_pressure - current_pressure) /
+                    elapsed
+              : 0.0;
+      beacon.g4irsf17_one_hop_ttl_pressure = 0.0;
+      auto outgoing = graph_.outgoing(event.node);
+      std::sort(outgoing.begin(), outgoing.end());
+      if (outgoing.size() > 4U) {
+        outgoing.resize(4U);
+      }
+      for (const int downstream : outgoing) {
+        const auto local = congestion_beacons_.find(downstream);
+        if (local == congestion_beacons_.end() ||
+            event.time - local->second.received_at >
+                60.0 + event_runtime_detail::kEpsilon) {
+          continue;
+        }
+        beacon.g4irsf17_one_hop_ttl_pressure = std::max(
+            beacon.g4irsf17_one_hop_ttl_pressure,
+            static_cast<double>(local->second.queue_length +
+                                local->second.scheduled_incoming));
+      }
+      const auto merge =
+          destination_merge_controllers_.find(event.node);
+      if (merge == destination_merge_controllers_.end()) {
+        beacon.g4irsf17_merge_pending_request_count = 0;
+        beacon.g4irsf17_merge_active_grant_count = 0;
+        beacon.g4irsf17_merge_generation = 0;
+        beacon.g4irsf17_merge_oldest_request_age_seconds = 0.0;
+        beacon.g4irsf17_recent_incoming_grants_60s = 0.0;
+        beacon.g4irsf17_incoming_grant_imbalance_60s = 0.0;
+      } else {
+        beacon.g4irsf17_merge_pending_request_count =
+            static_cast<int>(merge->second.pending_count());
+        beacon.g4irsf17_merge_active_grant_count =
+            static_cast<int>(
+                merge->second.active_unconsumed_count());
+        beacon.g4irsf17_merge_generation =
+            merge->second.generation();
+        beacon.g4irsf17_merge_oldest_request_age_seconds =
+            merge->second.oldest_pending_age(event.time);
+        beacon.g4irsf17_recent_incoming_grants_60s =
+            static_cast<double>(
+                merge->second.recent_incoming_grants(event.time));
+        beacon.g4irsf17_incoming_grant_imbalance_60s =
+            static_cast<double>(
+                merge->second.recent_incoming_grant_imbalance(event.time));
+      }
+    }
     beacon.received_at = event.time;
     ++beacon.generation;
     if (uses_first_edge_credit()) {
@@ -13453,6 +14920,10 @@ class EventDrivenJunctionRuntime {
     }
     std::sort(nodes.begin(), nodes.end());
     for (const int node : nodes) {
+      // Reuse the already-required final junction walk: this closes an
+      // outstanding real source-admission interval at runtime stop without
+      // introducing a telemetry-only global scan.
+      g4irsf17_close_source_wait_interval(node, now_);
       auto& controller = junctions_.at(node);
       controller.service_calendar.purge(now_);
       controller.observe_local_state();
@@ -13775,6 +15246,9 @@ class EventDrivenJunctionRuntime {
             counters.committed_transition_count;
         result_.summary.merge_grant_consumed_count +=
             counters.consumed_count;
+        result_.summary
+            .merge_grant_inflight_fault_generation_recovery_count +=
+            counters.inflight_fault_generation_recovery_count;
         result_.summary.merge_grant_expired_count +=
             counters.expired_count;
         result_.summary
@@ -13890,6 +15364,9 @@ class EventDrivenJunctionRuntime {
                       .merge_grant_terminal_request_count +
                   result_.summary
                       .merge_grant_outstanding_request_count &&
+          result_.summary
+                  .merge_grant_inflight_fault_generation_recovery_count <=
+              result_.summary.merge_grant_consumed_count &&
           result_.summary.merge_grant_issued_count ==
               result_.summary
                   .merge_grant_prepared_count &&
@@ -13943,10 +15420,16 @@ class EventDrivenJunctionRuntime {
     // container objects exist in the class layout.
     std::size_t runtime_object_bytes = sizeof(*this);
 #if defined(_MSC_VER) && defined(_WIN64)
-    if (!g4irsf14_extensions_enabled()) {
+    if (!g4irsf14_extensions_enabled() &&
+        !g4irsf17_extensions_enabled()) {
       runtime_object_bytes = 4496;
     }
 #endif
+    if (!g4irsf17_extensions_enabled() &&
+        g4irsf14_extensions_enabled()) {
+      runtime_object_bytes -=
+          event_runtime_detail::kG4IRSF17RuntimeExtensionBytes;
+    }
     std::size_t accounted = runtime_object_bytes;
     accounted += bags_.size() * sizeof(BagState);
     const std::size_t calendar_extension_bytes =
@@ -13955,6 +15438,10 @@ class EventDrivenJunctionRuntime {
     for (const auto& entry : junctions_) {
       accounted +=
           entry.second.current_local_state_accounted_bytes() -
+          (!g4irsf17_extensions_enabled()
+               ? event_runtime_detail::
+                     kG4IRSF17JunctionStateExtensionBytes
+               : 0) -
           (!g4irsf14_extensions_enabled()
                ? calendar_extension_bytes
                : 0);
@@ -13969,7 +15456,10 @@ class EventDrivenJunctionRuntime {
     accounted += physical_faults_.size() * sizeof(event_runtime_detail::FaultState);
     accounted += advertised_faults_.size() * sizeof(event_runtime_detail::AdvertisedFaultState);
     accounted += congestion_beacons_.size() *
-                 sizeof(event_runtime_detail::CongestionBeaconState);
+                 (g4irsf17_extensions_enabled()
+                      ? sizeof(event_runtime_detail::CongestionBeaconState)
+                      : event_runtime_detail::
+                            kPreG4IRSF17CongestionBeaconStateBytes);
     accounted += pibt_regret_prior_.size() *
                  sizeof(std::pair<const std::tuple<int, int, int>, double>);
     accounted += fault_affected_bags_.size() * sizeof(int);
@@ -14002,6 +15492,24 @@ class EventDrivenJunctionRuntime {
     accounted +=
         result_.source_admission_opportunities.capacity() *
         sizeof(EventRuntimeSourceOpportunityRow);
+    accounted +=
+        result_.g4irsf17_source_wait_blockers.capacity() *
+        sizeof(EventRuntimeSourceWaitBlockerRow);
+    accounted +=
+        result_.g4irsf17_source_policy_decisions.capacity() *
+        sizeof(EventRuntimeG4IRSF17SourcePolicyRow);
+    for (const auto& row : result_.g4irsf17_source_policy_decisions) {
+      accounted += row.candidate_queue_indices.capacity() * sizeof(int);
+      accounted += row.candidate_task_ids.capacity() * sizeof(int);
+      accounted += row.candidate_runtime_bag_ids.capacity() * sizeof(int);
+      accounted += row.candidate_segment_ids.capacity() * sizeof(std::string);
+      accounted += row.candidate_features.capacity() *
+                   sizeof(std::array<
+                       double, kG4IRSF17SourceCandidateFeatureCount>);
+      for (const auto& segment : row.candidate_segment_ids) {
+        accounted += segment.capacity() * sizeof(char);
+      }
+    }
     accounted +=
         result_.junction_arbitration_opportunities.capacity() *
         sizeof(EventRuntimeJunctionOpportunityRow);
@@ -14370,6 +15878,8 @@ EventDrivenJunctionRuntime::capture_g4irsf14_state(
     item.first_contention_time =
         entry.second.first_contention_time;
     item.grant_wait_seconds = entry.second.grant_wait_seconds;
+    item.exact_grant_edge_entry_observed =
+        entry.second.exact_grant_edge_entry_observed;
     if (entry.second.capability.has_value()) {
       item.capability =
           DestinationMergeGrantCheckpointCodec::capture(
@@ -14413,6 +15923,8 @@ EventDrivenJunctionRuntime::restore_g4irsf14_state(
     item.first_contention_time =
         entry.second.first_contention_time;
     item.grant_wait_seconds = entry.second.grant_wait_seconds;
+    item.exact_grant_edge_entry_observed =
+        entry.second.exact_grant_edge_entry_observed;
     if (entry.second.capability.has_value()) {
       item.capability.emplace(
           DestinationMergeGrantCheckpointCodec::restore(
@@ -15139,6 +16651,8 @@ fingerprint_deterministic_summary(
   writer.u64(summary.merge_grant_prepared_transition_count);
   writer.u64(summary.merge_grant_committed_transition_count);
   writer.u64(summary.merge_grant_consumed_count);
+  writer.u64(
+      summary.merge_grant_inflight_fault_generation_recovery_count);
   writer.u64(summary.merge_grant_expired_count);
   writer.u64(summary.merge_grant_request_expired_count);
   writer.u64(summary.merge_grant_grant_expired_count);
@@ -15358,6 +16872,8 @@ EventDrivenJunctionRuntime::compute_replay_hashes_projection() const {
   algorithm.u64(summary.merge_grant_prepared_count);
   algorithm.u64(summary.merge_grant_committed_count);
   algorithm.u64(summary.merge_grant_consumed_count);
+  algorithm.u64(
+      summary.merge_grant_inflight_fault_generation_recovery_count);
   algorithm.u64(summary.merge_grant_expired_count);
   algorithm.u64(summary.merge_grant_revoked_count);
   algorithm.u64(summary.merge_grant_rolled_back_count);
@@ -16080,6 +17596,8 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
     merge_grants.u64(counters.prepared_transition_count);
     merge_grants.u64(counters.committed_transition_count);
     merge_grants.u64(counters.consumed_count);
+    merge_grants.u64(
+        counters.inflight_fault_generation_recovery_count);
     merge_grants.u64(counters.expired_count);
     merge_grants.u64(counters.request_expired_count);
     merge_grants.u64(counters.grant_expired_count);
@@ -16396,6 +17914,7 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
       pibt.floating(item.pending_request_time);
       pibt.floating(item.first_contention_time);
       pibt.floating(item.grant_wait_seconds);
+      pibt.boolean(item.exact_grant_edge_entry_observed);
       pibt.boolean(item.capability.has_value());
       if (item.capability.has_value()) {
         fingerprint_capability(

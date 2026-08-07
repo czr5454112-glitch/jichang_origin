@@ -1098,6 +1098,8 @@ def _completed(row: Mapping[str, Any]) -> bool:
 def aggregate_raw_bag_timings(
     input_rows: Sequence[Mapping[str, Any]],
     segment_results: Sequence[Mapping[str, Any]],
+    *,
+    allow_release_before_original_entry: bool = False,
 ) -> list[dict[str, Any]]:
     """Aggregate protected segments by raw ``task_id``.
 
@@ -1195,7 +1197,10 @@ def aggregate_raw_bag_timings(
                 raise HarnessValidationError(
                     f"{segment_id}: runtime release differs from protected pass_time"
                 )
-            if java_release + 1.0e-9 < raw_pass:
+            if (
+                not allow_release_before_original_entry
+                and java_release + 1.0e-9 < raw_pass
+            ):
                 raise HarnessValidationError(
                     f"{segment_id}: Java release precedes raw original entry"
                 )
