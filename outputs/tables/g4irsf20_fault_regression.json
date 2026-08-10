@@ -1,0 +1,156 @@
+{
+  "claim_boundary": {
+    "delayed_or_dropped_fault_notifications": "NOT_EVALUATED_IN_G4IRSF20",
+    "immediate_fault_notifications": "EVALUATED"
+  },
+  "design": {
+    "baseline_policy": "E0",
+    "controller": "A0 + S4 + J2 (M3 destination-grant rule)",
+    "input": "protected_first_8192_file_order",
+    "only_changed_control": "g4irsf20_event_hotpath_policy",
+    "raw_bag_and_semantic_rows_persisted": 0,
+    "treatment_policy": "E2"
+  },
+  "failed_requirements": [],
+  "scenario_count": 2,
+  "scenarios": [
+    {
+      "baseline": {
+        "all_affected_tasks_completed": true,
+        "completed_bag_count": 4898,
+        "cpu_seconds": 4.796875,
+        "event_count": 883687,
+        "failed_count": 0,
+        "fault_affected_bag_count": 10,
+        "fault_affected_completed_count": 10,
+        "fault_event_count": 1,
+        "hard_safety_pass": true,
+        "mean_tth_seconds": 3437.4898853231894,
+        "notification_drop_count": 0,
+        "notification_update_event_count": 359950,
+        "physical_fault_entry_violation_count": 0,
+        "policy": "E0",
+        "raw_bag_count": 4898,
+        "repair_event_count": 1,
+        "requested_segment_count": 8192,
+        "status": "COMPLETE",
+        "wall_seconds": 5.068511399906129
+      },
+      "fault": {
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "onset_fraction": 0.35,
+        "onset_time": null
+      },
+      "paired_gates": {
+        "action_semantics_equal_to_e0": true,
+        "both_affected_task_sets_complete": true,
+        "both_complete": true,
+        "both_zero_physical_fault_entry_violations": true,
+        "hard_safety_semantics_equal_to_e0": true,
+        "per_task_tth_equal_to_e0": true
+      },
+      "scenario_id": "pending_inflight_repair",
+      "treatment": {
+        "all_affected_tasks_completed": true,
+        "completed_bag_count": 4898,
+        "cpu_seconds": 4.53125,
+        "event_count": 738058,
+        "failed_count": 0,
+        "fault_affected_bag_count": 10,
+        "fault_affected_completed_count": 10,
+        "fault_event_count": 1,
+        "hard_safety_pass": true,
+        "mean_tth_seconds": 3437.4898853231894,
+        "notification_drop_count": 0,
+        "notification_update_event_count": 214321,
+        "physical_fault_entry_violation_count": 0,
+        "policy": "E2",
+        "raw_bag_count": 4898,
+        "repair_event_count": 1,
+        "requested_segment_count": 8192,
+        "status": "COMPLETE",
+        "wall_seconds": 4.621979000046849
+      },
+      "treatment_minus_baseline": {
+        "event_count": -145629,
+        "mean_tth_seconds": 0.0
+      }
+    },
+    {
+      "baseline": {
+        "all_affected_tasks_completed": true,
+        "completed_bag_count": 4898,
+        "cpu_seconds": 5.03125,
+        "event_count": 883663,
+        "failed_count": 0,
+        "fault_affected_bag_count": 3,
+        "fault_affected_completed_count": 3,
+        "fault_event_count": 1,
+        "hard_safety_pass": true,
+        "mean_tth_seconds": 3437.4898853231894,
+        "notification_drop_count": 0,
+        "notification_update_event_count": 359943,
+        "physical_fault_entry_violation_count": 0,
+        "policy": "E0",
+        "raw_bag_count": 4898,
+        "repair_event_count": 1,
+        "requested_segment_count": 8192,
+        "status": "COMPLETE",
+        "wall_seconds": 5.2111647999845445
+      },
+      "fault": {
+        "duration_seconds": 300.0,
+        "edges": [
+          [
+            6,
+            12
+          ]
+        ],
+        "onset_fraction": 0.35,
+        "onset_time": 16966.01816
+      },
+      "paired_gates": {
+        "action_semantics_equal_to_e0": true,
+        "both_affected_task_sets_complete": true,
+        "both_complete": true,
+        "both_zero_physical_fault_entry_violations": true,
+        "hard_safety_semantics_equal_to_e0": true,
+        "per_task_tth_equal_to_e0": true
+      },
+      "scenario_id": "inflight_exact_lease_repair",
+      "treatment": {
+        "all_affected_tasks_completed": true,
+        "completed_bag_count": 4898,
+        "cpu_seconds": 4.421875,
+        "event_count": 738018,
+        "failed_count": 0,
+        "fault_affected_bag_count": 3,
+        "fault_affected_completed_count": 3,
+        "fault_event_count": 1,
+        "hard_safety_pass": true,
+        "mean_tth_seconds": 3437.4898853231894,
+        "notification_drop_count": 0,
+        "notification_update_event_count": 214298,
+        "physical_fault_entry_violation_count": 0,
+        "policy": "E2",
+        "raw_bag_count": 4898,
+        "repair_event_count": 1,
+        "requested_segment_count": 8192,
+        "status": "COMPLETE",
+        "wall_seconds": 4.514335099840537
+      },
+      "treatment_minus_baseline": {
+        "event_count": -145645,
+        "mean_tth_seconds": 0.0
+      }
+    }
+  ],
+  "schema": "czr005.g4irsf20.fault_regression.v1",
+  "status": "COMPLETE"
+}

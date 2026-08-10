@@ -715,6 +715,7 @@ def g4irsf11_event_runtime_from_records(
     g4irsf18_merge_kill_switch: bool = False,
     bounded_wall_seconds: float = -1.0,
     bounded_check_every_events: int = 65_536,
+    g4irsf20_event_hotpath_policy: str = "E0",
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -915,6 +916,12 @@ def g4irsf11_event_runtime_from_records(
     )
     if bounded_check_every_events <= 0:
         raise ValueError("bounded_check_every_events must be positive")
+    if not isinstance(g4irsf20_event_hotpath_policy, str):
+        raise TypeError("g4irsf20_event_hotpath_policy must be a string")
+    if g4irsf20_event_hotpath_policy not in {"E0", "E1", "E2"}:
+        raise ValueError(
+            "g4irsf20_event_hotpath_policy must be E0, E1, or E2"
+        )
     scale = strict_finite_number(scale, "scale")
     entry_headway_seconds = strict_finite_number(
         entry_headway_seconds, "entry_headway_seconds"
@@ -1738,6 +1745,41 @@ def g4irsf11_event_runtime_from_records(
             float(bounded_wall_seconds),
             int(bounded_check_every_events),
         )
+    if g4irsf20_event_hotpath_policy != "E0":
+        # G20 is append-only after the complete G19 bounded tail. Materialize
+        # that tail for unbounded opt-in calls without changing E0 calls to
+        # older native binaries.
+        if bounded_wall_seconds <= 0.0:
+            native_event_tail = (
+                str(event_semantics),
+                bool(enable_opportunity_telemetry),
+                int(opportunity_trace_limit),
+                str(merge_grant_rule),
+                int(merge_grant_max_pending_requests),
+                int(merge_grant_lifecycle_limit),
+                str(g4irsf16_supervisor_mode),
+                normalized_g4irsf16_i3_model,
+                normalized_g4irsf16_i4_model,
+                normalized_g4irsf16_rule_bundle,
+                bool(enable_g4irsf17_source_wait_telemetry),
+                int(g4irsf17_source_wait_trace_limit),
+                str(g4irsf17_source_policy_mode),
+                normalized_g4irsf17_source_policy,
+                int(g4irsf17_source_policy_trace_limit),
+                canonical_merge_grant_timing_mode,
+                str(g4irsf18_merge_policy_mode),
+                normalized_g4irsf18_merge_policy,
+                bool(g4irsf18_merge_research_closed_loop_authorized),
+                bool(g4irsf18_merge_fixed_research_workload),
+                bool(g4irsf18_merge_production_closed_loop_authorized),
+                bool(g4irsf18_merge_offline_gate_passed),
+                float(g4irsf18_merge_coverage_cap),
+                int(g4irsf18_merge_max_overrides_per_segment),
+                bool(g4irsf18_merge_kill_switch),
+                float(bounded_wall_seconds),
+                int(bounded_check_every_events),
+            )
+        native_event_tail += (str(g4irsf20_event_hotpath_policy),)
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
             normalized_node_records,

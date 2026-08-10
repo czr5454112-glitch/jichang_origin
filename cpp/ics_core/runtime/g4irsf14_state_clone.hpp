@@ -333,6 +333,16 @@ struct G4IRSF14CloneBoundary {
       g4irsf17_i1_treatment_observation{};
   std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
       g4irsf17_i1_pairwise_features{};
+  // Outcome-free G20 Route sidecar.  Like the G17 Source observation above,
+  // this is deliberately excluded from the content address: it describes
+  // bounded local model inputs at an already-sealed decision boundary and is
+  // never allowed to alter action identity or clone matching.
+  bool g4irsf20_route_observation_available = false;
+  bool g4irsf20_route_normal_flow = false;
+  int g4irsf20_route_baseline_candidate_index = -1;
+  std::vector<int> g4irsf20_route_candidate_next_nodes;
+  std::vector<std::vector<double>>
+      g4irsf20_route_candidate_features;
   std::vector<std::uint64_t> pending_merge_request_order;
   std::vector<int> legal_next_edges;
   std::vector<int> pibt_ready_bag_ids;
@@ -430,6 +440,43 @@ struct G4IRSF14CloneBoundary {
     } else if (g4irsf17_i1_observation_peer_runtime_bag_id != -1) {
       throw std::invalid_argument(
           "G17 I1 observation peer exists without an observation");
+    }
+    if (g4irsf20_route_observation_available) {
+      if (kind !=
+              G4IRSF14CloneBoundaryKind::kJunctionRouteArbitration ||
+          g4irsf20_route_candidate_next_nodes.size() < 2U ||
+          g4irsf20_route_candidate_next_nodes.size() !=
+              g4irsf20_route_candidate_features.size() ||
+          g4irsf20_route_baseline_candidate_index < 0 ||
+          static_cast<std::size_t>(
+              g4irsf20_route_baseline_candidate_index) >=
+              g4irsf20_route_candidate_next_nodes.size() ||
+          g4irsf20_route_candidate_next_nodes[
+              static_cast<std::size_t>(
+                  g4irsf20_route_baseline_candidate_index)] !=
+              baseline_next_node ||
+          g4irsf20_route_candidate_next_nodes != legal_next_edges) {
+        throw std::invalid_argument(
+            "G20 Route observation is not aligned to the legal action set");
+      }
+      std::size_t feature_count = 0;
+      for (const auto& row : g4irsf20_route_candidate_features) {
+        if (row.empty() ||
+            (feature_count != 0U && row.size() != feature_count) ||
+            !std::all_of(row.begin(), row.end(), [](double value) {
+              return std::isfinite(value);
+            })) {
+          throw std::invalid_argument(
+              "G20 Route observation must be finite and rectangular");
+        }
+        feature_count = row.size();
+      }
+    } else if (g4irsf20_route_normal_flow ||
+               g4irsf20_route_baseline_candidate_index != -1 ||
+               !g4irsf20_route_candidate_next_nodes.empty() ||
+               !g4irsf20_route_candidate_features.empty()) {
+      throw std::invalid_argument(
+          "G20 Route observation fields require the availability flag");
     }
     const bool pibt_vectors_empty =
         pibt_ready_bag_ids.empty() &&

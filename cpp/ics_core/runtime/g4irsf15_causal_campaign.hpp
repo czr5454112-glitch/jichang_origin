@@ -44,6 +44,12 @@ struct G4IRSF15CausalOpportunitySkeleton {
       g4irsf17_i1_treatment_observation{};
   std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
       g4irsf17_i1_pairwise_features{};
+  bool g4irsf20_route_observation_available = false;
+  bool g4irsf20_route_normal_flow = false;
+  int g4irsf20_route_baseline_candidate_index = -1;
+  std::vector<int> g4irsf20_route_candidate_next_nodes;
+  std::vector<std::vector<double>>
+      g4irsf20_route_candidate_features;
   std::vector<int> legal_next_edges;
 };
 
