@@ -1,0 +1,62 @@
+{
+  "schema": "czr005.g4irsf21.wait_h_system_probe.v1",
+  "status": "COMPLETE_NO_WAIT_BENEFIT_OBSERVED",
+  "controller": "Source A0 + Route S4 + Merge J2 + E2",
+  "source_scale": 1,
+  "target_schema": "czr005.g4irsf21.route_action_target.v1",
+  "action_kind": "WAIT",
+  "pair_count": 4,
+  "all_same_state_start": true,
+  "all_action_changed": true,
+  "all_pair_complete": true,
+  "all_live_safety_pass": true,
+  "all_action_certificates_valid": true,
+  "raw_bag_tth_result_counts": {
+    "beneficial": 0,
+    "exact_zero": 2,
+    "one_segment_only_harm": 2
+  },
+  "rows": [
+    {
+      "group_index": 227,
+      "event_ordinal": 238923,
+      "task_id": 1976,
+      "wait_age_seconds": 4.6009999999987485,
+      "existing_edge_label": "BENEFICIAL",
+      "affected_segment_completion_delta_seconds": 0.0,
+      "segment_cohort_mean_delta_seconds": 0.0,
+      "raw_bag_tth_mean_delta_seconds": 0.0
+    },
+    {
+      "group_index": 6376,
+      "event_ordinal": 4259694,
+      "task_id": 25119,
+      "wait_age_seconds": 4.201000000000931,
+      "existing_edge_label": "NEUTRAL_WITHIN_TOLERANCE",
+      "affected_segment_completion_delta_seconds": 0.0,
+      "segment_cohort_mean_delta_seconds": 0.0,
+      "raw_bag_tth_mean_delta_seconds": 0.0
+    },
+    {
+      "group_index": 0,
+      "event_ordinal": 25,
+      "task_id": 0,
+      "wait_age_seconds": 2.6010000000005675,
+      "existing_edge_label": "HARMFUL",
+      "affected_segment_completion_delta_seconds": 1.0,
+      "segment_cohort_mean_delta_seconds": 0.000022934201780344665,
+      "raw_bag_tth_mean_delta_seconds": 0.000035080333731229985
+    },
+    {
+      "group_index": 24,
+      "event_ordinal": 26017,
+      "task_id": 233,
+      "wait_age_seconds": 48.60100000000239,
+      "existing_edge_label": "HARMFUL",
+      "affected_segment_completion_delta_seconds": 1.0,
+      "segment_cohort_mean_delta_seconds": 0.000022934201780344665,
+      "raw_bag_tth_mean_delta_seconds": 0.000035080333731229985
+    }
+  ],
+  "claim_boundary": "Four protected 1x H_system probes only; no 2x, learned-policy, or general WAIT conclusion."
+}
