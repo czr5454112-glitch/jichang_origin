@@ -1,0 +1,76 @@
+{
+  "schema": "czr005.g4irsf21.narrow_profile_probes.v1",
+  "status": "NO_PROFILE_CANDIDATE_RETAINED",
+  "controller": "Source A0 + Route S4 + Merge J2 + E2",
+  "probes": {
+    "diagnostic_hops": {
+      "scope": "4x bounded probe",
+      "hops_0": {
+        "events": 4456448,
+        "completed_segments": 25218,
+        "events_per_second_rounded": 73009
+      },
+      "hops_2": {
+        "events": 4521984,
+        "completed_segments": 25551,
+        "events_per_second_rounded": 74558
+      },
+      "decision": "NO_GO_DIAGNOSTIC_HOPS_ZERO_NOT_FASTER"
+    },
+    "future_release_prefix": {
+      "scope": "4x bounded 30-second probe",
+      "full_input": {
+        "input_segments": 174412,
+        "events": 2752512,
+        "completed_segments": 16412,
+        "wall_seconds": 31.385
+      },
+      "release_time_prefix": {
+        "input_segments": 85672,
+        "events": 2621440,
+        "completed_segments": 15711,
+        "wall_seconds": 30.959
+      },
+      "decision": "NO_GO_DORMANT_FUTURE_RELEASES_NOT_THE_PRIMARY_BOTTLENECK"
+    },
+    "scalar_beacon_payload": {
+      "scope": "4x bounded 20-second order-balanced probe",
+      "rows": [
+        {
+          "order": 0,
+          "mode": "rich",
+          "events": 2293760,
+          "completed_segments": 13800,
+          "events_per_second": 105434.84359877072,
+          "events_per_completed": 166.21449275362318
+        },
+        {
+          "order": 1,
+          "mode": "scalar",
+          "events": 2359296,
+          "completed_segments": 14141,
+          "events_per_second": 108516.98817213537,
+          "events_per_completed": 166.84081748108338
+        },
+        {
+          "order": 2,
+          "mode": "scalar",
+          "events": 2359296,
+          "completed_segments": 14141,
+          "events_per_second": 108359.26579378602,
+          "events_per_completed": 166.84081748108338
+        },
+        {
+          "order": 3,
+          "mode": "rich",
+          "events": 2359296,
+          "completed_segments": 14141,
+          "events_per_second": 107919.0707418583,
+          "events_per_completed": 166.84081748108338
+        }
+      ],
+      "decision": "NO_GO_BELOW_FIVE_PERCENT_AND_NO_EVENTS_PER_COMPLETED_GAIN"
+    }
+  },
+  "claim_boundary": "Short profiling probes only; rejected code paths were removed and no capacity claim is made."
+}

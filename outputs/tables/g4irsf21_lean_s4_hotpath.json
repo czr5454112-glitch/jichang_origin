@@ -1,0 +1,664 @@
+{
+  "decision": {
+    "bounded_4x": {
+      "gates": {
+        "all_failed_counts_zero": true,
+        "all_hard_safety_pass": true,
+        "completion_not_regressed": true,
+        "events_per_completed_not_regressed": false,
+        "events_per_second_not_regressed": true,
+        "lean_covered_all_candidates": true,
+        "minimum_five_percent_gain": false,
+        "rich_did_not_use_lean_path": true
+      },
+      "median": {
+        "completion_improvement_fraction": 0.01382515361281792,
+        "events_per_completed_bag_reduction_fraction": -0.0005632352946390598,
+        "events_per_second_improvement_fraction": 0.013184217494819255,
+        "lean_completed_bags": 26069.5,
+        "lean_events_per_completed_bag": 177.2300182023422,
+        "lean_events_per_second": 76721.55852359599,
+        "rich_completed_bags": 25714.0,
+        "rich_events_per_completed_bag": 177.13025219255903,
+        "rich_events_per_second": 75723.20728928872
+      },
+      "pass": false,
+      "scale": 4
+    },
+    "full_parity": [
+      {
+        "gates": {
+          "actions_equal": true,
+          "event_count_equal": true,
+          "hard_safety_equal": true,
+          "lean_covered_all_candidates": true,
+          "rich_did_not_use_lean_path": true,
+          "route_wait_by_task_equal": true,
+          "tth_equal": true
+        },
+        "pass": true,
+        "scale": 1
+      },
+      {
+        "gates": {
+          "actions_equal": true,
+          "event_count_equal": true,
+          "hard_safety_equal": true,
+          "lean_covered_all_candidates": true,
+          "rich_did_not_use_lean_path": true,
+          "route_wait_by_task_equal": true,
+          "tth_equal": true
+        },
+        "pass": true,
+        "scale": 2
+      }
+    ],
+    "runtime_controls": {
+      "diagnostic_hops": 2,
+      "g4irsf20_event_hotpath_policy": "E2"
+    },
+    "selected": false,
+    "status": "NO_GO_KEEP_RICH_S4"
+  },
+  "design": {
+    "bounded_repeats": 2,
+    "bounded_scale": 4,
+    "controller": "Source A0 + Route S4 + Merge J2 + E2",
+    "full_scales": [
+      1,
+      2
+    ],
+    "lean_diagnostic_hops": 0,
+    "minimum_bounded_improvement_fraction": 0.05,
+    "raw_rows_persisted": false,
+    "rich_diagnostic_hops": 2
+  },
+  "rows": [
+    {
+      "diagnostic_hops": 2,
+      "execution_mode": "full",
+      "hard_safety": {
+        "gates": {
+          "all_segments_completed": true,
+          "conflict_zero": true,
+          "deadlock_zero": true,
+          "event_limit_not_reached": true,
+          "failed_zero": true,
+          "full_astar_zero": true,
+          "full_cie_zero": true,
+          "future_route_zero": true,
+          "future_routes_not_stored": true,
+          "future_schedule_zero": true,
+          "global_scan_zero": true,
+          "time_limit_not_reached": true,
+          "unsafe_zero": true
+        },
+        "pass": true
+      },
+      "hotpath": {
+        "policy": "E2",
+        "redundant_beacon_suppressed_count": 610330,
+        "same_state_beacon_suppressed_count": 182235,
+        "total_beacon_suppressed_count": 792565
+      },
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 1,
+        "segments": 43603,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "mechanism": {
+        "lean_candidate_evaluations": 0,
+        "scorer_candidate_evaluations": 594256
+      },
+      "metrics": {
+        "congestion_beacon_event_count": 1186398,
+        "event_count": 4064751,
+        "events_per_completed_bag": 142.5928225636708,
+        "events_per_wall_second": 200290.95065170707,
+        "mean_tth_seconds": 213.9123169157372,
+        "merge_grant_wait_mean_seconds": 1.1986774714105095,
+        "network_time_mean_seconds": 213.86246776117326,
+        "p95_tth_seconds": 252.00399999998626,
+        "p99_tth_seconds": 281.00399999999354,
+        "route_wait_mean_seconds": 4.743131270610928,
+        "source_wait_mean_seconds": 0.04984915456395145
+      },
+      "progress": {
+        "completed_bags": 28506,
+        "current_backlog": 15097,
+        "failed_bags": 0,
+        "released_bags": 43603,
+        "requested_bags": 43603
+      },
+      "repeat": 0,
+      "resources": {
+        "native_cpu_to_wall_ratio": 0.9731829269175933,
+        "native_process_cpu_seconds": 19.75,
+        "native_wall_seconds": 20.294231900013983
+      },
+      "scale": 1,
+      "status": "COMPLETE",
+      "variant": "rich"
+    },
+    {
+      "diagnostic_hops": 0,
+      "execution_mode": "full",
+      "hard_safety": {
+        "gates": {
+          "all_segments_completed": true,
+          "conflict_zero": true,
+          "deadlock_zero": true,
+          "event_limit_not_reached": true,
+          "failed_zero": true,
+          "full_astar_zero": true,
+          "full_cie_zero": true,
+          "future_route_zero": true,
+          "future_routes_not_stored": true,
+          "future_schedule_zero": true,
+          "global_scan_zero": true,
+          "time_limit_not_reached": true,
+          "unsafe_zero": true
+        },
+        "pass": true
+      },
+      "hotpath": {
+        "policy": "E2",
+        "redundant_beacon_suppressed_count": 610330,
+        "same_state_beacon_suppressed_count": 182235,
+        "total_beacon_suppressed_count": 792565
+      },
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 1,
+        "segments": 43603,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "mechanism": {
+        "lean_candidate_evaluations": 594256,
+        "scorer_candidate_evaluations": 594256
+      },
+      "metrics": {
+        "congestion_beacon_event_count": 1186398,
+        "event_count": 4064751,
+        "events_per_completed_bag": 142.5928225636708,
+        "events_per_wall_second": 204100.9316376759,
+        "mean_tth_seconds": 213.9123169157372,
+        "merge_grant_wait_mean_seconds": 1.1986774714105095,
+        "network_time_mean_seconds": 213.86246776117326,
+        "p95_tth_seconds": 252.00399999998626,
+        "p99_tth_seconds": 281.00399999999354,
+        "route_wait_mean_seconds": 4.743131270610928,
+        "source_wait_mean_seconds": 0.04984915456395145
+      },
+      "progress": {
+        "completed_bags": 28506,
+        "current_backlog": 15097,
+        "failed_bags": 0,
+        "released_bags": 43603,
+        "requested_bags": 43603
+      },
+      "repeat": 0,
+      "resources": {
+        "native_cpu_to_wall_ratio": 0.9791419368454992,
+        "native_process_cpu_seconds": 19.5,
+        "native_wall_seconds": 19.915396600030363
+      },
+      "scale": 1,
+      "status": "COMPLETE",
+      "variant": "lean"
+    },
+    {
+      "diagnostic_hops": 2,
+      "execution_mode": "full",
+      "hard_safety": {
+        "gates": {
+          "all_segments_completed": true,
+          "conflict_zero": true,
+          "deadlock_zero": true,
+          "event_limit_not_reached": true,
+          "failed_zero": true,
+          "full_astar_zero": true,
+          "full_cie_zero": true,
+          "future_route_zero": true,
+          "future_routes_not_stored": true,
+          "future_schedule_zero": true,
+          "global_scan_zero": true,
+          "time_limit_not_reached": true,
+          "unsafe_zero": true
+        },
+        "pass": true
+      },
+      "hotpath": {
+        "policy": "E2",
+        "redundant_beacon_suppressed_count": 1218570,
+        "same_state_beacon_suppressed_count": 715104,
+        "total_beacon_suppressed_count": 1933674
+      },
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 2,
+        "segments": 87206,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "mechanism": {
+        "lean_candidate_evaluations": 0,
+        "scorer_candidate_evaluations": 2053265
+      },
+      "metrics": {
+        "congestion_beacon_event_count": 2687019,
+        "event_count": 9454789,
+        "events_per_completed_bag": 165.83857784326108,
+        "events_per_wall_second": 170159.8660171509,
+        "mean_tth_seconds": 337.8427087630685,
+        "merge_grant_wait_mean_seconds": 4.950128920228403,
+        "network_time_mean_seconds": 283.17635343436575,
+        "p95_tth_seconds": 960.0039999999972,
+        "p99_tth_seconds": 2242.9539999999943,
+        "route_wait_mean_seconds": 72.7680953132691,
+        "source_wait_mean_seconds": 54.66635532870273
+      },
+      "progress": {
+        "completed_bags": 57012,
+        "current_backlog": 30194,
+        "failed_bags": 0,
+        "released_bags": 87206,
+        "requested_bags": 87206
+      },
+      "repeat": 0,
+      "resources": {
+        "native_cpu_to_wall_ratio": 0.9783173338692235,
+        "native_process_cpu_seconds": 54.359375,
+        "native_wall_seconds": 55.56415400002152
+      },
+      "scale": 2,
+      "status": "COMPLETE",
+      "variant": "rich"
+    },
+    {
+      "diagnostic_hops": 0,
+      "execution_mode": "full",
+      "hard_safety": {
+        "gates": {
+          "all_segments_completed": true,
+          "conflict_zero": true,
+          "deadlock_zero": true,
+          "event_limit_not_reached": true,
+          "failed_zero": true,
+          "full_astar_zero": true,
+          "full_cie_zero": true,
+          "future_route_zero": true,
+          "future_routes_not_stored": true,
+          "future_schedule_zero": true,
+          "global_scan_zero": true,
+          "time_limit_not_reached": true,
+          "unsafe_zero": true
+        },
+        "pass": true
+      },
+      "hotpath": {
+        "policy": "E2",
+        "redundant_beacon_suppressed_count": 1218570,
+        "same_state_beacon_suppressed_count": 715104,
+        "total_beacon_suppressed_count": 1933674
+      },
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 2,
+        "segments": 87206,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "mechanism": {
+        "lean_candidate_evaluations": 2053265,
+        "scorer_candidate_evaluations": 2053265
+      },
+      "metrics": {
+        "congestion_beacon_event_count": 2687019,
+        "event_count": 9454789,
+        "events_per_completed_bag": 165.83857784326108,
+        "events_per_wall_second": 173713.6269830926,
+        "mean_tth_seconds": 337.8427087630685,
+        "merge_grant_wait_mean_seconds": 4.950128920228403,
+        "network_time_mean_seconds": 283.17635343436575,
+        "p95_tth_seconds": 960.0039999999972,
+        "p99_tth_seconds": 2242.9539999999943,
+        "route_wait_mean_seconds": 72.7680953132691,
+        "source_wait_mean_seconds": 54.66635532870273
+      },
+      "progress": {
+        "completed_bags": 57012,
+        "current_backlog": 30194,
+        "failed_bags": 0,
+        "released_bags": 87206,
+        "requested_bags": 87206
+      },
+      "repeat": 0,
+      "resources": {
+        "native_cpu_to_wall_ratio": 0.976070056505417,
+        "native_process_cpu_seconds": 53.125,
+        "native_wall_seconds": 54.427445700159296
+      },
+      "scale": 2,
+      "status": "COMPLETE",
+      "variant": "lean"
+    },
+    {
+      "diagnostic_hops": 2,
+      "execution_mode": "bounded",
+      "hard_safety": {
+        "gates": {
+          "failed_count_zero": true,
+          "first_edge_credit_future_route_count_zero": true,
+          "first_edge_credit_global_scan_count_zero": true,
+          "full_future_routes_stored_zero": true,
+          "future_path_field_absent": true,
+          "global_reservation_scan_count_zero": true,
+          "microphase_runtime_global_scan_count_zero": true,
+          "physical_fault_edge_entry_violation_count_zero": true,
+          "priority_future_route_input_count_zero": true,
+          "priority_global_scan_count_zero": true,
+          "reservation_conflicts_zero": true,
+          "runtime_full_astar_calls_zero": true,
+          "runtime_full_cie_astar_calls_zero": true,
+          "scorer_future_route_input_count_zero": true,
+          "scorer_future_schedule_input_count_zero": true,
+          "scorer_runtime_global_scan_count_zero": true,
+          "unresolved_deadlock_count_zero": true
+        },
+        "pass": true
+      },
+      "hotpath": {
+        "policy": "E2",
+        "redundant_beacon_suppressed_count": 372493,
+        "same_state_beacon_suppressed_count": 385409,
+        "total_beacon_suppressed_count": 757902
+      },
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 4,
+        "segments": 174412,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "mechanism": {
+        "lean_candidate_evaluations": 0,
+        "scorer_candidate_evaluations": 1492622
+      },
+      "metrics": {
+        "completions_per_wall_second": 424.6593175569369,
+        "congestion_beacon_event_count": 1316084,
+        "event_count": 4521984,
+        "events_per_completed_bag": 176.97874838558178,
+        "events_per_wall_second": 75155.674511502,
+        "mean_tth_seconds": null,
+        "merge_grant_wait_mean_seconds": null,
+        "network_time_mean_seconds": null,
+        "p95_tth_seconds": null,
+        "p99_tth_seconds": null,
+        "route_wait_mean_seconds": null,
+        "source_wait_mean_seconds": null
+      },
+      "progress": {
+        "completed_bags": 25551,
+        "completion_fraction": 0.14649794738894112,
+        "current_backlog": 14390,
+        "failed_bags": 0,
+        "history_source": "native_bounded_progress_history",
+        "released_bags": 39941,
+        "requested_bags": 174412,
+        "simulated_time": 27500.001
+      },
+      "repeat": 0,
+      "resources": {
+        "bounded_check_every_events": 65536,
+        "bounded_wall_seconds": 60.0,
+        "native_cpu_to_wall_ratio": 0.9754782854675543,
+        "native_process_cpu_seconds": 60.28125,
+        "native_wall_seconds": 61.7966088000685
+      },
+      "scale": 4,
+      "status": "BOUNDED_PROGRESS",
+      "variant": "rich"
+    },
+    {
+      "diagnostic_hops": 0,
+      "execution_mode": "bounded",
+      "hard_safety": {
+        "gates": {
+          "failed_count_zero": true,
+          "first_edge_credit_future_route_count_zero": true,
+          "first_edge_credit_global_scan_count_zero": true,
+          "full_future_routes_stored_zero": true,
+          "future_path_field_absent": true,
+          "global_reservation_scan_count_zero": true,
+          "microphase_runtime_global_scan_count_zero": true,
+          "physical_fault_edge_entry_violation_count_zero": true,
+          "priority_future_route_input_count_zero": true,
+          "priority_global_scan_count_zero": true,
+          "reservation_conflicts_zero": true,
+          "runtime_full_astar_calls_zero": true,
+          "runtime_full_cie_astar_calls_zero": true,
+          "scorer_future_route_input_count_zero": true,
+          "scorer_future_schedule_input_count_zero": true,
+          "scorer_runtime_global_scan_count_zero": true,
+          "unresolved_deadlock_count_zero": true
+        },
+        "pass": true
+      },
+      "hotpath": {
+        "policy": "E2",
+        "redundant_beacon_suppressed_count": 382471,
+        "same_state_beacon_suppressed_count": 398683,
+        "total_beacon_suppressed_count": 781154
+      },
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 4,
+        "segments": 174412,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "mechanism": {
+        "lean_candidate_evaluations": 1538911,
+        "scorer_candidate_evaluations": 1538911
+      },
+      "metrics": {
+        "completions_per_wall_second": 435.264929214987,
+        "congestion_beacon_event_count": 1352871,
+        "event_count": 4653056,
+        "events_per_completed_bag": 177.17828040514812,
+        "events_per_wall_second": 77119.49167897992,
+        "mean_tth_seconds": null,
+        "merge_grant_wait_mean_seconds": null,
+        "network_time_mean_seconds": null,
+        "p95_tth_seconds": null,
+        "p99_tth_seconds": null,
+        "route_wait_mean_seconds": null,
+        "source_wait_mean_seconds": null
+      },
+      "progress": {
+        "completed_bags": 26262,
+        "completion_fraction": 0.15057450175446643,
+        "current_backlog": 14552,
+        "failed_bags": 0,
+        "history_source": "native_bounded_progress_history",
+        "released_bags": 40814,
+        "requested_bags": 174412,
+        "simulated_time": 27763.001000000004
+      },
+      "repeat": 0,
+      "resources": {
+        "bounded_check_every_events": 65536,
+        "bounded_wall_seconds": 60.0,
+        "native_cpu_to_wall_ratio": 0.9764798780520954,
+        "native_process_cpu_seconds": 60.5625,
+        "native_wall_seconds": 62.02124729985371
+      },
+      "scale": 4,
+      "status": "BOUNDED_PROGRESS",
+      "variant": "lean"
+    },
+    {
+      "diagnostic_hops": 0,
+      "execution_mode": "bounded",
+      "hard_safety": {
+        "gates": {
+          "failed_count_zero": true,
+          "first_edge_credit_future_route_count_zero": true,
+          "first_edge_credit_global_scan_count_zero": true,
+          "full_future_routes_stored_zero": true,
+          "future_path_field_absent": true,
+          "global_reservation_scan_count_zero": true,
+          "microphase_runtime_global_scan_count_zero": true,
+          "physical_fault_edge_entry_violation_count_zero": true,
+          "priority_future_route_input_count_zero": true,
+          "priority_global_scan_count_zero": true,
+          "reservation_conflicts_zero": true,
+          "runtime_full_astar_calls_zero": true,
+          "runtime_full_cie_astar_calls_zero": true,
+          "scorer_future_route_input_count_zero": true,
+          "scorer_future_schedule_input_count_zero": true,
+          "scorer_runtime_global_scan_count_zero": true,
+          "unresolved_deadlock_count_zero": true
+        },
+        "pass": true
+      },
+      "hotpath": {
+        "policy": "E2",
+        "redundant_beacon_suppressed_count": 377334,
+        "same_state_beacon_suppressed_count": 391583,
+        "total_beacon_suppressed_count": 768917
+      },
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 4,
+        "segments": 174412,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "mechanism": {
+        "lean_candidate_evaluations": 1515514,
+        "scorer_candidate_evaluations": 1515514
+      },
+      "metrics": {
+        "completions_per_wall_second": 430.521600702171,
+        "congestion_beacon_event_count": 1334817,
+        "event_count": 4587520,
+        "events_per_completed_bag": 177.28175599953627,
+        "events_per_wall_second": 76323.62536821206,
+        "mean_tth_seconds": null,
+        "merge_grant_wait_mean_seconds": null,
+        "network_time_mean_seconds": null,
+        "p95_tth_seconds": null,
+        "p99_tth_seconds": null,
+        "route_wait_mean_seconds": null,
+        "source_wait_mean_seconds": null
+      },
+      "progress": {
+        "completed_bags": 25877,
+        "completion_fraction": 0.14836708483361236,
+        "current_backlog": 14601,
+        "failed_bags": 0,
+        "history_source": "native_bounded_progress_history",
+        "released_bags": 40478,
+        "requested_bags": 174412,
+        "simulated_time": 27631.201
+      },
+      "repeat": 1,
+      "resources": {
+        "bounded_check_every_events": 65536,
+        "bounded_wall_seconds": 60.0,
+        "native_cpu_to_wall_ratio": 0.968469776609656,
+        "native_process_cpu_seconds": 59.8125,
+        "native_wall_seconds": 61.7598003000021
+      },
+      "scale": 4,
+      "status": "BOUNDED_PROGRESS",
+      "variant": "lean"
+    },
+    {
+      "diagnostic_hops": 2,
+      "execution_mode": "bounded",
+      "hard_safety": {
+        "gates": {
+          "failed_count_zero": true,
+          "first_edge_credit_future_route_count_zero": true,
+          "first_edge_credit_global_scan_count_zero": true,
+          "full_future_routes_stored_zero": true,
+          "future_path_field_absent": true,
+          "global_reservation_scan_count_zero": true,
+          "microphase_runtime_global_scan_count_zero": true,
+          "physical_fault_edge_entry_violation_count_zero": true,
+          "priority_future_route_input_count_zero": true,
+          "priority_global_scan_count_zero": true,
+          "reservation_conflicts_zero": true,
+          "runtime_full_astar_calls_zero": true,
+          "runtime_full_cie_astar_calls_zero": true,
+          "scorer_future_route_input_count_zero": true,
+          "scorer_future_schedule_input_count_zero": true,
+          "scorer_runtime_global_scan_count_zero": true,
+          "unresolved_deadlock_count_zero": true
+        },
+        "pass": true
+      },
+      "hotpath": {
+        "policy": "E2",
+        "redundant_beacon_suppressed_count": 377334,
+        "same_state_beacon_suppressed_count": 391583,
+        "total_beacon_suppressed_count": 768917
+      },
+      "input": {
+        "protocol": "g4irsf10_distribution_preserving_fixed_map_resample",
+        "scale": 4,
+        "segments": 174412,
+        "topology_changed": false,
+        "tth_denominator": "java_release_time_tth"
+      },
+      "mechanism": {
+        "lean_candidate_evaluations": 0,
+        "scorer_candidate_evaluations": 1515514
+      },
+      "metrics": {
+        "completions_per_wall_second": 430.33610332286526,
+        "congestion_beacon_event_count": 1334817,
+        "event_count": 4587520,
+        "events_per_completed_bag": 177.28175599953627,
+        "events_per_wall_second": 76290.74006707543,
+        "mean_tth_seconds": null,
+        "merge_grant_wait_mean_seconds": null,
+        "network_time_mean_seconds": null,
+        "p95_tth_seconds": null,
+        "p99_tth_seconds": null,
+        "route_wait_mean_seconds": null,
+        "source_wait_mean_seconds": null
+      },
+      "progress": {
+        "completed_bags": 25877,
+        "completion_fraction": 0.14836708483361236,
+        "current_backlog": 14601,
+        "failed_bags": 0,
+        "history_source": "native_bounded_progress_history",
+        "released_bags": 40478,
+        "requested_bags": 174412,
+        "simulated_time": 27631.201
+      },
+      "repeat": 1,
+      "resources": {
+        "bounded_check_every_events": 65536,
+        "bounded_wall_seconds": 60.0,
+        "native_cpu_to_wall_ratio": 0.9744542961441237,
+        "native_process_cpu_seconds": 60.328125,
+        "native_wall_seconds": 61.909650600049645
+      },
+      "scale": 4,
+      "status": "BOUNDED_PROGRESS",
+      "variant": "rich"
+    }
+  ],
+  "schema": "czr005.g4irsf21.lean_s4_hotpath.v1",
+  "status": "COMPLETE"
+}

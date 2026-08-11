@@ -1,0 +1,51 @@
+{
+  "claim_boundary": "Complete local one-hop action labels only; no H_system, model, closed loop, full 4x completion, or v2-safe gap-closure claim.",
+  "counts": {
+    "executed_treatments": 48,
+    "fully_complete_groups": 24,
+    "i3_census_groups": 174868,
+    "persisted_groups": 16,
+    "persisted_long_wait_groups": 8,
+    "persisted_short_wait_groups": 8,
+    "returned_pairs": 48,
+    "screened_groups": 24,
+    "unique_split_group_count": 8
+  },
+  "decision": "DATA_ONLY_NO_MODEL_TRAINED",
+  "design": {
+    "controller": "Source A0 + Route S4 + Merge J2 + E2",
+    "horizon": "H_bag",
+    "raw_native_pairs_persisted": false,
+    "screening_multiplier": 1.5,
+    "source_scale": 1,
+    "target_schema": "czr005.g4irsf21.route_action_target.v1",
+    "utility_semantics": "BASELINE_MINUS_TREATMENT_COMPLETION_SECONDS",
+    "utility_unit": "seconds",
+    "wait_feature_semantics": "NONE_ACTION_KIND_ONLY"
+  },
+  "dropped_group_reason_counts": {},
+  "persisted_action_kind_counts": {
+    "NEXT_EDGE": 32,
+    "WAIT": 16
+  },
+  "persisted_action_label_counts": {
+    "HARMFUL": 32,
+    "NEUTRAL": 16
+  },
+  "persisted_action_label_counts_by_kind": {
+    "NEXT_EDGE": {
+      "HARMFUL": 16,
+      "NEUTRAL": 16
+    },
+    "WAIT": {
+      "HARMFUL": 16
+    }
+  },
+  "schema": "czr005.g4irsf21.route_action_set_summary.v1",
+  "status": "COMPLETE_ACTION_SET_TARGET_MET",
+  "targets": {
+    "groups": 16,
+    "long_wait_groups": 8,
+    "long_wait_seconds": 30.0
+  }
+}

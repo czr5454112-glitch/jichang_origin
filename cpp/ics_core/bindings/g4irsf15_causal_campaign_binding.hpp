@@ -45,6 +45,8 @@ inline constexpr const char* kTargetAddressHorizonSchema =
     "czr005.g4irsf15.causal_target_address_horizon.v1";
 inline constexpr const char* kG4IRSF20RouteTargetSchema =
     "czr005.g4irsf20.route_target.v1";
+inline constexpr const char* kG4IRSF21RouteActionTargetSchema =
+    "czr005.g4irsf21.route_action_target.v1";
 inline constexpr const char* kPrepopEventGroupSchema =
     "czr005.g4irsf15.prepop_event_group.v1";
 inline constexpr const char* kPairRunSchema =
@@ -649,6 +651,7 @@ struct PopulationCandidate {
   std::string baseline_action;
   std::string intervention_action;
   std::string expected_action_change_type;
+  bool explicitly_selected_route_action = false;
 };
 
 inline std::string population_group_sha256(
@@ -715,6 +718,81 @@ primary_population_candidate(
     candidate.intervention_action =
         i3_action(skeleton.runtime_bag_id,
                   candidate.selected_next_node);
+    candidate.expected_action_change_type =
+        "EDGE_COMMIT_OR_MERGE_REQUEST_ENQUEUED";
+  } else {
+    candidate.baseline_action =
+        i4_action(skeleton.runtime_bag_id, true);
+    candidate.intervention_action =
+        i4_action(skeleton.runtime_bag_id, false);
+    candidate.expected_action_change_type =
+        "SAFE_HOLD_UNTIL_NEXT_JUNCTION_SERVICE_OPPORTUNITY";
+  }
+  return candidate;
+}
+
+inline std::optional<PopulationCandidate>
+route_action_population_candidate(
+    const Skeleton& skeleton,
+    const Strata& strata,
+    std::uint64_t event_ordinal,
+    bool pibt_prefilter_candidate_event,
+    const std::string& action_kind,
+    int selected_next_node) {
+  const int index = kind_index(skeleton.kind);
+  const bool next_edge = action_kind == "NEXT_EDGE";
+  const bool wait = action_kind == "WAIT";
+  if ((next_edge && index != 1) || (wait && index != 2) ||
+      (!next_edge && !wait)) {
+    return std::nullopt;
+  }
+
+  ics::G4IRSF15PrimaryLocalAction action;
+  if (next_edge) {
+    if (selected_next_node == skeleton.baseline_next_node ||
+        std::find(skeleton.legal_next_edges.begin(),
+                  skeleton.legal_next_edges.end(),
+                  selected_next_node) ==
+            skeleton.legal_next_edges.end()) {
+      return std::nullopt;
+    }
+    action.selected_next_node = selected_next_node;
+    action.candidate_action_count = static_cast<int>(
+        std::count_if(
+            skeleton.legal_next_edges.begin(),
+            skeleton.legal_next_edges.end(),
+            [&](int next) {
+              return next != skeleton.baseline_next_node;
+            }));
+  } else {
+    if (!skeleton.baseline_release) {
+      return std::nullopt;
+    }
+    action.selected_boolean = false;
+    action.candidate_action_count = 1;
+  }
+
+  PopulationCandidate candidate;
+  candidate.skeleton = skeleton;
+  candidate.strata = strata;
+  candidate.event_ordinal = event_ordinal;
+  candidate.pibt_prefilter_candidate_event =
+      pibt_prefilter_candidate_event;
+  candidate.selected_next_node = action.selected_next_node;
+  candidate.selected_boolean = action.selected_boolean;
+  candidate.candidate_action_count = action.candidate_action_count;
+  candidate.population_group_sha256 = population_group_sha256(
+      skeleton, strata, event_ordinal,
+      pibt_prefilter_candidate_event);
+  candidate.population_selection_sha256 =
+      ics::g4irsf15_population_selection_evidence_sha256(
+          candidate.population_group_sha256, action);
+  candidate.explicitly_selected_route_action = true;
+  if (next_edge) {
+    candidate.baseline_action = i3_action(
+        skeleton.runtime_bag_id, skeleton.baseline_next_node);
+    candidate.intervention_action = i3_action(
+        skeleton.runtime_bag_id, selected_next_node);
     candidate.expected_action_change_type =
         "EDGE_COMMIT_OR_MERGE_REQUEST_ENQUEUED";
   } else {
@@ -1072,6 +1150,9 @@ inline py::dict g4irsf20_route_census_row(
   row["candidate_count"] =
       static_cast<int>(
           skeleton.g4irsf20_route_candidate_next_nodes.size());
+  row["baseline_next_node"] = skeleton.baseline_next_node;
+  row["legal_next_edges"] = skeleton.legal_next_edges;
+  row["wait_available"] = true;
   row["normal_flow"] = skeleton.g4irsf20_route_normal_flow;
   return row;
 }
@@ -1110,6 +1191,55 @@ inline PrimaryDescriptor seal_primary_descriptor(
   intervention.runtime_bag_id = boundary.runtime_bag_id;
   intervention.peer_runtime_bag_id =
       selected_population.peer_runtime_bag_id;
+  intervention.selected_next_node =
+      selected_population.selected_next_node;
+  intervention.selected_boolean =
+      selected_population.selected_boolean;
+  intervention.validate_against(boundary);
+
+  PrimaryDescriptor descriptor;
+  descriptor.population = *replayed_population;
+  descriptor.boundary = boundary;
+  descriptor.intervention = intervention;
+  descriptor.descriptor_id =
+      intervention.intervention_sha256(boundary);
+  auto h_system = intervention;
+  h_system.horizon = Horizon::kSelectedSystem;
+  descriptor.h_system_sha256 =
+      h_system.intervention_sha256(boundary);
+  return descriptor;
+}
+
+inline PrimaryDescriptor seal_route_action_descriptor(
+    const PopulationCandidate& selected_population,
+    const Boundary& boundary,
+    const Strata& strata,
+    bool pibt_prefilter_candidate_event,
+    const std::string& action_kind) {
+  boundary.validate();
+  const auto replayed_population =
+      route_action_population_candidate(
+          skeleton_from_boundary(boundary), strata,
+          selected_population.event_ordinal,
+          pibt_prefilter_candidate_event, action_kind,
+          selected_population.selected_next_node);
+  if (!replayed_population.has_value() ||
+      replayed_population->population_group_sha256 !=
+          selected_population.population_group_sha256 ||
+      replayed_population->population_selection_sha256 !=
+          selected_population.population_selection_sha256 ||
+      replayed_population->selected_next_node !=
+          selected_population.selected_next_node ||
+      replayed_population->selected_boolean !=
+          selected_population.selected_boolean) {
+    throw std::invalid_argument(
+        "selected Route action is not the replayed native legal action");
+  }
+  Intervention intervention;
+  intervention.kind = intervention_kind_for(
+      kind_index(boundary.kind));
+  intervention.horizon = Horizon::kAffectedBag;
+  intervention.runtime_bag_id = boundary.runtime_bag_id;
   intervention.selected_next_node =
       selected_population.selected_next_node;
   intervention.selected_boolean =
@@ -1190,7 +1320,9 @@ inline py::dict descriptor_row(
   row["pibt_prefilter_candidate_event"] =
       population.pibt_prefilter_candidate_event;
   row["primary_action_selection"] =
-      "LOCAL_STABLE_NUMERIC_MIN_PEER_OR_NEXT_NODE_I4_UNIQUE";
+      population.explicitly_selected_route_action
+          ? "EXPLICIT_NATIVE_LEGAL_ROUTE_ACTION"
+          : "LOCAL_STABLE_NUMERIC_MIN_PEER_OR_NEXT_NODE_I4_UNIQUE";
   row["baseline_action"] = population.baseline_action;
   row["intervention_action"] =
       population.intervention_action;
@@ -2024,6 +2156,9 @@ inline py::dict invariant_row(const InvariantEvidence& evidence) {
 struct Target {
   bool deferred_address = false;
   bool g4irsf20_route_target = false;
+  bool g4irsf21_route_action_target = false;
+  std::string route_action_kind;
+  int requested_route_next_node = -1;
   std::string descriptor_id;
   std::string skeleton_id;
   std::string population_group_sha256;
@@ -2060,16 +2195,21 @@ inline Target parse_target(const py::dict& row) {
                           : std::string(kDescriptorSchema);
   if (schema != kDescriptorSchema &&
       schema != kTargetAddressSchema &&
-      schema != kG4IRSF20RouteTargetSchema) {
+      schema != kG4IRSF20RouteTargetSchema &&
+      schema != kG4IRSF21RouteActionTargetSchema) {
     throw py::value_error("unsupported G4IRSF15 descriptor schema");
   }
   Target target;
   target.g4irsf20_route_target =
       schema == kG4IRSF20RouteTargetSchema;
+  target.g4irsf21_route_action_target =
+      schema == kG4IRSF21RouteActionTargetSchema;
   target.deferred_address =
       schema == kTargetAddressSchema ||
-      target.g4irsf20_route_target;
-  if (target.g4irsf20_route_target) {
+      target.g4irsf20_route_target ||
+      target.g4irsf21_route_action_target;
+  if (target.g4irsf20_route_target ||
+      target.g4irsf21_route_action_target) {
     target.population_group_sha256 = strict_string(
         required_item(row, "population_group_id"),
         "population_group_id");
@@ -2081,8 +2221,6 @@ inline Target parse_target(const py::dict& row) {
       throw py::value_error(
           "G20 Route population IDs must be non-empty");
     }
-    target.descriptor_id =
-        target.population_selection_sha256;
     target.skeleton_id =
         target.population_selection_sha256;
     target.kind_index = 1;
@@ -2098,6 +2236,44 @@ inline Target parse_target(const py::dict& row) {
     } else {
       throw py::value_error("horizon must be H_bag or H_system");
     }
+    if (target.g4irsf20_route_target) {
+      target.descriptor_id =
+          target.population_selection_sha256;
+      return target;
+    }
+
+    target.route_action_kind = strict_string(
+        required_item(row, "action_kind"), "action_kind");
+    if (target.route_action_kind == "NEXT_EDGE") {
+      target.requested_route_next_node = strict_int(
+          required_item(row, "selected_next_node"),
+          "selected_next_node");
+      target.selected_next_node =
+          target.requested_route_next_node;
+    } else if (target.route_action_kind == "WAIT") {
+      if (optional_item(row, "selected_next_node")) {
+        throw py::value_error(
+            "WAIT Route action must not carry selected_next_node");
+      }
+    } else {
+      throw py::value_error(
+          "action_kind must be NEXT_EDGE or WAIT");
+    }
+    const char* horizon_token =
+        target.horizon == Horizon::kSelectedSystem
+            ? "H_system"
+            : "H_bag";
+    target.descriptor_id =
+        "G21_ROUTE_ACTION|GROUP=" +
+        target.population_group_sha256 +
+        "|SELECTION=" + target.population_selection_sha256 +
+        "|EVENT=" + std::to_string(target.event_ordinal) +
+        "|ACTION=" + target.route_action_kind +
+        (target.route_action_kind == "NEXT_EDGE"
+             ? "|NEXT_NODE=" +
+                   std::to_string(target.requested_route_next_node)
+             : std::string()) +
+        "|HORIZON=" + horizon_token;
     return target;
   }
   target.descriptor_id =
@@ -3597,13 +3773,15 @@ inline py::dict run_causal_target_pairs_from_records(
   const auto input_runtime_cohort_sha256 =
       detail::workload_cohort_sha256(requests);
   for (const auto& target : targets) {
-    if (target.g4irsf20_route_target &&
+    if ((target.g4irsf20_route_target ||
+         target.g4irsf21_route_action_target) &&
         research_profile != "G20_S4_J2") {
       throw py::value_error(
-          "G20 Route targets require research_profile G20_S4_J2");
+          "G20/G21 Route targets require research_profile G20_S4_J2");
     }
     if (target.deferred_address &&
         !target.g4irsf20_route_target &&
+        !target.g4irsf21_route_action_target &&
         target.input_runtime_cohort_sha256 !=
             input_runtime_cohort_sha256) {
       throw py::value_error(
@@ -3697,6 +3875,8 @@ inline py::dict run_causal_target_pairs_from_records(
          index < group_end; ++index) {
       auto target = targets[index];
       auto found = source_probe.observed_opportunities.end();
+      std::optional<detail::PopulationCandidate>
+          requested_route_population;
       bool ambiguous_address = false;
       if (target.deferred_address) {
         for (auto candidate_boundary =
@@ -3745,6 +3925,24 @@ inline py::dict run_causal_target_pairs_from_records(
             target.population_group_sha256;
         pair["population_selection_id"] =
             target.population_selection_sha256;
+      } else if (target.g4irsf21_route_action_target) {
+        pair["target_schema"] =
+            kG4IRSF21RouteActionTargetSchema;
+        pair["population_group_id"] =
+            target.population_group_sha256;
+        pair["population_selection_id"] =
+            target.population_selection_sha256;
+        pair["target_action_id"] = target.descriptor_id;
+        pair["action_kind"] = target.route_action_kind;
+        if (target.route_action_kind == "NEXT_EDGE") {
+          pair["requested_next_node"] =
+              target.requested_route_next_node;
+          pair["selected_next_node"] =
+              target.requested_route_next_node;
+        } else {
+          pair["requested_next_node"] = py::none();
+          pair["selected_next_node"] = py::none();
+        }
       }
       pair["kind"] = detail::kind_token(target.kind_index);
       pair["event_ordinal"] =
@@ -3811,16 +4009,142 @@ inline py::dict run_causal_target_pairs_from_records(
             resolved->intervention_action;
         target.expected_action_change_type =
             resolved->expected_action_change_type;
+      } else if (target.g4irsf21_route_action_target) {
+        const auto anchor = found;
+        const auto anchor_population =
+            detail::primary_population_candidate(
+                detail::skeleton_from_boundary(*anchor),
+                source_strata, target.event_ordinal,
+                pibt_prefilter_candidate_event);
+        if (!anchor_population.has_value() ||
+            anchor_population->population_group_sha256 !=
+                target.population_group_sha256 ||
+            anchor_population->population_selection_sha256 !=
+                target.population_selection_sha256) {
+          throw std::logic_error(
+              "matched G21 Route anchor did not reproduce its population IDs");
+        }
+
+        if (target.route_action_kind == "NEXT_EDGE") {
+          requested_route_population =
+              detail::route_action_population_candidate(
+                  detail::skeleton_from_boundary(*anchor),
+                  source_strata, target.event_ordinal,
+                  pibt_prefilter_candidate_event,
+                  target.route_action_kind,
+                  target.requested_route_next_node);
+          if (!requested_route_population.has_value()) {
+            pair["false_positive_reason"] =
+                "REQUESTED_NEXT_EDGE_NOT_LEGAL_AT_I3_BOUNDARY";
+            pair["source_probe"] = detail::step_row(source_probe);
+            pairs.append(std::move(pair));
+            ++false_positive_pair_count;
+            continue;
+          }
+        } else {
+          auto wait_sibling =
+              source_probe.observed_opportunities.end();
+          bool ambiguous_wait_sibling = false;
+          for (auto candidate_boundary =
+                   source_probe.observed_opportunities.begin();
+               candidate_boundary !=
+                   source_probe.observed_opportunities.end();
+               ++candidate_boundary) {
+            if (detail::kind_index(candidate_boundary->kind) != 2 ||
+                candidate_boundary->clone_group_id !=
+                    anchor->clone_group_id ||
+                candidate_boundary->event_seq != anchor->event_seq ||
+                !ics::event_runtime_detail::same_timestamp(
+                    candidate_boundary->time, anchor->time) ||
+                candidate_boundary->node != anchor->node ||
+                candidate_boundary->runtime_bag_id !=
+                    anchor->runtime_bag_id ||
+                candidate_boundary->baseline_next_node !=
+                    anchor->baseline_next_node ||
+                !candidate_boundary->baseline_release ||
+                candidate_boundary->legal_next_edges !=
+                    anchor->legal_next_edges) {
+              continue;
+            }
+            if (wait_sibling !=
+                source_probe.observed_opportunities.end()) {
+              ambiguous_wait_sibling = true;
+              wait_sibling =
+                  source_probe.observed_opportunities.end();
+              break;
+            }
+            wait_sibling = candidate_boundary;
+          }
+          if (ambiguous_wait_sibling ||
+              wait_sibling ==
+                  source_probe.observed_opportunities.end()) {
+            pair["false_positive_reason"] =
+                ambiguous_wait_sibling
+                    ? "WAIT_ACTION_MATCHED_MULTIPLE_I4_SIBLINGS"
+                    : "LEGAL_WAIT_I4_SIBLING_NOT_OBSERVED";
+            pair["source_probe"] = detail::step_row(source_probe);
+            pairs.append(std::move(pair));
+            ++false_positive_pair_count;
+            continue;
+          }
+          found = wait_sibling;
+          target.kind_index = 2;
+          requested_route_population =
+              detail::route_action_population_candidate(
+                  detail::skeleton_from_boundary(*found),
+                  source_strata, target.event_ordinal,
+                  pibt_prefilter_candidate_event,
+                  target.route_action_kind, -1);
+          if (!requested_route_population.has_value()) {
+            throw std::logic_error(
+                "matched G21 WAIT sibling is not a native legal hold action");
+          }
+        }
+
+        const auto& resolved = *requested_route_population;
+        target.clone_group_id = found->clone_group_id;
+        target.event_seq = found->event_seq;
+        target.event_time_bits =
+            ics::event_runtime_detail::timestamp_bits(found->time);
+        target.node = found->node;
+        target.runtime_bag_id = found->runtime_bag_id;
+        target.peer_runtime_bag_id =
+            resolved.peer_runtime_bag_id;
+        target.baseline_next_node = found->baseline_next_node;
+        target.selected_next_node =
+            resolved.selected_next_node;
+        target.baseline_release = found->baseline_release;
+        target.selected_boolean = resolved.selected_boolean;
+        target.source_ready_order = found->source_ready_order;
+        target.legal_next_edges = found->legal_next_edges;
+        target.baseline_action = resolved.baseline_action;
+        target.intervention_action = resolved.intervention_action;
+        target.expected_action_change_type =
+            resolved.expected_action_change_type;
+        pair["kind"] = detail::kind_token(target.kind_index);
+        pair["resolved_action_selection_id"] =
+            resolved.population_selection_sha256;
       }
 
       detail::verify_target_boundary(target, *found);
-      const auto resolved_population = detail::verify_target_population(
-          target, *found, source_strata,
-          pibt_prefilter_candidate_event);
-      const auto resolved_descriptor =
-          detail::seal_primary_descriptor(
-              resolved_population, *found, source_strata,
-              pibt_prefilter_candidate_event);
+      detail::PopulationCandidate resolved_population;
+      detail::PrimaryDescriptor resolved_descriptor;
+      if (target.g4irsf21_route_action_target) {
+        resolved_population = *requested_route_population;
+        resolved_descriptor =
+            detail::seal_route_action_descriptor(
+                resolved_population, *found, source_strata,
+                pibt_prefilter_candidate_event,
+                target.route_action_kind);
+      } else {
+        resolved_population = detail::verify_target_population(
+            target, *found, source_strata,
+            pibt_prefilter_candidate_event);
+        resolved_descriptor =
+            detail::seal_primary_descriptor(
+                resolved_population, *found, source_strata,
+                pibt_prefilter_candidate_event);
+      }
       const auto intervention =
           detail::intervention_for(target, *found);
       pair["resolved_execution_descriptor"] =
@@ -3959,7 +4283,8 @@ inline py::dict run_causal_target_pairs_from_records(
           protected_full_1x_shape,
           research_profile == "G20_S4_J2");
       const bool compact_g4irsf20_h_system =
-          target.g4irsf20_route_target &&
+          (target.g4irsf20_route_target ||
+           target.g4irsf21_route_action_target) &&
           research_profile == "G20_S4_J2" &&
           target.horizon == detail::Horizon::kSelectedSystem;
       pair["baseline"] =
