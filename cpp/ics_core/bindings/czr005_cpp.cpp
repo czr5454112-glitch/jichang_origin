@@ -3390,6 +3390,14 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["repair_event_count"] = summary.repair_event_count;
   row["local_queue_update_event_count"] = summary.local_queue_update_event_count;
   row["congestion_beacon_update_event_count"] = summary.congestion_beacon_update_event_count;
+  if (summary.g4irsf20_event_hotpath_policy != "E0") {
+    row["g4irsf20_event_hotpath_policy"] =
+        summary.g4irsf20_event_hotpath_policy;
+    row["g4irsf20_redundant_beacon_suppressed_count"] =
+        py::int_(summary.g4irsf20_redundant_beacon_suppressed_count);
+    row["g4irsf20_same_state_beacon_suppressed_count"] =
+        py::int_(summary.g4irsf20_same_state_beacon_suppressed_count);
+  }
   row["source_admission_enabled"] = summary.source_admission_enabled;
   row["source_admission_attempt_count"] =
       py::int_(summary.source_admission_attempt_count);
@@ -5959,6 +5967,16 @@ py::dict g4irsf19_progress_row(
   row["retry_count_by_reason"] = std::move(retries);
   row["duplicate_wakeup_count"] = snapshot.duplicate_wakeup_count;
   row["coalesced_event_count"] = snapshot.coalesced_wakeup_count;
+  if (snapshot.g4irsf20_event_hotpath_policy != "E0") {
+    row["g4irsf20_event_hotpath_policy"] =
+        snapshot.g4irsf20_event_hotpath_policy;
+    row["g4irsf20_redundant_beacon_suppressed_count"] =
+        py::int_(
+            snapshot.g4irsf20_redundant_beacon_suppressed_count);
+    row["g4irsf20_same_state_beacon_suppressed_count"] =
+        py::int_(
+            snapshot.g4irsf20_same_state_beacon_suppressed_count);
+  }
   return row;
 }
 
@@ -6045,7 +6063,8 @@ py::dict g4irsf11_event_runtime_from_records(
     const py::object& g4irsf18_merge_max_overrides_per_segment,
     bool g4irsf18_merge_kill_switch,
     double bounded_wall_seconds,
-    int bounded_check_every_events) {
+    int bounded_check_every_events,
+    const std::string& g4irsf20_event_hotpath_policy) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6134,6 +6153,12 @@ py::dict g4irsf11_event_runtime_from_records(
   if (bounded_check_every_events <= 0) {
     throw py::value_error(
         "bounded_check_every_events must be positive");
+  }
+  if (g4irsf20_event_hotpath_policy != "E0" &&
+      g4irsf20_event_hotpath_policy != "E1" &&
+      g4irsf20_event_hotpath_policy != "E2") {
+    throw py::value_error(
+        "g4irsf20_event_hotpath_policy must be E0, E1, or E2");
   }
   if (requested_destination_merge_grants &&
       priority_mode != "Q0" &&
@@ -6268,6 +6293,8 @@ py::dict g4irsf11_event_runtime_from_records(
           g4irsf18_merge_coverage_cap,
           g4irsf18_merge_max_overrides_per_segment,
           g4irsf18_merge_kill_switch);
+  config.g4irsf20_event_hotpath_policy =
+      g4irsf20_event_hotpath_policy;
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -7013,7 +7040,9 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("g4irsf18_merge_max_overrides_per_segment") = 2,
              py::arg("g4irsf18_merge_kill_switch") = false,
              py::arg("bounded_wall_seconds") = -1.0,
-             py::arg("bounded_check_every_events") = 65536);
+             py::arg("bounded_check_every_events") = 65536,
+             py::arg("g4irsf20_event_hotpath_policy") =
+                 std::string("E0"));
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

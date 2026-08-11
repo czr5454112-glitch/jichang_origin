@@ -611,6 +611,11 @@ struct EventDrivenJunctionConfig {
   // Internal causal-data sidecar capture.  The production default is exact
   // off; G15's frozen census enables it without changing any runtime action.
   bool enable_g4irsf17_causal_source_features = false;
+  // G20 removes only redundant congestion-beacon publications. E0 is exact
+  // G19 behavior, E1 prunes publications already covered by a same-time
+  // local-queue/arrival update, and E2 also prunes a no-action dispatch
+  // publication when no advertised state can have changed.
+  std::string g4irsf20_event_hotpath_policy = "E0";
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -745,6 +750,69 @@ struct EventDecisionTraceRow {
   bool g4irsf16_i4_ood = true;
   std::string g4irsf16_i4_model_reason;
 };
+
+// Stable raw schema for the outcome-free G20 Route observation sidecar.  Keep
+// this order aligned with Python's NATIVE_ROUTE_CANDIDATE_FIELDS: the first
+// seven values contain event_time plus every primitive needed to reconstruct
+// S4 exactly, and the remainder are existing bounded-local context fields.
+// Candidate/action IDs, scorer outputs, selected actions, and realized
+// outcomes deliberately remain outside the feature matrix.
+inline constexpr std::array<const char*, 23>
+    kG4IRSF20RouteNativeCandidateFeatureNames = {
+        "event_time",
+        "target_queue_length",
+        "target_scheduled_incoming",
+        "corridor_next_available",
+        "target_next_available",
+        "travel_time",
+        "static_potential",
+        "priority_slack_seconds",
+        "priority_age_seconds",
+        "recent_visit_count",
+        "junction_queue_length",
+        "junction_next_available_time",
+        "priority_local_contention",
+        "current_goal_queue_length",
+        "target_goal_queue_length",
+        "target_goal_scheduled_incoming",
+        "current_goal_max_wait",
+        "goal_conditioned_differential",
+        "estimated_service_rate",
+        "service_weighted_pressure",
+        "advertised_fault",
+        "fault_message_age_seconds",
+        "two_hop_queue_pressure",
+    };
+
+inline std::vector<double> g4irsf20_route_native_candidate_features(
+    const EventDecisionTraceRow& trace,
+    const EventCandidateRecord& candidate) {
+  return {
+      trace.event_time,
+      static_cast<double>(candidate.target_queue_length),
+      static_cast<double>(candidate.target_scheduled_incoming),
+      candidate.corridor_next_available,
+      candidate.target_next_available,
+      candidate.travel_time,
+      candidate.static_potential,
+      trace.priority_slack_seconds,
+      trace.priority_age_seconds,
+      static_cast<double>(candidate.recent_visit_count),
+      static_cast<double>(trace.junction_queue_length),
+      trace.junction_next_dispatch_time,
+      static_cast<double>(trace.priority_local_contention),
+      static_cast<double>(candidate.current_goal_queue_length),
+      static_cast<double>(candidate.target_goal_queue_length),
+      static_cast<double>(candidate.target_goal_scheduled_incoming),
+      candidate.current_goal_max_wait,
+      candidate.goal_conditioned_differential,
+      candidate.estimated_service_rate,
+      candidate.service_weighted_pressure,
+      candidate.advertised_fault ? 1.0 : 0.0,
+      candidate.fault_message_age_seconds,
+      static_cast<double>(candidate.two_hop_queue_pressure),
+  };
+}
 
 struct EventRuntimeTraceRow {
   std::uint64_t seq = 0;
@@ -1234,6 +1302,10 @@ struct EventRuntimeSummary {
   int g4irsf18_merge_future_route_input_count = 0;
   int g4irsf18_merge_future_schedule_input_count = 0;
   int g4irsf18_merge_full_astar_call_count = 0;
+  // Emitted only for an opt-in G20 event hotpath policy.
+  std::string g4irsf20_event_hotpath_policy = "E0";
+  std::uint64_t g4irsf20_redundant_beacon_suppressed_count = 0;
+  std::uint64_t g4irsf20_same_state_beacon_suppressed_count = 0;
 };
 
 struct EventRuntimeJunctionResult {
@@ -1588,6 +1660,9 @@ struct EventRuntimeProgressSnapshot {
   std::uint64_t merge_retry_count = 0;
   std::uint64_t duplicate_wakeup_count = 0;
   std::uint64_t coalesced_wakeup_count = 0;
+  std::string g4irsf20_event_hotpath_policy = "E0";
+  std::uint64_t g4irsf20_redundant_beacon_suppressed_count = 0;
+  std::uint64_t g4irsf20_same_state_beacon_suppressed_count = 0;
 };
 
 struct EventDrivenJunctionSafeBoundary {
@@ -2579,6 +2654,8 @@ class EventDrivenJunctionRuntime {
     result_.summary.trace_shard_index = config_.trace_shard_index;
     result_.summary.event_semantics = canonical_event_semantics();
     result_.summary.event_semantics_echo = config_.event_semantics;
+    result_.summary.g4irsf20_event_hotpath_policy =
+        config_.g4irsf20_event_hotpath_policy;
     result_.summary.opportunity_telemetry_enabled =
         config_.enable_opportunity_telemetry;
     result_.summary.g4irsf17_source_wait_telemetry_enabled =
@@ -3274,6 +3351,12 @@ class EventDrivenJunctionRuntime {
         result_.summary.merge_grant_duplicate_wakeup_prevented_count;
     snapshot.coalesced_wakeup_count =
         result_.summary.merge_grant_wakeup_coalesced_count;
+    snapshot.g4irsf20_event_hotpath_policy =
+        result_.summary.g4irsf20_event_hotpath_policy;
+    snapshot.g4irsf20_redundant_beacon_suppressed_count =
+        result_.summary.g4irsf20_redundant_beacon_suppressed_count;
+    snapshot.g4irsf20_same_state_beacon_suppressed_count =
+        result_.summary.g4irsf20_same_state_beacon_suppressed_count;
     return snapshot;
   }
 
@@ -3545,23 +3628,31 @@ class EventDrivenJunctionRuntime {
   };
 
   void require_g4irsf14_causal_frozen_tuple() const {
-    if (canonical_resource_semantics() !=
-            "R3_java_node_window_compatible" ||
-        canonical_scorer_mode() != "S1" ||
-        canonical_pibt_mode() != BoundedLocalPIBTMode::kP2 ||
-        canonical_pressure_mode() != "C0_off" ||
-        canonical_priority_mode() !=
-            BoundedLocalPIBTPriorityMode::kQ0Current ||
-         canonical_event_semantics() !=
-             "E4_batch_plus_destination_merge_request" ||
-        canonical_merge_grant_timing_mode() !=
-            DestinationMergeGrantTimingMode::kEager ||
-        canonical_merge_grant_rule() !=
-            DestinationMergeGrantRule::kM0EarliestKnown ||
-        canonical_admission_mode() != "off") {
+    const bool common_frozen_controls =
+        canonical_resource_semantics() ==
+            "R3_java_node_window_compatible" &&
+        canonical_pibt_mode() == BoundedLocalPIBTMode::kP2 &&
+        canonical_pressure_mode() == "C0_off" &&
+        canonical_priority_mode() ==
+            BoundedLocalPIBTPriorityMode::kQ0Current &&
+        canonical_event_semantics() ==
+            "E4_batch_plus_destination_merge_request" &&
+        canonical_admission_mode() == "off";
+    const bool g15_frozen =
+        canonical_scorer_mode() == "S1" &&
+        canonical_merge_grant_timing_mode() ==
+            DestinationMergeGrantTimingMode::kEager &&
+        canonical_merge_grant_rule() ==
+            DestinationMergeGrantRule::kM0EarliestKnown;
+    const bool g20_s4_j2 =
+        canonical_scorer_mode() == "S4" &&
+        canonical_merge_grant_timing_mode() ==
+            DestinationMergeGrantTimingMode::kJitFairAgingDeadline &&
+        effective_merge_grant_rule() ==
+            DestinationMergeGrantRule::kM3DeadlineAging;
+    if (!common_frozen_controls || (!g15_frozen && !g20_s4_j2)) {
       throw std::logic_error(
-          "Stage 14E causal intervention requires frozen "
-          "R3/S1/P2/C0/Q0/E4/M0");
+          "causal intervention requires frozen G15 or G20 S4/J2 controls");
     }
   }
 
@@ -3743,6 +3834,16 @@ class EventDrivenJunctionRuntime {
           boundary.g4irsf17_i1_treatment_observation;
       skeleton.g4irsf17_i1_pairwise_features =
           boundary.g4irsf17_i1_pairwise_features;
+      skeleton.g4irsf20_route_observation_available =
+          boundary.g4irsf20_route_observation_available;
+      skeleton.g4irsf20_route_normal_flow =
+          boundary.g4irsf20_route_normal_flow;
+      skeleton.g4irsf20_route_baseline_candidate_index =
+          boundary.g4irsf20_route_baseline_candidate_index;
+      skeleton.g4irsf20_route_candidate_next_nodes =
+          std::move(boundary.g4irsf20_route_candidate_next_nodes);
+      skeleton.g4irsf20_route_candidate_features =
+          std::move(boundary.g4irsf20_route_candidate_features);
       skeleton.legal_next_edges =
           std::move(boundary.legal_next_edges);
       active_causal_step_->skeleton_result
@@ -4004,6 +4105,15 @@ class EventDrivenJunctionRuntime {
     return config_.enable_g4irsf17_source_wait_telemetry ||
            g4irsf17_source_policy_enabled() ||
            config_.enable_g4irsf17_causal_source_features;
+  }
+
+  bool g4irsf20_prunes_redundant_beacons() const noexcept {
+    return config_.g4irsf20_event_hotpath_policy == "E1" ||
+           config_.g4irsf20_event_hotpath_policy == "E2";
+  }
+
+  bool g4irsf20_prunes_same_state_hold_beacons() const noexcept {
+    return config_.g4irsf20_event_hotpath_policy == "E2";
   }
 
   bool g4irsf16_uses_diagnostic_rule() const noexcept {
@@ -4602,6 +4712,18 @@ class EventDrivenJunctionRuntime {
     (void)canonical_event_semantics();
     (void)canonical_merge_grant_timing_mode();
     (void)canonical_merge_grant_rule();
+    if (config_.g4irsf20_event_hotpath_policy != "E0" &&
+        config_.g4irsf20_event_hotpath_policy != "E1" &&
+        config_.g4irsf20_event_hotpath_policy != "E2") {
+      throw std::invalid_argument(
+          "g4irsf20_event_hotpath_policy must be E0, E1, or E2");
+    }
+    if (config_.g4irsf20_event_hotpath_policy != "E0" &&
+        (g4irsf17_extensions_enabled() || uses_first_edge_credit())) {
+      throw std::invalid_argument(
+          "G4IRSF20 E1/E2 beacon suppression cannot be combined with "
+          "G4IRSF17 beacon extensions or first-edge credit");
+    }
     config_.g4irsf18_merge_policy.validate_controls();
     if (g4irsf18_merge_policy_enabled() &&
         (!uses_destination_merge_grants() ||
@@ -5953,13 +6075,17 @@ class EventDrivenJunctionRuntime {
                      -1,
                      node,
                      "source_dequeue");
-    schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
-                     time,
-                     task_id,
-                     node,
-                     node,
-                     node,
-                     "source_service_reservation_snapshot");
+    if (g4irsf20_prunes_redundant_beacons()) {
+      ++result_.summary.g4irsf20_redundant_beacon_suppressed_count;
+    } else {
+      schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                       time,
+                       task_id,
+                       node,
+                       node,
+                       node,
+                       "source_service_reservation_snapshot");
+    }
     ++result_.summary.source_admission_admitted_count;
     if (causal_i1_swap_selected) {
       mark_causal_action_applied(
@@ -6596,13 +6722,17 @@ class EventDrivenJunctionRuntime {
              event.node,
              event.from_node,
              event.to_node);
-    schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
-                     event.time,
-                     event.task_id,
-                     event.node,
-                     event.from_node,
-                     event.to_node,
-                     "service_completion_snapshot");
+    if (g4irsf20_prunes_redundant_beacons()) {
+      ++result_.summary.g4irsf20_redundant_beacon_suppressed_count;
+    } else {
+      schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                       event.time,
+                       event.task_id,
+                       event.node,
+                       event.from_node,
+                       event.to_node,
+                       "service_completion_snapshot");
+    }
     append_event_trace(event,
                        event.task_id,
                        event.node,
@@ -8648,13 +8778,58 @@ class EventDrivenJunctionRuntime {
     if (dispatch.selected_edge_count > 0) {
       g4irsf17_clear_local_blocker(event.node);
     }
-    schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
-                     event.time,
-                     dispatch.task_id >= 0 ? dispatch.task_id : event.task_id,
-                     event.node,
-                     event.from_node,
-                     dispatch.selected_next,
-                     "junction_dispatch_snapshot");
+    const bool suppress_redundant_dispatch_beacon =
+        g4irsf20_prunes_redundant_beacons() &&
+        dispatch.selected_edge_count > 0;
+    bool suppress_same_state_dispatch_beacon = false;
+    if (!suppress_redundant_dispatch_beacon &&
+        g4irsf20_prunes_same_state_hold_beacons() &&
+        !g4irsf17_extensions_enabled() &&
+        !uses_first_edge_credit()) {
+      // A held dispatch is not automatically a same-state event: advancing
+      // time can retire a destination-calendar interval and change the
+      // advertised next-available value.  Mirror the ordinary beacon's purge
+      // before comparing the exact bounded local state, and suppress only
+      // when an already-published snapshot would be reproduced.
+      controller.service_calendar.purge(event.time);
+      const auto advertised = congestion_beacons_.find(event.node);
+      suppress_same_state_dispatch_beacon =
+          advertised != congestion_beacons_.end() &&
+          advertised->second.generation > 0 &&
+          advertised->second.queue_length ==
+              static_cast<int>(controller.queue.size()) &&
+          advertised->second.scheduled_incoming ==
+              controller.scheduled_incoming &&
+          event_runtime_detail::same_timestamp(
+              advertised->second.service_calendar_reserved_until,
+              controller.service_calendar.reserved_until(event.time));
+    }
+    if (suppress_redundant_dispatch_beacon) {
+      ++result_.summary.g4irsf20_redundant_beacon_suppressed_count;
+    } else if (suppress_same_state_dispatch_beacon) {
+      ++result_.summary.g4irsf20_same_state_beacon_suppressed_count;
+      // Congestion-beacon handling also advances JIT merge opportunities.
+      // Preserve that liveness side effect explicitly when the observational
+      // event itself is redundant.
+      if (uses_jit_destination_merge_grants()) {
+        const auto merge =
+            destination_merge_controllers_.find(event.node);
+        if (merge != destination_merge_controllers_.end() &&
+            merge->second.pending_count() > 0) {
+          schedule_next_jit_destination_merge_opportunity(
+              merge->second, event.time, true);
+        }
+      }
+    } else {
+      schedule_passive(
+          JunctionEventType::kCongestionBeaconUpdate,
+          event.time,
+          dispatch.task_id >= 0 ? dispatch.task_id : event.task_id,
+          event.node,
+          event.from_node,
+          dispatch.selected_next,
+          "junction_dispatch_snapshot");
+    }
     result_.summary.max_edges_selected_per_arrive =
         std::max(result_.summary.max_edges_selected_per_arrive, dispatch.selected_edge_count);
     result_.summary.max_edges_selected_per_bag_per_decision =
@@ -12656,6 +12831,40 @@ class EventDrivenJunctionRuntime {
       boundary.baseline_next_node = selected;
       boundary.legal_next_edges =
           causal_legal_next_edges;
+      if (canonical_scorer_mode() == "S4") {
+        boundary.g4irsf20_route_observation_available = true;
+        boundary.g4irsf20_route_normal_flow =
+            selected == trace.scorer_raw_prediction &&
+            trace.fallback_selected_next < 0 &&
+            !trace.scorer_risk_abstain;
+        boundary.g4irsf20_route_candidate_next_nodes =
+            causal_legal_next_edges;
+        boundary.g4irsf20_route_baseline_candidate_index =
+            static_cast<int>(std::distance(
+                causal_legal_next_edges.begin(),
+                std::find(causal_legal_next_edges.begin(),
+                          causal_legal_next_edges.end(),
+                          selected)));
+        boundary.g4irsf20_route_candidate_features.reserve(
+            causal_legal_next_edges.size());
+        // Rows follow legal_next_edges exactly.  They are copied from the
+        // already-materialized decision trace before any causal intervention,
+        // so neither the chosen treatment nor a later outcome can leak in.
+        for (const int legal_next : causal_legal_next_edges) {
+          const auto candidate = std::find_if(
+              trace.candidates.begin(),
+              trace.candidates.end(),
+              [legal_next](const EventCandidateRecord& record) {
+                return record.next_node == legal_next;
+              });
+          if (candidate == trace.candidates.end()) {
+            throw std::logic_error(
+                "G20 Route legal candidate missing from decision trace");
+          }
+          boundary.g4irsf20_route_candidate_features.push_back(
+              g4irsf20_route_native_candidate_features(trace, *candidate));
+        }
+      }
       if (const auto* intervention =
               observe_causal_boundary(std::move(boundary));
           intervention != nullptr) {
@@ -17779,6 +17988,13 @@ fingerprint_deterministic_summary(
     writer.i64(summary.g4irsf18_merge_future_schedule_input_count);
     writer.i64(summary.g4irsf18_merge_full_astar_call_count);
   }
+  if (summary.g4irsf20_event_hotpath_policy != "E0") {
+    writer.string(summary.g4irsf20_event_hotpath_policy);
+    writer.u64(
+        summary.g4irsf20_redundant_beacon_suppressed_count);
+    writer.u64(
+        summary.g4irsf20_same_state_beacon_suppressed_count);
+  }
 }
 
 inline G4IRSF14CloneReplayHashes
@@ -19223,6 +19439,9 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
     scorer.floating(policy.coverage_cap);
     scorer.i64(policy.max_overrides_per_segment);
     scorer.boolean(policy.kill_switch);
+  }
+  if (config_.g4irsf20_event_hotpath_policy != "E0") {
+    scorer.string(config_.g4irsf20_event_hotpath_policy);
   }
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Test-build fault switches alter deterministic continuation and therefore

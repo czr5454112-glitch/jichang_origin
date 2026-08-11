@@ -43,6 +43,8 @@ inline constexpr const char* kTargetAddressSchema =
     "czr005.g4irsf15.causal_target_address.v1";
 inline constexpr const char* kTargetAddressHorizonSchema =
     "czr005.g4irsf15.causal_target_address_horizon.v1";
+inline constexpr const char* kG4IRSF20RouteTargetSchema =
+    "czr005.g4irsf20.route_target.v1";
 inline constexpr const char* kPrepopEventGroupSchema =
     "czr005.g4irsf15.prepop_event_group.v1";
 inline constexpr const char* kPairRunSchema =
@@ -418,7 +420,13 @@ inline ics::EventDrivenJunctionConfig frozen_config(
     double scorer_b2,
     double scorer_risk_margin_threshold,
     double scorer_risk_bottleneck_threshold,
-    const std::string& scorer_model_sha256) {
+    const std::string& scorer_model_sha256,
+    const std::string& research_profile) {
+  if (research_profile != "G15_FROZEN" &&
+      research_profile != "G20_S4_J2") {
+    throw std::invalid_argument(
+        "research_profile must be G15_FROZEN or G20_S4_J2");
+  }
   // Do not add knobs here.  Descriptor discovery and both matched branches
   // must use the exact Stage-14E production tuple.
   ics::EventDrivenJunctionConfig config;
@@ -481,21 +489,46 @@ inline ics::EventDrivenJunctionConfig frozen_config(
   // Outcome-free, local-only sidecar for I1 model training.  This toggle
   // records observations but cannot alter source, junction, or merge order.
   config.enable_g4irsf17_causal_source_features = true;
+  if (research_profile == "G20_S4_J2") {
+    // G20 reuses the exact clone/intervention engine while changing only the
+    // frozen control arm to the selected G19 decentralized baseline.  No
+    // future route, global reservation scan, or second planning framework is
+    // introduced here.
+    config.scorer_mode = "S4_queue_aware_rule_only";
+    config.scorer_model_sha256.clear();
+    config.merge_grant_rule = "M3";
+    config.merge_grant_timing_mode =
+        "jit_fair_aging_deadline";
+    config.enable_g4irsf17_causal_source_features = false;
+  }
   return config;
 }
 
-inline py::dict frozen_controls_row() {
+inline py::dict frozen_controls_row(
+    const std::string& research_profile) {
   py::dict row;
+  row["research_profile"] = research_profile;
   row["resource_semantics"] = "R3_java_node_window_compatible";
-  row["scorer_mode"] = "S1_frozen_g4e_legal_local_adapter";
+  row["scorer_mode"] =
+      research_profile == "G20_S4_J2"
+          ? "S4_queue_aware_rule_only"
+          : "S1_frozen_g4e_legal_local_adapter";
   row["pibt_mode"] = "P2";
   row["pressure_mode"] = "C0_off";
   row["priority_mode"] = "Q0";
   row["event_semantics"] =
       "E4_batch_plus_destination_merge_request";
-  row["merge_grant_rule"] = "M0";
+  row["merge_grant_rule"] =
+      research_profile == "G20_S4_J2" ? "M3" : "M0";
+  row["merge_grant_timing_mode"] =
+      research_profile == "G20_S4_J2"
+          ? "jit_fair_aging_deadline"
+          : "eager";
   row["admission_mode"] = "off";
-  row["frozen_tuple"] = ics::kG4IRSF14CausalFrozenTuple;
+  row["frozen_tuple"] =
+      research_profile == "G20_S4_J2"
+          ? "R3/S4/P2/C0/Q0/E4/J2"
+          : ics::kG4IRSF14CausalFrozenTuple;
   row["reservation_depth"] = 1;
   row["max_events"] = 20000000;
   row["max_simulation_time"] = -1.0;
@@ -718,6 +751,16 @@ inline Skeleton skeleton_from_boundary(
       boundary.g4irsf17_i1_treatment_observation;
   skeleton.g4irsf17_i1_pairwise_features =
       boundary.g4irsf17_i1_pairwise_features;
+  skeleton.g4irsf20_route_observation_available =
+      boundary.g4irsf20_route_observation_available;
+  skeleton.g4irsf20_route_normal_flow =
+      boundary.g4irsf20_route_normal_flow;
+  skeleton.g4irsf20_route_baseline_candidate_index =
+      boundary.g4irsf20_route_baseline_candidate_index;
+  skeleton.g4irsf20_route_candidate_next_nodes =
+      boundary.g4irsf20_route_candidate_next_nodes;
+  skeleton.g4irsf20_route_candidate_features =
+      boundary.g4irsf20_route_candidate_features;
   skeleton.legal_next_edges =
       boundary.legal_next_edges;
   return skeleton;
@@ -806,6 +849,97 @@ inline py::object g4irsf17_i1_observation_pair_row(
   return std::move(row);
 }
 
+template <typename ObservationOwner>
+inline py::object g4irsf20_route_observation_row(
+    const ObservationOwner& owner,
+    int expected_treatment_next_node) {
+  if (!owner.g4irsf20_route_observation_available) {
+    return py::none();
+  }
+  static constexpr std::array<const char*, 23> kFeatureNames{{
+      "event_time",
+      "target_queue_length",
+      "target_scheduled_incoming",
+      "corridor_next_available",
+      "target_next_available",
+      "travel_time",
+      "static_potential",
+      "priority_slack_seconds",
+      "priority_age_seconds",
+      "recent_visit_count",
+      "junction_queue_length",
+      "junction_next_available_time",
+      "priority_local_contention",
+      "current_goal_queue_length",
+      "target_goal_queue_length",
+      "target_goal_scheduled_incoming",
+      "current_goal_max_wait",
+      "goal_conditioned_differential",
+      "estimated_service_rate",
+      "service_weighted_pressure",
+      "advertised_fault",
+      "fault_message_age_seconds",
+      "two_hop_queue_pressure",
+  }};
+  const auto& nodes = owner.g4irsf20_route_candidate_next_nodes;
+  const auto& features = owner.g4irsf20_route_candidate_features;
+  if (nodes.size() != features.size() || nodes.size() < 2U) {
+    throw std::logic_error("G20 Route observation shape drifted");
+  }
+  const auto treatment_it = std::find(
+      nodes.begin(), nodes.end(), expected_treatment_next_node);
+  if (treatment_it == nodes.end()) {
+    throw std::logic_error(
+        "G20 Route treatment is absent from candidate observation");
+  }
+  const int treatment_index = static_cast<int>(
+      std::distance(nodes.begin(), treatment_it));
+  py::list feature_names;
+  for (const char* name : kFeatureNames) {
+    feature_names.append(name);
+  }
+  py::list candidate_observations;
+  py::list canonical_candidate_observations;
+  for (const auto& values : features) {
+    if (values.size() != kFeatureNames.size()) {
+      throw std::logic_error(
+          "G20 Route observation width drifted");
+    }
+    py::dict mapped;
+    py::list vector;
+    for (std::size_t index = 0; index < values.size(); ++index) {
+      if (index == 20U) {
+        mapped[kFeatureNames[index]] =
+            py::bool_(values[index] != 0.0);
+      } else {
+        mapped[kFeatureNames[index]] = values[index];
+      }
+      vector.append(values[index]);
+    }
+    candidate_observations.append(std::move(mapped));
+    canonical_candidate_observations.append(std::move(vector));
+  }
+  py::dict row;
+  row["schema"] =
+      "czr005.g4irsf20.route_pre_action_observation_set.v1";
+  row["feature_names"] = std::move(feature_names);
+  row["candidate_observations"] =
+      std::move(candidate_observations);
+  row["canonical_candidate_observations"] =
+      std::move(canonical_candidate_observations);
+  row["candidate_next_nodes"] = nodes;
+  row["baseline_candidate_index"] =
+      owner.g4irsf20_route_baseline_candidate_index;
+  row["treatment_candidate_index"] = treatment_index;
+  row["normal_flow"] = owner.g4irsf20_route_normal_flow;
+  row["identity_fields_are_trace_only"] = true;
+  row["runtime_global_scan_count"] = 0;
+  row["runtime_future_route_read_count"] = 0;
+  row["runtime_future_schedule_read_count"] = 0;
+  row["runtime_full_astar_call_count"] = 0;
+  return std::move(row);
+}
+
 inline py::dict population_candidate_row(
     const PopulationCandidate& candidate,
     const std::vector<ics::EventRuntimeBagRequest>& requests) {
@@ -886,17 +1020,59 @@ inline py::dict population_candidate_row(
       candidate.intervention_action;
   row["expected_action_change_type"] =
       candidate.expected_action_change_type;
-  row["observation_pair"] =
-      index == 0
-          ? g4irsf17_i1_observation_pair_row(
-                candidate.skeleton,
-                candidate.peer_runtime_bag_id)
-          : py::object(py::none());
+  py::object observation = py::none();
+  if (index == 0) {
+    observation = g4irsf17_i1_observation_pair_row(
+        candidate.skeleton,
+        candidate.peer_runtime_bag_id);
+  } else if (index == 1) {
+    observation = g4irsf20_route_observation_row(
+        candidate.skeleton,
+        candidate.selected_next_node);
+  }
+  row["observation_pair"] = observation;
+  row["route_observation"] =
+      index == 1 ? observation : py::object(py::none());
   row["primary_action_selection"] =
       "LOCAL_STABLE_NUMERIC_MIN_PEER_OR_NEXT_NODE_I4_UNIQUE";
   row["outcome_free"] = true;
   row["runtime_state_sha256"] = py::none();
   row["boundary_sha256"] = py::none();
+  return row;
+}
+
+inline py::dict g4irsf20_route_census_row(
+    const PopulationCandidate& candidate) {
+  const auto& skeleton = candidate.skeleton;
+  if (!skeleton.g4irsf20_route_observation_available ||
+      skeleton.g4irsf20_route_baseline_candidate_index < 0 ||
+      static_cast<std::size_t>(
+          skeleton.g4irsf20_route_baseline_candidate_index) >=
+          skeleton.g4irsf20_route_candidate_features.size()) {
+    throw std::logic_error(
+        "G20 Route census row lacks its pre-action observation");
+  }
+  const auto& baseline =
+      skeleton.g4irsf20_route_candidate_features.at(
+          static_cast<std::size_t>(
+              skeleton.g4irsf20_route_baseline_candidate_index));
+  if (baseline.size() != 23U) {
+    throw std::logic_error("G20 Route census feature width drifted");
+  }
+  py::dict row;
+  row["schema"] = kSkeletonSchema;
+  row["skeleton_id"] = candidate.population_selection_sha256;
+  row["population_group_sha256"] = candidate.population_group_sha256;
+  row["skeleton_selection_sha256"] =
+      candidate.population_selection_sha256;
+  row["kind"] = "I3";
+  row["event_ordinal"] = py::int_(candidate.event_ordinal);
+  row["runtime_bag_id"] = skeleton.runtime_bag_id;
+  row["wait_age_seconds"] = baseline[8];
+  row["candidate_count"] =
+      static_cast<int>(
+          skeleton.g4irsf20_route_candidate_next_nodes.size());
+  row["normal_flow"] = skeleton.g4irsf20_route_normal_flow;
   return row;
 }
 
@@ -1020,12 +1196,19 @@ inline py::dict descriptor_row(
       population.intervention_action;
   row["expected_action_change_type"] =
       population.expected_action_change_type;
-  row["observation_pair"] =
-      index == 0
-          ? g4irsf17_i1_observation_pair_row(
-                boundary,
-                descriptor.intervention.peer_runtime_bag_id)
-          : py::object(py::none());
+  py::object observation = py::none();
+  if (index == 0) {
+    observation = g4irsf17_i1_observation_pair_row(
+        boundary,
+        descriptor.intervention.peer_runtime_bag_id);
+  } else if (index == 1) {
+    observation = g4irsf20_route_observation_row(
+        boundary,
+        descriptor.intervention.selected_next_node);
+  }
+  row["observation_pair"] = observation;
+  row["route_observation"] =
+      index == 1 ? observation : py::object(py::none());
   row["horizon"] = "H_bag";
   row["intervention_sha256"] = descriptor.descriptor_id;
   py::dict horizon_hashes;
@@ -1661,7 +1844,8 @@ struct InvariantEvidence {
 inline InvariantEvidence invariant_evidence(
     const ics::EventRuntimeSummary& summary,
     bool finalized_system_horizon,
-    bool protected_full_1x_shape) {
+    bool protected_full_1x_shape,
+    bool allow_lazy_stale_merge_wakeups = false) {
   InvariantEvidence evidence;
   evidence.requested_count = summary.requested_count;
   evidence.completed_count = summary.completed_count;
@@ -1743,7 +1927,11 @@ inline InvariantEvidence invariant_evidence(
        "EVENT_LIMIT_REACHED");
   fail(evidence.time_limit_reached,
        "TIME_LIMIT_REACHED");
-  fail(evidence.merge_grant_stale_arbitration_count != 0U,
+  // J2 deliberately uses generation-invalidated lazy wakeups; its native
+  // protocol tests require these superseded timers to be observable.  They
+  // are not stale action execution (tracked separately below).
+  fail(!allow_lazy_stale_merge_wakeups &&
+           evidence.merge_grant_stale_arbitration_count != 0U,
        "MERGE_GRANT_STALE_ARBITRATION");
   fail(evidence.stale_arbitration_event_count != 0U,
        "STALE_ARBITRATION_EVENT");
@@ -1835,6 +2023,7 @@ inline py::dict invariant_row(const InvariantEvidence& evidence) {
 
 struct Target {
   bool deferred_address = false;
+  bool g4irsf20_route_target = false;
   std::string descriptor_id;
   std::string skeleton_id;
   std::string population_group_sha256;
@@ -1870,11 +2059,47 @@ inline Target parse_target(const py::dict& row) {
                           ? strict_string(schema_item, "schema")
                           : std::string(kDescriptorSchema);
   if (schema != kDescriptorSchema &&
-      schema != kTargetAddressSchema) {
+      schema != kTargetAddressSchema &&
+      schema != kG4IRSF20RouteTargetSchema) {
     throw py::value_error("unsupported G4IRSF15 descriptor schema");
   }
   Target target;
-  target.deferred_address = schema == kTargetAddressSchema;
+  target.g4irsf20_route_target =
+      schema == kG4IRSF20RouteTargetSchema;
+  target.deferred_address =
+      schema == kTargetAddressSchema ||
+      target.g4irsf20_route_target;
+  if (target.g4irsf20_route_target) {
+    target.population_group_sha256 = strict_string(
+        required_item(row, "population_group_id"),
+        "population_group_id");
+    target.population_selection_sha256 = strict_string(
+        required_item(row, "population_selection_id"),
+        "population_selection_id");
+    if (target.population_group_sha256.empty() ||
+        target.population_selection_sha256.empty()) {
+      throw py::value_error(
+          "G20 Route population IDs must be non-empty");
+    }
+    target.descriptor_id =
+        target.population_selection_sha256;
+    target.skeleton_id =
+        target.population_selection_sha256;
+    target.kind_index = 1;
+    target.event_ordinal = strict_uint64(
+        required_item(row, "event_ordinal"),
+        "event_ordinal");
+    const auto horizon = strict_string(
+        required_item(row, "horizon"), "horizon");
+    if (horizon == "H_bag") {
+      target.horizon = Horizon::kAffectedBag;
+    } else if (horizon == "H_system") {
+      target.horizon = Horizon::kSelectedSystem;
+    } else {
+      throw py::value_error("horizon must be H_bag or H_system");
+    }
+    return target;
+  }
   target.descriptor_id =
       strict_sha256(required_item(row, "descriptor_id"),
                     "descriptor_id");
@@ -2451,7 +2676,8 @@ inline BranchEvidence drive_branch(
     const std::vector<int>& all_runtime_ids,
     int boundary_node,
     std::uint64_t start_event_count,
-    bool protected_full_1x_shape) {
+    bool protected_full_1x_shape,
+    bool allow_lazy_stale_merge_wakeups) {
   BranchEvidence evidence;
   const auto& cohort =
       horizon == Horizon::kSelectedSystem
@@ -2529,7 +2755,8 @@ inline BranchEvidence drive_branch(
   evidence.invariants = invariant_evidence(
       runtime.current_result().summary,
       horizon == Horizon::kSelectedSystem,
-      protected_full_1x_shape);
+      protected_full_1x_shape,
+      allow_lazy_stale_merge_wakeups);
   return evidence;
 }
 
@@ -2786,7 +3013,8 @@ inline py::dict cohort_difference_sidecar_row(
 inline py::dict branch_row(
     const BranchEvidence& evidence,
     const std::vector<ics::EventRuntimeBagRequest>& requests,
-    const std::vector<double>& original_entry_times) {
+    const std::vector<double>& original_entry_times,
+    bool compact_g4irsf20_h_system) {
   py::dict row;
   row["finalized"] = evidence.finalized;
   row["horizon_complete"] = evidence.horizon_complete;
@@ -2815,19 +3043,32 @@ inline py::dict branch_row(
         raw_bag_cohort_metrics_row(
             evidence.cohort_outcomes, requests,
             original_entry_times);
-    row["raw_bag_sufficient_statistics_sidecar"] =
-        raw_bag_sufficient_statistics_sidecar_row(
-            evidence.cohort_outcomes, requests,
-            original_entry_times);
-    row["raw_bag_sufficient_statistics_serialized"] =
-        true;
-    row["h_system_cohort_mapping_sha256"] =
-        runtime_segment_mapping_sha256(requests);
-    row["raw_bag_mapping_sha256"] =
-        raw_bag_mapping_sha256(requests);
-    row["raw_bag_original_entry_mapping_sha256"] =
-        raw_bag_original_entry_mapping_sha256(
-            requests, original_entry_times);
+    if (compact_g4irsf20_h_system) {
+      row["raw_bag_sufficient_statistics_sidecar"] =
+          py::none();
+      row["raw_bag_sufficient_statistics_serialized"] =
+          false;
+      row["raw_bag_sufficient_statistics_omission_reason"] =
+          "G4IRSF20_COMPACT_H_SYSTEM_OUTPUT";
+      row["h_system_cohort_mapping_sha256"] = py::none();
+      row["raw_bag_mapping_sha256"] = py::none();
+      row["raw_bag_original_entry_mapping_sha256"] =
+          py::none();
+    } else {
+      row["raw_bag_sufficient_statistics_sidecar"] =
+          raw_bag_sufficient_statistics_sidecar_row(
+              evidence.cohort_outcomes, requests,
+              original_entry_times);
+      row["raw_bag_sufficient_statistics_serialized"] =
+          true;
+      row["h_system_cohort_mapping_sha256"] =
+          runtime_segment_mapping_sha256(requests);
+      row["raw_bag_mapping_sha256"] =
+          raw_bag_mapping_sha256(requests);
+      row["raw_bag_original_entry_mapping_sha256"] =
+          raw_bag_original_entry_mapping_sha256(
+              requests, original_entry_times);
+    }
   } else {
     row["raw_bag_cohort_metrics"] = py::none();
     row["raw_bag_sufficient_statistics_sidecar"] =
@@ -2883,7 +3124,8 @@ inline py::dict scan_causal_skeletons_from_records(
     double scorer_risk_margin_threshold,
     double scorer_risk_bottleneck_threshold,
     const std::string& scorer_model_sha256,
-    const std::vector<double>& original_entry_times) {
+    const std::vector<double>& original_entry_times,
+    const std::string& research_profile) {
   const auto graph = detail::graph_from_records(
       node_records, edge_records, heuristic_time);
   const auto requests =
@@ -2907,7 +3149,8 @@ inline py::dict scan_causal_skeletons_from_records(
       scorer_w1, scorer_b1, scorer_w2, scorer_b2,
       scorer_risk_margin_threshold,
       scorer_risk_bottleneck_threshold,
-      scorer_model_sha256);
+      scorer_model_sha256,
+      research_profile);
 
   detail::Runtime source(graph, config);
   source.initialize(requests);
@@ -2989,7 +3232,8 @@ inline py::dict scan_causal_skeletons_from_records(
   const auto terminal_invariants =
       detail::invariant_evidence(
           source.current_result().summary, true,
-          protected_full_1x_shape);
+          protected_full_1x_shape,
+          research_profile == "G20_S4_J2");
   const bool census_complete =
       terminal_invariants.formal_hard_gate_pass;
 
@@ -3029,9 +3273,16 @@ inline py::dict scan_causal_skeletons_from_records(
         static_cast<std::uint64_t>(
             accumulator.population.size());
     for (const auto& candidate : accumulator.population) {
-      skeleton_rows.append(
-          detail::population_candidate_row(
-              candidate, requests));
+      if (research_profile == "G20_S4_J2") {
+        if (index == 1) {
+          skeleton_rows.append(
+              detail::g4irsf20_route_census_row(candidate));
+        }
+      } else {
+        skeleton_rows.append(
+            detail::population_candidate_row(
+                candidate, requests));
+      }
     }
   }
 
@@ -3053,7 +3304,8 @@ inline py::dict scan_causal_skeletons_from_records(
   payload["target_address_frame_required"] = true;
   payload["full_state_seal_policy"] =
       "DEFERRED_TO_EXECUTED_PAIR";
-  payload["frozen_controls"] = detail::frozen_controls_row();
+  payload["frozen_controls"] =
+      detail::frozen_controls_row(research_profile);
   payload["input_request_count"] =
       static_cast<int>(requests.size());
   payload["input_runtime_cohort_sha256"] =
@@ -3078,6 +3330,10 @@ inline py::dict scan_causal_skeletons_from_records(
       "FULL_CENSUS_ONE_LOCAL_NUMERIC_PRIMARY_ACTION_PER_POPULATION_GROUP";
   payload["population_counts"] = std::move(counts);
   payload["skeletons"] = std::move(skeleton_rows);
+  payload["skeleton_rows_scope"] =
+      research_profile == "G20_S4_J2"
+          ? "I3_COMPACT_CENSUS_ONLY"
+          : "ALL_PRIMARY_KINDS";
   return payload;
 }
 
@@ -3094,7 +3350,8 @@ inline py::dict materialize_causal_descriptors_from_records(
     double scorer_risk_bottleneck_threshold,
     const std::string& scorer_model_sha256,
     const std::vector<double>& original_entry_times,
-    const py::sequence& selected_skeletons) {
+    const py::sequence& selected_skeletons,
+    const std::string& research_profile) {
   std::vector<detail::SelectedSkeleton> selected;
   selected.reserve(
       static_cast<std::size_t>(py::len(selected_skeletons)));
@@ -3147,7 +3404,8 @@ inline py::dict materialize_causal_descriptors_from_records(
       scorer_w1, scorer_b1, scorer_w2, scorer_b2,
       scorer_risk_margin_threshold,
       scorer_risk_bottleneck_threshold,
-      scorer_model_sha256);
+      scorer_model_sha256,
+      research_profile);
   detail::Runtime source(graph, config);
   source.initialize(requests);
 
@@ -3251,7 +3509,8 @@ inline py::dict materialize_causal_descriptors_from_records(
   payload["evidence_scope"] =
       "SELECTED_NATIVE_PREPOP_BOUNDARY_MATERIALIZATION";
   payload["formal_pass_claimed"] = false;
-  payload["frozen_controls"] = detail::frozen_controls_row();
+  payload["frozen_controls"] =
+      detail::frozen_controls_row(research_profile);
   payload["input_request_count"] =
       static_cast<int>(requests.size());
   payload["input_runtime_cohort_sha256"] =
@@ -3288,7 +3547,8 @@ inline py::dict run_causal_target_pairs_from_records(
     double scorer_risk_bottleneck_threshold,
     const std::string& scorer_model_sha256,
     const std::vector<double>& original_entry_times,
-    const py::sequence& target_descriptors) {
+    const py::sequence& target_descriptors,
+    const std::string& research_profile) {
   std::vector<detail::Target> targets;
   targets.reserve(
       static_cast<std::size_t>(py::len(target_descriptors)));
@@ -3337,7 +3597,13 @@ inline py::dict run_causal_target_pairs_from_records(
   const auto input_runtime_cohort_sha256 =
       detail::workload_cohort_sha256(requests);
   for (const auto& target : targets) {
+    if (target.g4irsf20_route_target &&
+        research_profile != "G20_S4_J2") {
+      throw py::value_error(
+          "G20 Route targets require research_profile G20_S4_J2");
+    }
     if (target.deferred_address &&
+        !target.g4irsf20_route_target &&
         target.input_runtime_cohort_sha256 !=
             input_runtime_cohort_sha256) {
       throw py::value_error(
@@ -3363,7 +3629,8 @@ inline py::dict run_causal_target_pairs_from_records(
       scorer_w1, scorer_b1, scorer_w2, scorer_b2,
       scorer_risk_margin_threshold,
       scorer_risk_bottleneck_threshold,
-      scorer_model_sha256);
+      scorer_model_sha256,
+      research_profile);
   std::vector<int> all_runtime_ids(requests.size());
   std::iota(all_runtime_ids.begin(), all_runtime_ids.end(), 0);
 
@@ -3428,7 +3695,7 @@ inline py::dict run_causal_target_pairs_from_records(
 
     for (std::size_t index = target_cursor;
          index < group_end; ++index) {
-      const auto& target = targets[index];
+      auto target = targets[index];
       auto found = source_probe.observed_opportunities.end();
       bool ambiguous_address = false;
       if (target.deferred_address) {
@@ -3472,6 +3739,13 @@ inline py::dict run_causal_target_pairs_from_records(
       py::dict pair;
       pair["descriptor_id"] = target.descriptor_id;
       pair["target_address_id"] = target.descriptor_id;
+      if (target.g4irsf20_route_target) {
+        pair["target_schema"] = kG4IRSF20RouteTargetSchema;
+        pair["population_group_id"] =
+            target.population_group_sha256;
+        pair["population_selection_id"] =
+            target.population_selection_sha256;
+      }
       pair["kind"] = detail::kind_token(target.kind_index);
       pair["event_ordinal"] =
           py::int_(target.event_ordinal);
@@ -3503,6 +3777,42 @@ inline py::dict run_causal_target_pairs_from_records(
         continue;
       }
 
+      if (target.g4irsf20_route_target) {
+        const auto resolved = detail::primary_population_candidate(
+            detail::skeleton_from_boundary(*found),
+            source_strata, target.event_ordinal,
+            pibt_prefilter_candidate_event);
+        if (!resolved.has_value() ||
+            resolved->population_group_sha256 !=
+                target.population_group_sha256 ||
+            resolved->population_selection_sha256 !=
+                target.population_selection_sha256) {
+          throw std::logic_error(
+              "matched G20 Route target did not reproduce its population IDs");
+        }
+        target.clone_group_id = found->clone_group_id;
+        target.event_seq = found->event_seq;
+        target.event_time_bits =
+            ics::event_runtime_detail::timestamp_bits(found->time);
+        target.node = found->node;
+        target.runtime_bag_id = found->runtime_bag_id;
+        target.peer_runtime_bag_id =
+            resolved->peer_runtime_bag_id;
+        target.baseline_next_node =
+            found->baseline_next_node;
+        target.selected_next_node =
+            resolved->selected_next_node;
+        target.baseline_release = found->baseline_release;
+        target.selected_boolean = resolved->selected_boolean;
+        target.source_ready_order = found->source_ready_order;
+        target.legal_next_edges = found->legal_next_edges;
+        target.baseline_action = resolved->baseline_action;
+        target.intervention_action =
+            resolved->intervention_action;
+        target.expected_action_change_type =
+            resolved->expected_action_change_type;
+      }
+
       detail::verify_target_boundary(target, *found);
       const auto resolved_population = detail::verify_target_population(
           target, *found, source_strata,
@@ -3515,11 +3825,18 @@ inline py::dict run_causal_target_pairs_from_records(
           detail::intervention_for(target, *found);
       pair["resolved_execution_descriptor"] =
           detail::descriptor_row(resolved_descriptor);
-      pair["observation_pair"] =
-          target.kind_index == 0
-              ? detail::g4irsf17_i1_observation_pair_row(
-                    *found,
-                    target.peer_runtime_bag_id)
+      py::object observation = py::none();
+      if (target.kind_index == 0) {
+        observation = detail::g4irsf17_i1_observation_pair_row(
+            *found, target.peer_runtime_bag_id);
+      } else if (target.kind_index == 1) {
+        observation = detail::g4irsf20_route_observation_row(
+            *found, target.selected_next_node);
+      }
+      pair["observation_pair"] = observation;
+      pair["route_observation"] =
+          target.kind_index == 1
+              ? observation
               : py::object(py::none());
       pair["resolved_execution_runtime_state_sha256"] =
           found->runtime_state_sha256;
@@ -3607,7 +3924,8 @@ inline py::dict run_causal_target_pairs_from_records(
       const auto treatment_evidence = detail::drive_branch(
           branch, target.horizon, intended_ids, all_runtime_ids,
           found->node, treatment_start_event_count,
-          protected_full_1x_shape);
+          protected_full_1x_shape,
+          research_profile == "G20_S4_J2");
 
       // Replaying one baseline event is much cheaper than retaining a second
       // full checkpoint while a possibly full-system treatment drains.
@@ -3638,15 +3956,22 @@ inline py::dict run_causal_target_pairs_from_records(
       const auto baseline_evidence = detail::drive_branch(
           branch, target.horizon, intended_ids, all_runtime_ids,
           found->node, baseline_start_event_count,
-          protected_full_1x_shape);
+          protected_full_1x_shape,
+          research_profile == "G20_S4_J2");
+      const bool compact_g4irsf20_h_system =
+          target.g4irsf20_route_target &&
+          research_profile == "G20_S4_J2" &&
+          target.horizon == detail::Horizon::kSelectedSystem;
       pair["baseline"] =
           detail::branch_row(
               baseline_evidence, requests,
-              protected_original_entry_times);
+              protected_original_entry_times,
+              compact_g4irsf20_h_system);
       pair["treatment"] =
           detail::branch_row(
               treatment_evidence, requests,
-              protected_original_entry_times);
+              protected_original_entry_times,
+              compact_g4irsf20_h_system);
       py::list affected_deltas;
       if (baseline_evidence.affected_outcomes.size() !=
           treatment_evidence.affected_outcomes.size()) {
@@ -3666,25 +3991,37 @@ inline py::dict run_causal_target_pairs_from_records(
       }
       pair["affected_bag_deltas"] =
           std::move(affected_deltas);
-      const auto externality = detail::realized_externality_row(
-          baseline_evidence, treatment_evidence, intended_ids,
-          target.horizon);
-      pair["realized_externality"] = externality;
       pair["direct_affected_runtime_bag_ids"] = intended_ids;
-      pair["realized_affected_runtime_bag_ids"] =
-          externality["realized_affected_runtime_bag_ids"];
-      pair["externality_runtime_bag_ids"] =
-          externality["realized_external_runtime_bag_ids"];
-      pair["externality_observation_status"] =
-          externality["externality_observation_status"];
-      pair["realized_affected_set_observable"] =
-          externality["realized_affected_set_observable"];
-      pair["realized_outcome_deltas"] =
-          externality["realized_outcome_deltas"];
-      pair["realized_outcome_deltas_sha256"] =
-          externality["realized_outcome_deltas_sha256"];
+      if (compact_g4irsf20_h_system) {
+        pair["realized_externality"] = py::none();
+        pair["realized_affected_runtime_bag_ids"] = py::none();
+        pair["externality_runtime_bag_ids"] = py::none();
+        pair["externality_observation_status"] =
+            "OMITTED_G4IRSF20_COMPACT_H_SYSTEM_OUTPUT";
+        pair["realized_affected_set_observable"] = false;
+        pair["realized_outcome_deltas"] = py::none();
+        pair["realized_outcome_deltas_sha256"] = py::none();
+      } else {
+        const auto externality = detail::realized_externality_row(
+            baseline_evidence, treatment_evidence, intended_ids,
+            target.horizon);
+        pair["realized_externality"] = externality;
+        pair["realized_affected_runtime_bag_ids"] =
+            externality["realized_affected_runtime_bag_ids"];
+        pair["externality_runtime_bag_ids"] =
+            externality["realized_external_runtime_bag_ids"];
+        pair["externality_observation_status"] =
+            externality["externality_observation_status"];
+        pair["realized_affected_set_observable"] =
+            externality["realized_affected_set_observable"];
+        pair["realized_outcome_deltas"] =
+            externality["realized_outcome_deltas"];
+        pair["realized_outcome_deltas_sha256"] =
+            externality["realized_outcome_deltas_sha256"];
+      }
       if (target.horizon ==
-          detail::Horizon::kSelectedSystem) {
+              detail::Horizon::kSelectedSystem &&
+          !compact_g4irsf20_h_system) {
         pair["cohort_difference_sidecar"] =
             detail::cohort_difference_sidecar_row(
                 baseline_evidence, treatment_evidence);
@@ -3694,6 +4031,19 @@ inline py::dict run_causal_target_pairs_from_records(
         pair["cohort_difference_sidecar"] = py::none();
         pair["cohort_difference_sidecar_serialized"] =
             false;
+      }
+      if (compact_g4irsf20_h_system) {
+        py::dict omissions;
+        omissions["raw_bag_sufficient_statistics_sidecar"] = true;
+        omissions["cohort_difference_sidecar"] = true;
+        omissions["realized_externality_outcome_deltas"] = true;
+        omissions["preserved_affected_bag_deltas"] = true;
+        omissions["preserved_aggregate_cohort_metrics"] = true;
+        omissions["preserved_hard_gates"] = true;
+        omissions["preserved_route_observation"] = true;
+        pair["g4irsf20_compact_h_system_output"] = true;
+        pair["g4irsf20_compact_omissions"] =
+            std::move(omissions);
       }
       const bool live_safety_pass =
           baseline_evidence.invariants.live_safety_pass &&
@@ -3797,7 +4147,8 @@ inline py::dict run_causal_target_pairs_from_records(
   payload["evidence_scope"] =
       "EXACT_NATIVE_SAME_STATE_ONE_SHOT_MATCHED_PAIRS";
   payload["formal_pass_claimed"] = false;
-  payload["frozen_controls"] = detail::frozen_controls_row();
+  payload["frozen_controls"] =
+      detail::frozen_controls_row(research_profile);
   payload["input_request_count"] =
       static_cast<int>(requests.size());
   payload["input_runtime_cohort_sha256"] =
@@ -3850,7 +4201,9 @@ inline void register_causal_campaign_bindings(py::module_& module) {
       py::arg("scorer_risk_margin_threshold"),
       py::arg("scorer_risk_bottleneck_threshold"),
       py::arg("scorer_model_sha256"),
-      py::arg("original_entry_times"));
+      py::arg("original_entry_times"),
+      py::arg("research_profile") =
+          std::string("G15_FROZEN"));
   module.def(
       "g4irsf15_materialize_causal_descriptors_from_records",
       &materialize_causal_descriptors_from_records,
@@ -3866,7 +4219,9 @@ inline void register_causal_campaign_bindings(py::module_& module) {
       py::arg("scorer_risk_bottleneck_threshold"),
       py::arg("scorer_model_sha256"),
       py::arg("original_entry_times"),
-      py::arg("selected_skeletons"));
+      py::arg("selected_skeletons"),
+      py::arg("research_profile") =
+          std::string("G15_FROZEN"));
   module.def(
       "g4irsf15_run_causal_target_pairs_from_records",
       &run_causal_target_pairs_from_records,
@@ -3882,7 +4237,9 @@ inline void register_causal_campaign_bindings(py::module_& module) {
       py::arg("scorer_risk_bottleneck_threshold"),
       py::arg("scorer_model_sha256"),
       py::arg("original_entry_times"),
-      py::arg("target_descriptors"));
+      py::arg("target_descriptors"),
+      py::arg("research_profile") =
+          std::string("G15_FROZEN"));
 }
 
 }  // namespace czr005::bindings::g4irsf15
