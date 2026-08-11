@@ -361,4 +361,19 @@ struct G4IRSF15LocalActionSnapshot {
   double junction_wakeup_time = -1.0;
 };
 
+// Outcome-free, node-local observations for the offline G22 value-of-
+// information study.  This is deliberately a summary rather than an event
+// trace: the production scorer never sees it, and collecting it cannot choose
+// or modify an action.
+struct G4IRSF22LocalGuidanceSnapshot {
+  double simulated_time = 0.0;
+  int node = -1;
+  bool known = false;
+  int junction_queue_length = 0;
+  int scheduled_incoming = 0;
+  double service_next_available = 0.0;
+  std::uint64_t service_reservation_count = 0;
+  double queued_wait_seconds = 0.0;
+};
+
 }  // namespace czr005::ics
