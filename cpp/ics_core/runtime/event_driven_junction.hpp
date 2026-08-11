@@ -3530,6 +3530,35 @@ class EventDrivenJunctionRuntime {
     return row;
   }
 
+  [[nodiscard]] G4IRSF22LocalGuidanceSnapshot
+  g4irsf22_local_guidance_snapshot(int node) const {
+    G4IRSF22LocalGuidanceSnapshot row;
+    row.simulated_time = now_;
+    row.node = node;
+    const auto controller = junctions_.find(node);
+    if (controller == junctions_.end()) {
+      return row;
+    }
+    row.known = true;
+    row.junction_queue_length =
+        static_cast<int>(controller->second.queue.size());
+    row.scheduled_incoming = controller->second.scheduled_incoming;
+    row.service_next_available =
+        controller->second.service_calendar.earliest_start(
+            now_, service_duration(node));
+    row.service_reservation_count =
+        controller->second.service_reservation_count;
+    for (const int runtime_bag_id : controller->second.queue) {
+      const auto bag = bags_.find(runtime_bag_id);
+      if (bag == bags_.end() || bag->second.junction_enqueued_at < 0.0) {
+        continue;
+      }
+      row.queued_wait_seconds +=
+          std::max(0.0, now_ - bag->second.junction_enqueued_at);
+    }
+    return row;
+  }
+
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   void test_mutate_final_result_hash_field(
       std::string_view family) {
