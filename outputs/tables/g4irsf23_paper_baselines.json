@@ -1,0 +1,434 @@
+{
+  "comparison_contract": {
+    "cross_denominator_winner_claim_allowed": false,
+    "denominators_to_report_separately": [
+      "processed_segment_attempt_time_tth",
+      "java_release_time_tth",
+      "original_entry_time_tth"
+    ],
+    "hca_2x": "N/A_NOT_IN_PAPER_PROTOCOL",
+    "hca_4x": "N/A_NOT_IN_PAPER_PROTOCOL",
+    "matched_dimensions": [
+      "map and task population",
+      "raw-bag grouping",
+      "speed and scenario",
+      "THT denominator",
+      "completion and safety scope"
+    ],
+    "paper_main_scope": "1x / 28,506 raw bags / 2.5 m/s"
+  },
+  "paper": {
+    "doi": "10.1016/j.cie.2022.108802",
+    "one_x": {
+      "duration_hours": 24,
+      "ebs_count": 1,
+      "junctions": 44,
+      "loading_stations": 7,
+      "main_metrics": [
+        "bag-level THT min/mean/max",
+        "complete bags / TH"
+      ],
+      "paper_conveyors": 72,
+      "primary_speed_evidence": "表5.2 行李吞吐时间",
+      "primary_speed_mps": 2.5,
+      "processed_segment_count": 43603,
+      "raw_bag_count": 28506,
+      "tth_aggregation": "sum split-segment travel times by original bag",
+      "unloading_stations": 22
+    },
+    "primary_method": "centralized IoT-DRPA / HCA*",
+    "table_5_2_speed_sweep": [
+      {
+        "avg": 6.44,
+        "max": 9.68,
+        "min": 5.1,
+        "source": "表5.2",
+        "speed_mps": 1.5
+      },
+      {
+        "avg": 4.93,
+        "max": 7.37,
+        "min": 3.87,
+        "source": "表5.2",
+        "speed_mps": 2.0
+      },
+      {
+        "avg": 3.96,
+        "max": 5.98,
+        "min": 3.13,
+        "source": "表5.2",
+        "speed_mps": 2.5
+      },
+      {
+        "avg": 3.37,
+        "max": 5.05,
+        "min": 2.63,
+        "source": "表5.2",
+        "speed_mps": 3.0
+      }
+    ],
+    "table_5_3_iot_drpa_vs_dispersed_heuristic": {
+      "boundary": "Implementation is described in prose; not rerun here as executable baseline.",
+      "rows": [
+        {
+          "avg": 4.43,
+          "max": 8.62,
+          "method": "dispersed_heuristic",
+          "min": 3.56,
+          "source": "表5.3",
+          "unit": "minutes"
+        },
+        {
+          "avg": 3.96,
+          "max": 5.98,
+          "method": "iot_drpa_hca_star",
+          "min": 3.13,
+          "source": "表5.3",
+          "unit": "minutes"
+        },
+        {
+          "avg": 10.6,
+          "max": 30.6,
+          "method": "improvement",
+          "min": 12.1,
+          "source": "表5.3",
+          "unit": "percent"
+        }
+      ],
+      "status": "PAPER_REPORTED_ONLY"
+    },
+    "table_5_4_dynamic_iot_drpa_vs_static_lra_star": {
+      "baseline_status": "PAPER_REPORTED_ONLY",
+      "boundary": "No-A* fault-aware v1 is not automatically equivalent to LRA* static strategy.",
+      "rows": [
+        {
+          "dynamic": 6.45,
+          "improvement": 2.12,
+          "source": "表5.4",
+          "speed_deviation_percent": 10,
+          "speed_mps": 1.5,
+          "static": 6.59
+        },
+        {
+          "dynamic": 6.67,
+          "improvement": 2.77,
+          "source": "表5.4",
+          "speed_deviation_percent": 20,
+          "speed_mps": 1.5,
+          "static": 6.86
+        },
+        {
+          "dynamic": 6.91,
+          "improvement": 2.81,
+          "source": "表5.4",
+          "speed_deviation_percent": 30,
+          "speed_mps": 1.5,
+          "static": 7.11
+        },
+        {
+          "dynamic": 4.92,
+          "improvement": 2.96,
+          "source": "表5.4",
+          "speed_deviation_percent": 10,
+          "speed_mps": 2.0,
+          "static": 5.07
+        },
+        {
+          "dynamic": 5.16,
+          "improvement": 3.73,
+          "source": "表5.4",
+          "speed_deviation_percent": 20,
+          "speed_mps": 2.0,
+          "static": 5.36
+        },
+        {
+          "dynamic": 5.42,
+          "improvement": 3.56,
+          "source": "表5.4",
+          "speed_deviation_percent": 30,
+          "speed_mps": 2.0,
+          "static": 5.62
+        },
+        {
+          "dynamic": 3.99,
+          "improvement": 4.77,
+          "source": "表5.4",
+          "speed_deviation_percent": 10,
+          "speed_mps": 2.5,
+          "static": 4.19
+        },
+        {
+          "dynamic": 4.25,
+          "improvement": 4.71,
+          "source": "表5.4",
+          "speed_deviation_percent": 20,
+          "speed_mps": 2.5,
+          "static": 4.46
+        },
+        {
+          "dynamic": 4.49,
+          "improvement": 4.87,
+          "source": "表5.4",
+          "speed_deviation_percent": 30,
+          "speed_mps": 2.5,
+          "static": 4.72
+        },
+        {
+          "dynamic": 3.39,
+          "improvement": 4.78,
+          "source": "表5.4",
+          "speed_deviation_percent": 10,
+          "speed_mps": 3.0,
+          "static": 3.56
+        },
+        {
+          "dynamic": 3.51,
+          "improvement": 5.65,
+          "source": "表5.4",
+          "speed_deviation_percent": 20,
+          "speed_mps": 3.0,
+          "static": 3.72
+        },
+        {
+          "dynamic": 3.64,
+          "improvement": 5.94,
+          "source": "表5.4",
+          "speed_deviation_percent": 30,
+          "speed_mps": 3.0,
+          "static": 3.87
+        }
+      ]
+    },
+    "table_5_5_faults": [
+      {
+        "affected_conveyors": 1,
+        "arc_ids": [
+          1
+        ],
+        "baggage_success_rate": 1.0,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 7,
+        "arc_ids": [
+          2
+        ],
+        "baggage_success_rate": 0.88,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 5,
+        "arc_ids": [
+          3
+        ],
+        "baggage_success_rate": 1.0,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 15,
+        "arc_ids": [
+          4
+        ],
+        "baggage_success_rate": 0.95,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 24,
+        "arc_ids": [
+          5
+        ],
+        "baggage_success_rate": 0.97,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 7,
+        "arc_ids": [
+          6
+        ],
+        "baggage_success_rate": 0.96,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 1,
+        "arc_ids": [
+          7
+        ],
+        "baggage_success_rate": 1.0,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 7,
+        "arc_ids": [
+          8
+        ],
+        "baggage_success_rate": 0.99,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 2,
+        "arc_ids": [
+          1,
+          7
+        ],
+        "baggage_success_rate": 1.0,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 22,
+        "arc_ids": [
+          2,
+          4
+        ],
+        "baggage_success_rate": 0.76,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 36,
+        "arc_ids": [
+          3,
+          5
+        ],
+        "baggage_success_rate": 0.66,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 54,
+        "arc_ids": [
+          4,
+          5
+        ],
+        "baggage_success_rate": 0.0,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 12,
+        "arc_ids": [
+          5,
+          7
+        ],
+        "baggage_success_rate": 0.48,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 36,
+        "arc_ids": [
+          2,
+          4,
+          6
+        ],
+        "baggage_success_rate": 0.26,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 51,
+        "arc_ids": [
+          3,
+          5,
+          8
+        ],
+        "baggage_success_rate": 0.05,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      },
+      {
+        "affected_conveyors": 30,
+        "arc_ids": [
+          4,
+          6,
+          7
+        ],
+        "baggage_success_rate": 0.26,
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "source": "表5.5"
+      }
+    ],
+    "title": "Internet-of-Things-augmented dynamic route planning approach to the airport baggage handling system",
+    "url": "https://doi.org/10.1016/j.cie.2022.108802"
+  },
+  "required_baselines": {
+    "frozen_f2": {
+      "baseline_id": "G4IRSF13_F2_FROZEN",
+      "configuration": {
+        "admission_mode": "off",
+        "control": "C0",
+        "framework": "event_loop_one_step",
+        "pibt": "P2",
+        "pressure_mode": "off",
+        "reservation_depth": 1,
+        "resource": "R3_java_node_window_compatible",
+        "scorer": "S1_frozen_g4e_legal_local_adapter"
+      },
+      "evidence": "artifacts/policies/g4irsf13_f2_frozen_baseline.json",
+      "evidence_status": "COMMITTED_FROZEN_CONTROL",
+      "one_x": {
+        "complete_raw_bags": 28506,
+        "completed_segments": 43603,
+        "conflicts": 0,
+        "failed_segments": 0,
+        "global_reservation_scans": 0,
+        "original_entry_mean_minutes": 41.514218717973414,
+        "original_entry_p95_seconds": 7349.348647499981,
+        "original_entry_p99_seconds": 10789.015762999989,
+        "pass_time_anchored_mean_minutes": 4.143217183651398,
+        "processed_segment_count": 43603,
+        "raw_bag_count": 28506,
+        "runtime_full_astar_calls": 0
+      },
+      "role": "decentralized frozen framework baseline",
+      "scale_availability": {
+        "1x": "COMMITTED_FROZEN_CONTROL",
+        "2x": "FRESH_MATCHED_RUN_REQUIRED",
+        "4x": "FRESH_MATCHED_RUN_REQUIRED_IF_UNLOCKED"
+      }
+    },
+    "original_hca_star": {
+      "baseline_id": "original_project_iot_drpa_hca_star",
+      "claim_boundary": "The 1x values are parsed historical original-project evidence, not a fresh Java/HCA* rerun. Static A*, v2-safe, and a copied 1x number are not substitutes for HCA* at 2x or 4x.",
+      "evidence": [
+        "outputs/tables/g4irsf5_baseline_protocol_results.csv",
+        "outputs/tables/g4irsf8_tth_denominator_comparison.csv",
+        "artifacts/policies/g4irsf12_denominator_reconciliation.json"
+      ],
+      "evidence_status": "HISTORICAL_PARSED_ORIGINAL_PROJECT_OUTPUT",
+      "fresh_java_rerun": false,
+      "one_x": {
+        "complete_raw_bags": 28506,
+        "java_release_time_tth_max_minutes": 24.31666667,
+        "java_release_time_tth_mean_minutes": 5.19722515,
+        "java_release_time_tth_min_minutes": 3.13333333,
+        "legacy_mislabeled_original_entry_max_minutes": 27.14962583,
+        "legacy_mislabeled_original_entry_mean_minutes": 5.76493675,
+        "legacy_mislabeled_original_entry_min_minutes": 3.11684817,
+        "matched_raw_entry_time_tth_mean_minutes": 43.13593828041816,
+        "processed_segment_attempt_time_tth": {
+          "max_minutes": 5.98333333,
+          "mean_minutes": 3.96712271,
+          "min_minutes": 3.13333333
+        },
+        "raw_bag_count": 28506,
+        "speed_mps": 2.5
+      },
+      "role": "original centralized IoT-DRPA / HCA* baseline",
+      "scale_availability": {
+        "1x": "HISTORICAL_PARSED_ORIGINAL_PROJECT_OUTPUT",
+        "2x": "N/A_NOT_IN_PAPER_PROTOCOL",
+        "4x": "N/A_NOT_IN_PAPER_PROTOCOL"
+      }
+    }
+  },
+  "schema": "czr005.g4irsf23.paper_dual_baseline.v1"
+}

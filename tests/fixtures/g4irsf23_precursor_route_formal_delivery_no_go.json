@@ -1,0 +1,85 @@
+{
+  "schema": "czr005.g4irsf23.precursor_route_formal_delivery_summary.v1",
+  "protocol_mode": "FORMAL_WITH_EXACT_PILOT_REUSE",
+  "formal_decision_status": "NO_GO_PRECURSOR_FORMAL_SUPPORT",
+  "formal_support_pass": false,
+  "formal_counts": {
+    "h_bag_complete_group_count": 2048,
+    "h_system_sparse_reused_group_count": 256,
+    "h_bag_only_group_count": 1792,
+    "new_h_system_group_count": 0,
+    "new_h_system_target_count": 0,
+    "fair_promotion_group_count": 6,
+    "block8_fair_promotion_group_count": 0,
+    "required_fair_promotion_group_count": 16,
+    "required_block8_fair_promotion_group_count": 4
+  },
+  "tiny_mlp_unlock": {
+    "required_formal_fair_positive_count": 40,
+    "required_heldout_fair_positive_count": 12,
+    "observed_formal_fair_positive_count": 6,
+    "observed_heldout_fair_positive_count": 0,
+    "heldout_evidence_status": "NOT_RUN",
+    "nonlinear_regret_requirement": "STABLE_NONLINEAR_REGRET_REQUIRED",
+    "nonlinear_regret_evidence_status": "NOT_RUN",
+    "unlocked": false
+  },
+  "identity_audit": {
+    "pilot_group_count": 512,
+    "pilot_h_system_group_count": 256,
+    "pilot_h_bag_only_group_count": 256,
+    "formal_group_count": 2048,
+    "delta_group_count": 1536,
+    "delta_h_bag_only_group_count": 1536,
+    "per_block_prefix_match": {
+      "7": true,
+      "8": true
+    },
+    "pilot_planned_target_count": 1536,
+    "formal_planned_target_count": 4608,
+    "reused_pilot_execution_target_count": 1024,
+    "delta_execution_target_count": 3072,
+    "full_formal_execution_target_count": 4096,
+    "formal_h_system_target_count": 512,
+    "new_h_system_target_count": 0,
+    "exact_execution_partition": true
+  },
+  "exact_pair_gate": {
+    "schema": "czr005.g4irsf23.precursor_route_exact_gate.v1",
+    "status": "PASS_EXACT_PAIR_GATE",
+    "coverage_complete": true,
+    "expected_target_count": 4096,
+    "observed_target_count": 4096,
+    "failure_count": 0,
+    "pass": true
+  },
+  "precursor_formal": {
+    "schema": "czr005.g4irsf23.precursor_route_pilot_summary.v1",
+    "status": "NO_GO_PRECURSOR_PILOT_SUPPORT",
+    "attempted_group_count": 2048,
+    "h_bag_complete_group_count": 2048,
+    "h_system_planned_group_count": 256,
+    "h_system_complete_group_count": 256,
+    "action_changed_group_rate": 1.0,
+    "fair_promotion_group_count": 6,
+    "block8_fair_promotion_group_count": 0,
+    "fair_promotion_strata_count": 4,
+    "thresholds": {
+      "required_h_bag_groups": 2048,
+      "required_h_system_groups": 256,
+      "required_action_change_rate": 0.8,
+      "required_fair_promotion_groups": 16,
+      "required_block8_fair_promotion_groups": 4,
+      "required_fair_promotion_strata": 3
+    },
+    "gates": {
+      "h_bag_group_coverage": true,
+      "h_system_group_coverage": true,
+      "action_changing_rate": true,
+      "fair_promotion_group_count": false,
+      "block8_fair_promotion_group_count": false,
+      "fair_promotion_strata_coverage": true
+    },
+    "pilot_support_pass": false
+  }
+}

@@ -1,0 +1,1401 @@
+{
+  "claim_boundaries": [
+    "Paper Tables 5.2-5.5 are paper-reported references, not local reproductions.",
+    "The original IoT-DRPA/HCA* 1x result is parsed historical evidence, not a fresh Java rerun; HCA* 2x and 4x remain N/A.",
+    "Processed-attempt, Java-release, and original-entry TTH are separate denominators; cross-denominator winner claims are forbidden.",
+    "F2 pass-time-anchored TTH and the legacy HCA mislabeled field are diagnostics and are not substitutes for missing cells in the three-denominator panel.",
+    "A real and safe local action is not by itself causal support, and causal support is not a closed-loop performance improvement.",
+    "H_system benefit and current-bag direct cost remain separate; no individual-fairness claim follows from system benefit alone.",
+    "No learned-policy, 1x/2x/4x, or fault-performance claim is allowed until its explicit stage has completed.",
+    "Precursor Formal covers 2,048 H_bag groups but only 256 sparse reused H_system groups; 1,792 are H_bag-only and no new H_system group is implied."
+  ],
+  "comparison_contract": {
+    "cross_denominator_winner_claim_allowed": false,
+    "denominators_to_report_separately": [
+      "processed_segment_attempt_time_tth",
+      "java_release_time_tth",
+      "original_entry_time_tth"
+    ],
+    "hca_2x": "N/A_NOT_IN_PAPER_PROTOCOL",
+    "hca_4x": "N/A_NOT_IN_PAPER_PROTOCOL",
+    "matched_dimensions": [
+      "map and task population",
+      "raw-bag grouping",
+      "speed and scenario",
+      "THT denominator",
+      "completion and safety scope"
+    ],
+    "paper_main_scope": "1x / 28,506 raw bags / 2.5 m/s"
+  },
+  "denominator_panel": {
+    "baseline_ids": [
+      "G4IRSF13_F2_FROZEN",
+      "original_project_iot_drpa_hca_star"
+    ],
+    "candidate_metrics_status": "NOT_RUN_AFTER_SUPPORT_NO_GO",
+    "rows": [
+      {
+        "comparison_status": "N/A_NOT_COMPARABLE",
+        "denominator": "processed_segment_attempt_time_tth",
+        "fresh_matched_winner_claim_allowed": false,
+        "frozen_f2": {
+          "mean_minutes": null,
+          "status": "NOT_REPORTED_FOR_F2"
+        },
+        "original_hca_star": {
+          "mean_minutes": 3.96712271,
+          "status": "HISTORICAL_PARSED_ORIGINAL_PROJECT_OUTPUT"
+        }
+      },
+      {
+        "comparison_status": "N/A_NOT_COMPARABLE",
+        "denominator": "java_release_time_tth",
+        "fresh_matched_winner_claim_allowed": false,
+        "frozen_f2": {
+          "mean_minutes": null,
+          "status": "NOT_REPORTED_FOR_F2"
+        },
+        "original_hca_star": {
+          "mean_minutes": 5.19722515,
+          "status": "HISTORICAL_PARSED_ORIGINAL_PROJECT_OUTPUT"
+        }
+      },
+      {
+        "comparison_status": "DENOMINATOR_ALIGNED_HISTORICAL_DIRECTION_ONLY",
+        "denominator": "original_entry_time_tth",
+        "f2_minus_hca_minutes": -1.6217195624447456,
+        "fresh_matched_winner_claim_allowed": false,
+        "frozen_f2": {
+          "mean_minutes": 41.514218717973414,
+          "status": "COMMITTED_FROZEN_CONTROL"
+        },
+        "original_hca_star": {
+          "mean_minutes": 43.13593828041816,
+          "status": "HISTORICAL_ALGEBRAICALLY_RECONCILED"
+        }
+      }
+    ],
+    "unit": "minutes_per_complete_raw_bag",
+    "unmapped_diagnostics": {
+      "f2_pass_time_anchored_mean_minutes": 4.143217183651398,
+      "hca_legacy_mislabeled_original_entry_mean_minutes": 5.76493675,
+      "status": "DO_NOT_SUBSTITUTE_IN_THE_THREE_DENOMINATOR_PANEL"
+    }
+  },
+  "final_decision": {
+    "candidate_promotion_authorized": false,
+    "closed_loop_performance_claim": "NOT_RUN",
+    "label": "TESTED_SEAM_LOCAL_ACTION_CEILING",
+    "learned_policy_deployed": false,
+    "reason": "Source, precursor Route Formal 2048, and the preregistered externality neighborhood all returned complete compact no-support labels. This ceiling is limited to the tested Source/precursor/externality seams, not node52 or one-step local control in general.",
+    "status": "COMPLETE_LOCAL_ACTION_SUPPORT_NO_GO"
+  },
+  "paper": {
+    "doi": "10.1016/j.cie.2022.108802",
+    "one_x": {
+      "duration_hours": 24,
+      "ebs_count": 1,
+      "junctions": 44,
+      "loading_stations": 7,
+      "main_metrics": [
+        "bag-level THT min/mean/max",
+        "complete bags / TH"
+      ],
+      "paper_conveyors": 72,
+      "primary_speed_evidence": "\u88685.2 \u884c\u674e\u541e\u5410\u65f6\u95f4",
+      "primary_speed_mps": 2.5,
+      "processed_segment_count": 43603,
+      "raw_bag_count": 28506,
+      "tth_aggregation": "sum split-segment travel times by original bag",
+      "unloading_stations": 22
+    },
+    "panels": {
+      "table_5_2_speed_sweep": {
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "rows": [
+          {
+            "avg": 6.44,
+            "max": 9.68,
+            "min": 5.1,
+            "source": "\u88685.2",
+            "speed_mps": 1.5
+          },
+          {
+            "avg": 4.93,
+            "max": 7.37,
+            "min": 3.87,
+            "source": "\u88685.2",
+            "speed_mps": 2.0
+          },
+          {
+            "avg": 3.96,
+            "max": 5.98,
+            "min": 3.13,
+            "source": "\u88685.2",
+            "speed_mps": 2.5
+          },
+          {
+            "avg": 3.37,
+            "max": 5.05,
+            "min": 2.63,
+            "source": "\u88685.2",
+            "speed_mps": 3.0
+          }
+        ]
+      },
+      "table_5_3_iot_drpa_vs_dispersed_heuristic": {
+        "boundary": "Implementation is described in prose; not rerun here as executable baseline.",
+        "rows": [
+          {
+            "avg": 4.43,
+            "max": 8.62,
+            "method": "dispersed_heuristic",
+            "min": 3.56,
+            "source": "\u88685.3",
+            "unit": "minutes"
+          },
+          {
+            "avg": 3.96,
+            "max": 5.98,
+            "method": "iot_drpa_hca_star",
+            "min": 3.13,
+            "source": "\u88685.3",
+            "unit": "minutes"
+          },
+          {
+            "avg": 10.6,
+            "max": 30.6,
+            "method": "improvement",
+            "min": 12.1,
+            "source": "\u88685.3",
+            "unit": "percent"
+          }
+        ],
+        "status": "PAPER_REPORTED_ONLY"
+      },
+      "table_5_4_dynamic_iot_drpa_vs_static_lra_star": {
+        "baseline_status": "PAPER_REPORTED_ONLY",
+        "boundary": "No-A* fault-aware v1 is not automatically equivalent to LRA* static strategy.",
+        "rows": [
+          {
+            "dynamic": 6.45,
+            "improvement": 2.12,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 10,
+            "speed_mps": 1.5,
+            "static": 6.59
+          },
+          {
+            "dynamic": 6.67,
+            "improvement": 2.77,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 20,
+            "speed_mps": 1.5,
+            "static": 6.86
+          },
+          {
+            "dynamic": 6.91,
+            "improvement": 2.81,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 30,
+            "speed_mps": 1.5,
+            "static": 7.11
+          },
+          {
+            "dynamic": 4.92,
+            "improvement": 2.96,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 10,
+            "speed_mps": 2.0,
+            "static": 5.07
+          },
+          {
+            "dynamic": 5.16,
+            "improvement": 3.73,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 20,
+            "speed_mps": 2.0,
+            "static": 5.36
+          },
+          {
+            "dynamic": 5.42,
+            "improvement": 3.56,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 30,
+            "speed_mps": 2.0,
+            "static": 5.62
+          },
+          {
+            "dynamic": 3.99,
+            "improvement": 4.77,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 10,
+            "speed_mps": 2.5,
+            "static": 4.19
+          },
+          {
+            "dynamic": 4.25,
+            "improvement": 4.71,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 20,
+            "speed_mps": 2.5,
+            "static": 4.46
+          },
+          {
+            "dynamic": 4.49,
+            "improvement": 4.87,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 30,
+            "speed_mps": 2.5,
+            "static": 4.72
+          },
+          {
+            "dynamic": 3.39,
+            "improvement": 4.78,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 10,
+            "speed_mps": 3.0,
+            "static": 3.56
+          },
+          {
+            "dynamic": 3.51,
+            "improvement": 5.65,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 20,
+            "speed_mps": 3.0,
+            "static": 3.72
+          },
+          {
+            "dynamic": 3.64,
+            "improvement": 5.94,
+            "source": "\u88685.4",
+            "speed_deviation_percent": 30,
+            "speed_mps": 3.0,
+            "static": 3.87
+          }
+        ]
+      },
+      "table_5_5_faults": {
+        "evidence_status": "PAPER_REPORTED_ONLY",
+        "rows": [
+          {
+            "affected_conveyors": 1,
+            "arc_ids": [
+              1
+            ],
+            "baggage_success_rate": 1.0,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 7,
+            "arc_ids": [
+              2
+            ],
+            "baggage_success_rate": 0.88,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 5,
+            "arc_ids": [
+              3
+            ],
+            "baggage_success_rate": 1.0,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 15,
+            "arc_ids": [
+              4
+            ],
+            "baggage_success_rate": 0.95,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 24,
+            "arc_ids": [
+              5
+            ],
+            "baggage_success_rate": 0.97,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 7,
+            "arc_ids": [
+              6
+            ],
+            "baggage_success_rate": 0.96,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 1,
+            "arc_ids": [
+              7
+            ],
+            "baggage_success_rate": 1.0,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 7,
+            "arc_ids": [
+              8
+            ],
+            "baggage_success_rate": 0.99,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 2,
+            "arc_ids": [
+              1,
+              7
+            ],
+            "baggage_success_rate": 1.0,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 22,
+            "arc_ids": [
+              2,
+              4
+            ],
+            "baggage_success_rate": 0.76,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 36,
+            "arc_ids": [
+              3,
+              5
+            ],
+            "baggage_success_rate": 0.66,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 54,
+            "arc_ids": [
+              4,
+              5
+            ],
+            "baggage_success_rate": 0.0,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 12,
+            "arc_ids": [
+              5,
+              7
+            ],
+            "baggage_success_rate": 0.48,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 36,
+            "arc_ids": [
+              2,
+              4,
+              6
+            ],
+            "baggage_success_rate": 0.26,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 51,
+            "arc_ids": [
+              3,
+              5,
+              8
+            ],
+            "baggage_success_rate": 0.05,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          },
+          {
+            "affected_conveyors": 30,
+            "arc_ids": [
+              4,
+              6,
+              7
+            ],
+            "baggage_success_rate": 0.26,
+            "evidence_status": "PAPER_REPORTED_ONLY",
+            "source": "\u88685.5"
+          }
+        ]
+      }
+    },
+    "title": "Internet-of-Things-augmented dynamic route planning approach to the airport baggage handling system",
+    "url": "https://doi.org/10.1016/j.cie.2022.108802"
+  },
+  "required_baselines": {
+    "frozen_f2": {
+      "baseline_id": "G4IRSF13_F2_FROZEN",
+      "configuration": {
+        "admission_mode": "off",
+        "control": "C0",
+        "framework": "event_loop_one_step",
+        "pibt": "P2",
+        "pressure_mode": "off",
+        "reservation_depth": 1,
+        "resource": "R3_java_node_window_compatible",
+        "scorer": "S1_frozen_g4e_legal_local_adapter"
+      },
+      "evidence": "artifacts/policies/g4irsf13_f2_frozen_baseline.json",
+      "evidence_status": "COMMITTED_FROZEN_CONTROL",
+      "one_x": {
+        "complete_raw_bags": 28506,
+        "completed_segments": 43603,
+        "conflicts": 0,
+        "failed_segments": 0,
+        "global_reservation_scans": 0,
+        "original_entry_mean_minutes": 41.514218717973414,
+        "original_entry_p95_seconds": 7349.348647499981,
+        "original_entry_p99_seconds": 10789.015762999989,
+        "pass_time_anchored_mean_minutes": 4.143217183651398,
+        "processed_segment_count": 43603,
+        "raw_bag_count": 28506,
+        "runtime_full_astar_calls": 0
+      },
+      "role": "decentralized frozen framework baseline",
+      "scale_availability": {
+        "1x": "COMMITTED_FROZEN_CONTROL",
+        "2x": "FRESH_MATCHED_RUN_REQUIRED",
+        "4x": "FRESH_MATCHED_RUN_REQUIRED_IF_UNLOCKED"
+      }
+    },
+    "original_hca_star": {
+      "baseline_id": "original_project_iot_drpa_hca_star",
+      "claim_boundary": "The 1x values are parsed historical original-project evidence, not a fresh Java/HCA* rerun. Static A*, v2-safe, and a copied 1x number are not substitutes for HCA* at 2x or 4x.",
+      "evidence": [
+        "outputs/tables/g4irsf5_baseline_protocol_results.csv",
+        "outputs/tables/g4irsf8_tth_denominator_comparison.csv",
+        "artifacts/policies/g4irsf12_denominator_reconciliation.json"
+      ],
+      "evidence_status": "HISTORICAL_PARSED_ORIGINAL_PROJECT_OUTPUT",
+      "fresh_java_rerun": false,
+      "one_x": {
+        "complete_raw_bags": 28506,
+        "java_release_time_tth_max_minutes": 24.31666667,
+        "java_release_time_tth_mean_minutes": 5.19722515,
+        "java_release_time_tth_min_minutes": 3.13333333,
+        "legacy_mislabeled_original_entry_max_minutes": 27.14962583,
+        "legacy_mislabeled_original_entry_mean_minutes": 5.76493675,
+        "legacy_mislabeled_original_entry_min_minutes": 3.11684817,
+        "matched_raw_entry_time_tth_mean_minutes": 43.13593828041816,
+        "processed_segment_attempt_time_tth": {
+          "max_minutes": 5.98333333,
+          "mean_minutes": 3.96712271,
+          "min_minutes": 3.13333333
+        },
+        "raw_bag_count": 28506,
+        "speed_mps": 2.5
+      },
+      "role": "original centralized IoT-DRPA / HCA* baseline",
+      "scale_availability": {
+        "1x": "HISTORICAL_PARSED_ORIGINAL_PROJECT_OUTPUT",
+        "2x": "N/A_NOT_IN_PAPER_PROTOCOL",
+        "4x": "N/A_NOT_IN_PAPER_PROTOCOL"
+      }
+    }
+  },
+  "required_question_audit": {
+    "question_count": 30,
+    "rows": [
+      {
+        "answer": "\u51bb\u7ed3\u65b9\u6848\u8bb0\u5f55 PR #7 \u7684 GitHub Actions Run #69 \u4e3a success\uff1b\u672c\u6b21 G23 \u7684 CI \u6210\u529f\u8bc1\u636e\u5c1a\u672a\u5199\u5165 compact handoff\uff0c\u72b6\u6001\u4fdd\u6301 PENDING\uff0c\u63a8\u9001\u540e\u4ee5 GitHub check \u4e3a\u51c6\u3002",
+        "evidence_stage": "GitHub handoff",
+        "number": 1,
+        "question": "PR #7 \u4e0e G23 CI \u662f\u5426\u7eff\u8272\uff1f",
+        "status": "PENDING"
+      },
+      {
+        "answer": "G23 \u53ea\u5728 storage_out/node52 \u5bf9\u540c\u4e00\u961f\u9996\u8df3\u8fc7\u4e00\u6b21\u81ea\u7136\u670d\u52a1\u673a\u4f1a\uff0c\u968f\u540e\u5f3a\u5236\u56de A0\uff1b\u4e0d\u6362 bag\u3001\u4e0d\u91cd\u6392 top-K\u3001\u4e0d\u6539\u5b8c\u6574\u8def\u7ebf\u3002I1 \u6362\u6e90\u961f\u5217\u670d\u52a1\u987a\u5e8f\uff0c\u65e7 A1/A2 \u662f\u5e7f\u6cdb\u538b\u529b\u95e8\u4e14\u53ef\u4ea7\u751f\u91cd\u590d retry\u3002",
+        "evidence_stage": "23B/23C",
+        "number": 2,
+        "question": "\u65b0 Source HOLD \u4e0e\u65e7 I1/A1/A2 \u6709\u4ec0\u4e48\u672c\u8d28\u533a\u522b\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "Source H_system exact groups: 128; block 8: 48; total exact interventions: 256.",
+        "evidence_stage": "23C",
+        "number": 3,
+        "question": "block 7 \u6709\u591a\u5c11 exact applicable groups\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "\u5426\u3002block 8 promotion-eligible fair positives = 0\uff1bSource \u62a5\u544a\u672a\u590d\u73b0 block 7 \u7684\u5f31\u8bca\u65ad\u65b9\u5411\u3002",
+        "evidence_stage": "23C",
+        "number": 4,
+        "question": "block 8 \u662f\u5426\u590d\u73b0\u65b9\u5411\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "treatment-baseline current-bag cost: mean +0.000085227s, max +0.001000000s\uff1b\u4e0a\u9650\u4e3a\u4e00\u6b21 0.001s \u81ea\u7136\u673a\u4f1a\u3002",
+        "evidence_stage": "23C",
+        "number": 5,
+        "question": "HOLD \u7ed9\u5f53\u524d bag \u589e\u52a0\u591a\u5c11\u65f6\u95f4\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "176 \u4e2a\u5b8c\u6574 H_system \u6807\u7b7e\u7684 treatment-baseline mean-effect panel \u5747\u503c\u4e3a -0.000082139s/complete raw bag\uff0c\u8303\u56f4 [-0.004837473, +0.000007770]\uff1b\u6548\u5e94\u4f4e\u4e8e\u53ef\u7528\u95e8\u69db\u3002",
+        "evidence_stage": "23C",
+        "number": 6,
+        "question": "HOLD \u5bf9 57,012-bag mean \u6709\u591a\u5c11\u5f71\u54cd\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "p95 mean/min/max = +0.000000000/+0.000000000/+0.000000000s\uff1bp99 = +0.000000000/+0.000000000/+0.000000000s\uff0c\u5747\u672a\u663e\u793a\u540c\u5411\u6536\u76ca\u3002",
+        "evidence_stage": "23C",
+        "number": 7,
+        "question": "p95/p99 \u662f\u5426\u540c\u5411\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "\u8bca\u65ad\u6807\u7b7e 3\uff0c\u4f46 promotion-eligible usable/strong fair positives = 0\uff1b\u4e0d\u80fd\u628a\u5f31\u8bca\u65ad\u6807\u7b7e\u5f53\u4f5c\u664b\u7ea7\u6b63\u4f8b\u3002",
+        "evidence_stage": "23C",
+        "number": 8,
+        "question": "\u6709\u591a\u5c11 FAIR_SYSTEM_BENEFICIAL\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "0",
+        "evidence_stage": "23C",
+        "number": 9,
+        "question": "\u6709\u591a\u5c11 SYSTEM_BENEFICIAL_BUT_UNFAIR\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "promotion-eligible positives = 0\uff0c\u6545\u53ef\u664b\u7ea7\u538b\u529b/\u65f6\u95f4\u8986\u76d6\u5747\u4e3a 0\uff1b\u4ec5\u6709 2 \u4e2a\u5f31\u8bca\u65ad strata\uff0c\u65f6\u95f4\u6807\u8bb0 ['t28']\uff0c\u4e0d\u8db3\u4ee5\u8bad\u7ec3\u3002",
+        "evidence_stage": "23C",
+        "number": 10,
+        "question": "\u6b63\u4f8b\u8de8\u591a\u5c11\u538b\u529b\u533a\u95f4\u548c\u65f6\u95f4\u533a\u95f4\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "Source causal-support gate \u672a\u901a\u8fc7\uff0c\u56e0\u6b64\u6ca1\u6709\u5236\u9020 feature ranking\u3001rule/linear/tiny MLP\u3001held-out precision \u6216\u7ebf\u4e0a\u6a21\u578b HOLD \u6570\u5b57\u3002",
+        "evidence_stage": "23E",
+        "number": 11,
+        "question": "\u54ea\u4e9b\u5c40\u90e8\u7279\u5f81\u6700\u6709\u7528\uff1f",
+        "status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE"
+      },
+      {
+        "answer": "\u4e8c\u8df3\u6ca1\u6709\u7528\u4e8e\u7b5b\u9009\u3001\u5206\u5c42\u6216 held-out signature\uff1b\u4e00\u8df3 signature pass=False\uff0c\u56e0\u6b64\u672c\u8f6e\u6ca1\u6709\u8bc1\u636e\u8bc1\u660e\u4e8c\u8df3\u5fc5\u8981\u3002",
+        "evidence_stage": "23J",
+        "number": 12,
+        "question": "\u4e8c\u8df3\u4fe1\u606f\u662f\u5426\u771f\u7684\u5fc5\u8981\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "Source causal-support gate \u672a\u901a\u8fc7\uff0c\u56e0\u6b64\u6ca1\u6709\u5236\u9020 feature ranking\u3001rule/linear/tiny MLP\u3001held-out precision \u6216\u7ebf\u4e0a\u6a21\u578b HOLD \u6570\u5b57\u3002",
+        "evidence_stage": "23F",
+        "number": 13,
+        "question": "\u89c4\u5219\u3001\u7ebf\u6027\u3001tiny MLP \u8c01\u6700\u597d\uff1f",
+        "status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE"
+      },
+      {
+        "answer": "Source causal-support gate \u672a\u901a\u8fc7\uff0c\u56e0\u6b64\u6ca1\u6709\u5236\u9020 feature ranking\u3001rule/linear/tiny MLP\u3001held-out precision \u6216\u7ebf\u4e0a\u6a21\u578b HOLD \u6570\u5b57\u3002",
+        "evidence_stage": "23F/23G",
+        "number": 14,
+        "question": "held-out precision \u548c harmful rate \u662f\u591a\u5c11\uff1f",
+        "status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE"
+      },
+      {
+        "answer": "Source causal-support gate \u672a\u901a\u8fc7\uff0c\u56e0\u6b64\u6ca1\u6709\u5236\u9020 feature ranking\u3001rule/linear/tiny MLP\u3001held-out precision \u6216\u7ebf\u4e0a\u6a21\u578b HOLD \u6570\u5b57\u3002",
+        "evidence_stage": "23H",
+        "number": 15,
+        "question": "\u6a21\u578b\u5b9e\u9645\u63d0\u4ea4\u591a\u5c11 HOLD\uff1f",
+        "status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE"
+      },
+      {
+        "answer": "Source causal-support gate \u672a\u901a\u8fc7\uff0c\u56e0\u6b64\u6ca1\u6709\u5236\u9020 feature ranking\u3001rule/linear/tiny MLP\u3001held-out precision \u6216\u7ebf\u4e0a\u6a21\u578b HOLD \u6570\u5b57\u3002",
+        "evidence_stage": "23H",
+        "number": 16,
+        "question": "\u6709\u591a\u5c11 HOLD \u88ab\u516c\u5e73\u7ea6\u675f\u62d2\u7edd\uff1f",
+        "status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE"
+      },
+      {
+        "answer": "\u6ca1\u6709\uff1b256 \u4e2a intervention \u4e2d repeated HOLD groups = 0\uff0c\u4e14\u6bcf\u6b21 HOLD \u540e\u5f3a\u5236\u56de A0\u3002",
+        "evidence_stage": "23B/23C",
+        "number": 17,
+        "question": "\u662f\u5426\u51fa\u73b0\u91cd\u590d HOLD\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "\u65e0 causally supported G23 candidate\uff0c\u6545\u672a\u89e6\u53d1\u95ed\u73af/\u89c4\u6a21/\u6545\u969c claim\u3002",
+        "evidence_stage": "23H/23K",
+        "number": 18,
+        "question": "1\u00d7 \u662f\u5426\u4fdd\u6301\uff1f",
+        "status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE"
+      },
+      {
+        "answer": "\u65e0 causally supported G23 candidate\uff0c\u6545\u672a\u89e6\u53d1\u95ed\u73af/\u89c4\u6a21/\u6545\u969c claim\u3002",
+        "evidence_stage": "23H/23K",
+        "number": 19,
+        "question": "2\u00d7 mean/p95/p99 \u5982\u4f55\uff1f",
+        "status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE"
+      },
+      {
+        "answer": "\u56e0\u679c H_system \u63cf\u8ff0\u503c\uff08\u975e\u95ed\u73af\u5019\u9009\uff09\uff1asource wait -0.000000892s/bag\uff0cnetwork -0.000081247s/bag\uff0cscheduled pre-release wait +0.000000000s/bag\uff1b\u603b\u6548\u5e94\u6781\u5c0f\u4e14\u4e0d\u8de8 block \u590d\u73b0\u3002",
+        "evidence_stage": "23C",
+        "number": 20,
+        "question": "Source wait\u3001network time \u5982\u4f55\u91cd\u65b0\u5206\u914d\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "\u65e0 causally supported G23 candidate\uff0c\u6545\u672a\u89e6\u53d1\u95ed\u73af/\u89c4\u6a21/\u6545\u969c claim\u3002",
+        "evidence_stage": "23H/23K",
+        "number": 21,
+        "question": "\u5173\u95ed\u591a\u5c11 v2-safe gap\uff1f",
+        "status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE"
+      },
+      {
+        "answer": "\u65e0 causally supported G23 candidate\uff0c\u6545\u672a\u89e6\u53d1\u95ed\u73af/\u89c4\u6a21/\u6545\u969c claim\u3002",
+        "evidence_stage": "23H/23K",
+        "number": 22,
+        "question": "\u662f\u5426\u8fbe\u5230 Direction/Gap-10/25/50\uff1f",
+        "status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE"
+      },
+      {
+        "answer": "Pilot mutations=512/512\uff0cfair promotions=6\uff08block8=0\uff09\uff0cH_system actions=512, mean=+0.979877s, p95=+6.376816s, p99=+1.347072s, current-bag cost mean +249.969s / max +5344.400s, fair promotions=6/6, mean effect -3.609646s, cost mean/max +753.050/+1495.400s\uff1bFormal fair promotions=6/16\uff08block8=0/4\uff09\uff0cH_system actions=512, mean=+0.979877s, p95=+6.376816s, p99=+1.347072s, current-bag cost mean +249.969s / max +5344.400s, fair promotions=6/6, mean effect -3.609646s, cost mean/max +753.050/+1495.400s\uff0cFormal decision=NO_GO_PRECURSOR_FORMAL_SUPPORT\u3002tiny MLP unlock=False\uff08Formal fair positives=6/40\uff0cheld-out=0/12\uff0cstable nonlinear regret=NOT_RUN\uff09\u3002",
+        "evidence_stage": "23I Pilot + Formal",
+        "number": 23,
+        "question": "Source \u4e0d\u901a\u8fc7\u65f6\uff0c\u524d\u9a71 Route \u662f\u5426\u6709\u6b63\u4f8b\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "\u6539 storage_out/node52 \u4e4b\u524d\u3001\u5bf9\u5e94 storage_in \u884c\u674e\u6700\u8fd1\u4e00\u6b21\u771f\u5b9e\u591a\u52a8\u4f5c Route \u63a5\u53e3\u7684\u4e00\u6b65 NEXT_EDGE/WAIT\uff1b\u540e\u7eed\u7acb\u5373\u56de S4/J2/E2\uff0c\u4e0d\u589e\u52a0 planner\u3002",
+        "evidence_stage": "23I",
+        "number": 24,
+        "question": "\u524d\u9a71 Route \u6539\u7684\u662f\u54ea\u4e2a\u771f\u5b9e\u4e0a\u6e38\u63a5\u53e3\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "256-group neighborhood: fair system-beneficial=17 across 10 cells; continuation=False\u3002\u8fd9\u5c31\u662f\u5bf9 G22 cohort-relief \u53ef\u6cdb\u5316\u6027\u7684\u9650\u5b9a\u7b54\u6848\u3002",
+        "evidence_stage": "23J",
+        "number": 25,
+        "question": "G22 \u4e24\u4e2a cohort-relief \u52a8\u4f5c\u662f\u5426\u53ef\u6cdb\u5316\uff1f",
+        "status": "COMPLETE"
+      },
+      {
+        "answer": "\u65e0 causally supported G23 candidate\uff0c\u6545\u672a\u89e6\u53d1\u95ed\u73af/\u89c4\u6a21/\u6545\u969c claim\u3002",
+        "evidence_stage": "23K",
+        "number": 26,
+        "question": "4\u00d7 60 \u79d2\u662f\u5426\u6539\u5584\uff1f",
+        "status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE"
+      },
+      {
+        "answer": "\u65e0 causally supported G23 candidate\uff0c\u6545\u672a\u89e6\u53d1\u95ed\u73af/\u89c4\u6a21/\u6545\u969c claim\u3002",
+        "evidence_stage": "23K",
+        "number": 27,
+        "question": "\u662f\u5426\u89e3\u9501 180 \u79d2\u6216 full\uff1f",
+        "status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE"
+      },
+      {
+        "answer": "\u65e0 causally supported G23 candidate\uff0c\u6545\u672a\u89e6\u53d1\u95ed\u73af/\u89c4\u6a21/\u6545\u969c claim\u3002",
+        "evidence_stage": "23K",
+        "number": 28,
+        "question": "\u5355\u5b9e\u4f8b\u5e76\u884c\u662f\u5426\u6709\u5fc5\u8981\uff1f",
+        "status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE"
+      },
+      {
+        "answer": "\u65e0 causally supported G23 candidate\uff0c\u6545\u672a\u89e6\u53d1\u95ed\u73af/\u89c4\u6a21/\u6545\u969c claim\u3002",
+        "evidence_stage": "23K",
+        "number": 29,
+        "question": "\u6545\u969c\u662f\u5426\u5b89\u5168\uff1f",
+        "status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE"
+      },
+      {
+        "answer": "\u505c\u6b62\u6269\u5f20 node52 HOLD/Route \u6a21\u578b\uff1b\u4e0b\u4e00\u7a84\u95ee\u9898\u4ec5\u5e94\u662f\u66f4\u65e9\u4e00\u4e2a\u771f\u5b9e merge-token \u63a5\u53e3\u7684\u4e00\u6b65 MOVE/WAIT \u662f\u5426\u6709\u56e0\u679c\u652f\u6301\u3002",
+        "evidence_stage": "final decision",
+        "number": 30,
+        "question": "\u4e0b\u4e00\u9636\u6bb5\u6700\u7a84\u3001\u6700\u6709\u4ef7\u503c\u7684\u95ee\u9898\u662f\u4ec0\u4e48\uff1f",
+        "status": "COMPLETE"
+      }
+    ],
+    "schema": "czr005.g4irsf23.required_30_questions.v1",
+    "status_counts": {
+      "COMPLETE": 16,
+      "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE": 8,
+      "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE": 5,
+      "PENDING": 1
+    }
+  },
+  "schema": "czr005.g4irsf23.decision_summary.v1",
+  "stages": {
+    "23A_baseline_and_takeover": {
+      "decision_status": "DUAL_BASELINE_CONTRACT_FIXED",
+      "evidence_status": "COMPLETE"
+    },
+    "23B_exact_source_action": {
+      "decision_status": "VALIDATED",
+      "evidence_status": "COMPLETE"
+    },
+    "23C_source_pilot": {
+      "action_changed_group_count": 256,
+      "action_implementation": "VALIDATED",
+      "block8_promotion_eligible_fair_positive_count": 0,
+      "component_mean_delta_seconds_per_raw_bag": {
+        "all": {
+          "metrics": {
+            "raw_bag_network_time_mean_delta_seconds": {
+              "count": 176,
+              "max": 7.752754704881681e-06,
+              "mean": -8.124665138997678e-05,
+              "median": -1.7540155994311135e-08,
+              "min": -0.0047805023502967,
+              "nonzero_count": 176
+            },
+            "raw_bag_scheduled_pre_release_wait_mean_delta_seconds": {
+              "count": 176,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "nonzero_count": 0
+            },
+            "raw_bag_source_wait_mean_delta_seconds": {
+              "count": 176,
+              "max": 1.6487758225380844e-06,
+              "mean": -8.92156661350371e-07,
+              "median": 1.754017597832558e-08,
+              "min": -5.698800252362801e-05,
+              "nonzero_count": 176
+            }
+          },
+          "pair_count": 176
+        },
+        "by_release_block": {
+          "7": {
+            "metrics": {
+              "raw_bag_network_time_mean_delta_seconds": {
+                "count": 128,
+                "max": 1.0524098925657199e-07,
+                "mean": -0.00011209317774360517,
+                "median": -1.7540155994311135e-08,
+                "min": -0.0047805023502967,
+                "nonzero_count": 128
+              },
+              "raw_bag_scheduled_pre_release_wait_mean_delta_seconds": {
+                "count": 128,
+                "max": 0.0,
+                "mean": 0.0,
+                "median": 0.0,
+                "min": 0.0,
+                "nonzero_count": 0
+              },
+              "raw_bag_source_wait_mean_delta_seconds": {
+                "count": 128,
+                "max": 3.508033863397486e-08,
+                "mean": -1.3160606463467894e-06,
+                "median": 1.754017597832558e-08,
+                "min": -5.698800252362801e-05,
+                "nonzero_count": 128
+              }
+            },
+            "pair_count": 128
+          },
+          "8": {
+            "metrics": {
+              "raw_bag_network_time_mean_delta_seconds": {
+                "count": 48,
+                "max": 7.752754704881681e-06,
+                "mean": 1.0107522196989294e-06,
+                "median": -1.7540155994311135e-08,
+                "min": -1.6487758891514659e-06,
+                "nonzero_count": 48
+              },
+              "raw_bag_scheduled_pre_release_wait_mean_delta_seconds": {
+                "count": 48,
+                "max": 0.0,
+                "mean": 0.0,
+                "median": 0.0,
+                "min": 0.0,
+                "nonzero_count": 0
+              },
+              "raw_bag_source_wait_mean_delta_seconds": {
+                "count": 48,
+                "max": 1.6487758225380844e-06,
+                "mean": 2.3825396530674503e-07,
+                "median": 1.754017597832558e-08,
+                "min": 1.754017597832558e-08,
+                "nonzero_count": 48
+              }
+            },
+            "pair_count": 48
+          }
+        },
+        "delta_direction": "treatment_minus_baseline",
+        "h_system_pair_count": 176,
+        "release_block_pair_counts": {
+          "7": 128,
+          "8": 48
+        },
+        "unit": "seconds_per_complete_raw_bag"
+      },
+      "current_bag_cost_seconds": {
+        "individual_cost_gate_pass_count": 176,
+        "max": 0.0010000000002037268,
+        "mean": 8.522727274463581e-05,
+        "min": 0.0,
+        "natural_opportunity_seconds": 0.001,
+        "nonzero_count": 15
+      },
+      "decision_status": "TARGETED_SOURCE_NO_SUPPORT",
+      "evidence_status": "COMPLETE",
+      "executed_target_count": 256,
+      "fair_system_beneficial_label_count": 3,
+      "forced_a0_after_hold_group_count": 256,
+      "full_horizon_raw_bag_count": 57012,
+      "h_system_by_release_block": {
+        "7": 128,
+        "8": 48
+      },
+      "h_system_label_count": 176,
+      "pilot_support_pass": false,
+      "planned_group_count": 256,
+      "promotion_eligible_fair_positive_count": 0,
+      "promotion_eligible_strata_count": 0,
+      "reason": "All 256 interventions were real and safe, but none of 176 H_system labels reached usable or strong promotion strength, and block 8 supplied no positive transfer evidence.",
+      "repeated_hold_group_count": 0,
+      "selector_status": "SOURCE_ADMISSION_SELECTOR_NO_GO",
+      "single_hold_opportunity_group_count": 256,
+      "system_beneficial_but_unfair_label_count": 0,
+      "system_mean_delta_seconds": {
+        "max": 7.77029853793465e-06,
+        "mean": -8.21388079177219e-05,
+        "min": -0.0048374728137901,
+        "nonzero_count": 26
+      },
+      "system_p95_delta_seconds": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "nonzero_count": 0
+      },
+      "system_p99_delta_seconds": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "nonzero_count": 0
+      },
+      "weak_diagnostic_rows": [
+        {
+          "release_block": 7,
+          "selection_stratum": "source_high|downstream_mid|service_mid|rising|t28",
+          "system_mean_delta_seconds": -0.004837385113063419
+        },
+        {
+          "release_block": 7,
+          "selection_stratum": "source_high|downstream_low|service_mid|rising|t28",
+          "system_mean_delta_seconds": -0.0048374728137901
+        },
+        {
+          "release_block": 7,
+          "selection_stratum": "source_high|downstream_low|service_mid|rising|t28",
+          "system_mean_delta_seconds": -0.0048374728137901
+        }
+      ],
+      "weak_diagnostic_strata_count": 2
+    },
+    "23D_source_formal": {
+      "decision_status": "NOT_TRIGGERED_BY_SOURCE_PILOT_CONTINUATION_GATE",
+      "evidence_status": "NOT_TRIGGERED",
+      "reason": "SOURCE_PILOT_CONTINUATION_GATE_NOT_MET"
+    },
+    "23E_feature_reduction": {
+      "decision_status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE",
+      "evidence_status": "NOT_TRIGGERED",
+      "reason": "TARGETED_SOURCE_PILOT_HAD_NO_PROMOTION_ELIGIBLE_SUPPORT"
+    },
+    "23F_selector": {
+      "decision_status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE",
+      "declared_source_selector_outcome": "SOURCE_ADMISSION_SELECTOR_NO_GO",
+      "evidence_status": "NOT_TRIGGERED",
+      "reason": "TARGETED_SOURCE_PILOT_HAD_NO_PROMOTION_ELIGIBLE_SUPPORT"
+    },
+    "23G_offline_gate": {
+      "decision_status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE",
+      "evidence_status": "NOT_TRIGGERED",
+      "reason": "TARGETED_SOURCE_PILOT_HAD_NO_PROMOTION_ELIGIBLE_SUPPORT"
+    },
+    "23H_native_closed_loop": {
+      "decision_status": "NOT_TRIGGERED_BY_SOURCE_CAUSAL_SUPPORT_GATE",
+      "evidence_status": "NOT_TRIGGERED",
+      "reason": "TARGETED_SOURCE_PILOT_HAD_NO_PROMOTION_ELIGIBLE_SUPPORT"
+    },
+    "23I_precursor_route": {
+      "attempted_group_count": 512,
+      "block8_fair_promotion_group_count": 0,
+      "decision_status": "NO_GO_PRECURSOR_FORMAL_SUPPORT",
+      "evidence_status": "COMPLETE",
+      "exact_pair_gate": "PASS_EXACT_PAIR_GATE",
+      "fair_promotion_group_count": 6,
+      "formal_attempted_group_count": 2048,
+      "formal_block8_fair_promotion_group_count": 0,
+      "formal_decision_status": "NO_GO_PRECURSOR_FORMAL_SUPPORT",
+      "formal_evidence_status": "COMPLETE",
+      "formal_exact_pair_gate_pass": true,
+      "formal_fair_promotion_group_count": 6,
+      "formal_fair_promotion_strata_count": 4,
+      "formal_h_bag_complete_group_count": 2048,
+      "formal_h_bag_only_group_count": 1792,
+      "formal_h_system_effect_distribution": {
+        "complete_h_system_action_count": 512,
+        "complete_h_system_group_count": 256,
+        "delta_direction": "treatment_minus_baseline",
+        "fair_promotions": {
+          "action_count": 6,
+          "group_count": 6,
+          "metrics": {
+            "current_bag_cost_seconds": {
+              "count": 6,
+              "max": 1495.3999999999978,
+              "mean": 753.0500000000017,
+              "median": 808.4250000000047,
+              "min": 112.0,
+              "missing_count": 0,
+              "nonzero_count": 6
+            },
+            "deadline_headroom_seconds": {
+              "count": 6,
+              "max": 8263.419260706,
+              "mean": 6019.8392607060005,
+              "median": 5721.749260705999,
+              "min": 4968.629260706006,
+              "missing_count": 0,
+              "nonzero_count": 6
+            },
+            "raw_bag_max_delta_seconds": {
+              "count": 6,
+              "max": 238.0,
+              "mean": 86.26666666666522,
+              "median": 68.5999999999949,
+              "min": 0.0,
+              "missing_count": 0,
+              "nonzero_count": 4
+            },
+            "raw_bag_mean_delta_seconds": {
+              "count": 6,
+              "max": -0.016610538131942576,
+              "mean": -3.6096462148421438,
+              "median": -3.885528485250447,
+              "min": -8.530958394731556,
+              "missing_count": 0,
+              "nonzero_count": 6
+            },
+            "raw_bag_network_time_mean_delta_seconds": {
+              "count": 6,
+              "max": -0.0166105381323689,
+              "mean": -1.620722099440961,
+              "median": -0.8585210131202992,
+              "min": -6.522600505156788,
+              "missing_count": 0,
+              "nonzero_count": 6
+            },
+            "raw_bag_p95_delta_seconds": {
+              "count": 6,
+              "max": 0.0,
+              "mean": -26.384166666664594,
+              "median": -31.782499999997526,
+              "min": -54.432499999992615,
+              "missing_count": 0,
+              "nonzero_count": 4
+            },
+            "raw_bag_p99_delta_seconds": {
+              "count": 6,
+              "max": 0.0,
+              "mean": -5.785083333331386,
+              "median": -8.443999999997686,
+              "min": -9.378499999995256,
+              "missing_count": 0,
+              "nonzero_count": 4
+            },
+            "raw_bag_source_wait_mean_delta_seconds": {
+              "count": 6,
+              "max": 0.0,
+              "mean": -1.988924115390913,
+              "median": -2.5176826808391217,
+              "min": -3.8711718585560995,
+              "missing_count": 0,
+              "nonzero_count": 4
+            }
+          },
+          "release_block_action_counts": {
+            "7": 6
+          }
+        },
+        "panel": {
+          "action_count": 512,
+          "group_count": 256,
+          "metrics": {
+            "current_bag_cost_seconds": {
+              "count": 512,
+              "max": 5344.399999999998,
+              "mean": 249.9692382812492,
+              "median": 38.42499999999745,
+              "min": 0.1500000000014552,
+              "missing_count": 0,
+              "nonzero_count": 512
+            },
+            "deadline_headroom_seconds": {
+              "count": 512,
+              "max": 14176.419260706,
+              "mean": 8160.879495081,
+              "median": 7398.444260706001,
+              "min": 3632.1692607059995,
+              "missing_count": 0,
+              "nonzero_count": 512
+            },
+            "raw_bag_max_delta_seconds": {
+              "count": 512,
+              "max": 532.0,
+              "mean": 12.210058593749302,
+              "median": 0.0,
+              "min": -95.80000000000291,
+              "missing_count": 0,
+              "nonzero_count": 101
+            },
+            "raw_bag_mean_delta_seconds": {
+              "count": 512,
+              "max": 23.860560057506888,
+              "mean": 0.9798772883792615,
+              "median": 2.1925208955053677e-05,
+              "min": -8.530958394731556,
+              "missing_count": 0,
+              "nonzero_count": 512
+            },
+            "raw_bag_network_time_mean_delta_seconds": {
+              "count": 512,
+              "max": 4.703334385736788,
+              "mean": 0.10700458175115793,
+              "median": 2.1925208741890856e-05,
+              "min": -6.522600505156788,
+              "missing_count": 0,
+              "nonzero_count": 512
+            },
+            "raw_bag_p95_delta_seconds": {
+              "count": 512,
+              "max": 150.74750000000222,
+              "mean": 6.376816406250704,
+              "median": 0.0,
+              "min": -54.432499999992615,
+              "missing_count": 0,
+              "nonzero_count": 128
+            },
+            "raw_bag_p99_delta_seconds": {
+              "count": 512,
+              "max": 24.893500000007407,
+              "mean": 1.347072265627208,
+              "median": 0.0,
+              "min": -9.378499999995256,
+              "missing_count": 0,
+              "nonzero_count": 96
+            },
+            "raw_bag_source_wait_mean_delta_seconds": {
+              "count": 512,
+              "max": 19.157225671788403,
+              "mean": 0.8728727066231672,
+              "median": 0.0,
+              "min": -3.8711718585560995,
+              "missing_count": 0,
+              "nonzero_count": 124
+            }
+          },
+          "release_block_action_counts": {
+            "7": 384,
+            "8": 128
+          }
+        },
+        "planned_h_system_action_count": 512,
+        "raw_bag_mean_denominator": "complete_raw_bag"
+      },
+      "formal_h_system_evidence_scope": "SPARSE_256_REUSED_NOT_2048_SYSTEM_LABELS",
+      "formal_h_system_sparse_reused_group_count": 256,
+      "formal_input_compact_status": "NO_GO_PRECURSOR_PILOT_SUPPORT",
+      "formal_new_h_system_group_count": 0,
+      "formal_new_h_system_target_count": 0,
+      "formal_reason": null,
+      "formal_required_block8_fair_promotion_group_count": 4,
+      "formal_required_fair_promotion_group_count": 16,
+      "formal_support_pass": false,
+      "h_system_complete_group_count": 256,
+      "pilot_action_changed_group_count": 512,
+      "pilot_action_changed_group_rate": 1.0,
+      "pilot_decision_status": "NO_GO_PRECURSOR_PILOT_SUPPORT",
+      "pilot_effect_tier_counts": {
+        "direct_only": 512,
+        "harmful": 242,
+        "missing": 0,
+        "neutral": 256,
+        "strong": 7,
+        "usable": 6,
+        "weak_diagnostic": 1
+      },
+      "pilot_evidence_status": "COMPLETE",
+      "pilot_h_system_effect_distribution": {
+        "complete_h_system_action_count": 512,
+        "complete_h_system_group_count": 256,
+        "delta_direction": "treatment_minus_baseline",
+        "fair_promotions": {
+          "action_count": 6,
+          "group_count": 6,
+          "metrics": {
+            "current_bag_cost_seconds": {
+              "count": 6,
+              "max": 1495.3999999999978,
+              "mean": 753.0500000000017,
+              "median": 808.4250000000047,
+              "min": 112.0,
+              "missing_count": 0,
+              "nonzero_count": 6
+            },
+            "deadline_headroom_seconds": {
+              "count": 6,
+              "max": 8263.419260706,
+              "mean": 6019.8392607060005,
+              "median": 5721.749260705999,
+              "min": 4968.629260706006,
+              "missing_count": 0,
+              "nonzero_count": 6
+            },
+            "raw_bag_max_delta_seconds": {
+              "count": 6,
+              "max": 238.0,
+              "mean": 86.26666666666522,
+              "median": 68.5999999999949,
+              "min": 0.0,
+              "missing_count": 0,
+              "nonzero_count": 4
+            },
+            "raw_bag_mean_delta_seconds": {
+              "count": 6,
+              "max": -0.016610538131942576,
+              "mean": -3.6096462148421438,
+              "median": -3.885528485250447,
+              "min": -8.530958394731556,
+              "missing_count": 0,
+              "nonzero_count": 6
+            },
+            "raw_bag_network_time_mean_delta_seconds": {
+              "count": 6,
+              "max": -0.0166105381323689,
+              "mean": -1.620722099440961,
+              "median": -0.8585210131202992,
+              "min": -6.522600505156788,
+              "missing_count": 0,
+              "nonzero_count": 6
+            },
+            "raw_bag_p95_delta_seconds": {
+              "count": 6,
+              "max": 0.0,
+              "mean": -26.384166666664594,
+              "median": -31.782499999997526,
+              "min": -54.432499999992615,
+              "missing_count": 0,
+              "nonzero_count": 4
+            },
+            "raw_bag_p99_delta_seconds": {
+              "count": 6,
+              "max": 0.0,
+              "mean": -5.785083333331386,
+              "median": -8.443999999997686,
+              "min": -9.378499999995256,
+              "missing_count": 0,
+              "nonzero_count": 4
+            },
+            "raw_bag_source_wait_mean_delta_seconds": {
+              "count": 6,
+              "max": 0.0,
+              "mean": -1.988924115390913,
+              "median": -2.5176826808391217,
+              "min": -3.8711718585560995,
+              "missing_count": 0,
+              "nonzero_count": 4
+            }
+          },
+          "release_block_action_counts": {
+            "7": 6
+          }
+        },
+        "panel": {
+          "action_count": 512,
+          "group_count": 256,
+          "metrics": {
+            "current_bag_cost_seconds": {
+              "count": 512,
+              "max": 5344.399999999998,
+              "mean": 249.9692382812492,
+              "median": 38.42499999999745,
+              "min": 0.1500000000014552,
+              "missing_count": 0,
+              "nonzero_count": 512
+            },
+            "deadline_headroom_seconds": {
+              "count": 512,
+              "max": 14176.419260706,
+              "mean": 8160.879495081,
+              "median": 7398.444260706001,
+              "min": 3632.1692607059995,
+              "missing_count": 0,
+              "nonzero_count": 512
+            },
+            "raw_bag_max_delta_seconds": {
+              "count": 512,
+              "max": 532.0,
+              "mean": 12.210058593749302,
+              "median": 0.0,
+              "min": -95.80000000000291,
+              "missing_count": 0,
+              "nonzero_count": 101
+            },
+            "raw_bag_mean_delta_seconds": {
+              "count": 512,
+              "max": 23.860560057506888,
+              "mean": 0.9798772883792615,
+              "median": 2.1925208955053677e-05,
+              "min": -8.530958394731556,
+              "missing_count": 0,
+              "nonzero_count": 512
+            },
+            "raw_bag_network_time_mean_delta_seconds": {
+              "count": 512,
+              "max": 4.703334385736788,
+              "mean": 0.10700458175115793,
+              "median": 2.1925208741890856e-05,
+              "min": -6.522600505156788,
+              "missing_count": 0,
+              "nonzero_count": 512
+            },
+            "raw_bag_p95_delta_seconds": {
+              "count": 512,
+              "max": 150.74750000000222,
+              "mean": 6.376816406250704,
+              "median": 0.0,
+              "min": -54.432499999992615,
+              "missing_count": 0,
+              "nonzero_count": 128
+            },
+            "raw_bag_p99_delta_seconds": {
+              "count": 512,
+              "max": 24.893500000007407,
+              "mean": 1.347072265627208,
+              "median": 0.0,
+              "min": -9.378499999995256,
+              "missing_count": 0,
+              "nonzero_count": 96
+            },
+            "raw_bag_source_wait_mean_delta_seconds": {
+              "count": 512,
+              "max": 19.157225671788403,
+              "mean": 0.8728727066231672,
+              "median": 0.0,
+              "min": -3.8711718585560995,
+              "missing_count": 0,
+              "nonzero_count": 124
+            }
+          },
+          "release_block_action_counts": {
+            "7": 384,
+            "8": 128
+          }
+        },
+        "planned_h_system_action_count": 512,
+        "raw_bag_mean_denominator": "complete_raw_bag"
+      },
+      "pilot_individual_fair_action_count": 512,
+      "pilot_strict_no_delay_action_count": 0,
+      "pilot_support_pass": false,
+      "pilot_system_beneficial_but_costly_group_count": 6,
+      "pilot_system_beneficial_group_count": 6,
+      "tiny_mlp_unlock": {
+        "heldout_evidence_status": "NOT_RUN",
+        "nonlinear_regret_evidence_status": "NOT_RUN",
+        "nonlinear_regret_requirement": "STABLE_NONLINEAR_REGRET_REQUIRED",
+        "observed_formal_fair_positive_count": 6,
+        "observed_heldout_fair_positive_count": 0,
+        "required_formal_fair_positive_count": 40,
+        "required_heldout_fair_positive_count": 12,
+        "unlocked": false
+      }
+    },
+    "23J_externality_neighborhood": {
+      "action_applied_count": 243,
+      "action_changing_rate": 0.94921875,
+      "action_changing_rate_gate_pass": true,
+      "attempted_group_count": 256,
+      "continuation_cell_coverage_uses_fair_system_beneficial": true,
+      "continuation_pass": false,
+      "decision_status": "NO_GO_EXTERNALITY_NEIGHBORHOOD_SUPPORT",
+      "effect_and_fairness_use_action_applied_pairs_only": true,
+      "effect_complete_count": 243,
+      "evidence_status": "COMPLETE",
+      "execution_256_identity_coverage": true,
+      "execution_coverage_and_effect_evidence_are_separate": true,
+      "execution_coverage_count": 256,
+      "fair_system_beneficial_cell_count": 10,
+      "fair_system_beneficial_count": 17,
+      "guard_abstain_count": 13,
+      "guard_abstain_reasons": {
+        "NOT_APPLICABLE_ACTION_PRECONDITION_FAILED": 13
+      },
+      "heldout_local_signature_feature": "one_hop_target_queue_bin",
+      "heldout_local_signature_individual_fairness_used": false,
+      "heldout_local_signature_pass": false,
+      "heldout_local_signature_scope": "SYSTEM_BENEFICIAL_ONLY",
+      "individual_fair_count": 243,
+      "individual_fair_evidence_incomplete_count": 0,
+      "individual_fairness_contract": "FROZEN_PRE_ACTION_DEADLINE_HEADROOM_AND_TREATMENT_CURRENT_BAG_OUTCOME",
+      "individual_fairness_evaluated": true,
+      "missing_execution_count": 0,
+      "one_hop_pressure_bins": [
+        "q16_23",
+        "q24_31",
+        "q32_plus"
+      ],
+      "planned_group_count": 256,
+      "post_hoc_individual_cost_cap_applied": false,
+      "raw_bag_max_delta_is_diagnostic_only": true,
+      "raw_bag_max_delta_seconds_diagnostic": {
+        "count": 243,
+        "max": 596.0,
+        "mean": 45.610493827158095,
+        "median": 0.0,
+        "min": -165.8000000000029,
+        "role": "DIAGNOSTIC_ONLY_NOT_A_SYSTEM_HARD_GATE"
+      },
+      "recognized_execution_outcomes": true,
+      "selection_scope": "ONE_HOP_ALTERNATE_TARGET_QUEUE_ONLY",
+      "system_beneficial_and_individual_fair_are_orthogonal": true,
+      "system_beneficial_but_costly_count": 15,
+      "system_beneficial_but_unfair_count": 0,
+      "system_beneficial_cell_count": 10,
+      "system_beneficial_count": 17,
+      "system_safe_and_individual_cost_are_separate": true,
+      "system_safe_count": 61,
+      "system_tail_hard_gate_metrics": [
+        "raw_bag_p95_delta_seconds",
+        "raw_bag_p99_delta_seconds"
+      ],
+      "two_hop_queue_pressure_used": false,
+      "unknown_execution_count": 0
+    },
+    "23K_scale_and_fault": {
+      "decision_status": "NOT_TRIGGERED_BY_CANDIDATE_PROMOTION_GATE",
+      "evidence_status": "NOT_TRIGGERED",
+      "reason": "NO_CAUSALLY_SUPPORTED_G23_CANDIDATE_EXISTS"
+    }
+  },
+  "status": "COMPLETE_LOCAL_ACTION_SUPPORT_NO_GO"
+}

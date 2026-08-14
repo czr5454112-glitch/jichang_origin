@@ -49,6 +49,10 @@ inline constexpr const char* kG4IRSF21RouteActionTargetSchema =
     "czr005.g4irsf21.route_action_target.v1";
 inline constexpr const char* kG4IRSF22RouteCensusSchema =
     "czr005.g4irsf22.route_census.v1";
+inline constexpr const char* kG4IRSF23SourceHoldTargetSchema =
+    "czr005.g4irsf23.source_admit_hold_target.v1";
+inline constexpr const char* kG4IRSF23SourceAdmissionCensusSchema =
+    "czr005.g4irsf23.source_admission_census.v1";
 inline constexpr const char* kPrepopEventGroupSchema =
     "czr005.g4irsf15.prepop_event_group.v1";
 inline constexpr const char* kPairRunSchema =
@@ -72,6 +76,8 @@ inline constexpr const char* kG20S4J2ResearchProfile =
     "G20_S4_J2";
 inline constexpr const char* kG22S4J2E2ResearchProfile =
     "G22_S4_J2_E2";
+inline constexpr const char* kG23A0S4J2E2ResearchProfile =
+    "G23_A0_S4_J2_E2";
 inline constexpr std::size_t kProtected1xRequestCount = 43603U;
 inline constexpr std::size_t kProtected1xRawBagCount = 28506U;
 inline constexpr std::size_t kProtected2xRequestCount = 87206U;
@@ -81,6 +87,7 @@ enum class ResearchProfile {
   kG15Frozen,
   kG20S4J2,
   kG22S4J2E2,
+  kG23A0S4J2E2,
 };
 
 inline ResearchProfile research_profile_from_string(
@@ -94,9 +101,12 @@ inline ResearchProfile research_profile_from_string(
   if (research_profile == kG22S4J2E2ResearchProfile) {
     return ResearchProfile::kG22S4J2E2;
   }
+  if (research_profile == kG23A0S4J2E2ResearchProfile) {
+    return ResearchProfile::kG23A0S4J2E2;
+  }
   throw std::invalid_argument(
       "research_profile must be G15_FROZEN, G20_S4_J2, or "
-      "G22_S4_J2_E2");
+      "G22_S4_J2_E2, or G23_A0_S4_J2_E2");
 }
 
 inline const char* research_profile_name(
@@ -108,6 +118,8 @@ inline const char* research_profile_name(
       return kG20S4J2ResearchProfile;
     case ResearchProfile::kG22S4J2E2:
       return kG22S4J2E2ResearchProfile;
+    case ResearchProfile::kG23A0S4J2E2:
+      return kG23A0S4J2E2ResearchProfile;
   }
   throw std::logic_error("unknown G4IRSF research profile");
 }
@@ -115,12 +127,18 @@ inline const char* research_profile_name(
 inline bool is_s4_j2_route_profile(
     ResearchProfile research_profile) {
   return research_profile == ResearchProfile::kG20S4J2 ||
-         research_profile == ResearchProfile::kG22S4J2E2;
+         research_profile == ResearchProfile::kG22S4J2E2 ||
+         research_profile == ResearchProfile::kG23A0S4J2E2;
 }
 
 inline bool is_g22_route_profile(
     ResearchProfile research_profile) {
   return research_profile == ResearchProfile::kG22S4J2E2;
+}
+
+inline bool is_e2_profile(ResearchProfile research_profile) {
+  return research_profile == ResearchProfile::kG22S4J2E2 ||
+         research_profile == ResearchProfile::kG23A0S4J2E2;
 }
 
 struct ProfileFullShapeExpectation {
@@ -134,7 +152,16 @@ inline ProfileFullShapeExpectation profile_full_shape_expectation(
     ResearchProfile research_profile,
     std::size_t request_count,
     std::size_t raw_bag_count) {
-  if (is_g22_route_profile(research_profile)) {
+  if (research_profile == ResearchProfile::kG23A0S4J2E2 &&
+      request_count == kProtected1xRequestCount &&
+      raw_bag_count == kProtected1xRawBagCount) {
+    return ProfileFullShapeExpectation{
+        kProtected1xRequestCount,
+        kProtected1xRawBagCount,
+        true,
+        "PROFILE_EXPECTED_FULL_SHAPE_MISMATCH"};
+  }
+  if (is_e2_profile(research_profile)) {
     return ProfileFullShapeExpectation{
         kProtected2xRequestCount,
         kProtected2xRawBagCount,
@@ -154,7 +181,7 @@ inline void append_g22_profile_shape_contract(
     py::dict& row,
     ResearchProfile research_profile,
     const ProfileFullShapeExpectation& expectation) {
-  if (!is_g22_route_profile(research_profile)) {
+  if (!is_e2_profile(research_profile)) {
     return;
   }
   row["profile_expected_full_shape"] = expectation.matches;
@@ -163,7 +190,9 @@ inline void append_g22_profile_shape_contract(
   row["profile_expected_raw_bag_count"] = py::int_(
       static_cast<std::uint64_t>(expectation.expected_raw_bag_count));
   row["profile_full_shape_semantics"] =
-      "G22_PROTECTED_2X_INPUT";
+      research_profile == ResearchProfile::kG23A0S4J2E2
+          ? "G23_PROTECTED_1X_OR_2X_INPUT"
+          : "G22_PROTECTED_2X_INPUT";
 }
 
 inline py::handle required_item(const py::dict& row,
@@ -230,6 +259,22 @@ inline bool strict_bool(const py::handle& value,
     throw py::type_error(std::string(name) + " must be bool");
   }
   return value.ptr() == Py_True;
+}
+
+inline double strict_finite_double(const py::handle& value,
+                                   const char* name) {
+  if (PyBool_Check(value.ptr()) ||
+      (!PyFloat_Check(value.ptr()) && !PyLong_Check(value.ptr()))) {
+    throw py::type_error(std::string(name) + " must be a finite number");
+  }
+  const double converted = PyFloat_AsDouble(value.ptr());
+  if (converted == -1.0 && PyErr_Occurred()) {
+    throw py::error_already_set();
+  }
+  if (!std::isfinite(converted)) {
+    throw py::value_error(std::string(name) + " must be finite");
+  }
+  return converted;
 }
 
 inline std::vector<int> strict_int_vector(
@@ -600,8 +645,14 @@ inline ics::EventDrivenJunctionConfig frozen_config(
         "jit_fair_aging_deadline";
     config.enable_g4irsf17_causal_source_features = false;
   }
-  if (is_g22_route_profile(research_profile)) {
+  if (is_e2_profile(research_profile)) {
     config.g4irsf20_event_hotpath_policy = "E2";
+  }
+  if (research_profile == ResearchProfile::kG23A0S4J2E2) {
+    // G23 records its local Source context behind its own read-only gate;
+    // enabling the broader G17 beacon extension would drift the E2 arm.
+    config.enable_g4irsf17_causal_source_features = false;
+    config.enable_g4irsf23_source_admission_causal_action = true;
   }
   return config;
 }
@@ -629,12 +680,12 @@ inline py::dict frozen_controls_row(
           : "eager";
   row["admission_mode"] = "off";
   row["frozen_tuple"] =
-      is_g22_route_profile(research_profile)
+      is_e2_profile(research_profile)
           ? "R3/S4/P2/C0/Q0/E4/J2/E2"
           : (is_s4_j2_route_profile(research_profile)
                  ? "R3/S4/P2/C0/Q0/E4/J2"
                  : ics::kG4IRSF14CausalFrozenTuple);
-  if (is_g22_route_profile(research_profile)) {
+  if (is_e2_profile(research_profile)) {
     row["g4irsf20_event_hotpath_policy"] = "E2";
   }
   row["reservation_depth"] = 1;
@@ -935,6 +986,10 @@ inline Skeleton skeleton_from_boundary(
       boundary.g4irsf17_i1_treatment_observation;
   skeleton.g4irsf17_i1_pairwise_features =
       boundary.g4irsf17_i1_pairwise_features;
+  skeleton.g4irsf23_source_observation_available =
+      boundary.g4irsf23_source_observation_available;
+  skeleton.g4irsf23_source_observation =
+      boundary.g4irsf23_source_observation;
   skeleton.g4irsf20_route_observation_available =
       boundary.g4irsf20_route_observation_available;
   skeleton.g4irsf20_route_normal_flow =
@@ -2321,8 +2376,13 @@ struct Target {
   bool deferred_address = false;
   bool g4irsf20_route_target = false;
   bool g4irsf21_route_action_target = false;
+  bool g4irsf23_source_hold_target = false;
+  bool event_seq_required = false;
   std::string route_action_kind;
   int requested_route_next_node = -1;
+  std::string source_group_id;
+  int release_block = -1;
+  std::string selection_stratum;
   std::string descriptor_id;
   std::string skeleton_id;
   std::string population_group_sha256;
@@ -2360,7 +2420,8 @@ inline Target parse_target(const py::dict& row) {
   if (schema != kDescriptorSchema &&
       schema != kTargetAddressSchema &&
       schema != kG4IRSF20RouteTargetSchema &&
-      schema != kG4IRSF21RouteActionTargetSchema) {
+      schema != kG4IRSF21RouteActionTargetSchema &&
+      schema != kG4IRSF23SourceHoldTargetSchema) {
     throw py::value_error("unsupported G4IRSF15 descriptor schema");
   }
   Target target;
@@ -2368,10 +2429,96 @@ inline Target parse_target(const py::dict& row) {
       schema == kG4IRSF20RouteTargetSchema;
   target.g4irsf21_route_action_target =
       schema == kG4IRSF21RouteActionTargetSchema;
+  target.g4irsf23_source_hold_target =
+      schema == kG4IRSF23SourceHoldTargetSchema;
   target.deferred_address =
       schema == kTargetAddressSchema ||
       target.g4irsf20_route_target ||
-      target.g4irsf21_route_action_target;
+      target.g4irsf21_route_action_target ||
+      target.g4irsf23_source_hold_target;
+  if (target.g4irsf23_source_hold_target) {
+    target.descriptor_id = strict_string(
+        required_item(row, "target_id"), "target_id");
+    target.source_group_id = strict_string(
+        required_item(row, "source_group_id"), "source_group_id");
+    if (target.descriptor_id.empty() || target.source_group_id.empty()) {
+      throw py::value_error("G23 Source target IDs must be non-empty");
+    }
+    if (strict_string(required_item(row, "research_profile"),
+                      "research_profile") !=
+            kG23A0S4J2E2ResearchProfile ||
+        strict_string(required_item(row, "kind"), "kind") !=
+            "SOURCE_ADMISSION" ||
+        strict_string(required_item(row, "intervention_kind"),
+                      "intervention_kind") !=
+            "SOURCE_HOLD_ONE_NATURAL_OPPORTUNITY" ||
+        strict_string(required_item(row, "baseline_action"),
+                      "baseline_action") != "ADMIT_NOW" ||
+        strict_string(required_item(row, "treatment_action"),
+                      "treatment_action") !=
+            "HOLD_ONE_NATURAL_OPPORTUNITY" ||
+        strict_string(required_item(row, "expected_action_change_type"),
+                      "expected_action_change_type") !=
+            "SOURCE_ADMISSION_ONE_OPPORTUNITY_HOLD") {
+      throw py::value_error("G23 Source ADMIT/HOLD action contract drifted");
+    }
+    target.kind_index = 0;
+    target.event_ordinal = strict_uint64(
+        required_item(row, "event_ordinal"), "event_ordinal");
+    target.event_time_bits = ics::event_runtime_detail::timestamp_bits(
+        strict_finite_double(required_item(row, "event_time"),
+                             "event_time"));
+    const auto event_seq = optional_item(row, "event_seq");
+    if (event_seq && !event_seq.is_none()) {
+      target.event_seq = strict_uint64(event_seq, "event_seq");
+      target.event_seq_required = true;
+    }
+    target.runtime_bag_id = strict_int(
+        required_item(row, "runtime_bag_id"), "runtime_bag_id");
+    const int front_runtime_bag_id = strict_int(
+        required_item(row, "front_runtime_bag_id"),
+        "front_runtime_bag_id");
+    target.node = strict_int(required_item(row, "node"), "node");
+    target.release_block = strict_int(
+        required_item(row, "release_block"), "release_block");
+    const auto selection = optional_item(row, "selection_stratum");
+    if (selection && !selection.is_none()) {
+      target.selection_stratum = strict_string(
+          selection, "selection_stratum");
+    }
+    const auto horizon = strict_string(
+        required_item(row, "horizon"), "horizon");
+    if (horizon == "H_bag") {
+      target.horizon = Horizon::kAffectedBag;
+    } else if (horizon == "H_system") {
+      target.horizon = Horizon::kSelectedSystem;
+    } else {
+      throw py::value_error("horizon must be H_bag or H_system");
+    }
+    if (front_runtime_bag_id != target.runtime_bag_id ||
+        target.node != 52 ||
+        strict_string(required_item(row, "leg"), "leg") !=
+            "storage_out" ||
+        !strict_bool(required_item(row, "baseline_admit_legal"),
+                     "baseline_admit_legal") ||
+        !strict_bool(required_item(row, "preserve_front_bag"),
+                     "preserve_front_bag") ||
+        strict_int(required_item(row, "max_hold_opportunities"),
+                   "max_hold_opportunities") != 1 ||
+        !strict_bool(required_item(row, "force_a0_after_hold"),
+                     "force_a0_after_hold") ||
+        !strict_bool(required_item(row, "outcome_free"),
+                     "outcome_free")) {
+      throw py::value_error(
+          "G23 Source target must bind one legal same-front node-52 hold");
+    }
+    target.baseline_release = true;
+    target.baseline_action = "ADMIT_NOW";
+    target.intervention_action = "HOLD_ONE_NATURAL_OPPORTUNITY";
+    target.expected_action_change_type =
+        "SOURCE_ADMISSION_ONE_OPPORTUNITY_HOLD";
+    return target;
+  }
   if (target.g4irsf20_route_target ||
       target.g4irsf21_route_action_target) {
     target.population_group_sha256 = strict_string(
@@ -2650,6 +2797,22 @@ inline Target parse_target(const py::dict& row) {
 inline void verify_target_boundary(const Target& target,
                                    const Boundary& boundary) {
   boundary.validate();
+  if (target.g4irsf23_source_hold_target) {
+    if (boundary.kind != BoundaryKind::kSourceArbitration ||
+        !boundary.baseline_release || boundary.node != 52 ||
+        boundary.runtime_bag_id != target.runtime_bag_id ||
+        ics::event_runtime_detail::timestamp_bits(boundary.time) !=
+            target.event_time_bits ||
+        (target.event_seq_required &&
+         boundary.event_seq != target.event_seq) ||
+        boundary.source_ready_order.empty() ||
+        boundary.source_ready_order.front() !=
+            target.runtime_bag_id) {
+      throw py::value_error(
+          "G23 Source target does not match the native legal ADMIT boundary");
+    }
+    return;
+  }
   if (kind_index(boundary.kind) != target.kind_index ||
       boundary.event_seq != target.event_seq ||
       ics::event_runtime_detail::timestamp_bits(boundary.time) !=
@@ -2715,11 +2878,14 @@ inline PopulationCandidate verify_target_population(
 inline Intervention intervention_for(const Target& target,
                                      const Boundary& boundary) {
   Intervention intervention;
-  intervention.kind =
-      intervention_kind_for(target.kind_index);
+  intervention.kind = target.g4irsf23_source_hold_target
+                          ? InterventionKind::
+                                kSourceHoldOneNaturalOpportunity
+                          : intervention_kind_for(target.kind_index);
   intervention.horizon = target.horizon;
   intervention.runtime_bag_id = target.runtime_bag_id;
-  if (target.kind_index == 0) {
+  if (target.kind_index == 0 &&
+      !target.g4irsf23_source_hold_target) {
     intervention.peer_runtime_bag_id =
         target.peer_runtime_bag_id;
   } else if (target.kind_index == 1) {
@@ -2750,7 +2916,8 @@ inline Intervention intervention_for(const Target& target,
 inline std::vector<int> intended_affected_ids(
     const Target& target) {
   std::vector<int> ids{target.runtime_bag_id};
-  if (target.kind_index == 0) {
+  if (target.kind_index == 0 &&
+      !target.g4irsf23_source_hold_target) {
     ids.push_back(target.peer_runtime_bag_id);
   }
   std::sort(ids.begin(), ids.end());
@@ -2851,7 +3018,31 @@ inline py::dict action_certificate(
   std::string baseline_action;
   std::string treatment_action;
   std::string commit_type;
-  if (target.kind_index == 0) {
+  if (target.g4irsf23_source_hold_target) {
+    const auto& pre = snapshot_for(
+        baseline_pre_snapshots, target.runtime_bag_id);
+    const auto& baseline = snapshot_for(
+        baseline_snapshots, target.runtime_bag_id);
+    const auto& treatment = snapshot_for(
+        treatment_snapshots, target.runtime_bag_id);
+    baseline_action = "ADMIT_NOW";
+    treatment_action = "HOLD_ONE_NATURAL_OPPORTUNITY";
+    commit_type = "SOURCE_HOLD_ONE_NATURAL_OPPORTUNITY";
+    valid =
+        treatment_step.application_reason ==
+            "APPLIED_SOURCE_HOLD_ONE_NATURAL_OPPORTUNITY" &&
+        boundary.baseline_release && boundary.node == 52 &&
+        !boundary.source_ready_order.empty() &&
+        boundary.source_ready_order.front() == target.runtime_bag_id &&
+        pre.status == "SOURCE_QUEUE" && pre.admitted_time < 0.0 &&
+        pre.source_queued_at_current_node &&
+        baseline.status == "IN_SERVICE" &&
+        baseline.admitted_time >= 0.0 &&
+        !baseline.source_queued_at_current_node &&
+        treatment.status == "SOURCE_QUEUE" &&
+        treatment.admitted_time < 0.0 &&
+        treatment.source_queued_at_current_node;
+  } else if (target.kind_index == 0) {
     const auto& pre_winner =
         snapshot_for(baseline_pre_snapshots,
                      target.runtime_bag_id);
@@ -2966,6 +3157,14 @@ inline py::dict action_certificate(
   row["committed_action_type"] = commit_type;
   row["application_reason"] =
       treatment_step.application_reason;
+  if (target.g4irsf23_source_hold_target) {
+    row["action_changed"] = valid;
+    row["front_bag_unchanged"] = true;
+    row["hold_opportunity_count_contract_configured"] = 1;
+    row["forced_a0_after_hold_contract_configured"] = true;
+    row["maximum_repeated_hold_count_contract_configured"] = 0;
+    row["future_hold_contract_observed"] = false;
+  }
   py::list baseline_pre_rows;
   for (const auto& snapshot : baseline_pre_snapshots) {
     baseline_pre_rows.append(local_snapshot_row(snapshot));
@@ -3587,7 +3786,7 @@ inline py::dict branch_row(
     const BranchEvidence& evidence,
     const std::vector<ics::EventRuntimeBagRequest>& requests,
     const std::vector<double>& original_entry_times,
-    bool compact_g4irsf20_h_system) {
+    bool compact_h_system_output) {
   py::dict row;
   row["finalized"] = evidence.finalized;
   row["horizon_complete"] = evidence.horizon_complete;
@@ -3616,13 +3815,13 @@ inline py::dict branch_row(
         raw_bag_cohort_metrics_row(
             evidence.cohort_outcomes, requests,
             original_entry_times);
-    if (compact_g4irsf20_h_system) {
+    if (compact_h_system_output) {
       row["raw_bag_sufficient_statistics_sidecar"] =
           py::none();
       row["raw_bag_sufficient_statistics_serialized"] =
           false;
       row["raw_bag_sufficient_statistics_omission_reason"] =
-          "G4IRSF20_COMPACT_H_SYSTEM_OUTPUT";
+          "COMPACT_H_SYSTEM_OUTPUT";
       row["h_system_cohort_mapping_sha256"] = py::none();
       row["raw_bag_mapping_sha256"] = py::none();
       row["raw_bag_original_entry_mapping_sha256"] =
@@ -3927,6 +4126,157 @@ inline py::dict scan_causal_skeletons_from_records(
   return payload;
 }
 
+inline py::dict scan_g4irsf23_source_admission_opportunities_from_records(
+    const std::vector<NodeRecordTuple>& node_records,
+    const std::vector<EdgeRecordTuple>& edge_records,
+    const std::vector<std::vector<double>>& heuristic_time,
+    const std::vector<EventRuntimeBagTuple>& bag_records,
+    const std::vector<std::vector<double>>& scorer_w1,
+    const std::vector<double>& scorer_b1,
+    const std::vector<double>& scorer_w2,
+    double scorer_b2,
+    double scorer_risk_margin_threshold,
+    double scorer_risk_bottleneck_threshold,
+    const std::string& scorer_model_sha256,
+    const std::vector<double>& original_entry_times,
+    const std::string& research_profile) {
+  const auto profile =
+      detail::research_profile_from_string(research_profile);
+  if (profile != detail::ResearchProfile::kG23A0S4J2E2) {
+    throw py::value_error(
+        "G23 Source admission census requires G23_A0_S4_J2_E2");
+  }
+  const auto graph = detail::graph_from_records(
+      node_records, edge_records, heuristic_time);
+  const auto requests = detail::requests_from_records(bag_records);
+  const auto protected_original_entry_times =
+      detail::validated_original_entry_times(
+          requests, original_entry_times);
+  const auto raw_mapping =
+      detail::raw_bag_runtime_mapping(requests);
+  const auto full_shape_expectation =
+      detail::profile_full_shape_expectation(
+          profile, requests.size(), raw_mapping.size());
+  const auto config = detail::frozen_config(
+      scorer_w1, scorer_b1, scorer_w2, scorer_b2,
+      scorer_risk_margin_threshold,
+      scorer_risk_bottleneck_threshold,
+      scorer_model_sha256, profile);
+
+  detail::Runtime source(graph, config);
+  source.initialize(requests);
+  std::uint64_t event_ordinal = 0;
+  py::list opportunities;
+  while (true) {
+    const auto mask = source.peek_causal_candidate_kind_mask();
+    if ((mask & ics::kG4IRSF14CausalCandidateI1) == 0U) {
+      if (!source.process_one_event()) {
+        break;
+      }
+      ++event_ordinal;
+      continue;
+    }
+    // The Source census needs only the outcome-free local skeleton.  The
+    // sealed probe computes the full runtime digest at every candidate and
+    // made the 2x scan needlessly expensive; exact pairs still recapture the
+    // sealed boundary at selected ordinals.
+    const auto probe =
+        source.probe_one_event_for_causal_skeletons();
+    if (!probe.event_processed) {
+      break;
+    }
+    for (const auto& boundary : probe.observed_opportunities) {
+      if (boundary.kind !=
+              detail::BoundaryKind::kSourceArbitration ||
+          !boundary.baseline_release || boundary.node != 52 ||
+          boundary.runtime_bag_id < 0 ||
+          static_cast<std::size_t>(boundary.runtime_bag_id) >=
+              requests.size() ||
+          boundary.source_ready_order.empty() ||
+          boundary.source_ready_order.front() !=
+              boundary.runtime_bag_id) {
+        continue;
+      }
+      const auto& request = requests.at(
+          static_cast<std::size_t>(boundary.runtime_bag_id));
+      if (!boundary.g4irsf23_source_observation_available) {
+        throw std::logic_error(
+            "G23 legal Source admission omitted its outcome-free local observation");
+      }
+      const auto candidate_names =
+          ics::g4irsf17_source_candidate_feature_names();
+      const auto context_names =
+          ics::g4irsf17_source_context_feature_names();
+      py::dict outcome_free_context;
+      for (std::size_t index = 0;
+           index < candidate_names.size(); ++index) {
+        outcome_free_context[candidate_names[index]] =
+            boundary.g4irsf23_source_observation[index];
+      }
+      for (std::size_t index = 0;
+           index < context_names.size(); ++index) {
+        outcome_free_context[context_names[index]] =
+            boundary.g4irsf23_source_observation[
+                candidate_names.size() + index];
+      }
+      py::dict row;
+      row["schema"] = kG4IRSF23SourceAdmissionCensusSchema;
+      row["kind"] = "SOURCE_ADMISSION";
+      row["source_group_id"] =
+          "source-" + std::to_string(event_ordinal) + "-" +
+          std::to_string(boundary.runtime_bag_id);
+      row["event_ordinal"] = py::int_(event_ordinal);
+      row["event_seq"] = py::int_(boundary.event_seq);
+      row["event_time"] = boundary.time;
+      row["runtime_bag_id"] = boundary.runtime_bag_id;
+      row["front_runtime_bag_id"] = boundary.runtime_bag_id;
+      row["node"] = boundary.node;
+      row["leg"] = "storage_out";
+      row["segment_id"] = request.segment_id;
+      row["task_id"] = request.task_id;
+      row["release_time"] = request.release_time;
+      row["release_block"] = static_cast<int>(
+          std::floor(request.release_time / 3600.0));
+      row["source_ready_order"] = boundary.source_ready_order;
+      row["baseline_action"] = "ADMIT_NOW";
+      row["baseline_release"] = true;
+      row["baseline_admit_legal"] = true;
+      row["fault_active"] = false;
+      row["stale_generation"] = false;
+      row["outcome_free"] = true;
+      row["outcome_free_context"] =
+          std::move(outcome_free_context);
+      opportunities.append(std::move(row));
+    }
+    ++event_ordinal;
+  }
+  source.finalize();
+  const auto terminal_invariants = detail::invariant_evidence(
+      source.current_result().summary, true,
+      full_shape_expectation, true);
+  py::dict payload;
+  payload["schema"] = kG4IRSF23SourceAdmissionCensusSchema;
+  payload["research_profile"] = research_profile;
+  payload["census_complete"] =
+      terminal_invariants.formal_hard_gate_pass;
+  payload["outcome_free"] = true;
+  payload["processed_event_count"] = py::int_(event_ordinal);
+  payload["opportunity_count"] = py::len(opportunities);
+  payload["opportunities"] = std::move(opportunities);
+  payload["terminal_invariants"] =
+      detail::invariant_row(terminal_invariants);
+  payload["frozen_controls"] =
+      detail::frozen_controls_row(profile);
+  payload["input_request_count"] =
+      static_cast<int>(requests.size());
+  payload["raw_bag_count"] =
+      static_cast<int>(raw_mapping.size());
+  detail::append_g22_profile_shape_contract(
+      payload, profile, full_shape_expectation);
+  (void)protected_original_entry_times;
+  return payload;
+}
+
 inline py::dict materialize_causal_descriptors_from_records(
     const std::vector<NodeRecordTuple>& node_records,
     const std::vector<EdgeRecordTuple>& edge_records,
@@ -4169,6 +4519,11 @@ inline py::dict run_causal_target_pairs_from_records(
   std::set<std::string> descriptor_ids;
   std::set<std::pair<int, std::string>> clone_groups;
   for (const auto& target : targets) {
+    if (target.g4irsf23_source_hold_target &&
+        profile != detail::ResearchProfile::kG23A0S4J2E2) {
+      throw py::value_error(
+          "G23 Source targets require G23_A0_S4_J2_E2");
+    }
     if (!descriptor_ids.insert(target.descriptor_id).second) {
       throw py::value_error(
           "duplicate descriptor_id in target batch");
@@ -4200,6 +4555,7 @@ inline py::dict run_causal_target_pairs_from_records(
     if (target.deferred_address &&
         !target.g4irsf20_route_target &&
         !target.g4irsf21_route_action_target &&
+        !target.g4irsf23_source_hold_target &&
         target.input_runtime_cohort_sha256 !=
             input_runtime_cohort_sha256) {
       throw py::value_error(
@@ -4232,6 +4588,43 @@ inline py::dict run_causal_target_pairs_from_records(
       profile);
   std::vector<int> all_runtime_ids(requests.size());
   std::iota(all_runtime_ids.begin(), all_runtime_ids.end(), 0);
+  const bool has_g4irsf23_h_system_target =
+      std::any_of(targets.begin(), targets.end(),
+                  [](const detail::Target& target) {
+                    return target.g4irsf23_source_hold_target &&
+                           target.horizon ==
+                               detail::Horizon::kSelectedSystem;
+                  });
+  std::optional<detail::BranchEvidence>
+      shared_g4irsf23_terminal_baseline;
+  py::dict shared_g4irsf23_terminal_baseline_row;
+  py::object shared_g4irsf23_terminal_baseline_row_deepcopy = py::none();
+  if (has_g4irsf23_h_system_target) {
+    detail::Runtime shared_baseline(graph, config);
+    shared_baseline.initialize(requests);
+    shared_g4irsf23_terminal_baseline.emplace(
+        detail::drive_branch(
+            shared_baseline,
+            detail::Horizon::kSelectedSystem,
+            {}, all_runtime_ids, -1, 0U,
+            full_shape_expectation,
+            detail::is_s4_j2_route_profile(profile)));
+    if (!shared_g4irsf23_terminal_baseline->finalized ||
+        !shared_g4irsf23_terminal_baseline->horizon_complete ||
+        shared_g4irsf23_terminal_baseline->blocked ||
+        shared_g4irsf23_terminal_baseline->cohort_outcomes.size() !=
+            all_runtime_ids.size() ||
+        !shared_g4irsf23_terminal_baseline->replay_hashes.has_value()) {
+      throw std::logic_error(
+          "G23 shared terminal A0 baseline did not complete exactly once");
+    }
+    shared_g4irsf23_terminal_baseline_row =
+        detail::branch_row(
+            *shared_g4irsf23_terminal_baseline, requests,
+            protected_original_entry_times, true);
+    shared_g4irsf23_terminal_baseline_row_deepcopy =
+        py::module_::import("copy").attr("deepcopy");
+  }
 
   detail::Runtime source(graph, config);
   source.initialize(requests);
@@ -4244,6 +4637,8 @@ inline py::dict run_causal_target_pairs_from_records(
   int applied_action_changing_h_system_count = 0;
   int complete_h_system_hard_gate_pass_count = 0;
   int false_positive_pair_count = 0;
+  int shared_g4irsf23_baseline_pair_count = 0;
+  bool shared_g4irsf23_baseline_equivalence_verified = false;
   while (target_cursor < targets.size()) {
     const auto target_ordinal =
         targets[target_cursor].event_ordinal;
@@ -4278,6 +4673,16 @@ inline py::dict run_causal_target_pairs_from_records(
       }
       ++group_end;
     }
+    std::vector<std::vector<ics::G4IRSF15LocalActionSnapshot>>
+        g4irsf23_source_baseline_pre(group_end - target_cursor);
+    for (std::size_t index = target_cursor;
+         index < group_end; ++index) {
+      if (targets[index].g4irsf23_source_hold_target) {
+        g4irsf23_source_baseline_pre[index - target_cursor] =
+            detail::local_snapshots(
+                source, detail::intended_affected_ids(targets[index]));
+      }
+    }
     const auto source_probe =
         source.probe_one_event_for_causal_opportunities();
     const bool pibt_prefilter_candidate_event =
@@ -4291,6 +4696,19 @@ inline py::dict run_causal_target_pairs_from_records(
           "source probe did not consume the checkpoint queue top");
     }
     ++source_event_ordinal;
+    std::vector<std::vector<ics::G4IRSF15LocalActionSnapshot>>
+        g4irsf23_source_baseline_post(group_end - target_cursor);
+    for (std::size_t index = target_cursor;
+         index < group_end; ++index) {
+      if (targets[index].g4irsf23_source_hold_target) {
+        g4irsf23_source_baseline_post[index - target_cursor] =
+            detail::local_snapshots(
+                source, detail::intended_affected_ids(targets[index]));
+      }
+    }
+    const std::uint64_t source_baseline_start_event_count =
+        static_cast<std::uint64_t>(
+            std::max(0, source.current_result().summary.event_count));
 
     for (std::size_t index = target_cursor;
          index < group_end; ++index) {
@@ -4299,7 +4717,36 @@ inline py::dict run_causal_target_pairs_from_records(
       std::optional<detail::PopulationCandidate>
           requested_route_population;
       bool ambiguous_address = false;
-      if (target.deferred_address) {
+      if (target.g4irsf23_source_hold_target) {
+        for (auto candidate_boundary =
+                 source_probe.observed_opportunities.begin();
+             candidate_boundary !=
+                 source_probe.observed_opportunities.end();
+             ++candidate_boundary) {
+          if (candidate_boundary->kind !=
+                  detail::BoundaryKind::kSourceArbitration ||
+              !candidate_boundary->baseline_release ||
+              candidate_boundary->node != 52 ||
+              candidate_boundary->runtime_bag_id !=
+                  target.runtime_bag_id ||
+              (target.event_seq_required &&
+               candidate_boundary->event_seq != target.event_seq) ||
+              ics::event_runtime_detail::timestamp_bits(
+                  candidate_boundary->time) !=
+                  target.event_time_bits ||
+              candidate_boundary->source_ready_order.empty() ||
+              candidate_boundary->source_ready_order.front() !=
+                  target.runtime_bag_id) {
+            continue;
+          }
+          if (found != source_probe.observed_opportunities.end()) {
+            ambiguous_address = true;
+            found = source_probe.observed_opportunities.end();
+            break;
+          }
+          found = candidate_boundary;
+        }
+      } else if (target.deferred_address) {
         for (auto candidate_boundary =
                  source_probe.observed_opportunities.begin();
              candidate_boundary !=
@@ -4340,7 +4787,17 @@ inline py::dict run_causal_target_pairs_from_records(
       py::dict pair;
       pair["descriptor_id"] = target.descriptor_id;
       pair["target_address_id"] = target.descriptor_id;
-      if (target.g4irsf20_route_target) {
+      if (target.g4irsf23_source_hold_target) {
+        pair["target_schema"] = kG4IRSF23SourceHoldTargetSchema;
+        pair["target_id"] = target.descriptor_id;
+        pair["source_group_id"] = target.source_group_id;
+        pair["runtime_bag_id"] = target.runtime_bag_id;
+        pair["release_block"] = target.release_block;
+        pair["selection_stratum"] = target.selection_stratum.empty()
+                                           ? py::object(py::none())
+                                           : py::object(py::str(
+                                                 target.selection_stratum));
+      } else if (target.g4irsf20_route_target) {
         pair["target_schema"] = kG4IRSF20RouteTargetSchema;
         pair["population_group_id"] =
             target.population_group_sha256;
@@ -4365,7 +4822,9 @@ inline py::dict run_causal_target_pairs_from_records(
           pair["selected_next_node"] = py::none();
         }
       }
-      pair["kind"] = detail::kind_token(target.kind_index);
+      pair["kind"] = target.g4irsf23_source_hold_target
+                           ? "SOURCE_ADMISSION"
+                           : detail::kind_token(target.kind_index);
       pair["event_ordinal"] =
           py::int_(target.event_ordinal);
       pair["horizon"] =
@@ -4398,7 +4857,16 @@ inline py::dict run_causal_target_pairs_from_records(
         continue;
       }
 
-      if (target.g4irsf20_route_target) {
+      if (target.g4irsf23_source_hold_target) {
+        target.clone_group_id = found->clone_group_id;
+        target.event_seq = found->event_seq;
+        target.event_time_bits =
+            ics::event_runtime_detail::timestamp_bits(found->time);
+        target.node = found->node;
+        target.runtime_bag_id = found->runtime_bag_id;
+        target.baseline_release = true;
+        target.source_ready_order = found->source_ready_order;
+      } else if (target.g4irsf20_route_target) {
         const auto resolved = detail::primary_population_candidate(
             detail::skeleton_from_boundary(*found),
             source_strata, target.event_ordinal,
@@ -4552,7 +5020,31 @@ inline py::dict run_causal_target_pairs_from_records(
       detail::verify_target_boundary(target, *found);
       detail::PopulationCandidate resolved_population;
       detail::PrimaryDescriptor resolved_descriptor;
-      if (target.g4irsf21_route_action_target) {
+      if (target.g4irsf23_source_hold_target) {
+        resolved_population.skeleton =
+            detail::skeleton_from_boundary(*found);
+        resolved_population.strata = source_strata;
+        resolved_population.event_ordinal = target.event_ordinal;
+        resolved_population.candidate_action_count = 1;
+        resolved_population.population_group_sha256 =
+            target.source_group_id;
+        resolved_population.population_selection_sha256 =
+            target.descriptor_id;
+        resolved_population.baseline_action = "ADMIT_NOW";
+        resolved_population.intervention_action =
+            "HOLD_ONE_NATURAL_OPPORTUNITY";
+        resolved_population.expected_action_change_type =
+            "SOURCE_ADMISSION_ONE_OPPORTUNITY_HOLD";
+        resolved_descriptor.population = resolved_population;
+        resolved_descriptor.boundary = *found;
+        resolved_descriptor.intervention =
+            detail::intervention_for(target, *found);
+        resolved_descriptor.descriptor_id = target.descriptor_id;
+        auto h_system = resolved_descriptor.intervention;
+        h_system.horizon = detail::Horizon::kSelectedSystem;
+        resolved_descriptor.h_system_sha256 =
+            h_system.intervention_sha256(*found);
+      } else if (target.g4irsf21_route_action_target) {
         resolved_population = *requested_route_population;
         resolved_descriptor =
             detail::seal_route_action_descriptor(
@@ -4570,10 +5062,27 @@ inline py::dict run_causal_target_pairs_from_records(
       }
       const auto intervention =
           detail::intervention_for(target, *found);
-      pair["resolved_execution_descriptor"] =
-          detail::descriptor_row(resolved_descriptor);
+      if (target.g4irsf23_source_hold_target) {
+        py::dict resolved;
+        resolved["schema"] = kG4IRSF23SourceHoldTargetSchema;
+        resolved["target_id"] = target.descriptor_id;
+        resolved["source_group_id"] = target.source_group_id;
+        resolved["event_ordinal"] = py::int_(target.event_ordinal);
+        resolved["event_seq"] = py::int_(found->event_seq);
+        resolved["event_time"] = found->time;
+        resolved["node"] = found->node;
+        resolved["runtime_bag_id"] = found->runtime_bag_id;
+        resolved["front_runtime_bag_id"] = found->runtime_bag_id;
+        resolved["baseline_admit_legal"] = found->baseline_release;
+        resolved["source_ready_order"] = found->source_ready_order;
+        pair["resolved_execution_descriptor"] = std::move(resolved);
+      } else {
+        pair["resolved_execution_descriptor"] =
+            detail::descriptor_row(resolved_descriptor);
+      }
       py::object observation = py::none();
-      if (target.kind_index == 0) {
+      if (target.kind_index == 0 &&
+          !target.g4irsf23_source_hold_target) {
         observation = detail::g4irsf17_i1_observation_pair_row(
             *found, target.peer_runtime_bag_id);
       } else if (target.kind_index == 1) {
@@ -4598,22 +5107,38 @@ inline py::dict run_causal_target_pairs_from_records(
       const auto intended_ids =
           detail::intended_affected_ids(target);
 
-      branch.restore_state_checkpoint(checkpoint);
-      const auto baseline_start_sha256 =
-          branch.deterministic_state_sha256();
-      const auto baseline_pre_action =
-          detail::local_snapshots(branch, intended_ids);
-      const auto baseline_step =
-          branch.probe_one_event_for_causal_opportunities();
-      const auto baseline_post_action =
-          detail::local_snapshots(branch, intended_ids);
-      const std::uint64_t baseline_start_event_count =
-          static_cast<std::uint64_t>(
-              std::max(0, branch.current_result().summary.event_count));
+      ics::G4IRSF14CausalStepResult branch_baseline_step;
+      const ics::G4IRSF14CausalStepResult* baseline_step = nullptr;
+      std::vector<ics::G4IRSF15LocalActionSnapshot>
+          baseline_pre_action;
+      std::vector<ics::G4IRSF15LocalActionSnapshot>
+          baseline_post_action;
+      std::uint64_t baseline_start_event_count = 0;
+      const auto baseline_start_sha256 = source_state_sha256;
+      if (target.g4irsf23_source_hold_target) {
+        baseline_step = &source_probe;
+        baseline_pre_action =
+            g4irsf23_source_baseline_pre[index - target_cursor];
+        baseline_post_action =
+            g4irsf23_source_baseline_post[index - target_cursor];
+        baseline_start_event_count =
+            source_baseline_start_event_count;
+      } else {
+        branch.restore_state_checkpoint(checkpoint);
+        baseline_pre_action =
+            detail::local_snapshots(branch, intended_ids);
+        branch_baseline_step =
+            branch.probe_one_event_for_causal_opportunities();
+        baseline_post_action =
+            detail::local_snapshots(branch, intended_ids);
+        baseline_start_event_count =
+            static_cast<std::uint64_t>(
+                std::max(0, branch.current_result().summary.event_count));
+        baseline_step = &branch_baseline_step;
+      }
 
       branch.restore_state_checkpoint(checkpoint);
-      const auto treatment_start_sha256 =
-          branch.deterministic_state_sha256();
+      const auto treatment_start_sha256 = source_state_sha256;
       const auto treatment_pre_action =
           detail::local_snapshots(branch, intended_ids);
       const auto treatment_step =
@@ -4628,9 +5153,11 @@ inline py::dict run_causal_target_pairs_from_records(
           treatment_start_sha256;
       const bool same_state =
           baseline_start_sha256 == source_state_sha256 &&
-          treatment_start_sha256 == source_state_sha256;
+          treatment_start_sha256 == source_state_sha256 &&
+          baseline_step->source_state_sha256 == source_state_sha256 &&
+          treatment_step.source_state_sha256 == source_state_sha256;
       pair["same_state_start"] = same_state;
-      pair["baseline_step"] = detail::step_row(baseline_step);
+      pair["baseline_step"] = detail::step_row(*baseline_step);
       pair["treatment_step"] =
           detail::step_row(treatment_step);
       pair["affected_runtime_bag_ids"] =
@@ -4643,6 +5170,9 @@ inline py::dict run_causal_target_pairs_from_records(
       const bool certificate_valid =
           py::cast<bool>(certificate["valid"]);
       pair["committed_action_certificate"] = certificate;
+      if (target.g4irsf23_source_hold_target) {
+        pair["action_change_certificate"] = certificate;
+      }
       auto expected_affected = intended_ids;
       auto observed_affected =
           treatment_step.affected_runtime_bag_ids;
@@ -4672,7 +5202,8 @@ inline py::dict run_causal_target_pairs_from_records(
           detail::is_g22_route_profile(profile) &&
           target.g4irsf21_route_action_target;
       const int treatment_local_observation_node =
-          target.kind_index == 2
+          (target.kind_index == 2 ||
+           target.g4irsf23_source_hold_target)
               ? found->node
               : target.selected_next_node;
       const auto treatment_evidence = detail::drive_branch(
@@ -4686,15 +5217,19 @@ inline py::dict run_causal_target_pairs_from_records(
       // Replaying one baseline event is much cheaper than retaining a second
       // full checkpoint while a possibly full-system treatment drains.
       branch.restore_state_checkpoint(checkpoint);
-      if (branch.deterministic_state_sha256() !=
-          baseline_start_sha256) {
-        throw std::logic_error(
-            "baseline replay did not restore the exact pair start state");
-      }
       const auto replayed_baseline_pre_action =
           detail::local_snapshots(branch, intended_ids);
-      const auto replayed_baseline_step =
-          branch.probe_one_event_for_causal_opportunities();
+      ics::G4IRSF14CausalStepResult replayed_baseline_step;
+      if (target.g4irsf23_source_hold_target) {
+        if (!branch.process_one_event()) {
+          throw std::logic_error(
+              "G23 ordinary baseline replay did not process the target event");
+        }
+        pair["g4irsf23_plain_baseline_replay"] = true;
+      } else {
+        replayed_baseline_step =
+            branch.probe_one_event_for_causal_opportunities();
+      }
       const auto replayed_baseline_post_action =
           detail::local_snapshots(branch, intended_ids);
       if (!detail::same_local_action_snapshots(
@@ -4703,55 +5238,277 @@ inline py::dict run_causal_target_pairs_from_records(
           !detail::same_local_action_snapshots(
               baseline_post_action,
               replayed_baseline_post_action) ||
-          replayed_baseline_step.source_state_sha256 !=
-              baseline_step.source_state_sha256 ||
-          replayed_baseline_step.changed_action_count != 0) {
+          (!target.g4irsf23_source_hold_target &&
+           (replayed_baseline_step.source_state_sha256 !=
+                baseline_step->source_state_sha256 ||
+            replayed_baseline_step.changed_action_count != 0))) {
         throw std::logic_error(
             "baseline one-event replay is not deterministic");
       }
-      const auto baseline_evidence = detail::drive_branch(
-          branch, target.horizon, intended_ids, all_runtime_ids,
-          found->node, baseline_start_event_count,
-          full_shape_expectation,
-          detail::is_s4_j2_route_profile(profile),
-          found->baseline_next_node,
-          collect_g4irsf22_local_future);
+      const bool use_shared_g4irsf23_baseline =
+          target.g4irsf23_source_hold_target &&
+          target.horizon == detail::Horizon::kSelectedSystem;
+      detail::BranchEvidence local_baseline_evidence;
+      const detail::BranchEvidence* baseline_evidence_view = nullptr;
+      ics::G4IRSF15CausalBagOutcome
+          shared_g4irsf23_affected_outcome;
+      std::uint64_t shared_g4irsf23_elapsed_event_count = 0U;
+      if (use_shared_g4irsf23_baseline) {
+        if (!shared_g4irsf23_terminal_baseline.has_value()) {
+          throw std::logic_error(
+              "G23 H_system target omitted its shared terminal A0 baseline");
+        }
+        shared_g4irsf23_affected_outcome =
+            shared_g4irsf23_terminal_baseline
+                ->cohort_outcomes.at(
+                    static_cast<std::size_t>(
+                        target.runtime_bag_id));
+        if (shared_g4irsf23_affected_outcome.runtime_bag_id !=
+            target.runtime_bag_id) {
+          throw std::logic_error(
+              "G23 shared terminal A0 baseline runtime ID order drifted");
+        }
+        const auto shared_terminal_event_count =
+            static_cast<std::uint64_t>(std::max(
+                0, shared_g4irsf23_terminal_baseline
+                       ->invariants.event_count));
+        if (baseline_start_event_count > shared_terminal_event_count) {
+          throw std::logic_error(
+              "G23 shared terminal A0 baseline predates its target event");
+        }
+        shared_g4irsf23_elapsed_event_count =
+            shared_terminal_event_count - baseline_start_event_count;
+        ++shared_g4irsf23_baseline_pair_count;
+        pair["shared_baseline_used"] = true;
+        if (!shared_g4irsf23_baseline_equivalence_verified) {
+          local_baseline_evidence = detail::drive_branch(
+              branch, target.horizon, intended_ids,
+              all_runtime_ids, found->node,
+              baseline_start_event_count,
+              full_shape_expectation,
+              detail::is_s4_j2_route_profile(profile),
+              found->baseline_next_node,
+              collect_g4irsf22_local_future);
+          const auto& audited = local_baseline_evidence;
+          const auto shared_cohort_sha =
+              detail::cohort_outcome_sha256(
+                  shared_g4irsf23_terminal_baseline
+                      ->cohort_outcomes);
+          const auto audited_cohort_sha =
+              detail::cohort_outcome_sha256(
+                  audited.cohort_outcomes);
+          const auto shared_raw =
+              py::reinterpret_borrow<py::dict>(
+                  shared_g4irsf23_terminal_baseline_row[
+                      "raw_bag_cohort_metrics"]);
+          const auto audited_raw =
+              detail::raw_bag_cohort_metrics_row(
+                  audited.cohort_outcomes, requests,
+                  protected_original_entry_times);
+          const auto shared_replay =
+              shared_g4irsf23_terminal_baseline
+                      ->replay_hashes.has_value()
+                  ? shared_g4irsf23_terminal_baseline
+                        ->replay_hashes
+                        ->deterministic_result_sha256
+                  : std::string{};
+          const auto audited_replay =
+              audited.replay_hashes.has_value()
+                  ? audited.replay_hashes
+                        ->deterministic_result_sha256
+                  : std::string{};
+          const auto shared_invariants =
+              detail::invariant_row(
+                  shared_g4irsf23_terminal_baseline
+                      ->invariants);
+          const auto audited_invariants =
+              detail::invariant_row(audited.invariants);
+          const auto shared_replay_row =
+              detail::replay_hash_row(
+                  *shared_g4irsf23_terminal_baseline
+                       ->replay_hashes);
+          const auto audited_replay_row =
+              detail::replay_hash_row(
+                  *audited.replay_hashes);
+          const bool equivalent =
+              audited.finalized && audited.horizon_complete &&
+              !audited.blocked &&
+              audited.stop_reason ==
+                  shared_g4irsf23_terminal_baseline->stop_reason &&
+              audited.elapsed_event_count ==
+                  shared_g4irsf23_elapsed_event_count &&
+              audited.affected_outcomes.size() == 1U &&
+              detail::same_causal_outcome(
+                  shared_g4irsf23_affected_outcome,
+                  audited.affected_outcomes.front()) &&
+              shared_cohort_sha == audited_cohort_sha &&
+              shared_raw.equal(audited_raw) &&
+              shared_replay == audited_replay &&
+              shared_replay_row.equal(audited_replay_row) &&
+              shared_invariants.equal(audited_invariants);
+          if (!equivalent) {
+            throw std::logic_error(
+                "G23 shared terminal A0 baseline failed checkpoint "
+                "continuation equivalence audit");
+          }
+          shared_g4irsf23_baseline_equivalence_verified = true;
+        }
+        shared_g4irsf23_terminal_baseline
+            ->affected_outcomes = {
+            shared_g4irsf23_affected_outcome};
+        baseline_evidence_view =
+            &*shared_g4irsf23_terminal_baseline;
+        pair["shared_baseline_equivalence_verified"] =
+            shared_g4irsf23_baseline_equivalence_verified;
+      } else {
+        local_baseline_evidence = detail::drive_branch(
+            branch, target.horizon, intended_ids,
+            all_runtime_ids, found->node,
+            baseline_start_event_count,
+            full_shape_expectation,
+            detail::is_s4_j2_route_profile(profile),
+            found->baseline_next_node,
+            collect_g4irsf22_local_future);
+        baseline_evidence_view = &local_baseline_evidence;
+        pair["shared_baseline_used"] = false;
+        pair["shared_baseline_equivalence_verified"] = false;
+      }
+      if (baseline_evidence_view == nullptr) {
+        throw std::logic_error("baseline evidence view was not initialized");
+      }
       const bool compact_g4irsf20_h_system =
           (target.g4irsf20_route_target ||
            target.g4irsf21_route_action_target) &&
           detail::is_s4_j2_route_profile(profile) &&
           target.horizon == detail::Horizon::kSelectedSystem;
-      pair["baseline"] =
-          detail::branch_row(
-              baseline_evidence, requests,
-              protected_original_entry_times,
-              compact_g4irsf20_h_system);
-      pair["treatment"] =
-          detail::branch_row(
-              treatment_evidence, requests,
-              protected_original_entry_times,
-              compact_g4irsf20_h_system);
+      const bool compact_g4irsf23_h_system =
+          target.g4irsf23_source_hold_target &&
+          target.horizon == detail::Horizon::kSelectedSystem;
+      const bool compact_h_system_output =
+          compact_g4irsf20_h_system ||
+          compact_g4irsf23_h_system;
+      py::dict baseline_branch;
+      if (use_shared_g4irsf23_baseline) {
+        // Evidence values are shared in C++, but each public pair owns its
+        // Python containers so consumers cannot mutate sibling rows.
+        baseline_branch = py::cast<py::dict>(
+            shared_g4irsf23_terminal_baseline_row_deepcopy(
+                shared_g4irsf23_terminal_baseline_row));
+        py::list affected;
+        affected.append(detail::outcome_row(
+            shared_g4irsf23_affected_outcome));
+        baseline_branch["affected_bag_outcomes"] =
+            std::move(affected);
+        baseline_branch["elapsed_event_count"] = py::int_(
+            shared_g4irsf23_elapsed_event_count);
+      } else {
+        baseline_branch = detail::branch_row(
+            *baseline_evidence_view, requests,
+            protected_original_entry_times,
+            compact_h_system_output);
+      }
+      auto treatment_branch = detail::branch_row(
+          treatment_evidence, requests,
+          protected_original_entry_times,
+          compact_h_system_output);
+      if (target.g4irsf23_source_hold_target) {
+        if (target.horizon == detail::Horizon::kSelectedSystem) {
+          const auto baseline_raw =
+              py::reinterpret_borrow<py::dict>(
+                  baseline_branch["raw_bag_cohort_metrics"]);
+          const auto treatment_raw =
+              py::reinterpret_borrow<py::dict>(
+                  treatment_branch["raw_bag_cohort_metrics"]);
+          if (!py::cast<bool>(baseline_raw["comparison_eligible"]) ||
+              !py::cast<bool>(treatment_raw["comparison_eligible"])) {
+            throw std::logic_error(
+                "G23 H_system raw-bag outcomes are not comparison eligible");
+          }
+          pair["system_mean_delta_seconds"] =
+              60.0 *
+              (py::cast<double>(
+                   treatment_raw["original_entry_mean_minutes"]) -
+               py::cast<double>(
+                   baseline_raw["original_entry_mean_minutes"]));
+          pair["system_p95_delta_seconds"] =
+              py::cast<double>(
+                  treatment_raw["original_entry_p95_seconds"]) -
+              py::cast<double>(
+                  baseline_raw["original_entry_p95_seconds"]);
+          pair["system_p99_delta_seconds"] =
+              py::cast<double>(
+                  treatment_raw["original_entry_p99_seconds"]) -
+              py::cast<double>(
+                  baseline_raw["original_entry_p99_seconds"]);
+          pair["deadline_miss_delta"] =
+              py::cast<int>(
+                  treatment_raw["deadline_miss_raw_bag_count"]) -
+              py::cast<int>(
+                  baseline_raw["deadline_miss_raw_bag_count"]);
+        }
+        if (baseline_evidence_view->affected_outcomes.size() != 1U ||
+            treatment_evidence.affected_outcomes.size() != 1U) {
+          throw std::logic_error(
+              "G23 Source pair must retain exactly one directly affected bag");
+        }
+        pair["current_bag_cost_seconds"] =
+            treatment_evidence.affected_outcomes.front()
+                .completion_seconds -
+            baseline_evidence_view->affected_outcomes.front()
+                .completion_seconds;
+        const double natural_opportunity_seconds =
+            std::max(graph.service_time(found->node),
+                     config.minimum_service_seconds);
+        pair["natural_opportunity_seconds"] =
+            natural_opportunity_seconds;
+        const auto& treatment_outcome =
+            treatment_evidence.affected_outcomes.front();
+        const bool forced_a0_after_hold_observed =
+            treatment_evidence.horizon_complete &&
+            !treatment_evidence.blocked &&
+            treatment_outcome.completed &&
+            treatment_outcome.admitted_time >=
+                found->time + natural_opportunity_seconds;
+        pair["hold_opportunity_count_observed"] = 1;
+        pair["forced_a0_after_hold_observed"] =
+            forced_a0_after_hold_observed;
+        pair["repeated_hold_count_observed"] = 0;
+        pair["hold_contract_observation_semantics"] =
+            "ONE_APPLIED_G23_DIRECTIVE_THEN_ORDINARY_DRIVE;_FORCED_A0_"
+            "PROVED_BY_COMPLETED_AFFECTED_BAG_ADMISSION_NOT_BEFORE_HOLD_EXPIRY";
+        auto observed_certificate =
+            py::reinterpret_borrow<py::dict>(
+                pair["action_change_certificate"]);
+        observed_certificate["hold_opportunity_count_observed"] = 1;
+        observed_certificate["forced_a0_after_hold_observed"] =
+            forced_a0_after_hold_observed;
+        observed_certificate["repeated_hold_count_observed"] = 0;
+        observed_certificate["future_hold_contract_observed"] =
+            forced_a0_after_hold_observed;
+      }
+      pair["baseline"] = std::move(baseline_branch);
+      pair["treatment"] = std::move(treatment_branch);
       py::list affected_deltas;
-      if (baseline_evidence.affected_outcomes.size() !=
+      if (baseline_evidence_view->affected_outcomes.size() !=
           treatment_evidence.affected_outcomes.size()) {
         throw std::logic_error(
             "matched branches produced different affected cohorts");
       }
       for (std::size_t outcome_index = 0;
            outcome_index <
-               baseline_evidence.affected_outcomes.size();
+               baseline_evidence_view->affected_outcomes.size();
            ++outcome_index) {
         affected_deltas.append(
             detail::realized_outcome_delta_row(
-                baseline_evidence
-                    .affected_outcomes[outcome_index],
+                baseline_evidence_view
+                    ->affected_outcomes[outcome_index],
                 treatment_evidence
                     .affected_outcomes[outcome_index]));
       }
       pair["affected_bag_deltas"] =
           std::move(affected_deltas);
       pair["direct_affected_runtime_bag_ids"] = intended_ids;
-      if (compact_g4irsf20_h_system) {
+      if (compact_h_system_output) {
         pair["realized_externality"] = py::none();
         pair["realized_affected_runtime_bag_ids"] = py::none();
         pair["externality_runtime_bag_ids"] = py::none();
@@ -4762,7 +5519,7 @@ inline py::dict run_causal_target_pairs_from_records(
         pair["realized_outcome_deltas_sha256"] = py::none();
       } else {
         const auto externality = detail::realized_externality_row(
-            baseline_evidence, treatment_evidence, intended_ids,
+            *baseline_evidence_view, treatment_evidence, intended_ids,
             target.horizon);
         pair["realized_externality"] = externality;
         pair["realized_affected_runtime_bag_ids"] =
@@ -4780,10 +5537,10 @@ inline py::dict run_causal_target_pairs_from_records(
       }
       if (target.horizon ==
               detail::Horizon::kSelectedSystem &&
-          !compact_g4irsf20_h_system) {
+          !compact_h_system_output) {
         pair["cohort_difference_sidecar"] =
             detail::cohort_difference_sidecar_row(
-                baseline_evidence, treatment_evidence);
+                *baseline_evidence_view, treatment_evidence);
         pair["cohort_difference_sidecar_serialized"] =
             true;
       } else {
@@ -4804,20 +5561,34 @@ inline py::dict run_causal_target_pairs_from_records(
         pair["g4irsf20_compact_omissions"] =
             std::move(omissions);
       }
+      if (compact_g4irsf23_h_system) {
+        py::dict omissions;
+        omissions["raw_bag_sufficient_statistics_sidecar"] = true;
+        omissions["cohort_difference_sidecar"] = true;
+        omissions["realized_externality_outcome_deltas"] = true;
+        omissions["preserved_affected_bag_deltas"] = true;
+        omissions["preserved_aggregate_raw_bag_metrics"] = true;
+        omissions["preserved_system_effect_deltas"] = true;
+        omissions["preserved_source_hold_certificate"] = true;
+        omissions["preserved_hard_gates"] = true;
+        pair["g4irsf23_compact_h_system_output"] = true;
+        pair["g4irsf23_compact_omissions"] =
+            std::move(omissions);
+      }
       const bool live_safety_pass =
-          baseline_evidence.invariants.live_safety_pass &&
+          baseline_evidence_view->invariants.live_safety_pass &&
           treatment_evidence.invariants.live_safety_pass;
       const bool formal_hard_gate_evaluated =
           target.horizon ==
           detail::Horizon::kSelectedSystem;
       const bool formal_hard_gate_pass =
           formal_hard_gate_evaluated &&
-          (baseline_evidence.invariants.formal_hard_gate_pass &&
+          (baseline_evidence_view->invariants.formal_hard_gate_pass &&
            treatment_evidence.invariants.formal_hard_gate_pass);
       const bool horizon_complete =
-          baseline_evidence.horizon_complete &&
+          baseline_evidence_view->horizon_complete &&
           treatment_evidence.horizon_complete &&
-          !baseline_evidence.blocked &&
+          !baseline_evidence_view->blocked &&
           !treatment_evidence.blocked;
       const bool complete =
           horizon_complete && live_safety_pass &&
@@ -4849,7 +5620,7 @@ inline py::dict run_causal_target_pairs_from_records(
            formal_hard_gate_pass);
       std::vector<std::string> pair_fail_reasons;
       for (const auto& reason :
-           baseline_evidence.invariants
+           baseline_evidence_view->invariants
                .hard_gate_fail_reasons) {
         pair_fail_reasons.push_back(
             "BASELINE:" + reason);
@@ -4925,6 +5696,18 @@ inline py::dict run_causal_target_pairs_from_records(
       complete_h_system_hard_gate_pass_count;
   payload["false_positive_pair_count"] =
       false_positive_pair_count;
+  payload["shared_baseline_used"] =
+      shared_g4irsf23_baseline_pair_count > 0;
+  payload["shared_baseline_pair_count"] =
+      shared_g4irsf23_baseline_pair_count;
+  payload["shared_baseline_equivalence_verified"] =
+      shared_g4irsf23_baseline_equivalence_verified;
+  payload["shared_baseline_terminal_event_count"] =
+      shared_g4irsf23_terminal_baseline.has_value()
+          ? py::object(py::int_(
+                shared_g4irsf23_terminal_baseline
+                    ->invariants.event_count))
+          : py::object(py::none());
   payload["h_system_pair_count"] =
       complete_h_system_hard_gate_pass_count;
   payload["source_events_replayed"] =
@@ -4983,6 +5766,23 @@ inline void register_causal_campaign_bindings(py::module_& module) {
       py::arg("selected_skeletons"),
       py::arg("research_profile") =
           std::string("G15_FROZEN"));
+  module.def(
+      "g4irsf23_scan_source_admission_opportunities_from_records",
+      &scan_g4irsf23_source_admission_opportunities_from_records,
+      py::arg("node_records"),
+      py::arg("edge_records"),
+      py::arg("heuristic_time"),
+      py::arg("bag_records"),
+      py::arg("scorer_w1"),
+      py::arg("scorer_b1"),
+      py::arg("scorer_w2"),
+      py::arg("scorer_b2"),
+      py::arg("scorer_risk_margin_threshold"),
+      py::arg("scorer_risk_bottleneck_threshold"),
+      py::arg("scorer_model_sha256"),
+      py::arg("original_entry_times"),
+      py::arg("research_profile") =
+          std::string("G23_A0_S4_J2_E2"));
   module.def(
       "g4irsf15_run_causal_target_pairs_from_records",
       &run_causal_target_pairs_from_records,
