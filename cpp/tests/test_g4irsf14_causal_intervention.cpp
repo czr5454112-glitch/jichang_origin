@@ -471,6 +471,185 @@ void test_i1_source_swap() {
   apply_and_finish(config, captured);
 }
 
+void test_source_hold_one_natural_opportunity() {
+  {
+    const auto legacy_config = frozen_config();
+    EventDrivenJunctionRuntime legacy(
+        canonical_map2().graph, legacy_config);
+    legacy.initialize({
+        request(61491, 52, 49, 2.0, "legacy-node52-single"),
+        request(61492, 3, 47, 100.0, "legacy-node52-system")});
+    for (int event = 0; event < 1000; ++event) {
+      const auto next = legacy.peek_safe_boundary();
+      require(next.has_value(),
+              "legacy node52 fixture stopped before source arbitration");
+      if (next->next_event_type ==
+              JunctionEventType::kSourceArbitration &&
+          next->node == 52) {
+        require(
+            (legacy.peek_causal_candidate_kind_mask() &
+             kG4IRSF14CausalCandidateI1) == 0U,
+            "G23 seam must remain disabled for the frozen legacy profile");
+        break;
+      }
+      require(legacy.process_one_event(),
+              "legacy node52 fixture stopped early");
+    }
+  }
+  auto config = frozen_config();
+  config.retry_interval = 7.0;
+  config.enable_g4irsf23_source_admission_causal_action = true;
+  {
+    EventDrivenJunctionRuntime non_target_source(
+        canonical_map2().graph, config);
+    non_target_source.initialize({
+        request(61493, 46, 51, 2.0, "g23-non-target-a"),
+        request(61494, 46, 51, 2.0, "g23-non-target-b")});
+    bool observed_non_target_source = false;
+    for (int event = 0; event < 1000; ++event) {
+      const auto next = non_target_source.peek_safe_boundary();
+      require(next.has_value(),
+              "G23 non-target fixture stopped before source arbitration");
+      if (next->next_event_type ==
+              JunctionEventType::kSourceArbitration &&
+          next->node == 46) {
+        observed_non_target_source = true;
+        require(
+            (non_target_source.peek_causal_candidate_kind_mask() &
+             kG4IRSF14CausalCandidateI1) == 0U,
+            "G23 must not probe legacy I1 at a non-target Source node");
+        break;
+      }
+      require(non_target_source.process_one_event(),
+              "G23 non-target fixture stopped early");
+    }
+    require(observed_non_target_source,
+            "G23 non-target fixture never reached source arbitration");
+  }
+  EventDrivenJunctionRuntime runtime(canonical_map2().graph,
+                                     config);
+  runtime.initialize({
+      request(61501, 52, 49, 2.0, "g23-storage-out"),
+      request(61502, 3, 47, 100.0, "g23-system")});
+  const auto captured = capture_opportunity(
+      runtime, G4IRSF14CloneBoundaryKind::kSourceArbitration,
+      kG4IRSF14CausalCandidateI1);
+  require(
+      captured.boundary.node == 52 &&
+          captured.boundary.baseline_release &&
+          captured.boundary.source_ready_order.size() == 1U &&
+          captured.boundary.g4irsf23_source_observation_available &&
+          !captured.boundary.g4irsf17_i1_observation_available &&
+          captured.boundary.runtime_bag_id ==
+              captured.boundary.source_ready_order.front(),
+      "G23 must expose the legal node-52 source admit seam for one front");
+  EventDrivenJunctionRuntime skeleton_runtime(
+      canonical_map2().graph, config);
+  skeleton_runtime.restore_state_checkpoint(captured.checkpoint);
+  const auto skeleton_step =
+      skeleton_runtime.probe_one_event_for_causal_skeletons();
+  const auto skeleton = std::find_if(
+      skeleton_step.observed_opportunities.begin(),
+      skeleton_step.observed_opportunities.end(),
+      [](const auto& row) {
+        return row.kind ==
+                   G4IRSF14CloneBoundaryKind::kSourceArbitration &&
+               row.baseline_release;
+      });
+  require(
+      skeleton != skeleton_step.observed_opportunities.end() &&
+          skeleton->g4irsf23_source_observation_available &&
+          skeleton->g4irsf23_source_observation ==
+              captured.boundary.g4irsf23_source_observation,
+      "G23 lightweight census must preserve the exact outcome-free local context");
+  require(
+      !g4irsf15_primary_local_action(*skeleton).has_value(),
+      "G23 source-admission context must not project as a legacy I1 swap");
+  EventDrivenJunctionRuntime plain_runtime(
+      canonical_map2().graph, config);
+  plain_runtime.restore_state_checkpoint(captured.checkpoint);
+  require(plain_runtime.process_one_event(),
+          "G23 plain comparison event must process");
+  require(
+      plain_runtime.deterministic_state_sha256() ==
+          skeleton_runtime.deterministic_state_sha256(),
+      "G23 outcome-free context collection must not change post-event state");
+  require(
+      std::string(g4irsf14_clone_intervention_kind_name(
+          G4IRSF14CloneInterventionKind::
+              kSourceHoldOneNaturalOpportunity)) ==
+          "SOURCE_HOLD_ONE_NATURAL_OPPORTUNITY",
+      "G23 intervention must retain its native public name");
+
+  G4IRSF14CausalInterventionDirective directive;
+  directive.boundary = captured.boundary;
+  directive.intervention.kind =
+      G4IRSF14CloneInterventionKind::
+          kSourceHoldOneNaturalOpportunity;
+  directive.intervention.horizon =
+      G4IRSF14CloneHorizon::kAffectedBag;
+  directive.intervention.runtime_bag_id =
+      captured.boundary.runtime_bag_id;
+  directive.validate();
+  auto wrong_seam = directive;
+  wrong_seam.boundary.baseline_release = false;
+  require_invalid(
+      [&] { wrong_seam.validate(); },
+      "G23 must reject the earlier source-order seam");
+
+  EventDrivenJunctionRuntime treatment(
+      canonical_map2().graph, config);
+  treatment.restore_state_checkpoint(captured.checkpoint);
+  const auto applied =
+      treatment.process_one_event_with_causal_intervention(
+          directive);
+  require(
+      applied.intervention_applied &&
+          applied.changed_action_count == 1 &&
+          applied.application_reason ==
+              "APPLIED_SOURCE_HOLD_ONE_NATURAL_OPPORTUNITY" &&
+          applied.affected_runtime_bag_ids ==
+              std::vector<int>{captured.boundary.runtime_bag_id},
+      "G23 must certify exactly one source-local hold action");
+  const auto held = treatment.g4irsf15_causal_bag_outcome(
+      captured.boundary.runtime_bag_id);
+  require(
+      held.known && held.status == "SOURCE_QUEUE" &&
+          held.admitted_time < 0.0 &&
+          held.current_node == captured.boundary.node,
+      "G23 must keep the identical front queued without admission or route change");
+  const auto held_checkpoint =
+      treatment.capture_state_checkpoint();
+  EventDrivenJunctionRuntime restored(
+      canonical_map2().graph, config);
+  restored.restore_state_checkpoint(held_checkpoint);
+  require(
+      restored.capture_state_checkpoint().state_sha256() ==
+          held_checkpoint.state_sha256(),
+      "G23 source-local one-shot state must survive exact checkpoint restore");
+
+  const double expected_retry =
+      captured.boundary.time +
+      service_duration(captured.boundary.node, config);
+  const auto next = restored.peek_safe_boundary();
+  require(
+      next.has_value() &&
+          next->next_event_type ==
+              JunctionEventType::kSourceArbitration &&
+          std::abs(next->next_event_time - expected_retry) <=
+              1.0e-12,
+      "G23 wakeup must be one native service quantum, not retry_interval");
+  require(restored.process_one_event(),
+          "G23 forced-A0 retry event must process");
+  const auto admitted = restored.g4irsf15_causal_bag_outcome(
+      captured.boundary.runtime_bag_id);
+  require(
+      admitted.status == "IN_SERVICE" &&
+          std::abs(admitted.admitted_time - expected_retry) <=
+              1.0e-12,
+      "G23 must admit the same front under A0 at the next legal opportunity");
+}
+
 void test_i2_merge_swap() {
   auto config = frozen_config();
   const int goal =
@@ -1500,6 +1679,7 @@ int main() {
     // NON_FORMAL_UNIT_INTEGRATION_FIXTURE: these constructed requests prove
     // mechanism and safety only; they are not original-task causal labels.
     test_i1_source_swap();
+    test_source_hold_one_natural_opportunity();
     test_i2_merge_swap();
     test_i3_and_i4_local_actions();
     test_i4_natural_hold_is_retry_interval_independent();

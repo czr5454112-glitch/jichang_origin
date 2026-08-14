@@ -611,6 +611,9 @@ struct EventDrivenJunctionConfig {
   // Internal causal-data sidecar capture.  The production default is exact
   // off; G15's frozen census enables it without changing any runtime action.
   bool enable_g4irsf17_causal_source_features = false;
+  // Opt-in G23 ADMIT/HOLD causal seam.  Keeping it separate preserves the
+  // frozen G15 I1 census and materialization contract for every older profile.
+  bool enable_g4irsf23_source_admission_causal_action = false;
   // G20 removes only redundant congestion-beacon publications. E0 is exact
   // G19 behavior, E1 prunes publications already covered by a same-time
   // local-queue/arrival update, and E2 also prunes a no-action dispatch
@@ -2149,6 +2152,10 @@ struct JunctionState {
   std::uint64_t junction_wakeup_generation = 0;
   bool source_wakeup_pending = false;
   bool junction_wakeup_pending = false;
+  // G23's source action is one local, one-shot deferral.  It preserves the
+  // selected front and expires at the next native source-service quantum.
+  int source_natural_hold_runtime_bag_id = -1;
+  double source_natural_hold_until = -1.0;
   int escape_token_task = -1;
   std::uint64_t g4irsf17_source_generation = 0;
   std::optional<G4IRSF17ActiveSourceWait>
@@ -3081,8 +3088,18 @@ class EventDrivenJunctionRuntime {
     const auto& event = events_.top();
     if (event.type == JunctionEventType::kSourceArbitration) {
       const auto local = junctions_.find(event.node);
-      return local != junctions_.end() &&
-                     local->second.source_queue.size() >= 2U
+      if (local == junctions_.end()) {
+        return kG4IRSF14CausalCandidateNone;
+      }
+      // G23 has one deliberately narrow Source seam.  Do not make its
+      // census pay for legacy I1 probes at every other multi-bag source.
+      // With the opt-in disabled, preserve the frozen I1 prefilter exactly.
+      if (config_.enable_g4irsf23_source_admission_causal_action) {
+        return event.node == 52 && !local->second.source_queue.empty()
+                   ? kG4IRSF14CausalCandidateI1
+                   : kG4IRSF14CausalCandidateNone;
+      }
+      return local->second.source_queue.size() >= 2U
                  ? kG4IRSF14CausalCandidateI1
                  : kG4IRSF14CausalCandidateNone;
     }
@@ -3863,6 +3880,10 @@ class EventDrivenJunctionRuntime {
           boundary.g4irsf17_i1_treatment_observation;
       skeleton.g4irsf17_i1_pairwise_features =
           boundary.g4irsf17_i1_pairwise_features;
+      skeleton.g4irsf23_source_observation_available =
+          boundary.g4irsf23_source_observation_available;
+      skeleton.g4irsf23_source_observation =
+          boundary.g4irsf23_source_observation;
       skeleton.g4irsf20_route_observation_available =
           boundary.g4irsf20_route_observation_available;
       skeleton.g4irsf20_route_normal_flow =
@@ -5324,7 +5345,9 @@ class EventDrivenJunctionRuntime {
       bag.local_enqueue_sequence = next_local_enqueue_sequence_++;
       controller.source_queue.push_back(event.task_id);
       if (g4irsf17_source_policy_enabled() ||
-          config_.enable_g4irsf17_causal_source_features) {
+          config_.enable_g4irsf17_causal_source_features ||
+          (config_.enable_g4irsf23_source_admission_causal_action &&
+           event.node == 52)) {
         controller.g4irsf17_source_temporal.releases.record(event.time);
       }
       update_queue_maxima(controller);
@@ -5613,7 +5636,8 @@ class EventDrivenJunctionRuntime {
       double time,
       std::uint64_t source_generation,
       const BagState& baseline_bag,
-      event_runtime_detail::JunctionState& controller) {
+      event_runtime_detail::JunctionState& controller,
+      bool commit_temporal_observation = true) {
     G4IRSF17SourceContextObservation context;
     const double queue_length =
         static_cast<double>(controller.source_queue.size());
@@ -5635,7 +5659,9 @@ class EventDrivenJunctionRuntime {
                 ? source_generation -
                       temporal.last_observed_source_generation
                 : 0U));
-    temporal.last_observed_source_generation = source_generation;
+    if (commit_temporal_observation) {
+      temporal.last_observed_source_generation = source_generation;
+    }
     context.release_count_10s = temporal.releases.count(time, 10.0);
     context.release_count_30s = temporal.releases.count(time, 30.0);
     context.release_count_60s = temporal.releases.count(time, 60.0);
@@ -5710,7 +5736,9 @@ class EventDrivenJunctionRuntime {
             merge_generation >= temporal.last_observed_merge_generation
                 ? merge_generation - temporal.last_observed_merge_generation
                 : 0U));
-    temporal.last_observed_merge_generation = merge_generation;
+    if (commit_temporal_observation) {
+      temporal.last_observed_merge_generation = merge_generation;
+    }
     if (selected != nullptr) {
       context.target_queue_length = selected->queue_length;
       const double target_capacity =
@@ -5881,18 +5909,48 @@ class EventDrivenJunctionRuntime {
     if (controller.source_queue.empty()) {
       return -1;
     }
+    bool force_source_a0_after_natural_hold = false;
+    std::optional<std::size_t> held_queue_index;
+    if (controller.source_natural_hold_runtime_bag_id >= 0) {
+      const auto held = std::find(
+          controller.source_queue.begin(),
+          controller.source_queue.end(),
+          controller.source_natural_hold_runtime_bag_id);
+      if (held == controller.source_queue.end()) {
+        throw std::logic_error(
+            "held source front disappeared before forced A0 commit");
+      } else {
+        held_queue_index = static_cast<std::size_t>(
+            std::distance(controller.source_queue.begin(), held));
+        if (time + event_runtime_detail::kEpsilon <
+            controller.source_natural_hold_until) {
+          if (chosen_task != nullptr) {
+            *chosen_task = *held;
+          }
+          return -1;
+        }
+        // The skipped local service opportunity has elapsed.  Keep the same
+        // source front and suppress every later learned source action until
+        // this bag actually commits through native A0.
+        force_source_a0_after_natural_hold = true;
+      }
+    }
     const std::uint64_t source_generation =
-        g4irsf17_extensions_enabled()
+        (g4irsf17_extensions_enabled() ||
+         (config_.enable_g4irsf23_source_admission_causal_action &&
+          node == 52))
             ? ++controller.g4irsf17_source_generation
             : 0;
-    std::size_t queue_index =
-        choose_bag(controller.source_queue,
-                   time,
-                   controller.escape_token_task,
-                   priority_comparison_count);
+    std::size_t queue_index = held_queue_index.has_value()
+                                  ? *held_queue_index
+                                  : choose_bag(controller.source_queue,
+                                               time,
+                                               controller.escape_token_task,
+                                               priority_comparison_count);
     std::optional<G4IRSF17SourceContextObservation>
         g4irsf17_pre_action_context;
-    if (controller.source_queue.size() >= 2U &&
+    if (!force_source_a0_after_natural_hold &&
+        controller.source_queue.size() >= 2U &&
         (g4irsf17_source_policy_enabled() ||
          config_.enable_g4irsf17_causal_source_features)) {
       g4irsf17_pre_action_context.emplace(
@@ -5901,7 +5959,8 @@ class EventDrivenJunctionRuntime {
               bags_.at(controller.source_queue[queue_index]),
               controller));
     }
-    if (g4irsf17_source_policy_enabled() &&
+    if (!force_source_a0_after_natural_hold &&
+        g4irsf17_source_policy_enabled() &&
         g4irsf17_pre_action_context.has_value()) {
       queue_index = g4irsf17_apply_source_policy(
           node, time, source_generation, queue_index, controller,
@@ -5910,7 +5969,8 @@ class EventDrivenJunctionRuntime {
     bool causal_i1_swap_selected = false;
     int causal_i1_baseline_runtime_bag_id = -1;
     int causal_i1_peer_runtime_bag_id = -1;
-    if (active_causal_step_ != nullptr &&
+    if (!force_source_a0_after_natural_hold &&
+        active_causal_step_ != nullptr &&
         controller.source_queue.size() >= 2U) {
       G4IRSF14CloneBoundary boundary;
       boundary.kind =
@@ -6061,16 +6121,72 @@ class EventDrivenJunctionRuntime {
           node, time, source_generation, task_id, blocker);
       return -1;
     }
+    if (!force_source_a0_after_natural_hold &&
+        config_.enable_g4irsf23_source_admission_causal_action &&
+        active_causal_step_ != nullptr && node == 52 &&
+        is_storage_out_task(bag)) {
+      G4IRSF14CloneBoundary boundary;
+      boundary.kind =
+          G4IRSF14CloneBoundaryKind::kSourceArbitration;
+      boundary.node = node;
+      boundary.runtime_bag_id = task_id;
+      // The boundary order is action order: selected native front first,
+      // followed by the unchanged local ready set.
+      boundary.source_ready_order.push_back(task_id);
+      for (const int ready_runtime_bag_id : controller.source_queue) {
+        if (ready_runtime_bag_id != task_id) {
+          boundary.source_ready_order.push_back(ready_runtime_bag_id);
+        }
+      }
+      // Distinguish this legal admit seam from the earlier I1 order seam.
+      boundary.baseline_release = true;
+      if (!g4irsf17_pre_action_context.has_value()) {
+        g4irsf17_pre_action_context.emplace(
+            g4irsf17_source_context_observation(
+                node, time, source_generation, bag, controller,
+                false));
+      }
+      const auto source_observation =
+          g4irsf17_source_candidate_observation(bag, 0, time);
+      boundary.g4irsf23_source_observation_available = true;
+      boundary.g4irsf23_source_observation =
+          g4irsf17_canonical_source_observation(
+              source_observation, source_observation,
+              *g4irsf17_pre_action_context);
+      if (const auto* intervention =
+              observe_causal_boundary(std::move(boundary));
+          intervention != nullptr) {
+        if (intervention->kind !=
+                G4IRSF14CloneInterventionKind::
+                    kSourceHoldOneNaturalOpportunity ||
+            intervention->runtime_bag_id != task_id) {
+          throw std::logic_error(
+              "source natural-opportunity directive changed another action");
+        }
+        controller.source_natural_hold_runtime_bag_id = task_id;
+        controller.source_natural_hold_until = time + duration;
+        mark_causal_action_applied(
+            "APPLIED_SOURCE_HOLD_ONE_NATURAL_OPPORTUNITY",
+            {task_id});
+        return -1;
+      }
+    }
     if (node == bag.request.goal) {
       bag.first_edge_credit_consumed = true;
     }
 
     controller.service_calendar.reserve(task_id, time, time + duration);
+    if (force_source_a0_after_natural_hold) {
+      controller.source_natural_hold_runtime_bag_id = -1;
+      controller.source_natural_hold_until = -1.0;
+    }
     controller.record_service_reservation(time, time + duration);
     update_calendar_maxima(controller, nullptr);
     controller.source_queue.erase(controller.source_queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
     if (g4irsf17_source_policy_enabled() ||
-        config_.enable_g4irsf17_causal_source_features) {
+        config_.enable_g4irsf17_causal_source_features ||
+        (config_.enable_g4irsf23_source_admission_causal_action &&
+         node == 52)) {
       controller.g4irsf17_source_temporal.admissions.record(time);
     }
     controller.observe_local_state();
@@ -6741,7 +6857,9 @@ class EventDrivenJunctionRuntime {
     found->second.node_service_time_seconds +=
         service_duration(event.node);
     if (g4irsf17_source_policy_enabled() ||
-        config_.enable_g4irsf17_causal_source_features) {
+        config_.enable_g4irsf17_causal_source_features ||
+        (config_.enable_g4irsf23_source_admission_causal_action &&
+         event.node == 52)) {
       junctions_[event.node]
           .g4irsf17_source_temporal.service_completions.record(event.time);
     }
@@ -8945,6 +9063,8 @@ class EventDrivenJunctionRuntime {
     std::uint64_t junction_wakeup_generation = 0;
     bool source_wakeup_pending = false;
     bool junction_wakeup_pending = false;
+    int source_natural_hold_runtime_bag_id = -1;
+    double source_natural_hold_until = -1.0;
     int escape_token_task = -1;
     bool g4irsf14_local_state_existed = false;
     event_runtime_detail::LocalArbitrationState
@@ -10628,6 +10748,11 @@ class EventDrivenJunctionRuntime {
     mix(junction.junction_wakeup_generation);
     mix(junction.source_wakeup_pending ? 1 : 0);
     mix(junction.junction_wakeup_pending ? 1 : 0);
+    mix(static_cast<std::uint64_t>(
+        static_cast<std::uint32_t>(
+            junction.source_natural_hold_runtime_bag_id)));
+    mix(event_runtime_detail::timestamp_bits(
+        junction.source_natural_hold_until));
     mix(event_runtime_detail::timestamp_bits(
         junction.next_dispatch_time));
     mix(static_cast<std::uint64_t>(
@@ -10959,6 +11084,10 @@ class EventDrivenJunctionRuntime {
             junction.source_wakeup_pending;
         saved.junction_wakeup_pending =
             junction.junction_wakeup_pending;
+        saved.source_natural_hold_runtime_bag_id =
+            junction.source_natural_hold_runtime_bag_id;
+        saved.source_natural_hold_until =
+            junction.source_natural_hold_until;
         saved.escape_token_task = junction.escape_token_task;
         if (g4irsf14_state_ != nullptr) {
           const auto local =
@@ -11355,6 +11484,10 @@ class EventDrivenJunctionRuntime {
           saved.source_wakeup_pending;
       junction.junction_wakeup_pending =
           saved.junction_wakeup_pending;
+      junction.source_natural_hold_runtime_bag_id =
+          saved.source_natural_hold_runtime_bag_id;
+      junction.source_natural_hold_until =
+          saved.source_natural_hold_until;
       junction.escape_token_task = saved.escape_token_task;
       if (g4irsf14_state_ != nullptr) {
         if (saved.g4irsf14_local_state_existed) {
@@ -15611,6 +15744,19 @@ class EventDrivenJunctionRuntime {
 
   void schedule_source_wakeup(int node, double time) {
     auto& controller = junctions_[node];
+    if (controller.source_natural_hold_runtime_bag_id >= 0) {
+      // Before the skipped opportunity expires, wake exactly at that native
+      // service quantum (independent of the generic retry interval).  Once it
+      // has expired, ordinary retry/calendar timing resumes while A0 remains
+      // forced until the held bag commits.
+      if (now_ + event_runtime_detail::kEpsilon <
+          controller.source_natural_hold_until) {
+        time = controller.source_natural_hold_until;
+      } else {
+        time = std::max(time,
+                        controller.source_natural_hold_until);
+      }
+    }
     if (batches_source_same_timestamp()) {
       auto& local = g4irsf14_local_state(node);
       if (controller.source_wakeup_pending) {
@@ -18784,6 +18930,9 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
     }
     source_queues.u64(junction.source_wakeup_generation);
     source_queues.boolean(junction.source_wakeup_pending);
+    source_queues.i64(
+        junction.source_natural_hold_runtime_bag_id);
+    source_queues.floating(junction.source_natural_hold_until);
 
     junction_queues.i64(node);
     junction_queues.u64(junction.queue.size());

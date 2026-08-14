@@ -1,0 +1,260 @@
+{
+  "schema": "czr005.g4irsf23.source_pilot_evidence_summary.v1",
+  "research_profile": "G23_A0_S4_J2_E2",
+  "evidence_scope": {
+    "release_blocks": [
+      7,
+      8
+    ],
+    "input_payload_count": 20,
+    "input_payload_partition": {
+      "h_bag_payload_count": 4,
+      "h_bag_pairs_per_payload": 20,
+      "h_system_payload_count": 8,
+      "h_system_pairs_per_payload": 8,
+      "h_system_resume_payload_count": 8,
+      "h_system_resume_pairs_per_payload": 14
+    },
+    "planned_group_count": 256,
+    "planned_target_count": 432,
+    "executed_target_count": 256,
+    "execution_explanation": "The 176 H_system pairs include the same immediate action certificate as H_bag, so only the other 80 groups require a separate H_bag pair.",
+    "horizon_counts": {
+      "H_bag": 80,
+      "H_system": 176
+    },
+    "h_system_by_release_block": {
+      "7": 128,
+      "8": 48
+    },
+    "unique_group_count": 256,
+    "duplicate_pair_count": 0,
+    "missing_target_count": 0,
+    "coverage_complete": true
+  },
+  "action_certificate": {
+    "action_changed_count": 256,
+    "action_changed_rate": 1.0,
+    "same_state_start_count": 256,
+    "pair_complete_count": 256,
+    "horizon_complete_count": 256,
+    "certificate_valid_count": 256,
+    "changed_action_count_equals_one": 256,
+    "front_bag_unchanged_count": 256,
+    "hold_opportunity_count_equals_one": 256,
+    "forced_a0_after_hold_count": 256,
+    "repeated_hold_count_equals_zero": 256,
+    "pre_action_snapshots_match_count": 256,
+    "post_commit_verified_count": 256,
+    "baseline_action": "ADMIT_NOW",
+    "treatment_action": "HOLD_ONE_NATURAL_OPPORTUNITY",
+    "pair_status": "ACTION_CHANGED_HORIZON_COMPLETE"
+  },
+  "safety": {
+    "live_safety_pass_count": 256,
+    "safety_equivalent_count": 256,
+    "hard_gate_pass_count": 256,
+    "hard_gate_failure_count": 0,
+    "formal_h_system_gate_evaluated_count": 176,
+    "formal_h_system_gate_pass_count": 176,
+    "full_horizon_raw_bag_count": 57012,
+    "full_horizon_segment_count": 87206,
+    "completed_segment_count": 87206,
+    "failed_segment_count": 0,
+    "unsafe_entry_count": 0,
+    "unresolved_deadlock_count": 0,
+    "reservation_conflict_count": 0,
+    "runtime_full_astar_call_count": 0,
+    "runtime_global_scan_count": 0,
+    "runtime_future_route_read_count": 0,
+    "runtime_future_schedule_read_count": 0,
+    "two_step_reservation_count": 0,
+    "event_or_time_limit_reached": false,
+    "shared_baseline_used_count": 176,
+    "shared_baseline_equivalence_verified_count": 176,
+    "plain_baseline_replay_verified_count": 176
+  },
+  "h_system_effect": {
+    "label_count": 176,
+    "label_counts": {
+      "FAIR_SYSTEM_BENEFICIAL": 3,
+      "SYSTEM_BENEFICIAL_BUT_UNFAIR": 0,
+      "HARMFUL": 0,
+      "NEUTRAL": 173
+    },
+    "effect_tier_counts": {
+      "strong": 0,
+      "usable": 0,
+      "weak_diagnostic": 3,
+      "neutral": 173,
+      "harmful": 0
+    },
+    "promotion_eligible_fair_positive_count": 0,
+    "block_8_promotion_eligible_fair_positive_count": 0,
+    "promotion_eligible_strata_count": 0,
+    "weak_diagnostic_strata_count": 2,
+    "system_mean_delta_seconds": {
+      "min": -0.0048374728137901,
+      "mean": -0.0000821388079177219,
+      "max": 0.00000777029853793465,
+      "nonzero_count": 26
+    },
+    "system_p95_delta_seconds": {
+      "min": 0.0,
+      "mean": 0.0,
+      "max": 0.0,
+      "nonzero_count": 0
+    },
+    "system_p99_delta_seconds": {
+      "min": 0.0,
+      "mean": 0.0,
+      "max": 0.0,
+      "nonzero_count": 0
+    },
+    "deadline_miss_delta": {
+      "min": 0,
+      "mean": 0.0,
+      "max": 0,
+      "nonzero_count": 0
+    },
+    "current_bag_cost_seconds": {
+      "min": 0.0,
+      "mean": 0.00008522727274463581,
+      "max": 0.0010000000002037268,
+      "nonzero_count": 15,
+      "natural_opportunity_seconds": 0.001,
+      "individual_cost_gate_pass_count": 176
+    },
+    "component_mean_delta_seconds_per_raw_bag": {
+      "all": {
+        "metrics": {
+          "raw_bag_network_time_mean_delta_seconds": {
+            "count": 176,
+            "max": 7.752754704881681e-06,
+            "mean": -8.124665138997678e-05,
+            "median": -1.7540155994311135e-08,
+            "min": -0.0047805023502967,
+            "nonzero_count": 176
+          },
+          "raw_bag_scheduled_pre_release_wait_mean_delta_seconds": {
+            "count": 176,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "nonzero_count": 0
+          },
+          "raw_bag_source_wait_mean_delta_seconds": {
+            "count": 176,
+            "max": 1.6487758225380844e-06,
+            "mean": -8.92156661350371e-07,
+            "median": 1.754017597832558e-08,
+            "min": -5.698800252362801e-05,
+            "nonzero_count": 176
+          }
+        },
+        "pair_count": 176
+      },
+      "by_release_block": {
+        "7": {
+          "metrics": {
+            "raw_bag_network_time_mean_delta_seconds": {
+              "count": 128,
+              "max": 1.0524098925657199e-07,
+              "mean": -0.00011209317774360517,
+              "median": -1.7540155994311135e-08,
+              "min": -0.0047805023502967,
+              "nonzero_count": 128
+            },
+            "raw_bag_scheduled_pre_release_wait_mean_delta_seconds": {
+              "count": 128,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "nonzero_count": 0
+            },
+            "raw_bag_source_wait_mean_delta_seconds": {
+              "count": 128,
+              "max": 3.508033863397486e-08,
+              "mean": -1.3160606463467894e-06,
+              "median": 1.754017597832558e-08,
+              "min": -5.698800252362801e-05,
+              "nonzero_count": 128
+            }
+          },
+          "pair_count": 128
+        },
+        "8": {
+          "metrics": {
+            "raw_bag_network_time_mean_delta_seconds": {
+              "count": 48,
+              "max": 7.752754704881681e-06,
+              "mean": 1.0107522196989294e-06,
+              "median": -1.7540155994311135e-08,
+              "min": -1.6487758891514659e-06,
+              "nonzero_count": 48
+            },
+            "raw_bag_scheduled_pre_release_wait_mean_delta_seconds": {
+              "count": 48,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "nonzero_count": 0
+            },
+            "raw_bag_source_wait_mean_delta_seconds": {
+              "count": 48,
+              "max": 1.6487758225380844e-06,
+              "mean": 2.3825396530674503e-07,
+              "median": 1.754017597832558e-08,
+              "min": 1.754017597832558e-08,
+              "nonzero_count": 48
+            }
+          },
+          "pair_count": 48
+        }
+      },
+      "delta_direction": "treatment_minus_baseline",
+      "h_system_pair_count": 176,
+      "release_block_pair_counts": {
+        "7": 128,
+        "8": 48
+      },
+      "unit": "seconds_per_complete_raw_bag"
+    },
+    "weak_diagnostic_rows": [
+      {
+        "release_block": 7,
+        "selection_stratum": "source_high|downstream_mid|service_mid|rising|t28",
+        "system_mean_delta_seconds": -0.004837385113063419
+      },
+      {
+        "release_block": 7,
+        "selection_stratum": "source_high|downstream_low|service_mid|rising|t28",
+        "system_mean_delta_seconds": -0.0048374728137901
+      },
+      {
+        "release_block": 7,
+        "selection_stratum": "source_high|downstream_low|service_mid|rising|t28",
+        "system_mean_delta_seconds": -0.0048374728137901
+      }
+    ]
+  },
+  "preregistered_gates": {
+    "execution_coverage_complete": true,
+    "h_system_coverage_128_plus_48": true,
+    "action_changing_rate_at_least_0_80": true,
+    "promotion_eligible_fair_positive_count_at_least_16": false,
+    "block_8_promotion_eligible_fair_positive_count_at_least_4": false,
+    "promotion_eligible_positive_strata_at_least_3": false,
+    "pilot_support_pass": false
+  },
+  "decision": {
+    "source_action_implementation": "VALIDATED",
+    "source_causal_support": "TARGETED_SOURCE_NO_SUPPORT",
+    "source_selector": "SOURCE_ADMISSION_SELECTOR_NO_GO",
+    "next_step": "PIVOT_TO_PRECURSOR_ROUTE",
+    "reason": "All 256 interventions were real and safe, but none of 176 H_system labels reached usable or strong promotion strength, and block 8 supplied no positive transfer evidence."
+  }
+}

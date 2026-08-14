@@ -188,6 +188,7 @@ inline const char* g4irsf14_clone_boundary_kind_name(
 enum class G4IRSF14CloneInterventionKind {
   kNoOp,
   kSourceOrderSwap,
+  kSourceHoldOneNaturalOpportunity,
   kMergeRequestOrderSwap,
   kNextEdge,
   kHoldRelease,
@@ -201,6 +202,9 @@ inline const char* g4irsf14_clone_intervention_kind_name(
       return "I0_no_op";
     case G4IRSF14CloneInterventionKind::kSourceOrderSwap:
       return "I1_source_order_swap";
+    case G4IRSF14CloneInterventionKind::
+        kSourceHoldOneNaturalOpportunity:
+      return "SOURCE_HOLD_ONE_NATURAL_OPPORTUNITY";
     case G4IRSF14CloneInterventionKind::kMergeRequestOrderSwap:
       return "I2_merge_request_order_swap";
     case G4IRSF14CloneInterventionKind::kNextEdge:
@@ -333,6 +337,11 @@ struct G4IRSF14CloneBoundary {
       g4irsf17_i1_treatment_observation{};
   std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
       g4irsf17_i1_pairwise_features{};
+  // Outcome-free G23 ADMIT/HOLD sidecar for the selected source front.
+  // It reuses the bounded G17 candidate+local-context layout but has no peer.
+  bool g4irsf23_source_observation_available = false;
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      g4irsf23_source_observation{};
   // Outcome-free G20 Route sidecar.  Like the G17 Source observation above,
   // this is deliberately excluded from the content address: it describes
   // bounded local model inputs at an already-sealed decision boundary and is
@@ -440,6 +449,20 @@ struct G4IRSF14CloneBoundary {
     } else if (g4irsf17_i1_observation_peer_runtime_bag_id != -1) {
       throw std::invalid_argument(
           "G17 I1 observation peer exists without an observation");
+    }
+    if (g4irsf23_source_observation_available) {
+      if (kind != G4IRSF14CloneBoundaryKind::kSourceArbitration ||
+          !baseline_release || runtime_bag_id < 0 ||
+          !g4irsf14_clone_detail::contains(source_ready_order,
+                                           runtime_bag_id) ||
+          !std::all_of(g4irsf23_source_observation.begin(),
+                       g4irsf23_source_observation.end(),
+                       [](double value) {
+                         return std::isfinite(value);
+                       })) {
+        throw std::invalid_argument(
+            "G23 Source observation is not a legal local ADMIT context");
+      }
     }
     if (g4irsf20_route_observation_available) {
       if (kind !=
@@ -674,6 +697,7 @@ struct G4IRSF14CloneIntervention {
       case G4IRSF14CloneInterventionKind::kSourceOrderSwap:
         if (merge_request_id != 0U || peer_merge_request_id != 0U ||
             selected_next_node != -1 || selected_boolean ||
+            boundary.g4irsf23_source_observation_available ||
             boundary.kind != G4IRSF14CloneBoundaryKind::kSourceArbitration ||
             runtime_bag_id == peer_runtime_bag_id ||
             !g4irsf14_clone_detail::contains(boundary.source_ready_order,
@@ -682,6 +706,24 @@ struct G4IRSF14CloneIntervention {
                                              peer_runtime_bag_id)) {
           throw std::invalid_argument(
               "I1 must swap two distinct bags in the same source ready set");
+        }
+        return;
+
+      case G4IRSF14CloneInterventionKind::
+          kSourceHoldOneNaturalOpportunity:
+        if (peer_runtime_bag_id != -1 || merge_request_id != 0U ||
+            peer_merge_request_id != 0U || selected_next_node != -1 ||
+            selected_boolean ||
+            boundary.kind != G4IRSF14CloneBoundaryKind::kSourceArbitration ||
+            boundary.node != 52 ||
+            !boundary.baseline_release ||
+            !boundary.g4irsf23_source_observation_available ||
+            runtime_bag_id != boundary.runtime_bag_id ||
+            !g4irsf14_clone_detail::contains(boundary.source_ready_order,
+                                             runtime_bag_id)) {
+          throw std::invalid_argument(
+              "SOURCE_HOLD_ONE_NATURAL_OPPORTUNITY must hold the current "
+              "source winner without selecting a peer or route");
         }
         return;
 

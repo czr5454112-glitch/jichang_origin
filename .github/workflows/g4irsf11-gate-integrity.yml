@@ -95,6 +95,17 @@ jobs:
         env:
           PYTHONPATH: build-ci/python
         run: python -m pytest -q tests/test_g4irsf16_*.py
+      - name: Run current Source/coordination and G4IRSF23 regressions
+        env:
+          PYTHONPATH: build-ci/python
+          G4IRSF23_REQUIRE_NATIVE: "1"
+        run: >-
+          python -m pytest -q
+          tests/test_g4irsf19_source_gate_campaign.py
+          tests/test_g4irsf22_action_timing.py
+          tests/test_g4irsf22_gap_episodes.py
+          tests/test_g4irsf22_local_oracle.py
+          tests/test_g4irsf23_*.py
       - name: Validate committed G4IRSF16 bindings and full shadow payload
         run: python scripts/eval/finalize_g4irsf16_decision.py --validate-only
       - name: Validate committed decision schema and artifact hashes

@@ -44,6 +44,9 @@ struct G4IRSF15CausalOpportunitySkeleton {
       g4irsf17_i1_treatment_observation{};
   std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
       g4irsf17_i1_pairwise_features{};
+  bool g4irsf23_source_observation_available = false;
+  std::array<double, kG4IRSF17SourcePairwiseFeatureCount>
+      g4irsf23_source_observation{};
   bool g4irsf20_route_observation_available = false;
   bool g4irsf20_route_normal_flow = false;
   int g4irsf20_route_baseline_candidate_index = -1;
@@ -70,6 +73,9 @@ g4irsf15_primary_local_action(
   std::vector<int> alternatives;
   if (skeleton.kind ==
       G4IRSF14CloneBoundaryKind::kSourceArbitration) {
+    if (skeleton.g4irsf23_source_observation_available) {
+      return std::nullopt;
+    }
     for (const int peer : skeleton.source_ready_order) {
       if (peer != skeleton.runtime_bag_id) {
         alternatives.push_back(peer);
@@ -263,6 +269,7 @@ struct G4IRSF15CausalSkeletonStepResult {
       }
       if (opportunity.kind ==
               G4IRSF14CloneBoundaryKind::kSourceArbitration &&
+          !opportunity.baseline_release &&
           opportunity.source_ready_order.size() < 2U) {
         throw std::invalid_argument(
             "I1 skeleton requires a multi-bag source ready set");
@@ -278,6 +285,20 @@ struct G4IRSF15CausalSkeletonStepResult {
                opportunity.g4irsf17_i1_observation_peer_runtime_bag_id))) {
         throw std::invalid_argument(
             "G17 I1 skeleton observation does not bind its local peer");
+      }
+      if (opportunity.g4irsf23_source_observation_available &&
+          (opportunity.kind !=
+               G4IRSF14CloneBoundaryKind::kSourceArbitration ||
+           !opportunity.baseline_release || opportunity.node != 52 ||
+           !g4irsf14_clone_detail::contains(
+               opportunity.source_ready_order,
+               opportunity.runtime_bag_id) ||
+           !std::all_of(
+               opportunity.g4irsf23_source_observation.begin(),
+               opportunity.g4irsf23_source_observation.end(),
+               [](double value) { return std::isfinite(value); }))) {
+        throw std::invalid_argument(
+            "G23 Source skeleton observation is not local and legal");
       }
       if (opportunity.kind ==
               G4IRSF14CloneBoundaryKind::kJunctionRouteArbitration &&
