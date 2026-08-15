@@ -3747,6 +3747,7 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["starvation_count"] = summary.starvation_count;
   row["loop_count"] = summary.loop_count;
   row["runtime_full_astar_calls"] = summary.runtime_full_astar_calls;
+  row["runtime_full_cie_astar_calls"] = 0;
   row["full_cie_astar_runtime_fallback"] = false;
   row["global_reservation_scan_count"] = summary.global_reservation_scan_count;
   row["max_edges_selected_per_arrive"] = summary.max_edges_selected_per_arrive;
@@ -6440,30 +6441,44 @@ py::dict g4irsf11_event_runtime_from_records(
                std::chrono::steady_clock::now() - wall_started)
         .count();
   };
-  runtime.initialize(requests, faults);
   std::vector<std::pair<double, czr005::ics::EventRuntimeProgressSnapshot>>
       progress_history;
   double next_progress_wall_seconds = 5.0;
   bool bounded_progress = false;
-  if (bounded_wall_seconds > 0.0) {
-    const double elapsed = wall_elapsed();
-    progress_history.emplace_back(elapsed, runtime.progress_snapshot());
-    bounded_progress = elapsed >= bounded_wall_seconds;
-  }
-  while (!bounded_progress && runtime.process_one_event()) {
-    if (bounded_wall_seconds <= 0.0 ||
-        runtime.current_result().summary.event_count %
-                bounded_check_every_events !=
-            0) {
-      continue;
-    }
-    const double elapsed = wall_elapsed();
-    if (elapsed >= next_progress_wall_seconds) {
+  const czr005::ics::EventDrivenJunctionResult* finalized_result = nullptr;
+  {
+    // Everything above this boundary parses or owns Python objects.  The
+    // runtime below is pure C++ and instance-local, so independent Python
+    // callers may execute it concurrently.  Reacquire the GIL before any
+    // py::dict/py::list construction in either the bounded or full result
+    // path.
+    py::gil_scoped_release release;
+    runtime.initialize(requests, faults);
+    if (bounded_wall_seconds > 0.0) {
+      const double elapsed = wall_elapsed();
       progress_history.emplace_back(elapsed, runtime.progress_snapshot());
-      next_progress_wall_seconds =
-          5.0 * (std::floor(elapsed / 5.0) + 1.0);
+      bounded_progress = elapsed >= bounded_wall_seconds;
     }
-    bounded_progress = elapsed >= bounded_wall_seconds;
+    while (!bounded_progress && runtime.process_one_event()) {
+      if (bounded_wall_seconds <= 0.0 ||
+          runtime.current_result().summary.event_count %
+                  bounded_check_every_events !=
+              0) {
+        continue;
+      }
+      const double elapsed = wall_elapsed();
+      if (elapsed >= next_progress_wall_seconds) {
+        progress_history.emplace_back(elapsed, runtime.progress_snapshot());
+        next_progress_wall_seconds =
+            5.0 * (std::floor(elapsed / 5.0) + 1.0);
+      }
+      bounded_progress = elapsed >= bounded_wall_seconds;
+    }
+    if (!(bounded_progress &&
+          runtime.phase() ==
+              czr005::ics::EventDrivenJunctionRuntimePhase::kReady)) {
+      finalized_result = &runtime.finalize();
+    }
   }
   if (bounded_progress &&
       runtime.phase() ==
@@ -6500,7 +6515,11 @@ py::dict g4irsf11_event_runtime_from_records(
     payload["summary"] = std::move(summary);
     return payload;
   }
-  const auto& result = runtime.finalize();
+  if (finalized_result == nullptr) {
+    throw std::logic_error(
+        "event runtime full result was not finalized");
+  }
+  const auto& result = *finalized_result;
   py::dict trace_context;
   trace_context["schema_id"] = "czr005.g4irsf11.decision_trace.v1";
   trace_context["scenario"] = scenario;
