@@ -1,0 +1,443 @@
+{
+  "active_policy": "S4",
+  "artifact_contract": {
+    "beta": 1.0,
+    "detour_allowance_seconds": 6.0,
+    "margin_seconds": 0.5,
+    "min_support": 8,
+    "mode": "ewma",
+    "schema": "czr005.g4irsf24.dlp.v1"
+  },
+  "artifact_path": "artifacts/policies/g4irsf24_dlp_corridor.json",
+  "binary": "build/g4irsf24_dlp_release/python/czr005_cpp.cp311-win_amd64.pyd",
+  "comparisons": [
+    {
+      "committed_mutations": 1834,
+      "complete_and_safe": true,
+      "deadline_miss_delta": 0,
+      "events_per_completed_relative_increase": 0.003027308338248602,
+      "mean_delta_seconds": 0.2270258892864092,
+      "mean_improvement_fraction": -0.0010771275565766992,
+      "p95_delta_seconds": 0.0,
+      "p99_delta_seconds": 0.8000000000165528,
+      "scale": 1
+    },
+    {
+      "committed_mutations": 8897,
+      "complete_and_safe": true,
+      "deadline_miss_delta": 0,
+      "events_per_completed_relative_increase": -0.00368183784958076,
+      "mean_delta_seconds": -4.855069108257965,
+      "mean_improvement_fraction": 0.017145037180455347,
+      "p95_delta_seconds": -16.327500000003056,
+      "p99_delta_seconds": -159.36050000001387,
+      "scale": 2
+    }
+  ],
+  "gates": {
+    "all_runs_complete_and_safe": true,
+    "deadline_nonregression": true,
+    "event_budget": true,
+    "one_x_business_win_or_hold_with_two_x_win": false,
+    "one_x_p95_p99_nonregression": false,
+    "real_mutations_at_both_scales": true,
+    "two_x_business_win": false,
+    "two_x_p95_p99_nonregression": true
+  },
+  "release_csv": "artifacts/datasets/g4irsf24_release_compact.csv",
+  "runs": [
+    {
+      "arm": "S4",
+      "artifact_echo": {
+        "active": false,
+        "native_echo_fields": [],
+        "pass": true
+      },
+      "case": "corridor_1x_S4",
+      "cpu_seconds": 19.203125,
+      "deadline_miss_count": 0,
+      "dlp": {},
+      "event_count": 3995959,
+      "events_per_completed": 91.64412999105566,
+      "events_per_wall_second": 201330.40354618034,
+      "raw_bags": 28506,
+      "safety": {
+        "gates": {
+          "all_required_fields_present": true,
+          "all_segments_completed": true,
+          "bag_future_path_field_present_false": true,
+          "event_limit_reached_false": true,
+          "failed_count_zero": true,
+          "first_edge_credit_future_route_count_zero": true,
+          "first_edge_credit_global_scan_count_zero": true,
+          "full_cie_astar_runtime_fallback_false": true,
+          "full_future_routes_stored_zero": true,
+          "g4irsf20_event_hotpath_policy_echo": true,
+          "global_reservation_scan_count_zero": true,
+          "merge_grant_timing_mode_echo": true,
+          "microphase_runtime_global_scan_count_zero": true,
+          "physical_fault_edge_entry_violation_count_zero": true,
+          "priority_future_route_input_count_zero": true,
+          "priority_global_scan_count_zero": true,
+          "reservation_conflicts_zero": true,
+          "runtime_full_astar_calls_zero": true,
+          "scorer_future_route_input_count_zero": true,
+          "scorer_future_schedule_input_count_zero": true,
+          "scorer_mode_echo": true,
+          "scorer_runtime_global_scan_count_zero": true,
+          "time_limit_reached_false": true,
+          "unresolved_deadlock_count_zero": true
+        },
+        "missing_fields": [],
+        "pass": true
+      },
+      "scale": 1,
+      "segments": 43603,
+      "status": "PASS",
+      "timing": {
+        "java_release": {
+          "count": 28506,
+          "max_seconds": 407.403999999995,
+          "mean_seconds": 210.76973465235392,
+          "median_seconds": 201.4019999999946,
+          "min_seconds": 188.00199999998586,
+          "p95_seconds": 247.20399999998335,
+          "p99_seconds": 254.00400000001446
+        },
+        "original_entry": {
+          "count": 28506,
+          "max_seconds": 12405.533459999999,
+          "mean_seconds": 2557.459498116046,
+          "median_seconds": 2632.2953700000435,
+          "min_seconds": 187.01288999999815,
+          "p95_seconds": 7516.924384999991,
+          "p99_seconds": 10818.984652999978
+        },
+        "processed_attempt": {
+          "count": 28506,
+          "max_seconds": 407.403999999995,
+          "mean_seconds": 210.76973465235392,
+          "median_seconds": 201.4019999999946,
+          "min_seconds": 188.00199999998586,
+          "p95_seconds": 247.20399999998335,
+          "p99_seconds": 254.00400000001446
+        }
+      },
+      "wall_seconds": 19.84776730000158
+    },
+    {
+      "arm": "CORRIDOR",
+      "artifact_echo": {
+        "active": true,
+        "artifact_contract": {
+          "beta": 1.0,
+          "detour_allowance_seconds": 6.0,
+          "edge_residual_count": 8,
+          "margin_seconds": 0.5,
+          "min_support": 8,
+          "mode": "ewma",
+          "schema": "czr005.g4irsf24.dlp.v1",
+          "value_residual_count": 0
+        },
+        "boundary": "schema and scalar controls are validated in the immutable Python artifact contract; the native ABI echoes mode and row counts",
+        "native_echo": {
+          "edge_residual_count": 8,
+          "mode": "ewma",
+          "value_residual_count": 0
+        },
+        "native_echo_fields": [
+          "mode",
+          "edge_residual_count",
+          "value_residual_count"
+        ],
+        "pass": true
+      },
+      "case": "corridor_1x_CORRIDOR",
+      "cpu_seconds": 19.265625,
+      "deadline_miss_count": 0,
+      "dlp": {
+        "g4irsf24_dlp_claim_boundary": "shield_legal_nonfault_ordinary_s4_route_move_only",
+        "g4irsf24_dlp_committed_mutation_count": 1834,
+        "g4irsf24_dlp_detour_fallback_count": 6013,
+        "g4irsf24_dlp_edge_residual_count": 8,
+        "g4irsf24_dlp_eligible_candidate_count": 500844,
+        "g4irsf24_dlp_fallback_s4_count": 370878,
+        "g4irsf24_dlp_low_support_fallback_count": 0,
+        "g4irsf24_dlp_margin_fallback_count": 0,
+        "g4irsf24_dlp_mode": "ewma",
+        "g4irsf24_dlp_proposal_count": 1835,
+        "g4irsf24_dlp_route_evaluation_count": 372713,
+        "g4irsf24_dlp_same_action_count": 8384,
+        "g4irsf24_dlp_shield_fault_fallback_count": 320,
+        "g4irsf24_dlp_supported_candidate_count": 26451,
+        "g4irsf24_dlp_unsupported_fallback_count": 356161,
+        "g4irsf24_dlp_value_residual_count": 0
+      },
+      "event_count": 4008056,
+      "events_per_completed": 91.92156502992913,
+      "events_per_wall_second": 203880.69579091243,
+      "raw_bags": 28506,
+      "safety": {
+        "gates": {
+          "all_required_fields_present": true,
+          "all_segments_completed": true,
+          "bag_future_path_field_present_false": true,
+          "event_limit_reached_false": true,
+          "failed_count_zero": true,
+          "first_edge_credit_future_route_count_zero": true,
+          "first_edge_credit_global_scan_count_zero": true,
+          "full_cie_astar_runtime_fallback_false": true,
+          "full_future_routes_stored_zero": true,
+          "g4irsf20_event_hotpath_policy_echo": true,
+          "global_reservation_scan_count_zero": true,
+          "merge_grant_timing_mode_echo": true,
+          "microphase_runtime_global_scan_count_zero": true,
+          "physical_fault_edge_entry_violation_count_zero": true,
+          "priority_future_route_input_count_zero": true,
+          "priority_global_scan_count_zero": true,
+          "reservation_conflicts_zero": true,
+          "runtime_full_astar_calls_zero": true,
+          "scorer_future_route_input_count_zero": true,
+          "scorer_future_schedule_input_count_zero": true,
+          "scorer_mode_echo": true,
+          "scorer_runtime_global_scan_count_zero": true,
+          "time_limit_reached_false": true,
+          "unresolved_deadlock_count_zero": true
+        },
+        "missing_fields": [],
+        "pass": true
+      },
+      "scale": 1,
+      "segments": 43603,
+      "status": "PASS",
+      "timing": {
+        "java_release": {
+          "count": 28506,
+          "max_seconds": 404.0039999999972,
+          "mean_seconds": 210.99676054164033,
+          "median_seconds": 201.4019999999946,
+          "min_seconds": 188.00199999999677,
+          "p95_seconds": 247.20399999998335,
+          "p99_seconds": 254.804000000031
+        },
+        "original_entry": {
+          "count": 28506,
+          "max_seconds": 12403.133459999997,
+          "mean_seconds": 2557.686524005332,
+          "median_seconds": 2632.6919700000144,
+          "min_seconds": 187.01396999999997,
+          "p95_seconds": 7518.403044999988,
+          "p99_seconds": 10818.984652999978
+        },
+        "processed_attempt": {
+          "count": 28506,
+          "max_seconds": 404.0039999999972,
+          "mean_seconds": 210.99676054164033,
+          "median_seconds": 201.4019999999946,
+          "min_seconds": 188.00199999999677,
+          "p95_seconds": 247.20399999998335,
+          "p99_seconds": 254.804000000031
+        }
+      },
+      "wall_seconds": 19.65883030000259
+    },
+    {
+      "arm": "CORRIDOR",
+      "artifact_echo": {
+        "active": true,
+        "artifact_contract": {
+          "beta": 1.0,
+          "detour_allowance_seconds": 6.0,
+          "edge_residual_count": 8,
+          "margin_seconds": 0.5,
+          "min_support": 8,
+          "mode": "ewma",
+          "schema": "czr005.g4irsf24.dlp.v1",
+          "value_residual_count": 0
+        },
+        "boundary": "schema and scalar controls are validated in the immutable Python artifact contract; the native ABI echoes mode and row counts",
+        "native_echo": {
+          "edge_residual_count": 8,
+          "mode": "ewma",
+          "value_residual_count": 0
+        },
+        "native_echo_fields": [
+          "mode",
+          "edge_residual_count",
+          "value_residual_count"
+        ],
+        "pass": true
+      },
+      "case": "corridor_2x_CORRIDOR",
+      "cpu_seconds": 53.625,
+      "deadline_miss_count": 0,
+      "dlp": {
+        "g4irsf24_dlp_claim_boundary": "shield_legal_nonfault_ordinary_s4_route_move_only",
+        "g4irsf24_dlp_committed_mutation_count": 8897,
+        "g4irsf24_dlp_detour_fallback_count": 15487,
+        "g4irsf24_dlp_edge_residual_count": 8,
+        "g4irsf24_dlp_eligible_candidate_count": 1805797,
+        "g4irsf24_dlp_fallback_s4_count": 1395779,
+        "g4irsf24_dlp_low_support_fallback_count": 0,
+        "g4irsf24_dlp_margin_fallback_count": 0,
+        "g4irsf24_dlp_mode": "ewma",
+        "g4irsf24_dlp_proposal_count": 46074,
+        "g4irsf24_dlp_route_evaluation_count": 1441853,
+        "g4irsf24_dlp_same_action_count": 17839,
+        "g4irsf24_dlp_shield_fault_fallback_count": 100446,
+        "g4irsf24_dlp_supported_candidate_count": 143313,
+        "g4irsf24_dlp_unsupported_fallback_count": 1262007,
+        "g4irsf24_dlp_value_residual_count": 0
+      },
+      "event_count": 9419978,
+      "events_per_completed": 108.01983808453546,
+      "events_per_wall_second": 172333.5030913447,
+      "raw_bags": 57012,
+      "safety": {
+        "gates": {
+          "all_required_fields_present": true,
+          "all_segments_completed": true,
+          "bag_future_path_field_present_false": true,
+          "event_limit_reached_false": true,
+          "failed_count_zero": true,
+          "first_edge_credit_future_route_count_zero": true,
+          "first_edge_credit_global_scan_count_zero": true,
+          "full_cie_astar_runtime_fallback_false": true,
+          "full_future_routes_stored_zero": true,
+          "g4irsf20_event_hotpath_policy_echo": true,
+          "global_reservation_scan_count_zero": true,
+          "merge_grant_timing_mode_echo": true,
+          "microphase_runtime_global_scan_count_zero": true,
+          "physical_fault_edge_entry_violation_count_zero": true,
+          "priority_future_route_input_count_zero": true,
+          "priority_global_scan_count_zero": true,
+          "reservation_conflicts_zero": true,
+          "runtime_full_astar_calls_zero": true,
+          "scorer_future_route_input_count_zero": true,
+          "scorer_future_schedule_input_count_zero": true,
+          "scorer_mode_echo": true,
+          "scorer_runtime_global_scan_count_zero": true,
+          "time_limit_reached_false": true,
+          "unresolved_deadlock_count_zero": true
+        },
+        "missing_fields": [],
+        "pass": true
+      },
+      "scale": 2,
+      "segments": 87206,
+      "status": "PASS",
+      "timing": {
+        "java_release": {
+          "count": 57012,
+          "max_seconds": 6040.353999999996,
+          "mean_seconds": 355.4101296569154,
+          "median_seconds": 226.20200000000295,
+          "min_seconds": 188.00199999999677,
+          "p95_seconds": 1143.6989999999957,
+          "p99_seconds": 2640.6634999999947
+        },
+        "original_entry": {
+          "count": 57012,
+          "max_seconds": 16582.239598587996,
+          "mean_seconds": 2704.954101267533,
+          "median_seconds": 2688.0087285879963,
+          "min_seconds": 187.00674929399975,
+          "p95_seconds": 8281.936648588007,
+          "p99_seconds": 11125.205058387994
+        },
+        "processed_attempt": {
+          "count": 57012,
+          "max_seconds": 5935.303999999993,
+          "mean_seconds": 278.3212843261078,
+          "median_seconds": 224.2019999999975,
+          "min_seconds": 188.00199999999677,
+          "p95_seconds": 495.6764999999905,
+          "p99_seconds": 1124.6684999999852
+        }
+      },
+      "wall_seconds": 54.66132720001042
+    },
+    {
+      "arm": "S4",
+      "artifact_echo": {
+        "active": false,
+        "native_echo_fields": [],
+        "pass": true
+      },
+      "case": "corridor_2x_S4",
+      "cpu_seconds": 51.953125,
+      "deadline_miss_count": 0,
+      "dlp": {},
+      "event_count": 9454789,
+      "events_per_completed": 108.41901933353209,
+      "events_per_wall_second": 178907.5019265942,
+      "raw_bags": 57012,
+      "safety": {
+        "gates": {
+          "all_required_fields_present": true,
+          "all_segments_completed": true,
+          "bag_future_path_field_present_false": true,
+          "event_limit_reached_false": true,
+          "failed_count_zero": true,
+          "first_edge_credit_future_route_count_zero": true,
+          "first_edge_credit_global_scan_count_zero": true,
+          "full_cie_astar_runtime_fallback_false": true,
+          "full_future_routes_stored_zero": true,
+          "g4irsf20_event_hotpath_policy_echo": true,
+          "global_reservation_scan_count_zero": true,
+          "merge_grant_timing_mode_echo": true,
+          "microphase_runtime_global_scan_count_zero": true,
+          "physical_fault_edge_entry_violation_count_zero": true,
+          "priority_future_route_input_count_zero": true,
+          "priority_global_scan_count_zero": true,
+          "reservation_conflicts_zero": true,
+          "runtime_full_astar_calls_zero": true,
+          "scorer_future_route_input_count_zero": true,
+          "scorer_future_schedule_input_count_zero": true,
+          "scorer_mode_echo": true,
+          "scorer_runtime_global_scan_count_zero": true,
+          "time_limit_reached_false": true,
+          "unresolved_deadlock_count_zero": true
+        },
+        "missing_fields": [],
+        "pass": true
+      },
+      "scale": 2,
+      "segments": 87206,
+      "status": "PASS",
+      "timing": {
+        "java_release": {
+          "count": 57012,
+          "max_seconds": 5511.453999999994,
+          "mean_seconds": 337.8427087630685,
+          "median_seconds": 225.2019999999975,
+          "min_seconds": 188.00199999998586,
+          "p95_seconds": 960.0039999999972,
+          "p99_seconds": 2242.9539999999943
+        },
+        "original_entry": {
+          "count": 57012,
+          "max_seconds": 16445.376838588,
+          "mean_seconds": 2687.3866803736864,
+          "median_seconds": 2690.8996285879984,
+          "min_seconds": 187.00674929399975,
+          "p95_seconds": 8142.348610587993,
+          "p99_seconds": 11103.432129787994
+        },
+        "processed_attempt": {
+          "count": 57012,
+          "max_seconds": 5511.453999999994,
+          "mean_seconds": 283.17635343436575,
+          "median_seconds": 223.80399999999645,
+          "min_seconds": 188.00199999998586,
+          "p95_seconds": 512.0039999999935,
+          "p99_seconds": 1284.028999999999
+        }
+      },
+      "wall_seconds": 52.84735910000745
+    }
+  ],
+  "schema": "czr005.g4irsf24.reconvergent_corridor_campaign.v1",
+  "stage": "CORRIDOR_1X_2X",
+  "status": "CORRIDOR_NO_GO_KEEP_S4"
+}

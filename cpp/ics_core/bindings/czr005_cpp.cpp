@@ -3269,6 +3269,73 @@ g4irsf16_i4_rule_config_from_bundle(const py::dict& bundle) {
   return config;
 }
 
+czr005::ics::G4IRSF24DLPConfig
+g4irsf24_dlp_config_from_artifact(const py::dict& artifact) {
+  czr005::ics::G4IRSF24DLPConfig config;
+  if (artifact.empty()) {
+    return config;
+  }
+  const auto required = [&](const char* name) -> py::handle {
+    if (!artifact.contains(name)) {
+      throw py::value_error(
+          std::string("G4IRSF24 DLP artifact missing ") + name);
+    }
+    return artifact[name];
+  };
+  if (py::cast<std::string>(required("schema")) !=
+      "czr005.g4irsf24.dlp.v1") {
+    throw py::value_error(
+        "G4IRSF24 DLP artifact schema must be "
+        "czr005.g4irsf24.dlp.v1");
+  }
+  config.mode = py::cast<std::string>(required("mode"));
+  if (config.mode == "off") {
+    return config;
+  }
+  if (config.mode != "ewma" && config.mode != "td") {
+    throw py::value_error(
+        "G4IRSF24 DLP artifact mode must be off, ewma, or td");
+  }
+  config.beta = py::cast<double>(required("beta"));
+  config.min_support = py::cast<int>(required("min_support"));
+  config.margin_seconds =
+      py::cast<double>(required("margin_seconds"));
+  config.detour_allowance_seconds =
+      py::cast<double>(required("detour_allowance_seconds"));
+
+  const auto edge_rows = py::reinterpret_borrow<py::sequence>(
+      required("edge_residuals"));
+  for (const py::handle item : edge_rows) {
+    const auto row = py::cast<py::dict>(item);
+    const int from = py::cast<int>(row["from"]);
+    const int to = py::cast<int>(row["to"]);
+    if (!config.insert_edge(
+            from,
+            to,
+            py::cast<double>(row["residual_seconds"]),
+            py::cast<int>(row["support"]))) {
+      throw py::value_error(
+          "G4IRSF24 DLP edge_residuals contains a duplicate from/to key");
+    }
+  }
+  const auto value_rows = py::reinterpret_borrow<py::sequence>(
+      required("value_residuals"));
+  for (const py::handle item : value_rows) {
+    const auto row = py::cast<py::dict>(item);
+    const int node = py::cast<int>(row["node"]);
+    const int goal = py::cast<int>(row["goal"]);
+    if (!config.insert_value(
+            node,
+            goal,
+            py::cast<double>(row["residual_seconds"]),
+            py::cast<int>(row["support"]))) {
+      throw py::value_error(
+          "G4IRSF24 DLP value_residuals contains a duplicate node/goal key");
+    }
+  }
+  return config;
+}
+
 py::dict g4irsf11_event_runtime_summary_row(
     const czr005::ics::EventRuntimeSummary& summary,
     bool include_destination_merge_grants,
@@ -3397,6 +3464,39 @@ py::dict g4irsf11_event_runtime_summary_row(
         py::int_(summary.g4irsf20_redundant_beacon_suppressed_count);
     row["g4irsf20_same_state_beacon_suppressed_count"] =
         py::int_(summary.g4irsf20_same_state_beacon_suppressed_count);
+  }
+  if (!summary.g4irsf24_dlp_mode.empty()) {
+    row["g4irsf24_dlp_mode"] = summary.g4irsf24_dlp_mode;
+    row["g4irsf24_dlp_claim_boundary"] =
+        "shield_legal_nonfault_ordinary_s4_route_move_only";
+    row["g4irsf24_dlp_edge_residual_count"] =
+        summary.g4irsf24_dlp_edge_residual_count;
+    row["g4irsf24_dlp_value_residual_count"] =
+        summary.g4irsf24_dlp_value_residual_count;
+    row["g4irsf24_dlp_route_evaluation_count"] =
+        py::int_(summary.g4irsf24_dlp_route_evaluation_count);
+    row["g4irsf24_dlp_eligible_candidate_count"] =
+        py::int_(summary.g4irsf24_dlp_eligible_candidate_count);
+    row["g4irsf24_dlp_supported_candidate_count"] =
+        py::int_(summary.g4irsf24_dlp_supported_candidate_count);
+    row["g4irsf24_dlp_proposal_count"] =
+        py::int_(summary.g4irsf24_dlp_proposal_count);
+    row["g4irsf24_dlp_committed_mutation_count"] =
+        py::int_(summary.g4irsf24_dlp_committed_mutation_count);
+    row["g4irsf24_dlp_fallback_s4_count"] =
+        py::int_(summary.g4irsf24_dlp_fallback_s4_count);
+    row["g4irsf24_dlp_same_action_count"] =
+        py::int_(summary.g4irsf24_dlp_same_action_count);
+    row["g4irsf24_dlp_unsupported_fallback_count"] =
+        py::int_(summary.g4irsf24_dlp_unsupported_fallback_count);
+    row["g4irsf24_dlp_low_support_fallback_count"] =
+        py::int_(summary.g4irsf24_dlp_low_support_fallback_count);
+    row["g4irsf24_dlp_margin_fallback_count"] =
+        py::int_(summary.g4irsf24_dlp_margin_fallback_count);
+    row["g4irsf24_dlp_detour_fallback_count"] =
+        py::int_(summary.g4irsf24_dlp_detour_fallback_count);
+    row["g4irsf24_dlp_shield_fault_fallback_count"] =
+        py::int_(summary.g4irsf24_dlp_shield_fault_fallback_count);
   }
   row["source_admission_enabled"] = summary.source_admission_enabled;
   row["source_admission_attempt_count"] =
@@ -4888,6 +4988,29 @@ py::list g4irsf11_event_decision_rows(
     row["scorer_raw_fallback_disagreement"] =
         scorer_raw_fallback_disagreement;
     row["candidate_ordering"] = "next_node_ascending";
+    if (decision.g4irsf24_dlp_evaluated) {
+      py::dict dlp;
+      dlp["mode"] = decision.g4irsf24_dlp_mode;
+      dlp["s4_next"] = decision.g4irsf24_dlp_s4_next;
+      dlp["proposed_next"] =
+          decision.g4irsf24_dlp_proposed_next >= 0
+              ? py::cast(decision.g4irsf24_dlp_proposed_next)
+              : py::none();
+      dlp["residual_seconds"] =
+          decision.g4irsf24_dlp_residual_seconds;
+      dlp["edge_support"] =
+          decision.g4irsf24_dlp_edge_support;
+      dlp["value_support"] =
+          decision.g4irsf24_dlp_value_support;
+      dlp["fallback_reason"] =
+          decision.g4irsf24_dlp_fallback_reason.empty()
+              ? py::none()
+              : py::cast(
+                    decision.g4irsf24_dlp_fallback_reason);
+      dlp["committed_mutation"] =
+          decision.g4irsf24_dlp_committed_mutation;
+      row["g4irsf24_dlp"] = std::move(dlp);
+    }
     if (decision.g4irsf16_evaluated) {
       const auto finite_or_none = [](double value) -> py::object {
         return std::isfinite(value) ? py::cast(value) : py::none();
@@ -6064,7 +6187,8 @@ py::dict g4irsf11_event_runtime_from_records(
     bool g4irsf18_merge_kill_switch,
     double bounded_wall_seconds,
     int bounded_check_every_events,
-    const std::string& g4irsf20_event_hotpath_policy) {
+    const std::string& g4irsf20_event_hotpath_policy,
+    const py::dict& g4irsf24_dlp_artifact) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6295,6 +6419,9 @@ py::dict g4irsf11_event_runtime_from_records(
           g4irsf18_merge_kill_switch);
   config.g4irsf20_event_hotpath_policy =
       g4irsf20_event_hotpath_policy;
+  config.g4irsf24_dlp =
+      g4irsf24_dlp_config_from_artifact(
+          g4irsf24_dlp_artifact);
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -7042,7 +7169,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("bounded_wall_seconds") = -1.0,
              py::arg("bounded_check_every_events") = 65536,
              py::arg("g4irsf20_event_hotpath_policy") =
-                 std::string("E0"));
+                 std::string("E0"),
+             py::arg("g4irsf24_dlp_artifact") = py::dict());
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

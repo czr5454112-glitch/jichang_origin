@@ -486,6 +486,66 @@ struct EventRuntimeRegretPriorRecord {
   double penalty = 0.0;
 };
 
+struct G4IRSF24DLPResidualRecord {
+  double residual_seconds = 0.0;
+  int support = 0;
+};
+
+// One immutable, process-local lookup table.  Decision-time access is two
+// O(1) key lookups at most; no route suffix or graph-wide scan is introduced.
+struct G4IRSF24DLPConfig {
+  std::string mode = "off";  // off, ewma (edge only), td (edge + value)
+  double beta = 1.0;
+  int min_support = 8;
+  double margin_seconds = 0.0;
+  double detour_allowance_seconds = 0.0;
+  std::unordered_map<std::uint64_t, G4IRSF24DLPResidualRecord>
+      edge_residuals;
+  std::unordered_map<std::uint64_t, G4IRSF24DLPResidualRecord>
+      value_residuals;
+
+  static std::uint64_t key(int first, int second) noexcept {
+    return (static_cast<std::uint64_t>(
+                static_cast<std::uint32_t>(first))
+            << 32U) |
+           static_cast<std::uint32_t>(second);
+  }
+
+  bool insert_edge(int from,
+                   int to,
+                   double residual_seconds,
+                   int support) {
+    return edge_residuals
+        .emplace(key(from, to),
+                 G4IRSF24DLPResidualRecord{
+                     residual_seconds, support})
+        .second;
+  }
+
+  bool insert_value(int node,
+                    int goal,
+                    double residual_seconds,
+                    int support) {
+    return value_residuals
+        .emplace(key(node, goal),
+                 G4IRSF24DLPResidualRecord{
+                     residual_seconds, support})
+        .second;
+  }
+
+  const G4IRSF24DLPResidualRecord* edge(int from,
+                                        int to) const noexcept {
+    const auto found = edge_residuals.find(key(from, to));
+    return found == edge_residuals.end() ? nullptr : &found->second;
+  }
+
+  const G4IRSF24DLPResidualRecord* value(int node,
+                                         int goal) const noexcept {
+    const auto found = value_residuals.find(key(node, goal));
+    return found == value_residuals.end() ? nullptr : &found->second;
+  }
+};
+
 struct EventDrivenJunctionConfig {
   std::string queue_discipline = "aging";  // fifo, deadline, aging
   // R0 preserves the frozen G4IRSF11 negative control.  R1-R4 isolate one
@@ -619,6 +679,10 @@ struct EventDrivenJunctionConfig {
   // local-queue/arrival update, and E2 also prunes a no-action dispatch
   // publication when no advertised state can have changed.
   std::string g4irsf20_event_hotpath_policy = "E0";
+  // G24 is an append-only residual reorder of already materialized, legal S4
+  // Route MOVE candidates.  It is never read by source, wait, merge, or PIBT
+  // arbitration paths.
+  G4IRSF24DLPConfig g4irsf24_dlp;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -752,6 +816,16 @@ struct EventDecisionTraceRow {
       -std::numeric_limits<double>::infinity();
   bool g4irsf16_i4_ood = true;
   std::string g4irsf16_i4_model_reason;
+  // Emitted by the Python binding only when the G24 table is active.
+  bool g4irsf24_dlp_evaluated = false;
+  std::string g4irsf24_dlp_mode;
+  int g4irsf24_dlp_s4_next = -1;
+  int g4irsf24_dlp_proposed_next = -1;
+  double g4irsf24_dlp_residual_seconds = 0.0;
+  int g4irsf24_dlp_edge_support = 0;
+  int g4irsf24_dlp_value_support = 0;
+  std::string g4irsf24_dlp_fallback_reason;
+  bool g4irsf24_dlp_committed_mutation = false;
 };
 
 // Stable raw schema for the outcome-free G20 Route observation sidecar.  Keep
@@ -1309,6 +1383,23 @@ struct EventRuntimeSummary {
   std::string g4irsf20_event_hotpath_policy = "E0";
   std::uint64_t g4irsf20_redundant_beacon_suppressed_count = 0;
   std::uint64_t g4irsf20_same_state_beacon_suppressed_count = 0;
+  // G24 fields stay empty/zero and are omitted from the Python payload while
+  // the default empty artifact keeps DLP off.
+  std::string g4irsf24_dlp_mode;
+  int g4irsf24_dlp_edge_residual_count = 0;
+  int g4irsf24_dlp_value_residual_count = 0;
+  std::uint64_t g4irsf24_dlp_route_evaluation_count = 0;
+  std::uint64_t g4irsf24_dlp_eligible_candidate_count = 0;
+  std::uint64_t g4irsf24_dlp_supported_candidate_count = 0;
+  std::uint64_t g4irsf24_dlp_proposal_count = 0;
+  std::uint64_t g4irsf24_dlp_committed_mutation_count = 0;
+  std::uint64_t g4irsf24_dlp_fallback_s4_count = 0;
+  std::uint64_t g4irsf24_dlp_same_action_count = 0;
+  std::uint64_t g4irsf24_dlp_unsupported_fallback_count = 0;
+  std::uint64_t g4irsf24_dlp_low_support_fallback_count = 0;
+  std::uint64_t g4irsf24_dlp_margin_fallback_count = 0;
+  std::uint64_t g4irsf24_dlp_detour_fallback_count = 0;
+  std::uint64_t g4irsf24_dlp_shield_fault_fallback_count = 0;
 };
 
 struct EventRuntimeJunctionResult {
@@ -2663,6 +2754,16 @@ class EventDrivenJunctionRuntime {
     result_.summary.event_semantics_echo = config_.event_semantics;
     result_.summary.g4irsf20_event_hotpath_policy =
         config_.g4irsf20_event_hotpath_policy;
+    if (config_.g4irsf24_dlp.mode != "off") {
+      result_.summary.g4irsf24_dlp_mode =
+          config_.g4irsf24_dlp.mode;
+      result_.summary.g4irsf24_dlp_edge_residual_count =
+          static_cast<int>(
+              config_.g4irsf24_dlp.edge_residuals.size());
+      result_.summary.g4irsf24_dlp_value_residual_count =
+          static_cast<int>(
+              config_.g4irsf24_dlp.value_residuals.size());
+    }
     result_.summary.opportunity_telemetry_enabled =
         config_.enable_opportunity_telemetry;
     result_.summary.g4irsf17_source_wait_telemetry_enabled =
@@ -4773,6 +4874,42 @@ class EventDrivenJunctionRuntime {
       throw std::invalid_argument(
           "G4IRSF20 E1/E2 beacon suppression cannot be combined with "
           "G4IRSF17 beacon extensions or first-edge credit");
+    }
+    const auto& dlp = config_.g4irsf24_dlp;
+    if (dlp.mode != "off" && dlp.mode != "ewma" &&
+        dlp.mode != "td") {
+      throw std::invalid_argument(
+          "g4irsf24_dlp mode must be off, ewma, or td");
+    }
+    if (dlp.mode != "off") {
+      if (canonical_scorer_mode() != "S4") {
+        throw std::invalid_argument(
+            "G4IRSF24 DLP requires the S4 queue-aware scorer");
+      }
+      if (!std::isfinite(dlp.beta) || dlp.beta < 0.0 ||
+          dlp.min_support <= 0 ||
+          !std::isfinite(dlp.margin_seconds) ||
+          dlp.margin_seconds < 0.0 ||
+          !std::isfinite(dlp.detour_allowance_seconds) ||
+          dlp.detour_allowance_seconds < 0.0) {
+        throw std::invalid_argument(
+            "G4IRSF24 DLP beta/margin/detour must be finite and "
+            "non-negative, with positive min_support");
+      }
+      const auto valid_residual = [](const auto& entry) {
+        return std::isfinite(entry.second.residual_seconds) &&
+               entry.second.support >= 0;
+      };
+      if (!std::all_of(dlp.edge_residuals.begin(),
+                       dlp.edge_residuals.end(),
+                       valid_residual) ||
+          !std::all_of(dlp.value_residuals.begin(),
+                       dlp.value_residuals.end(),
+                       valid_residual)) {
+        throw std::invalid_argument(
+            "G4IRSF24 DLP residuals must be finite with non-negative "
+            "support");
+      }
     }
     config_.g4irsf18_merge_policy.validate_controls();
     if (g4irsf18_merge_policy_enabled() &&
@@ -8840,6 +8977,9 @@ class EventDrivenJunctionRuntime {
     }
     clear_consumed_repair_reentry_boost(bag);
 
+    commit_g4irsf24_dlp_mutation(
+        winner_pending->second.trace,
+        request.destination_merge_node);
     publish_prepared_decision_trace_noexcept(
         std::move(winner_pending->second.trace), true);
     pending_merge_dispatches_.erase(winner_pending);
@@ -9487,6 +9627,254 @@ class EventDrivenJunctionRuntime {
         }
       }
     }
+  }
+
+  void apply_g4irsf24_dlp_residual(EventDecisionTraceRow& trace) {
+    const auto& dlp = config_.g4irsf24_dlp;
+    if (dlp.mode == "off") {
+      return;
+    }
+
+    trace.g4irsf24_dlp_evaluated = true;
+    trace.g4irsf24_dlp_mode = dlp.mode;
+    ++result_.summary.g4irsf24_dlp_route_evaluation_count;
+
+    const auto fallback =
+        [&](const char* reason, std::uint64_t& reason_counter) {
+          trace.g4irsf24_dlp_fallback_reason = reason;
+          ++result_.summary.g4irsf24_dlp_fallback_s4_count;
+          ++reason_counter;
+        };
+    if (trace.candidates.empty()) {
+      fallback(
+          "unsupported",
+          result_.summary.g4irsf24_dlp_unsupported_fallback_count);
+      return;
+    }
+
+    const auto score_precedes =
+        [&](std::size_t left, std::size_t right) {
+          const auto& lhs = trace.candidates[left];
+          const auto& rhs = trace.candidates[right];
+          return std::tie(lhs.model_score, lhs.next_node) <
+                 std::tie(rhs.model_score, rhs.next_node);
+        };
+    std::size_t baseline_index = 0;
+    for (std::size_t index = 1; index < trace.candidates.size(); ++index) {
+      if (score_precedes(index, baseline_index)) {
+        baseline_index = index;
+      }
+    }
+    const auto& baseline = trace.candidates[baseline_index];
+    trace.g4irsf24_dlp_s4_next = baseline.next_node;
+    if (!baseline.shield_allowed || baseline.advertised_fault) {
+      fallback(
+          "shield_or_fault",
+          result_.summary.g4irsf24_dlp_shield_fault_fallback_count);
+      return;
+    }
+
+    struct CandidateDLPScore {
+      bool supported = false;
+      bool missing = false;
+      bool low_support = false;
+      bool detour = false;
+      bool shield_or_fault = false;
+      double residual_seconds = 0.0;
+      double adjusted_score = 0.0;
+      int edge_support = 0;
+      int value_support = 0;
+    };
+    std::vector<CandidateDLPScore> scores(trace.candidates.size());
+    bool saw_missing = false;
+    bool saw_low_support = false;
+    bool saw_detour = false;
+    bool saw_shield_or_fault = false;
+    const double baseline_static =
+        baseline.travel_time + baseline.static_potential;
+
+    for (std::size_t index = 0; index < trace.candidates.size(); ++index) {
+      const auto& candidate = trace.candidates[index];
+      auto& score = scores[index];
+      score.adjusted_score = candidate.model_score;
+      if (!candidate.shield_allowed || candidate.advertised_fault) {
+        score.shield_or_fault = true;
+        saw_shield_or_fault = true;
+        continue;
+      }
+      ++result_.summary.g4irsf24_dlp_eligible_candidate_count;
+      const double candidate_static =
+          candidate.travel_time + candidate.static_potential;
+      if (candidate_static >
+          baseline_static + dlp.detour_allowance_seconds +
+              event_runtime_detail::kEpsilon) {
+        score.detour = true;
+        saw_detour = true;
+        continue;
+      }
+      const auto* edge = dlp.edge(
+          trace.current_node, candidate.next_node);
+      // The learner's TD target defines downstream value as exactly zero
+      // after the selected edge reaches the goal.  Requiring a synthetic
+      // (goal, goal) row here would make every terminal MOVE unsupported.
+      const bool requires_value =
+          dlp.mode == "td" &&
+          candidate.next_node != trace.goal_node;
+      const auto* value =
+          requires_value
+              ? dlp.value(candidate.next_node, trace.goal_node)
+              : nullptr;
+      if (edge == nullptr || (requires_value && value == nullptr)) {
+        score.missing = true;
+        saw_missing = true;
+        continue;
+      }
+      if (edge->support < dlp.min_support ||
+          (value != nullptr && value->support < dlp.min_support)) {
+        score.low_support = true;
+        saw_low_support = true;
+        continue;
+      }
+      score.supported = true;
+      score.edge_support = edge->support;
+      score.value_support = value == nullptr ? 0 : value->support;
+      score.residual_seconds =
+          edge->residual_seconds +
+          (value == nullptr ? 0.0 : value->residual_seconds);
+      score.adjusted_score =
+          candidate.model_score + dlp.beta * score.residual_seconds;
+      ++result_.summary.g4irsf24_dlp_supported_candidate_count;
+    }
+
+    const auto& baseline_score = scores[baseline_index];
+    if (baseline_score.missing || !baseline_score.supported) {
+      if (baseline_score.low_support) {
+        fallback(
+            "low_support",
+            result_.summary.g4irsf24_dlp_low_support_fallback_count);
+      } else {
+        fallback(
+            "unsupported",
+            result_.summary.g4irsf24_dlp_unsupported_fallback_count);
+      }
+      return;
+    }
+
+    std::size_t proposed_index = baseline_index;
+    for (std::size_t index = 0; index < trace.candidates.size(); ++index) {
+      if (!scores[index].supported) {
+        continue;
+      }
+      if (std::tie(scores[index].adjusted_score,
+                   trace.candidates[index].next_node) <
+          std::tie(scores[proposed_index].adjusted_score,
+                   trace.candidates[proposed_index].next_node)) {
+        proposed_index = index;
+      }
+    }
+
+    const auto& proposed_score = scores[proposed_index];
+    trace.g4irsf24_dlp_residual_seconds =
+        proposed_score.residual_seconds;
+    trace.g4irsf24_dlp_edge_support = proposed_score.edge_support;
+    trace.g4irsf24_dlp_value_support = proposed_score.value_support;
+    if (proposed_index == baseline_index) {
+      if (saw_low_support) {
+        fallback(
+            "low_support",
+            result_.summary.g4irsf24_dlp_low_support_fallback_count);
+      } else if (saw_missing) {
+        fallback(
+            "unsupported",
+            result_.summary.g4irsf24_dlp_unsupported_fallback_count);
+      } else if (saw_detour) {
+        fallback(
+            "detour",
+            result_.summary.g4irsf24_dlp_detour_fallback_count);
+      } else if (saw_shield_or_fault) {
+        fallback(
+            "shield_or_fault",
+            result_.summary.g4irsf24_dlp_shield_fault_fallback_count);
+      } else {
+        fallback(
+            "same_action",
+            result_.summary.g4irsf24_dlp_same_action_count);
+      }
+      return;
+    }
+
+    const double improvement_seconds =
+        baseline_score.adjusted_score - proposed_score.adjusted_score;
+    if (improvement_seconds + event_runtime_detail::kEpsilon <
+        dlp.margin_seconds) {
+      fallback(
+          "margin",
+          result_.summary.g4irsf24_dlp_margin_fallback_count);
+      return;
+    }
+
+    // Unsupported, over-detour, or unsafe rows retain their exact S4 score.
+    // Activate the residual scores only if the supported proposal still wins
+    // the complete existing ranking; otherwise abstain byte-for-byte to S4.
+    std::size_t complete_ranking_best = 0;
+    const auto effective_score = [&](std::size_t index) {
+      return scores[index].supported
+                 ? scores[index].adjusted_score
+                 : trace.candidates[index].model_score;
+    };
+    for (std::size_t index = 1; index < trace.candidates.size(); ++index) {
+      if (std::make_tuple(effective_score(index),
+                          trace.candidates[index].next_node) <
+          std::make_tuple(
+              effective_score(complete_ranking_best),
+              trace.candidates[complete_ranking_best].next_node)) {
+        complete_ranking_best = index;
+      }
+    }
+    if (complete_ranking_best != proposed_index) {
+      const auto& blocker = scores[complete_ranking_best];
+      if (blocker.shield_or_fault) {
+        fallback(
+            "shield_or_fault",
+            result_.summary.g4irsf24_dlp_shield_fault_fallback_count);
+      } else if (blocker.low_support) {
+        fallback(
+            "low_support",
+            result_.summary.g4irsf24_dlp_low_support_fallback_count);
+      } else if (blocker.detour) {
+        fallback(
+            "detour",
+            result_.summary.g4irsf24_dlp_detour_fallback_count);
+      } else {
+        fallback(
+            "unsupported",
+            result_.summary.g4irsf24_dlp_unsupported_fallback_count);
+      }
+      return;
+    }
+
+    for (std::size_t index = 0; index < trace.candidates.size(); ++index) {
+      if (scores[index].supported) {
+        trace.candidates[index].model_score = scores[index].adjusted_score;
+      }
+    }
+    trace.g4irsf24_dlp_proposed_next =
+        trace.candidates[proposed_index].next_node;
+    ++result_.summary.g4irsf24_dlp_proposal_count;
+  }
+
+  void commit_g4irsf24_dlp_mutation(EventDecisionTraceRow& trace,
+                                     int selected_next) noexcept {
+    if (!trace.g4irsf24_dlp_evaluated ||
+        trace.g4irsf24_dlp_committed_mutation ||
+        trace.g4irsf24_dlp_proposed_next < 0 ||
+        trace.g4irsf24_dlp_proposed_next ==
+            trace.g4irsf24_dlp_s4_next ||
+        selected_next != trace.g4irsf24_dlp_proposed_next) {
+      return;
+    }
+    trace.g4irsf24_dlp_committed_mutation = true;
+    ++result_.summary.g4irsf24_dlp_committed_mutation_count;
   }
 
   std::optional<EventDecisionTraceRow> pibt_trace_for_bag(
@@ -12779,6 +13167,9 @@ class EventDrivenJunctionRuntime {
       }
     }
     apply_scorer(trace);
+    // G24 deliberately lives only on the ordinary Route path.  PIBT builds
+    // its own trace through pibt_trace_for_bag() and never calls this hook.
+    apply_g4irsf24_dlp_residual(trace);
 
     std::vector<std::size_t> ranking(trace.candidates.size());
     for (std::size_t index = 0; index < ranking.size(); ++index) {
@@ -13547,6 +13938,7 @@ class EventDrivenJunctionRuntime {
         ++result_.summary.g4irsf16_action_change_count;
       }
       dispatch_selected_edge(bag, node, selected, time);
+      commit_g4irsf24_dlp_mutation(trace, selected);
       if (causal_i3_override_selected) {
         mark_causal_action_applied(
             "APPLIED_I3_ONE_EDGE_COMMIT_ONE_ACTION",
