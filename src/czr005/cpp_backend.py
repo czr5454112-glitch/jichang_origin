@@ -716,6 +716,7 @@ def g4irsf11_event_runtime_from_records(
     bounded_wall_seconds: float = -1.0,
     bounded_check_every_events: int = 65_536,
     g4irsf20_event_hotpath_policy: str = "E0",
+    g4irsf24_dlp_artifact: Mapping[str, Any] | PathLike | None = None,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -1125,6 +1126,27 @@ def g4irsf11_event_runtime_from_records(
         g4irsf18_merge_policy_artifact,
         "g4irsf18_merge_policy_artifact",
     )
+    normalized_g4irsf24_dlp = normalized_g4irsf16_artifact(
+        g4irsf24_dlp_artifact,
+        "g4irsf24_dlp_artifact",
+    )
+    if normalized_g4irsf24_dlp:
+        g4irsf24_dlp_mode = normalized_g4irsf24_dlp.get("mode")
+        if (
+            normalized_g4irsf24_dlp.get("schema")
+            != "czr005.g4irsf24.dlp.v1"
+            or g4irsf24_dlp_mode not in {"off", "ewma", "td"}
+        ):
+            raise ValueError(
+                "g4irsf24_dlp_artifact must use the "
+                "czr005.g4irsf24.dlp.v1 schema and off, ewma, or td mode"
+            )
+        if g4irsf24_dlp_mode == "off":
+            # Explicit off is semantically identical to None/{} and must keep
+            # the historical positional call usable with older native ABIs.
+            normalized_g4irsf24_dlp = {}
+        elif scorer_mode not in {"S4", "S4_queue_aware_rule_only"}:
+            raise ValueError("G4IRSF24 DLP requires the frozen S4 scorer")
     if g4irsf17_source_policy_mode == "off":
         if normalized_g4irsf17_source_policy:
             raise ValueError(
@@ -1780,6 +1802,42 @@ def g4irsf11_event_runtime_from_records(
                 int(bounded_check_every_events),
             )
         native_event_tail += (str(g4irsf20_event_hotpath_policy),)
+    if normalized_g4irsf24_dlp:
+        # DLP is the append-only G24 tail.  Active calls target the G24 ABI,
+        # so materialize every intervening default exactly once.  The empty
+        # artifact path keeps the historical positional call unchanged and
+        # remains compatible with older native modules.
+        native_event_tail = (
+            str(event_semantics),
+            bool(enable_opportunity_telemetry),
+            int(opportunity_trace_limit),
+            str(merge_grant_rule),
+            int(merge_grant_max_pending_requests),
+            int(merge_grant_lifecycle_limit),
+            str(g4irsf16_supervisor_mode),
+            normalized_g4irsf16_i3_model,
+            normalized_g4irsf16_i4_model,
+            normalized_g4irsf16_rule_bundle,
+            bool(enable_g4irsf17_source_wait_telemetry),
+            int(g4irsf17_source_wait_trace_limit),
+            str(g4irsf17_source_policy_mode),
+            normalized_g4irsf17_source_policy,
+            int(g4irsf17_source_policy_trace_limit),
+            canonical_merge_grant_timing_mode,
+            str(g4irsf18_merge_policy_mode),
+            normalized_g4irsf18_merge_policy,
+            bool(g4irsf18_merge_research_closed_loop_authorized),
+            bool(g4irsf18_merge_fixed_research_workload),
+            bool(g4irsf18_merge_production_closed_loop_authorized),
+            bool(g4irsf18_merge_offline_gate_passed),
+            float(g4irsf18_merge_coverage_cap),
+            int(g4irsf18_merge_max_overrides_per_segment),
+            bool(g4irsf18_merge_kill_switch),
+            float(bounded_wall_seconds),
+            int(bounded_check_every_events),
+            str(g4irsf20_event_hotpath_policy),
+            normalized_g4irsf24_dlp,
+        )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
             normalized_node_records,

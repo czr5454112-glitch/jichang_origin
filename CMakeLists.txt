@@ -164,6 +164,15 @@ add_test(
   COMMAND test_event_runtime_bounded_local_pibt)
 
 add_executable(
+  test_g4irsf24_dlp
+  cpp/tests/test_g4irsf24_dlp.cpp)
+target_link_libraries(test_g4irsf24_dlp PRIVATE ics_core)
+if(MSVC)
+  target_compile_options(test_g4irsf24_dlp PRIVATE /bigobj)
+endif()
+add_test(NAME g4irsf24_dlp COMMAND test_g4irsf24_dlp)
+
+add_executable(
   test_expiring_first_edge_credit_real_map
   cpp/tests/test_expiring_first_edge_credit_real_map.cpp)
 target_link_libraries(test_expiring_first_edge_credit_real_map PRIVATE ics_core)

@@ -19,6 +19,22 @@ import java.util.HashSet;
 import java.util.List;
 
 public class LegacyIcsNoFaultWindowBenchmark {
+    private static final class ReleaseEvent {
+        final int ordinal;
+        final int taskId;
+        final int start;
+        final int goal;
+        final double epoch;
+
+        ReleaseEvent(int ordinal, int taskId, int start, int goal, double epoch) {
+            this.ordinal = ordinal;
+            this.taskId = taskId;
+            this.start = start;
+            this.goal = goal;
+            this.epoch = epoch;
+        }
+    }
+
     private static final class PlannedRoute {
         final int ordinal;
         final int taskId;
@@ -65,6 +81,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
         long routeSizeChecksum;
         long routeLocationChecksum;
         double lastEpoch;
+        ArrayList<ReleaseEvent> releases = new ArrayList<>();
         ArrayList<PlannedRoute> plannedRoutes = new ArrayList<>();
     }
 
@@ -87,7 +104,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
             throw new IllegalArgumentException(
                 "usage: LegacyIcsNoFaultWindowBenchmark <mapPath> <inputdataPath> <startEpoch> "
                 + "<maxEpochs> <maxNewTasks> <repeats> <warmupRepeats> <routeCsv> <summaryCsv> "
-                + "[faultSchedule] [faultProbability] [repairProbability]"
+                + "[faultSchedule] [faultProbability] [repairProbability] [releaseCsv]"
             );
         }
         System.setProperty("java.awt.headless", "true");
@@ -103,6 +120,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
         ArrayList<ScheduleEvent> schedule = args.length > 9 ? parseSchedule(args[9]) : new ArrayList<ScheduleEvent>();
         double faultProbability = args.length > 10 ? Double.parseDouble(args[10]) : 0.0;
         double repairProbability = args.length > 11 ? Double.parseDouble(args[11]) : 0.0;
+        String releaseCsv = args.length > 12 ? args[12] : null;
 
         for (int repeat = 0; repeat < warmupRepeats; repeat++) {
             runOnce(
@@ -139,6 +157,9 @@ public class LegacyIcsNoFaultWindowBenchmark {
         }
 
         writeRoutes(routeCsv, runs.get(0).plannedRoutes);
+        if (releaseCsv != null && !releaseCsv.trim().isEmpty()) {
+            writeReleases(releaseCsv, runs.get(0).releases);
+        }
         writeSummary(summaryCsv, runs);
 
         RunResult first = runs.get(0);
@@ -206,6 +227,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
             result.generatedFaultEdgeCount += newTasks.getFault_edges().size();
             result.generatedRepairEdgeCount += newTasks.getRepaired_edges().size();
             result.generatedCount += newTasks.getNew_tasks_list().size();
+            recordReleases(result, newTasks, epoch);
             HashSet<Integer> beforeKeys = new HashSet<>(ics.getSaved_routes().keySet());
             ics.ICS_path_finding(newTasks, ics.getMap(), epoch, ics);
             recordNewRoutes(result, beforeKeys, ics, epoch);
@@ -220,6 +242,20 @@ public class LegacyIcsNoFaultWindowBenchmark {
         result.unfinishedCount = ics.getUnfinishTasks().size();
         result.activeFaultCount = ics.getFault_edges().size();
         return result;
+    }
+
+    private static void recordReleases(RunResult result, Tasks newTasks, double epoch) {
+        for (task released : newTasks.getNew_tasks_list()) {
+            result.releases.add(
+                new ReleaseEvent(
+                    result.releases.size() + 1,
+                    released.getTask_ID(),
+                    released.getStar(),
+                    released.getGoal(),
+                    epoch
+                )
+            );
+        }
     }
 
     private static void applyScheduleEvents(
@@ -429,6 +465,20 @@ public class LegacyIcsNoFaultWindowBenchmark {
                 writer.write(
                     route.ordinal + "," + route.taskId + "," + route.start + "," + route.goal + ","
                         + route.epoch + "," + route.finishTime + "," + pathText(route.path)
+                );
+                writer.newLine();
+            }
+        }
+    }
+
+    private static void writeReleases(String path, ArrayList<ReleaseEvent> releases) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write("ordinal,task_id,start,goal,release_epoch");
+            writer.newLine();
+            for (ReleaseEvent release : releases) {
+                writer.write(
+                    release.ordinal + "," + release.taskId + "," + release.start + ","
+                        + release.goal + "," + release.epoch
                 );
                 writer.newLine();
             }
