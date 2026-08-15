@@ -162,8 +162,8 @@ def _event_key(row: Mapping[str, Any]) -> tuple[int, int, int]:
 
 
 def _take(
-    queues: Mapping[tuple[int, int, int], deque[Any]],
-    key: tuple[int, int, int],
+    queues: Mapping[Any, deque[Any]],
+    key: Any,
     label: str,
 ) -> Any:
     queue = queues.get(key)
@@ -183,6 +183,40 @@ def _parse_completions(path: Path) -> list[dict[str, float | int]]:
         if len(parts) < 2:
             raise FreshHcaError(f"invalid output.txt line {line_no}: {line!r}")
         events.append({"task_id": int(parts[0]), "finish_epoch": float(parts[1])})
+    return events
+
+
+def _parse_processed_attempts(
+    path: Path,
+) -> list[dict[str, float | int]] | None:
+    """Read actual successful planning attempts from legacy outputstarttime.txt.
+
+    The legacy route export only notices new ``saved_routes`` keys.  A task
+    that initially had no path and succeeds later can therefore be absent from
+    routes.csv, while this append-only legacy file still records the real
+    successful attempt.
+    """
+
+    if not path.exists():
+        return None
+    events: list[dict[str, float | int]] = []
+    for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        parts = line.split()
+        if len(parts) != 4:
+            raise FreshHcaError(
+                f"invalid outputstarttime.txt line {line_no}: {line!r}"
+            )
+        events.append(
+            {
+                "ordinal": len(events) + 1,
+                "task_id": int(parts[0]),
+                "start": int(parts[1]),
+                "scheduled_pass_time": float(parts[2]),
+                "processed_attempt_epoch": float(parts[3]),
+            }
+        )
     return events
 
 
@@ -229,10 +263,12 @@ def _build_lifecycle(
     releases: Sequence[Mapping[str, str]],
     routes: Sequence[Mapping[str, str]],
     completions: Sequence[Mapping[str, float | int]],
+    processed_attempts: Sequence[Mapping[str, float | int]] | None = None,
 ) -> list[dict[str, Any]]:
     candidates = _canonical_queues(canonical)
     lifecycle: list[dict[str, Any]] = []
     released_by_key: dict[tuple[int, int, int], deque[dict[str, Any]]] = defaultdict(deque)
+    released_by_task_start: dict[tuple[int, int], deque[dict[str, Any]]] = defaultdict(deque)
 
     for event in sorted(releases, key=lambda row: int(row["ordinal"])):
         key = _event_key(event)
@@ -253,12 +289,24 @@ def _build_lifecycle(
         }
         lifecycle.append(row)
         released_by_key[key].append(row)
+        released_by_task_start[(int(row["task_id"]), int(row["start"]))].append(row)
 
     planned_by_task: dict[int, deque[dict[str, Any]]] = defaultdict(deque)
-    for event in sorted(routes, key=lambda row: int(row["ordinal"])):
-        row = _take(released_by_key, _event_key(event), "planned route")
-        row["processed_attempt_epoch"] = float(event["epoch"])
-        planned_by_task[int(row["task_id"])].append(row)
+    if processed_attempts is not None:
+        for event in sorted(processed_attempts, key=lambda row: int(row["ordinal"])):
+            key = int(event["task_id"]), int(event["start"])
+            row = _take(
+                released_by_task_start,
+                key,
+                "processed attempt",
+            )
+            row["processed_attempt_epoch"] = float(event["processed_attempt_epoch"])
+            planned_by_task[int(row["task_id"])].append(row)
+    else:
+        for event in sorted(routes, key=lambda row: int(row["ordinal"])):
+            row = _take(released_by_key, _event_key(event), "planned route")
+            row["processed_attempt_epoch"] = float(event["epoch"])
+            planned_by_task[int(row["task_id"])].append(row)
 
     for event in completions:
         task_id = int(event["task_id"])
@@ -343,11 +391,23 @@ def aggregate_run(run_dir: Path, canonical_path: Path) -> dict[str, Any]:
     canonical = _load_canonical(canonical_path)
     releases = _read_csv(run_dir / "release.csv")
     routes = _read_csv(run_dir / "routes.csv")
+    processed_attempts = _parse_processed_attempts(run_dir / "outputstarttime.txt")
     completions = _parse_completions(run_dir / "output.txt")
-    lifecycle = _build_lifecycle(canonical, releases, routes, completions)
+    lifecycle = _build_lifecycle(
+        canonical,
+        releases,
+        routes,
+        completions,
+        processed_attempts=processed_attempts,
+    )
     raw_bags = _aggregate_raw_bags(canonical, lifecycle)
 
     complete_bags = [row for row in raw_bags if bool(row["complete"])]
+    canonical_complete_bags = [
+        row
+        for row in complete_bags
+        if bool(row["canonical_bag_covered"])
+    ]
     completed_segment_count = sum(bool(row["complete"]) for row in lifecycle)
     canonical_task_count = len({int(row["task_id"]) for row in canonical})
     comparison_eligible = (
@@ -373,6 +433,14 @@ def aggregate_run(run_dir: Path, canonical_path: Path) -> dict[str, Any]:
         "canonical_segment_count": len(canonical),
         "canonical_raw_bag_count": canonical_task_count,
         "released_segment_count": len(lifecycle),
+        "processed_attempt_source": (
+            "outputstarttime.txt"
+            if processed_attempts is not None
+            else "routes.csv_fallback"
+        ),
+        "processed_attempt_event_count": (
+            len(processed_attempts) if processed_attempts is not None else len(routes)
+        ),
         "planned_segment_count": sum(
             row["processed_attempt_epoch"] is not None for row in lifecycle
         ),
@@ -381,6 +449,9 @@ def aggregate_run(run_dir: Path, canonical_path: Path) -> dict[str, Any]:
         "released_raw_bag_count": len(raw_bags),
         "complete_raw_bag_count": len(complete_bags),
         "incomplete_raw_bag_count": len(raw_bags) - len(complete_bags),
+        "canonical_complete_raw_bag_count": len(canonical_complete_bags),
+        "canonical_incomplete_raw_bag_count": canonical_task_count - len(canonical_complete_bags),
+        "canonical_success_rate": len(canonical_complete_bags) / canonical_task_count,
         "fully_covered_raw_bag_count": sum(
             bool(row["canonical_bag_covered"]) for row in raw_bags
         ),
@@ -423,10 +494,15 @@ def aggregate_campaign(output_root: Path, canonical_path: Path) -> dict[str, Any
             "scope": metrics["scope"],
             "comparison_eligible": metrics["comparison_eligible"],
             "released_segment_count": metrics["released_segment_count"],
+            "processed_attempt_source": metrics["processed_attempt_source"],
+            "processed_attempt_event_count": metrics["processed_attempt_event_count"],
             "planned_segment_count": metrics["planned_segment_count"],
             "completed_segment_count": metrics["completed_segment_count"],
             "released_raw_bag_count": metrics["released_raw_bag_count"],
             "complete_raw_bag_count": metrics["complete_raw_bag_count"],
+            "canonical_complete_raw_bag_count": metrics["canonical_complete_raw_bag_count"],
+            "canonical_incomplete_raw_bag_count": metrics["canonical_incomplete_raw_bag_count"],
+            "canonical_success_rate": metrics["canonical_success_rate"],
             "wall_seconds": metrics["wall_seconds"],
         }
         for denominator in ("processed_attempt", "java_release", "raw_entry"):
@@ -443,10 +519,15 @@ def aggregate_campaign(output_root: Path, canonical_path: Path) -> dict[str, Any
         "scope",
         "comparison_eligible",
         "released_segment_count",
+        "processed_attempt_source",
+        "processed_attempt_event_count",
         "planned_segment_count",
         "completed_segment_count",
         "released_raw_bag_count",
         "complete_raw_bag_count",
+        "canonical_complete_raw_bag_count",
+        "canonical_incomplete_raw_bag_count",
+        "canonical_success_rate",
         "wall_seconds",
         *[
             f"{denominator}_{statistic}_minutes"
@@ -503,9 +584,11 @@ def java_run_command(
     max_epochs: int,
     max_new_tasks: int,
     run_dir: Path,
+    fault_schedule: str = "none",
+    speed_mps: float | None = None,
 ) -> list[str]:
     # One repeat per process keeps route/release/output artifacts from the same run.
-    return [
+    command = [
         java,
         "-Djava.awt.headless=true",
         "-cp",
@@ -520,11 +603,16 @@ def java_run_command(
         "0",
         str((run_dir / "routes.csv").resolve()),
         str((run_dir / "summary.csv").resolve()),
-        "none",
+        fault_schedule,
         "0",
         "0",
         str((run_dir / "release.csv").resolve()),
     ]
+    # Keep the historical direct-call shape when no speed is supplied.  The
+    # CLI always supplies its explicit/default speed as the optional tail arg.
+    if speed_mps is not None:
+        command.append(str(speed_mps))
+    return command
 
 
 def _as_text(value: str | bytes | None) -> str:
@@ -542,6 +630,23 @@ def _completed_run(run_dir: Path) -> bool:
     )
 
 
+def _cleanup_epoch_files(run_dir: Path) -> bool:
+    """Remove only the benchmark's per-epoch task directory."""
+
+    task_dir = run_dir / "task"
+    if not task_dir.is_dir():
+        return False
+    shutil.rmtree(task_dir)
+    return True
+
+
+def _record_cleanup(run_dir: Path, *, requested: bool, removed: bool) -> None:
+    status = _read_json(run_dir / "run_status.json")
+    status["cleanup_epoch_files_requested"] = requested
+    status["cleanup_epoch_files_removed"] = removed
+    _write_json(run_dir / "run_status.json", status)
+
+
 def run_campaign(args: argparse.Namespace) -> int:
     defaults = PROFILE_DEFAULTS[args.profile]
     start_epoch = args.start_epoch if args.start_epoch is not None else defaults["start_epoch"]
@@ -557,6 +662,8 @@ def run_campaign(args: argparse.Namespace) -> int:
     )
     if repeats < 1 or max_epochs < 1 or max_new_tasks < 0 or timeout_seconds < 0:
         raise FreshHcaError("repeats/max_epochs must be positive; limits cannot be negative")
+    if not math.isfinite(args.speed_mps) or args.speed_mps <= 0.0:
+        raise FreshHcaError("speed-mps must be finite and positive")
 
     output_root = args.output_root.resolve()
     commands = [
@@ -571,6 +678,8 @@ def run_campaign(args: argparse.Namespace) -> int:
                 max_epochs=max_epochs,
                 max_new_tasks=max_new_tasks,
                 run_dir=output_root / f"run_{index:02d}",
+                fault_schedule=args.fault_schedule,
+                speed_mps=args.speed_mps,
             ),
         )
         for index in range(1, repeats + 1)
@@ -593,6 +702,9 @@ def run_campaign(args: argparse.Namespace) -> int:
         if not args.force and _completed_run(run_dir):
             print(f"resume: keeping completed {run_dir.name}")
             aggregate_run(run_dir, args.canonical_input)
+            if args.cleanup_epoch_files:
+                removed = _cleanup_epoch_files(run_dir)
+                _record_cleanup(run_dir, requested=True, removed=removed)
             continue
 
         status: dict[str, Any] = {
@@ -606,6 +718,10 @@ def run_campaign(args: argparse.Namespace) -> int:
             "start_epoch": start_epoch,
             "max_epochs": max_epochs,
             "max_new_tasks": max_new_tasks,
+            "fault_schedule": args.fault_schedule,
+            "speed_mps": args.speed_mps,
+            "cleanup_epoch_files_requested": args.cleanup_epoch_files,
+            "cleanup_epoch_files_removed": False,
         }
         _write_json(run_dir / "run_status.json", status)
         started = time.perf_counter()
@@ -649,6 +765,9 @@ def run_campaign(args: argparse.Namespace) -> int:
             return 1
 
         metrics = aggregate_run(run_dir, args.canonical_input)
+        if args.cleanup_epoch_files:
+            removed = _cleanup_epoch_files(run_dir)
+            _record_cleanup(run_dir, requested=True, removed=removed)
         print(
             f"{run_dir.name}: released={metrics['released_segment_count']} "
             f"completed={metrics['completed_segment_count']} "
@@ -689,6 +808,9 @@ def _parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--max-new-tasks", type=int)
     run_parser.add_argument("--repeats", type=int)
     run_parser.add_argument("--timeout-seconds", type=int)
+    run_parser.add_argument("--speed-mps", type=float, default=2.5)
+    run_parser.add_argument("--fault-schedule", default="none")
+    run_parser.add_argument("--cleanup-epoch-files", action="store_true")
     run_parser.add_argument("--skip-compile", action="store_true")
     run_parser.add_argument("--force", action="store_true")
     run_parser.add_argument("--dry-run", action="store_true")

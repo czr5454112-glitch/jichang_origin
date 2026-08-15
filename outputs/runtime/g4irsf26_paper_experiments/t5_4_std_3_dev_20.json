@@ -1,0 +1,161 @@
+{
+  "case": {
+    "actual_speed_mps": 2.4000000000000004,
+    "case_group": "speed_deviation",
+    "case_id": "t5_4_std_3_dev_20",
+    "case_role": "degraded_actual_dual_speed_reconstruction",
+    "comparison_reference_case_id": "t5_2_speed_3",
+    "deviation_percent": 20,
+    "fault_line_ids": [],
+    "mapping_evidence": "NOT_APPLICABLE",
+    "paper_reported": {
+      "dynamic": 3.51,
+      "improvement": 5.65,
+      "static": 3.72
+    },
+    "paper_tables": [
+      "5.4"
+    ],
+    "protocol_fidelity": "RECONSTRUCTION_STANDARD_HEURISTIC_ACTUAL_EDGE_TIME_NOT_THE_ORIGINAL_DEVIATION_SIMULATOR",
+    "seed_edges": [],
+    "standard_speed_mps": 3.0
+  },
+  "outcome": {
+    "business_and_safety_axes_are_separate": true,
+    "business_failed_raw_bag_count": 0,
+    "business_failure_is_safety_failure": false,
+    "completed_raw_bag_count": 28506,
+    "paper_raw_bag_tth": {
+      "denominator": "sum_over_segments(finish_time-admitted_time)",
+      "distribution": {
+        "count": 28506,
+        "minutes": {
+          "max": 5.623677777778236,
+          "mean": 3.6486565923742913,
+          "min": 3.2555888888885725,
+          "p50": 3.4916999999997644,
+          "p95": 4.27645555555561,
+          "p99": 4.332011111110478
+        },
+        "seconds": {
+          "max": 337.42066666669416,
+          "mean": 218.91939554245747,
+          "min": 195.33533333331434,
+          "p50": 209.50199999998586,
+          "p95": 256.5873333333366,
+          "p99": 259.9206666666287
+        }
+      },
+      "scope": "complete_raw_bags_only"
+    },
+    "requested_segment_count": 43603,
+    "runtime_completed_segment_count": 43603,
+    "runtime_failed_segment_count": 0,
+    "selected_raw_bag_count": 28506,
+    "success": {
+      "denominator_raw_bags": 28506,
+      "finish_le_std": {
+        "count": 28506,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD",
+        "rate": 1.0
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 12209,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds",
+        "rate": 0.428295797375991
+      },
+      "primary_completed_raw_bags": {
+        "count": 28506,
+        "definition": "all_selected_segments_completed",
+        "rate": 1.0
+      }
+    }
+  },
+  "protocol": {
+    "exact_fresh_status": "EXACT_G24_LIFECYCLE_ALIGNED",
+    "exact_hca_release_alignment": {
+      "aligned_segment_count": 43603,
+      "release_minus_canonical_pass_max_seconds": 1458.0,
+      "release_minus_canonical_pass_mean_seconds": 83.93475708215031,
+      "release_minus_canonical_pass_min_seconds": -0.9999900000002526,
+      "source": "artifacts/datasets/g4irsf26_release_speed_3p0.csv"
+    },
+    "framework": "active_decentralized_A0_S4_J2_E2",
+    "full_workload_gates": {
+      "raw_bag_count_is_28506": true,
+      "segment_count_is_43603": true
+    },
+    "input": "protected_original_day_exact_file_order",
+    "paper_raw_bag_tth_denominator": "sum_over_segments(finish_time-admitted_time)",
+    "raw_bag_count": 28506,
+    "reconstruction": {
+      "fault": {
+        "mode": "no_fault",
+        "windows": []
+      },
+      "speed": {
+        "edge_travel_time": "length/actual_speed_mps",
+        "heuristic_reconstruction": "directed_shortest_travel_time_using_standard_speed_mps",
+        "heuristic_speed_mps": 3.0,
+        "physical_edge_speed_mps": 2.4000000000000004,
+        "topology": "protected_map2_54_nodes_69_edges"
+      }
+    },
+    "release_semantics": "exact_G24_HCA_segment_lifecycle_release_epoch",
+    "segment_count": 43603,
+    "table_5_4_claim_boundary": "RECONSTRUCTION_NOT_THE_ORIGINAL_DEVIATION_SIMULATOR",
+    "table_5_5_claim_boundary": "SEED_EDGE_MAPPING_WITH_EXPLICIT_EVIDENCE_NOT_EXACT_CASCADE"
+  },
+  "runtime": {
+    "cpu_seconds": 23.515625,
+    "decision_count": 339395,
+    "event_count": 3985962,
+    "fault_event_count": 0,
+    "repair_event_count": 0,
+    "wall_seconds": 23.953242200019304
+  },
+  "safety": {
+    "admission": {
+      "mode": "G24_STRICT_S4",
+      "pass": true,
+      "runtime_echo_pass": true,
+      "selected_safety_pass": true
+    },
+    "fixed_horizon_fault": null,
+    "runtime_echo_gates": {
+      "active_e2_hotpath": true,
+      "active_j2_timing": true,
+      "active_s4_scorer": true
+    },
+    "strict_s4": {
+      "gates": {
+        "all_required_fields_present": true,
+        "all_segments_completed": true,
+        "bag_future_path_field_present_false": true,
+        "event_limit_reached_false": true,
+        "failed_count_zero": true,
+        "first_edge_credit_future_route_count_zero": true,
+        "first_edge_credit_global_scan_count_zero": true,
+        "full_cie_astar_runtime_fallback_false": true,
+        "full_future_routes_stored_zero": true,
+        "global_reservation_scan_count_zero": true,
+        "microphase_runtime_global_scan_count_zero": true,
+        "physical_fault_edge_entry_violation_count_zero": true,
+        "priority_future_route_input_count_zero": true,
+        "priority_global_scan_count_zero": true,
+        "reservation_conflicts_zero": true,
+        "runtime_full_astar_calls_zero": true,
+        "runtime_full_cie_astar_calls_zero": true,
+        "scorer_future_route_input_count_zero": true,
+        "scorer_future_schedule_input_count_zero": true,
+        "scorer_runtime_global_scan_count_zero": true,
+        "time_limit_reached_false": true,
+        "unresolved_deadlock_count_zero": true
+      },
+      "missing_fields": [],
+      "pass": true
+    }
+  },
+  "schema": "czr005.g4irsf26.paper_s4_case.v1",
+  "status": "COMPLETE"
+}
