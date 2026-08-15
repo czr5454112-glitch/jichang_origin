@@ -210,4 +210,13 @@ if(CZR005_BUILD_PYBIND)
       "PYTHONPATH=$<TARGET_FILE_DIR:czr005_cpp>"
       ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cpp/tests/test_pybind_smoke.py)
   set_tests_properties(pybind_smoke PROPERTIES DEPENDS czr005_cpp)
+
+  add_test(
+    NAME event_runtime_gil_concurrency
+    COMMAND
+      ${CMAKE_COMMAND} -E env
+      "PYTHONPATH=$<TARGET_FILE_DIR:czr005_cpp>"
+      ${Python3_EXECUTABLE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/cpp/tests/test_event_runtime_gil_concurrency.py)
+  set_tests_properties(event_runtime_gil_concurrency PROPERTIES DEPENDS czr005_cpp)
 endif()
