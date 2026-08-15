@@ -921,6 +921,33 @@ def _scale_rows(scale: Mapping[str, Any] | None) -> list[dict[str, Any]]:
 def _release_evidence(source: Path) -> int | str:
     RELEASE_EVIDENCE.parent.mkdir(parents=True, exist_ok=True)
     fields = ["segment_id", "task_id", "start", "goal", "release_epoch"]
+    if source.resolve() == RELEASE_EVIDENCE.resolve():
+        if not source.is_file():
+            raise ReportingError(f"release evidence is missing: {source}")
+        with source.open("r", encoding="utf-8", newline="") as input_handle:
+            reader = csv.DictReader(input_handle)
+            if reader.fieldnames != fields:
+                raise ReportingError(
+                    f"release evidence fields mismatch: expected {fields}, got {reader.fieldnames}"
+                )
+            segment_ids: set[str] = set()
+            count = 0
+            for row_number, row in enumerate(reader, start=2):
+                for field in fields:
+                    if not str(row.get(field) or "").strip():
+                        raise ReportingError(
+                            f"release evidence field {field!r} is empty at row {row_number}"
+                        )
+                segment_id = str(row["segment_id"]).strip()
+                if segment_id in segment_ids:
+                    raise ReportingError(
+                        f"release evidence has duplicate segment_id {segment_id!r}"
+                    )
+                segment_ids.add(segment_id)
+                count += 1
+        if count == 0:
+            raise ReportingError("release evidence has no data rows")
+        return count
     if not source.is_file():
         _write_csv(RELEASE_EVIDENCE, fields, [{"segment_id": NOT_MEASURED}])
         return NOT_MEASURED

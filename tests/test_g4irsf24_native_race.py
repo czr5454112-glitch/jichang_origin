@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from scripts.eval import g4irsf12_reproducible_harness as harness
 from scripts.eval import run_g4irsf24_native_race as race
 from scripts.eval import run_g4irsf24_reporting as reporting
@@ -134,6 +136,46 @@ def test_exact_hca_release_trace_replaces_native_release(tmp_path) -> None:
     assert adjusted.rows[0]["pass_time"] == 12.0
     assert adjusted.rows[0]["original_entry_time"] == 10.75
     assert summary["release_minus_canonical_pass_mean_seconds"] == 1.25
+
+
+def test_release_evidence_same_source_is_validated_without_truncation(
+    tmp_path, monkeypatch
+) -> None:
+    evidence = tmp_path / "release.csv"
+    contents = (
+        "segment_id,task_id,start,goal,release_epoch\n"
+        "a,1,3,47,12.0\n"
+        "b,2,4,47,13.0\n"
+    )
+    evidence.write_text(contents, encoding="utf-8")
+    monkeypatch.setattr(reporting, "RELEASE_EVIDENCE", evidence)
+
+    assert reporting._release_evidence(evidence) == 2
+    assert evidence.read_text(encoding="utf-8") == contents
+
+
+@pytest.mark.parametrize(
+    "contents, message",
+    [
+        ("segment_id,task_id,start,goal,release_epoch\n", "no data rows"),
+        (
+            "segment_id,task_id,start,goal,release_epoch\n"
+            "a,1,3,47,12.0\n"
+            "a,2,4,47,13.0\n",
+            "duplicate segment_id",
+        ),
+        ("segment_id,task_id,start,goal\na,1,3,47\n", "fields mismatch"),
+    ],
+)
+def test_release_evidence_same_source_rejects_invalid_compact_data(
+    tmp_path, monkeypatch, contents: str, message: str
+) -> None:
+    evidence = tmp_path / "release.csv"
+    evidence.write_text(contents, encoding="utf-8")
+    monkeypatch.setattr(reporting, "RELEASE_EVIDENCE", evidence)
+
+    with pytest.raises(reporting.ReportingError, match=message):
+        reporting._release_evidence(evidence)
 
 
 def test_fresh_decision_requires_every_repeat_to_win() -> None:
