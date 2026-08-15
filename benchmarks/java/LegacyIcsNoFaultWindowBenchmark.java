@@ -78,6 +78,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
         int activeFaultCount;
         int activeRouteCount;
         int unfinishedCount;
+        double speedMps;
         long routeSizeChecksum;
         long routeLocationChecksum;
         double lastEpoch;
@@ -104,7 +105,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
             throw new IllegalArgumentException(
                 "usage: LegacyIcsNoFaultWindowBenchmark <mapPath> <inputdataPath> <startEpoch> "
                 + "<maxEpochs> <maxNewTasks> <repeats> <warmupRepeats> <routeCsv> <summaryCsv> "
-                + "[faultSchedule] [faultProbability] [repairProbability] [releaseCsv]"
+                + "[faultSchedule] [faultProbability] [repairProbability] [releaseCsv] [speedMps]"
             );
         }
         System.setProperty("java.awt.headless", "true");
@@ -121,6 +122,10 @@ public class LegacyIcsNoFaultWindowBenchmark {
         double faultProbability = args.length > 10 ? Double.parseDouble(args[10]) : 0.0;
         double repairProbability = args.length > 11 ? Double.parseDouble(args[11]) : 0.0;
         String releaseCsv = args.length > 12 ? args[12] : null;
+        double speedMps = args.length > 13 ? Double.parseDouble(args[13]) : 2.5;
+        if (!Double.isFinite(speedMps) || speedMps <= 0.0) {
+            throw new IllegalArgumentException("speedMps must be finite and positive");
+        }
 
         for (int repeat = 0; repeat < warmupRepeats; repeat++) {
             runOnce(
@@ -131,7 +136,8 @@ public class LegacyIcsNoFaultWindowBenchmark {
                 maxNewTasks,
                 schedule,
                 faultProbability,
-                repairProbability
+                repairProbability,
+                speedMps
             );
         }
 
@@ -147,7 +153,8 @@ public class LegacyIcsNoFaultWindowBenchmark {
                     maxNewTasks,
                     schedule,
                     faultProbability,
-                    repairProbability
+                    repairProbability,
+                    speedMps
                 )
             );
         }
@@ -174,6 +181,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
         System.out.println("start_epoch=" + first.startEpoch);
         System.out.println("max_epochs=" + first.maxEpochs);
         System.out.println("max_new_tasks=" + first.maxNewTasks);
+        System.out.println("speed_mps=" + first.speedMps);
         System.out.println("epochs_run=" + first.epochsRun);
         System.out.println("generated_count=" + first.generatedCount);
         System.out.println("planned_count=" + first.plannedCount);
@@ -198,16 +206,19 @@ public class LegacyIcsNoFaultWindowBenchmark {
         int maxNewTasks,
         ArrayList<ScheduleEvent> schedule,
         double faultProbability,
-        double repairProbability
+        double repairProbability,
+        double speedMps
     ) throws IOException {
         prepareWorkingFiles();
         RunResult result = new RunResult();
         result.startEpoch = startEpoch;
         result.maxEpochs = maxEpochs;
         result.maxNewTasks = maxNewTasks;
+        result.speedMps = speedMps;
 
         ICS_PathFinding ics = new ICS_PathFinding();
         ics.getMap().read(ics.getMap(), mapPath);
+        configureMapSpeed(ics, speedMps);
         HashMap<Integer, ArrayList<task>> taskList = new HashMap<>();
         for (Vertex vertex : ics.getMap().getStar()) {
             taskList.put(vertex.getLocation(), new ArrayList<task>());
@@ -242,6 +253,19 @@ public class LegacyIcsNoFaultWindowBenchmark {
         result.unfinishedCount = ics.getUnfinishTasks().size();
         result.activeFaultCount = ics.getFault_edges().size();
         return result;
+    }
+
+    private static void configureMapSpeed(ICS_PathFinding ics, double speedMps) {
+        for (Edge edge : ics.getMap().getE()) {
+            edge.setV(speedMps);
+        }
+        double scale = 2.5 / speedMps;
+        double[][] hcost = ics.getMap().getHcost();
+        for (int row = 0; row < hcost.length; row++) {
+            for (int column = 0; column < hcost[row].length; column++) {
+                hcost[row][column] *= scale;
+            }
+        }
     }
 
     private static void recordReleases(RunResult result, Tasks newTasks, double epoch) {
@@ -488,7 +512,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
     private static void writeSummary(String path, ArrayList<RunResult> runs) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             writer.write(
-                "repeat,start_epoch,max_epochs,max_new_tasks,epochs_run,generated_count,planned_count,"
+                "repeat,speed_mps,start_epoch,max_epochs,max_new_tasks,epochs_run,generated_count,planned_count,"
                 + "completed_count,fault_event_count,repair_event_count,active_fault_count,"
                     + "generated_fault_edge_count,generated_repair_edge_count,"
                     + "active_route_count,unfinished_count,route_size_checksum,"
@@ -498,7 +522,7 @@ public class LegacyIcsNoFaultWindowBenchmark {
             for (int index = 0; index < runs.size(); index++) {
                 RunResult run = runs.get(index);
                 writer.write(
-                    (index + 1) + "," + run.startEpoch + "," + run.maxEpochs + "," + run.maxNewTasks + ","
+                    (index + 1) + "," + run.speedMps + "," + run.startEpoch + "," + run.maxEpochs + "," + run.maxNewTasks + ","
                         + run.epochsRun + "," + run.generatedCount + "," + run.plannedCount + ","
                         + run.completedCount + "," + run.faultEventCount + "," + run.repairEventCount + ","
                         + run.activeFaultCount + "," + run.generatedFaultEdgeCount + ","

@@ -1,0 +1,151 @@
+{
+  "case": {
+    "actual_speed_mps": 2.25,
+    "case_group": "speed_deviation",
+    "case_id": "t5_4_std_2p5_dev_10",
+    "case_role": "degraded_actual_dual_speed_reconstruction",
+    "comparison_reference_case_id": "t5_2_speed_2p5",
+    "deviation_percent": 10,
+    "fault_line_ids": [],
+    "mapping_evidence": "NOT_APPLICABLE",
+    "paper_reported": {
+      "dynamic": 3.99,
+      "improvement": 4.77,
+      "static": 4.19
+    },
+    "paper_tables": [
+      "5.4"
+    ],
+    "protocol_fidelity": "RECONSTRUCTION_STANDARD_HEURISTIC_ACTUAL_EDGE_TIME_NOT_THE_ORIGINAL_DEVIATION_SIMULATOR",
+    "seed_edges": [],
+    "standard_speed_mps": 2.5
+  },
+  "outcome": {
+    "completed_raw_bag_count": 28506,
+    "paper_raw_bag_tth": {
+      "denominator": "sum_over_segments(finish_time-admitted_time)",
+      "distribution": {
+        "count": 28506,
+        "minutes": {
+          "max": 7.137103703703724,
+          "mean": 3.8807008208798996,
+          "min": 3.4592925925925857,
+          "p50": 3.716700000000007,
+          "p95": 4.559325925925805,
+          "p99": 4.648214814814734
+        },
+        "seconds": {
+          "max": 428.22622222222344,
+          "mean": 232.84204925279397,
+          "min": 207.55755555555515,
+          "p50": 223.0020000000004,
+          "p95": 273.5595555555483,
+          "p99": 278.89288888888404
+        }
+      },
+      "scope": "complete_raw_bags_only"
+    },
+    "requested_segment_count": 43603,
+    "runtime_completed_segment_count": 43603,
+    "runtime_failed_segment_count": 0,
+    "selected_raw_bag_count": 28506,
+    "success": {
+      "denominator_raw_bags": 28506,
+      "finish_le_std": {
+        "count": 28506,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD",
+        "rate": 1.0
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 12182,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds",
+        "rate": 0.427348628358942
+      },
+      "primary_completed_raw_bags": {
+        "count": 28506,
+        "definition": "all_selected_segments_completed",
+        "rate": 1.0
+      }
+    }
+  },
+  "protocol": {
+    "exact_fresh_status": "EXACT_G24_LIFECYCLE_ALIGNED",
+    "exact_hca_release_alignment": {
+      "aligned_segment_count": 43603,
+      "release_minus_canonical_pass_max_seconds": 1213.0,
+      "release_minus_canonical_pass_mean_seconds": 68.27218799286747,
+      "release_minus_canonical_pass_min_seconds": -0.9999900000002526,
+      "source": "artifacts/datasets/g4irsf24_release_compact.csv"
+    },
+    "framework": "active_decentralized_A0_S4_J2_E2",
+    "full_workload_gates": {
+      "raw_bag_count_is_28506": true,
+      "segment_count_is_43603": true
+    },
+    "input": "protected_original_day_exact_file_order",
+    "paper_raw_bag_tth_denominator": "sum_over_segments(finish_time-admitted_time)",
+    "raw_bag_count": 28506,
+    "reconstruction": {
+      "fault": {
+        "mode": "no_fault",
+        "windows": []
+      },
+      "speed": {
+        "edge_travel_time": "length/actual_speed_mps",
+        "heuristic_reconstruction": "directed_shortest_travel_time_using_standard_speed_mps",
+        "heuristic_speed_mps": 2.5,
+        "physical_edge_speed_mps": 2.25,
+        "topology": "protected_map2_54_nodes_69_edges"
+      }
+    },
+    "release_semantics": "exact_G24_HCA_segment_lifecycle_release_epoch",
+    "segment_count": 43603,
+    "table_5_4_claim_boundary": "RECONSTRUCTION_NOT_THE_ORIGINAL_DEVIATION_SIMULATOR",
+    "table_5_5_claim_boundary": "SEED_EDGE_MAPPING_WITH_EXPLICIT_EVIDENCE_NOT_EXACT_CASCADE"
+  },
+  "runtime": {
+    "cpu_seconds": 25.46875,
+    "decision_count": 339313,
+    "event_count": 3994514,
+    "fault_event_count": 0,
+    "repair_event_count": 0,
+    "wall_seconds": 26.112908600014634
+  },
+  "safety": {
+    "runtime_echo_gates": {
+      "active_e2_hotpath": true,
+      "active_j2_timing": true,
+      "active_s4_scorer": true
+    },
+    "strict_s4": {
+      "gates": {
+        "all_required_fields_present": true,
+        "all_segments_completed": true,
+        "bag_future_path_field_present_false": true,
+        "event_limit_reached_false": true,
+        "failed_count_zero": true,
+        "first_edge_credit_future_route_count_zero": true,
+        "first_edge_credit_global_scan_count_zero": true,
+        "full_cie_astar_runtime_fallback_false": true,
+        "full_future_routes_stored_zero": true,
+        "global_reservation_scan_count_zero": true,
+        "microphase_runtime_global_scan_count_zero": true,
+        "physical_fault_edge_entry_violation_count_zero": true,
+        "priority_future_route_input_count_zero": true,
+        "priority_global_scan_count_zero": true,
+        "reservation_conflicts_zero": true,
+        "runtime_full_astar_calls_zero": true,
+        "runtime_full_cie_astar_calls_zero": true,
+        "scorer_future_route_input_count_zero": true,
+        "scorer_future_schedule_input_count_zero": true,
+        "scorer_runtime_global_scan_count_zero": true,
+        "time_limit_reached_false": true,
+        "unresolved_deadlock_count_zero": true
+      },
+      "missing_fields": [],
+      "pass": true
+    }
+  },
+  "schema": "czr005.g4irsf26.paper_s4_case.v1",
+  "status": "COMPLETE"
+}
