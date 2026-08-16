@@ -3498,6 +3498,18 @@ py::dict g4irsf11_event_runtime_summary_row(
     row["g4irsf24_dlp_shield_fault_fallback_count"] =
         py::int_(summary.g4irsf24_dlp_shield_fault_fallback_count);
   }
+  if (summary.legacy_observation_bias_max_seconds > 0.0) {
+    row["legacy_observation_bias_max_seconds"] =
+        summary.legacy_observation_bias_max_seconds;
+    row["legacy_observation_bias_seed"] =
+        py::int_(summary.legacy_observation_bias_seed);
+    row["legacy_observation_bias_sample_count"] =
+        py::int_(summary.legacy_observation_bias_sample_count);
+    row["legacy_observation_bias_total_seconds"] =
+        summary.legacy_observation_bias_total_seconds;
+    row["legacy_observation_bias_claim_boundary"] =
+        "deterministic_local_observation_delay_only";
+  }
   row["source_admission_enabled"] = summary.source_admission_enabled;
   row["source_admission_attempt_count"] =
       py::int_(summary.source_admission_attempt_count);
@@ -3747,6 +3759,7 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["starvation_count"] = summary.starvation_count;
   row["loop_count"] = summary.loop_count;
   row["runtime_full_astar_calls"] = summary.runtime_full_astar_calls;
+  row["runtime_full_cie_astar_calls"] = 0;
   row["full_cie_astar_runtime_fallback"] = false;
   row["global_reservation_scan_count"] = summary.global_reservation_scan_count;
   row["max_edges_selected_per_arrive"] = summary.max_edges_selected_per_arrive;
@@ -6188,7 +6201,9 @@ py::dict g4irsf11_event_runtime_from_records(
     double bounded_wall_seconds,
     int bounded_check_every_events,
     const std::string& g4irsf20_event_hotpath_policy,
-    const py::dict& g4irsf24_dlp_artifact) {
+    const py::dict& g4irsf24_dlp_artifact,
+    double legacy_observation_bias_max_seconds,
+    std::uint64_t legacy_observation_bias_seed) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6422,6 +6437,11 @@ py::dict g4irsf11_event_runtime_from_records(
   config.g4irsf24_dlp =
       g4irsf24_dlp_config_from_artifact(
           g4irsf24_dlp_artifact);
+  // Append-only Table 5.4 reconstruction seam; zero remains exact-off.
+  config.legacy_observation_bias_max_seconds =
+      legacy_observation_bias_max_seconds;
+  config.legacy_observation_bias_seed =
+      legacy_observation_bias_seed;
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -7170,7 +7190,10 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("bounded_check_every_events") = 65536,
              py::arg("g4irsf20_event_hotpath_policy") =
                  std::string("E0"),
-             py::arg("g4irsf24_dlp_artifact") = py::dict());
+             py::arg("g4irsf24_dlp_artifact") = py::dict(),
+             py::arg("legacy_observation_bias_max_seconds") = 0.0,
+             py::arg("legacy_observation_bias_seed") =
+                 std::uint64_t{0});
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

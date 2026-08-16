@@ -70,6 +70,7 @@ def _assert_invariants(payload: dict[str, object], completed: int) -> None:
     assert summary["failed_count"] == 0
     assert summary["reservation_conflicts"] == 0
     assert summary["runtime_full_astar_calls"] == 0
+    assert summary["runtime_full_cie_astar_calls"] == 0
     assert summary["global_reservation_scan_count"] == 0
     assert summary["reservation_depth"] == 1
     assert summary["two_step_reservation_count"] == 0
