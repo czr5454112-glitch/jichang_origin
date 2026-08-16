@@ -1,0 +1,112 @@
+{
+  "canonical_output": "artifacts/tasks/g4irsf30/inputdata_flight_densified_3x.jsonl",
+  "direct_raw_task_count": 40227,
+  "early_split_raw_task_count": 45291,
+  "expanded_by_start": {
+    "0": 9600,
+    "1": 9579,
+    "2": 9597,
+    "3": 14661,
+    "4": 14661,
+    "5": 14658,
+    "52": 45291,
+    "53": 12762
+  },
+  "expanded_segment_count": 130809,
+  "flight_count": 1080,
+  "flight_csv_output": "artifacts/tasks/g4irsf30/g4irsf30_flights.csv",
+  "flight_key": [
+    "STD",
+    "end",
+    "Unloader"
+  ],
+  "input_expanded_segment_count": 43603,
+  "input_flight_count": 360,
+  "input_raw_task_count": 28506,
+  "inserted_flight_count": 720,
+  "inserted_flights_per_original": 2,
+  "inserted_id_offsets": [
+    28506,
+    57012
+  ],
+  "insertion_rule": {
+    "manifest_shift": "EntryTime_and_STD_receive_the_same_delta",
+    "nonterminal": "one_third_and_two_thirds_to_next_STD_in_same_stream",
+    "terminal": "lower_median_positive_stream_headway_times_one_third_and_two_thirds"
+  },
+  "invariants": {
+    "canonical_was_expanded_from_generated_raw": true,
+    "categorical_manifest_is_copied_per_inserted_flight": true,
+    "direct_count_is_exactly_3x": true,
+    "early_split_count_is_exactly_3x": true,
+    "end_counts_are_exactly_3x": true,
+    "expanded_segment_count_is_exactly_3x": true,
+    "flight_count_is_exactly_3x": true,
+    "loader_counts_are_exactly_3x": true,
+    "raw_task_count_is_exactly_3x": true,
+    "same_24h_axis_no_time_compression": true,
+    "slack_and_storage_class_are_preserved": true,
+    "start_counts_are_exactly_3x": true,
+    "unloader_counts_are_exactly_3x": true
+  },
+  "lifecycle": {
+    "bag_id_rule": "original task_id retained; inserted cohort 1/2 uses its registered ID offset plus source row rank",
+    "early_bag_threshold_seconds": 4800.0,
+    "segment_id_rule": "<task_id>:direct|storage_in|storage_out",
+    "storage_in_goal": 47,
+    "storage_out_lead_seconds": 2700.0,
+    "storage_out_start": 52
+  },
+  "original_flight_count": 360,
+  "protocol": "SCHEDULE_PRESERVING_INTERMEDIATE_FLIGHT_DENSIFICATION_3X",
+  "raw_by_end": {
+    "48": 18918,
+    "49": 39903,
+    "50": 26697
+  },
+  "raw_by_loader": {
+    "A1": 3528,
+    "B1": 8616,
+    "B2": 16632,
+    "C1": 13599,
+    "C2": 22626,
+    "D1": 7755,
+    "T": 12762
+  },
+  "raw_by_start": {
+    "0": 9600,
+    "1": 9579,
+    "2": 9597,
+    "3": 14661,
+    "4": 14661,
+    "5": 14658,
+    "53": 12762
+  },
+  "raw_by_unloader": {
+    "1": 28413,
+    "2": 26973,
+    "3": 12192,
+    "4": 9417,
+    "5": 8523
+  },
+  "raw_output": "artifacts/tasks/g4irsf30/inputdata_flight_densified_3x.txt",
+  "raw_task_count": 85518,
+  "scale": 3,
+  "schema": "czr005.g4irsf30.workload_manifest.v1",
+  "source_raw_input": "legacy/jichang_origin_readonly/inputdata.txt",
+  "status": "COMPLETE",
+  "stream_count": 13,
+  "stream_key": [
+    "end",
+    "Unloader"
+  ],
+  "timing": {
+    "day_axis_seconds": 86400.0,
+    "earliest_entry_time": 8267.845453,
+    "earliest_std": 22200.0,
+    "latest_entry_time": 82703.72582,
+    "latest_std": 85900.0,
+    "rolling_days": 1,
+    "time_compression": 1.0
+  }
+}
