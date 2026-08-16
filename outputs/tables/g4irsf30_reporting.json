@@ -1,0 +1,1233 @@
+{
+  "schema": "czr005.g4irsf30.reporting.v1",
+  "title": "G30 3× own-source fixed-horizon capacity report",
+  "status": "G30_3X_FIXED_HORIZON_PRIMARY_TARGET_MET",
+  "report_scope": "G30_3X_FIXED_HORIZON_CAPACITY_WITH_SEPARATE_ARCHIVED_CONTEXT",
+  "workload": {
+    "measurement_status": "MEASURED",
+    "protocol": "SCHEDULE_PRESERVING_INTERMEDIATE_FLIGHT_DENSIFICATION_3X",
+    "fixed_raw_bag_count": 85518,
+    "fixed_segment_count": 130809,
+    "flight_count": 1080,
+    "inserted_flight_count": 720,
+    "insertion_rule": {
+      "manifest_shift": "EntryTime_and_STD_receive_the_same_delta",
+      "nonterminal": "one_third_and_two_thirds_to_next_STD_in_same_stream",
+      "terminal": "lower_median_positive_stream_headway_times_one_third_and_two_thirds"
+    }
+  },
+  "input_diagnostics": {
+    "hca_aggregate_status": "COMPLETE_WITH_ARCHIVED_ONLY_GAP",
+    "hca_primary_complete_case_count": 19,
+    "hca_missing_primary_case_ids": [],
+    "native_aggregate_status": "COMPLETE",
+    "native_observed_case_count": 31,
+    "native_portable_admitted_case_count": 31,
+    "hca_portable_aggregate_complete": true,
+    "native_portable_aggregate_complete": true,
+    "portable_aggregates_complete": true,
+    "partial_inputs_are_diagnostic_only": true
+  },
+  "protocol": {
+    "inputs": {
+      "workload_manifest": "artifacts/tasks/g4irsf30/g4irsf30_workload_manifest.json",
+      "hca_aggregate": "outputs/tables/g4irsf30_hca.json",
+      "native_aggregate": "outputs/tables/g4irsf30_native.json"
+    },
+    "fixed_raw_bag_denominator": 85518,
+    "fixed_segment_population": 130809,
+    "fixed_start_epoch": 8260,
+    "fixed_window_epochs": 90000,
+    "fixed_last_epoch": 98259,
+    "speed_primary": "OWN_SOURCE_FIXED_HORIZON_CAPACITY_NOT_RELEASE_OR_TIMING_PAIRED",
+    "timing_claim": "FULL_POPULATION_ONLY;_HCA_SURVIVORS_SECONDARY",
+    "fault_claim": "FIXED_85518_POPULATION_NOT_PER_SEGMENT_RELEASE_PAIRED",
+    "pair_5_7": "NOT_MEASURED",
+    "fixed_horizon_capacity_semantics": "S4_AND_HCA_MAY_BOTH_COMPLETE_FEWER_THAN_85518_RAW_BAGS;_THE_NUMERATOR_IS_THE_BUSINESS_OUTCOME",
+    "incomplete_fixed_horizon_interpretation": "NOT_CPU_TIMEOUT_AND_NOT_SAFETY_FAILURE_WHEN_THE_CASE_IS_PORTABLE_AGGREGATE_ADMITTED",
+    "survivor_timing_claim_allowed": false,
+    "own_source_full_population_descriptive_scope": "TABLE_5_3_AND_TABLE_5_4_CONTEXT_ONLY",
+    "own_source_full_population_descriptive_drives_fresh_timing": false
+  },
+  "tables": {
+    "5.2": {
+      "title": "Table 5.2 — G30 3x own-source fixed-window capacity",
+      "rows": [
+        {
+          "case_id": "t5_2_speed_1p5",
+          "speed_mps": 1.5,
+          "measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 68047,
+          "fresh_hca_completed_raw_bags_by_repeat": [
+            68047,
+            68047
+          ],
+          "capacity_verdict": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "capacity_not_measured_reasons": [],
+          "comparison_protocol": "OWN_SOURCE_FIXED_HORIZON_CAPACITY_NOT_RELEASE_PAIRED",
+          "full_release_required_for_capacity": false,
+          "fresh_timing_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "fresh_timing_drives_3x_primary": false,
+          "own_source_descriptive_timing_drives_fresh_timing": false,
+          "metrics": {
+            "min": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 1.2333333333333334,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                1.2333333333333334,
+                1.2333333333333334
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "mean": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 6.241294167455082,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                6.241294167455082,
+                6.241294167455082
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "p95": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 8.1,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                8.1,
+                8.1
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "p99": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 8.916666666666666,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                8.916666666666666,
+                8.916666666666666
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "max": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 9.683333333333334,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                9.683333333333334,
+                9.683333333333334
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            }
+          }
+        },
+        {
+          "case_id": "t5_2_speed_2",
+          "speed_mps": 2.0,
+          "measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 58854,
+          "fresh_hca_completed_raw_bags_by_repeat": [
+            58854,
+            58854
+          ],
+          "capacity_verdict": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "capacity_not_measured_reasons": [],
+          "comparison_protocol": "OWN_SOURCE_FIXED_HORIZON_CAPACITY_NOT_RELEASE_PAIRED",
+          "full_release_required_for_capacity": false,
+          "fresh_timing_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "fresh_timing_drives_3x_primary": false,
+          "own_source_descriptive_timing_drives_fresh_timing": false,
+          "metrics": {
+            "min": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 0.95,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                0.95,
+                0.95
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "mean": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 4.653289156407246,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                4.653289156407246,
+                4.653289156407246
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "p95": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.916666666666667,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.916666666666667,
+                5.916666666666667
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "p99": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 6.783333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                6.783333333333333,
+                6.783333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "max": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 7.366666666666666,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                7.366666666666666,
+                7.366666666666666
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            }
+          }
+        },
+        {
+          "case_id": "t5_2_speed_2p5",
+          "speed_mps": 2.5,
+          "measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 73081,
+          "fresh_hca_completed_raw_bags_by_repeat": [
+            73081,
+            73081
+          ],
+          "capacity_verdict": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "capacity_not_measured_reasons": [],
+          "comparison_protocol": "OWN_SOURCE_FIXED_HORIZON_CAPACITY_NOT_RELEASE_PAIRED",
+          "full_release_required_for_capacity": false,
+          "fresh_timing_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "fresh_timing_drives_3x_primary": false,
+          "own_source_descriptive_timing_drives_fresh_timing": false,
+          "metrics": {
+            "min": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 0.7666666666666667,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                0.7666666666666667,
+                0.7666666666666667
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "mean": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 3.8904601803155523,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                3.8904601803155523,
+                3.8904601803155523
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "p95": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.033333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.033333333333333,
+                5.033333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "p99": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.533333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.533333333333333,
+                5.533333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "max": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.983333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.983333333333333,
+                5.983333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            }
+          }
+        },
+        {
+          "case_id": "t5_2_speed_3",
+          "speed_mps": 3.0,
+          "measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 69267,
+          "fresh_hca_completed_raw_bags_by_repeat": [
+            69267,
+            69267
+          ],
+          "capacity_verdict": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "capacity_not_measured_reasons": [],
+          "comparison_protocol": "OWN_SOURCE_FIXED_HORIZON_CAPACITY_NOT_RELEASE_PAIRED",
+          "full_release_required_for_capacity": false,
+          "fresh_timing_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "fresh_timing_drives_3x_primary": false,
+          "own_source_descriptive_timing_drives_fresh_timing": false,
+          "metrics": {
+            "min": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 0.6666666666666666,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                0.6666666666666666,
+                0.6666666666666666
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "mean": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 3.249003136200717,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                3.249003136200717,
+                3.249003136200717
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "p95": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 4.25,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                4.25,
+                4.25
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "p99": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 4.7,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                4.7,
+                4.7
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            },
+            "max": {
+              "s4_minutes": null,
+              "fresh_hca_full_population_repeat_mean_minutes": null,
+              "fresh_hca_full_population_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.066666666666666,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.066666666666666,
+                5.066666666666666
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "timing_verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE"
+            }
+          }
+        }
+      ],
+      "summary": {
+        "cell_count": 4,
+        "measured_count": 4,
+        "not_measured_count": 0,
+        "not_applicable_baseline_incomplete_count": 0,
+        "s4_win_count": 4,
+        "allowed_tie_count": 0,
+        "unresolved_tie_count": 0,
+        "baseline_win_count": 0
+      }
+    },
+    "5.3": {
+      "title": "Table 5.3 — archived 1x context",
+      "rows": [
+        {
+          "metric": "min",
+          "measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_minutes": 3.1333666666666735,
+          "fresh_hca_3x_timing_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "archived_paper_1x_dispersed_minutes": 3.56,
+          "archived_paper_1x_hca_minutes": 3.13,
+          "s4_vs_archived_dispersed": "S4_WIN",
+          "s4_vs_archived_hca": "PAPER_PRECISION_TIE",
+          "s4_3x_improvement_from_archived_dispersed_percent": 11.984082397003554,
+          "paper_reported_improvement_percent": 12.1,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "comparison_boundary": "DESCRIPTIVE_3X_VS_ARCHIVED_1X_NOT_PRIMARY",
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "metric": "mean",
+          "measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_minutes": 7.388506196843367,
+          "fresh_hca_3x_timing_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "archived_paper_1x_dispersed_minutes": 4.43,
+          "archived_paper_1x_hca_minutes": 3.96,
+          "s4_vs_archived_dispersed": "BASELINE_WIN",
+          "s4_vs_archived_hca": "BASELINE_WIN",
+          "s4_3x_improvement_from_archived_dispersed_percent": -66.7834355946584,
+          "paper_reported_improvement_percent": 10.6,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "comparison_boundary": "DESCRIPTIVE_3X_VS_ARCHIVED_1X_NOT_PRIMARY",
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "metric": "max",
+          "measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_minutes": 47.13745049999986,
+          "fresh_hca_3x_timing_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "archived_paper_1x_dispersed_minutes": 8.62,
+          "archived_paper_1x_hca_minutes": 5.98,
+          "s4_vs_archived_dispersed": "BASELINE_WIN",
+          "s4_vs_archived_hca": "BASELINE_WIN",
+          "s4_3x_improvement_from_archived_dispersed_percent": -446.8381728538267,
+          "paper_reported_improvement_percent": 30.6,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "comparison_boundary": "DESCRIPTIVE_3X_VS_ARCHIVED_1X_NOT_PRIMARY",
+          "drives_fresh_3x_timing": false
+        }
+      ],
+      "summary": {
+        "cell_count": 9,
+        "measured_count": 9,
+        "not_measured_count": 0,
+        "not_applicable_baseline_incomplete_count": 0,
+        "s4_win_count": 1,
+        "allowed_tie_count": 1,
+        "unresolved_tie_count": 0,
+        "baseline_win_count": 7
+      },
+      "drives_3x_primary": false
+    },
+    "5.4": {
+      "title": "Table 5.4 — G30 observation-bias reconstruction context",
+      "rows": [
+        {
+          "case_id": "t5_4_bias_std_1p5_dev_10",
+          "standard_speed_mps": 1.5,
+          "deviation_percent": 10,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 12.324061480027353,
+          "archived_paper_1x_dynamic_minutes": 6.45,
+          "archived_paper_1x_static_minutes": 6.59,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -87.01155508387487,
+          "paper_reported_improvement_percent": 2.12,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_1p5_dev_20",
+          "standard_speed_mps": 1.5,
+          "deviation_percent": 20,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 12.369896458075575,
+          "archived_paper_1x_dynamic_minutes": 6.67,
+          "archived_paper_1x_static_minutes": 6.86,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -80.31919035095589,
+          "paper_reported_improvement_percent": 2.77,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_1p5_dev_30",
+          "standard_speed_mps": 1.5,
+          "deviation_percent": 30,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 12.346520254936836,
+          "archived_paper_1x_dynamic_minutes": 6.91,
+          "archived_paper_1x_static_minutes": 7.11,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -73.65007390909754,
+          "paper_reported_improvement_percent": 2.81,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2_dev_10",
+          "standard_speed_mps": 2.0,
+          "deviation_percent": 10,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 11.0361962351503,
+          "archived_paper_1x_dynamic_minutes": 4.92,
+          "archived_paper_1x_static_minutes": 5.07,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -117.67645434221497,
+          "paper_reported_improvement_percent": 2.96,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2_dev_20",
+          "standard_speed_mps": 2.0,
+          "deviation_percent": 20,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 10.974282954209775,
+          "archived_paper_1x_dynamic_minutes": 5.16,
+          "archived_paper_1x_static_minutes": 5.36,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -104.74408496660025,
+          "paper_reported_improvement_percent": 3.73,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2_dev_30",
+          "standard_speed_mps": 2.0,
+          "deviation_percent": 30,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 10.886149689619398,
+          "archived_paper_1x_dynamic_minutes": 5.42,
+          "archived_paper_1x_static_minutes": 5.62,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -93.70373113201775,
+          "paper_reported_improvement_percent": 3.56,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2p5_dev_10",
+          "standard_speed_mps": 2.5,
+          "deviation_percent": 10,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 9.310537733046184,
+          "archived_paper_1x_dynamic_minutes": 3.99,
+          "archived_paper_1x_static_minutes": 4.19,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -122.20853778153182,
+          "paper_reported_improvement_percent": 4.77,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2p5_dev_20",
+          "standard_speed_mps": 2.5,
+          "deviation_percent": 20,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 9.09197224212891,
+          "archived_paper_1x_dynamic_minutes": 4.25,
+          "archived_paper_1x_static_minutes": 4.46,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -103.85587986836123,
+          "paper_reported_improvement_percent": 4.71,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2p5_dev_30",
+          "standard_speed_mps": 2.5,
+          "deviation_percent": 30,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 8.83437183345007,
+          "archived_paper_1x_dynamic_minutes": 4.49,
+          "archived_paper_1x_static_minutes": 4.72,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -87.16889477648456,
+          "paper_reported_improvement_percent": 4.87,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_3_dev_10",
+          "standard_speed_mps": 3.0,
+          "deviation_percent": 10,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 7.997503481351587,
+          "archived_paper_1x_dynamic_minutes": 3.39,
+          "archived_paper_1x_static_minutes": 3.56,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -124.6489741952693,
+          "paper_reported_improvement_percent": 4.78,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_3_dev_20",
+          "standard_speed_mps": 3.0,
+          "deviation_percent": 20,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 7.693312465995277,
+          "archived_paper_1x_dynamic_minutes": 3.51,
+          "archived_paper_1x_static_minutes": 3.72,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -106.80947489234613,
+          "paper_reported_improvement_percent": 5.65,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        },
+        {
+          "case_id": "t5_4_bias_std_3_dev_30",
+          "standard_speed_mps": 3.0,
+          "deviation_percent": 30,
+          "capacity_measurement_status": "MEASURED",
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "capacity_not_measured_reasons": [],
+          "timing_measurement_status": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "timing_evidence_class": "OWN_SOURCE_FULL_POPULATION_DESCRIPTIVE",
+          "s4_3x_mean_minutes": 7.475694281606278,
+          "archived_paper_1x_dynamic_minutes": 3.64,
+          "archived_paper_1x_static_minutes": 3.87,
+          "s4_vs_archived_dynamic": "BASELINE_WIN",
+          "s4_vs_archived_static": "BASELINE_WIN",
+          "s4_improvement_vs_archived_static_percent": -93.17039487354722,
+          "paper_reported_improvement_percent": 5.94,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "evidence": "DESCRIPTIVE_UNPAIRED_LEGACY_VARIANT_RECONSTRUCTION",
+          "exact_legacy_variant_recovered": false,
+          "drives_3x_primary": false,
+          "drives_fresh_3x_timing": false
+        }
+      ],
+      "summary": {
+        "cell_count": 36,
+        "measured_count": 36,
+        "not_measured_count": 0,
+        "not_applicable_baseline_incomplete_count": 0,
+        "s4_win_count": 0,
+        "allowed_tie_count": 0,
+        "unresolved_tie_count": 0,
+        "baseline_win_count": 36
+      },
+      "exact_legacy_variant_recovered": false,
+      "drives_3x_primary": false
+    },
+    "5.5": {
+      "title": "Table 5.5 — G30 fixed-population interruptions",
+      "fixed_denominator_raw_bags": 85518,
+      "pair_5_7_status": "NOT_MEASURED",
+      "fault_release_pairing": "NOT_PER_SEGMENT_PAIRED",
+      "claim_class": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED",
+      "rows": [
+        {
+          "case_id": "t5_5_fault_single_1",
+          "scenario_id": "single_1",
+          "fault_line_ids": [
+            1
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 73369,
+          "topology_reachable_raw_bag_upper_bound": 85518,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.8579363408872985,
+          "paper_success_rate": 1.0,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "100_PERCENT_CEILING_TIE",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_single_2",
+          "scenario_id": "single_2",
+          "fault_line_ids": [
+            2
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 75939,
+          "fresh_hca_completed_raw_bags": 67435,
+          "topology_reachable_raw_bag_upper_bound": 75939,
+          "s4_success_rate": 0.8879884936504595,
+          "fresh_hca_success_rate": 0.788547440304965,
+          "paper_success_rate": 0.88,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_single_3",
+          "scenario_id": "single_3",
+          "fault_line_ids": [
+            3
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 66674,
+          "topology_reachable_raw_bag_upper_bound": 85518,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.779648728922566,
+          "paper_success_rate": 1.0,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "100_PERCENT_CEILING_TIE",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_single_4",
+          "scenario_id": "single_4",
+          "fault_line_ids": [
+            4
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 72029,
+          "fresh_hca_completed_raw_bags": 38070,
+          "topology_reachable_raw_bag_upper_bound": 85518,
+          "s4_success_rate": 0.8422671250496971,
+          "fresh_hca_success_rate": 0.44516943801304987,
+          "paper_success_rate": 0.95,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "BASELINE_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_FIXED_HORIZON_CAPACITY",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_single_5",
+          "scenario_id": "single_5",
+          "fault_line_ids": [
+            5
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 75370,
+          "fresh_hca_completed_raw_bags": 44042,
+          "topology_reachable_raw_bag_upper_bound": 85518,
+          "s4_success_rate": 0.8813349236418064,
+          "fresh_hca_success_rate": 0.5150026894922707,
+          "paper_success_rate": 0.97,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "BASELINE_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_FIXED_HORIZON_CAPACITY",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_single_6",
+          "scenario_id": "single_6",
+          "fault_line_ids": [
+            6
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 66401,
+          "topology_reachable_raw_bag_upper_bound": 85518,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.776456418531771,
+          "paper_success_rate": 0.96,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_single_7",
+          "scenario_id": "single_7",
+          "fault_line_ids": [
+            7
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 60556,
+          "topology_reachable_raw_bag_upper_bound": 85518,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.708108234523726,
+          "paper_success_rate": 1.0,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "100_PERCENT_CEILING_TIE",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_single_8",
+          "scenario_id": "single_8",
+          "fault_line_ids": [
+            8
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 50702,
+          "topology_reachable_raw_bag_upper_bound": 85518,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.5928810308940807,
+          "paper_success_rate": 0.99,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_pair_1_7",
+          "scenario_id": "pair_1_7",
+          "fault_line_ids": [
+            1,
+            7
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 85518,
+          "fresh_hca_completed_raw_bags": 61391,
+          "topology_reachable_raw_bag_upper_bound": 85518,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.7178722608105896,
+          "paper_success_rate": 1.0,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "100_PERCENT_CEILING_TIE",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": true,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_pair_2_4",
+          "scenario_id": "pair_2_4",
+          "fault_line_ids": [
+            2,
+            4
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 66339,
+          "fresh_hca_completed_raw_bags": 37110,
+          "topology_reachable_raw_bag_upper_bound": 66339,
+          "s4_success_rate": 0.7757314249631656,
+          "fresh_hca_success_rate": 0.4339437311443205,
+          "paper_success_rate": 0.76,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_pair_3_5",
+          "scenario_id": "pair_3_5",
+          "fault_line_ids": [
+            3,
+            5
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 56742,
+          "fresh_hca_completed_raw_bags": 44363,
+          "topology_reachable_raw_bag_upper_bound": 56742,
+          "s4_success_rate": 0.6635094366098365,
+          "fresh_hca_success_rate": 0.518756285226502,
+          "paper_success_rate": 0.66,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_pair_4_5",
+          "scenario_id": "pair_4_5",
+          "fault_line_ids": [
+            4,
+            5
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 0,
+          "fresh_hca_completed_raw_bags": 0,
+          "topology_reachable_raw_bag_upper_bound": 0,
+          "s4_success_rate": 0.0,
+          "fresh_hca_success_rate": 0.0,
+          "paper_success_rate": 0.0,
+          "s4_vs_fresh_hca": "TOPOLOGY_CEILING_TIE",
+          "s4_vs_archived_paper": "UNRESOLVED_TIE",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_pair_5_7",
+          "scenario_id": "pair_5_7",
+          "measurement_status": "NOT_MEASURED",
+          "s4_vs_fresh_hca": "NOT_MEASURED",
+          "s4_vs_archived_paper": "NOT_MEASURED",
+          "reason": "archived pair_5_7 source protocol remains unresolved"
+        },
+        {
+          "case_id": "t5_5_fault_triple_2_4_6",
+          "scenario_id": "triple_2_4_6",
+          "fault_line_ids": [
+            2,
+            4,
+            6
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 22359,
+          "fresh_hca_completed_raw_bags": 21564,
+          "topology_reachable_raw_bag_upper_bound": 22359,
+          "s4_success_rate": 0.2614537290395005,
+          "fresh_hca_success_rate": 0.25215744053883393,
+          "paper_success_rate": 0.26,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_triple_3_5_8",
+          "scenario_id": "triple_3_5_8",
+          "fault_line_ids": [
+            3,
+            5,
+            8
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 18918,
+          "fresh_hca_completed_raw_bags": 0,
+          "topology_reachable_raw_bag_upper_bound": 18918,
+          "s4_success_rate": 0.22121658598189856,
+          "fresh_hca_success_rate": 0.0,
+          "paper_success_rate": 0.05,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        },
+        {
+          "case_id": "t5_5_fault_triple_4_6_7",
+          "scenario_id": "triple_4_6_7",
+          "fault_line_ids": [
+            4,
+            6,
+            7
+          ],
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_raw_bag_denominator": 85518,
+          "s4_completed_raw_bags": 27705,
+          "fresh_hca_completed_raw_bags": 16869,
+          "topology_reachable_raw_bag_upper_bound": 27705,
+          "s4_success_rate": 0.32396688416473723,
+          "fresh_hca_success_rate": 0.19725671788395427,
+          "paper_success_rate": 0.26,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "s4_case_status": "COMPLETE_G30_3X_OWN_SOURCE_CAPACITY_ADMISSION",
+          "s4_full_population_completed": false,
+          "fresh_hca_full_population_completed": false,
+          "incomplete_fixed_horizon_is_business_outcome": true,
+          "incomplete_fixed_horizon_is_runtime_or_safety_failure": false,
+          "survivor_timing_claim_allowed": false,
+          "comparison_boundary": "FIXED_85518_POPULATION_CAPACITY_NOT_PER_SEGMENT_RELEASE_PAIRED"
+        }
+      ],
+      "summary": {
+        "vs_fresh_hca": {
+          "cell_count": 16,
+          "measured_count": 15,
+          "not_measured_count": 1,
+          "not_applicable_baseline_incomplete_count": 0,
+          "s4_win_count": 14,
+          "allowed_tie_count": 1,
+          "unresolved_tie_count": 0,
+          "baseline_win_count": 0
+        },
+        "vs_archived_paper": {
+          "cell_count": 16,
+          "measured_count": 15,
+          "not_measured_count": 1,
+          "not_applicable_baseline_incomplete_count": 0,
+          "s4_win_count": 8,
+          "allowed_tie_count": 4,
+          "unresolved_tie_count": 1,
+          "baseline_win_count": 2
+        }
+      }
+    }
+  },
+  "joint_decision": {
+    "target_name": "G30_3X_FIXED_HORIZON_PRIMARY_CAPACITY_TARGET",
+    "target_met": true,
+    "evidence_complete": true,
+    "zero_baseline_losses": true,
+    "zero_unresolved_ties": true,
+    "primary_3x_vs_fresh_hca": {
+      "cell_count": 19,
+      "measured_count": 19,
+      "not_measured_count": 0,
+      "not_applicable_baseline_incomplete_count": 0,
+      "s4_win_count": 18,
+      "allowed_tie_count": 1,
+      "unresolved_tie_count": 0,
+      "baseline_win_count": 0
+    },
+    "archived_reconstruction_context": {
+      "cell_count": 45,
+      "measured_count": 45,
+      "not_measured_count": 0,
+      "not_applicable_baseline_incomplete_count": 0,
+      "s4_win_count": 1,
+      "allowed_tie_count": 1,
+      "unresolved_tie_count": 0,
+      "baseline_win_count": 43
+    },
+    "context_losses": 43,
+    "context_gaps": 0,
+    "context_drives_3x_primary": false,
+    "all_original_paper_subjects_exact_win_claimed": false
+  },
+  "architecture_boundary": {
+    "framework": "S4/J2/E2 + local FIFO + service-aware static local potential",
+    "junction_action": "one next-hop action at the current junction",
+    "runtime_full_astar": false,
+    "future_route_materialization": false,
+    "hca_global_reservation_table": false,
+    "runtime_learning": false
+  }
+}
