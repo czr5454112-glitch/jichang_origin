@@ -1,0 +1,1177 @@
+{
+  "schema": "czr005.g4irsf29.reporting.v1",
+  "title": "G29 fresh 2× primary target report",
+  "report_scope": "FRESH_2X_FIXED_HORIZON_PRIMARY_WITH_SEPARATE_DESCRIPTIVE_CONTEXT",
+  "status": "G29_FRESH_2X_PRIMARY_TARGET_MET",
+  "workload": {
+    "measurement_status": "MEASURED",
+    "protocol": "SCHEDULE_PRESERVING_INTERMEDIATE_FLIGHT_DENSIFICATION_2X",
+    "fixed_raw_bag_count": 57012,
+    "fixed_segment_count": 87206,
+    "original_flight_count": 360,
+    "inserted_flight_count": 360,
+    "stream_count": 13,
+    "insertion_rule": {
+      "manifest_shift": "EntryTime_and_STD_receive_the_same_delta",
+      "nonterminal": "midpoint_to_next_STD_in_same_stream",
+      "terminal": "lower_median_positive_stream_headway_divided_by_2"
+    }
+  },
+  "protocol": {
+    "inputs": {
+      "workload_manifest": "artifacts/tasks/g4irsf29/g4irsf29_workload_manifest.json",
+      "hca_aggregate": "outputs/tables/g4irsf29_hca.json",
+      "native_aggregate": "outputs/tables/g4irsf29_native.json"
+    },
+    "fixed_raw_bag_denominator": 57012,
+    "fixed_segment_population": 87206,
+    "fixed_start_epoch": 8260,
+    "fixed_window_epochs": 90000,
+    "fixed_last_epoch": 98259,
+    "fixed_max_simulation_time": 98259.0,
+    "native_expected_case_count": 31,
+    "native_aggregate_fixed_horizon_admitted": true,
+    "native_aggregate_not_admitted_reasons": [],
+    "stable_and_bias_require_complete_exact_hca_release": true,
+    "stable_capacity_and_timing_are_separate_axes": true,
+    "fresh_timing_requires_both_full_populations_complete": true,
+    "hca_survivor_timing_scope": "CENSORED_SECONDARY_NOT_A_VERDICT",
+    "baseline_incomplete_speed_decision": "S4 full completion versus HCA incomplete completion is decided by fixed-population capacity; fresh timing is not applicable",
+    "fault_comparison": "fixed-population business outcome, not per-segment fault-release timing pairing",
+    "fault_claim_class": "FIXED_57012_POPULATION_CAPACITY_DESCRIPTIVE_NOT_PER_SEGMENT_RELEASE_PAIRED",
+    "tie_policy": "only physical resolution, paper precision, 100 percent, or proven topology ceilings are admissible",
+    "pair_5_7": "NOT_MEASURED"
+  },
+  "tables": {
+    "5.2": {
+      "title": "Table 5.2 — four conveyor speeds on the faithful 2x cohort",
+      "rows": [
+        {
+          "case_id": "t5_2_speed_1p5",
+          "speed_mps": 1.5,
+          "measurement_status": "MEASURED",
+          "capacity_measurement_status": "MEASURED",
+          "fresh_timing_measurement_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "s4_full_population_timing_status": "MEASURED",
+          "primary_decision_status": "COMPLETE_CAPACITY_DECISION_BASELINE_INCOMPLETE",
+          "capacity_not_measured_reasons": [],
+          "fresh_timing_not_measured_reasons": [],
+          "fresh_timing_non_applicable_reason": "HCA released the full population but did not complete it within the fixed horizon; survivor timing is censored",
+          "evidence": "EXACT_RELEASE_FIXED_POPULATION_CAPACITY",
+          "fixed_raw_bag_count": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 56822,
+          "fresh_hca_completed_raw_bags_by_repeat": [
+            56822,
+            56822
+          ],
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.996667368273346,
+          "capacity_verdict": "S4_WIN",
+          "business_throughput_bags_per_simulated_hour": {
+            "s4": 2280.48,
+            "fresh_hca": 2272.88,
+            "verdict": "S4_WIN"
+          },
+          "hca_timing_scope": "CENSORED_COMPLETED_SURVIVORS_SECONDARY",
+          "computational_throughput_diagnostic": {
+            "formal_metric": false,
+            "s4_raw_bags_per_wall_second": 1150.3184947864747,
+            "hca_raw_bags_per_wall_second": 149.51747771270925,
+            "interpretation": "implementation/runtime diagnostic, not simulated-clock baggage throughput"
+          },
+          "metrics": {
+            "min": {
+              "s4_minutes": 5.088922222221906,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.1,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.1,
+                5.1
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            },
+            "mean": {
+              "s4_minutes": 5.725105848671219,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 6.655409876456302,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                6.655409876456302,
+                6.655409876456302
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            },
+            "p95": {
+              "s4_minutes": 6.744511111111691,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 8.116666666666667,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                8.116666666666667,
+                8.116666666666667
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": false
+            },
+            "p99": {
+              "s4_minutes": 6.88201111111072,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 8.916666666666666,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                8.916666666666666,
+                8.916666666666666
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": false
+            },
+            "max": {
+              "s4_minutes": 8.472288888889064,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 9.633333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                9.633333333333333,
+                9.633333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            }
+          },
+          "formal_verdicts": [
+            "S4_WIN"
+          ],
+          "primary_decision_verdicts": [
+            "S4_WIN"
+          ]
+        },
+        {
+          "case_id": "t5_2_speed_2",
+          "speed_mps": 2.0,
+          "measurement_status": "MEASURED",
+          "capacity_measurement_status": "MEASURED",
+          "fresh_timing_measurement_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "s4_full_population_timing_status": "MEASURED",
+          "primary_decision_status": "COMPLETE_CAPACITY_DECISION_BASELINE_INCOMPLETE",
+          "capacity_not_measured_reasons": [],
+          "fresh_timing_not_measured_reasons": [],
+          "fresh_timing_non_applicable_reason": "HCA released the full population but did not complete it within the fixed horizon; survivor timing is censored",
+          "evidence": "EXACT_RELEASE_FIXED_POPULATION_CAPACITY",
+          "fixed_raw_bag_count": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 56992,
+          "fresh_hca_completed_raw_bags_by_repeat": [
+            56992,
+            56992
+          ],
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.9996491966603522,
+          "capacity_verdict": "S4_WIN",
+          "business_throughput_bags_per_simulated_hour": {
+            "s4": 2280.48,
+            "fresh_hca": 2279.68,
+            "verdict": "S4_WIN"
+          },
+          "hca_timing_scope": "CENSORED_COMPLETED_SURVIVORS_SECONDARY",
+          "computational_throughput_diagnostic": {
+            "formal_metric": false,
+            "s4_raw_bags_per_wall_second": 1195.8633849633263,
+            "hca_raw_bags_per_wall_second": 161.79266817328147,
+            "interpretation": "implementation/runtime diagnostic, not simulated-clock baggage throughput"
+          },
+          "metrics": {
+            "min": {
+              "s4_minutes": 3.8666999999998857,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 3.8833333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                3.8833333333333333,
+                3.8833333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            },
+            "mean": {
+              "s4_minutes": 4.322392263032325,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.0328329707093395,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.0328329707093395,
+                5.0328329707093395
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            },
+            "p95": {
+              "s4_minutes": 5.075066666666681,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 6.183333333333334,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                6.183333333333334,
+                6.183333333333334
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": false
+            },
+            "p99": {
+              "s4_minutes": 5.112566666666923,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 6.783333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                6.783333333333333,
+                6.783333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": false
+            },
+            "max": {
+              "s4_minutes": 5.679233333333104,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 7.366666666666666,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                7.366666666666666,
+                7.366666666666666
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            }
+          },
+          "formal_verdicts": [
+            "S4_WIN"
+          ],
+          "primary_decision_verdicts": [
+            "S4_WIN"
+          ]
+        },
+        {
+          "case_id": "t5_2_speed_2p5",
+          "speed_mps": 2.5,
+          "measurement_status": "MEASURED",
+          "capacity_measurement_status": "MEASURED",
+          "fresh_timing_measurement_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "s4_full_population_timing_status": "MEASURED",
+          "primary_decision_status": "COMPLETE_CAPACITY_DECISION_BASELINE_INCOMPLETE",
+          "capacity_not_measured_reasons": [],
+          "fresh_timing_not_measured_reasons": [],
+          "fresh_timing_non_applicable_reason": "HCA released the full population but did not complete it within the fixed horizon; survivor timing is censored",
+          "evidence": "EXACT_RELEASE_FIXED_POPULATION_CAPACITY",
+          "fixed_raw_bag_count": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 56917,
+          "fresh_hca_completed_raw_bags_by_repeat": [
+            56917,
+            56917
+          ],
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.998333684136673,
+          "capacity_verdict": "S4_WIN",
+          "business_throughput_bags_per_simulated_hour": {
+            "s4": 2280.48,
+            "fresh_hca": 2276.68,
+            "verdict": "S4_WIN"
+          },
+          "hca_timing_scope": "CENSORED_COMPLETED_SURVIVORS_SECONDARY",
+          "computational_throughput_diagnostic": {
+            "formal_metric": false,
+            "s4_raw_bags_per_wall_second": 1143.7837439979808,
+            "hca_raw_bags_per_wall_second": 195.90331169443166,
+            "interpretation": "implementation/runtime diagnostic, not simulated-clock baggage throughput"
+          },
+          "metrics": {
+            "min": {
+              "s4_minutes": 3.133366666666431,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 3.1333333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                3.1333333333333333,
+                3.1333333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            },
+            "mean": {
+              "s4_minutes": 3.544535598353571,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 4.104975666321135,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                4.104975666321135,
+                4.104975666321135
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            },
+            "p95": {
+              "s4_minutes": 4.146733333333153,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.033333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.033333333333333,
+                5.033333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": false
+            },
+            "p99": {
+              "s4_minutes": 5.02933333333316,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.516666666666667,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.516666666666667,
+                5.516666666666667
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": false
+            },
+            "max": {
+              "s4_minutes": 6.896733333333274,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.983333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.983333333333333,
+                5.983333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            }
+          },
+          "formal_verdicts": [
+            "S4_WIN"
+          ],
+          "primary_decision_verdicts": [
+            "S4_WIN"
+          ]
+        },
+        {
+          "case_id": "t5_2_speed_3",
+          "speed_mps": 3.0,
+          "measurement_status": "MEASURED",
+          "capacity_measurement_status": "MEASURED",
+          "fresh_timing_measurement_status": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "s4_full_population_timing_status": "MEASURED",
+          "primary_decision_status": "COMPLETE_CAPACITY_DECISION_BASELINE_INCOMPLETE",
+          "capacity_not_measured_reasons": [],
+          "fresh_timing_not_measured_reasons": [],
+          "fresh_timing_non_applicable_reason": "HCA released the full population but did not complete it within the fixed horizon; survivor timing is censored",
+          "evidence": "EXACT_RELEASE_FIXED_POPULATION_CAPACITY",
+          "fixed_raw_bag_count": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 56829,
+          "fresh_hca_completed_raw_bags_by_repeat": [
+            56829,
+            56829
+          ],
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.9967901494422227,
+          "capacity_verdict": "S4_WIN",
+          "business_throughput_bags_per_simulated_hour": {
+            "s4": 2280.48,
+            "fresh_hca": 2273.16,
+            "verdict": "S4_WIN"
+          },
+          "hca_timing_scope": "CENSORED_COMPLETED_SURVIVORS_SECONDARY",
+          "computational_throughput_diagnostic": {
+            "formal_metric": false,
+            "s4_raw_bags_per_wall_second": 1172.4720323455583,
+            "hca_raw_bags_per_wall_second": 169.8925426306551,
+            "interpretation": "implementation/runtime diagnostic, not simulated-clock baggage throughput"
+          },
+          "metrics": {
+            "min": {
+              "s4_minutes": 2.633366666666431,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 2.6333333333333333,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                2.6333333333333333,
+                2.6333333333333333
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            },
+            "mean": {
+              "s4_minutes": 2.9702021052097547,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 3.467984948999044,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                3.467984948999044,
+                3.467984948999044
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            },
+            "p95": {
+              "s4_minutes": 3.461177777777751,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 4.266666666666667,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                4.266666666666667,
+                4.266666666666667
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": false
+            },
+            "p99": {
+              "s4_minutes": 3.9772333333330825,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 4.945333333333353,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                4.945333333333353,
+                4.945333333333353
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": false
+            },
+            "max": {
+              "s4_minutes": 5.522288888888761,
+              "fresh_hca_repeat_mean_minutes": null,
+              "fresh_hca_repeat_values_minutes": [],
+              "fresh_hca_censored_survivor_repeat_mean_minutes": 5.066666666666666,
+              "fresh_hca_censored_survivor_repeat_values_minutes": [
+                5.066666666666666,
+                5.066666666666666
+              ],
+              "hca_censored_survivor_timing_drives_verdict": false,
+              "verdict": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+              "formal_original_paper_metric": true
+            }
+          },
+          "formal_verdicts": [
+            "S4_WIN"
+          ],
+          "primary_decision_verdicts": [
+            "S4_WIN"
+          ]
+        }
+      ],
+      "summary": {
+        "cell_count": 4,
+        "measured_count": 4,
+        "not_measured_count": 0,
+        "not_applicable_baseline_incomplete_count": 0,
+        "s4_win_count": 4,
+        "allowed_tie_count": 0,
+        "unresolved_tie_count": 0,
+        "baseline_win_count": 0
+      }
+    },
+    "5.3": {
+      "title": "Table 5.3 — 2.5 m/s algorithm comparison",
+      "evidence_boundary": "fresh 2x HCA is controlled; paper dispersed/HCA values are archived 1x context",
+      "rows": [
+        {
+          "metric": "min",
+          "measurement_status": "MEASURED",
+          "s4_2x_minutes": 3.133366666666431,
+          "fresh_hca_2x_minutes": null,
+          "fresh_hca_2x_censored_survivor_minutes": 3.1333333333333333,
+          "fresh_hca_2x_censored_survivor_drives_verdict": false,
+          "s4_vs_fresh_hca_2x": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "archived_paper_1x_dispersed_minutes": 3.56,
+          "archived_paper_1x_hca_minutes": 3.13,
+          "s4_2x_vs_archived_dispersed": "S4_WIN",
+          "s4_2x_vs_archived_hca": "PAPER_PRECISION_TIE",
+          "s4_2x_improvement_from_archived_dispersed_percent": 11.984082397010365,
+          "paper_reported_improvement_percent": 12.1,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "archived_comparison_boundary": "DESCRIPTIVE_2X_VS_ARCHIVED_1X_AT_PAPER_PRECISION"
+        },
+        {
+          "metric": "mean",
+          "measurement_status": "MEASURED",
+          "s4_2x_minutes": 3.544535598353571,
+          "fresh_hca_2x_minutes": null,
+          "fresh_hca_2x_censored_survivor_minutes": 4.104975666321135,
+          "fresh_hca_2x_censored_survivor_drives_verdict": false,
+          "s4_vs_fresh_hca_2x": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "archived_paper_1x_dispersed_minutes": 4.43,
+          "archived_paper_1x_hca_minutes": 3.96,
+          "s4_2x_vs_archived_dispersed": "S4_WIN",
+          "s4_2x_vs_archived_hca": "S4_WIN",
+          "s4_2x_improvement_from_archived_dispersed_percent": 19.98790974371171,
+          "paper_reported_improvement_percent": 10.6,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "archived_comparison_boundary": "DESCRIPTIVE_2X_VS_ARCHIVED_1X_AT_PAPER_PRECISION"
+        },
+        {
+          "metric": "max",
+          "measurement_status": "MEASURED",
+          "s4_2x_minutes": 6.896733333333274,
+          "fresh_hca_2x_minutes": null,
+          "fresh_hca_2x_censored_survivor_minutes": 5.983333333333333,
+          "fresh_hca_2x_censored_survivor_drives_verdict": false,
+          "s4_vs_fresh_hca_2x": "NOT_APPLICABLE_BASELINE_INCOMPLETE",
+          "archived_paper_1x_dispersed_minutes": 8.62,
+          "archived_paper_1x_hca_minutes": 5.98,
+          "s4_2x_vs_archived_dispersed": "S4_WIN",
+          "s4_2x_vs_archived_hca": "BASELINE_WIN",
+          "s4_2x_improvement_from_archived_dispersed_percent": 19.99149265274623,
+          "paper_reported_improvement_percent": 30.6,
+          "improvement_vs_paper_reported": "BASELINE_WIN",
+          "archived_comparison_boundary": "DESCRIPTIVE_2X_VS_ARCHIVED_1X_AT_PAPER_PRECISION"
+        }
+      ],
+      "summary": {
+        "cell_count": 9,
+        "measured_count": 9,
+        "not_measured_count": 0,
+        "not_applicable_baseline_incomplete_count": 0,
+        "s4_win_count": 5,
+        "allowed_tie_count": 1,
+        "unresolved_tie_count": 0,
+        "baseline_win_count": 3
+      }
+    },
+    "5.4": {
+      "title": "Table 5.4 — observation-bias reconstruction",
+      "exact_legacy_variant_recovered": false,
+      "comparison_boundary": "2x S4 reconstruction versus unpaired archived 1x values; not an exact legacy causal replay",
+      "rows": [
+        {
+          "case_id": "t5_4_bias_std_1p5_dev_10",
+          "standard_speed_mps": 1.5,
+          "deviation_percent": 10,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 5.975958455680467,
+          "archived_paper_1x_dynamic_minutes": 6.45,
+          "archived_paper_1x_static_minutes": 6.59,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 9.317777607276675,
+          "paper_reported_improvement_percent": 2.12,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_1p5_dev_20",
+          "standard_speed_mps": 1.5,
+          "deviation_percent": 20,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 6.027200128500989,
+          "archived_paper_1x_dynamic_minutes": 6.67,
+          "archived_paper_1x_static_minutes": 6.86,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 12.139939817769843,
+          "paper_reported_improvement_percent": 2.77,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_1p5_dev_30",
+          "standard_speed_mps": 1.5,
+          "deviation_percent": 30,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 6.111290461982009,
+          "archived_paper_1x_dynamic_minutes": 6.91,
+          "archived_paper_1x_static_minutes": 7.11,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 14.046547651448535,
+          "paper_reported_improvement_percent": 2.81,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2_dev_10",
+          "standard_speed_mps": 2.0,
+          "deviation_percent": 10,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 4.460772926569618,
+          "archived_paper_1x_dynamic_minutes": 4.92,
+          "archived_paper_1x_static_minutes": 5.07,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 12.01631308541188,
+          "paper_reported_improvement_percent": 2.96,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2_dev_20",
+          "standard_speed_mps": 2.0,
+          "deviation_percent": 20,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 4.5655927782676,
+          "archived_paper_1x_dynamic_minutes": 5.16,
+          "archived_paper_1x_static_minutes": 5.36,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 14.821030256201492,
+          "paper_reported_improvement_percent": 3.73,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2_dev_30",
+          "standard_speed_mps": 2.0,
+          "deviation_percent": 30,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 4.6659363249160295,
+          "archived_paper_1x_dynamic_minutes": 5.42,
+          "archived_paper_1x_static_minutes": 5.62,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 16.976221976583105,
+          "paper_reported_improvement_percent": 3.56,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2p5_dev_10",
+          "standard_speed_mps": 2.5,
+          "deviation_percent": 10,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 3.715189374437249,
+          "archived_paper_1x_dynamic_minutes": 3.99,
+          "archived_paper_1x_static_minutes": 4.19,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 11.331995836819846,
+          "paper_reported_improvement_percent": 4.77,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2p5_dev_20",
+          "standard_speed_mps": 2.5,
+          "deviation_percent": 20,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 3.7852269104856835,
+          "archived_paper_1x_dynamic_minutes": 4.25,
+          "archived_paper_1x_static_minutes": 4.46,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 15.129441468930862,
+          "paper_reported_improvement_percent": 4.71,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_2p5_dev_30",
+          "standard_speed_mps": 2.5,
+          "deviation_percent": 30,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 3.880505780500015,
+          "archived_paper_1x_dynamic_minutes": 4.49,
+          "archived_paper_1x_static_minutes": 4.72,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 17.785894480931876,
+          "paper_reported_improvement_percent": 4.87,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_3_dev_10",
+          "standard_speed_mps": 3.0,
+          "deviation_percent": 10,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 3.1046236007120904,
+          "archived_paper_1x_dynamic_minutes": 3.39,
+          "archived_paper_1x_static_minutes": 3.56,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 12.79147189010982,
+          "paper_reported_improvement_percent": 4.78,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_3_dev_20",
+          "standard_speed_mps": 3.0,
+          "deviation_percent": 20,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 3.205477067467163,
+          "archived_paper_1x_dynamic_minutes": 3.51,
+          "archived_paper_1x_static_minutes": 3.72,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 13.831261627226803,
+          "paper_reported_improvement_percent": 5.65,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        },
+        {
+          "case_id": "t5_4_bias_std_3_dev_30",
+          "standard_speed_mps": 3.0,
+          "deviation_percent": 30,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "s4_2x_mean_minutes": 3.304665632131355,
+          "archived_paper_1x_dynamic_minutes": 3.64,
+          "archived_paper_1x_static_minutes": 3.87,
+          "s4_vs_archived_dynamic": "S4_WIN",
+          "s4_vs_archived_static": "S4_WIN",
+          "s4_improvement_vs_archived_static_percent": 14.60812320074019,
+          "paper_reported_improvement_percent": 5.94,
+          "improvement_vs_paper_reported": "S4_WIN",
+          "evidence": "OBSERVATION_BIAS_RECONSTRUCTION_DESCRIPTIVE_UNPAIRED",
+          "exact_legacy_variant_recovered": false
+        }
+      ],
+      "summary": {
+        "cell_count": 36,
+        "measured_count": 36,
+        "not_measured_count": 0,
+        "not_applicable_baseline_incomplete_count": 0,
+        "s4_win_count": 36,
+        "allowed_tie_count": 0,
+        "unresolved_tie_count": 0,
+        "baseline_win_count": 0
+      }
+    },
+    "5.5": {
+      "title": "Table 5.5 — all-day line interruptions",
+      "fixed_denominator_raw_bags": 57012,
+      "claim_class": "FIXED_57012_POPULATION_CAPACITY_DESCRIPTIVE_NOT_PER_SEGMENT_RELEASE_PAIRED",
+      "fault_release_pairing": "NOT_PER_SEGMENT_PAIRED",
+      "pair_5_7_status": "NOT_MEASURED",
+      "rows": [
+        {
+          "case_id": "t5_5_fault_single_1",
+          "scenario_id": "single_1",
+          "fault_line_ids": [
+            1
+          ],
+          "affected_conveyor_count": 1,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 56894,
+          "topology_reachable_raw_bag_upper_bound": 57012,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.997930260296078,
+          "archived_paper_1x_success_rate": 1.0,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "100_PERCENT_CEILING_TIE",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_single_2",
+          "scenario_id": "single_2",
+          "fault_line_ids": [
+            2
+          ],
+          "affected_conveyor_count": 7,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 50626,
+          "fresh_hca_completed_raw_bags": 50583,
+          "topology_reachable_raw_bag_upper_bound": 50626,
+          "s4_success_rate": 0.8879884936504595,
+          "fresh_hca_success_rate": 0.8872342664702167,
+          "archived_paper_1x_success_rate": 0.88,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_single_3",
+          "scenario_id": "single_3",
+          "fault_line_ids": [
+            3
+          ],
+          "affected_conveyor_count": 5,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 57006,
+          "topology_reachable_raw_bag_upper_bound": 57012,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.9998947589981056,
+          "archived_paper_1x_success_rate": 1.0,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "100_PERCENT_CEILING_TIE",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_single_4",
+          "scenario_id": "single_4",
+          "fault_line_ids": [
+            4
+          ],
+          "affected_conveyor_count": 15,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 42592,
+          "topology_reachable_raw_bag_upper_bound": 57012,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.7470707921139409,
+          "archived_paper_1x_success_rate": 0.95,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_single_5",
+          "scenario_id": "single_5",
+          "fault_line_ids": [
+            5
+          ],
+          "affected_conveyor_count": 24,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 50520,
+          "topology_reachable_raw_bag_upper_bound": 57012,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.8861292359503262,
+          "archived_paper_1x_success_rate": 0.97,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_single_6",
+          "scenario_id": "single_6",
+          "fault_line_ids": [
+            6
+          ],
+          "affected_conveyor_count": 7,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 56817,
+          "topology_reachable_raw_bag_upper_bound": 57012,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.9965796674384341,
+          "archived_paper_1x_success_rate": 0.96,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_single_7",
+          "scenario_id": "single_7",
+          "fault_line_ids": [
+            7
+          ],
+          "affected_conveyor_count": 1,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 56932,
+          "topology_reachable_raw_bag_upper_bound": 57012,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.9985967866414088,
+          "archived_paper_1x_success_rate": 1.0,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "100_PERCENT_CEILING_TIE",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_single_8",
+          "scenario_id": "single_8",
+          "fault_line_ids": [
+            8
+          ],
+          "affected_conveyor_count": 7,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 55349,
+          "topology_reachable_raw_bag_upper_bound": 57012,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.9708307023082859,
+          "archived_paper_1x_success_rate": 0.99,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_pair_1_7",
+          "scenario_id": "pair_1_7",
+          "fault_line_ids": [
+            1,
+            7
+          ],
+          "affected_conveyor_count": 2,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 57012,
+          "fresh_hca_completed_raw_bags": 56938,
+          "topology_reachable_raw_bag_upper_bound": 57012,
+          "s4_success_rate": 1.0,
+          "fresh_hca_success_rate": 0.9987020276433032,
+          "archived_paper_1x_success_rate": 1.0,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "100_PERCENT_CEILING_TIE",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_pair_2_4",
+          "scenario_id": "pair_2_4",
+          "fault_line_ids": [
+            2,
+            4
+          ],
+          "affected_conveyor_count": 22,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 44226,
+          "fresh_hca_completed_raw_bags": 39566,
+          "topology_reachable_raw_bag_upper_bound": 44226,
+          "s4_success_rate": 0.7757314249631656,
+          "fresh_hca_success_rate": 0.6939942468252298,
+          "archived_paper_1x_success_rate": 0.76,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_pair_3_5",
+          "scenario_id": "pair_3_5",
+          "fault_line_ids": [
+            3,
+            5
+          ],
+          "affected_conveyor_count": 36,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 37828,
+          "fresh_hca_completed_raw_bags": 37751,
+          "topology_reachable_raw_bag_upper_bound": 37828,
+          "s4_success_rate": 0.6635094366098365,
+          "fresh_hca_success_rate": 0.6621588437521925,
+          "archived_paper_1x_success_rate": 0.66,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_pair_4_5",
+          "scenario_id": "pair_4_5",
+          "fault_line_ids": [
+            4,
+            5
+          ],
+          "affected_conveyor_count": 54,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 0,
+          "fresh_hca_completed_raw_bags": 0,
+          "topology_reachable_raw_bag_upper_bound": 0,
+          "s4_success_rate": 0.0,
+          "fresh_hca_success_rate": 0.0,
+          "archived_paper_1x_success_rate": 0.0,
+          "s4_vs_fresh_hca": "TOPOLOGY_CEILING_TIE",
+          "s4_vs_archived_paper": "UNRESOLVED_TIE",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_pair_5_7",
+          "scenario_id": "pair_5_7",
+          "fault_line_ids": [
+            5,
+            7
+          ],
+          "affected_conveyor_count": 12,
+          "measurement_status": "NOT_MEASURED",
+          "s4_vs_fresh_hca": "NOT_MEASURED",
+          "s4_vs_archived_paper": "NOT_MEASURED",
+          "reason": "archived-only pair_5_7 source protocol remains unresolved"
+        },
+        {
+          "case_id": "t5_5_fault_triple_2_4_6",
+          "scenario_id": "triple_2_4_6",
+          "fault_line_ids": [
+            2,
+            4,
+            6
+          ],
+          "affected_conveyor_count": 36,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 14906,
+          "fresh_hca_completed_raw_bags": 14906,
+          "topology_reachable_raw_bag_upper_bound": 14906,
+          "s4_success_rate": 0.2614537290395005,
+          "fresh_hca_success_rate": 0.2614537290395005,
+          "archived_paper_1x_success_rate": 0.26,
+          "s4_vs_fresh_hca": "TOPOLOGY_CEILING_TIE",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_triple_3_5_8",
+          "scenario_id": "triple_3_5_8",
+          "fault_line_ids": [
+            3,
+            5,
+            8
+          ],
+          "affected_conveyor_count": 51,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 12612,
+          "fresh_hca_completed_raw_bags": 0,
+          "topology_reachable_raw_bag_upper_bound": 12612,
+          "s4_success_rate": 0.22121658598189856,
+          "fresh_hca_success_rate": 0.0,
+          "archived_paper_1x_success_rate": 0.05,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        },
+        {
+          "case_id": "t5_5_fault_triple_4_6_7",
+          "scenario_id": "triple_4_6_7",
+          "fault_line_ids": [
+            4,
+            6,
+            7
+          ],
+          "affected_conveyor_count": 30,
+          "measurement_status": "MEASURED",
+          "not_measured_reasons": [],
+          "fixed_denominator_raw_bags": 57012,
+          "s4_completed_raw_bags": 18470,
+          "fresh_hca_completed_raw_bags": 11252,
+          "topology_reachable_raw_bag_upper_bound": 18470,
+          "s4_success_rate": 0.32396688416473723,
+          "fresh_hca_success_rate": 0.1973619588858486,
+          "archived_paper_1x_success_rate": 0.26,
+          "s4_vs_fresh_hca": "S4_WIN",
+          "s4_vs_archived_paper": "S4_WIN",
+          "comparison_boundary": "same 57012 population and fixed horizon; fault releases are not paired segment by segment"
+        }
+      ],
+      "summary": {
+        "vs_fresh_hca": {
+          "cell_count": 16,
+          "measured_count": 15,
+          "not_measured_count": 1,
+          "not_applicable_baseline_incomplete_count": 0,
+          "s4_win_count": 13,
+          "allowed_tie_count": 2,
+          "unresolved_tie_count": 0,
+          "baseline_win_count": 0
+        },
+        "vs_archived_paper": {
+          "cell_count": 16,
+          "measured_count": 15,
+          "not_measured_count": 1,
+          "not_applicable_baseline_incomplete_count": 0,
+          "s4_win_count": 10,
+          "allowed_tie_count": 4,
+          "unresolved_tie_count": 1,
+          "baseline_win_count": 0
+        }
+      }
+    }
+  },
+  "joint_decision": {
+    "target_name": "G29_FRESH_2X_PRIMARY_TARGET",
+    "target_scope": "fresh 2x fixed-horizon primary comparisons only",
+    "target_met": true,
+    "evidence_complete": true,
+    "zero_baseline_losses": true,
+    "zero_unresolved_ties": true,
+    "primary_2x_vs_fresh_hca": {
+      "cell_count": 19,
+      "measured_count": 19,
+      "not_measured_count": 0,
+      "not_applicable_baseline_incomplete_count": 0,
+      "s4_win_count": 17,
+      "allowed_tie_count": 2,
+      "unresolved_tie_count": 0,
+      "baseline_win_count": 0
+    },
+    "archived_reconstruction_context": {
+      "cell_count": 60,
+      "measured_count": 60,
+      "not_measured_count": 0,
+      "not_applicable_baseline_incomplete_count": 0,
+      "s4_win_count": 51,
+      "allowed_tie_count": 5,
+      "unresolved_tie_count": 1,
+      "baseline_win_count": 3
+    },
+    "context_evidence_complete": true,
+    "context_losses": 3,
+    "context_drives_2x_fresh_target": false,
+    "all_original_paper_subjects_exact_win_claimed": false,
+    "claim_boundary": "the 2x fresh target uses Table 5.2 per-speed fixed-horizon decisions and Table 5.5 fresh fixed-population completion; all archived 1x arms and Table 5.4 are unpaired descriptive context only"
+  },
+  "architecture_boundary": {
+    "framework": "S4/J2/E2 + local FIFO + service-aware static local potential",
+    "junction_action": "one next-hop action at the current junction",
+    "runtime_full_astar": false,
+    "future_route_materialization": false,
+    "hca_global_reservation_table": false,
+    "runtime_learning": false
+  }
+}

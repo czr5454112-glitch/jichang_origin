@@ -1,0 +1,101 @@
+{
+  "canonical_output": "artifacts/tasks/g4irsf29/inputdata_flight_densified_2x.jsonl",
+  "direct_raw_task_count": 26818,
+  "early_split_raw_task_count": 30194,
+  "expanded_by_start": {
+    "0": 6400,
+    "1": 6386,
+    "2": 6398,
+    "3": 9774,
+    "4": 9774,
+    "5": 9772,
+    "52": 30194,
+    "53": 8508
+  },
+  "expanded_segment_count": 87206,
+  "flight_count": 720,
+  "flight_csv_output": "artifacts/tasks/g4irsf29/g4irsf29_flights.csv",
+  "flight_key": [
+    "STD",
+    "end",
+    "Unloader"
+  ],
+  "input_expanded_segment_count": 43603,
+  "input_flight_count": 360,
+  "input_raw_task_count": 28506,
+  "inserted_flight_count": 360,
+  "inserted_id_offset": 28506,
+  "insertion_rule": {
+    "manifest_shift": "EntryTime_and_STD_receive_the_same_delta",
+    "nonterminal": "midpoint_to_next_STD_in_same_stream",
+    "terminal": "lower_median_positive_stream_headway_divided_by_2"
+  },
+  "invariants": {
+    "canonical_was_expanded_from_generated_raw": true,
+    "categorical_manifest_is_copied_per_inserted_flight": true,
+    "direct_count_is_exactly_2x": true,
+    "early_split_count_is_exactly_2x": true,
+    "expanded_segment_count_is_exactly_2x": true,
+    "raw_task_count_is_exactly_2x": true,
+    "same_day_no_time_compression": true,
+    "slack_and_storage_class_are_preserved": true
+  },
+  "lifecycle": {
+    "bag_id_rule": "original task_id retained; inserted task_id equals inserted_id_offset plus source row rank",
+    "early_bag_threshold_seconds": 4800.0,
+    "segment_id_rule": "<task_id>:direct|storage_in|storage_out",
+    "storage_in_goal": 47,
+    "storage_out_lead_seconds": 2700.0,
+    "storage_out_start": 52
+  },
+  "original_flight_count": 360,
+  "protocol": "SCHEDULE_PRESERVING_INTERMEDIATE_FLIGHT_DENSIFICATION_2X",
+  "raw_by_end": {
+    "48": 12612,
+    "49": 26602,
+    "50": 17798
+  },
+  "raw_by_loader": {
+    "A1": 2352,
+    "B1": 5744,
+    "B2": 11088,
+    "C1": 9066,
+    "C2": 15084,
+    "D1": 5170,
+    "T": 8508
+  },
+  "raw_by_start": {
+    "0": 6400,
+    "1": 6386,
+    "2": 6398,
+    "3": 9774,
+    "4": 9774,
+    "5": 9772,
+    "53": 8508
+  },
+  "raw_by_unloader": {
+    "1": 18942,
+    "2": 17982,
+    "3": 8128,
+    "4": 6278,
+    "5": 5682
+  },
+  "raw_output": "artifacts/tasks/g4irsf29/inputdata_flight_densified_2x.txt",
+  "raw_task_count": 57012,
+  "schema": "czr005.g4irsf29.workload_manifest.v1",
+  "source_raw_input": "legacy/jichang_origin_readonly/inputdata.txt",
+  "status": "COMPLETE",
+  "stream_count": 13,
+  "stream_key": [
+    "end",
+    "Unloader"
+  ],
+  "timing": {
+    "earliest_entry_time": 8267.845453,
+    "earliest_std": 22200.0,
+    "latest_entry_time": 82403.72582,
+    "latest_std": 85500.0,
+    "rolling_days": 1,
+    "time_compression": 1.0
+  }
+}
