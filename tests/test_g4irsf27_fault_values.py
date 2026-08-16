@@ -172,6 +172,62 @@ def test_source_reject_filters_only_unreachable_segment_of_same_task(
     assert evidence["source_rejected_unreachable_segment_count"] == 1
 
 
+def test_service_aware_fault_residual_cancels_to_travel_only_structural_value(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    prefix = _prefix([_row("reachable", 1, 0, 2)])
+    nodes = [
+        (0, 1, 0.0, 1, 0, [1, 2]),
+        (1, 1, 4.0, 1, 0, [2]),
+        (2, 1, 0.0, 1, 0, []),
+    ]
+    edges = [
+        (0, 1, 1.0, 1.0),
+        (1, 2, 1.0, 1.0),
+        (0, 2, 3.0, 1.0),
+    ]
+
+    monkeypatch.setattr(
+        g27.g26,
+        "build_s4_request",
+        lambda case, supplied, binary: (
+            {
+                "node_records": nodes,
+                "edge_records": edges,
+                "heuristic_time": [[77.0] * 3 for _ in range(3)],
+                "bag_records": [],
+            },
+            {"fault": {"fixed_runtime_limit": 98_259.0}},
+        ),
+    )
+
+    request, runtime_rows, rejected, evidence = g27.prepare_request(
+        {"seed_edges": [[0, 2]]},
+        prefix,
+        binary=tmp_path / "unused.pyd",
+        service_aware_potential=True,
+    )
+
+    assert len(runtime_rows) == 1
+    assert rejected == ()
+    static = request["heuristic_time"][0][2]
+    residual = next(
+        row["residual_seconds"]
+        for row in request["g4irsf24_dlp_artifact"]["value_residuals"]
+        if row["node"] == 0 and row["goal"] == 2
+    )
+    # The surviving 0->1->2 travel-only structural distance is two seconds.
+    assert static + residual == pytest.approx(2.0)
+    assert static != pytest.approx(77.0)
+    assert evidence["service_aware_potential"]["enabled"] is True
+    assert evidence["artifact_contract"]["dynamic_distance_semantics"] == (
+        "surviving_edge_travel_time_only"
+    )
+    assert evidence["artifact_contract"]["residual_reference"] == (
+        "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL"
+    )
+
+
 def _safe_summary(*, completed: int = 2) -> dict[str, object]:
     summary: dict[str, object] = {
         name: 0 for name in g24.HARD_SAFETY_ZERO_FIELDS
@@ -259,7 +315,7 @@ def test_case_cli_atomically_persists_main_gate_status(
     monkeypatch.setattr(
         g27,
         "execute_case",
-        lambda case_id, segments, binary: {
+        lambda case_id, segments, binary, service_aware_potential: {
             "schema": g27.SCHEMA,
             "status": status,
             "case": {"case_id": case_id},
@@ -283,3 +339,47 @@ def test_case_cli_atomically_persists_main_gate_status(
     assert code == expected_code
     assert json.loads(output.read_text(encoding="utf-8"))["status"] == status
     assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_case_cli_forwards_explicit_service_aware_option(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    captured: dict[str, object] = {}
+    output = tmp_path / "g28_fault_case.json"
+
+    def fake_execute(
+        case_id: str,
+        *,
+        segments: int,
+        binary: Path,
+        service_aware_potential: bool,
+    ) -> dict[str, object]:
+        captured.update(
+            case_id=case_id,
+            segments=segments,
+            binary=binary,
+            service_aware_potential=service_aware_potential,
+        )
+        return {
+            "schema": g27.SCHEMA,
+            "status": g27.ADMITTED_STATUS,
+            "case": {"case_id": case_id},
+        }
+
+    monkeypatch.setattr(g27, "execute_case", fake_execute)
+
+    assert g27.main(
+        [
+            "case",
+            "--case-id",
+            "t5_5_fault_single_4",
+            "--segments",
+            "512",
+            "--binary",
+            str(tmp_path / "runtime.pyd"),
+            "--output",
+            str(output),
+            "--service-aware-potential",
+        ]
+    ) == 0
+    assert captured["service_aware_potential"] is True
