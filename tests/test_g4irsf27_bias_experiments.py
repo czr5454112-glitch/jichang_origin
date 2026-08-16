@@ -130,8 +130,14 @@ def test_g26_derating_is_a_separate_stress_not_table_5_4_evidence() -> None:
 
 
 class _FakeBiasBackend:
-    def __init__(self, mean_minutes: float = 4.0) -> None:
+    def __init__(
+        self,
+        mean_minutes: float = 4.0,
+        *,
+        service_aware_potential: bool = False,
+    ) -> None:
         self.mean_minutes = mean_minutes
+        self.service_aware_potential = service_aware_potential
         self.calls: list[dict] = []
 
     def run_case(self, *, case, release_csv: Path, bias_plan):
@@ -143,12 +149,19 @@ class _FakeBiasBackend:
                 "maximum_seconds": bias_plan.maximum_seconds,
             }
         )
-        return {
+        result = {
             "status": "COMPLETE",
             "tth_mean_minutes": self.mean_minutes,
             "selected_segment_count": 43_603,
             "selected_raw_bag_count": 28_506,
         }
+        if self.service_aware_potential:
+            result["service_aware_potential"] = {
+                "enabled": True,
+                "change_scope": "heuristic_time_only",
+                "contract": {"mode": "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL"},
+            }
+        return result
 
 
 def test_fake_backend_seam_runs_without_native_abi_and_builds_report() -> None:
@@ -179,13 +192,33 @@ def test_fake_backend_seam_runs_without_native_abi_and_builds_report() -> None:
     assert "1/12 admitted case results passed all strict safety gates" in markdown
 
 
+def test_service_aware_bias_result_records_the_explicit_potential_contract() -> None:
+    backend = _FakeBiasBackend(service_aware_potential=True)
+
+    result = g27.execute_case(
+        "t5_4_bias_std_2p5_dev_20",
+        backend=backend,
+        service_aware_potential=True,
+    )
+
+    evidence = result["runtime_protocol"]["service_aware_potential"]
+    assert evidence["enabled"] is True
+    assert evidence["change_scope"] == "heuristic_time_only"
+    assert evidence["contract"]["mode"] == (
+        "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL"
+    )
+
+
+@pytest.mark.parametrize("service_aware_potential", [False, True])
 def test_native_adapter_reuses_nominal_g26_request_and_aggregates_gates(
     monkeypatch: pytest.MonkeyPatch,
+    service_aware_potential: bool,
 ) -> None:
     from czr005 import cpp_backend
     from scripts.eval import g4irsf12_reproducible_harness as harness
     from scripts.eval import run_g4irsf24_native_race as g24
     from scripts.eval import run_g4irsf26_paper_experiments as g26
+    from scripts.eval import run_g4irsf28_service_potential as g28
 
     prefix = SimpleNamespace(rows=[{"task_id": 1}], raw_bag_count=28_506)
     captured: dict = {}
@@ -216,6 +249,19 @@ def test_native_adapter_reuses_nominal_g26_request_and_aggregates_gates(
         return {"ordinary_request": True}, {"speed": {"actual": 2.5}}
 
     monkeypatch.setattr(g26, "build_s4_request", fake_request)
+
+    def fake_apply_service_potential(request):
+        captured["service_potential_input"] = dict(request)
+        return {
+            **request,
+            "heuristic_time": [[0.0]],
+        }, {"mode": "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL"}
+
+    monkeypatch.setattr(
+        g28,
+        "apply_service_aware_potential",
+        fake_apply_service_potential,
+    )
 
     def fake_runtime(**request):
         captured["request"] = dict(request)
@@ -264,7 +310,10 @@ def test_native_adapter_reuses_nominal_g26_request_and_aggregates_gates(
     )
 
     case = g27.case_by_id("t5_4_bias_std_2p5_dev_20")
-    backend = g27._NativeObservationBiasBackend(Path(g27.__file__))
+    backend = g27._NativeObservationBiasBackend(
+        Path(g27.__file__),
+        service_aware_potential=service_aware_potential,
+    )
     summary = backend.run_case(
         case=case,
         release_csv=g27.SPEED_RELEASE_CSV[2.5],
@@ -280,6 +329,13 @@ def test_native_adapter_reuses_nominal_g26_request_and_aggregates_gates(
         g27.FIXED_OBSERVATION_BIAS_SEED
     )
     assert captured["request"]["queue_discipline"] == "fifo"
+    assert ("heuristic_time" in captured["request"]) is service_aware_potential
+    assert (
+        "service_aware_potential" in summary
+    ) is service_aware_potential
+    assert captured["request"]["scenario"].startswith(
+        "g4irsf28_" if service_aware_potential else "g4irsf27_"
+    )
     assert summary["status"] == "COMPLETE"
     assert summary["tth_mean_minutes"] == 4.0
     assert summary["queue_discipline"] == "fifo"

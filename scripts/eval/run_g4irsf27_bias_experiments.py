@@ -306,8 +306,14 @@ def _load_native_module(binary: Path) -> Any:
 
 
 class _NativeObservationBiasBackend:
-    def __init__(self, binary: Path) -> None:
+    def __init__(
+        self,
+        binary: Path,
+        *,
+        service_aware_potential: bool = False,
+    ) -> None:
         self._binary = binary
+        self._service_aware_potential = service_aware_potential
 
     def run_case(
         self,
@@ -316,8 +322,9 @@ class _NativeObservationBiasBackend:
         release_csv: Path,
         bias_plan: ObservationBiasPlan,
     ) -> Mapping[str, Any]:
-        # Reuse the exact G26/G24 request path.  The only runtime delta is the
-        # append-only observation-delay pair; both graph speeds stay nominal.
+        # Reuse the exact G26/G24 request path.  The observation-delay pair is
+        # the only runtime delta; the explicit G28 option changes only the
+        # precomputed heuristic matrix.  Both graph speeds stay nominal.
         from czr005 import cpp_backend
         from scripts.eval import g4irsf12_reproducible_harness as harness
         from scripts.eval import run_g4irsf24_native_race as g24
@@ -336,8 +343,17 @@ class _NativeObservationBiasBackend:
             prefix,
             binary=self._binary,
         )
+        potential_contract: Mapping[str, Any] | None = None
+        if self._service_aware_potential:
+            from scripts.eval import run_g4irsf28_service_potential as g28
+
+            request, potential_contract = g28.apply_service_aware_potential(request)
         request.update(
-            scenario=f"g4irsf27_{case['case_id']}",
+            scenario=(
+                f"g4irsf28_{case['case_id']}"
+                if potential_contract is not None
+                else f"g4irsf27_{case['case_id']}"
+            ),
             queue_discipline=ACTIVE_QUEUE_DISCIPLINE,
             legacy_observation_bias_max_seconds=bias_plan.maximum_seconds,
             legacy_observation_bias_seed=bias_plan.seed,
@@ -396,7 +412,7 @@ class _NativeObservationBiasBackend:
             and all(bias_echo_gates.values())
         )
         minutes = outcome["paper_raw_bag_tth"]["distribution"]["minutes"]
-        return {
+        result = {
             "status": "COMPLETE" if admitted else "FAILED_STRICT_S4_GATE",
             "tth_mean_minutes": minutes["mean"],
             "tth_distribution_minutes": dict(minutes),
@@ -420,9 +436,20 @@ class _NativeObservationBiasBackend:
             "nominal_speed_reconstruction": reconstruction,
             "native_wall_seconds": wall_seconds,
         }
+        if potential_contract is not None:
+            result["service_aware_potential"] = {
+                "enabled": True,
+                "change_scope": "heuristic_time_only",
+                "contract": dict(potential_contract),
+            }
+        return result
 
 
-def native_backend_or_raise(binary: Path) -> ObservationBiasBackend:
+def native_backend_or_raise(
+    binary: Path,
+    *,
+    service_aware_potential: bool = False,
+) -> ObservationBiasBackend:
     """Verify the append-only ABI pair, failing before simulation starts."""
 
     from czr005 import cpp_backend
@@ -461,7 +488,10 @@ def native_backend_or_raise(binary: Path) -> ObservationBiasBackend:
             f"{', '.join(missing_native or NATIVE_ABI_ARGUMENTS)}; this build "
             "does not expose them. No full run was started."
         )
-    return _NativeObservationBiasBackend(resolved_binary)
+    return _NativeObservationBiasBackend(
+        resolved_binary,
+        service_aware_potential=service_aware_potential,
+    )
 
 
 def _validate_backend_summary(summary: Mapping[str, Any]) -> dict[str, Any]:
@@ -485,8 +515,9 @@ def execute_case(
     backend: ObservationBiasBackend | None = None,
     *,
     binary: Path | None = None,
+    service_aware_potential: bool = False,
 ) -> dict[str, Any]:
-    """Run one case through an injected backend or the required native hook."""
+    """Run one case, optionally replacing only its static local potential."""
 
     case = case_by_id(case_id)
     release_csv = ROOT / case["release_csv"]
@@ -497,7 +528,12 @@ def execute_case(
     if backend is None and binary is None:
         raise ValueError("binary is required for native G27 execution")
     selected_backend = (
-        backend if backend is not None else native_backend_or_raise(binary)
+        backend
+        if backend is not None
+        else native_backend_or_raise(
+            binary,
+            service_aware_potential=service_aware_potential,
+        )
     )
     run_case = getattr(selected_backend, "run_case", None)
     if not callable(run_case):
@@ -510,9 +546,19 @@ def execute_case(
     summary = _validate_backend_summary(
         run_case(case=case, release_csv=release_csv, bias_plan=plan)
     )
+    potential_evidence = summary.get("service_aware_potential")
+    if service_aware_potential and not isinstance(potential_evidence, Mapping):
+        raise ValueError(
+            "service-aware bias execution must return its potential contract"
+        )
     archived = case["archived_paper_reported"]
     current_mean = summary["tth_mean_minutes"]
     admitted = summary["status"] == "COMPLETE"
+    runtime_protocol: dict[str, Any] = {
+        "queue_discipline": case["queue_discipline"],
+    }
+    if isinstance(potential_evidence, Mapping):
+        runtime_protocol["service_aware_potential"] = dict(potential_evidence)
     return {
         "schema": CASE_RESULT_SCHEMA,
         "case_id": case_id,
@@ -522,9 +568,7 @@ def execute_case(
         "physical_edge_speed_mps": case["physical_edge_speed_mps"],
         "deviation_percent": case["deviation_percent"],
         "release_csv": case["release_csv"],
-        "runtime_protocol": {
-            "queue_discipline": case["queue_discipline"],
-        },
+        "runtime_protocol": runtime_protocol,
         "observation_bias": dict(bias),
         "archived_paper_reported": dict(archived),
         "recovered_raw_evidence": case["recovered_raw_evidence"],
@@ -700,6 +744,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     run_parser.add_argument("--case-id", required=True)
     run_parser.add_argument("--binary", required=True, type=Path)
     run_parser.add_argument("--output", type=Path)
+    run_parser.add_argument(
+        "--service-aware-potential",
+        action="store_true",
+        help=(
+            "replace only heuristic_time with the G28 service-aware static "
+            "local potential"
+        ),
+    )
 
     report_parser = commands.add_parser("report", help="render saved case results")
     report_parser.add_argument("--result", action="append", type=Path, default=[])
@@ -713,7 +765,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     if args.command == "run-case":
         try:
-            result = execute_case(args.case_id, binary=args.binary)
+            result = execute_case(
+                args.case_id,
+                binary=args.binary,
+                service_aware_potential=args.service_aware_potential,
+            )
         except ObservationBiasAbiUnavailable as exc:
             print(str(exc), file=sys.stderr)
             return 2

@@ -275,16 +275,26 @@ def prepare_request(
     prefix: harness.InputPrefix,
     *,
     binary: Path,
+    service_aware_potential: bool = False,
 ) -> tuple[dict[str, Any], tuple[dict[str, Any], ...], tuple[dict[str, Any], ...], dict[str, Any]]:
-    """Build G26 S4, enable local FIFO, then add fault-local values if needed."""
+    """Build FIFO S4, optionally replace its potential, then add fault values."""
 
     request, reconstruction = g26.build_s4_request(case, prefix, binary=binary)
     request["queue_discipline"] = G27_QUEUE_DISCIPLINE
+    potential_contract: Mapping[str, Any] | None = None
+    if service_aware_potential:
+        # Imported lazily because the G28 no-fault runner itself reuses this
+        # G27 request builder.  The shared helper changes only heuristic_time.
+        from scripts.eval import run_g4irsf28_service_potential as g28
+
+        request, potential_contract = g28.apply_service_aware_potential(request)
     active_policy = {
         "choice": "local_junction_fifo_arbitration",
         "queue_discipline": G27_QUEUE_DISCIPLINE,
         "scope": "one_junction_local_queue",
     }
+    if potential_contract is not None:
+        active_policy["static_potential"] = potential_contract["mode"]
     rejected: tuple[dict[str, Any], ...] = ()
     runtime_rows: tuple[dict[str, Any], ...] = tuple(dict(row) for row in prefix.rows)
     seed_edges = tuple(tuple(int(part) for part in edge) for edge in case["seed_edges"])
@@ -293,7 +303,7 @@ def prepare_request(
             raise FaultValueError(
                 "no-fault G27 request must leave the fault-value/DLP seam exactly off"
             )
-        return request, runtime_rows, rejected, {
+        evidence = {
             "activation": "FAULT_VALUES_DLP_EXACT_OFF_NO_FAULT_CASE",
             "active_policy": active_policy,
             "source_rejected_unreachable_segment_count": 0,
@@ -307,6 +317,13 @@ def prepare_request(
             "artifact_contract": None,
             "g26_reconstruction": reconstruction,
         }
+        if potential_contract is not None:
+            evidence["service_aware_potential"] = {
+                "enabled": True,
+                "change_scope": "heuristic_time_only",
+                "contract": dict(potential_contract),
+            }
+        return request, runtime_rows, rejected, evidence
 
     goals = sorted({int(row["goal"]) for row in prefix.rows})
     distances, relaxation = local_bellman_fixed_point(
@@ -332,8 +349,18 @@ def prepare_request(
         request["heuristic_time"],
         distances,
     )
+    if potential_contract is not None:
+        artifact_contract = {
+            **artifact_contract,
+            "dynamic_distance_semantics": "surviving_edge_travel_time_only",
+            "residual_reference": potential_contract["mode"],
+            "fault_takeover_identity": (
+                "service_aware_static_potential_plus_value_residual_equals_"
+                "fault_structural_travel_time_distance"
+            ),
+        }
     request["g4irsf24_dlp_artifact"] = artifact
-    return request, runtime_rows, rejected, {
+    evidence = {
         "activation": "FAULT_ONLY_STRUCTURAL_TD_ACTIVE",
         "active_policy": active_policy,
         "source_rejected_unreachable_segment_count": len(rejected),
@@ -348,6 +375,13 @@ def prepare_request(
         "artifact_contract": artifact_contract,
         "g26_reconstruction": reconstruction,
     }
+    if potential_contract is not None:
+        evidence["service_aware_potential"] = {
+            "enabled": True,
+            "change_scope": "heuristic_time_only",
+            "contract": dict(potential_contract),
+        }
+    return request, runtime_rows, rejected, evidence
 
 
 def _finite_number(summary: Mapping[str, Any], name: str) -> float | None:
@@ -513,8 +547,9 @@ def execute_case(
     *,
     segments: int,
     binary: Path,
+    service_aware_potential: bool = False,
 ) -> dict[str, Any]:
-    """Run one registered G26 case under the minimal G27 local-value policy."""
+    """Run a G26 case under G27 values and the optional G28 potential."""
 
     if segments not in ALLOWED_SEGMENT_COUNTS:
         raise FaultValueError(f"segments must be one of {ALLOWED_SEGMENT_COUNTS}")
@@ -534,6 +569,7 @@ def execute_case(
         case,
         prefix,
         binary=binary.resolve(strict=True),
+        service_aware_potential=service_aware_potential,
     )
     topology = g26.topology_reachable_raw_bag_upper_bound(
         prefix.rows,
@@ -645,6 +681,11 @@ def execute_case(
                 "structural_fault_local_scalar_policy_not_learning_not_per_bag_route_"
                 "not_global_reservation_not_physical_distributed_deployment"
             ),
+            **(
+                {"service_aware_potential": local["service_aware_potential"]}
+                if "service_aware_potential" in local
+                else {}
+            ),
         },
         "local_values": local,
         "outcome": {
@@ -703,6 +744,14 @@ def _parser() -> argparse.ArgumentParser:
     case.add_argument("--segments", type=int, required=True, choices=ALLOWED_SEGMENT_COUNTS)
     case.add_argument("--binary", type=Path, required=True)
     case.add_argument("--output", type=Path, required=True)
+    case.add_argument(
+        "--service-aware-potential",
+        action="store_true",
+        help=(
+            "replace only heuristic_time with the G28 service-aware static "
+            "local potential before fault residual construction"
+        ),
+    )
     return parser
 
 
@@ -714,6 +763,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.case_id,
         segments=args.segments,
         binary=args.binary,
+        service_aware_potential=args.service_aware_potential,
     )
     output = _rooted(args.output)
     g26._atomic_json(output, value)

@@ -69,6 +69,15 @@ The fresh 2.5 m/s S4 TTH statistics may be compared with both historical minute-
 
 ## Table 5.4: two-speed reconstruction
 
+> **Superseded protocol note (G27/G28):** this G26 matrix is retained as the
+> `SUSTAINED_PHYSICAL_DERATING_STRESS` family.  It is not an exact
+> reconstruction of thesis Table 5.4.  The surviving thesis text describes
+> planning at standard speed and using observed deviation to update position
+> and conflict handling; the executable legacy variant, random stream, and
+> several raw cells are missing.  The closer G27/G28 observation-bias family
+> is therefore reported separately as `LEGACY_VARIANT_RECONSTRUCTION`, with
+> archived comparisons explicitly unpaired.
+
 For standard speed `v` and deviation `d`, the degraded case uses physical edge speed `v * (1 - d/100)` while the heuristic continues to use standard speed `v`. The nominal reference is the exact Table 5.2 S4 case at `v`. A cell is `RECONSTRUCTED` only when both nominal and degraded cases are exact.
 
 | Standard (m/s) | Deviation | Actual (m/s) | Paper dynamic | Paper static | Paper improvement (%) |
