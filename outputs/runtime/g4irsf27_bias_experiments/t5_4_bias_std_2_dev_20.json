@@ -1,0 +1,143 @@
+{
+  "schema": "czr005.g4irsf27.bias_case_result.v1",
+  "case_id": "t5_4_bias_std_2_dev_20",
+  "status": "COMPLETE",
+  "protocol_fidelity": "LEGACY_VARIANT_RECONSTRUCTION",
+  "standard_speed_mps": 2.0,
+  "physical_edge_speed_mps": 2.0,
+  "deviation_percent": 20,
+  "release_csv": "artifacts/datasets/g4irsf26_release_speed_2p0.csv",
+  "runtime_protocol": {
+    "queue_discipline": "fifo"
+  },
+  "observation_bias": {
+    "seed": 20260816,
+    "distribution": "uniform_0_to_k_seconds",
+    "maximum_seconds": 2.0,
+    "level_mapping": "k_seconds=deviation_percent/10",
+    "level_mapping_evidence": "INFERRED_FROM_SURVIVING_LEGACY_BIAS_TIME_CODE",
+    "target": "position_observation_and_conflict_prediction_time",
+    "changes_physical_travel_time": false,
+    "changes_route_cost_speed": false,
+    "runtime_stream": "FIXED_REPRODUCIBLE_S4_STREAM",
+    "archived_comparison_pairing": "UNPAIRED_ARCHIVED_VALUES_NO_SHARED_SEED"
+  },
+  "archived_paper_reported": {
+    "dynamic": 5.16,
+    "static": 5.36,
+    "improvement": 3.73
+  },
+  "recovered_raw_evidence": {
+    "dynamic": {
+      "status": "RECOVERED_COMPLETION_TRACE",
+      "source_collection": "legacy_仿真数据2",
+      "filename": "2.0 20 0.txt",
+      "row_count": 43603,
+      "raw_bag_count": 28506,
+      "mean_total_segment_time_minutes": 5.1653447227484275
+    },
+    "static": {
+      "status": "RECOVERED_COMPLETION_TRACE",
+      "source_collection": "legacy_仿真数据2",
+      "filename": "2.0 20 1.txt",
+      "row_count": 43603,
+      "raw_bag_count": 28506,
+      "mean_total_segment_time_minutes": 5.3595582216609365
+    }
+  },
+  "runtime_summary": {
+    "status": "COMPLETE",
+    "tth_mean_minutes": 4.564667310194298,
+    "tth_distribution_minutes": {
+      "min": 3.978929840348428,
+      "p50": 4.332878403821572,
+      "mean": 4.564667310194298,
+      "p95": 5.339034183241105,
+      "p99": 5.477530069337191,
+      "max": 6.082167339113706
+    },
+    "selected_segment_count": 43603,
+    "selected_raw_bag_count": 28506,
+    "completed_raw_bag_count": 28506,
+    "queue_discipline": "fifo",
+    "strict_safety": {
+      "pass": true,
+      "gates": {
+        "all_required_fields_present": true,
+        "all_segments_completed": true,
+        "failed_count_zero": true,
+        "reservation_conflicts_zero": true,
+        "physical_fault_edge_entry_violation_count_zero": true,
+        "unresolved_deadlock_count_zero": true,
+        "runtime_full_astar_calls_zero": true,
+        "runtime_full_cie_astar_calls_zero": true,
+        "global_reservation_scan_count_zero": true,
+        "priority_global_scan_count_zero": true,
+        "scorer_runtime_global_scan_count_zero": true,
+        "microphase_runtime_global_scan_count_zero": true,
+        "first_edge_credit_global_scan_count_zero": true,
+        "priority_future_route_input_count_zero": true,
+        "scorer_future_route_input_count_zero": true,
+        "first_edge_credit_future_route_count_zero": true,
+        "scorer_future_schedule_input_count_zero": true,
+        "full_future_routes_stored_zero": true,
+        "event_limit_reached_false": true,
+        "time_limit_reached_false": true,
+        "bag_future_path_field_present_false": true,
+        "full_cie_astar_runtime_fallback_false": true
+      },
+      "missing_fields": []
+    },
+    "runtime_echo_gates": {
+      "active_s4_scorer": true,
+      "active_j2_timing": true,
+      "active_e2_hotpath": true
+    },
+    "observation_bias_echo_gates": {
+      "maximum_seconds_echo": true,
+      "seed_echo": true,
+      "sample_count_positive": true,
+      "total_seconds_nonnegative": true,
+      "claim_boundary_echo": true
+    },
+    "observation_bias_runtime": {
+      "maximum_seconds": 2.0,
+      "seed": 20260816,
+      "sample_count": 339754,
+      "total_seconds": 339696.5623618486,
+      "claim_boundary": "deterministic_local_observation_delay_only"
+    },
+    "exact_release_alignment": {
+      "source": "artifacts/datasets/g4irsf26_release_speed_2p0.csv",
+      "aligned_segment_count": 43603,
+      "release_minus_canonical_pass_mean_seconds": 107.33750459952297,
+      "release_minus_canonical_pass_min_seconds": -0.9999900000002526,
+      "release_minus_canonical_pass_max_seconds": 1832.0
+    },
+    "nominal_speed_reconstruction": {
+      "speed": {
+        "topology": "protected_map2_54_nodes_69_edges",
+        "physical_edge_speed_mps": 2.0,
+        "heuristic_speed_mps": 2.0,
+        "edge_travel_time": "length/actual_speed_mps",
+        "heuristic_reconstruction": "directed_shortest_travel_time_using_standard_speed_mps"
+      },
+      "fault": {
+        "mode": "no_fault",
+        "windows": []
+      }
+    },
+    "native_wall_seconds": 19.579997799999546
+  },
+  "comparison": {
+    "s4_beats_archived_dynamic_mean": true,
+    "s4_beats_archived_static_mean": true,
+    "comparison_is_exact_protocol_reproduction": false
+  },
+  "separate_g26_stress_reference": {
+    "label": "SUSTAINED_PHYSICAL_DERATING_STRESS",
+    "g26_case_id": "t5_4_std_2_dev_20",
+    "changes_physical_travel_time": true,
+    "counts_as_table_5_4_reconstruction": false
+  }
+}

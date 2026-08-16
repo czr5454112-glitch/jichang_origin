@@ -937,6 +937,66 @@ void test_g4irsf16_learned_model_closed_loop_is_not_self_authorizing(
       "learned-model shadow must remain diagnostic-only and action-inert");
 }
 
+void test_legacy_observation_bias_is_local_deterministic_and_exact_off(
+    Checks& checks) {
+  // One bag isolates timing from contention so the chosen one-hop actions
+  // must remain identical while observed arrival timestamps move.
+  const auto& graph = canonical_graph();
+  const std::vector<EventRuntimeBagRequest> request = {
+      {"legacy-observation-bias", 801, 0.0, 10000.0, 3, 47,
+       "canonical-map2"}};
+
+  auto baseline_config = test_config();
+  EventDrivenJunctionRuntime baseline_runtime(graph, baseline_config);
+  const auto baseline = baseline_runtime.run(request);
+
+  auto off_config = baseline_config;
+  off_config.legacy_observation_bias_max_seconds = 0.0;
+  off_config.legacy_observation_bias_seed = 12345;
+  EventDrivenJunctionRuntime off_runtime(graph, off_config);
+  const auto off = off_runtime.run(request);
+  checks.require(
+      baseline.bags.front().finish_time == off.bags.front().finish_time &&
+          baseline.summary.event_count == off.summary.event_count &&
+          baseline.decisions.size() == off.decisions.size(),
+      "zero legacy observation bias must preserve the exact runtime result");
+
+  auto active_config = baseline_config;
+  active_config.legacy_observation_bias_max_seconds = 3.0;
+  active_config.legacy_observation_bias_seed = 12345;
+  EventDrivenJunctionRuntime left_runtime(graph, active_config);
+  EventDrivenJunctionRuntime right_runtime(graph, active_config);
+  const auto left = left_runtime.run(request);
+  const auto right = right_runtime.run(request);
+  checks.require(
+      left.bags.front().finish_time == right.bags.front().finish_time &&
+          left.summary.legacy_observation_bias_total_seconds ==
+              right.summary.legacy_observation_bias_total_seconds,
+      "legacy observation bias must be deterministic for a fixed seed");
+  checks.require(
+      left.bags.front().finish_time > baseline.bags.front().finish_time &&
+          left.summary.legacy_observation_bias_sample_count > 0 &&
+          left.summary.legacy_observation_bias_total_seconds > 0.0,
+      "active observation bias must delay observed node-arrival time");
+  checks.require(
+      left.summary.physical_fault_edge_entry_violation_count == 0 &&
+          left.summary.runtime_full_astar_calls == 0 &&
+          left.summary.global_reservation_scan_count == 0,
+      "observation bias must preserve the local safety boundary");
+  checks.require(left.decisions.size() == baseline.decisions.size(),
+                 "observation bias must preserve the one-hop decision count");
+  if (left.decisions.size() == baseline.decisions.size()) {
+    for (std::size_t index = 0; index < left.decisions.size(); ++index) {
+      checks.require(
+          left.decisions[index].current_node ==
+                  baseline.decisions[index].current_node &&
+              left.decisions[index].selected_next ==
+                  baseline.decisions[index].selected_next,
+          "observation bias must not introduce an illegal or different edge");
+    }
+  }
+}
+
 }  // namespace
 
 int main() {
@@ -962,6 +1022,7 @@ int main() {
     test_bounded_pibt_sensor_loss_uses_local_fault_handoff(checks);
     test_g4irsf16_fault_generation_survives_repair_boost_reset(checks);
     test_g4irsf16_learned_model_closed_loop_is_not_self_authorizing(checks);
+    test_legacy_observation_bias_is_local_deterministic_and_exact_off(checks);
   } catch (const std::exception& error) {
     ++checks.failures;
     std::cerr << "FAIL: canonical map2 test setup/runtime exception: " << error.what() << '\n';

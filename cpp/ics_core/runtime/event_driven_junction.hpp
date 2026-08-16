@@ -683,6 +683,12 @@ struct EventDrivenJunctionConfig {
   // Route MOVE candidates.  It is never read by source, wait, merge, or PIBT
   // arbitration paths.
   G4IRSF24DLPConfig g4irsf24_dlp;
+  // Optional reconstruction of the legacy Table 5.4 observation-time bias.
+  // Zero is exact-off.  An active value delays only the observation of a
+  // completed physical node arrival; it does not change an edge, route, or
+  // reservation decision.
+  double legacy_observation_bias_max_seconds = 0.0;
+  std::uint64_t legacy_observation_bias_seed = 0;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -1013,6 +1019,10 @@ struct EventRuntimeSummary {
   int repair_event_count = 0;
   int local_queue_update_event_count = 0;
   int congestion_beacon_update_event_count = 0;
+  double legacy_observation_bias_max_seconds = 0.0;
+  std::uint64_t legacy_observation_bias_seed = 0;
+  std::uint64_t legacy_observation_bias_sample_count = 0;
+  double legacy_observation_bias_total_seconds = 0.0;
   std::uint64_t source_admission_attempt_count = 0;
   std::uint64_t source_admission_admitted_count = 0;
   std::uint64_t source_admission_local_resource_hold_count = 0;
@@ -2754,6 +2764,12 @@ class EventDrivenJunctionRuntime {
     result_.summary.event_semantics_echo = config_.event_semantics;
     result_.summary.g4irsf20_event_hotpath_policy =
         config_.g4irsf20_event_hotpath_policy;
+    if (config_.legacy_observation_bias_max_seconds > 0.0) {
+      result_.summary.legacy_observation_bias_max_seconds =
+          config_.legacy_observation_bias_max_seconds;
+      result_.summary.legacy_observation_bias_seed =
+          config_.legacy_observation_bias_seed;
+    }
     if (config_.g4irsf24_dlp.mode != "off") {
       result_.summary.g4irsf24_dlp_mode =
           config_.g4irsf24_dlp.mode;
@@ -4982,6 +4998,11 @@ class EventDrivenJunctionRuntime {
         config_.pressure_distance_bias < 0.0) {
       throw std::invalid_argument("event runtime pressure weights must be non-negative");
     }
+    if (!std::isfinite(config_.legacy_observation_bias_max_seconds) ||
+        config_.legacy_observation_bias_max_seconds < 0.0) {
+      throw std::invalid_argument(
+          "legacy observation bias maximum must be finite and non-negative");
+    }
     if (config_.g4irsf17_source_wait_trace_limit < 0) {
       throw std::invalid_argument(
           "g4irsf17_source_wait_trace_limit must be non-negative");
@@ -7000,8 +7021,20 @@ class EventDrivenJunctionRuntime {
       junctions_[event.node]
           .g4irsf17_source_temporal.service_completions.record(event.time);
     }
+    const double observation_delay =
+        event.from_node < 0
+            ? 0.0
+            : legacy_observation_delay_seconds(
+                  found->second);
+    if (observation_delay > 0.0) {
+      ++result_.summary.legacy_observation_bias_sample_count;
+      result_.summary.legacy_observation_bias_total_seconds +=
+          observation_delay;
+    }
+    const double observed_arrival_time =
+        event.time + observation_delay;
     schedule(JunctionEventType::kArriveJunction,
-             event.time,
+             observed_arrival_time,
              event.task_id,
              event.node,
              event.from_node,
@@ -7010,7 +7043,7 @@ class EventDrivenJunctionRuntime {
       ++result_.summary.g4irsf20_redundant_beacon_suppressed_count;
     } else {
       schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
-                       event.time,
+                       observed_arrival_time,
                        event.task_id,
                        event.node,
                        event.from_node,
@@ -7024,6 +7057,34 @@ class EventDrivenJunctionRuntime {
                        event.to_node,
                        "junction_service_complete",
                        0);
+  }
+
+  static std::uint64_t bias_sample_bits(std::uint64_t value) noexcept {
+    value += 0x9e3779b97f4a7c15ULL;
+    value = (value ^ (value >> 30U)) * 0xbf58476d1ce4e5b9ULL;
+    value = (value ^ (value >> 27U)) * 0x94d049bb133111ebULL;
+    return value ^ (value >> 31U);
+  }
+
+  double legacy_observation_delay_seconds(
+      const event_runtime_detail::BagState& bag) const noexcept {
+    if (config_.legacy_observation_bias_max_seconds <= 0.0) {
+      return 0.0;
+    }
+    std::uint64_t key = config_.legacy_observation_bias_seed;
+    key ^= static_cast<std::uint64_t>(bag.request.runtime_bag_id + 1) *
+           0x9e3779b97f4a7c15ULL;
+    // decision_count increases once per committed one-hop move, so at the
+    // following physical arrival it is the visit ordinal for this bag.  A
+    // policy that takes another legal route therefore receives the same
+    // per-bag, per-visit sample rather than a route-dependent stream.
+    key ^= static_cast<std::uint64_t>(bag.decision_count + 1) *
+           0x94d049bb133111ebULL;
+    constexpr double kInverse53 =
+        1.0 / 9007199254740992.0;
+    const double unit =
+        static_cast<double>(bias_sample_bits(key) >> 11U) * kInverse53;
+    return unit * config_.legacy_observation_bias_max_seconds;
   }
 
   void process_arrive(const RuntimeEvent& event) {

@@ -717,6 +717,8 @@ def g4irsf11_event_runtime_from_records(
     bounded_check_every_events: int = 65_536,
     g4irsf20_event_hotpath_policy: str = "E0",
     g4irsf24_dlp_artifact: Mapping[str, Any] | PathLike | None = None,
+    legacy_observation_bias_max_seconds: float = 0.0,
+    legacy_observation_bias_seed: int = 0,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -923,6 +925,20 @@ def g4irsf11_event_runtime_from_records(
         raise ValueError(
             "g4irsf20_event_hotpath_policy must be E0, E1, or E2"
         )
+    legacy_observation_bias_max_seconds = strict_finite_number(
+        legacy_observation_bias_max_seconds,
+        "legacy_observation_bias_max_seconds",
+    )
+    if legacy_observation_bias_max_seconds < 0.0:
+        raise ValueError(
+            "legacy_observation_bias_max_seconds must be non-negative"
+        )
+    legacy_observation_bias_seed = strict_integer(
+        legacy_observation_bias_seed,
+        "legacy_observation_bias_seed",
+    )
+    if legacy_observation_bias_seed < 0:
+        raise ValueError("legacy_observation_bias_seed must be non-negative")
     scale = strict_finite_number(scale, "scale")
     entry_headway_seconds = strict_finite_number(
         entry_headway_seconds, "entry_headway_seconds"
@@ -1837,6 +1853,43 @@ def g4irsf11_event_runtime_from_records(
             int(bounded_check_every_events),
             str(g4irsf20_event_hotpath_policy),
             normalized_g4irsf24_dlp,
+        )
+    if legacy_observation_bias_max_seconds > 0.0:
+        # The legacy observation seam follows G24.  Materialize intervening
+        # exact defaults only for this opt-in call; zero keeps the historical
+        # positional call unchanged.
+        native_event_tail = (
+            str(event_semantics),
+            bool(enable_opportunity_telemetry),
+            int(opportunity_trace_limit),
+            str(merge_grant_rule),
+            int(merge_grant_max_pending_requests),
+            int(merge_grant_lifecycle_limit),
+            str(g4irsf16_supervisor_mode),
+            normalized_g4irsf16_i3_model,
+            normalized_g4irsf16_i4_model,
+            normalized_g4irsf16_rule_bundle,
+            bool(enable_g4irsf17_source_wait_telemetry),
+            int(g4irsf17_source_wait_trace_limit),
+            str(g4irsf17_source_policy_mode),
+            normalized_g4irsf17_source_policy,
+            int(g4irsf17_source_policy_trace_limit),
+            canonical_merge_grant_timing_mode,
+            str(g4irsf18_merge_policy_mode),
+            normalized_g4irsf18_merge_policy,
+            bool(g4irsf18_merge_research_closed_loop_authorized),
+            bool(g4irsf18_merge_fixed_research_workload),
+            bool(g4irsf18_merge_production_closed_loop_authorized),
+            bool(g4irsf18_merge_offline_gate_passed),
+            float(g4irsf18_merge_coverage_cap),
+            int(g4irsf18_merge_max_overrides_per_segment),
+            bool(g4irsf18_merge_kill_switch),
+            float(bounded_wall_seconds),
+            int(bounded_check_every_events),
+            str(g4irsf20_event_hotpath_policy),
+            normalized_g4irsf24_dlp,
+            float(legacy_observation_bias_max_seconds),
+            int(legacy_observation_bias_seed),
         )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(

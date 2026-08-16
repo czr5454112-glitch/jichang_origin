@@ -1,0 +1,17 @@
+# G27 FIFO 无故障速度控制汇总
+
+四个控制均完成全部 28,506 个原始行李；无故障时 G27 故障局部势值层保持 exact-off，因此这里测量的是 FIFO/S4 控制表现，不把故障扩展冒充为无故障收益。
+按 min/mean/max 共 12 个单元，对 fresh HCA 为 9 胜、2 平、1 负；对论文值为 9 胜、2 平、1 负。
+
+| Speed (m/s) | FIFO min/mean/p95/p99/max (min) | Fresh HCA min/mean/max | Paper min/mean/max | FIFO vs HCA min/mean/max | FIFO vs paper min/mean/max |
+|---:|---:|---:|---:|---|---|
+| 1.5 | 5.088922/5.718631/6.722289/6.798678/7.255622 | 5.100000/6.419924/9.633333 | 5.100000/6.440000/9.680000 | G27_FIFO_WIN/G27_FIFO_WIN/G27_FIFO_WIN | G27_FIFO_WIN/G27_FIFO_WIN/G27_FIFO_WIN |
+| 2.0 | 3.866700/4.325141/5.075067/5.125067/5.308400 | 3.866667/4.927377/7.366667 | 3.870000/4.930000/7.370000 | RESOLUTION_BOUND_TIE/G27_FIFO_WIN/G27_FIFO_WIN | RESOLUTION_BOUND_TIE/G27_FIFO_WIN/G27_FIFO_WIN |
+| 2.5 | 3.133367/3.512618/4.120067/4.250067/4.796733 | 3.133333/3.945169/5.950000 | 3.130000/3.960000/5.980000 | RESOLUTION_BOUND_TIE/G27_FIFO_WIN/G27_FIFO_WIN | RESOLUTION_BOUND_TIE/G27_FIFO_WIN/G27_FIFO_WIN |
+| 3.0 | 2.638922/2.952777/3.461178/3.527844/3.855622 | 2.633333/3.354569/5.050000 | 2.630000/3.370000/5.050000 | ORIGINAL_WIN/G27_FIFO_WIN/G27_FIFO_WIN | ORIGINAL_WIN/G27_FIFO_WIN/G27_FIFO_WIN |
+
+## 最小值分辨率边界
+
+- 论文最小值只报告到 0.01 分钟；差异不超过半个末位单位（0.005 分钟）登记为 `RESOLUTION_BOUND_TIE`，不机械宣称微小胜负。
+- fresh HCA 与 FIFO 在 2.0、2.5 m/s 的最小值仅相差约 0.002 秒，也登记为 `RESOLUTION_BOUND_TIE`。mean 和 max 不套用该最小值边界。
+- P95、P99 在论文表 5.2 与 fresh HCA 汇总中没有对应列，因此只如实报告 FIFO 实测值，不制造比较结论。
