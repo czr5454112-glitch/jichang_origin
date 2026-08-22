@@ -3336,6 +3336,259 @@ g4irsf24_dlp_config_from_artifact(const py::dict& artifact) {
   return config;
 }
 
+czr005::ics::G4IRSF25CLCRConfig
+g4irsf25_clcr_config_from_artifact(const py::dict& artifact) {
+  czr005::ics::G4IRSF25CLCRConfig config;
+  if (artifact.empty()) {
+    return config;
+  }
+  const auto reject_unknown = [](const py::dict& mapping,
+                                 const std::set<std::string>& allowed,
+                                 const char* section) {
+    for (const auto& item : mapping) {
+      const auto key = py::cast<std::string>(item.first);
+      if (allowed.find(key) == allowed.end()) {
+        throw py::value_error(
+            std::string("G4IRSF25 CLCR ") + section +
+            " contains unknown key: " + key);
+      }
+    }
+  };
+  reject_unknown(
+      artifact,
+      {"schema", "mode", "feature_names", "record_trajectories",
+       "trajectory_max_seconds", "trajectory_trace_limit", "min_support", "margin_seconds",
+       "private_cap_seconds", "t0_metric", "t0_enter_pressure",
+       "t0_exit_pressure", "l3_short_alpha", "l3_long_alpha",
+       "l3_bias_cap_seconds", "normalization", "model", "arms",
+       "training_metadata"},
+      "artifact");
+  const auto required = [&](const char* name) -> py::handle {
+    if (!artifact.contains(name)) {
+      throw py::value_error(
+          std::string("G4IRSF25 CLCR artifact missing ") + name);
+    }
+    return artifact[name];
+  };
+  if (py::cast<std::string>(required("schema")) !=
+      "czr005.g4irsf25.clcr.v1") {
+    throw py::value_error(
+        "G4IRSF25 CLCR artifact schema must be "
+        "czr005.g4irsf25.clcr.v1");
+  }
+  config.mode = py::cast<std::string>(required("mode"));
+  if (config.mode == "off") {
+    return config;
+  }
+  if (config.mode != "observe" && config.mode != "t0" &&
+      config.mode != "l1" && config.mode != "l2" &&
+      config.mode != "l3") {
+    throw py::value_error(
+        "G4IRSF25 CLCR mode must be off, observe, t0, l1, l2, or l3");
+  }
+  const auto feature_names =
+      py::cast<std::vector<std::string>>(required("feature_names"));
+  if (feature_names.size() != czr005::ics::kG4IRSF25CLCRFeatureCount) {
+    throw py::value_error("G4IRSF25 CLCR feature_names has the wrong size");
+  }
+  for (std::size_t index = 0; index < feature_names.size(); ++index) {
+    if (feature_names[index] !=
+        czr005::ics::kG4IRSF25CLCRFeatureNames[index]) {
+      throw py::value_error(
+          "G4IRSF25 CLCR feature_names must match the native order");
+    }
+  }
+  if (artifact.contains("training_metadata") &&
+      !py::isinstance<py::dict>(artifact["training_metadata"])) {
+    throw py::type_error(
+        "G4IRSF25 CLCR training_metadata must be a mapping");
+  }
+  if (artifact.contains("record_trajectories")) {
+    if (!PyBool_Check(artifact["record_trajectories"].ptr())) {
+      throw py::type_error(
+          "G4IRSF25 CLCR record_trajectories must be a bool");
+    }
+    config.record_trajectories =
+        py::cast<bool>(artifact["record_trajectories"]);
+  }
+  if (artifact.contains("trajectory_max_seconds")) {
+    config.trajectory_max_seconds =
+        py::cast<double>(artifact["trajectory_max_seconds"]);
+  }
+  if (artifact.contains("trajectory_trace_limit")) {
+    config.trajectory_trace_limit =
+        py::cast<int>(artifact["trajectory_trace_limit"]);
+  }
+  if (artifact.contains("min_support")) {
+    config.min_support = py::cast<int>(artifact["min_support"]);
+  }
+  if (artifact.contains("margin_seconds")) {
+    config.margin_seconds = py::cast<double>(artifact["margin_seconds"]);
+  }
+  if (artifact.contains("private_cap_seconds")) {
+    config.private_cap_seconds =
+        py::cast<double>(artifact["private_cap_seconds"]);
+  }
+  if (artifact.contains("t0_metric")) {
+    config.t0_metric = py::cast<std::string>(artifact["t0_metric"]);
+  }
+  if (config.mode == "t0") {
+    config.t0_enter_pressure =
+        py::cast<double>(required("t0_enter_pressure"));
+    config.t0_exit_pressure =
+        py::cast<double>(required("t0_exit_pressure"));
+  }
+  if (artifact.contains("l3_short_alpha")) {
+    config.l3_short_alpha = py::cast<double>(artifact["l3_short_alpha"]);
+  }
+  if (artifact.contains("l3_long_alpha")) {
+    config.l3_long_alpha = py::cast<double>(artifact["l3_long_alpha"]);
+  }
+  if (artifact.contains("l3_bias_cap_seconds")) {
+    config.l3_bias_cap_seconds =
+        py::cast<double>(artifact["l3_bias_cap_seconds"]);
+  }
+
+  if (artifact.contains("normalization")) {
+    if (!py::isinstance<py::dict>(artifact["normalization"])) {
+      throw py::type_error(
+          "G4IRSF25 CLCR normalization must be a mapping");
+    }
+    const auto normalization =
+        py::reinterpret_borrow<py::dict>(artifact["normalization"]);
+    reject_unknown(normalization, {"mean", "scale", "min", "max"},
+                   "normalization");
+    if (normalization.contains("mean")) {
+      config.feature_mean =
+          py::cast<std::vector<double>>(normalization["mean"]);
+    }
+    if (normalization.contains("scale")) {
+      config.feature_scale =
+          py::cast<std::vector<double>>(normalization["scale"]);
+    }
+    if (normalization.contains("min")) {
+      config.feature_min =
+          py::cast<std::vector<double>>(normalization["min"]);
+    }
+    if (normalization.contains("max")) {
+      config.feature_max =
+          py::cast<std::vector<double>>(normalization["max"]);
+    }
+  }
+
+  if (config.mode == "l1" || config.mode == "l2" ||
+      config.mode == "l3") {
+    const auto model_handle = required("model");
+    if (!py::isinstance<py::dict>(model_handle)) {
+      throw py::type_error("G4IRSF25 CLCR model must be a mapping");
+    }
+    const auto model = py::reinterpret_borrow<py::dict>(model_handle);
+    if (config.mode == "l2") {
+      reject_unknown(
+          model,
+          {"hidden_weights", "hidden_bias", "hidden_system_weights",
+           "hidden_private_weights", "hidden_system_bias",
+           "hidden_private_bias"},
+          "model");
+      const auto model_required = [&](const char* name) -> py::handle {
+        if (!model.contains(name)) {
+          throw py::value_error(
+              std::string("G4IRSF25 CLCR model missing ") + name);
+        }
+        return model[name];
+      };
+      config.hidden_weights =
+          py::cast<std::vector<std::vector<double>>>(
+              model_required("hidden_weights"));
+      config.hidden_bias = py::cast<std::vector<double>>(
+          model_required("hidden_bias"));
+      config.hidden_system_weights = py::cast<std::vector<double>>(
+          model_required("hidden_system_weights"));
+      config.hidden_private_weights = py::cast<std::vector<double>>(
+          model_required("hidden_private_weights"));
+      config.hidden_system_bias =
+          py::cast<double>(model_required("hidden_system_bias"));
+      config.hidden_private_bias =
+          py::cast<double>(model_required("hidden_private_bias"));
+    } else {
+      reject_unknown(model, {"system_weights", "private_weights"},
+                     "model");
+      if (!model.contains("system_weights") ||
+          !model.contains("private_weights")) {
+        throw py::value_error(
+            "G4IRSF25 CLCR linear model needs system_weights and "
+            "private_weights");
+      }
+      config.system_weights = py::cast<std::vector<double>>(
+          model["system_weights"]);
+      config.private_weights = py::cast<std::vector<double>>(
+          model["private_weights"]);
+    }
+  } else if (artifact.contains("model")) {
+    throw py::value_error(
+        "G4IRSF25 CLCR observe/t0 artifact must not contain a model");
+  }
+
+  const auto arm_rows = py::reinterpret_borrow<py::sequence>(required("arms"));
+  config.arms.reserve(static_cast<std::size_t>(py::len(arm_rows)));
+  for (const py::handle item : arm_rows) {
+    if (!py::isinstance<py::dict>(item)) {
+      throw py::type_error("G4IRSF25 CLCR arm must be a mapping");
+    }
+    const auto row = py::reinterpret_borrow<py::dict>(item);
+    reject_unknown(
+        row,
+        {"branch_node", "first_edge", "rejoin_node", "corridor_nodes",
+         "support", "training_support", "static_duration_seconds",
+         "t0_system_delta_seconds",
+         "t0_private_delta_seconds", "system_intercept",
+         "private_intercept"},
+        "arm");
+    const auto arm_required = [&](const char* name) -> py::handle {
+      if (!row.contains(name)) {
+        throw py::value_error(
+            std::string("G4IRSF25 CLCR arm missing ") + name);
+      }
+      return row[name];
+    };
+    czr005::ics::G4IRSF25CLCRArm arm;
+    arm.branch_node = py::cast<int>(arm_required("branch_node"));
+    arm.first_edge = py::cast<int>(arm_required("first_edge"));
+    arm.rejoin_node = py::cast<int>(arm_required("rejoin_node"));
+    arm.corridor_nodes = py::cast<std::vector<int>>(
+        arm_required("corridor_nodes"));
+    arm.support = py::cast<int>(arm_required("support"));
+    if (row.contains("training_support")) {
+      arm.training_support = py::cast<int>(row["training_support"]);
+    }
+    if (row.contains("static_duration_seconds")) {
+      arm.static_duration_seconds =
+          py::cast<double>(row["static_duration_seconds"]);
+    }
+    if (row.contains("t0_system_delta_seconds")) {
+      arm.t0_system_delta_seconds =
+          py::cast<double>(row["t0_system_delta_seconds"]);
+    }
+    if (row.contains("t0_private_delta_seconds")) {
+      arm.t0_private_delta_seconds =
+          py::cast<double>(row["t0_private_delta_seconds"]);
+    }
+    if (row.contains("system_intercept")) {
+      arm.system_intercept = py::cast<double>(row["system_intercept"]);
+    }
+    if (row.contains("private_intercept")) {
+      arm.private_intercept = py::cast<double>(row["private_intercept"]);
+    }
+    config.arms.push_back(std::move(arm));
+  }
+  try {
+    config.validate_and_index();
+  } catch (const std::invalid_argument& error) {
+    throw py::value_error(error.what());
+  }
+  return config;
+}
+
 py::dict g4irsf11_event_runtime_summary_row(
     const czr005::ics::EventRuntimeSummary& summary,
     bool include_destination_merge_grants,
@@ -3497,6 +3750,63 @@ py::dict g4irsf11_event_runtime_summary_row(
         py::int_(summary.g4irsf24_dlp_detour_fallback_count);
     row["g4irsf24_dlp_shield_fault_fallback_count"] =
         py::int_(summary.g4irsf24_dlp_shield_fault_fallback_count);
+  }
+  if (!summary.g4irsf25_clcr_mode.empty()) {
+    row["g4irsf25_clcr_mode"] = summary.g4irsf25_clcr_mode;
+    row["g4irsf25_clcr_claim_boundary"] =
+        "registered_split_rejoin_legal_local_s4_candidates_only";
+    row["g4irsf25_clcr_arm_count"] = summary.g4irsf25_clcr_arm_count;
+    row["g4irsf25_clcr_route_evaluation_count"] =
+        py::int_(summary.g4irsf25_clcr_route_evaluation_count);
+    row["g4irsf25_clcr_eligible_candidate_count"] =
+        py::int_(summary.g4irsf25_clcr_eligible_candidate_count);
+    row["g4irsf25_clcr_supported_candidate_count"] =
+        py::int_(summary.g4irsf25_clcr_supported_candidate_count);
+    row["g4irsf25_clcr_proposal_count"] =
+        py::int_(summary.g4irsf25_clcr_proposal_count);
+    row["g4irsf25_clcr_committed_mutation_count"] =
+        py::int_(summary.g4irsf25_clcr_committed_mutation_count);
+    row["g4irsf25_clcr_fallback_s4_count"] =
+        py::int_(summary.g4irsf25_clcr_fallback_s4_count);
+    row["g4irsf25_clcr_same_action_count"] =
+        py::int_(summary.g4irsf25_clcr_same_action_count);
+    row["g4irsf25_clcr_low_support_fallback_count"] =
+        py::int_(summary.g4irsf25_clcr_low_support_fallback_count);
+    row["g4irsf25_clcr_ood_fallback_count"] =
+        py::int_(summary.g4irsf25_clcr_ood_fallback_count);
+    row["g4irsf25_clcr_margin_fallback_count"] =
+        py::int_(summary.g4irsf25_clcr_margin_fallback_count);
+    row["g4irsf25_clcr_threshold_fallback_count"] =
+        py::int_(summary.g4irsf25_clcr_threshold_fallback_count);
+    row["g4irsf25_clcr_fairness_fallback_count"] =
+        py::int_(summary.g4irsf25_clcr_fairness_fallback_count);
+    row["g4irsf25_clcr_fault_shield_fallback_count"] =
+        py::int_(summary.g4irsf25_clcr_fault_shield_fallback_count);
+    row["g4irsf25_clcr_non_corridor_fallback_count"] =
+        py::int_(summary.g4irsf25_clcr_non_corridor_fallback_count);
+    row["g4irsf25_clcr_feedback_count"] =
+        py::int_(summary.g4irsf25_clcr_feedback_count);
+    row["g4irsf25_clcr_online_bias_update_count"] =
+        py::int_(summary.g4irsf25_clcr_online_bias_update_count);
+    py::dict mutations_by_branch;
+    for (const auto& [branch, count] :
+         summary.g4irsf25_clcr_committed_mutations_by_branch) {
+      mutations_by_branch[py::int_(branch)] = py::int_(count);
+    }
+    row["g4irsf25_clcr_committed_mutations_by_branch"] =
+        std::move(mutations_by_branch);
+    row["g4irsf25_corridor_trajectory_started_count"] = py::int_(
+        summary.g4irsf25_corridor_trajectory_started_count);
+    row["g4irsf25_corridor_trajectory_completed_count"] = py::int_(
+        summary.g4irsf25_corridor_trajectory_completed_count);
+    row["g4irsf25_corridor_trajectory_timeout_count"] = py::int_(
+        summary.g4irsf25_corridor_trajectory_timeout_count);
+    row["g4irsf25_runtime_global_scan_count"] =
+        summary.g4irsf25_runtime_global_scan_count;
+    row["g4irsf25_future_route_input_count"] =
+        summary.g4irsf25_future_route_input_count;
+    row["g4irsf25_full_astar_call_count"] =
+        summary.g4irsf25_full_astar_call_count;
   }
   row["source_admission_enabled"] = summary.source_admission_enabled;
   row["source_admission_attempt_count"] =
@@ -5011,6 +5321,33 @@ py::list g4irsf11_event_decision_rows(
           decision.g4irsf24_dlp_committed_mutation;
       row["g4irsf24_dlp"] = std::move(dlp);
     }
+    if (decision.g4irsf25_clcr_evaluated) {
+      py::dict clcr;
+      clcr["mode"] = decision.g4irsf25_clcr_mode;
+      clcr["s4_next"] = decision.g4irsf25_clcr_s4_next;
+      clcr["proposed_next"] =
+          decision.g4irsf25_clcr_proposed_next >= 0
+              ? py::cast(decision.g4irsf25_clcr_proposed_next)
+              : py::none();
+      clcr["rejoin_node"] =
+          decision.g4irsf25_clcr_rejoin_node >= 0
+              ? py::cast(decision.g4irsf25_clcr_rejoin_node)
+              : py::none();
+      clcr["support"] = decision.g4irsf25_clcr_support;
+      clcr["predicted_system_delta_seconds"] =
+          decision.g4irsf25_clcr_predicted_system_delta_seconds;
+      clcr["predicted_private_delta_seconds"] =
+          decision.g4irsf25_clcr_predicted_private_delta_seconds;
+      clcr["selected_features"] =
+          decision.g4irsf25_clcr_selected_features;
+      clcr["fallback_reason"] =
+          decision.g4irsf25_clcr_fallback_reason.empty()
+              ? py::none()
+              : py::cast(decision.g4irsf25_clcr_fallback_reason);
+      clcr["committed_mutation"] =
+          decision.g4irsf25_clcr_committed_mutation;
+      row["g4irsf25_clcr"] = std::move(clcr);
+    }
     if (decision.g4irsf16_evaluated) {
       const auto finite_or_none = [](double value) -> py::object {
         return std::isfinite(value) ? py::cast(value) : py::none();
@@ -5100,6 +5437,71 @@ py::list g4irsf11_event_runtime_junction_rows(
         junction.last_service_reservation_end_time;
     row["scheduled_incoming"] = junction.scheduled_incoming;
     row["next_dispatch_time"] = junction.next_dispatch_time;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
+py::list g4irsf25_corridor_trajectory_rows(
+    const std::vector<czr005::ics::G4IRSF25CorridorTrajectoryRow>&
+        trajectories) {
+  py::list rows;
+  for (const auto& trajectory : trajectories) {
+    py::dict row;
+    row["schema_id"] = "czr005.g4irsf25.corridor_trajectory.v1";
+    row["runtime_bag_id"] = trajectory.runtime_bag_id;
+    row["task_id"] = trajectory.task_id;
+    row["segment_id"] = trajectory.segment_id;
+    row["leg"] = trajectory.leg;
+    row["task_class"] = trajectory.task_class;
+    row["goal_node"] = trajectory.goal_node;
+    row["branch_node"] = trajectory.branch_node;
+    row["s4_first_edge"] = trajectory.s4_first_edge;
+    row["selected_first_edge"] = trajectory.selected_first_edge;
+    row["rejoin_node"] = trajectory.rejoin_node;
+    row["decision_time"] = trajectory.decision_time;
+    row["arrival_time"] = trajectory.arrival_time >= 0.0
+                              ? py::cast(trajectory.arrival_time)
+                              : py::none();
+    row["actual_corridor_duration"] =
+        trajectory.actual_corridor_duration >= 0.0
+            ? py::cast(trajectory.actual_corridor_duration)
+            : py::none();
+    row["private_bag_cost_seconds"] =
+        trajectory.private_bag_cost_seconds >= 0.0
+            ? py::cast(trajectory.private_bag_cost_seconds)
+            : py::none();
+    row["corridor_wait_seconds"] = trajectory.corridor_wait_seconds;
+    row["local_queue_area_bag_seconds"] =
+        trajectory.local_queue_area_bag_seconds;
+    row["scheduled_incoming_area_bag_seconds"] =
+        trajectory.scheduled_incoming_area_bag_seconds;
+    row["peak_local_queue"] = trajectory.peak_local_queue;
+    row["peak_local_queue_semantics"] =
+        "START_END_ENDPOINT_MAX_NOT_FULL_INTERVAL";
+    row["intermediate_decision_count"] =
+        trajectory.intermediate_decision_count;
+    row["actual_path"] = trajectory.actual_path;
+    row["selected_features"] = trajectory.selected_features;
+    row["feedback_sample_count"] = trajectory.feedback_sample_count;
+    row["feedback_short_ewma_seconds"] =
+        trajectory.feedback_short_ewma_seconds;
+    row["feedback_long_ewma_seconds"] =
+        trajectory.feedback_long_ewma_seconds;
+    row["feedback_trend_seconds"] =
+        trajectory.feedback_trend_seconds;
+    row["feedback_timeout_rate"] = trajectory.feedback_timeout_rate;
+    row["feedback_short_local_system_cost"] =
+        trajectory.feedback_short_local_system_cost;
+    row["feedback_long_local_system_cost"] =
+        trajectory.feedback_long_local_system_cost;
+    row["applied_online_bias"] = trajectory.applied_online_bias;
+    row["completed_rejoin"] = trajectory.completed_rejoin;
+    row["timeout"] = trajectory.timeout;
+    row["censored"] = trajectory.censored;
+    row["censor_reason"] = trajectory.censor_reason;
+    row["loop"] = trajectory.loop;
+    row["safe"] = trajectory.safe;
     rows.append(std::move(row));
   }
   return rows;
@@ -6188,7 +6590,8 @@ py::dict g4irsf11_event_runtime_from_records(
     double bounded_wall_seconds,
     int bounded_check_every_events,
     const std::string& g4irsf20_event_hotpath_policy,
-    const py::dict& g4irsf24_dlp_artifact) {
+    const py::dict& g4irsf24_dlp_artifact,
+    const py::dict& g4irsf25_clcr_artifact) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6422,6 +6825,9 @@ py::dict g4irsf11_event_runtime_from_records(
   config.g4irsf24_dlp =
       g4irsf24_dlp_config_from_artifact(
           g4irsf24_dlp_artifact);
+  config.g4irsf25_clcr =
+      g4irsf25_clcr_config_from_artifact(
+          g4irsf25_clcr_artifact);
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -6836,6 +7242,30 @@ py::dict g4irsf11_event_runtime_from_records(
     trace_context["g4irsf18_merge_future_schedule_input_count"] = 0;
     trace_context["g4irsf18_merge_full_astar_call_count"] = 0;
   }
+  if (!result.summary.g4irsf25_clcr_mode.empty()) {
+    trace_context["g4irsf25_clcr_schema"] =
+        "czr005.g4irsf25.clcr.v1";
+    trace_context["g4irsf25_clcr_mode"] =
+        result.summary.g4irsf25_clcr_mode;
+    trace_context["g4irsf25_clcr_score_direction"] =
+        "lower_predicted_delta_is_better";
+    trace_context["g4irsf25_clcr_identity_semantics"] =
+        "bag_task_segment_and_absolute_time_are_trace_only";
+    py::list feature_names;
+    for (std::size_t index = 0;
+         index < czr005::ics::kG4IRSF25CLCRFeatureCount; ++index) {
+      feature_names.append(
+          czr005::ics::kG4IRSF25CLCRFeatureNames[index]);
+    }
+    trace_context["g4irsf25_clcr_feature_names"] =
+        std::move(feature_names);
+    trace_context["g4irsf25_runtime_global_scan_count"] =
+        result.summary.g4irsf25_runtime_global_scan_count;
+    trace_context["g4irsf25_future_route_input_count"] =
+        result.summary.g4irsf25_future_route_input_count;
+    trace_context["g4irsf25_full_astar_call_count"] =
+        result.summary.g4irsf25_full_astar_call_count;
+  }
 
   py::dict payload;
   payload["summary"] = g4irsf11_event_runtime_summary_row(
@@ -6859,6 +7289,11 @@ py::dict g4irsf11_event_runtime_from_records(
       g4irsf12_event_runtime_credit_rows(result.credit_events);
   payload["pibt_events"] =
       g4irsf12_event_runtime_pibt_rows(result.pibt_events);
+  if (!result.summary.g4irsf25_clcr_mode.empty()) {
+    payload["g4irsf25_corridor_trajectories"] =
+        g4irsf25_corridor_trajectory_rows(
+            result.g4irsf25_corridor_trajectories);
+  }
   if (result.summary.g4irsf17_source_wait_telemetry_enabled) {
     payload["g4irsf17_source_wait_blockers"] =
         g4irsf17_source_wait_blocker_rows(
@@ -7170,7 +7605,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("bounded_check_every_events") = 65536,
              py::arg("g4irsf20_event_hotpath_policy") =
                  std::string("E0"),
-             py::arg("g4irsf24_dlp_artifact") = py::dict());
+             py::arg("g4irsf24_dlp_artifact") = py::dict(),
+             py::arg("g4irsf25_clcr_artifact") = py::dict());
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

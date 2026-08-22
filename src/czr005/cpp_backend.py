@@ -22,6 +22,30 @@ ROOT = Path(__file__).resolve().parents[2]
 
 PathLike = str | os.PathLike[str]
 
+G4IRSF25_CLCR_FEATURE_NAMES = (
+    "s4_score_delta",
+    "travel_time_delta",
+    "static_potential_delta",
+    "target_queue_delta",
+    "target_scheduled_incoming_delta",
+    "corridor_wait_delta",
+    "target_wait_delta",
+    "goal_conditioned_differential_delta",
+    "estimated_service_rate_delta",
+    "service_weighted_pressure_delta",
+    "two_hop_pressure_delta",
+    "recent_visit_delta",
+    "current_bag_age_seconds",
+    "deadline_headroom_seconds",
+    "recent_corridor_short_ewma_seconds",
+    "recent_corridor_long_ewma_seconds",
+    "recent_corridor_trend_seconds",
+    "recent_corridor_feedback_age_seconds",
+    "recent_corridor_feedback_sample_log1p",
+    "recent_corridor_timeout_rate",
+    "arm_support_log1p",
+)
+
 
 def g4irsf17_pairwise_ensemble_source_policy_artifact(
     pairwise_artifact: Mapping[str, Any] | PathLike,
@@ -717,6 +741,7 @@ def g4irsf11_event_runtime_from_records(
     bounded_check_every_events: int = 65_536,
     g4irsf20_event_hotpath_policy: str = "E0",
     g4irsf24_dlp_artifact: Mapping[str, Any] | PathLike | None = None,
+    g4irsf25_clcr_artifact: Mapping[str, Any] | PathLike | None = None,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -1130,6 +1155,10 @@ def g4irsf11_event_runtime_from_records(
         g4irsf24_dlp_artifact,
         "g4irsf24_dlp_artifact",
     )
+    normalized_g4irsf25_clcr = normalized_g4irsf16_artifact(
+        g4irsf25_clcr_artifact,
+        "g4irsf25_clcr_artifact",
+    )
     if normalized_g4irsf24_dlp:
         g4irsf24_dlp_mode = normalized_g4irsf24_dlp.get("mode")
         if (
@@ -1147,6 +1176,63 @@ def g4irsf11_event_runtime_from_records(
             normalized_g4irsf24_dlp = {}
         elif scorer_mode not in {"S4", "S4_queue_aware_rule_only"}:
             raise ValueError("G4IRSF24 DLP requires the frozen S4 scorer")
+    if normalized_g4irsf25_clcr:
+        allowed_g4irsf25_keys = {
+            "schema",
+            "mode",
+            "feature_names",
+            "record_trajectories",
+            "trajectory_max_seconds",
+            "trajectory_trace_limit",
+            "min_support",
+            "margin_seconds",
+            "private_cap_seconds",
+            "t0_metric",
+            "t0_enter_pressure",
+            "t0_exit_pressure",
+            "l3_short_alpha",
+            "l3_long_alpha",
+            "l3_bias_cap_seconds",
+            "normalization",
+            "model",
+            "arms",
+            "training_metadata",
+        }
+        unknown_g4irsf25_keys = sorted(
+            set(normalized_g4irsf25_clcr) - allowed_g4irsf25_keys
+        )
+        if unknown_g4irsf25_keys:
+            raise ValueError(
+                "g4irsf25_clcr_artifact contains unknown keys: "
+                f"{unknown_g4irsf25_keys}"
+            )
+        g4irsf25_clcr_mode = normalized_g4irsf25_clcr.get("mode")
+        if (
+            normalized_g4irsf25_clcr.get("schema")
+            != "czr005.g4irsf25.clcr.v1"
+            or g4irsf25_clcr_mode
+            not in {"off", "observe", "t0", "l1", "l2", "l3"}
+        ):
+            raise ValueError(
+                "g4irsf25_clcr_artifact must use the "
+                "czr005.g4irsf25.clcr.v1 schema and a supported mode"
+            )
+        if g4irsf25_clcr_mode == "off":
+            normalized_g4irsf25_clcr = {}
+        else:
+            if tuple(normalized_g4irsf25_clcr.get("feature_names", ())) != (
+                G4IRSF25_CLCR_FEATURE_NAMES
+            ):
+                raise ValueError(
+                    "g4irsf25_clcr_artifact feature_names must match the "
+                    "native 21-feature order"
+                )
+            if scorer_mode not in {"S4", "S4_queue_aware_rule_only"}:
+                raise ValueError("G4IRSF25 CLCR requires the frozen S4 scorer")
+            if normalized_g4irsf24_dlp:
+                raise ValueError(
+                    "G4IRSF25 CLCR and G4IRSF24 DLP cannot be active together"
+                )
     if g4irsf17_source_policy_mode == "off":
         if normalized_g4irsf17_source_policy:
             raise ValueError(
@@ -1837,6 +1923,42 @@ def g4irsf11_event_runtime_from_records(
             int(bounded_check_every_events),
             str(g4irsf20_event_hotpath_policy),
             normalized_g4irsf24_dlp,
+        )
+    if normalized_g4irsf25_clcr:
+        # CLCR is the append-only G25 tail.  Supplying it targets the G25
+        # native ABI, including the empty G24 slot immediately before it.
+        # Empty/explicit-off artifacts keep older positional calls unchanged.
+        native_event_tail = (
+            str(event_semantics),
+            bool(enable_opportunity_telemetry),
+            int(opportunity_trace_limit),
+            str(merge_grant_rule),
+            int(merge_grant_max_pending_requests),
+            int(merge_grant_lifecycle_limit),
+            str(g4irsf16_supervisor_mode),
+            normalized_g4irsf16_i3_model,
+            normalized_g4irsf16_i4_model,
+            normalized_g4irsf16_rule_bundle,
+            bool(enable_g4irsf17_source_wait_telemetry),
+            int(g4irsf17_source_wait_trace_limit),
+            str(g4irsf17_source_policy_mode),
+            normalized_g4irsf17_source_policy,
+            int(g4irsf17_source_policy_trace_limit),
+            canonical_merge_grant_timing_mode,
+            str(g4irsf18_merge_policy_mode),
+            normalized_g4irsf18_merge_policy,
+            bool(g4irsf18_merge_research_closed_loop_authorized),
+            bool(g4irsf18_merge_fixed_research_workload),
+            bool(g4irsf18_merge_production_closed_loop_authorized),
+            bool(g4irsf18_merge_offline_gate_passed),
+            float(g4irsf18_merge_coverage_cap),
+            int(g4irsf18_merge_max_overrides_per_segment),
+            bool(g4irsf18_merge_kill_switch),
+            float(bounded_wall_seconds),
+            int(bounded_check_every_events),
+            str(g4irsf20_event_hotpath_policy),
+            {},
+            normalized_g4irsf25_clcr,
         )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
