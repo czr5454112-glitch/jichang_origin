@@ -2403,6 +2403,14 @@ struct Target {
   bool selected_boolean = false;
   std::vector<int> source_ready_order;
   std::vector<int> legal_next_edges;
+  // Optional G25 label horizon.  Keeping this on the existing G21 target
+  // avoids adding a second intervention or planner ABI: only the forced first
+  // edge differs, then both branches immediately return to ordinary S4/J2/E2.
+  bool g4irsf25_corridor_horizon = false;
+  int g4irsf25_rejoin_node = -1;
+  std::vector<int> g4irsf25_corridor_nodes;
+  double g4irsf25_settle_seconds = 0.0;
+  double g4irsf25_max_horizon_seconds = 0.0;
   std::string baseline_action;
   std::string intervention_action;
   std::string expected_action_change_type;
@@ -2413,6 +2421,19 @@ struct Target {
 };
 
 inline Target parse_target(const py::dict& row) {
+  const auto g4irsf25_rejoin_item =
+      optional_item(row, "g4irsf25_rejoin_node");
+  const auto g4irsf25_corridor_item =
+      optional_item(row, "g4irsf25_corridor_nodes");
+  const auto g4irsf25_settle_item =
+      optional_item(row, "g4irsf25_settle_seconds");
+  const auto g4irsf25_max_horizon_item =
+      optional_item(row, "g4irsf25_max_horizon_seconds");
+  const int g4irsf25_field_count =
+      static_cast<int>(static_cast<bool>(g4irsf25_rejoin_item)) +
+      static_cast<int>(static_cast<bool>(g4irsf25_corridor_item)) +
+      static_cast<int>(static_cast<bool>(g4irsf25_settle_item)) +
+      static_cast<int>(static_cast<bool>(g4irsf25_max_horizon_item));
   const auto schema_item = optional_item(row, "schema");
   const auto schema = schema_item
                           ? strict_string(schema_item, "schema")
@@ -2437,6 +2458,10 @@ inline Target parse_target(const py::dict& row) {
       target.g4irsf21_route_action_target ||
       target.g4irsf23_source_hold_target;
   if (target.g4irsf23_source_hold_target) {
+    if (g4irsf25_field_count != 0) {
+      throw py::value_error(
+          "G25 corridor horizon fields require a G21 NEXT_EDGE target");
+    }
     target.descriptor_id = strict_string(
         required_item(row, "target_id"), "target_id");
     target.source_group_id = strict_string(
@@ -2548,6 +2573,10 @@ inline Target parse_target(const py::dict& row) {
       throw py::value_error("horizon must be H_bag or H_system");
     }
     if (target.g4irsf20_route_target) {
+      if (g4irsf25_field_count != 0) {
+        throw py::value_error(
+            "G25 corridor horizon fields require a G21 NEXT_EDGE target");
+      }
       target.descriptor_id =
           target.population_selection_sha256;
       return target;
@@ -2570,6 +2599,50 @@ inline Target parse_target(const py::dict& row) {
       throw py::value_error(
           "action_kind must be NEXT_EDGE or WAIT");
     }
+    if (g4irsf25_field_count != 0) {
+      if (g4irsf25_field_count != 4 ||
+          target.route_action_kind != "NEXT_EDGE") {
+        throw py::value_error(
+            "G25 corridor horizon requires all four fields on G21 NEXT_EDGE");
+      }
+      target.g4irsf25_rejoin_node = strict_int(
+          g4irsf25_rejoin_item, "g4irsf25_rejoin_node");
+      target.g4irsf25_corridor_nodes = strict_int_vector(
+          g4irsf25_corridor_item, "g4irsf25_corridor_nodes");
+      target.g4irsf25_settle_seconds = strict_finite_double(
+          g4irsf25_settle_item, "g4irsf25_settle_seconds");
+      target.g4irsf25_max_horizon_seconds = strict_finite_double(
+          g4irsf25_max_horizon_item,
+          "g4irsf25_max_horizon_seconds");
+      const std::set<int> unique_corridor_nodes(
+          target.g4irsf25_corridor_nodes.begin(),
+          target.g4irsf25_corridor_nodes.end());
+      if (target.g4irsf25_rejoin_node < 0 ||
+          target.g4irsf25_corridor_nodes.empty() ||
+          unique_corridor_nodes.size() !=
+              target.g4irsf25_corridor_nodes.size() ||
+          std::any_of(
+              target.g4irsf25_corridor_nodes.begin(),
+              target.g4irsf25_corridor_nodes.end(),
+              [](int node) { return node < 0; }) ||
+          unique_corridor_nodes.find(target.g4irsf25_rejoin_node) ==
+              unique_corridor_nodes.end()) {
+        throw py::value_error(
+            "G25 corridor nodes must be unique non-negative nodes and include rejoin");
+      }
+      if (target.g4irsf25_settle_seconds < 30.0 ||
+          target.g4irsf25_settle_seconds > 60.0) {
+        throw py::value_error(
+            "g4irsf25_settle_seconds must be between 30 and 60");
+      }
+      if (target.g4irsf25_max_horizon_seconds <
+              target.g4irsf25_settle_seconds ||
+          target.g4irsf25_max_horizon_seconds > 600.0) {
+        throw py::value_error(
+            "g4irsf25_max_horizon_seconds must cover settle and be at most 600");
+      }
+      target.g4irsf25_corridor_horizon = true;
+    }
     const char* horizon_token =
         target.horizon == Horizon::kSelectedSystem
             ? "H_system"
@@ -2586,6 +2659,10 @@ inline Target parse_target(const py::dict& row) {
              : std::string()) +
         "|HORIZON=" + horizon_token;
     return target;
+  }
+  if (g4irsf25_field_count != 0) {
+    throw py::value_error(
+        "G25 corridor horizon fields require a G21 NEXT_EDGE target");
   }
   target.descriptor_id =
       strict_sha256(required_item(row, "descriptor_id"),
@@ -2794,6 +2871,26 @@ inline Target parse_target(const py::dict& row) {
   return target;
 }
 
+inline void append_g4irsf25_short_horizon_contract(
+    py::dict& row, const Target& target) {
+  if (!target.g4irsf25_corridor_horizon) {
+    return;
+  }
+  row["g4irsf25_short_horizon_enabled"] = true;
+  row["g4irsf25_execution_horizon"] =
+      "REJOIN_PLUS_SETTLE_OR_BOUNDED_TIMEOUT";
+  row["g4irsf25_rejoin_node"] =
+      target.g4irsf25_rejoin_node;
+  row["g4irsf25_corridor_nodes"] =
+      target.g4irsf25_corridor_nodes;
+  row["g4irsf25_settle_seconds"] =
+      target.g4irsf25_settle_seconds;
+  row["g4irsf25_max_horizon_seconds"] =
+      target.g4irsf25_max_horizon_seconds;
+  row["g4irsf25_post_first_action_policy"] =
+      "ORDINARY_S4_J2_E2";
+}
+
 inline void verify_target_boundary(const Target& target,
                                    const Boundary& boundary) {
   boundary.validate();
@@ -2836,6 +2933,18 @@ inline void verify_target_boundary(const Target& target,
       boundary.boundary_sha256() != target.boundary_sha256) {
     throw py::value_error(
         "sealed target descriptor full boundary identity drifted");
+  }
+  if (target.g4irsf25_corridor_horizon) {
+    const std::set<int> corridor_nodes(
+        target.g4irsf25_corridor_nodes.begin(),
+        target.g4irsf25_corridor_nodes.end());
+    if (target.g4irsf25_rejoin_node == boundary.node ||
+        corridor_nodes.find(boundary.node) == corridor_nodes.end() ||
+        corridor_nodes.find(target.selected_next_node) ==
+            corridor_nodes.end()) {
+      throw py::value_error(
+          "G25 corridor nodes must include distinct branch, selected edge, and rejoin");
+    }
   }
 }
 
@@ -3207,6 +3316,134 @@ struct BranchEvidence {
   InvariantEvidence invariants;
   std::optional<ics::G4IRSF14CloneReplayHashes> replay_hashes;
   py::object g4irsf22_local_future_summary = py::none();
+  py::object g4irsf25_short_horizon_summary = py::none();
+};
+
+struct G4IRSF25ShortHorizonSpec {
+  int rejoin_node = -1;
+  std::vector<int> corridor_nodes;
+  double settle_seconds = 0.0;
+  double max_horizon_seconds = 0.0;
+};
+
+struct G4IRSF25CorridorAggregateSnapshot {
+  double simulated_time = 0.0;
+  bool known = true;
+  int queue_length = 0;
+  int scheduled_incoming = 0;
+};
+
+inline G4IRSF25CorridorAggregateSnapshot
+g4irsf25_corridor_aggregate_snapshot(
+    const Runtime& runtime,
+    const std::vector<int>& corridor_nodes) {
+  G4IRSF25CorridorAggregateSnapshot aggregate;
+  aggregate.simulated_time =
+      runtime.progress_snapshot().simulated_time;
+  for (const int node : corridor_nodes) {
+    const auto [queue_length, scheduled_incoming] =
+        runtime.g4irsf25_local_backlog_counts(node);
+    // Junction controllers are materialized lazily.  An absent controller is
+    // the exact empty local state (zero queue and zero scheduled incoming),
+    // not missing label coverage.
+    aggregate.queue_length += std::max(0, queue_length);
+    aggregate.scheduled_incoming += std::max(0, scheduled_incoming);
+  }
+  return aggregate;
+}
+
+class G4IRSF25ShortHorizonAccumulator {
+ public:
+  explicit G4IRSF25ShortHorizonAccumulator(
+      G4IRSF25CorridorAggregateSnapshot initial)
+      : start_time_(initial.simulated_time), previous_(initial) {
+    if (!initial.known) {
+      throw std::invalid_argument(
+          "G25 corridor_nodes contains an unknown runtime node");
+    }
+    peak_queue_length_ = initial.queue_length;
+    peak_scheduled_incoming_ = initial.scheduled_incoming;
+    peak_backlog_ = initial.queue_length + initial.scheduled_incoming;
+  }
+
+  void observe(G4IRSF25CorridorAggregateSnapshot current) {
+    if (!current.known) {
+      throw std::logic_error(
+          "G25 corridor node became unknown during branch drive");
+    }
+    if (current.simulated_time +
+            ics::event_runtime_detail::kEpsilon <
+        previous_.simulated_time) {
+      throw std::logic_error(
+          "G25 short-horizon observation time moved backwards");
+    }
+    const double elapsed = std::max(
+        0.0, current.simulated_time - previous_.simulated_time);
+    queue_area_bag_seconds_ +=
+        static_cast<double>(previous_.queue_length) * elapsed;
+    scheduled_incoming_area_bag_seconds_ +=
+        static_cast<double>(previous_.scheduled_incoming) * elapsed;
+    previous_ = current;
+    peak_queue_length_ =
+        std::max(peak_queue_length_, current.queue_length);
+    peak_scheduled_incoming_ = std::max(
+        peak_scheduled_incoming_, current.scheduled_incoming);
+    peak_backlog_ = std::max(
+        peak_backlog_,
+        current.queue_length + current.scheduled_incoming);
+  }
+
+  void advance_constant_to(double simulated_time) {
+    auto endpoint = previous_;
+    endpoint.simulated_time = simulated_time;
+    observe(endpoint);
+  }
+
+  [[nodiscard]] double start_time() const noexcept {
+    return start_time_;
+  }
+
+  [[nodiscard]] double simulated_time() const noexcept {
+    return previous_.simulated_time;
+  }
+
+  [[nodiscard]] double queue_area_bag_seconds() const noexcept {
+    return queue_area_bag_seconds_;
+  }
+
+  [[nodiscard]] double
+  scheduled_incoming_area_bag_seconds() const noexcept {
+    return scheduled_incoming_area_bag_seconds_;
+  }
+
+  [[nodiscard]] int queue_length() const noexcept {
+    return previous_.queue_length;
+  }
+
+  [[nodiscard]] int scheduled_incoming() const noexcept {
+    return previous_.scheduled_incoming;
+  }
+
+  [[nodiscard]] int peak_queue_length() const noexcept {
+    return peak_queue_length_;
+  }
+
+  [[nodiscard]] int peak_scheduled_incoming() const noexcept {
+    return peak_scheduled_incoming_;
+  }
+
+  [[nodiscard]] int peak_backlog() const noexcept {
+    return peak_backlog_;
+  }
+
+ private:
+  double start_time_ = 0.0;
+  G4IRSF25CorridorAggregateSnapshot previous_;
+  double queue_area_bag_seconds_ = 0.0;
+  double scheduled_incoming_area_bag_seconds_ = 0.0;
+  int peak_queue_length_ = 0;
+  int peak_scheduled_incoming_ = 0;
+  int peak_backlog_ = 0;
 };
 
 inline double g4irsf22_service_deficit_area(
@@ -3405,6 +3642,250 @@ class G4IRSF22LocalFutureAccumulator {
   std::array<HorizonRow, horizons_.size()> rows_{};
 };
 
+inline BranchEvidence drive_g4irsf25_short_horizon(
+    Runtime& runtime,
+    const std::vector<int>& affected_ids,
+    std::uint64_t start_event_count,
+    const ProfileFullShapeExpectation& full_shape_expectation,
+    bool allow_lazy_stale_merge_wakeups,
+    const G4IRSF25ShortHorizonSpec& spec) {
+  if (affected_ids.size() != 1U) {
+    throw std::invalid_argument(
+        "G25 corridor horizon requires exactly one affected Route bag");
+  }
+  const int affected_id = affected_ids.front();
+  auto accumulator = G4IRSF25ShortHorizonAccumulator(
+      g4irsf25_corridor_aggregate_snapshot(
+          runtime, spec.corridor_nodes));
+  const double max_deadline =
+      accumulator.start_time() + spec.max_horizon_seconds;
+  bool rejoin_arrived = false;
+  double rejoin_arrival_time = -1.0;
+  bool affected_failed = false;
+  bool reached_endpoint = false;
+  bool runtime_stopped = false;
+
+  while (true) {
+    const auto affected =
+        runtime.g4irsf15_local_action_snapshot(affected_id);
+    affected_failed = affected_failed || affected.status == "FAILED";
+    if (!rejoin_arrived && affected.known &&
+        affected.current_node == spec.rejoin_node) {
+      rejoin_arrived = true;
+      rejoin_arrival_time = accumulator.simulated_time();
+    }
+    const double endpoint = rejoin_arrived
+                                ? std::min(
+                                      max_deadline,
+                                      rejoin_arrival_time +
+                                          spec.settle_seconds)
+                                : max_deadline;
+    if (accumulator.simulated_time() +
+            ics::event_runtime_detail::kEpsilon >=
+        endpoint) {
+      if (accumulator.simulated_time() < endpoint) {
+        accumulator.advance_constant_to(endpoint);
+      }
+      reached_endpoint = true;
+      break;
+    }
+
+    const auto next_event_time =
+        runtime.g4irsf25_trusted_next_event_time();
+    if (!next_event_time.has_value()) {
+      if (runtime.phase() ==
+              ics::EventDrivenJunctionRuntimePhase::kReady &&
+          runtime.process_one_event()) {
+        accumulator.observe(
+            g4irsf25_corridor_aggregate_snapshot(
+                runtime, spec.corridor_nodes));
+        continue;
+      }
+      runtime_stopped = true;
+      break;
+    }
+    // Once rejoin has been observed, the settling interval is half-open and
+    // an event exactly at its endpoint cannot contribute area.  Before
+    // arrival, process an event exactly at the max cap so an arrival there is
+    // retained rather than silently reported as a miss.
+    const bool endpoint_precedes_next_event =
+        *next_event_time >
+            endpoint + ics::event_runtime_detail::kEpsilon ||
+        (rejoin_arrived &&
+         *next_event_time +
+                 ics::event_runtime_detail::kEpsilon >=
+             endpoint);
+    if (endpoint_precedes_next_event) {
+      accumulator.advance_constant_to(endpoint);
+      reached_endpoint = true;
+      break;
+    }
+    if (!runtime.process_one_event()) {
+      runtime_stopped = true;
+      break;
+    }
+    accumulator.observe(
+        g4irsf25_corridor_aggregate_snapshot(
+            runtime, spec.corridor_nodes));
+  }
+
+  const auto& stopped_summary = runtime.current_result().summary;
+  const bool clean_terminal =
+      runtime_stopped &&
+      runtime.phase() !=
+          ics::EventDrivenJunctionRuntimePhase::kReady &&
+      !stopped_summary.event_limit_reached &&
+      !stopped_summary.time_limit_reached;
+  if (clean_terminal) {
+    // With no future event, the current local state is exact through the
+    // bounded endpoint.  Extending the last value keeps terminal examples in
+    // the training data instead of dropping them for lack of a timer event.
+    const double endpoint = rejoin_arrived
+                                ? std::min(
+                                      max_deadline,
+                                      rejoin_arrival_time +
+                                          spec.settle_seconds)
+                                : max_deadline;
+    if (accumulator.simulated_time() < endpoint) {
+      accumulator.advance_constant_to(endpoint);
+    }
+    reached_endpoint = true;
+  }
+
+  const double settle_deadline =
+      rejoin_arrived
+          ? rejoin_arrival_time + spec.settle_seconds
+          : std::numeric_limits<double>::infinity();
+  const bool settle_complete =
+      rejoin_arrived && settle_deadline <=
+                            max_deadline +
+                                ics::event_runtime_detail::kEpsilon &&
+      accumulator.simulated_time() +
+              ics::event_runtime_detail::kEpsilon >=
+          settle_deadline;
+  const bool cap_reached =
+      accumulator.simulated_time() +
+              ics::event_runtime_detail::kEpsilon >=
+          max_deadline;
+  const bool timeout = !settle_complete && cap_reached;
+
+  BranchEvidence evidence;
+  evidence.horizon_complete =
+      !affected_failed && reached_endpoint &&
+      (settle_complete || timeout);
+  evidence.blocked = !evidence.horizon_complete;
+  if (affected_failed) {
+    evidence.stop_reason = "G25_AFFECTED_BAG_FAILED";
+  } else if (settle_complete) {
+    evidence.stop_reason = "G25_REJOIN_SETTLED";
+  } else if (timeout) {
+    evidence.stop_reason = "G25_MAX_HORIZON_TIMEOUT";
+  } else if (rejoin_arrived) {
+    evidence.stop_reason = "G25_RUNTIME_STOPPED_BEFORE_SETTLE";
+  } else {
+    evidence.stop_reason = "G25_RUNTIME_STOPPED_BEFORE_REJOIN";
+  }
+  const auto terminal_progress = runtime.progress_snapshot();
+  const auto terminal_event_count = static_cast<std::uint64_t>(
+      std::max(0, terminal_progress.event_count));
+  evidence.elapsed_event_count =
+      terminal_event_count >= start_event_count
+          ? terminal_event_count - start_event_count
+          : 0U;
+
+  if (!runtime.g4irsf25_trusted_next_event_time().has_value()) {
+    if (runtime.phase() ==
+        ics::EventDrivenJunctionRuntimePhase::kReady) {
+      if (runtime.process_one_event()) {
+        throw std::logic_error(
+            "G25 missing terminal safe boundary processed an event");
+      }
+    }
+    runtime.finalize();
+    evidence.finalized = true;
+  }
+  // This bounded supervised label does not use a terminal identity.  Full
+  // runtime hashing dominated the cost of each pair while adding no learning
+  // signal, so G25 deliberately records that it was not collected.
+  evidence.terminal_state_sha256.clear();
+  evidence.terminal_digest_kind =
+      "NOT_COLLECTED_G25_BOUNDED_SHORT_HORIZON";
+
+  evidence.affected_outcomes.push_back(
+      runtime.g4irsf15_causal_bag_outcome(affected_id));
+  evidence.cohort_outcomes = evidence.affected_outcomes;
+  evidence.invariants = invariant_evidence(
+      runtime.current_result().summary, false,
+      full_shape_expectation,
+      allow_lazy_stale_merge_wakeups);
+
+  const auto final_affected =
+      runtime.g4irsf15_local_action_snapshot(affected_id);
+  py::dict row;
+  row["schema"] =
+      "czr005.g4irsf25.short_horizon_branch.v1";
+  row["producer"] =
+      "EXACT_SAME_CHECKPOINT_REJOIN_SETTLE_ONLINE_ACCUMULATOR";
+  row["affected_runtime_bag_id"] = affected_id;
+  row["rejoin_node"] = spec.rejoin_node;
+  row["corridor_nodes"] = spec.corridor_nodes;
+  row["start_time"] = accumulator.start_time();
+  row["end_time"] = accumulator.simulated_time();
+  row["observed_seconds"] = std::max(
+      0.0, accumulator.simulated_time() -
+               accumulator.start_time());
+  row["settle_seconds"] = spec.settle_seconds;
+  row["max_horizon_seconds"] = spec.max_horizon_seconds;
+  row["rejoin_arrived"] = rejoin_arrived;
+  row["rejoin_arrival_time"] =
+      rejoin_arrived
+          ? py::object(py::float_(rejoin_arrival_time))
+          : py::object(py::none());
+  row["settle_complete"] = settle_complete;
+  row["timeout"] = timeout;
+  row["coverage_complete"] = reached_endpoint;
+  row["cap_reached"] = cap_reached;
+  row["runtime_stopped"] = runtime_stopped;
+  row["affected_bag_failed"] = affected_failed;
+  // A censored/failed arm deliberately receives the full cap.  It remains a
+  // high-cost supervised example instead of disappearing from the dataset.
+  row["private_cost_seconds"] =
+      rejoin_arrived
+          ? std::max(0.0, rejoin_arrival_time -
+                              accumulator.start_time())
+          : spec.max_horizon_seconds;
+  row["private_cost_censored"] = !rejoin_arrived;
+  row["queue_area_bag_seconds"] =
+      accumulator.queue_area_bag_seconds();
+  row["scheduled_incoming_area_bag_seconds"] =
+      accumulator.scheduled_incoming_area_bag_seconds();
+  row["local_system_cost"] =
+      accumulator.queue_area_bag_seconds() +
+      accumulator.scheduled_incoming_area_bag_seconds();
+  row["local_system_cost_units"] =
+      "BAG_SECONDS_QUEUE_PLUS_SCHEDULED_INCOMING";
+  row["queue_backlog_at_horizon"] =
+      accumulator.queue_length();
+  row["scheduled_incoming_at_horizon"] =
+      accumulator.scheduled_incoming();
+  row["local_backlog_at_horizon"] =
+      accumulator.queue_length() +
+      accumulator.scheduled_incoming();
+  row["peak_queue_length"] =
+      accumulator.peak_queue_length();
+  row["peak_scheduled_incoming"] =
+      accumulator.peak_scheduled_incoming();
+  row["peak_local_backlog"] = accumulator.peak_backlog();
+  row["affected_bag_completed"] =
+      final_affected.status == "COMPLETED";
+  row["active_bag_backlog_at_horizon"] =
+      terminal_progress.active_bag_count;
+  row["safety_pass"] = evidence.invariants.live_safety_pass;
+  row["stop_reason"] = evidence.stop_reason;
+  evidence.g4irsf25_short_horizon_summary = std::move(row);
+  return evidence;
+}
+
 inline BranchEvidence drive_branch(
     Runtime& runtime,
     Horizon horizon,
@@ -3415,7 +3896,15 @@ inline BranchEvidence drive_branch(
     const ProfileFullShapeExpectation& full_shape_expectation,
     bool allow_lazy_stale_merge_wakeups,
     int g4irsf22_local_observation_node = -1,
-    bool collect_g4irsf22_local_future = false) {
+    bool collect_g4irsf22_local_future = false,
+    const G4IRSF25ShortHorizonSpec* g4irsf25_spec = nullptr) {
+  if (g4irsf25_spec != nullptr) {
+    return drive_g4irsf25_short_horizon(
+        runtime, affected_ids, start_event_count,
+        full_shape_expectation,
+        allow_lazy_stale_merge_wakeups,
+        *g4irsf25_spec);
+  }
   BranchEvidence evidence;
   std::optional<G4IRSF22LocalFutureAccumulator> local_future;
   if (collect_g4irsf22_local_future &&
@@ -3856,6 +4345,22 @@ inline py::dict branch_row(
   if (!evidence.g4irsf22_local_future_summary.is_none()) {
     row["local_future_summary"] =
         evidence.g4irsf22_local_future_summary;
+  }
+  if (!evidence.g4irsf25_short_horizon_summary.is_none()) {
+    const auto short_horizon = py::reinterpret_borrow<py::dict>(
+        evidence.g4irsf25_short_horizon_summary);
+    row["g4irsf25_short_horizon"] = short_horizon;
+    // Keep the two supervised labels and operational diagnostics shallow for
+    // compact JSONL consumers; the nested row retains their full provenance.
+    row["private_cost_seconds"] =
+        short_horizon["private_cost_seconds"];
+    row["local_system_cost"] =
+        short_horizon["local_system_cost"];
+    row["rejoin_arrived"] = short_horizon["rejoin_arrived"];
+    row["timeout"] = short_horizon["timeout"];
+    row["local_backlog_at_horizon"] =
+        short_horizon["local_backlog_at_horizon"];
+    row["safety_pass"] = short_horizon["safety_pass"];
   }
   if (evidence.replay_hashes.has_value()) {
     row["replay_hashes"] =
@@ -4658,12 +5163,21 @@ inline py::dict run_causal_target_pairs_from_records(
     const auto pibt_prefilter_before =
         source.current_result()
             .summary.g4irsf14_i5_prefilter_candidate_count;
-    const auto checkpoint = source.capture_state_checkpoint();
+    const bool g4irsf25_trusted_checkpoint =
+        targets[target_cursor].g4irsf25_corridor_horizon;
+    const auto checkpoint = g4irsf25_trusted_checkpoint
+                                ? source.capture_state_checkpoint_for_g4irsf25()
+                                : source.capture_state_checkpoint();
     const auto source_state_sha256 = checkpoint.state_sha256();
     std::size_t group_end = target_cursor;
     while (group_end < targets.size() &&
            targets[group_end].event_ordinal ==
                target_ordinal) {
+      if (targets[group_end].g4irsf25_corridor_horizon !=
+          g4irsf25_trusted_checkpoint) {
+        throw py::value_error(
+            "one event ordinal cannot mix G25 trusted and sealed targets");
+      }
       if (!targets[group_end].deferred_address &&
           targets[group_end].runtime_state_sha256 !=
               source_state_sha256) {
@@ -4684,7 +5198,9 @@ inline py::dict run_causal_target_pairs_from_records(
       }
     }
     const auto source_probe =
-        source.probe_one_event_for_causal_opportunities();
+        g4irsf25_trusted_checkpoint
+            ? source.probe_one_event_for_g4irsf25_trusted_opportunities()
+            : source.probe_one_event_for_causal_opportunities();
     const bool pibt_prefilter_candidate_event =
         source.current_result()
             .summary.g4irsf14_i5_prefilter_candidate_count >
@@ -4831,6 +5347,8 @@ inline py::dict run_causal_target_pairs_from_records(
           target.horizon == detail::Horizon::kSelectedSystem
               ? "H_system"
               : "H_bag";
+      detail::append_g4irsf25_short_horizon_contract(
+          pair, target);
       pair["source_checkpoint_state_sha256"] =
           source_state_sha256;
       pair["protected_full_1x_shape"] =
@@ -5124,11 +5642,17 @@ inline py::dict run_causal_target_pairs_from_records(
         baseline_start_event_count =
             source_baseline_start_event_count;
       } else {
-        branch.restore_state_checkpoint(checkpoint);
+        if (g4irsf25_trusted_checkpoint) {
+          branch.restore_state_checkpoint_for_g4irsf25(checkpoint);
+        } else {
+          branch.restore_state_checkpoint(checkpoint);
+        }
         baseline_pre_action =
             detail::local_snapshots(branch, intended_ids);
         branch_baseline_step =
-            branch.probe_one_event_for_causal_opportunities();
+            g4irsf25_trusted_checkpoint
+                ? branch.probe_one_event_for_g4irsf25_trusted_opportunities()
+                : branch.probe_one_event_for_causal_opportunities();
         baseline_post_action =
             detail::local_snapshots(branch, intended_ids);
         baseline_start_event_count =
@@ -5137,13 +5661,20 @@ inline py::dict run_causal_target_pairs_from_records(
         baseline_step = &branch_baseline_step;
       }
 
-      branch.restore_state_checkpoint(checkpoint);
+      if (g4irsf25_trusted_checkpoint) {
+        branch.restore_state_checkpoint_for_g4irsf25(checkpoint);
+      } else {
+        branch.restore_state_checkpoint(checkpoint);
+      }
       const auto treatment_start_sha256 = source_state_sha256;
       const auto treatment_pre_action =
           detail::local_snapshots(branch, intended_ids);
       const auto treatment_step =
-          branch.process_one_event_with_causal_intervention(
-              directive);
+          g4irsf25_trusted_checkpoint
+              ? branch.process_one_event_with_g4irsf25_trusted_intervention(
+                    directive)
+              : branch.process_one_event_with_causal_intervention(
+                    directive);
       const auto treatment_post_action =
           detail::local_snapshots(branch, intended_ids);
 
@@ -5198,25 +5729,47 @@ inline py::dict run_causal_target_pairs_from_records(
       const std::uint64_t treatment_start_event_count =
           static_cast<std::uint64_t>(
               std::max(0, branch.current_result().summary.event_count));
+      std::optional<detail::G4IRSF25ShortHorizonSpec>
+          g4irsf25_short_horizon_spec;
+      if (target.g4irsf25_corridor_horizon) {
+        g4irsf25_short_horizon_spec.emplace(
+            detail::G4IRSF25ShortHorizonSpec{
+                target.g4irsf25_rejoin_node,
+                target.g4irsf25_corridor_nodes,
+                target.g4irsf25_settle_seconds,
+                target.g4irsf25_max_horizon_seconds});
+      }
+      const auto execution_horizon =
+          target.g4irsf25_corridor_horizon
+              ? detail::Horizon::kAffectedBag
+              : target.horizon;
       const bool collect_g4irsf22_local_future =
           detail::is_g22_route_profile(profile) &&
-          target.g4irsf21_route_action_target;
+          target.g4irsf21_route_action_target &&
+          !target.g4irsf25_corridor_horizon;
       const int treatment_local_observation_node =
           (target.kind_index == 2 ||
            target.g4irsf23_source_hold_target)
               ? found->node
               : target.selected_next_node;
       const auto treatment_evidence = detail::drive_branch(
-          branch, target.horizon, intended_ids, all_runtime_ids,
+          branch, execution_horizon, intended_ids, all_runtime_ids,
           found->node, treatment_start_event_count,
           full_shape_expectation,
           detail::is_s4_j2_route_profile(profile),
           treatment_local_observation_node,
-          collect_g4irsf22_local_future);
+          collect_g4irsf22_local_future,
+          g4irsf25_short_horizon_spec.has_value()
+              ? &*g4irsf25_short_horizon_spec
+              : nullptr);
 
       // Replaying one baseline event is much cheaper than retaining a second
       // full checkpoint while a possibly full-system treatment drains.
-      branch.restore_state_checkpoint(checkpoint);
+      if (g4irsf25_trusted_checkpoint) {
+        branch.restore_state_checkpoint_for_g4irsf25(checkpoint);
+      } else {
+        branch.restore_state_checkpoint(checkpoint);
+      }
       const auto replayed_baseline_pre_action =
           detail::local_snapshots(branch, intended_ids);
       ics::G4IRSF14CausalStepResult replayed_baseline_step;
@@ -5228,7 +5781,9 @@ inline py::dict run_causal_target_pairs_from_records(
         pair["g4irsf23_plain_baseline_replay"] = true;
       } else {
         replayed_baseline_step =
-            branch.probe_one_event_for_causal_opportunities();
+            g4irsf25_trusted_checkpoint
+                ? branch.probe_one_event_for_g4irsf25_trusted_opportunities()
+                : branch.probe_one_event_for_causal_opportunities();
       }
       const auto replayed_baseline_post_action =
           detail::local_snapshots(branch, intended_ids);
@@ -5282,13 +5837,16 @@ inline py::dict run_causal_target_pairs_from_records(
         pair["shared_baseline_used"] = true;
         if (!shared_g4irsf23_baseline_equivalence_verified) {
           local_baseline_evidence = detail::drive_branch(
-              branch, target.horizon, intended_ids,
+              branch, execution_horizon, intended_ids,
               all_runtime_ids, found->node,
               baseline_start_event_count,
               full_shape_expectation,
               detail::is_s4_j2_route_profile(profile),
               found->baseline_next_node,
-              collect_g4irsf22_local_future);
+              collect_g4irsf22_local_future,
+              g4irsf25_short_horizon_spec.has_value()
+                  ? &*g4irsf25_short_horizon_spec
+                  : nullptr);
           const auto& audited = local_baseline_evidence;
           const auto shared_cohort_sha =
               detail::cohort_outcome_sha256(
@@ -5362,13 +5920,16 @@ inline py::dict run_causal_target_pairs_from_records(
             shared_g4irsf23_baseline_equivalence_verified;
       } else {
         local_baseline_evidence = detail::drive_branch(
-            branch, target.horizon, intended_ids,
+            branch, execution_horizon, intended_ids,
             all_runtime_ids, found->node,
             baseline_start_event_count,
             full_shape_expectation,
             detail::is_s4_j2_route_profile(profile),
             found->baseline_next_node,
-            collect_g4irsf22_local_future);
+            collect_g4irsf22_local_future,
+            g4irsf25_short_horizon_spec.has_value()
+                ? &*g4irsf25_short_horizon_spec
+                : nullptr);
         baseline_evidence_view = &local_baseline_evidence;
         pair["shared_baseline_used"] = false;
         pair["shared_baseline_equivalence_verified"] = false;
@@ -5380,10 +5941,10 @@ inline py::dict run_causal_target_pairs_from_records(
           (target.g4irsf20_route_target ||
            target.g4irsf21_route_action_target) &&
           detail::is_s4_j2_route_profile(profile) &&
-          target.horizon == detail::Horizon::kSelectedSystem;
+          execution_horizon == detail::Horizon::kSelectedSystem;
       const bool compact_g4irsf23_h_system =
           target.g4irsf23_source_hold_target &&
-          target.horizon == detail::Horizon::kSelectedSystem;
+          execution_horizon == detail::Horizon::kSelectedSystem;
       const bool compact_h_system_output =
           compact_g4irsf20_h_system ||
           compact_g4irsf23_h_system;
@@ -5412,7 +5973,7 @@ inline py::dict run_causal_target_pairs_from_records(
           protected_original_entry_times,
           compact_h_system_output);
       if (target.g4irsf23_source_hold_target) {
-        if (target.horizon == detail::Horizon::kSelectedSystem) {
+        if (execution_horizon == detail::Horizon::kSelectedSystem) {
           const auto baseline_raw =
               py::reinterpret_borrow<py::dict>(
                   baseline_branch["raw_bag_cohort_metrics"]);
@@ -5486,6 +6047,40 @@ inline py::dict run_causal_target_pairs_from_records(
         observed_certificate["future_hold_contract_observed"] =
             forced_a0_after_hold_observed;
       }
+      if (target.g4irsf25_corridor_horizon) {
+        const auto baseline_short =
+            py::reinterpret_borrow<py::dict>(
+                baseline_evidence_view
+                    ->g4irsf25_short_horizon_summary);
+        const auto treatment_short =
+            py::reinterpret_borrow<py::dict>(
+                treatment_evidence
+                    .g4irsf25_short_horizon_summary);
+        pair["g4irsf25_private_cost_delta_seconds"] =
+            py::cast<double>(
+                treatment_short["private_cost_seconds"]) -
+            py::cast<double>(
+                baseline_short["private_cost_seconds"]);
+        pair["g4irsf25_local_system_cost_delta"] =
+            py::cast<double>(
+                treatment_short["local_system_cost"]) -
+            py::cast<double>(
+                baseline_short["local_system_cost"]);
+        pair["g4irsf25_local_backlog_delta"] =
+            py::cast<int>(
+                treatment_short["local_backlog_at_horizon"]) -
+            py::cast<int>(
+                baseline_short["local_backlog_at_horizon"]);
+        pair["g4irsf25_both_rejoin_arrived"] =
+            py::cast<bool>(baseline_short["rejoin_arrived"]) &&
+            py::cast<bool>(treatment_short["rejoin_arrived"]);
+        pair["g4irsf25_any_timeout"] =
+            py::cast<bool>(baseline_short["timeout"]) ||
+            py::cast<bool>(treatment_short["timeout"]);
+        pair["g4irsf25_both_safe"] =
+            py::cast<bool>(baseline_short["safety_pass"]) &&
+            py::cast<bool>(treatment_short["safety_pass"]);
+      }
       pair["baseline"] = std::move(baseline_branch);
       pair["treatment"] = std::move(treatment_branch);
       py::list affected_deltas;
@@ -5520,7 +6115,7 @@ inline py::dict run_causal_target_pairs_from_records(
       } else {
         const auto externality = detail::realized_externality_row(
             *baseline_evidence_view, treatment_evidence, intended_ids,
-            target.horizon);
+            execution_horizon);
         pair["realized_externality"] = externality;
         pair["realized_affected_runtime_bag_ids"] =
             externality["realized_affected_runtime_bag_ids"];
@@ -5535,7 +6130,7 @@ inline py::dict run_causal_target_pairs_from_records(
         pair["realized_outcome_deltas_sha256"] =
             externality["realized_outcome_deltas_sha256"];
       }
-      if (target.horizon ==
+      if (execution_horizon ==
               detail::Horizon::kSelectedSystem &&
           !compact_h_system_output) {
         pair["cohort_difference_sidecar"] =
@@ -5579,7 +6174,7 @@ inline py::dict run_causal_target_pairs_from_records(
           baseline_evidence_view->invariants.live_safety_pass &&
           treatment_evidence.invariants.live_safety_pass;
       const bool formal_hard_gate_evaluated =
-          target.horizon ==
+          execution_horizon ==
           detail::Horizon::kSelectedSystem;
       const bool formal_hard_gate_pass =
           formal_hard_gate_evaluated &&
@@ -5634,32 +6229,32 @@ inline py::dict run_causal_target_pairs_from_records(
       pair["hard_gate_fail_reasons"] =
           pair_fail_reasons;
       pair["h_system_cohort_is_all_input_runtime_ids"] =
-          target.horizon ==
+          execution_horizon ==
                   detail::Horizon::kSelectedSystem &&
           all_runtime_ids.size() == requests.size();
       pair["h_system_cohort_size"] =
-          target.horizon == detail::Horizon::kSelectedSystem
+          execution_horizon == detail::Horizon::kSelectedSystem
               ? py::int_(all_runtime_ids.size())
               : py::int_(0);
       pair["h_system_cohort_mapping_sha256"] =
-          target.horizon ==
+          execution_horizon ==
                   detail::Horizon::kSelectedSystem
               ? py::object(py::str(runtime_mapping_sha256))
               : py::object(py::none());
       pair["raw_bag_mapping_sha256"] =
-          target.horizon ==
+          execution_horizon ==
                   detail::Horizon::kSelectedSystem
               ? py::object(py::str(raw_mapping_sha256))
               : py::object(py::none());
       pair["raw_bag_original_entry_mapping_sha256"] =
-          target.horizon ==
+          execution_horizon ==
                   detail::Horizon::kSelectedSystem
               ? py::object(py::str(
                     raw_original_entry_mapping_sha256))
               : py::object(py::none());
       pairs.append(std::move(pair));
       ++applied_action_changing_pair_count;
-      if (target.horizon ==
+      if (execution_horizon ==
           detail::Horizon::kSelectedSystem) {
         ++applied_action_changing_h_system_count;
         if (complete && formal_hard_gate_pass) {

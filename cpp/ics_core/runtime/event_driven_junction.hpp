@@ -38,6 +38,7 @@
 #include "ics_core/runtime/g4irsf16_supervisor.hpp"
 #include "ics_core/runtime/g4irsf17_source_policy.hpp"
 #include "ics_core/runtime/g4irsf18_merge_policy.hpp"
+#include "ics_core/runtime/g4irsf25_clcr.hpp"
 
 namespace czr005::ics {
 
@@ -683,6 +684,9 @@ struct EventDrivenJunctionConfig {
   // Route MOVE candidates.  It is never read by source, wait, merge, or PIBT
   // arbitration paths.
   G4IRSF24DLPConfig g4irsf24_dlp;
+  // G25 is a compact residual over S4 at registered split/rejoin corridors.
+  // Empty/off preserves the complete historical path.
+  G4IRSF25CLCRConfig g4irsf25_clcr;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -826,6 +830,18 @@ struct EventDecisionTraceRow {
   int g4irsf24_dlp_value_support = 0;
   std::string g4irsf24_dlp_fallback_reason;
   bool g4irsf24_dlp_committed_mutation = false;
+  // Emitted only when the compact G25 policy/recorder is enabled.
+  bool g4irsf25_clcr_evaluated = false;
+  std::string g4irsf25_clcr_mode;
+  int g4irsf25_clcr_s4_next = -1;
+  int g4irsf25_clcr_proposed_next = -1;
+  int g4irsf25_clcr_rejoin_node = -1;
+  int g4irsf25_clcr_support = 0;
+  double g4irsf25_clcr_predicted_system_delta_seconds = 0.0;
+  double g4irsf25_clcr_predicted_private_delta_seconds = 0.0;
+  std::vector<double> g4irsf25_clcr_selected_features;
+  std::string g4irsf25_clcr_fallback_reason;
+  bool g4irsf25_clcr_committed_mutation = false;
 };
 
 // Stable raw schema for the outcome-free G20 Route observation sidecar.  Keep
@@ -1400,6 +1416,34 @@ struct EventRuntimeSummary {
   std::uint64_t g4irsf24_dlp_margin_fallback_count = 0;
   std::uint64_t g4irsf24_dlp_detour_fallback_count = 0;
   std::uint64_t g4irsf24_dlp_shield_fault_fallback_count = 0;
+  // G25 counters remain empty/zero in exact-off mode and are omitted by the
+  // binding. proposal and committed mutation are intentionally distinct.
+  std::string g4irsf25_clcr_mode;
+  int g4irsf25_clcr_arm_count = 0;
+  std::uint64_t g4irsf25_clcr_route_evaluation_count = 0;
+  std::uint64_t g4irsf25_clcr_eligible_candidate_count = 0;
+  std::uint64_t g4irsf25_clcr_supported_candidate_count = 0;
+  std::uint64_t g4irsf25_clcr_proposal_count = 0;
+  std::uint64_t g4irsf25_clcr_committed_mutation_count = 0;
+  std::uint64_t g4irsf25_clcr_fallback_s4_count = 0;
+  std::uint64_t g4irsf25_clcr_same_action_count = 0;
+  std::uint64_t g4irsf25_clcr_low_support_fallback_count = 0;
+  std::uint64_t g4irsf25_clcr_ood_fallback_count = 0;
+  std::uint64_t g4irsf25_clcr_margin_fallback_count = 0;
+  std::uint64_t g4irsf25_clcr_threshold_fallback_count = 0;
+  std::uint64_t g4irsf25_clcr_fairness_fallback_count = 0;
+  std::uint64_t g4irsf25_clcr_fault_shield_fallback_count = 0;
+  std::uint64_t g4irsf25_clcr_non_corridor_fallback_count = 0;
+  std::uint64_t g4irsf25_clcr_feedback_count = 0;
+  std::uint64_t g4irsf25_clcr_online_bias_update_count = 0;
+  std::map<int, std::uint64_t>
+      g4irsf25_clcr_committed_mutations_by_branch;
+  std::uint64_t g4irsf25_corridor_trajectory_started_count = 0;
+  std::uint64_t g4irsf25_corridor_trajectory_completed_count = 0;
+  std::uint64_t g4irsf25_corridor_trajectory_timeout_count = 0;
+  int g4irsf25_runtime_global_scan_count = 0;
+  int g4irsf25_future_route_input_count = 0;
+  int g4irsf25_full_astar_call_count = 0;
 };
 
 struct EventRuntimeJunctionResult {
@@ -1715,6 +1759,8 @@ struct EventDrivenJunctionResult {
   std::vector<EventRuntimeEventSeqAuditRow> event_seq_ordering_audit;
   std::vector<EventRuntimeArbitrationBatchRow> arbitration_batch_cardinality;
   std::vector<DestinationMergeGrantLifecycleRow> merge_grant_lifecycle;
+  std::vector<G4IRSF25CorridorTrajectoryRow>
+      g4irsf25_corridor_trajectories;
 };
 
 enum class EventDrivenJunctionRuntimePhase {
@@ -2569,6 +2615,39 @@ static_assert(std::is_nothrow_move_assignable_v<RuntimeEvent>);
 
 class EventDrivenJunctionRuntime {
  private:
+  struct G4IRSF25CorridorFeedbackState {
+    int sample_count = 0;
+    int completed_count = 0;
+    int timeout_count = 0;
+    double short_ewma_seconds = 0.0;
+    double long_ewma_seconds = 0.0;
+    double short_local_system_cost = 0.0;
+    double long_local_system_cost = 0.0;
+    double last_update_time = -1.0;
+  };
+
+  struct G4IRSF25PendingCorridorTrajectory {
+    G4IRSF25CorridorTrajectoryRow row;
+    std::uint64_t arm_key = 0;
+    double initial_junction_wait_seconds = 0.0;
+    double initial_local_queue_area = 0.0;
+    double initial_scheduled_incoming_area = 0.0;
+    int initial_bag_loop_count = 0;
+    std::size_t path_limit = 0;
+  };
+
+  // One bounded local integral per registered arm.  Trajectories retain only
+  // their starting cumulative values, so event cost is independent of the
+  // number of bags concurrently traversing a corridor.
+  struct G4IRSF25ArmLocalIntegralState {
+    double last_integrated_time = 0.0;
+    double local_queue_area = 0.0;
+    double scheduled_incoming_area = 0.0;
+    int current_local_queue = 0;
+    int current_scheduled_incoming = 0;
+    std::vector<int> local_nodes;
+  };
+
   struct CheckpointStorage {
     const Graph* graph_identity = nullptr;
     std::string graph_sha256;
@@ -2609,6 +2688,15 @@ class EventDrivenJunctionRuntime {
         active_fault_instance_by_edge;
     std::map<std::pair<long long, int>, double>
         repair_time_by_fault_instance;
+    std::unordered_map<std::uint64_t,
+                       G4IRSF25CorridorFeedbackState>
+        g4irsf25_corridor_feedback;
+    std::unordered_map<int, G4IRSF25PendingCorridorTrajectory>
+        g4irsf25_pending_corridor_trajectories;
+    std::unordered_map<std::uint64_t, G4IRSF25ArmLocalIntegralState>
+        g4irsf25_arm_local_integrals;
+    std::set<std::pair<double, int>> g4irsf25_corridor_timeout_index;
+    std::unordered_map<int, bool> g4irsf25_t0_gate_open_by_branch;
     event_runtime_detail::RuntimeEventQueue events;
     std::optional<
         event_runtime_detail::G4IRSF14RuntimeStateCheckpoint>
@@ -2705,6 +2793,7 @@ class EventDrivenJunctionRuntime {
 
   explicit EventDrivenJunctionRuntime(const Graph& graph, EventDrivenJunctionConfig config = {})
       : graph_(graph), config_(std::move(config)) {
+    config_.g4irsf25_clcr.validate_and_index();
     validate_config();
     if (g4irsf14_extensions_enabled()) {
       g4irsf14_state_ =
@@ -2763,6 +2852,12 @@ class EventDrivenJunctionRuntime {
       result_.summary.g4irsf24_dlp_value_residual_count =
           static_cast<int>(
               config_.g4irsf24_dlp.value_residuals.size());
+    }
+    if (config_.g4irsf25_clcr.mode != "off") {
+      result_.summary.g4irsf25_clcr_mode =
+          config_.g4irsf25_clcr.mode;
+      result_.summary.g4irsf25_clcr_arm_count =
+          static_cast<int>(config_.g4irsf25_clcr.arms.size());
     }
     result_.summary.opportunity_telemetry_enabled =
         config_.enable_opportunity_telemetry;
@@ -3083,6 +3178,20 @@ class EventDrivenJunctionRuntime {
     return boundary;
   }
 
+  // G25's trusted in-process label horizon only needs the next event time.
+  // The general boundary view deliberately includes a sealed full-state
+  // identity; recomputing that identity for every event would turn a bounded
+  // local rollout into repeated global scans.
+  [[nodiscard]] std::optional<double>
+  g4irsf25_trusted_next_event_time() const {
+    if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+        events_.empty()) {
+      return std::nullopt;
+    }
+    require_checkpoint_safe_boundary();
+    return events_.top().time;
+  }
+
   bool process_one_event() {
     if (runtime_phase_ == EventDrivenJunctionRuntimePhase::kStopped ||
         runtime_phase_ == EventDrivenJunctionRuntimePhase::kFinalized) {
@@ -3110,9 +3219,11 @@ class EventDrivenJunctionRuntime {
       runtime_phase_ = EventDrivenJunctionRuntimePhase::kStopped;
       return false;
     }
+    g4irsf25_integrate_corridor_trajectories(event.time);
     now_ = event.time;
     ++result_.summary.event_count;
     process_event(event);
+    g4irsf25_refresh_arm_local_integrals();
     if (events_.empty()) {
       runtime_phase_ = EventDrivenJunctionRuntimePhase::kStopped;
     }
@@ -3124,7 +3235,16 @@ class EventDrivenJunctionRuntime {
   // checkpoint into an independently constructed runtime.
   G4IRSF14CausalStepResult
   probe_one_event_for_causal_opportunities() {
-    return process_one_event_causal_impl(nullptr);
+    return process_one_event_causal_impl(nullptr, false);
+  }
+
+  // G25 paired labels branch only inside one process from the exact same
+  // shared checkpoint.  They retain queue-top addressing and action
+  // certificates but deliberately avoid rescanning the full runtime into an
+  // 18-component digest for every restore and one-event step.
+  G4IRSF14CausalStepResult
+  probe_one_event_for_g4irsf25_trusted_opportunities() {
+    return process_one_event_causal_impl(nullptr, true);
   }
 
   // Lightweight, outcome-free census transition.  Unlike the sealed causal
@@ -3173,7 +3293,13 @@ class EventDrivenJunctionRuntime {
   G4IRSF14CausalStepResult
   process_one_event_with_causal_intervention(
       const G4IRSF14CausalInterventionDirective& directive) {
-    return process_one_event_causal_impl(&directive);
+    return process_one_event_causal_impl(&directive, false);
+  }
+
+  G4IRSF14CausalStepResult
+  process_one_event_with_g4irsf25_trusted_intervention(
+      const G4IRSF14CausalInterventionDirective& directive) {
+    return process_one_event_causal_impl(&directive, true);
   }
 
   // O(1) / one-local-owner prefilter for a multi-million-event census.  A
@@ -3648,6 +3774,20 @@ class EventDrivenJunctionRuntime {
     return row;
   }
 
+  // Minimal O(1) local view used by G25's bounded label horizon.  The richer
+  // G22 snapshot below also walks every queued bag and probes the service
+  // calendar; neither value is part of the G25 queue+incoming integral.
+  [[nodiscard]] std::pair<int, int>
+  g4irsf25_local_backlog_counts(int node) const noexcept {
+    const auto controller = junctions_.find(node);
+    if (controller == junctions_.end()) {
+      return {0, 0};
+    }
+    return {
+        static_cast<int>(controller->second.queue.size()),
+        controller->second.scheduled_incoming};
+  }
+
   [[nodiscard]] G4IRSF22LocalGuidanceSnapshot
   g4irsf22_local_guidance_snapshot(int node) const {
     G4IRSF22LocalGuidanceSnapshot row;
@@ -3749,6 +3889,10 @@ class EventDrivenJunctionRuntime {
 
   [[nodiscard]] StateCheckpoint capture_state_checkpoint() const;
   void restore_state_checkpoint(const StateCheckpoint& checkpoint);
+  [[nodiscard]] StateCheckpoint
+  capture_state_checkpoint_for_g4irsf25() const;
+  void restore_state_checkpoint_for_g4irsf25(
+      const StateCheckpoint& checkpoint);
   [[nodiscard]] G4IRSF14RuntimeStateDigests
   deterministic_state_digests() const;
   [[nodiscard]] std::string deterministic_state_sha256() const;
@@ -3848,8 +3992,34 @@ class EventDrivenJunctionRuntime {
     return result;
   }
 
+  [[nodiscard]] static G4IRSF14RuntimeStateDigests
+  g4irsf25_trusted_state_digests() {
+    const std::string local_token(64U, '0');
+    G4IRSF14RuntimeStateDigests state;
+    state.event_queue_sha256 = local_token;
+    state.current_time_sha256 = local_token;
+    state.bags_sha256 = local_token;
+    state.source_queues_sha256 = local_token;
+    state.junction_queues_sha256 = local_token;
+    state.local_service_calendars_sha256 = local_token;
+    state.corridor_state_sha256 = local_token;
+    state.scheduled_incoming_sha256 = local_token;
+    state.credits_sha256 = local_token;
+    state.merge_grants_sha256 = local_token;
+    state.fault_state_sha256 = local_token;
+    state.pibt_owner_state_sha256 = local_token;
+    state.deterministic_counters_sha256 = local_token;
+    state.scorer_state_sha256 = local_token;
+    state.result_accumulator_sha256 = local_token;
+    state.current_runtime_hashes_sha256 = local_token;
+    state.congestion_beacons_sha256 = local_token;
+    state.microphase_state_sha256 = local_token;
+    return state;
+  }
+
   G4IRSF14CausalStepResult process_one_event_causal_impl(
-      const G4IRSF14CausalInterventionDirective* directive) {
+      const G4IRSF14CausalInterventionDirective* directive,
+      bool g4irsf25_trusted_in_process) {
     require_g4irsf14_causal_frozen_tuple();
     if (active_causal_step_ != nullptr) {
       throw std::logic_error(
@@ -3864,7 +4034,9 @@ class EventDrivenJunctionRuntime {
 
     G4IRSF14CausalStepResult result;
     result.treatment_requested = directive != nullptr;
-    const auto state = deterministic_state_digests();
+    const auto state = g4irsf25_trusted_in_process
+                           ? g4irsf25_trusted_state_digests()
+                           : deterministic_state_digests();
     const auto state_sha256 = state.aggregate_sha256();
     result.source_state_sha256 = state_sha256;
     if (directive != nullptr) {
@@ -4208,6 +4380,11 @@ class EventDrivenJunctionRuntime {
       const EventRuntimeSummary& summary);
 
   G4IRSF14RuntimeStateDigests compute_runtime_state_digests() const;
+  [[nodiscard]] StateCheckpoint capture_state_checkpoint_impl(
+      bool verify_digest) const;
+  void restore_state_checkpoint_impl(
+      const StateCheckpoint& checkpoint,
+      bool verify_digest);
   G4IRSF14CloneReplayHashes
   compute_replay_hashes_projection() const;
   static event_runtime_detail::G4IRSF14RuntimeStateCheckpoint
@@ -4911,6 +5088,21 @@ class EventDrivenJunctionRuntime {
             "support");
       }
     }
+    const auto& clcr = config_.g4irsf25_clcr;
+    if (clcr.mode != "off") {
+      if (canonical_scorer_mode() != "S4") {
+        throw std::invalid_argument(
+            "G4IRSF25 CLCR requires the S4 queue-aware scorer");
+      }
+      if (dlp.mode != "off") {
+        throw std::invalid_argument(
+            "G4IRSF25 CLCR and G4IRSF24 DLP cannot both own Route ranking");
+      }
+      if (g4irsf16_enabled()) {
+        throw std::invalid_argument(
+            "G4IRSF25 CLCR requires the G4IRSF16 route supervisor to be off");
+      }
+    }
     config_.g4irsf18_merge_policy.validate_controls();
     if (g4irsf18_merge_policy_enabled() &&
         (!uses_destination_merge_grants() ||
@@ -5169,6 +5361,11 @@ class EventDrivenJunctionRuntime {
     runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
     time_limit_ = 0.0;
     result_ = {};
+    g4irsf25_corridor_feedback_.clear();
+    g4irsf25_pending_corridor_trajectories_.clear();
+    g4irsf25_arm_local_integrals_.clear();
+    g4irsf25_corridor_timeout_index_.clear();
+    g4irsf25_t0_gate_open_by_branch_.clear();
     bags_.clear();
     segment_runtime_ids_.clear();
     junctions_.clear();
@@ -8980,6 +9177,9 @@ class EventDrivenJunctionRuntime {
     commit_g4irsf24_dlp_mutation(
         winner_pending->second.trace,
         request.destination_merge_node);
+    commit_g4irsf25_clcr(
+        winner_pending->second.trace,
+        request.destination_merge_node);
     publish_prepared_decision_trace_noexcept(
         std::move(winner_pending->second.trace), true);
     pending_merge_dispatches_.erase(winner_pending);
@@ -9875,6 +10075,716 @@ class EventDrivenJunctionRuntime {
     }
     trace.g4irsf24_dlp_committed_mutation = true;
     ++result_.summary.g4irsf24_dlp_committed_mutation_count;
+  }
+
+  void g4irsf25_fallback(EventDecisionTraceRow& trace,
+                         const char* reason,
+                         std::uint64_t& reason_counter) noexcept {
+    trace.g4irsf25_clcr_fallback_reason = reason;
+    ++result_.summary.g4irsf25_clcr_fallback_s4_count;
+    ++reason_counter;
+  }
+
+  [[nodiscard]] const G4IRSF25CorridorFeedbackState*
+  g4irsf25_feedback(const G4IRSF25CLCRArm& arm) const noexcept {
+    const auto found = g4irsf25_corridor_feedback_.find(
+        G4IRSF25CLCRConfig::key(arm.branch_node, arm.first_edge));
+    return found == g4irsf25_corridor_feedback_.end()
+               ? nullptr
+               : &found->second;
+  }
+
+  [[nodiscard]] std::vector<double> g4irsf25_clcr_features(
+      const EventDecisionTraceRow& trace,
+      const EventCandidateRecord& baseline,
+      const EventCandidateRecord& candidate,
+      const G4IRSF25CLCRArm& arm) const {
+    const auto bag = bags_.find(trace.runtime_bag_id);
+    if (bag == bags_.end()) {
+      throw std::logic_error("G4IRSF25 feature build lost its runtime bag");
+    }
+    const auto corridor_wait = [&](const EventCandidateRecord& row) {
+      return std::max(0.0, row.corridor_next_available - trace.event_time);
+    };
+    const auto target_wait = [&](const EventCandidateRecord& row) {
+      return std::max(
+          0.0,
+          row.target_next_available - trace.event_time - row.travel_time);
+    };
+    const bool use_feedback_features =
+        config_.g4irsf25_clcr.mode == "observe" ||
+        config_.g4irsf25_clcr.mode == "l3";
+    const auto* feedback =
+        use_feedback_features ? g4irsf25_feedback(arm) : nullptr;
+    const double short_ewma =
+        feedback == nullptr ? 0.0 : feedback->short_ewma_seconds;
+    const double long_ewma =
+        feedback == nullptr ? 0.0 : feedback->long_ewma_seconds;
+    const double feedback_age =
+        feedback == nullptr || feedback->last_update_time < 0.0
+            ? config_.g4irsf25_clcr.trajectory_max_seconds
+            : std::min(config_.g4irsf25_clcr.trajectory_max_seconds,
+                       std::max(0.0, trace.event_time -
+                                         feedback->last_update_time));
+    const double timeout_rate =
+        feedback == nullptr || feedback->sample_count == 0
+            ? 0.0
+            : static_cast<double>(feedback->timeout_count) /
+                  static_cast<double>(feedback->sample_count);
+    const double deadline_headroom =
+        bag->second.request.deadline >= 0.0
+            ? bag->second.request.deadline - trace.event_time
+            : config_.g4irsf25_clcr.trajectory_max_seconds;
+    std::vector<double> features = {
+        candidate.model_score - baseline.model_score,
+        candidate.travel_time - baseline.travel_time,
+        candidate.static_potential - baseline.static_potential,
+        static_cast<double>(candidate.target_queue_length -
+                            baseline.target_queue_length),
+        static_cast<double>(candidate.target_scheduled_incoming -
+                            baseline.target_scheduled_incoming),
+        corridor_wait(candidate) - corridor_wait(baseline),
+        target_wait(candidate) - target_wait(baseline),
+        candidate.goal_conditioned_differential -
+            baseline.goal_conditioned_differential,
+        candidate.estimated_service_rate - baseline.estimated_service_rate,
+        candidate.service_weighted_pressure -
+            baseline.service_weighted_pressure,
+        static_cast<double>(candidate.two_hop_queue_pressure -
+                            baseline.two_hop_queue_pressure),
+        static_cast<double>(candidate.recent_visit_count -
+                            baseline.recent_visit_count),
+        std::max(0.0, trace.event_time - bag->second.request.release_time),
+        deadline_headroom,
+        short_ewma,
+        long_ewma,
+        short_ewma - long_ewma,
+        feedback_age,
+        std::log1p(static_cast<double>(
+            feedback == nullptr ? 0 : feedback->sample_count)),
+        timeout_rate,
+        std::log1p(static_cast<double>(arm.support)),
+    };
+    if (features.size() != kG4IRSF25CLCRFeatureCount) {
+      throw std::logic_error("G4IRSF25 feature contract drifted");
+    }
+    return features;
+  }
+
+  [[nodiscard]] double g4irsf25_t0_pressure(
+      const EventDecisionTraceRow& trace,
+      int branch_node) const noexcept {
+    const auto& metric = config_.g4irsf25_clcr.t0_metric;
+    double pressure = 0.0;
+    for (const auto& candidate : trace.candidates) {
+      const auto* arm = config_.g4irsf25_clcr.arm(
+          branch_node, candidate.next_node);
+      if (arm == nullptr) {
+        continue;
+      }
+      if (metric == "target_queue_plus_incoming") {
+        pressure = std::max(
+            pressure,
+            static_cast<double>(candidate.target_queue_length +
+                                candidate.target_scheduled_incoming));
+      } else if (metric == "service_weighted_pressure") {
+        pressure = std::max(pressure, candidate.service_weighted_pressure);
+      } else {
+        const auto* feedback = g4irsf25_feedback(*arm);
+        if (feedback != nullptr) {
+          pressure = std::max(
+              pressure,
+              feedback->short_ewma_seconds - feedback->long_ewma_seconds);
+        }
+      }
+    }
+    return pressure;
+  }
+
+  void apply_g4irsf25_clcr(EventDecisionTraceRow& trace) {
+    const auto& clcr = config_.g4irsf25_clcr;
+    if (clcr.mode == "off") {
+      return;
+    }
+    trace.g4irsf25_clcr_evaluated = true;
+    trace.g4irsf25_clcr_mode = clcr.mode;
+    ++result_.summary.g4irsf25_clcr_route_evaluation_count;
+    if (trace.candidates.empty()) {
+      g4irsf25_fallback(
+          trace, "non_corridor",
+          result_.summary.g4irsf25_clcr_non_corridor_fallback_count);
+      return;
+    }
+
+    const auto score_precedes = [&](std::size_t left, std::size_t right) {
+      const auto& lhs = trace.candidates[left];
+      const auto& rhs = trace.candidates[right];
+      return std::tie(lhs.model_score, lhs.next_node) <
+             std::tie(rhs.model_score, rhs.next_node);
+    };
+    std::size_t baseline_index = 0;
+    for (std::size_t index = 1; index < trace.candidates.size(); ++index) {
+      if (score_precedes(index, baseline_index)) {
+        baseline_index = index;
+      }
+    }
+    const auto& baseline = trace.candidates[baseline_index];
+    trace.g4irsf25_clcr_s4_next = baseline.next_node;
+    const auto* baseline_arm = clcr.arm(trace.current_node, baseline.next_node);
+    if (baseline_arm == nullptr) {
+      g4irsf25_fallback(
+          trace, "non_corridor",
+          result_.summary.g4irsf25_clcr_non_corridor_fallback_count);
+      return;
+    }
+    trace.g4irsf25_clcr_rejoin_node = baseline_arm->rejoin_node;
+    trace.g4irsf25_clcr_support = baseline_arm->support;
+    if (!baseline.shield_allowed || baseline.advertised_fault) {
+      g4irsf25_fallback(
+          trace, "shield_or_fault",
+          result_.summary.g4irsf25_clcr_fault_shield_fallback_count);
+      return;
+    }
+    if (clcr.mode == "observe") {
+      trace.g4irsf25_clcr_selected_features = g4irsf25_clcr_features(
+          trace, baseline, baseline, *baseline_arm);
+      g4irsf25_fallback(
+          trace, "observe",
+          result_.summary.g4irsf25_clcr_same_action_count);
+      return;
+    }
+
+    if (clcr.mode == "t0") {
+      bool& open = g4irsf25_t0_gate_open_by_branch_[trace.current_node];
+      const double pressure =
+          g4irsf25_t0_pressure(trace, trace.current_node);
+      open = open ? pressure + event_runtime_detail::kEpsilon >=
+                        clcr.t0_exit_pressure
+                  : pressure + event_runtime_detail::kEpsilon >=
+                        clcr.t0_enter_pressure;
+      if (!open) {
+        g4irsf25_fallback(
+            trace, "threshold",
+            result_.summary.g4irsf25_clcr_threshold_fallback_count);
+        return;
+      }
+    }
+
+    struct CandidateScore {
+      const G4IRSF25CLCRArm* arm = nullptr;
+      bool supported = false;
+      G4IRSF25CLCRPrediction prediction;
+      std::vector<double> features;
+      double adjusted_score = std::numeric_limits<double>::infinity();
+    };
+    std::vector<CandidateScore> scores(trace.candidates.size());
+    bool saw_low_support = false;
+    bool saw_ood = false;
+    bool saw_shield_or_fault = false;
+    for (std::size_t index = 0; index < trace.candidates.size(); ++index) {
+      const auto& candidate = trace.candidates[index];
+      auto& score = scores[index];
+      score.arm = clcr.arm(trace.current_node, candidate.next_node);
+      if (score.arm == nullptr ||
+          score.arm->rejoin_node != baseline_arm->rejoin_node) {
+        continue;
+      }
+      ++result_.summary.g4irsf25_clcr_eligible_candidate_count;
+      if (!candidate.shield_allowed || candidate.advertised_fault) {
+        saw_shield_or_fault = true;
+        continue;
+      }
+      if (score.arm->training_support < clcr.min_support) {
+        saw_low_support = true;
+        continue;
+      }
+      score.features = g4irsf25_clcr_features(
+          trace, baseline, candidate, *score.arm);
+      const auto* feedback = g4irsf25_feedback(*score.arm);
+      const double online_bias =
+          feedback == nullptr || feedback->sample_count == 0
+              ? 0.0
+              : feedback->short_local_system_cost -
+                    feedback->long_local_system_cost;
+      score.prediction = g4irsf25_clcr_predict(
+          clcr, *score.arm, score.features, online_bias);
+      if (score.prediction.ood) {
+        saw_ood = true;
+        continue;
+      }
+      score.supported = true;
+      score.adjusted_score =
+          candidate.model_score + score.prediction.system_delta_seconds;
+      ++result_.summary.g4irsf25_clcr_supported_candidate_count;
+    }
+    if (!scores[baseline_index].supported) {
+      if (scores[baseline_index].arm != nullptr &&
+          scores[baseline_index].arm->training_support < clcr.min_support) {
+        g4irsf25_fallback(
+            trace, "low_support",
+            result_.summary.g4irsf25_clcr_low_support_fallback_count);
+      } else if (scores[baseline_index].prediction.ood || saw_ood) {
+        g4irsf25_fallback(
+            trace, "ood",
+            result_.summary.g4irsf25_clcr_ood_fallback_count);
+      } else {
+        g4irsf25_fallback(
+            trace, "shield_or_fault",
+            result_.summary.g4irsf25_clcr_fault_shield_fallback_count);
+      }
+      return;
+    }
+
+    std::size_t proposed_index = baseline_index;
+    for (std::size_t index = 0; index < scores.size(); ++index) {
+      if (!scores[index].supported) {
+        continue;
+      }
+      if (std::tie(scores[index].adjusted_score,
+                   trace.candidates[index].next_node) <
+          std::tie(scores[proposed_index].adjusted_score,
+                   trace.candidates[proposed_index].next_node)) {
+        proposed_index = index;
+      }
+    }
+    if (proposed_index == baseline_index) {
+      if (saw_low_support) {
+        g4irsf25_fallback(
+            trace, "low_support",
+            result_.summary.g4irsf25_clcr_low_support_fallback_count);
+      } else if (saw_ood) {
+        g4irsf25_fallback(
+            trace, "ood",
+            result_.summary.g4irsf25_clcr_ood_fallback_count);
+      } else if (saw_shield_or_fault) {
+        g4irsf25_fallback(
+            trace, "shield_or_fault",
+            result_.summary.g4irsf25_clcr_fault_shield_fallback_count);
+      } else {
+        g4irsf25_fallback(
+            trace, "same_action",
+            result_.summary.g4irsf25_clcr_same_action_count);
+      }
+      return;
+    }
+    const double improvement =
+        scores[baseline_index].adjusted_score -
+        scores[proposed_index].adjusted_score;
+    if (improvement + event_runtime_detail::kEpsilon < clcr.margin_seconds) {
+      g4irsf25_fallback(
+          trace, "margin",
+          result_.summary.g4irsf25_clcr_margin_fallback_count);
+      return;
+    }
+    if (scores[proposed_index].prediction.private_delta_seconds >
+        scores[baseline_index].prediction.private_delta_seconds +
+            clcr.private_cap_seconds + event_runtime_detail::kEpsilon) {
+      g4irsf25_fallback(
+          trace, "fairness",
+          result_.summary.g4irsf25_clcr_fairness_fallback_count);
+      return;
+    }
+    const auto protected_bag = bags_.find(trace.runtime_bag_id);
+    if (protected_bag == bags_.end()) {
+      throw std::logic_error("G4IRSF25 fairness guard lost its runtime bag");
+    }
+    const double bag_age = std::max(
+        0.0, trace.event_time - protected_bag->second.request.release_time);
+    if (bag_age + event_runtime_detail::kEpsilon >= 600.0) {
+      g4irsf25_fallback(
+          trace, "fairness_age",
+          result_.summary.g4irsf25_clcr_fairness_fallback_count);
+      return;
+    }
+    if (protected_bag->second.request.deadline >= 0.0 &&
+        protected_bag->second.request.deadline - trace.event_time <=
+            clcr.private_cap_seconds + event_runtime_detail::kEpsilon) {
+      g4irsf25_fallback(
+          trace, "fairness_deadline",
+          result_.summary.g4irsf25_clcr_fairness_fallback_count);
+      return;
+    }
+    if (trace.candidates[proposed_index].recent_visit_count >
+        baseline.recent_visit_count) {
+      g4irsf25_fallback(
+          trace, "loop_guard",
+          result_.summary.g4irsf25_clcr_fairness_fallback_count);
+      return;
+    }
+
+    const double baseline_adjusted = scores[baseline_index].adjusted_score;
+    const double baseline_s4_score = baseline.model_score;
+    for (std::size_t index = 0; index < scores.size(); ++index) {
+      if (scores[index].supported) {
+        trace.candidates[index].model_score =
+            baseline_s4_score + scores[index].adjusted_score -
+            baseline_adjusted;
+      }
+    }
+    trace.g4irsf25_clcr_proposed_next =
+        trace.candidates[proposed_index].next_node;
+    trace.g4irsf25_clcr_rejoin_node =
+        scores[proposed_index].arm->rejoin_node;
+    trace.g4irsf25_clcr_support = scores[proposed_index].arm->support;
+    trace.g4irsf25_clcr_predicted_system_delta_seconds =
+        scores[proposed_index].prediction.system_delta_seconds -
+        scores[baseline_index].prediction.system_delta_seconds;
+    trace.g4irsf25_clcr_predicted_private_delta_seconds =
+        scores[proposed_index].prediction.private_delta_seconds -
+        scores[baseline_index].prediction.private_delta_seconds;
+    trace.g4irsf25_clcr_selected_features = scores[proposed_index].features;
+    ++result_.summary.g4irsf25_clcr_proposal_count;
+  }
+
+  G4IRSF25ArmLocalIntegralState& g4irsf25_ensure_arm_local_integral(
+      const G4IRSF25CLCRArm& arm,
+      double time) {
+    const auto arm_key = G4IRSF25CLCRConfig::key(
+        arm.branch_node, arm.first_edge);
+    const auto existing = g4irsf25_arm_local_integrals_.find(arm_key);
+    if (existing != g4irsf25_arm_local_integrals_.end()) {
+      return existing->second;
+    }
+
+    G4IRSF25ArmLocalIntegralState state;
+    state.last_integrated_time = time;
+    for (const auto& candidate_arm : config_.g4irsf25_clcr.arms) {
+      if (candidate_arm.branch_node == arm.branch_node &&
+          candidate_arm.rejoin_node == arm.rejoin_node) {
+        state.local_nodes.insert(state.local_nodes.end(),
+                                 candidate_arm.corridor_nodes.begin(),
+                                 candidate_arm.corridor_nodes.end());
+      }
+    }
+    for (const int downstream : graph_.outgoing(arm.rejoin_node)) {
+      state.local_nodes.push_back(downstream);
+    }
+    std::sort(state.local_nodes.begin(), state.local_nodes.end());
+    state.local_nodes.erase(
+        std::unique(state.local_nodes.begin(), state.local_nodes.end()),
+        state.local_nodes.end());
+    for (const int node : state.local_nodes) {
+      const auto junction = junctions_.find(node);
+      if (junction == junctions_.end()) {
+        continue;
+      }
+      state.current_local_queue +=
+          static_cast<int>(junction->second.queue.size());
+      state.current_scheduled_incoming += junction->second.scheduled_incoming;
+    }
+    return g4irsf25_arm_local_integrals_.emplace(
+        arm_key, std::move(state)).first->second;
+  }
+
+  void g4irsf25_start_corridor_trajectory(
+      EventDecisionTraceRow& trace,
+      int selected_next) {
+    const auto& clcr = config_.g4irsf25_clcr;
+    if (!clcr.observes()) {
+      return;
+    }
+    const auto* arm = clcr.arm(trace.current_node, selected_next);
+    const auto bag = bags_.find(trace.runtime_bag_id);
+    auto existing = g4irsf25_pending_corridor_trajectories_.find(
+        trace.runtime_bag_id);
+    if (existing != g4irsf25_pending_corridor_trajectories_.end()) {
+      ++existing->second.row.intermediate_decision_count;
+      if (arm == nullptr || bag == bags_.end()) {
+        return;
+      }
+      // A new registered split supersedes the old open corridor.  Preserve
+      // its measured prefix as censored evidence, do not turn it into a
+      // synthetic timeout/feedback sample, then start the new decision.
+      g4irsf25_finish_corridor_trajectory(
+          trace.runtime_bag_id, trace.event_time,
+          false, false, true, false,
+          "SUPERSEDED_BY_REGISTERED_SPLIT");
+    }
+    if (arm == nullptr || bag == bags_.end()) {
+      return;
+    }
+    G4IRSF25PendingCorridorTrajectory pending;
+    pending.arm_key = G4IRSF25CLCRConfig::key(
+        arm->branch_node, arm->first_edge);
+    pending.initial_junction_wait_seconds =
+        bag->second.junction_queue_wait_seconds;
+    pending.initial_bag_loop_count = bag->second.loop_count;
+    pending.path_limit = std::min<std::size_t>(
+        64U, arm->corridor_nodes.size() + 8U);
+    auto& row = pending.row;
+    row.runtime_bag_id = bag->second.request.runtime_bag_id;
+    row.task_id = bag->second.request.task_id;
+    row.segment_id = bag->second.request.segment_id;
+    row.leg = bag->second.request.source;
+    row.task_class = local_task_class(bag->second);
+    row.goal_node = bag->second.request.goal;
+    row.branch_node = trace.current_node;
+    row.s4_first_edge = trace.g4irsf25_clcr_s4_next;
+    row.selected_first_edge = selected_next;
+    row.rejoin_node = arm->rejoin_node;
+    row.decision_time = trace.event_time;
+    const auto baseline_candidate = std::find_if(
+        trace.candidates.begin(), trace.candidates.end(),
+        [&](const EventCandidateRecord& candidate) {
+          return candidate.next_node == trace.g4irsf25_clcr_s4_next;
+        });
+    const auto selected_candidate = std::find_if(
+        trace.candidates.begin(), trace.candidates.end(),
+        [&](const EventCandidateRecord& candidate) {
+          return candidate.next_node == selected_next;
+        });
+    if (baseline_candidate == trace.candidates.end() ||
+        selected_candidate == trace.candidates.end()) {
+      return;
+    }
+    row.selected_features = g4irsf25_clcr_features(
+        trace, *baseline_candidate, *selected_candidate, *arm);
+    const auto* decision_feedback = g4irsf25_feedback(*arm);
+    if (clcr.mode == "l3" && decision_feedback != nullptr) {
+      row.applied_online_bias = std::clamp(
+          decision_feedback->short_local_system_cost -
+              decision_feedback->long_local_system_cost,
+          -clcr.l3_bias_cap_seconds, clcr.l3_bias_cap_seconds);
+    }
+    row.actual_path.push_back(trace.current_node);
+    auto& integral = g4irsf25_ensure_arm_local_integral(*arm, trace.event_time);
+    pending.initial_local_queue_area = integral.local_queue_area;
+    pending.initial_scheduled_incoming_area =
+        integral.scheduled_incoming_area;
+    row.peak_local_queue = integral.current_local_queue;
+    const double deadline =
+        row.decision_time + config_.g4irsf25_clcr.trajectory_max_seconds;
+    const auto inserted = g4irsf25_pending_corridor_trajectories_.emplace(
+        trace.runtime_bag_id, std::move(pending));
+    if (!inserted.second) {
+      return;
+    }
+    g4irsf25_corridor_timeout_index_.emplace(
+        deadline, trace.runtime_bag_id);
+    ++result_.summary.g4irsf25_corridor_trajectory_started_count;
+  }
+
+  void commit_g4irsf25_clcr(EventDecisionTraceRow& trace,
+                             int selected_next) {
+    if (!trace.g4irsf25_clcr_evaluated) {
+      return;
+    }
+    if (!trace.g4irsf25_clcr_committed_mutation &&
+        trace.g4irsf25_clcr_proposed_next >= 0 &&
+        trace.g4irsf25_clcr_proposed_next != trace.g4irsf25_clcr_s4_next &&
+        selected_next == trace.g4irsf25_clcr_proposed_next) {
+      trace.g4irsf25_clcr_committed_mutation = true;
+      ++result_.summary.g4irsf25_clcr_committed_mutation_count;
+      ++result_.summary.g4irsf25_clcr_committed_mutations_by_branch[
+          trace.current_node];
+    }
+    g4irsf25_start_corridor_trajectory(trace, selected_next);
+  }
+
+  void g4irsf25_update_feedback(
+      std::uint64_t arm_key,
+      double observed_seconds,
+      double observed_local_system_cost,
+      bool timeout,
+      double update_time,
+      G4IRSF25CorridorTrajectoryRow& row) {
+    auto& feedback = g4irsf25_corridor_feedback_[arm_key];
+    const bool first = feedback.sample_count == 0;
+    ++feedback.sample_count;
+    if (timeout) {
+      ++feedback.timeout_count;
+    } else {
+      ++feedback.completed_count;
+    }
+    feedback.short_ewma_seconds =
+        first ? observed_seconds
+              : config_.g4irsf25_clcr.l3_short_alpha * observed_seconds +
+                    (1.0 - config_.g4irsf25_clcr.l3_short_alpha) *
+                        feedback.short_ewma_seconds;
+    feedback.long_ewma_seconds =
+        first ? observed_seconds
+              : config_.g4irsf25_clcr.l3_long_alpha * observed_seconds +
+                    (1.0 - config_.g4irsf25_clcr.l3_long_alpha) *
+                        feedback.long_ewma_seconds;
+    feedback.short_local_system_cost =
+        first ? observed_local_system_cost
+              : config_.g4irsf25_clcr.l3_short_alpha *
+                        observed_local_system_cost +
+                    (1.0 - config_.g4irsf25_clcr.l3_short_alpha) *
+                        feedback.short_local_system_cost;
+    feedback.long_local_system_cost =
+        first ? observed_local_system_cost
+              : config_.g4irsf25_clcr.l3_long_alpha *
+                        observed_local_system_cost +
+                    (1.0 - config_.g4irsf25_clcr.l3_long_alpha) *
+                        feedback.long_local_system_cost;
+    feedback.last_update_time = update_time;
+    row.feedback_sample_count = feedback.sample_count;
+    row.feedback_short_ewma_seconds = feedback.short_ewma_seconds;
+    row.feedback_long_ewma_seconds = feedback.long_ewma_seconds;
+    row.feedback_trend_seconds =
+        feedback.short_ewma_seconds - feedback.long_ewma_seconds;
+    row.feedback_timeout_rate =
+        static_cast<double>(feedback.timeout_count) /
+        static_cast<double>(feedback.sample_count);
+    row.feedback_short_local_system_cost =
+        feedback.short_local_system_cost;
+    row.feedback_long_local_system_cost =
+        feedback.long_local_system_cost;
+    ++result_.summary.g4irsf25_clcr_feedback_count;
+    if (config_.g4irsf25_clcr.mode == "l3") {
+      ++result_.summary.g4irsf25_clcr_online_bias_update_count;
+    }
+  }
+
+  void g4irsf25_finish_corridor_trajectory(
+      int runtime_bag_id,
+      double time,
+      bool completed,
+      bool timeout,
+      bool safe,
+      bool feedback_eligible,
+      const std::string& censor_reason) {
+    auto found = g4irsf25_pending_corridor_trajectories_.find(runtime_bag_id);
+    if (found == g4irsf25_pending_corridor_trajectories_.end()) {
+      return;
+    }
+    g4irsf25_integrate_arm_local_integrals(time);
+    auto pending = std::move(found->second);
+    g4irsf25_pending_corridor_trajectories_.erase(found);
+    auto& row = pending.row;
+    const double indexed_deadline =
+        row.decision_time + config_.g4irsf25_clcr.trajectory_max_seconds;
+    g4irsf25_corridor_timeout_index_.erase(
+        std::make_pair(indexed_deadline, runtime_bag_id));
+    const auto bag = bags_.find(runtime_bag_id);
+    const double elapsed = std::max(0.0, time - row.decision_time);
+    row.completed_rejoin = completed;
+    row.timeout = timeout;
+    row.censored = !completed && !timeout;
+    row.censor_reason = row.censored ? censor_reason : std::string{};
+    row.safe = safe;
+    row.arrival_time = completed ? time : -1.0;
+    row.actual_corridor_duration =
+        timeout ? config_.g4irsf25_clcr.trajectory_max_seconds : elapsed;
+    row.private_bag_cost_seconds = row.actual_corridor_duration;
+    if (bag != bags_.end()) {
+      row.corridor_wait_seconds = std::max(
+          0.0, bag->second.junction_queue_wait_seconds -
+                   pending.initial_junction_wait_seconds);
+      row.loop = row.loop ||
+                 bag->second.loop_count > pending.initial_bag_loop_count;
+    }
+    const auto integral = g4irsf25_arm_local_integrals_.find(pending.arm_key);
+    if (integral != g4irsf25_arm_local_integrals_.end()) {
+      row.local_queue_area_bag_seconds = std::max(
+          0.0, integral->second.local_queue_area -
+                   pending.initial_local_queue_area);
+      row.scheduled_incoming_area_bag_seconds = std::max(
+          0.0, integral->second.scheduled_incoming_area -
+                   pending.initial_scheduled_incoming_area);
+      row.peak_local_queue = std::max(
+          row.peak_local_queue, integral->second.current_local_queue);
+    }
+    if (feedback_eligible) {
+      g4irsf25_update_feedback(
+          pending.arm_key, row.actual_corridor_duration,
+          row.local_queue_area_bag_seconds +
+              row.scheduled_incoming_area_bag_seconds,
+          timeout, time, row);
+    }
+    if (completed) {
+      ++result_.summary.g4irsf25_corridor_trajectory_completed_count;
+    }
+    if (timeout) {
+      ++result_.summary.g4irsf25_corridor_trajectory_timeout_count;
+    }
+    if ((config_.g4irsf25_clcr.record_trajectories ||
+         config_.g4irsf25_clcr.mode == "observe") &&
+        result_.g4irsf25_corridor_trajectories.size() <
+            static_cast<std::size_t>(
+                config_.g4irsf25_clcr.trajectory_trace_limit)) {
+      result_.g4irsf25_corridor_trajectories.push_back(std::move(row));
+    }
+  }
+
+  void g4irsf25_integrate_arm_local_integrals(double target_time) {
+    for (auto& entry : g4irsf25_arm_local_integrals_) {
+      auto& state = entry.second;
+      const double delta = std::max(
+          0.0, target_time - state.last_integrated_time);
+      state.local_queue_area +=
+          delta * static_cast<double>(state.current_local_queue);
+      state.scheduled_incoming_area +=
+          delta * static_cast<double>(state.current_scheduled_incoming);
+      state.last_integrated_time = std::max(
+          state.last_integrated_time, target_time);
+    }
+  }
+
+  void g4irsf25_refresh_arm_local_integrals() {
+    for (auto& entry : g4irsf25_arm_local_integrals_) {
+      auto& state = entry.second;
+      int local_queue = 0;
+      int incoming = 0;
+      for (const int node : state.local_nodes) {
+        const auto junction = junctions_.find(node);
+        if (junction == junctions_.end()) {
+          continue;
+        }
+        local_queue += static_cast<int>(junction->second.queue.size());
+        incoming += junction->second.scheduled_incoming;
+      }
+      state.current_local_queue = local_queue;
+      state.current_scheduled_incoming = incoming;
+    }
+  }
+
+  void g4irsf25_integrate_corridor_trajectories(double target_time) {
+    while (!g4irsf25_corridor_timeout_index_.empty()) {
+      const auto next = g4irsf25_corridor_timeout_index_.begin();
+      const double deadline = next->first;
+      if (target_time <= deadline + event_runtime_detail::kEpsilon) {
+        break;
+      }
+      const int runtime_bag_id = next->second;
+      g4irsf25_corridor_timeout_index_.erase(next);
+      const auto pending =
+          g4irsf25_pending_corridor_trajectories_.find(runtime_bag_id);
+      if (pending == g4irsf25_pending_corridor_trajectories_.end() ||
+          std::abs(pending->second.row.decision_time +
+                       config_.g4irsf25_clcr.trajectory_max_seconds -
+                   deadline) > event_runtime_detail::kEpsilon) {
+        continue;
+      }
+      g4irsf25_integrate_arm_local_integrals(deadline);
+      g4irsf25_finish_corridor_trajectory(
+          runtime_bag_id, deadline, false, true, true, true, "");
+    }
+    g4irsf25_integrate_arm_local_integrals(target_time);
+  }
+
+  void g4irsf25_observe_edge_arrival(BagState& bag,
+                                      int node,
+                                      double time) {
+    auto found = g4irsf25_pending_corridor_trajectories_.find(
+        bag.request.runtime_bag_id);
+    if (found == g4irsf25_pending_corridor_trajectories_.end()) {
+      return;
+    }
+    auto& row = found->second.row;
+    if (std::find(row.actual_path.begin(), row.actual_path.end(), node) !=
+        row.actual_path.end()) {
+      row.loop = true;
+    }
+    if (row.actual_path.size() < found->second.path_limit &&
+        (row.actual_path.empty() || row.actual_path.back() != node)) {
+      row.actual_path.push_back(node);
+    }
+    if (node == row.rejoin_node) {
+      g4irsf25_finish_corridor_trajectory(
+          bag.request.runtime_bag_id, time, true, false, true, true, "");
+    }
   }
 
   std::optional<EventDecisionTraceRow> pibt_trace_for_bag(
@@ -13170,6 +14080,7 @@ class EventDrivenJunctionRuntime {
     // G24 deliberately lives only on the ordinary Route path.  PIBT builds
     // its own trace through pibt_trace_for_bag() and never calls this hook.
     apply_g4irsf24_dlp_residual(trace);
+    apply_g4irsf25_clcr(trace);
 
     std::vector<std::size_t> ranking(trace.candidates.size());
     for (std::size_t index = 0; index < ranking.size(); ++index) {
@@ -13939,6 +14850,7 @@ class EventDrivenJunctionRuntime {
       }
       dispatch_selected_edge(bag, node, selected, time);
       commit_g4irsf24_dlp_mutation(trace, selected);
+      commit_g4irsf25_clcr(trace, selected);
       if (causal_i3_override_selected) {
         mark_causal_action_applied(
             "APPLIED_I3_ONE_EDGE_COMMIT_ONE_ACTION",
@@ -15046,6 +15958,7 @@ class EventDrivenJunctionRuntime {
       // before this valid EDGE_EXIT in the bounded runtime history.
       bag.loop_extra_time_seconds += executed_travel;
     }
+    g4irsf25_observe_edge_arrival(bag, event.to_node, event.time);
     bag.status = BagStatus::kInService;
     schedule(JunctionEventType::kJunctionServiceComplete,
              event.service_end,
@@ -16596,6 +17509,9 @@ class EventDrivenJunctionRuntime {
   }
 
   void complete_bag(BagState& bag, double time) {
+    g4irsf25_finish_corridor_trajectory(
+        bag.request.runtime_bag_id, time, false, false, true, false,
+        "BAG_COMPLETED_BEFORE_REJOIN");
     deactivate_bag(bag);
     bag.status = BagStatus::kCompleted;
     ++result_.summary.completed_count;
@@ -16613,6 +17529,9 @@ class EventDrivenJunctionRuntime {
       bag.junction_queue_wait_seconds +=
           std::max(0.0, time - bag.junction_enqueued_at);
     }
+    g4irsf25_finish_corridor_trajectory(
+        bag.request.runtime_bag_id, time, false, false, false, false,
+        reason);
     deactivate_bag(bag);
     bag.status = BagStatus::kFailed;
     ++result_.summary.failed_count;
@@ -17588,6 +18507,14 @@ class EventDrivenJunctionRuntime {
   std::map<std::tuple<int, int, int>, double>
       pibt_regret_prior_;
   EventDrivenJunctionResult result_;
+  std::unordered_map<std::uint64_t, G4IRSF25CorridorFeedbackState>
+      g4irsf25_corridor_feedback_;
+  std::unordered_map<int, G4IRSF25PendingCorridorTrajectory>
+      g4irsf25_pending_corridor_trajectories_;
+  std::unordered_map<std::uint64_t, G4IRSF25ArmLocalIntegralState>
+      g4irsf25_arm_local_integrals_;
+  std::set<std::pair<double, int>> g4irsf25_corridor_timeout_index_;
+  std::unordered_map<int, bool> g4irsf25_t0_gate_open_by_branch_;
   std::unordered_map<int, BagState> bags_;
   std::unordered_map<std::string, int> segment_runtime_ids_;
   std::unordered_map<int, JunctionState> junctions_;
@@ -17764,6 +18691,17 @@ EventDrivenJunctionRuntime::restore_g4irsf14_state(
 
 inline EventDrivenJunctionRuntime::StateCheckpoint
 EventDrivenJunctionRuntime::capture_state_checkpoint() const {
+  return capture_state_checkpoint_impl(true);
+}
+
+inline EventDrivenJunctionRuntime::StateCheckpoint
+EventDrivenJunctionRuntime::capture_state_checkpoint_for_g4irsf25() const {
+  return capture_state_checkpoint_impl(false);
+}
+
+inline EventDrivenJunctionRuntime::StateCheckpoint
+EventDrivenJunctionRuntime::capture_state_checkpoint_impl(
+    bool verify_digest) const {
   if (g4irsf16_enabled()) {
     throw std::logic_error(
         "G4IRSF16 online supervisor state is not a G4IRSF14 causal-clone "
@@ -17811,6 +18749,16 @@ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
       active_fault_instance_by_edge_;
   storage->repair_time_by_fault_instance =
       repair_time_by_fault_instance_;
+  storage->g4irsf25_corridor_feedback =
+      g4irsf25_corridor_feedback_;
+  storage->g4irsf25_pending_corridor_trajectories =
+      g4irsf25_pending_corridor_trajectories_;
+  storage->g4irsf25_arm_local_integrals =
+      g4irsf25_arm_local_integrals_;
+  storage->g4irsf25_corridor_timeout_index =
+      g4irsf25_corridor_timeout_index_;
+  storage->g4irsf25_t0_gate_open_by_branch =
+      g4irsf25_t0_gate_open_by_branch_;
   storage->events = events_;
   if (g4irsf14_state_ != nullptr) {
     storage->g4irsf14_state =
@@ -17884,7 +18832,9 @@ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
   // excluded from deterministic state/result hashes as wall-clock telemetry.
   storage->decision_latencies_us = decision_latencies_us_;
   storage->phase = runtime_phase_;
-  storage->state_digests = compute_runtime_state_digests();
+  storage->state_digests = verify_digest
+                               ? compute_runtime_state_digests()
+                               : g4irsf25_trusted_state_digests();
   storage->state_sha256 =
       storage->state_digests.aggregate_sha256();
   return StateCheckpoint(storage, storage->state_sha256);
@@ -17892,6 +18842,19 @@ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
 
 inline void EventDrivenJunctionRuntime::
 restore_state_checkpoint(const StateCheckpoint& checkpoint) {
+  restore_state_checkpoint_impl(checkpoint, true);
+}
+
+inline void EventDrivenJunctionRuntime::
+restore_state_checkpoint_for_g4irsf25(
+    const StateCheckpoint& checkpoint) {
+  restore_state_checkpoint_impl(checkpoint, false);
+}
+
+inline void EventDrivenJunctionRuntime::
+restore_state_checkpoint_impl(
+    const StateCheckpoint& checkpoint,
+    bool verify_digest) {
   // A restore attempt is itself a phase boundary.  Fail closed before even
   // inspecting the supplied checkpoint so a bad seal/graph/phase cannot
   // leave an already-Ready target able to process its previous event queue.
@@ -17905,37 +18868,47 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
         "cannot restore an empty runtime checkpoint");
   }
   const auto& storage = *checkpoint.storage_;
-  g4irsf14_clone_detail::require_sha256(
-      "checkpoint seal", checkpoint.sealed_state_sha256_);
-  storage.state_digests.validate();
-  if (checkpoint.sealed_state_sha256_ != storage.state_sha256 ||
-      storage.state_sha256 !=
-          storage.state_digests.aggregate_sha256()) {
-    throw std::invalid_argument(
-        "runtime checkpoint seal does not bind its state inventory");
+  if (verify_digest) {
+    g4irsf14_clone_detail::require_sha256(
+        "checkpoint seal", checkpoint.sealed_state_sha256_);
+    storage.state_digests.validate();
+    if (checkpoint.sealed_state_sha256_ != storage.state_sha256 ||
+        storage.state_sha256 !=
+            storage.state_digests.aggregate_sha256()) {
+      throw std::invalid_argument(
+          "runtime checkpoint seal does not bind its state inventory");
+    }
   }
   if (storage.phase != EventDrivenJunctionRuntimePhase::kReady ||
       storage.events.empty()) {
     throw std::invalid_argument(
         "runtime checkpoint is not a live pre-pop boundary");
   }
-  if (scorer_graph_fingerprint() != storage.graph_sha256) {
+  if ((verify_digest &&
+       scorer_graph_fingerprint() != storage.graph_sha256) ||
+      (!verify_digest && storage.graph_identity != &graph_)) {
     throw std::invalid_argument(
         "runtime checkpoint graph identity mismatch");
   }
   config_ = storage.config;
   validate_config();
-  scorer_model_.reset();
-  scorer_static_hops_.clear();
-  pibt_regret_prior_.clear();
-  initialize_regret_prior();
-  initialize_scorer();
-  if (scorer_model_.has_value() !=
-          storage.scorer_model.has_value() ||
-      scorer_static_hops_ != storage.scorer_static_hops ||
-      pibt_regret_prior_ != storage.pibt_regret_prior) {
-    throw std::invalid_argument(
-        "runtime checkpoint scorer derivation mismatch");
+  if (verify_digest) {
+    scorer_model_.reset();
+    scorer_static_hops_.clear();
+    pibt_regret_prior_.clear();
+    initialize_regret_prior();
+    initialize_scorer();
+    if (scorer_model_.has_value() !=
+            storage.scorer_model.has_value() ||
+        scorer_static_hops_ != storage.scorer_static_hops ||
+        pibt_regret_prior_ != storage.pibt_regret_prior) {
+      throw std::invalid_argument(
+          "runtime checkpoint scorer derivation mismatch");
+    }
+  } else {
+    scorer_model_ = storage.scorer_model;
+    scorer_static_hops_ = storage.scorer_static_hops;
+    pibt_regret_prior_ = storage.pibt_regret_prior;
   }
   result_ = storage.result;
   bags_ = storage.bags;
@@ -17970,6 +18943,16 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
       storage.active_fault_instance_by_edge;
   repair_time_by_fault_instance_ =
       storage.repair_time_by_fault_instance;
+  g4irsf25_corridor_feedback_ =
+      storage.g4irsf25_corridor_feedback;
+  g4irsf25_pending_corridor_trajectories_ =
+      storage.g4irsf25_pending_corridor_trajectories;
+  g4irsf25_arm_local_integrals_ =
+      storage.g4irsf25_arm_local_integrals;
+  g4irsf25_corridor_timeout_index_ =
+      storage.g4irsf25_corridor_timeout_index;
+  g4irsf25_t0_gate_open_by_branch_ =
+      storage.g4irsf25_t0_gate_open_by_branch;
   events_ = storage.events;
   staged_event_sink_ = nullptr;
   staged_merge_visibility_sink_ = nullptr;
@@ -18048,14 +19031,24 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
   runtime_phase_ = storage.phase;
   runtime_started_ = std::chrono::steady_clock::now();
   require_checkpoint_safe_boundary();
-  validate_merge_capability_bijection();
-  const auto restored_digests = compute_runtime_state_digests();
-  if (restored_digests.aggregate_sha256() !=
-          storage.state_sha256 ||
-      restored_digests.canonical_payload() !=
-          storage.state_digests.canonical_payload()) {
-    throw std::invalid_argument(
-        "runtime checkpoint restore changed deterministic state");
+  // G25 short-horizon branches restore an in-process snapshot captured from
+  // this exact runtime and never deserialize untrusted state.  Re-running the
+  // full bag/grant bijection audit on every branch is both redundant and
+  // disproportionately expensive at scale.  Keep it on the general verified
+  // checkpoint path; the trusted G25 path still checks graph identity, phase,
+  // queue shape, and the safe-boundary invariants above.
+  if (verify_digest) {
+    validate_merge_capability_bijection();
+  }
+  if (verify_digest) {
+    const auto restored_digests = compute_runtime_state_digests();
+    if (restored_digests.aggregate_sha256() !=
+            storage.state_sha256 ||
+        restored_digests.canonical_payload() !=
+            storage.state_digests.canonical_payload()) {
+      throw std::invalid_argument(
+          "runtime checkpoint restore changed deterministic state");
+    }
   }
   } catch (...) {
     runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
