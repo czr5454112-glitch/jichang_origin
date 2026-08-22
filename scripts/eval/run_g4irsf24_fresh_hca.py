@@ -586,6 +586,10 @@ def java_run_command(
     run_dir: Path,
     fault_schedule: str = "none",
     speed_mps: float | None = None,
+    storage_in_goal: int | None = None,
+    storage_out_start: int | None = None,
+    early_threshold_seconds: float | None = None,
+    storage_lead_seconds: float | None = None,
 ) -> list[str]:
     # One repeat per process keeps route/release/output artifacts from the same run.
     command = [
@@ -608,9 +612,25 @@ def java_run_command(
         "0",
         str((run_dir / "release.csv").resolve()),
     ]
-    # Keep the historical direct-call shape when no speed is supplied.  The
-    # CLI always supplies its explicit/default speed as the optional tail arg.
-    if speed_mps is not None:
+    map_role_tail = (
+        storage_in_goal,
+        storage_out_start,
+        early_threshold_seconds,
+        storage_lead_seconds,
+    )
+    # Keep the historical direct-call shape unless a caller explicitly selects
+    # a map-specific role. Positional Java tails need the speed slot first.
+    if any(value is not None for value in map_role_tail):
+        command.extend(
+            [
+                str(2.5 if speed_mps is None else speed_mps),
+                str(47 if storage_in_goal is None else storage_in_goal),
+                str(52 if storage_out_start is None else storage_out_start),
+                str(4800.0 if early_threshold_seconds is None else early_threshold_seconds),
+                str(2700.0 if storage_lead_seconds is None else storage_lead_seconds),
+            ]
+        )
+    elif speed_mps is not None:
         command.append(str(speed_mps))
     return command
 
@@ -665,6 +685,11 @@ def run_campaign(args: argparse.Namespace) -> int:
     if not math.isfinite(args.speed_mps) or args.speed_mps <= 0.0:
         raise FreshHcaError("speed-mps must be finite and positive")
 
+    storage_in_goal = getattr(args, "storage_in_goal", None)
+    storage_out_start = getattr(args, "storage_out_start", None)
+    early_threshold_seconds = getattr(args, "early_threshold_seconds", None)
+    storage_lead_seconds = getattr(args, "storage_lead_seconds", None)
+
     output_root = args.output_root.resolve()
     commands = [
         (
@@ -680,6 +705,10 @@ def run_campaign(args: argparse.Namespace) -> int:
                 run_dir=output_root / f"run_{index:02d}",
                 fault_schedule=args.fault_schedule,
                 speed_mps=args.speed_mps,
+                storage_in_goal=storage_in_goal,
+                storage_out_start=storage_out_start,
+                early_threshold_seconds=early_threshold_seconds,
+                storage_lead_seconds=storage_lead_seconds,
             ),
         )
         for index in range(1, repeats + 1)
@@ -720,6 +749,10 @@ def run_campaign(args: argparse.Namespace) -> int:
             "max_new_tasks": max_new_tasks,
             "fault_schedule": args.fault_schedule,
             "speed_mps": args.speed_mps,
+            "storage_in_goal": storage_in_goal,
+            "storage_out_start": storage_out_start,
+            "early_threshold_seconds": early_threshold_seconds,
+            "storage_lead_seconds": storage_lead_seconds,
             "cleanup_epoch_files_requested": args.cleanup_epoch_files,
             "cleanup_epoch_files_removed": False,
         }
@@ -809,6 +842,10 @@ def _parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--repeats", type=int)
     run_parser.add_argument("--timeout-seconds", type=int)
     run_parser.add_argument("--speed-mps", type=float, default=2.5)
+    run_parser.add_argument("--storage-in-goal", type=int)
+    run_parser.add_argument("--storage-out-start", type=int)
+    run_parser.add_argument("--early-threshold-seconds", type=float)
+    run_parser.add_argument("--storage-lead-seconds", type=float)
     run_parser.add_argument("--fault-schedule", default="none")
     run_parser.add_argument("--cleanup-epoch-files", action="store_true")
     run_parser.add_argument("--skip-compile", action="store_true")

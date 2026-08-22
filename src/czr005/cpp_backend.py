@@ -719,6 +719,10 @@ def g4irsf11_event_runtime_from_records(
     g4irsf24_dlp_artifact: Mapping[str, Any] | PathLike | None = None,
     legacy_observation_bias_max_seconds: float = 0.0,
     legacy_observation_bias_seed: int = 0,
+    storage_source_nodes: Sequence[int] = (52,),
+    enable_s4_local_potential_descent_guard: bool = False,
+    enable_s4_direct_neighbor_merge_calendar_visibility: bool = False,
+    complete_on_goal_arrival: bool = False,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -889,6 +893,18 @@ def g4irsf11_event_runtime_from_records(
     enable_fault_policy = strict_bool(
         enable_fault_policy, "enable_fault_policy"
     )
+    enable_s4_local_potential_descent_guard = strict_bool(
+        enable_s4_local_potential_descent_guard,
+        "enable_s4_local_potential_descent_guard",
+    )
+    enable_s4_direct_neighbor_merge_calendar_visibility = strict_bool(
+        enable_s4_direct_neighbor_merge_calendar_visibility,
+        "enable_s4_direct_neighbor_merge_calendar_visibility",
+    )
+    complete_on_goal_arrival = strict_bool(
+        complete_on_goal_arrival,
+        "complete_on_goal_arrival",
+    )
     enable_opportunity_telemetry = strict_bool(
         enable_opportunity_telemetry,
         "enable_opportunity_telemetry",
@@ -939,6 +955,27 @@ def g4irsf11_event_runtime_from_records(
     )
     if legacy_observation_bias_seed < 0:
         raise ValueError("legacy_observation_bias_seed must be non-negative")
+    if isinstance(storage_source_nodes, (str, bytes)):
+        raise TypeError("storage_source_nodes must be a sequence of integers")
+    normalized_storage_source_nodes: list[int] = []
+    seen_storage_source_nodes: set[int] = set()
+    try:
+        storage_source_node_values = enumerate(storage_source_nodes)
+    except TypeError as exc:
+        raise TypeError(
+            "storage_source_nodes must be a sequence of integers"
+        ) from exc
+    for storage_index, value in storage_source_node_values:
+        node = strict_integer(
+            value,
+            f"storage_source_nodes[{storage_index}]",
+        )
+        if node < 0:
+            raise ValueError("storage_source_nodes must be non-negative")
+        if node in seen_storage_source_nodes:
+            raise ValueError("storage_source_nodes must not contain duplicates")
+        seen_storage_source_nodes.add(node)
+        normalized_storage_source_nodes.append(node)
     scale = strict_finite_number(scale, "scale")
     entry_headway_seconds = strict_finite_number(
         entry_headway_seconds, "entry_headway_seconds"
@@ -1891,6 +1928,66 @@ def g4irsf11_event_runtime_from_records(
             float(legacy_observation_bias_max_seconds),
             int(legacy_observation_bias_seed),
         )
+    append_only_map_tail_base = (
+        str(event_semantics),
+        bool(enable_opportunity_telemetry),
+        int(opportunity_trace_limit),
+        str(merge_grant_rule),
+        int(merge_grant_max_pending_requests),
+        int(merge_grant_lifecycle_limit),
+        str(g4irsf16_supervisor_mode),
+        normalized_g4irsf16_i3_model,
+        normalized_g4irsf16_i4_model,
+        normalized_g4irsf16_rule_bundle,
+        bool(enable_g4irsf17_source_wait_telemetry),
+        int(g4irsf17_source_wait_trace_limit),
+        str(g4irsf17_source_policy_mode),
+        normalized_g4irsf17_source_policy,
+        int(g4irsf17_source_policy_trace_limit),
+        canonical_merge_grant_timing_mode,
+        str(g4irsf18_merge_policy_mode),
+        normalized_g4irsf18_merge_policy,
+        bool(g4irsf18_merge_research_closed_loop_authorized),
+        bool(g4irsf18_merge_fixed_research_workload),
+        bool(g4irsf18_merge_production_closed_loop_authorized),
+        bool(g4irsf18_merge_offline_gate_passed),
+        float(g4irsf18_merge_coverage_cap),
+        int(g4irsf18_merge_max_overrides_per_segment),
+        bool(g4irsf18_merge_kill_switch),
+        float(bounded_wall_seconds),
+        int(bounded_check_every_events),
+        str(g4irsf20_event_hotpath_policy),
+        normalized_g4irsf24_dlp,
+        float(legacy_observation_bias_max_seconds),
+        int(legacy_observation_bias_seed),
+    )
+    map_tail_suffix: tuple[Any, ...] = ()
+    if complete_on_goal_arrival:
+        map_tail_suffix = (
+            normalized_storage_source_nodes,
+            bool(enable_s4_local_potential_descent_guard),
+            bool(enable_s4_direct_neighbor_merge_calendar_visibility),
+            True,
+        )
+    elif enable_s4_direct_neighbor_merge_calendar_visibility:
+        map_tail_suffix = (
+            normalized_storage_source_nodes,
+            bool(enable_s4_local_potential_descent_guard),
+            True,
+        )
+    elif enable_s4_local_potential_descent_guard:
+        map_tail_suffix = (
+            normalized_storage_source_nodes,
+            True,
+        )
+    elif tuple(normalized_storage_source_nodes) != (52,):
+        map_tail_suffix = (
+            normalized_storage_source_nodes,
+        )
+    if map_tail_suffix:
+        # Append only through the last requested flag.  With every G31/map
+        # option off, older native modules retain the historical call shape.
+        native_event_tail = append_only_map_tail_base + map_tail_suffix
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
             normalized_node_records,

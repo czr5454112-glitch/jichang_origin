@@ -223,6 +223,7 @@ def structural_td_artifact(
     artifact = {
         "schema": "czr005.g4irsf24.dlp.v1",
         "mode": "td",
+        "deterministic_surviving_graph_values": True,
         "beta": 1.0,
         "min_support": 1,
         "margin_seconds": 0.0,

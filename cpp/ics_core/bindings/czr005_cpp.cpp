@@ -3289,6 +3289,10 @@ g4irsf24_dlp_config_from_artifact(const py::dict& artifact) {
         "czr005.g4irsf24.dlp.v1");
   }
   config.mode = py::cast<std::string>(required("mode"));
+  if (artifact.contains("deterministic_surviving_graph_values")) {
+    config.deterministic_surviving_graph_values = py::cast<bool>(
+        artifact["deterministic_surviving_graph_values"]);
+  }
   if (config.mode == "off") {
     return config;
   }
@@ -3378,6 +3382,27 @@ py::dict g4irsf11_event_runtime_summary_row(
       summary.scorer_score_direction;
   row["scorer_claim_boundary"] =
       summary.scorer_claim_boundary;
+  if (summary.s4_local_potential_descent_guard_enabled) {
+    row["s4_local_potential_descent_guard_enabled"] = true;
+    row["s4_local_potential_descent_guard_learning_active"] =
+        summary.s4_local_potential_descent_guard_learning_active;
+    row["s4_local_potential_descent_guard_claim_boundary"] =
+        summary.s4_local_potential_descent_guard_claim_boundary;
+  }
+  if (summary.s4_direct_neighbor_merge_calendar_visibility_enabled) {
+    row["s4_direct_neighbor_merge_calendar_visibility_enabled"] = true;
+    row["s4_direct_neighbor_merge_calendar_visibility_learning_active"] =
+        summary
+            .s4_direct_neighbor_merge_calendar_visibility_learning_active;
+    row["s4_direct_neighbor_merge_calendar_visibility_claim_boundary"] =
+        summary
+            .s4_direct_neighbor_merge_calendar_visibility_claim_boundary;
+  }
+  if (summary.complete_on_goal_arrival_enabled) {
+    row["complete_on_goal_arrival_enabled"] = true;
+    row["complete_on_goal_arrival_claim_boundary"] =
+        summary.complete_on_goal_arrival_claim_boundary;
+  }
   row["scorer_out_of_distribution_diagnostic"] =
       summary.scorer_out_of_distribution_diagnostic;
   row["scorer_promotion_eligible"] =
@@ -6203,7 +6228,11 @@ py::dict g4irsf11_event_runtime_from_records(
     const std::string& g4irsf20_event_hotpath_policy,
     const py::dict& g4irsf24_dlp_artifact,
     double legacy_observation_bias_max_seconds,
-    std::uint64_t legacy_observation_bias_seed) {
+    std::uint64_t legacy_observation_bias_seed,
+    const std::vector<int>& storage_source_nodes,
+    bool enable_s4_local_potential_descent_guard,
+    bool enable_s4_direct_neighbor_merge_calendar_visibility,
+    bool complete_on_goal_arrival) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6437,11 +6466,17 @@ py::dict g4irsf11_event_runtime_from_records(
   config.g4irsf24_dlp =
       g4irsf24_dlp_config_from_artifact(
           g4irsf24_dlp_artifact);
+  config.enable_s4_local_potential_descent_guard =
+      enable_s4_local_potential_descent_guard;
+  config.enable_s4_direct_neighbor_merge_calendar_visibility =
+      enable_s4_direct_neighbor_merge_calendar_visibility;
+  config.complete_on_goal_arrival = complete_on_goal_arrival;
   // Append-only Table 5.4 reconstruction seam; zero remains exact-off.
   config.legacy_observation_bias_max_seconds =
       legacy_observation_bias_max_seconds;
   config.legacy_observation_bias_seed =
       legacy_observation_bias_seed;
+  config.storage_source_nodes = storage_source_nodes;
   config.pibt_regret_prior_records.reserve(
       pibt_regret_prior_records.size());
   for (const auto& record : pibt_regret_prior_records) {
@@ -7193,7 +7228,14 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("g4irsf24_dlp_artifact") = py::dict(),
              py::arg("legacy_observation_bias_max_seconds") = 0.0,
              py::arg("legacy_observation_bias_seed") =
-                 std::uint64_t{0});
+                 std::uint64_t{0},
+             py::arg("storage_source_nodes") =
+                 std::vector<int>{52},
+             py::arg("enable_s4_local_potential_descent_guard") = false,
+             py::arg(
+                 "enable_s4_direct_neighbor_merge_calendar_visibility") =
+                 false,
+             py::arg("complete_on_goal_arrival") = false);
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

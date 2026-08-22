@@ -495,6 +495,10 @@ struct G4IRSF24DLPResidualRecord {
 // O(1) key lookups at most; no route suffix or graph-wide scan is introduced.
 struct G4IRSF24DLPConfig {
   std::string mode = "off";  // off, ewma (edge only), td (edge + value)
+  // Explicit provenance gate for the local potential-descent guard.  Learned
+  // TD values must never become a hard routing invariant; only a
+  // preregistered deterministic surviving-graph fixed point may opt in.
+  bool deterministic_surviving_graph_values = false;
   double beta = 1.0;
   int min_support = 8;
   double margin_seconds = 0.0;
@@ -616,6 +620,18 @@ struct EventDrivenJunctionConfig {
   // and S4 are deterministic no-model ablations.
   std::string scorer_mode =
       "S0_current_handwritten_static_score";
+  // Exact-off compatibility default.  When enabled for S4, candidate
+  // arbitration remains one-hop/local but may consider only neighbours whose
+  // service-aware structural potential strictly decreases.
+  bool enable_s4_local_potential_descent_guard = false;
+  // Exact-off compatibility default.  When enabled for S4/E4, expose only a
+  // direct merge neighbour's existing service-calendar scalar to the existing
+  // calendar-wait score.  J2 remains the sole grant/reservation authority.
+  bool enable_s4_direct_neighbor_merge_calendar_visibility = false;
+  // Exact-off compatibility default.  G31 may opt into the legacy HCA
+  // completion seam: crossing the final physical edge completes the bag at
+  // goal arrival, without reserving or executing goal-node service.
+  bool complete_on_goal_arrival = false;
   std::vector<std::vector<double>> scorer_w1;
   std::vector<double> scorer_b1;
   std::vector<double> scorer_w2;
@@ -689,6 +705,10 @@ struct EventDrivenJunctionConfig {
   // reservation decision.
   double legacy_observation_bias_max_seconds = 0.0;
   std::uint64_t legacy_observation_bias_seed = 0;
+  // Semantic source roles belong to the loaded map profile.  The legacy map2
+  // default remains exact, while another dense graph can name its own EBS /
+  // storage injection nodes without changing the local runtime policy.
+  std::vector<int> storage_source_nodes{52};
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -968,6 +988,14 @@ struct EventRuntimeSummary {
   std::string scorer_model_sha256;
   std::string scorer_score_direction;
   std::string scorer_claim_boundary;
+  bool s4_local_potential_descent_guard_enabled = false;
+  bool s4_local_potential_descent_guard_learning_active = false;
+  std::string s4_local_potential_descent_guard_claim_boundary;
+  bool s4_direct_neighbor_merge_calendar_visibility_enabled = false;
+  bool s4_direct_neighbor_merge_calendar_visibility_learning_active = false;
+  std::string s4_direct_neighbor_merge_calendar_visibility_claim_boundary;
+  bool complete_on_goal_arrival_enabled = false;
+  std::string complete_on_goal_arrival_claim_boundary;
   bool scorer_out_of_distribution_diagnostic = false;
   bool scorer_promotion_eligible = false;
   bool scorer_absolute_node_ids_enabled = false;
@@ -2881,6 +2909,32 @@ class EventDrivenJunctionRuntime {
     result_.summary.credit_mode = canonical_credit_mode();
     result_.summary.scorer_mode = config_.scorer_mode;
     result_.summary.scorer_mode_echo = config_.scorer_mode;
+    if (config_.enable_s4_local_potential_descent_guard) {
+      result_.summary.s4_local_potential_descent_guard_enabled = true;
+      result_.summary.s4_local_potential_descent_guard_learning_active =
+          false;
+      result_.summary.s4_local_potential_descent_guard_claim_boundary =
+          "one_next_edge_at_current_junction;strict_H_eff_descent;"
+          "O_outdegree;no_full_route;no_learning";
+    }
+    if (config_.enable_s4_direct_neighbor_merge_calendar_visibility) {
+      result_.summary
+          .s4_direct_neighbor_merge_calendar_visibility_enabled = true;
+      result_.summary
+          .s4_direct_neighbor_merge_calendar_visibility_learning_active =
+          false;
+      result_.summary
+          .s4_direct_neighbor_merge_calendar_visibility_claim_boundary =
+          "direct_outgoing_neighbor_calendar_scalar;"
+          "existing_calendar_wait_weight;J2_authority_unchanged;"
+          "O_outdegree;no_full_route;no_learning";
+    }
+    if (config_.complete_on_goal_arrival) {
+      result_.summary.complete_on_goal_arrival_enabled = true;
+      result_.summary.complete_on_goal_arrival_claim_boundary =
+          "physical_goal_edge_exit_terminal;goal_service_not_reserved;"
+          "legacy_HCA_Tasks_ICS_completion_semantics";
+    }
     result_.summary.framework_mode = canonical_framework_mode();
     result_.summary.framework_mode_echo = config_.framework_mode;
     result_.summary.framework_diagnostic_only =
@@ -3212,7 +3266,8 @@ class EventDrivenJunctionRuntime {
       // census pay for legacy I1 probes at every other multi-bag source.
       // With the opt-in disabled, preserve the frozen I1 prefilter exactly.
       if (config_.enable_g4irsf23_source_admission_causal_action) {
-        return event.node == 52 && !local->second.source_queue.empty()
+        return (is_storage_source_node(event.node) &&
+                !local->second.source_queue.empty())
                    ? kG4IRSF14CausalCandidateI1
                    : kG4IRSF14CausalCandidateNone;
       }
@@ -4824,6 +4879,9 @@ class EventDrivenJunctionRuntime {
   }
 
   bool uses_destination_calendar(int node, int goal) const {
+    if (config_.complete_on_goal_arrival && node == goal) {
+      return false;
+    }
     const auto semantics = canonical_resource_semantics();
     if (semantics == "R3_java_node_window_compatible") {
       return node != goal;
@@ -4926,6 +4984,20 @@ class EventDrivenJunctionRuntime {
             "G4IRSF24 DLP residuals must be finite with non-negative "
             "support");
       }
+    }
+    if (config_.enable_s4_local_potential_descent_guard &&
+        canonical_scorer_mode() != "S4") {
+      throw std::invalid_argument(
+          "the local potential-descent guard requires the S4 scorer");
+    }
+    if (config_.enable_s4_direct_neighbor_merge_calendar_visibility &&
+        canonical_scorer_mode() != "S4") {
+      throw std::invalid_argument(
+          "direct-neighbor merge-calendar visibility requires the S4 scorer");
+    }
+    if (dlp.deterministic_surviving_graph_values && dlp.mode != "td") {
+      throw std::invalid_argument(
+          "deterministic surviving-graph values require G4IRSF24 TD mode");
     }
     config_.g4irsf18_merge_policy.validate_controls();
     if (g4irsf18_merge_policy_enabled() &&
@@ -5505,7 +5577,7 @@ class EventDrivenJunctionRuntime {
       if (g4irsf17_source_policy_enabled() ||
           config_.enable_g4irsf17_causal_source_features ||
           (config_.enable_g4irsf23_source_admission_causal_action &&
-           event.node == 52)) {
+           is_storage_source_node(event.node))) {
         controller.g4irsf17_source_temporal.releases.record(event.time);
       }
       update_queue_maxima(controller);
@@ -6096,7 +6168,7 @@ class EventDrivenJunctionRuntime {
     const std::uint64_t source_generation =
         (g4irsf17_extensions_enabled() ||
          (config_.enable_g4irsf23_source_admission_causal_action &&
-          node == 52))
+          is_storage_source_node(node)))
             ? ++controller.g4irsf17_source_generation
             : 0;
     std::size_t queue_index = held_queue_index.has_value()
@@ -6281,7 +6353,7 @@ class EventDrivenJunctionRuntime {
     }
     if (!force_source_a0_after_natural_hold &&
         config_.enable_g4irsf23_source_admission_causal_action &&
-        active_causal_step_ != nullptr && node == 52 &&
+        active_causal_step_ != nullptr && is_storage_source_node(node) &&
         is_storage_out_task(bag)) {
       G4IRSF14CloneBoundary boundary;
       boundary.kind =
@@ -6344,7 +6416,7 @@ class EventDrivenJunctionRuntime {
     if (g4irsf17_source_policy_enabled() ||
         config_.enable_g4irsf17_causal_source_features ||
         (config_.enable_g4irsf23_source_admission_causal_action &&
-         node == 52)) {
+         is_storage_source_node(node))) {
       controller.g4irsf17_source_temporal.admissions.record(time);
     }
     controller.observe_local_state();
@@ -7017,7 +7089,7 @@ class EventDrivenJunctionRuntime {
     if (g4irsf17_source_policy_enabled() ||
         config_.enable_g4irsf17_causal_source_features ||
         (config_.enable_g4irsf23_source_admission_causal_action &&
-         event.node == 52)) {
+         is_storage_source_node(event.node))) {
       junctions_[event.node]
           .g4irsf17_source_temporal.service_completions.record(event.time);
     }
@@ -9433,6 +9505,49 @@ class EventDrivenJunctionRuntime {
     return found->second;
   }
 
+  std::optional<double> s4_local_effective_potential(int node,
+                                                      int goal) const {
+    const double base = static_potential(node, goal);
+    const auto& dlp = config_.g4irsf24_dlp;
+    if (!dlp.deterministic_surviving_graph_values || node == goal) {
+      return base;
+    }
+    const auto* residual = dlp.value(node, goal);
+    if (residual == nullptr || residual->support < dlp.min_support) {
+      return std::nullopt;
+    }
+    return base + residual->residual_seconds;
+  }
+
+  bool s4_local_potential_descent_allowed(
+      const EventDecisionTraceRow& trace,
+      const EventCandidateRecord& candidate) const {
+    if (!config_.enable_s4_local_potential_descent_guard) {
+      return true;
+    }
+    const auto current =
+        s4_local_effective_potential(trace.current_node, trace.goal_node);
+    const auto next =
+        s4_local_effective_potential(candidate.next_node, trace.goal_node);
+    return current.has_value() && next.has_value() &&
+           *next + event_runtime_detail::kEpsilon < *current;
+  }
+
+  void apply_s4_local_potential_descent_guard(
+      const EventDecisionTraceRow& trace,
+      std::vector<std::size_t>& ranking) const {
+    if (!config_.enable_s4_local_potential_descent_guard) {
+      return;
+    }
+    ranking.erase(
+        std::remove_if(
+            ranking.begin(), ranking.end(), [&](std::size_t index) {
+              return !s4_local_potential_descent_allowed(
+                  trace, trace.candidates[index]);
+            }),
+        ranking.end());
+  }
+
   void apply_scorer(EventDecisionTraceRow& trace) {
     trace.scorer_id = canonical_scorer_id();
     trace.scorer_effective_id = trace.scorer_id;
@@ -10007,6 +10122,7 @@ class EventDrivenJunctionRuntime {
       return std::tie(left_record.model_score, left_record.next_node) <
              std::tie(right_record.model_score, right_record.next_node);
     });
+    apply_s4_local_potential_descent_guard(trace, ranking);
     // model_prediction describes the scorer over the emitted candidate set.
     // Admission credit constrains the selected action, not the model output.
     if (!ranking.empty()) {
@@ -10489,6 +10605,9 @@ class EventDrivenJunctionRuntime {
     auto trigger_trace = std::move(*trigger_trace_result);
     const EventCandidateRecord* preferred = nullptr;
     for (const auto& candidate : trigger_trace.candidates) {
+      if (!s4_local_potential_descent_allowed(trigger_trace, candidate)) {
+        continue;
+      }
       if (merge_grant_authority != nullptr &&
           candidate.next_node !=
               merge_grant_authority
@@ -10606,6 +10725,9 @@ class EventDrivenJunctionRuntime {
       bool filtered_missing_merge_grant = false;
 
       for (const auto& record : trace.candidates) {
+        if (!s4_local_potential_descent_allowed(trace, record)) {
+          continue;
+        }
         if (merge_grant_authority != nullptr &&
             runtime_bag_id == trigger_runtime_bag_id &&
             record.next_node !=
@@ -13244,6 +13366,7 @@ class EventDrivenJunctionRuntime {
       }
       return left_record.next_node < right_record.next_node;
     });
+    apply_s4_local_potential_descent_guard(trace, ranking);
     // Report the scorer's prediction over all emitted candidates before
     // applying the first-edge admission credit constraint.
     if (!ranking.empty()) {
@@ -14375,11 +14498,15 @@ class EventDrivenJunctionRuntime {
     }
     const double service = service_duration(candidate);
     record.target_next_available = time + record.travel_time;
-    if (uses_destination_calendar(candidate,
-                                  bag.request.goal) &&
-        !(uses_destination_merge_grants() &&
-          graph_.incoming_degree(candidate) > 1 &&
-          candidate != bag.request.goal)) {
+    const bool destination_merge_candidate =
+        uses_destination_merge_grants() &&
+        graph_.incoming_degree(candidate) > 1 &&
+        candidate != bag.request.goal;
+    const bool s4_merge_calendar_visible =
+        config_.enable_s4_direct_neighbor_merge_calendar_visibility &&
+        canonical_scorer_mode() == "S4";
+    if (uses_destination_calendar(candidate, bag.request.goal) &&
+        (!destination_merge_candidate || s4_merge_calendar_visible)) {
       record.target_next_available =
           target.service_calendar.earliest_start(time + record.travel_time, service);
     }
@@ -15106,6 +15233,42 @@ class EventDrivenJunctionRuntime {
       // additive duration component. The destination must have been observed
       // before this valid EDGE_EXIT in the bounded runtime history.
       bag.loop_extra_time_seconds += executed_travel;
+    }
+    if (config_.complete_on_goal_arrival &&
+        event.to_node == bag.request.goal) {
+      auto& target = junctions_[event.to_node];
+      if (target.scheduled_incoming > 0) {
+        --target.scheduled_incoming;
+      }
+      auto incoming =
+          target.scheduled_incoming_by_goal.find(bag.request.goal);
+      if (incoming != target.scheduled_incoming_by_goal.end()) {
+        incoming->second = std::max(0, incoming->second - 1);
+        if (incoming->second == 0) {
+          target.scheduled_incoming_by_goal.erase(incoming);
+        }
+      }
+      remember_node(bag, event.to_node);
+      bag.transit_from = -1;
+      bag.transit_to = -1;
+      complete_bag(bag, event.time);
+      target.observe_local_state();
+      schedule_junction_wakeup(event.from_node, event.time);
+      schedule_passive(JunctionEventType::kCongestionBeaconUpdate,
+                       event.time,
+                       event.task_id,
+                       event.to_node,
+                       event.from_node,
+                       event.to_node,
+                       "goal_arrival_terminal_snapshot");
+      append_event_trace(event,
+                         event.task_id,
+                         event.to_node,
+                         event.from_node,
+                         event.to_node,
+                         "goal_arrival_terminal",
+                         0);
+      return;
     }
     bag.status = BagStatus::kInService;
     schedule(JunctionEventType::kJunctionServiceComplete,
@@ -16461,8 +16624,14 @@ class EventDrivenJunctionRuntime {
     return contention;
   }
 
+  bool is_storage_source_node(int node) const noexcept {
+    return std::find(config_.storage_source_nodes.begin(),
+                     config_.storage_source_nodes.end(),
+                     node) != config_.storage_source_nodes.end();
+  }
+
   bool is_storage_out_task(const BagState& bag) const {
-    if (bag.request.start == 52) {
+    if (is_storage_source_node(bag.request.start)) {
       return true;
     }
     std::string source = bag.request.source;
@@ -20016,6 +20185,14 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
   scorer.string(config_.priority_mode);
   scorer.string(config_.pibt_preference_mode);
   scorer.string(config_.scorer_mode);
+  if (config_.enable_s4_local_potential_descent_guard) {
+    scorer.string("s4_local_potential_descent_guard_v1");
+    scorer.boolean(
+        config_.g4irsf24_dlp.deterministic_surviving_graph_values);
+  }
+  if (config_.enable_s4_direct_neighbor_merge_calendar_visibility) {
+    scorer.string("s4_direct_neighbor_merge_calendar_visibility_v1");
+  }
   scorer.floating(config_.scorer_b2);
   scorer.floating(config_.scorer_risk_margin_threshold);
   scorer.floating(config_.scorer_risk_bottleneck_threshold);

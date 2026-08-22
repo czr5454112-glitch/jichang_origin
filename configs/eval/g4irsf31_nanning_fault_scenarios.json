@@ -1,0 +1,777 @@
+{
+  "schema": "czr005.g4irsf31.nanning_experiment_protocol.v1",
+  "status": "COMPLETE_PROTOCOL_ONLY_NO_ALGORITHM_RUN",
+  "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+  "selection_inputs": {
+    "topology": "151 nodes / 227 directed edges",
+    "business_population": "projected Nanning 1x raw workload",
+    "algorithm_outcomes_consulted": false,
+    "nominal_shortest_path_speed_mps": 2.5,
+    "eligible_edge_rule": "internal business edges only; no loader, unloader, or type-7 storage endpoint; positive pallet capacity; positive nominal 1x shortest-path exposure"
+  },
+  "fixed_window": {
+    "start_epoch": 8260.0,
+    "end_epoch": 98259.0,
+    "fault_start_epoch": 8260.0,
+    "repair_within_window": false
+  },
+  "storage_proxy": {
+    "storage_in_goal": 53,
+    "storage_out_start": 53,
+    "alias": "IDK1",
+    "source_role": "EMPTY_PALLET_STORAGE_EBS_PROXY_CANDIDATE",
+    "real_ebs_claimed": false
+  },
+  "line_count": 8,
+  "lines": [
+    {
+      "line_id": 1,
+      "edge": [
+        50,
+        25
+      ],
+      "from_alias": "IU25",
+      "from_external_id": "ICS51",
+      "to_alias": "ID26",
+      "to_external_id": "ICS26",
+      "from_system": "international",
+      "to_system": "international",
+      "length_m": 21.9,
+      "pallet_capacity": 10,
+      "nominal_1x_shortest_path_leg_exposure_count": 19091,
+      "selection_basis": "international internal edge with the largest nominal 1x shortest-path exposure among single-edge-removal-reachable trunks"
+    },
+    {
+      "line_id": 2,
+      "edge": [
+        28,
+        29
+      ],
+      "from_alias": "IU3",
+      "from_external_id": "ICS29",
+      "to_alias": "IU4",
+      "to_external_id": "ICS30",
+      "from_system": "international",
+      "to_system": "international",
+      "length_m": 5.0,
+      "pallet_capacity": 2,
+      "nominal_1x_shortest_path_leg_exposure_count": 13698,
+      "selection_basis": "international internal positive-capacity edge with the largest nominal 1x shortest-path exposure among edges whose removal blocks projected bags"
+    },
+    {
+      "line_id": 3,
+      "edge": [
+        94,
+        76
+      ],
+      "from_alias": "DU38",
+      "from_external_id": "ICS100",
+      "to_alias": "DU20",
+      "to_external_id": "ICS82",
+      "from_system": "domestic",
+      "to_system": "domestic",
+      "length_m": 19.9,
+      "pallet_capacity": 9,
+      "nominal_1x_shortest_path_leg_exposure_count": 11208,
+      "selection_basis": "domestic internal edge with the largest nominal 1x shortest-path exposure among single-edge-removal-reachable trunks"
+    },
+    {
+      "line_id": 4,
+      "edge": [
+        78,
+        80
+      ],
+      "from_alias": "DU22",
+      "from_external_id": "ICS84",
+      "to_alias": "DU24",
+      "to_external_id": "ICS86",
+      "from_system": "domestic",
+      "to_system": "domestic",
+      "length_m": 2.7,
+      "pallet_capacity": 1,
+      "nominal_1x_shortest_path_leg_exposure_count": 10905,
+      "selection_basis": "highest-exposure positive-capacity internal DU-to-DU branch whose removal blocks projected bags"
+    },
+    {
+      "line_id": 5,
+      "edge": [
+        112,
+        113
+      ],
+      "from_alias": "DD18",
+      "from_external_id": "ICS118",
+      "to_alias": "DD19",
+      "to_external_id": "ICS119",
+      "from_system": "domestic",
+      "to_system": "domestic",
+      "length_m": 3.0,
+      "pallet_capacity": 1,
+      "nominal_1x_shortest_path_leg_exposure_count": 6405,
+      "selection_basis": "positive-capacity internal DD-to-DD branch with the largest single-edge raw-bag reachability loss"
+    },
+    {
+      "line_id": 6,
+      "edge": [
+        29,
+        112
+      ],
+      "from_alias": "IU4",
+      "from_external_id": "ICS30",
+      "to_alias": "DD18",
+      "to_external_id": "ICS118",
+      "from_system": "international",
+      "to_system": "domestic",
+      "length_m": 58.7,
+      "pallet_capacity": 29,
+      "nominal_1x_shortest_path_leg_exposure_count": 10504,
+      "selection_basis": "highest-exposure positive-capacity internal edge whose endpoints belong to different workbook systems"
+    },
+    {
+      "line_id": 7,
+      "edge": [
+        34,
+        55
+      ],
+      "from_alias": "IU9",
+      "from_external_id": "ICS35",
+      "to_alias": "IUMES",
+      "to_external_id": "ICS156",
+      "from_system": "international",
+      "to_system": "international",
+      "length_m": 16.65,
+      "pallet_capacity": 8,
+      "nominal_1x_shortest_path_leg_exposure_count": 15054,
+      "selection_basis": "highest-exposure positive-capacity internal edge entering a documented recode station"
+    },
+    {
+      "line_id": 8,
+      "edge": [
+        100,
+        102
+      ],
+      "from_alias": "DD6",
+      "from_external_id": "ICS106",
+      "to_alias": "DD8",
+      "to_external_id": "ICS108",
+      "from_system": "domestic",
+      "to_system": "domestic",
+      "length_m": 4.6,
+      "pallet_capacity": 2,
+      "nominal_1x_shortest_path_leg_exposure_count": 8416,
+      "selection_basis": "highest-exposure remaining positive-capacity internal DD-to-DD branch whose removal blocks projected bags"
+    }
+  ],
+  "table_5_5_shape": "8 singles + 5 pairs + 3 triples",
+  "scales": {
+    "1x": {
+      "raw_bag_count": 28506,
+      "expanded_segment_count": 43603,
+      "scenario_count": 16,
+      "scenarios": [
+        {
+          "scenario": "single_1",
+          "line_ids": [
+            1
+          ],
+          "fault_edges": [
+            [
+              50,
+              25
+            ]
+          ],
+          "topology_upper_raw_bags": 28506,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "single_2",
+          "line_ids": [
+            2
+          ],
+          "fault_edges": [
+            [
+              28,
+              29
+            ]
+          ],
+          "topology_upper_raw_bags": 25886,
+          "topology_blocked_raw_bags": 2620,
+          "topology_upper_rate": 0.9080895250122781
+        },
+        {
+          "scenario": "single_3",
+          "line_ids": [
+            3
+          ],
+          "fault_edges": [
+            [
+              94,
+              76
+            ]
+          ],
+          "topology_upper_raw_bags": 28506,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "single_4",
+          "line_ids": [
+            4
+          ],
+          "fault_edges": [
+            [
+              78,
+              80
+            ]
+          ],
+          "topology_upper_raw_bags": 27813,
+          "topology_blocked_raw_bags": 693,
+          "topology_upper_rate": 0.9756893285624079
+        },
+        {
+          "scenario": "single_5",
+          "line_ids": [
+            5
+          ],
+          "fault_edges": [
+            [
+              112,
+              113
+            ]
+          ],
+          "topology_upper_raw_bags": 23669,
+          "topology_blocked_raw_bags": 4837,
+          "topology_upper_rate": 0.8303164246123623
+        },
+        {
+          "scenario": "single_6",
+          "line_ids": [
+            6
+          ],
+          "fault_edges": [
+            [
+              29,
+              112
+            ]
+          ],
+          "topology_upper_raw_bags": 28506,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "single_7",
+          "line_ids": [
+            7
+          ],
+          "fault_edges": [
+            [
+              34,
+              55
+            ]
+          ],
+          "topology_upper_raw_bags": 28506,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "single_8",
+          "line_ids": [
+            8
+          ],
+          "fault_edges": [
+            [
+              100,
+              102
+            ]
+          ],
+          "topology_upper_raw_bags": 27839,
+          "topology_blocked_raw_bags": 667,
+          "topology_upper_rate": 0.9766014172454922
+        },
+        {
+          "scenario": "pair_1_7",
+          "line_ids": [
+            1,
+            7
+          ],
+          "fault_edges": [
+            [
+              50,
+              25
+            ],
+            [
+              34,
+              55
+            ]
+          ],
+          "topology_upper_raw_bags": 28506,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "pair_2_4",
+          "line_ids": [
+            2,
+            4
+          ],
+          "fault_edges": [
+            [
+              28,
+              29
+            ],
+            [
+              78,
+              80
+            ]
+          ],
+          "topology_upper_raw_bags": 25193,
+          "topology_blocked_raw_bags": 3313,
+          "topology_upper_rate": 0.883778853574686
+        },
+        {
+          "scenario": "pair_3_5",
+          "line_ids": [
+            3,
+            5
+          ],
+          "fault_edges": [
+            [
+              94,
+              76
+            ],
+            [
+              112,
+              113
+            ]
+          ],
+          "topology_upper_raw_bags": 12186,
+          "topology_blocked_raw_bags": 16320,
+          "topology_upper_rate": 0.4274889496948011
+        },
+        {
+          "scenario": "pair_4_5",
+          "line_ids": [
+            4,
+            5
+          ],
+          "fault_edges": [
+            [
+              78,
+              80
+            ],
+            [
+              112,
+              113
+            ]
+          ],
+          "topology_upper_raw_bags": 22976,
+          "topology_blocked_raw_bags": 5530,
+          "topology_upper_rate": 0.8060057531747702
+        },
+        {
+          "scenario": "pair_5_7",
+          "line_ids": [
+            5,
+            7
+          ],
+          "fault_edges": [
+            [
+              112,
+              113
+            ],
+            [
+              34,
+              55
+            ]
+          ],
+          "topology_upper_raw_bags": 23669,
+          "topology_blocked_raw_bags": 4837,
+          "topology_upper_rate": 0.8303164246123623
+        },
+        {
+          "scenario": "triple_2_4_6",
+          "line_ids": [
+            2,
+            4,
+            6
+          ],
+          "fault_edges": [
+            [
+              28,
+              29
+            ],
+            [
+              78,
+              80
+            ],
+            [
+              29,
+              112
+            ]
+          ],
+          "topology_upper_raw_bags": 25193,
+          "topology_blocked_raw_bags": 3313,
+          "topology_upper_rate": 0.883778853574686
+        },
+        {
+          "scenario": "triple_3_5_8",
+          "line_ids": [
+            3,
+            5,
+            8
+          ],
+          "fault_edges": [
+            [
+              94,
+              76
+            ],
+            [
+              112,
+              113
+            ],
+            [
+              100,
+              102
+            ]
+          ],
+          "topology_upper_raw_bags": 12115,
+          "topology_blocked_raw_bags": 16391,
+          "topology_upper_rate": 0.42499824598330177
+        },
+        {
+          "scenario": "triple_4_6_7",
+          "line_ids": [
+            4,
+            6,
+            7
+          ],
+          "fault_edges": [
+            [
+              78,
+              80
+            ],
+            [
+              29,
+              112
+            ],
+            [
+              34,
+              55
+            ]
+          ],
+          "topology_upper_raw_bags": 27813,
+          "topology_blocked_raw_bags": 693,
+          "topology_upper_rate": 0.9756893285624079
+        }
+      ]
+    },
+    "2x": {
+      "raw_bag_count": 57012,
+      "expanded_segment_count": 87206,
+      "scenario_count": 16,
+      "scenarios": [
+        {
+          "scenario": "single_1",
+          "line_ids": [
+            1
+          ],
+          "fault_edges": [
+            [
+              50,
+              25
+            ]
+          ],
+          "topology_upper_raw_bags": 57012,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "single_2",
+          "line_ids": [
+            2
+          ],
+          "fault_edges": [
+            [
+              28,
+              29
+            ]
+          ],
+          "topology_upper_raw_bags": 51772,
+          "topology_blocked_raw_bags": 5240,
+          "topology_upper_rate": 0.9080895250122781
+        },
+        {
+          "scenario": "single_3",
+          "line_ids": [
+            3
+          ],
+          "fault_edges": [
+            [
+              94,
+              76
+            ]
+          ],
+          "topology_upper_raw_bags": 57012,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "single_4",
+          "line_ids": [
+            4
+          ],
+          "fault_edges": [
+            [
+              78,
+              80
+            ]
+          ],
+          "topology_upper_raw_bags": 55626,
+          "topology_blocked_raw_bags": 1386,
+          "topology_upper_rate": 0.9756893285624079
+        },
+        {
+          "scenario": "single_5",
+          "line_ids": [
+            5
+          ],
+          "fault_edges": [
+            [
+              112,
+              113
+            ]
+          ],
+          "topology_upper_raw_bags": 47338,
+          "topology_blocked_raw_bags": 9674,
+          "topology_upper_rate": 0.8303164246123623
+        },
+        {
+          "scenario": "single_6",
+          "line_ids": [
+            6
+          ],
+          "fault_edges": [
+            [
+              29,
+              112
+            ]
+          ],
+          "topology_upper_raw_bags": 57012,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "single_7",
+          "line_ids": [
+            7
+          ],
+          "fault_edges": [
+            [
+              34,
+              55
+            ]
+          ],
+          "topology_upper_raw_bags": 57012,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "single_8",
+          "line_ids": [
+            8
+          ],
+          "fault_edges": [
+            [
+              100,
+              102
+            ]
+          ],
+          "topology_upper_raw_bags": 55678,
+          "topology_blocked_raw_bags": 1334,
+          "topology_upper_rate": 0.9766014172454922
+        },
+        {
+          "scenario": "pair_1_7",
+          "line_ids": [
+            1,
+            7
+          ],
+          "fault_edges": [
+            [
+              50,
+              25
+            ],
+            [
+              34,
+              55
+            ]
+          ],
+          "topology_upper_raw_bags": 57012,
+          "topology_blocked_raw_bags": 0,
+          "topology_upper_rate": 1.0
+        },
+        {
+          "scenario": "pair_2_4",
+          "line_ids": [
+            2,
+            4
+          ],
+          "fault_edges": [
+            [
+              28,
+              29
+            ],
+            [
+              78,
+              80
+            ]
+          ],
+          "topology_upper_raw_bags": 50386,
+          "topology_blocked_raw_bags": 6626,
+          "topology_upper_rate": 0.883778853574686
+        },
+        {
+          "scenario": "pair_3_5",
+          "line_ids": [
+            3,
+            5
+          ],
+          "fault_edges": [
+            [
+              94,
+              76
+            ],
+            [
+              112,
+              113
+            ]
+          ],
+          "topology_upper_raw_bags": 24372,
+          "topology_blocked_raw_bags": 32640,
+          "topology_upper_rate": 0.4274889496948011
+        },
+        {
+          "scenario": "pair_4_5",
+          "line_ids": [
+            4,
+            5
+          ],
+          "fault_edges": [
+            [
+              78,
+              80
+            ],
+            [
+              112,
+              113
+            ]
+          ],
+          "topology_upper_raw_bags": 45952,
+          "topology_blocked_raw_bags": 11060,
+          "topology_upper_rate": 0.8060057531747702
+        },
+        {
+          "scenario": "pair_5_7",
+          "line_ids": [
+            5,
+            7
+          ],
+          "fault_edges": [
+            [
+              112,
+              113
+            ],
+            [
+              34,
+              55
+            ]
+          ],
+          "topology_upper_raw_bags": 47338,
+          "topology_blocked_raw_bags": 9674,
+          "topology_upper_rate": 0.8303164246123623
+        },
+        {
+          "scenario": "triple_2_4_6",
+          "line_ids": [
+            2,
+            4,
+            6
+          ],
+          "fault_edges": [
+            [
+              28,
+              29
+            ],
+            [
+              78,
+              80
+            ],
+            [
+              29,
+              112
+            ]
+          ],
+          "topology_upper_raw_bags": 50386,
+          "topology_blocked_raw_bags": 6626,
+          "topology_upper_rate": 0.883778853574686
+        },
+        {
+          "scenario": "triple_3_5_8",
+          "line_ids": [
+            3,
+            5,
+            8
+          ],
+          "fault_edges": [
+            [
+              94,
+              76
+            ],
+            [
+              112,
+              113
+            ],
+            [
+              100,
+              102
+            ]
+          ],
+          "topology_upper_raw_bags": 24230,
+          "topology_blocked_raw_bags": 32782,
+          "topology_upper_rate": 0.42499824598330177
+        },
+        {
+          "scenario": "triple_4_6_7",
+          "line_ids": [
+            4,
+            6,
+            7
+          ],
+          "fault_edges": [
+            [
+              78,
+              80
+            ],
+            [
+              29,
+              112
+            ],
+            [
+              34,
+              55
+            ]
+          ],
+          "topology_upper_raw_bags": 55626,
+          "topology_blocked_raw_bags": 1386,
+          "topology_upper_rate": 0.9756893285624079
+        }
+      ]
+    }
+  },
+  "claim_boundary": {
+    "new_map_line_identity": "NANNING_PRE_REGISTERED_RECONSTRUCTION",
+    "paper_affected_conveyor_counts_reused": false,
+    "pair_5_7_old_map_override_reused": false,
+    "topology_upper_is_not_an_algorithm_result": true
+  }
+}

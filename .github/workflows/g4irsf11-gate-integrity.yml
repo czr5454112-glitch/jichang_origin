@@ -132,6 +132,12 @@ jobs:
         run: python -m pytest -q tests/test_g4irsf30_*.py
       - name: Validate committed G4IRSF30 portable reports
         run: python scripts/eval/run_g4irsf30_reporting.py --validate-committed
+      - name: Run G4IRSF31 map-portability and reporting regressions
+        env:
+          PYTHONPATH: build-ci/python
+        run: python -m pytest -q tests/test_g4irsf31_*.py
+      - name: Validate committed G4IRSF31 portable reports
+        run: python scripts/eval/run_g4irsf31_reporting.py --validate-committed
       - name: Validate committed G4IRSF16 bindings and full shadow payload
         run: python scripts/eval/finalize_g4irsf16_decision.py --validate-only
       - name: Validate committed decision schema and artifact hashes

@@ -1,0 +1,402 @@
+{
+  "schema": "czr005.g4irsf31.same_hca_release_timing.v1",
+  "case_id": "t5_2_nanning_1x_speed_2",
+  "case": {
+    "case_id": "t5_2_nanning_1x_speed_2",
+    "paper_table": "5.2",
+    "group": "stable_speed",
+    "scale": 1,
+    "speed_mps": 2.0,
+    "fault_scenario": null
+  },
+  "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+  "view_role": "SECONDARY_STABLE_TIMING_ONLY",
+  "primary_view": {
+    "protocol": "OWN_SOURCE_FIXED_WINDOW_FIXED_DENOMINATOR_CAPACITY",
+    "remains_primary": true,
+    "modified_by_this_runner": false
+  },
+  "comparison_contract": {
+    "reference_arm": "HCA_corrected_run_01",
+    "candidate_arm": "S4_same_segment_release_trace",
+    "same_segment_release_required": true,
+    "both_full_raw_bag_populations_required": true,
+    "metrics_seconds": [
+      "min",
+      "mean",
+      "p95",
+      "p99",
+      "max"
+    ],
+    "lower_is_better": true,
+    "survivor_only_comparison_allowed": false,
+    "common_cohort_comparison_allowed": false,
+    "capacity_verdict_allowed": false
+  },
+  "selection": {
+    "scale": 1,
+    "speed_mps": 2.0,
+    "raw_bag_count": 28506,
+    "segment_count": 43603,
+    "whole_population": true
+  },
+  "hca_release_trace": {
+    "status": "ELIGIBLE_EXACT_HCA_RELEASE_TRACE",
+    "pass": true,
+    "hca_case_id": "nanning_1x_t5_2_speed_2",
+    "reference_run_id": "run_01",
+    "canonical_segment_count": 43603,
+    "protocol": "outputs/runtime/g4irsf31_nanning_hca/nanning_1x_t5_2_speed_2/case_protocol.json",
+    "protocol_gates": {
+      "schema": true,
+      "case_id": true,
+      "stable_no_fault": true,
+      "scale": true,
+      "speed": true,
+      "repeat_count": true,
+      "map": true,
+      "raw_population": true,
+      "segment_population": true,
+      "fixed_window": true
+    },
+    "gates": {
+      "matching_case_protocol": true,
+      "corrected_run_01_complete": true,
+      "all_repeat_release_traces_cover_canonical_segments": true,
+      "repeat_segment_release_values_identical": true
+    },
+    "runs": [
+      {
+        "run_id": "run_01",
+        "identity_gates": {
+          "run_id": true,
+          "speed": true,
+          "fixed_window": true,
+          "no_fault": true,
+          "storage_role": true
+        },
+        "release_gates": {
+          "metrics_schema": true,
+          "metrics_run_id": true,
+          "canonical_segment_count": true,
+          "canonical_raw_bag_count": true,
+          "reported_all_segments_released": true,
+          "lifecycle_exact_canonical_segments": true
+        },
+        "reported_released_segment_count": 43603,
+        "lifecycle_segment_count": 43603,
+        "lifecycle": "outputs/runtime/g4irsf31_nanning_hca/nanning_1x_t5_2_speed_2/run_01/segment_lifecycle.csv"
+      },
+      {
+        "run_id": "run_02",
+        "identity_gates": {
+          "run_id": true,
+          "speed": true,
+          "fixed_window": true,
+          "no_fault": true,
+          "storage_role": true
+        },
+        "release_gates": {
+          "metrics_schema": true,
+          "metrics_run_id": true,
+          "canonical_segment_count": true,
+          "canonical_raw_bag_count": true,
+          "reported_all_segments_released": true,
+          "lifecycle_exact_canonical_segments": true
+        },
+        "reported_released_segment_count": 43603,
+        "lifecycle_segment_count": 43603,
+        "lifecycle": "outputs/runtime/g4irsf31_nanning_hca/nanning_1x_t5_2_speed_2/run_02/segment_lifecycle.csv"
+      }
+    ],
+    "repeat_release_comparison": "direct_segment_id_to_release_epoch_equality",
+    "alignment": {
+      "source": "outputs/runtime/g4irsf31_nanning_hca/nanning_1x_t5_2_speed_2/run_01/segment_lifecycle.csv",
+      "aligned_segment_count": 43603,
+      "release_minus_canonical_pass_mean_seconds": 2935.071651332546,
+      "release_minus_canonical_pass_min_seconds": -0.9999900000002526,
+      "release_minus_canonical_pass_max_seconds": 49271.993669999996,
+      "only_modified_input_field": "pass_time",
+      "algorithm_or_policy_modified": false
+    }
+  },
+  "hca_timing": {
+    "status": "FULL_POPULATION_TIMING",
+    "pass": true,
+    "source": "outputs/runtime/g4irsf31_nanning_hca/nanning_1x_t5_2_speed_2/run_01/metrics.json",
+    "denominator": "sum_over_segments(finish_time-segment_release_epoch)",
+    "raw_bag_count": 28506,
+    "gates": {
+      "comparison_eligible": true,
+      "not_survivor_only": true,
+      "scope_full": true,
+      "all_segments_released": true,
+      "all_segments_planned": true,
+      "all_segments_completed": true,
+      "all_raw_bags_completed": true,
+      "java_release_denominator_full": true,
+      "five_metrics_finite": true
+    },
+    "metrics_seconds": {
+      "min": 59.0,
+      "mean": 448.0532870272925,
+      "p95": 769.0,
+      "p99": 922.9500000000007,
+      "max": 4042.0
+    },
+    "survivor_or_common_cohort_comparison_allowed": false
+  },
+  "status": "COMPLETE_G31_SAME_HCA_RELEASE_TIMING",
+  "native_execution_started": true,
+  "algorithm_contract": {
+    "policy": "S4/J2/E2 + node-local FIFO",
+    "decision_scope": "one_next_edge_at_current_junction",
+    "learning_active": false,
+    "completion_semantics": {
+      "enabled": true,
+      "terminal_event": "physical_goal_edge_exit",
+      "goal_service": "not_reserved_or_executed",
+      "legacy_reference": "HCA_Tasks_ICS_goal_arrival_completion"
+    },
+    "release_pairing_is_input_only": true,
+    "algorithm_or_weight_change": false
+  },
+  "outcome": {
+    "selected_raw_bag_count": 28506,
+    "completed_raw_bag_count": 28506,
+    "paper_raw_bag_tth": {
+      "denominator": "sum_over_segments(finish_time-admitted_time)",
+      "scope": "complete_raw_bags_only",
+      "distribution": {
+        "count": 28506,
+        "seconds": {
+          "min": 59.001000000000204,
+          "p50": 368.35799999998926,
+          "mean": 342.9902180944328,
+          "p95": 573.1484999999902,
+          "p99": 640.887249999987,
+          "max": 811.0930000000044
+        },
+        "minutes": {
+          "min": 0.9833500000000034,
+          "p50": 6.139299999999821,
+          "mean": 5.716503634907213,
+          "p95": 9.552474999999838,
+          "p99": 10.68145416666645,
+          "max": 13.51821666666674
+        }
+      }
+    },
+    "success": {
+      "denominator_raw_bags": 28506,
+      "primary_completed_raw_bags": {
+        "count": 28506,
+        "rate": 1.0,
+        "definition": "all_selected_segments_completed"
+      },
+      "finish_le_std": {
+        "count": 19127,
+        "rate": 0.6709815477443345,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD"
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 10884,
+        "rate": 0.3818143548726584,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds"
+      }
+    }
+  },
+  "safety": {
+    "pass": true,
+    "mode": "FULL_POPULATION_FIXED_HORIZON_CAPACITY",
+    "gates": {
+      "full_registered_population": true,
+      "selected_partition": true,
+      "runtime_terminal_partition": true,
+      "runtime_returned_exact_segment_ids": true,
+      "fixed_horizon_request": true,
+      "fixed_horizon_echo": true,
+      "event_budget_request": true,
+      "event_budget_echo": true,
+      "event_count_within_budget": true,
+      "event_limit_not_reached": true,
+      "time_limit_is_reported": true,
+      "fault_event_count": true,
+      "repair_event_count": true,
+      "reservation_conflicts_zero": true,
+      "fault_edge_entry_violations_zero": true,
+      "runtime_full_astar_zero": true,
+      "runtime_full_cie_astar_zero": true,
+      "global_reservation_scan_zero": true,
+      "s4_j2_e2_echo": true,
+      "fault_value_echo": true,
+      "local_potential_descent_guard": true,
+      "local_software_queue_cap": true,
+      "direct_neighbor_merge_calendar_visibility": true,
+      "goal_arrival_completion": true,
+      "topology_bound": true
+    },
+    "runtime_echo_gates": {
+      "active_s4_scorer": true,
+      "active_j2_timing": true,
+      "active_e2_hotpath": true
+    },
+    "fault_value_echo": {
+      "active": false,
+      "pass": true,
+      "gates": {
+        "fault_artifact_mode_echoed": true,
+        "edge_residual_count_echoed": true,
+        "value_residual_count_echoed": true
+      },
+      "mode": null,
+      "claim_boundary": null,
+      "counters": {
+        "g4irsf24_dlp_route_evaluation_count": 0,
+        "g4irsf24_dlp_eligible_candidate_count": 0,
+        "g4irsf24_dlp_supported_candidate_count": 0,
+        "g4irsf24_dlp_proposal_count": 0,
+        "g4irsf24_dlp_committed_mutation_count": 0,
+        "g4irsf24_dlp_fallback_s4_count": 0,
+        "g4irsf24_dlp_same_action_count": 0,
+        "g4irsf24_dlp_unsupported_fallback_count": 0,
+        "g4irsf24_dlp_low_support_fallback_count": 0,
+        "g4irsf24_dlp_margin_fallback_count": 0,
+        "g4irsf24_dlp_detour_fallback_count": 0,
+        "g4irsf24_dlp_shield_fault_fallback_count": 0
+      }
+    },
+    "local_potential_descent_guard": {
+      "pass": true,
+      "enabled": true,
+      "learning_active": false,
+      "decision_scope": "one_next_edge_at_current_junction",
+      "rule": "H_eff(next,goal)+epsilon<H_eff(current,goal)",
+      "gates": {
+        "request_enabled": true,
+        "summary_enabled": true,
+        "summary_nonlearning": true,
+        "summary_one_hop_strict_descent": true,
+        "protocol_nonlearning": true,
+        "fault_values_deterministic": true
+      }
+    },
+    "local_software_queue_cap": {
+      "pass": true,
+      "local_queue_capacity": 0,
+      "semantics": "no configured software queue cap; service calendar/R3 and E4/J2 retained; capacity-triggered PIBT relief inactive",
+      "summary_local_queue_capacity": 0.0,
+      "gates": {
+        "request_zero": true,
+        "summary_zero": true
+      }
+    },
+    "direct_neighbor_merge_calendar_visibility": {
+      "pass": true,
+      "enabled": true,
+      "read_scope": "direct_outgoing_merge_neighbor_service_calendar_scalar",
+      "score_input": "existing_target_next_available_calendar_wait",
+      "score_weight": "existing_calendar_wait_weight",
+      "merge_authority": "E4/J2_unchanged",
+      "decision_scope": "one_next_edge_at_current_junction",
+      "learning_active": false,
+      "gates": {
+        "request_enabled": true,
+        "summary_enabled": true,
+        "summary_nonlearning": true,
+        "summary_direct_neighbor_existing_weight_j2": true,
+        "protocol_exact": true
+      }
+    },
+    "goal_arrival_completion": {
+      "pass": true,
+      "enabled": true,
+      "terminal_event": "physical_goal_edge_exit",
+      "goal_service": "not_reserved_or_executed",
+      "legacy_reference": "HCA_Tasks_ICS_goal_arrival_completion",
+      "claim_boundary": "physical_goal_edge_exit_terminal;goal_service_not_reserved;legacy_HCA_Tasks_ICS_completion_semantics",
+      "gates": {
+        "request_enabled": true,
+        "summary_enabled": true,
+        "summary_legacy_completion_seam": true,
+        "protocol_exact": true
+      }
+    },
+    "topology": null,
+    "topology_gates": {},
+    "operational_outcome_not_structural_veto": {
+      "completed_segment_count": 43603,
+      "failed_segment_count": 0,
+      "unresolved_deadlock_count": 0,
+      "time_limit_reached": false
+    }
+  },
+  "runtime": {
+    "wall_seconds": 45.051359299977776,
+    "event_count": 6753215,
+    "time_limit_reached": false,
+    "event_limit_reached": false
+  },
+  "paired_s4_timing": {
+    "status": "FULL_POPULATION_TIMING",
+    "raw_bag_count": 28506,
+    "denominator": "sum_over_segments(finish_time-HCA_run_01_segment_release_epoch)",
+    "metrics_seconds": {
+      "min": 59.001000000000204,
+      "mean": 342.9913497158458,
+      "p95": 573.1484999999902,
+      "p99": 640.887249999987,
+      "max": 811.0930000000044
+    }
+  },
+  "comparison": {
+    "status": "FULL_POPULATION_SAME_RELEASE_COMPARISON",
+    "metric_rows": [
+      {
+        "metric": "min",
+        "hca_seconds": 59.0,
+        "s4_seconds": 59.001000000000204,
+        "s4_minus_hca_seconds": 0.0010000000002037268,
+        "s4_improvement_percent": -0.0016949152545825878,
+        "result": "HCA_LOWER"
+      },
+      {
+        "metric": "mean",
+        "hca_seconds": 448.0532870272925,
+        "s4_seconds": 342.9913497158458,
+        "s4_minus_hca_seconds": -105.06193731144674,
+        "s4_improvement_percent": 23.448536224006553,
+        "result": "S4_LOWER"
+      },
+      {
+        "metric": "p95",
+        "hca_seconds": 769.0,
+        "s4_seconds": 573.1484999999902,
+        "s4_minus_hca_seconds": -195.85150000000976,
+        "s4_improvement_percent": 25.468335500651463,
+        "result": "S4_LOWER"
+      },
+      {
+        "metric": "p99",
+        "hca_seconds": 922.9500000000007,
+        "s4_seconds": 640.887249999987,
+        "s4_minus_hca_seconds": -282.0627500000137,
+        "s4_improvement_percent": 30.561000054175576,
+        "result": "S4_LOWER"
+      },
+      {
+        "metric": "max",
+        "hca_seconds": 4042.0,
+        "s4_seconds": 811.0930000000044,
+        "s4_minus_hca_seconds": -3230.9069999999956,
+        "s4_improvement_percent": 79.93337456704592,
+        "result": "S4_LOWER"
+      }
+    ],
+    "s4_lower_metric_count": 4,
+    "hca_lower_metric_count": 1,
+    "tie_metric_count": 0,
+    "all_five_s4_strictly_lower": false,
+    "common_cohort_verdict_used": false
+  }
+}

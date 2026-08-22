@@ -105,7 +105,8 @@ public class LegacyIcsNoFaultWindowBenchmark {
             throw new IllegalArgumentException(
                 "usage: LegacyIcsNoFaultWindowBenchmark <mapPath> <inputdataPath> <startEpoch> "
                 + "<maxEpochs> <maxNewTasks> <repeats> <warmupRepeats> <routeCsv> <summaryCsv> "
-                + "[faultSchedule] [faultProbability] [repairProbability] [releaseCsv] [speedMps]"
+                + "[faultSchedule] [faultProbability] [repairProbability] [releaseCsv] [speedMps] "
+                + "[storageInGoal] [storageOutStart] [earlyBagThreshold] [storageLeadSeconds]"
             );
         }
         System.setProperty("java.awt.headless", "true");
@@ -123,8 +124,18 @@ public class LegacyIcsNoFaultWindowBenchmark {
         double repairProbability = args.length > 11 ? Double.parseDouble(args[11]) : 0.0;
         String releaseCsv = args.length > 12 ? args[12] : null;
         double speedMps = args.length > 13 ? Double.parseDouble(args[13]) : 2.5;
+        int storageInGoal = args.length > 14 ? Integer.parseInt(args[14]) : 47;
+        int storageOutStart = args.length > 15 ? Integer.parseInt(args[15]) : 52;
+        double earlyBagThreshold = args.length > 16 ? Double.parseDouble(args[16]) : 4800.0;
+        double storageLeadSeconds = args.length > 17 ? Double.parseDouble(args[17]) : 2700.0;
         if (!Double.isFinite(speedMps) || speedMps <= 0.0) {
             throw new IllegalArgumentException("speedMps must be finite and positive");
+        }
+        if (!Double.isFinite(earlyBagThreshold) || earlyBagThreshold < 0.0) {
+            throw new IllegalArgumentException("earlyBagThreshold must be finite and non-negative");
+        }
+        if (!Double.isFinite(storageLeadSeconds) || storageLeadSeconds < 0.0) {
+            throw new IllegalArgumentException("storageLeadSeconds must be finite and non-negative");
         }
 
         for (int repeat = 0; repeat < warmupRepeats; repeat++) {
@@ -137,7 +148,11 @@ public class LegacyIcsNoFaultWindowBenchmark {
                 schedule,
                 faultProbability,
                 repairProbability,
-                speedMps
+                speedMps,
+                storageInGoal,
+                storageOutStart,
+                earlyBagThreshold,
+                storageLeadSeconds
             );
         }
 
@@ -154,7 +169,11 @@ public class LegacyIcsNoFaultWindowBenchmark {
                     schedule,
                     faultProbability,
                     repairProbability,
-                    speedMps
+                    speedMps,
+                    storageInGoal,
+                    storageOutStart,
+                    earlyBagThreshold,
+                    storageLeadSeconds
                 )
             );
         }
@@ -207,7 +226,11 @@ public class LegacyIcsNoFaultWindowBenchmark {
         ArrayList<ScheduleEvent> schedule,
         double faultProbability,
         double repairProbability,
-        double speedMps
+        double speedMps,
+        int storageInGoal,
+        int storageOutStart,
+        double earlyBagThreshold,
+        double storageLeadSeconds
     ) throws IOException {
         prepareWorkingFiles();
         RunResult result = new RunResult();
@@ -219,11 +242,20 @@ public class LegacyIcsNoFaultWindowBenchmark {
         ICS_PathFinding ics = new ICS_PathFinding();
         ics.getMap().read(ics.getMap(), mapPath);
         configureMapSpeed(ics, speedMps);
+        enableReleaseSource(ics, storageOutStart);
+        requireMapNode(ics, storageInGoal, "storageInGoal");
         HashMap<Integer, ArrayList<task>> taskList = new HashMap<>();
         for (Vertex vertex : ics.getMap().getStar()) {
             taskList.put(vertex.getLocation(), new ArrayList<task>());
         }
-        readTaskList(inputdataPath, taskList, 4800.0);
+        readTaskList(
+            inputdataPath,
+            taskList,
+            earlyBagThreshold,
+            storageInGoal,
+            storageOutStart,
+            storageLeadSeconds
+        );
         for (int start : taskList.keySet()) {
             sortTasks(taskList.get(start));
         }
@@ -266,6 +298,26 @@ public class LegacyIcsNoFaultWindowBenchmark {
                 hcost[row][column] *= scale;
             }
         }
+    }
+
+    private static Vertex requireMapNode(ICS_PathFinding ics, int location, String role) {
+        for (Vertex vertex : ics.getMap().getV()) {
+            if (vertex.getLocation() == location) {
+                return vertex;
+            }
+        }
+        throw new IllegalArgumentException(role + " is not present in the selected map: " + location);
+    }
+
+    private static void enableReleaseSource(ICS_PathFinding ics, int location) {
+        Vertex source = requireMapNode(ics, location, "storageOutStart");
+        source.setCangenerated_task(true);
+        for (Vertex vertex : ics.getMap().getStar()) {
+            if (vertex.getLocation() == location) {
+                return;
+            }
+        }
+        ics.getMap().getStar().add(source);
     }
 
     private static void recordReleases(RunResult result, Tasks newTasks, double epoch) {
@@ -398,7 +450,10 @@ public class LegacyIcsNoFaultWindowBenchmark {
     private static void readTaskList(
         String path,
         HashMap<Integer, ArrayList<task>> taskList,
-        double earlyBagThreshold
+        double earlyBagThreshold,
+        int storageInGoal,
+        int storageOutStart,
+        double storageLeadSeconds
     ) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(path));
         reader.readLine();
@@ -419,15 +474,15 @@ public class LegacyIcsNoFaultWindowBenchmark {
                 newTask.setGoal(Integer.valueOf(order[4]));
                 taskList.get(newTask.getStar()).add(newTask);
             } else {
-                newTask.setGoal(47);
+                newTask.setGoal(storageInGoal);
                 taskList.get(newTask.getStar()).add(newTask);
 
                 task storageOut = new task();
                 storageOut.setTask_ID(Integer.valueOf(order[0]));
                 storageOut.setPallet_ID(Integer.valueOf(order[0]));
                 storageOut.setSTD(Double.valueOf(order[2]));
-                storageOut.setPass_time(storageOut.getSTD() - 2700);
-                storageOut.setStar(52);
+                storageOut.setPass_time(storageOut.getSTD() - storageLeadSeconds);
+                storageOut.setStar(storageOutStart);
                 storageOut.setGoal(Integer.valueOf(order[4]));
                 taskList.get(storageOut.getStar()).add(storageOut);
             }

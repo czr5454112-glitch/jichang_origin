@@ -997,6 +997,365 @@ void test_legacy_observation_bias_is_local_deterministic_and_exact_off(
   }
 }
 
+void test_storage_source_role_default_is_map2_compatible(Checks& checks) {
+  const EventDrivenJunctionConfig config;
+  checks.require(
+      config.storage_source_nodes == std::vector<int>{52},
+      "storage source role must retain the legacy map2 node-52 default");
+}
+
+Graph s4_merge_calendar_visibility_graph() {
+  Graph graph;
+  for (int node = 0; node < 6; ++node) {
+    const double service = node == 1 ? 100.0 : 0.001;
+    graph.add_node(czr005::ics::Node{node, 0, service, 0, 0, {}});
+  }
+  for (const auto [start, end] :
+       std::vector<std::pair<int, int>>{{0, 1}, {0, 2}, {3, 1},
+                                        {4, 2}, {1, 5}, {2, 5}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, 0.1, 1.0});
+  }
+  std::vector<std::vector<double>> heuristic(
+      6, std::vector<double>(6, 0.0));
+  heuristic[0][5] = 3.0;
+  heuristic[1][5] = 0.1;
+  heuristic[2][5] = 2.0;
+  heuristic[3][5] = 0.2;
+  heuristic[4][5] = 2.1;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_s4_direct_neighbor_merge_calendar_visibility_is_exact_off_and_local(
+    Checks& checks) {
+  const auto graph = s4_merge_calendar_visibility_graph();
+  const std::vector<EventRuntimeBagRequest> requests = {
+      {"calendar-blocker", 41, 0.0, 1000.0, 1, 5, "synthetic"},
+      {"calendar-probe", 42, 0.05, 1000.0, 0, 5, "synthetic"},
+  };
+  auto off = test_config();
+  off.scorer_mode = "S4_queue_aware_rule_only";
+  off.resource_semantics = "R3_java_node_window_compatible";
+  off.event_semantics = "E4_batch_plus_destination_merge_request";
+  off.merge_grant_rule = "M3";
+  off.merge_grant_timing_mode = "jit_fair_aging_deadline";
+  off.queue_discipline = "fifo";
+  off.enable_source_admission = false;
+  off.local_queue_capacity = 0;
+  off.storage_source_nodes = {1};
+
+  EventDrivenJunctionRuntime implicit_off_runtime(graph, off);
+  const auto implicit_off = implicit_off_runtime.run(requests);
+  off.enable_s4_direct_neighbor_merge_calendar_visibility = false;
+  EventDrivenJunctionRuntime explicit_off_runtime(graph, off);
+  const auto explicit_off = explicit_off_runtime.run(requests);
+  checks.require(
+      implicit_off.decisions.size() == explicit_off.decisions.size() &&
+          implicit_off.bags.size() == explicit_off.bags.size(),
+      "default-off merge-calendar visibility must preserve result shape");
+  if (implicit_off.decisions.size() == explicit_off.decisions.size()) {
+    for (std::size_t index = 0; index < implicit_off.decisions.size(); ++index) {
+      checks.require(
+          implicit_off.decisions[index].selected_next ==
+                  explicit_off.decisions[index].selected_next &&
+              implicit_off.decisions[index].event_time ==
+                  explicit_off.decisions[index].event_time,
+          "explicit false must preserve every default one-hop action");
+    }
+  }
+  if (implicit_off.bags.size() == explicit_off.bags.size()) {
+    for (std::size_t index = 0; index < implicit_off.bags.size(); ++index) {
+      checks.require(
+          implicit_off.bags[index].finish_time ==
+              explicit_off.bags[index].finish_time,
+          "explicit false must preserve every default completion time");
+    }
+  }
+
+  auto visible = off;
+  visible.enable_s4_direct_neighbor_merge_calendar_visibility = true;
+  EventDrivenJunctionRuntime visible_runtime(graph, visible);
+  const auto result = visible_runtime.run(requests);
+  checks.require(result.summary.completed_count == 2 &&
+                     result.summary.failed_count == 0,
+                 "merge-calendar visibility fixture must drain");
+  checks.require(
+      result.summary.s4_direct_neighbor_merge_calendar_visibility_enabled &&
+          !result.summary
+               .s4_direct_neighbor_merge_calendar_visibility_learning_active &&
+          result.summary
+                  .s4_direct_neighbor_merge_calendar_visibility_claim_boundary ==
+              "direct_outgoing_neighbor_calendar_scalar;"
+              "existing_calendar_wait_weight;J2_authority_unchanged;"
+              "O_outdegree;no_full_route;no_learning",
+      "active visibility summary must echo local non-learning semantics");
+
+  const auto probe_decision = [](const auto& run) {
+    return std::find_if(run.decisions.begin(), run.decisions.end(),
+                        [](const auto& row) {
+                          return row.segment_id == "calendar-probe" &&
+                                 row.current_node == 0;
+                        });
+  };
+  const auto off_probe = probe_decision(implicit_off);
+  const auto visible_probe = probe_decision(result);
+  checks.require(off_probe != implicit_off.decisions.end() &&
+                     off_probe->selected_next == 1,
+                 "suppressed merge calendar must keep the static S4 branch");
+  checks.require(visible_probe != result.decisions.end() &&
+                     visible_probe->selected_next == 2,
+                 "visible busy direct-neighbor calendar must switch S4 locally");
+  if (off_probe != implicit_off.decisions.end() &&
+      visible_probe != result.decisions.end()) {
+    const auto candidate_one = [](const auto& row) {
+      return std::find_if(row.candidates.begin(), row.candidates.end(),
+                          [](const auto& candidate) {
+                            return candidate.next_node == 1;
+                          });
+    };
+    const auto off_candidate = candidate_one(*off_probe);
+    const auto visible_candidate = candidate_one(*visible_probe);
+    checks.require(
+        off_candidate != off_probe->candidates.end() &&
+            visible_candidate != visible_probe->candidates.end() &&
+            visible_candidate->target_next_available >
+                off_candidate->target_next_available + 50.0,
+        "opt-in must expose the existing busy calendar scalar only");
+  }
+  checks.require(result.summary.merge_grant_committed_count > 0,
+                 "J2 must remain the real merge grant authority");
+  checks.require(result.summary.runtime_full_astar_calls == 0 &&
+                     result.summary.global_reservation_scan_count == 0 &&
+                     result.summary.two_step_reservation_count == 0,
+                 "visibility must remain one-hop without route planning");
+}
+
+Graph local_descent_cycle_graph() {
+  Graph graph;
+  for (int node = 0; node < 5; ++node) {
+    graph.add_node(czr005::ics::Node{
+        node, 0, node == 2 ? 100.0 : 0.001, 0, 0, {}});
+  }
+  for (const auto [start, end] :
+       std::vector<std::pair<int, int>>{{0, 1}, {1, 0}, {1, 2},
+                                        {2, 3}, {4, 2}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, 0.1, 1.0});
+  }
+  std::vector<std::vector<double>> heuristic(
+      5, std::vector<double>(5, 0.0));
+  heuristic[0][3] = 100.302;
+  heuristic[1][3] = 100.201;
+  heuristic[2][3] = 100.1;
+  heuristic[4][3] = 100.201;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_s4_local_descent_guard_is_exact_off_and_blocks_cycle(
+    Checks& checks) {
+  const auto graph = local_descent_cycle_graph();
+  const std::vector<EventRuntimeBagRequest> requests = {
+      {"blocker", 1, 0.0, 1000.0, 4, 3, "synthetic"},
+      {"probe", 2, 0.05, 1000.0, 0, 3, "synthetic"},
+  };
+  auto off = test_config();
+  off.scorer_mode = "S4_queue_aware_rule_only";
+  off.storage_source_nodes = {4};
+  EventDrivenJunctionRuntime implicit_off_runtime(graph, off);
+  const auto implicit_off = implicit_off_runtime.run(requests);
+  off.enable_s4_local_potential_descent_guard = false;
+  EventDrivenJunctionRuntime explicit_off_runtime(graph, off);
+  const auto explicit_off = explicit_off_runtime.run(requests);
+  checks.require(
+      implicit_off.decisions.size() == explicit_off.decisions.size(),
+      "the default-off descent guard must preserve the decision stream");
+  if (implicit_off.decisions.size() == explicit_off.decisions.size()) {
+    for (std::size_t index = 0; index < implicit_off.decisions.size(); ++index) {
+      checks.require(
+          implicit_off.decisions[index].selected_next ==
+              explicit_off.decisions[index].selected_next,
+          "explicit false must preserve every default S4 action");
+    }
+  }
+  const bool off_backtracked = std::any_of(
+      implicit_off.decisions.begin(), implicit_off.decisions.end(),
+      [](const auto& row) {
+        return row.segment_id == "probe" && row.current_node == 1 &&
+               row.selected_next == 0;
+      });
+  checks.require(off_backtracked,
+                 "the synthetic congestion case must expose the S4 cycle");
+
+  auto guarded = off;
+  guarded.enable_s4_local_potential_descent_guard = true;
+  EventDrivenJunctionRuntime guarded_runtime(graph, guarded);
+  const auto result = guarded_runtime.run(requests);
+  checks.require(result.summary.completed_count == 2 &&
+                     result.summary.failed_count == 0,
+                 "the guarded synthetic congestion case must drain");
+  checks.require(
+      result.summary.s4_local_potential_descent_guard_enabled &&
+          !result.summary.s4_local_potential_descent_guard_learning_active &&
+          result.summary.s4_local_potential_descent_guard_claim_boundary ==
+              "one_next_edge_at_current_junction;strict_H_eff_descent;"
+              "O_outdegree;no_full_route;no_learning",
+      "active guard summary must echo one-hop strict non-learning semantics");
+  for (const auto& row : result.decisions) {
+    if (row.segment_id != "probe" || row.selected_next < 0) {
+      continue;
+    }
+    const double current =
+        row.current_node == row.goal_node
+            ? 0.0
+            : graph.heuristic(row.current_node, row.goal_node);
+    const double next =
+        row.selected_next == row.goal_node
+            ? 0.0
+            : graph.heuristic(row.selected_next, row.goal_node);
+    checks.require(next + 1.0e-9 < current,
+                   "every guarded MOVE must strictly decrease H");
+  }
+}
+
+Graph local_descent_fault_graph() {
+  Graph graph;
+  for (int node = 0; node < 5; ++node) {
+    graph.add_node(czr005::ics::Node{node, 0, 0.001, 0, 0, {}});
+  }
+  for (const auto [start, end, length] :
+       std::vector<std::tuple<int, int, double>>{
+           {0, 1, 1.0}, {1, 2, 1.0}, {2, 3, 1.0},
+           {1, 4, 1.0}, {4, 3, 3.0}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, length, 1.0});
+  }
+  std::vector<std::vector<double>> heuristic(
+      5, std::vector<double>(5, 0.0));
+  heuristic[0][3] = 3.003;
+  heuristic[1][3] = 2.002;
+  heuristic[2][3] = 1.001;
+  heuristic[4][3] = 3.001;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_s4_local_descent_guard_uses_surviving_fault_potential(
+    Checks& checks) {
+  const auto graph = local_descent_fault_graph();
+  auto config = test_config();
+  config.scorer_mode = "S4_queue_aware_rule_only";
+  config.enable_s4_local_potential_descent_guard = true;
+  config.storage_source_nodes = {0};
+  config.g4irsf24_dlp.mode = "td";
+  config.g4irsf24_dlp.beta = 0.0;
+  config.g4irsf24_dlp.min_support = 1;
+  config.g4irsf24_dlp.detour_allowance_seconds = 1000.0;
+  config.g4irsf24_dlp.deterministic_surviving_graph_values = true;
+  config.g4irsf24_dlp.insert_value(0, 3, 2.0, 1);
+  config.g4irsf24_dlp.insert_value(1, 3, 2.0, 1);
+  config.g4irsf24_dlp.insert_value(2, 3, 100.0, 1);
+  config.g4irsf24_dlp.insert_value(4, 3, 0.0, 1);
+  for (const auto [start, end] :
+       std::vector<std::pair<int, int>>{{0, 1}, {1, 2}, {2, 3},
+                                        {1, 4}, {4, 3}}) {
+    config.g4irsf24_dlp.insert_edge(start, end, 0.0, 1);
+  }
+  EventDrivenJunctionRuntime runtime(graph, config);
+  const auto result = runtime.run(
+      {{"fault-detour", 3, 0.0, 1000.0, 0, 3, "synthetic"}},
+      {{2, 3, 0.0, 1000.0, 0.0, false}});
+  checks.require(result.summary.completed_count == 1 &&
+                     result.summary.failed_count == 0,
+                 "surviving-graph guard must complete the local fault detour");
+  const bool selected_detour = std::any_of(
+      result.decisions.begin(), result.decisions.end(), [](const auto& row) {
+        return row.current_node == 1 && row.selected_next == 4;
+      });
+  checks.require(
+      selected_detour,
+      "fault guard must use surviving H and permit the static-uphill detour");
+}
+
+Graph goal_arrival_completion_graph() {
+  Graph graph;
+  graph.add_node(czr005::ics::Node{0, 1, 1.0, 0, 0, {}});
+  graph.add_node(czr005::ics::Node{1, 1, 1.0, 0, 0, {}});
+  graph.add_node(czr005::ics::Node{2, 2, 100.0, 0, 0, {}});
+  graph.add_edge(czr005::ics::Edge{0, 2, 2.0, 1.0});
+  graph.add_edge(czr005::ics::Edge{1, 2, 2.0, 1.0});
+  std::vector<std::vector<double>> heuristic(
+      3, std::vector<double>(3, 0.0));
+  heuristic[0][2] = 2.0;
+  heuristic[1][2] = 2.0;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_goal_arrival_completion_is_exact_off_and_skips_busy_goal_service(
+    Checks& checks) {
+  const auto graph = goal_arrival_completion_graph();
+  const std::vector<EventRuntimeBagRequest> requests = {
+      {"direct-a", 1, 0.0, 1000.0, 0, 2, "synthetic"},
+      {"direct-b", 2, 0.0, 1000.0, 1, 2, "synthetic"},
+  };
+
+  auto off = test_config();
+  EventDrivenJunctionRuntime implicit_off_runtime(graph, off);
+  const auto implicit_off = implicit_off_runtime.run(requests);
+  off.complete_on_goal_arrival = false;
+  EventDrivenJunctionRuntime explicit_off_runtime(graph, off);
+  const auto explicit_off = explicit_off_runtime.run(requests);
+  checks.require(
+      implicit_off.summary.event_count == explicit_off.summary.event_count &&
+          implicit_off.bags.size() == explicit_off.bags.size(),
+      "explicit false goal-arrival completion must preserve result shape");
+  if (implicit_off.bags.size() == explicit_off.bags.size()) {
+    for (std::size_t index = 0; index < implicit_off.bags.size(); ++index) {
+      checks.require(
+          implicit_off.bags[index].segment_id ==
+                  explicit_off.bags[index].segment_id &&
+              implicit_off.bags[index].finish_time ==
+                  explicit_off.bags[index].finish_time,
+          "explicit false goal-arrival completion must preserve finish times");
+    }
+  }
+
+  auto active = off;
+  active.complete_on_goal_arrival = true;
+  EventDrivenJunctionRuntime active_runtime(graph, active);
+  const auto result = active_runtime.run(requests);
+  checks.require(result.summary.completed_count == 2 &&
+                     result.summary.failed_count == 0,
+                 "goal-arrival completion must drain both direct bags");
+  checks.require(
+      result.summary.complete_on_goal_arrival_enabled &&
+          result.summary.complete_on_goal_arrival_claim_boundary ==
+              "physical_goal_edge_exit_terminal;goal_service_not_reserved;"
+              "legacy_HCA_Tasks_ICS_completion_semantics",
+      "goal-arrival completion summary must echo the HCA-aligned seam");
+  for (const auto& bag : result.bags) {
+    checks.require(
+        std::abs(bag.finish_time - 3.0) <= 1.0e-9 &&
+            std::abs(bag.node_service_time_seconds - 1.0) <= 1.0e-9 &&
+            std::abs(bag.edge_travel_time_seconds - 2.0) <= 1.0e-9,
+        "goal arrival must complete after source service and final travel only");
+  }
+  const auto goal = std::find_if(
+      result.junctions.begin(), result.junctions.end(),
+      [](const auto& row) { return row.node == 2; });
+  checks.require(
+      goal != result.junctions.end() && goal->service_reservation_count == 0 &&
+          goal->peak_service_calendar_intervals == 0 &&
+          goal->scheduled_incoming == 0,
+      "busy goal service must receive no reservation and retain no incoming");
+  const auto off_goal = std::find_if(
+      implicit_off.junctions.begin(), implicit_off.junctions.end(),
+      [](const auto& row) { return row.node == 2; });
+  checks.require(
+      off_goal != implicit_off.junctions.end() &&
+          off_goal->service_reservation_count == 2,
+      "default semantics must retain the existing busy-goal service calendar");
+}
+
 }  // namespace
 
 int main() {
@@ -1023,6 +1382,13 @@ int main() {
     test_g4irsf16_fault_generation_survives_repair_boost_reset(checks);
     test_g4irsf16_learned_model_closed_loop_is_not_self_authorizing(checks);
     test_legacy_observation_bias_is_local_deterministic_and_exact_off(checks);
+    test_storage_source_role_default_is_map2_compatible(checks);
+    test_s4_direct_neighbor_merge_calendar_visibility_is_exact_off_and_local(
+        checks);
+    test_s4_local_descent_guard_is_exact_off_and_blocks_cycle(checks);
+    test_s4_local_descent_guard_uses_surviving_fault_potential(checks);
+    test_goal_arrival_completion_is_exact_off_and_skips_busy_goal_service(
+        checks);
   } catch (const std::exception& error) {
     ++checks.failures;
     std::cerr << "FAIL: canonical map2 test setup/runtime exception: " << error.what() << '\n';
