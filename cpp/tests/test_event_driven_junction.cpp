@@ -10,7 +10,12 @@
 #include <tuple>
 #include <vector>
 
+#ifndef CZR005_G4IRSF32_BUILD_HEAD
+#define CZR005_G4IRSF32_BUILD_HEAD "UNBOUND"
+#endif
+
 #include "ics_core/io/canonical_map2_reader.hpp"
+#define CZR005_EVENT_RUNTIME_TESTING 1
 #include "ics_core/runtime/event_driven_junction.hpp"
 
 #ifndef CZR005_SOURCE_DIR
@@ -36,6 +41,20 @@ struct Checks {
     }
   }
 };
+
+struct V3R2NativeProof {
+  bool pure_calendar_helper = false;
+  bool generic_storage_role_validation = false;
+  bool direct_unique_publish = false;
+  bool j2_unique_publish = false;
+  bool j2_direct_duplicate_suppressed = false;
+  bool direct_after_stage_rollback_exact = false;
+  bool j2_after_stage_rollback_exact = false;
+  bool trace_limit_fail_before_commit = false;
+  bool action_inert_invariants = false;
+};
+
+V3R2NativeProof v3r2_proof;
 
 const CanonicalMap2ReadResult& canonical_map2() {
   static const CanonicalMap2ReadResult fixture = [] {
@@ -1356,6 +1375,1574 @@ void test_goal_arrival_completion_is_exact_off_and_skips_busy_goal_service(
       "default semantics must retain the existing busy-goal service calendar");
 }
 
+EventDrivenJunctionConfig v3r2_shadow_config() {
+  EventDrivenJunctionConfig config;
+  config.queue_discipline = "fifo";
+  config.retry_interval = 0.25;
+  config.minimum_service_seconds = 0.001;
+  config.dispatch_headway_seconds = 0.001;
+  config.history_limit = 8;
+  config.max_decisions_per_bag = 512;
+  config.max_events = 2000000;
+  config.max_simulation_time = -1.0;
+  config.trace_limit = 200000;
+  config.event_trace_limit = 200000;
+  config.local_queue_capacity = 0;
+  config.deadlock_retry_threshold = 8;
+  config.diagnostic_hops = 2;
+  config.enable_source_admission = false;
+  config.enable_backpressure = false;
+  config.enable_pibt_lite = false;
+  config.enable_deadlock_escape = true;
+  config.enable_fault_policy = true;
+  config.resource_semantics = "R3_java_node_window_compatible";
+  config.entry_headway_seconds = 0.001;
+  config.pressure_mode = "off";
+  config.admission_mode = "off";
+  config.pibt_mode = "P2";
+  config.priority_mode = "Q0";
+  config.pibt_preference_mode = "current";
+  config.scorer_mode = "S4_queue_aware_rule_only";
+  config.framework_mode = "event_loop_one_step";
+  config.event_semantics = "E4_batch_plus_destination_merge_request";
+  config.merge_grant_rule = "M3";
+  config.merge_grant_timing_mode = "jit_fair_aging_deadline";
+  config.merge_grant_max_pending_requests = 256;
+  config.merge_grant_lifecycle_limit = 8192;
+  config.g4irsf20_event_hotpath_policy = "E2";
+  config.enable_opportunity_telemetry = false;
+  config.opportunity_trace_limit = 0;
+  config.enable_s4_local_potential_descent_guard = true;
+  config.enable_s4_direct_neighbor_merge_calendar_visibility = true;
+  config.complete_on_goal_arrival = true;
+  config.storage_source_nodes = {0};
+  config.source_aware_destination_service_mode = "shadow";
+  config.source_aware_destination_service_trace_limit = 200000;
+  return config;
+}
+
+Graph v3r2_slot_pair_graph(bool j2) {
+  Graph graph;
+  graph.add_node(czr005::ics::Node{0, 7, 0.0, 0, 0, {1}});
+  graph.add_node(czr005::ics::Node{1, 1, 1.0, 1, 0, {2}});
+  graph.add_node(czr005::ics::Node{2, 4, 0.0, 2, 0, {3}});
+  graph.add_node(czr005::ics::Node{3, 2, 0.0, 3, 0, {}});
+  if (j2) {
+    graph.add_node(czr005::ics::Node{4, 7, 0.0, 0, 1, {1}});
+  }
+  graph.add_edge(czr005::ics::Edge{0, 1, 0.05, 1.0});
+  graph.add_edge(czr005::ics::Edge{1, 2, 0.05, 1.0});
+  graph.add_edge(czr005::ics::Edge{2, 3, 0.05, 1.0});
+  if (j2) {
+    graph.add_edge(czr005::ics::Edge{4, 1, 0.05, 1.0});
+  }
+  const int size = j2 ? 5 : 4;
+  std::vector<std::vector<double>> heuristic(
+      size, std::vector<double>(size, 1000.0));
+  for (int node = 0; node < size; ++node) {
+    heuristic[node][node] = 0.0;
+  }
+  heuristic[0][3] = 1.15;
+  heuristic[1][3] = 0.10;
+  heuristic[2][3] = 0.05;
+  if (j2) {
+    heuristic[4][3] = 1.15;
+  }
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+std::vector<EventRuntimeBagRequest> v3r2_slot_pair_requests() {
+  return {
+      {"v3r2-local-first", 32032001, 0.0, 100.0, 1, 3, "local"},
+      {"v3r2-local-winner", 32032002, 0.0, 100.0, 1, 3, "local"},
+      {"v3r2-external", 32032000, 0.699, 100.0, 0, 3, "external"},
+  };
+}
+
+bool v3r2_census_is_zero(const czr005::ics::EventRuntimeSummary& summary) {
+  return summary
+                 .source_aware_destination_service_external_commit_considered_count ==
+             0 &&
+         summary.source_aware_destination_service_observation_stored_count == 0 &&
+         summary.source_aware_destination_service_observation_dropped_count == 0 &&
+         summary.source_aware_destination_service_direct_external_commit_count == 0 &&
+         summary.source_aware_destination_service_j2_exact_commit_count == 0 &&
+         summary.source_aware_destination_service_no_local_count == 0 &&
+         summary.source_aware_destination_service_local_guard_fail_count == 0 &&
+         summary.source_aware_destination_service_non_overlap_count == 0 &&
+         summary.source_aware_destination_service_staged_rollback_count == 0 &&
+         summary.source_aware_destination_service_action_change_count == 0 &&
+         summary.source_aware_destination_service_calendar_mutation_count == 0 &&
+         summary.source_aware_destination_service_future_release_read_count == 0 &&
+         summary.source_aware_destination_service_global_scan_count == 0;
+}
+
+bool v3r2_resource_fields_are_zero(
+    const czr005::ics::EventRuntimeSummary& summary) {
+  return summary
+                 .source_aware_destination_service_incremental_local_state_bytes ==
+             0 &&
+         summary
+                 .source_aware_destination_service_runtime_internal_accounted_bytes ==
+             0 &&
+         summary
+                 .source_aware_destination_service_trace_sidecar_accounted_bytes ==
+             0 &&
+         summary.source_aware_destination_service_total_accounted_bytes == 0;
+}
+
+bool v3r4_local_telemetry_is_exact(
+    const czr005::ics::EventRuntimeSourceAwareDestinationServiceShadowRow& row) {
+  return row.local_source_ready_count > 0 &&
+         row.local_choose_bag_index < row.local_source_ready_count &&
+         std::abs(row.local_source_uncovered_service_work_seconds -
+                  static_cast<double>(row.local_source_ready_count) *
+                      row.local_service_seconds) < 1.0e-12 &&
+         row.external_scheduled_incoming_count >= 0 &&
+         std::isfinite(row.oldest_local_wait_age_seconds) &&
+         row.oldest_local_wait_age_seconds >= 0.0 &&
+         std::isfinite(row.oldest_external_wait_age_seconds) &&
+         row.oldest_external_wait_age_seconds >= 0.0 &&
+         (row.destination_pending_count != 0 ||
+          row.oldest_external_wait_age_seconds == 0.0) &&
+         std::abs(row.service_calendar_next_free_seconds - row.L0) <
+             1.0e-12 &&
+         std::abs(row.existing_calendar_wait_seconds -
+                  (row.L0 - row.event_time)) < 1.0e-12 &&
+         row.selected_action_from_node == row.external_upstream_node &&
+         row.selected_action_to_node == row.node &&
+         row.selected_action_kind_code == row.seam_kind_code &&
+         row.local_origin_code == 1U && row.external_origin_code == 2U;
+}
+
+void test_v3r2_pure_helper_and_storage_roles(Checks& checks) {
+  czr005::ics::event_runtime_detail::LocalCalendar calendar;
+  calendar.reserve(1, 2.0, 3.0);
+  calendar.reserve(2, 5.0, 6.0);
+  const auto generation = calendar.generation();
+  const auto size = calendar.size();
+  const bool pure =
+      calendar.earliest_start(0.0, 1.0) == 0.0 &&
+      calendar.earliest_start_with_hypothetical(0.0, 1.0, 0.5, 1.5) ==
+          3.0 &&
+      calendar.generation() == generation && calendar.size() == size;
+  checks.require(pure, "V3R2 pure L1 helper must not mutate or copy C");
+  v3r2_proof.pure_calendar_helper = pure;
+
+  const auto graph = v3r2_slot_pair_graph(true);
+  const auto rejects = [&](std::string mode, std::vector<int> storage) {
+    auto config = v3r2_shadow_config();
+    config.source_aware_destination_service_mode = std::move(mode);
+    config.storage_source_nodes = std::move(storage);
+    try {
+      EventDrivenJunctionRuntime runtime(graph, config);
+      (void)runtime;
+      return false;
+    } catch (const std::invalid_argument&) {
+      return true;
+    }
+  };
+  const bool roles = rejects("enabled", {0, 4}) &&
+                     rejects("shadow", {}) &&
+                     rejects("shadow", {0, 0}) &&
+                     !rejects("shadow", {1}) &&
+                     rejects("shadow", {2});
+  checks.require(
+      roles,
+      "V3R2 must fail closed on mode and generic storage-role violations");
+  v3r2_proof.generic_storage_role_validation = roles;
+}
+
+void test_v3r2_direct_and_action_inert(Checks& checks) {
+  const auto graph = v3r2_slot_pair_graph(false);
+  const auto requests = v3r2_slot_pair_requests();
+  auto off_config = v3r2_shadow_config();
+  off_config.source_aware_destination_service_mode = "off";
+  EventDrivenJunctionRuntime off_runtime(graph, off_config);
+  const auto off = off_runtime.run(requests);
+  EventDrivenJunctionRuntime shadow_runtime(graph, v3r2_shadow_config());
+  const auto shadow = shadow_runtime.run(requests);
+  const auto direct_count = std::count_if(
+      shadow.source_aware_destination_service_shadow.begin(),
+      shadow.source_aware_destination_service_shadow.end(),
+      [](const auto& row) { return row.seam_kind_code == 1U; });
+  const auto direct = std::find_if(
+      shadow.source_aware_destination_service_shadow.begin(),
+      shadow.source_aware_destination_service_shadow.end(),
+      [](const auto& row) { return row.seam_kind_code == 1U; });
+  const bool row_valid =
+      direct_count == 1 &&
+      direct != shadow.source_aware_destination_service_shadow.end() &&
+      direct->external_path_code == 1U &&
+      direct->has_direct_episode_identity && !direct->has_j2_identity &&
+      direct->external_direct_episode_event_seq == direct->event_seq &&
+      direct->local_guards_passed && direct->local_task_id == 32032002 &&
+      direct->local_runtime_bag_id == 1 &&
+      direct->local_choose_bag_index == 0 &&
+      direct->local_escape_token_runtime_bag_id == -1 &&
+      v3r4_local_telemetry_is_exact(*direct) &&
+      direct->local_source_ready_count == 1 &&
+      direct->destination_pending_count == 0 &&
+      direct->oldest_external_wait_age_seconds == 0.0 &&
+      std::abs(direct->oldest_local_wait_age_seconds -
+               (direct->event_time - direct->local_source_enqueued_at)) <
+          1.0e-12 &&
+      std::abs(direct->local_release) < 1.0e-12 &&
+      std::abs(direct->local_deadline - 100.0) < 1.0e-12 &&
+      std::abs(direct->local_source_enqueued_at) < 1.0e-12 &&
+      std::abs(direct->L0 - 1.0) < 1.0e-12 &&
+      std::abs(direct->L1 - 2.0) < 1.0e-12 && direct->X_insert > 0.0 &&
+      direct->overlap_seconds > 0.0 &&
+      std::abs(direct->X_insert - (direct->L1 - direct->L0)) < 1.0e-12 &&
+      std::abs(direct->H_gap -
+               (direct->L1 - direct->external_slot_start_seconds)) <
+          1.0e-12;
+  checks.require(row_valid, "V3R2 DIRECT must publish one exact algebra row");
+  v3r2_proof.direct_unique_publish = row_valid;
+
+  const auto off_replay = off_runtime.deterministic_replay_hashes();
+  const auto shadow_replay = shadow_runtime.deterministic_replay_hashes();
+  const bool inert =
+      off_replay.segment_result_sha256 == shadow_replay.segment_result_sha256 &&
+      off_replay.junction_state_sha256 == shadow_replay.junction_state_sha256 &&
+      off_replay.deterministic_result_sha256 ==
+          shadow_replay.deterministic_result_sha256 &&
+      off.events.size() == shadow.events.size() &&
+      off.decisions.size() == shadow.decisions.size() &&
+      direct != shadow.source_aware_destination_service_shadow.end() &&
+      !direct->action_changed && direct->future_release_read_count == 0 &&
+      direct->global_scan_count == 0 && direct->calendar_mutation_count == 0 &&
+      shadow.summary.source_aware_destination_service_action_change_count == 0 &&
+      shadow.summary.source_aware_destination_service_calendar_mutation_count == 0;
+  checks.require(inert, "V3R2 shadow must preserve ordinary state and replay hashes");
+  v3r2_proof.action_inert_invariants = inert;
+}
+
+void test_v3r13_candidate_a_closed_loop(Checks& checks) {
+  const auto run_case = [](bool j2,
+                           double local_deadline,
+                           double pending_deadline) {
+    auto config = v3r2_shadow_config();
+    config.queue_discipline = "deadline";
+    config.source_aware_destination_service_mode = "closed_loop";
+    config.storage_source_nodes = j2 ? std::vector<int>{0, 4}
+                                     : std::vector<int>{0};
+    std::vector<EventRuntimeBagRequest> requests = {
+        {"v3r13-external-committed", 32033001, 0.0, 100.0, 0, 3,
+         "external"},
+        {"v3r13-local", 32033002, 0.1, local_deadline, 1, 3, "local"},
+        {"v3r13-external-contender", 32033003, j2 ? 0.05 : 0.2,
+         pending_deadline, j2 ? 4 : 0, 3, "external"},
+    };
+    const auto graph = v3r2_slot_pair_graph(j2);
+    EventDrivenJunctionRuntime runtime(graph, config);
+    return runtime.run(requests);
+  };
+  const auto direct = run_case(false, 10.0, 100.0);
+  const auto j2_local = run_case(true, 10.0, 100.0);
+  const auto j2_external = run_case(true, 100.0, 1.0);
+
+  const auto action_is_exact = [](const auto& result) {
+    const auto local = std::find_if(
+        result.bags.begin(), result.bags.end(), [](const auto& bag) {
+          return bag.segment_id == "v3r13-local";
+        });
+    const auto action = std::find_if(
+        result.events.begin(), result.events.end(), [](const auto& event) {
+          return event.segment_id == "v3r13-local" &&
+                 event.reason == "source_closed_loop_future_slot";
+        });
+    return result.summary.completed_count == 3 &&
+           result.summary.reservation_conflicts == 0 &&
+           result.summary
+                   .source_aware_destination_service_action_change_count ==
+               1 &&
+           result.summary
+                   .source_aware_destination_service_calendar_mutation_count ==
+               1 &&
+           result.summary
+                   .source_aware_destination_service_future_release_read_count ==
+               0 &&
+           result.summary
+                   .source_aware_destination_service_global_scan_count == 0 &&
+           result.source_aware_destination_service_shadow.empty() &&
+           local != result.bags.end() && local->completed &&
+           local->admitted_time > local->release_time &&
+           action != result.events.end() &&
+           std::abs(action->time - local->admitted_time) < 1.0e-12;
+  };
+  checks.require(action_is_exact(direct),
+                 "V3R13 DIRECT must commit one future local owner");
+  checks.require(action_is_exact(j2_local),
+                 "V3R13 J2 must commit one strictly-prior local owner");
+  const auto reverse_local = std::find_if(
+      j2_external.bags.begin(), j2_external.bags.end(), [](const auto& bag) {
+        return bag.segment_id == "v3r13-local";
+      });
+  const auto reverse_external = std::find_if(
+      j2_external.bags.begin(), j2_external.bags.end(), [](const auto& bag) {
+        return bag.segment_id == "v3r13-external-contender";
+      });
+  checks.require(
+      j2_external.summary.completed_count == 3 &&
+          j2_external.summary.reservation_conflicts == 0 &&
+          reverse_local != j2_external.bags.end() &&
+          reverse_external != j2_external.bags.end() &&
+          reverse_external->finish_time < reverse_local->finish_time,
+      "V3R13 J2 must preserve an earlier-deadline external winner");
+
+  auto bounded_config = v3r2_shadow_config();
+  bounded_config.queue_discipline = "deadline";
+  bounded_config.local_queue_capacity = 1;
+  bounded_config.source_aware_destination_service_mode = "closed_loop";
+  const auto bounded_graph = v3r2_slot_pair_graph(false);
+  EventDrivenJunctionRuntime bounded_runtime(bounded_graph, bounded_config);
+  const auto bounded = bounded_runtime.run(
+      {{"v3r13-bounded-external", 32033005, 0.0, 100.0, 0, 3,
+        "external"},
+       {"v3r13-bounded-local", 32033006, 0.1, 10.0, 1, 3, "local"}});
+  checks.require(
+      bounded.summary.completed_count == 2 &&
+          bounded.summary
+                  .source_aware_destination_service_action_change_count == 0,
+      "V3R13 finite-capacity configuration must keep ordinary admission");
+
+  auto no_external_config = v3r2_shadow_config();
+  no_external_config.source_aware_destination_service_mode = "closed_loop";
+  const auto no_external_graph = v3r2_slot_pair_graph(false);
+  EventDrivenJunctionRuntime no_external_runtime(
+      no_external_graph, no_external_config);
+  const auto no_external = no_external_runtime.run(
+      {{"v3r13-local-only", 32033004, 0.0, 10.0, 1, 3, "local"}});
+  checks.require(
+      no_external.summary.completed_count == 1 &&
+          no_external.summary
+                  .source_aware_destination_service_action_change_count == 0,
+      "V3R13 local-only control must remain a no-op");
+}
+
+Graph v3r15_commit_recheck_graph(bool j2) {
+  Graph graph;
+  graph.add_node(czr005::ics::Node{0, 7, 0.0, 0, 0, {1}});
+  graph.add_node(czr005::ics::Node{1, 1, 1.0, 1, 0, {2}});
+  graph.add_node(czr005::ics::Node{2, 4, 0.0, 2, 0, {3}});
+  graph.add_node(czr005::ics::Node{3, 2, 0.0, 3, 0, {}});
+  if (j2) {
+    graph.add_node(czr005::ics::Node{4, 7, 0.0, 0, 1, {1}});
+  }
+  graph.add_edge(czr005::ics::Edge{0, 1, 0.799, 1.0});
+  graph.add_edge(czr005::ics::Edge{1, 2, 0.05, 1.0});
+  graph.add_edge(czr005::ics::Edge{2, 3, 0.05, 1.0});
+  if (j2) {
+    graph.add_edge(czr005::ics::Edge{4, 1, 1.699, 1.0});
+  }
+  const int size = j2 ? 5 : 4;
+  std::vector<std::vector<double>> heuristic(
+      size, std::vector<double>(size, 1000.0));
+  for (int node = 0; node < size; ++node) {
+    heuristic[node][node] = 0.0;
+  }
+  heuristic[0][3] = 1.899;
+  heuristic[1][3] = 0.10;
+  heuristic[2][3] = 0.05;
+  if (j2) {
+    heuristic[4][3] = 2.799;
+  }
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_v3r15_candidate_a_commit_recheck(Checks& checks) {
+  const auto run = [](bool j2,
+                      const std::string& mode,
+                      std::vector<EventRuntimeBagRequest> requests) {
+    auto config = v3r2_shadow_config();
+    config.queue_discipline = "deadline";
+    config.source_aware_destination_service_mode = mode;
+    config.storage_source_nodes =
+        j2 ? std::vector<int>{0, 4} : std::vector<int>{0};
+    const auto graph = v3r15_commit_recheck_graph(j2);
+    EventDrivenJunctionRuntime runtime(graph, config);
+    return runtime.run(requests);
+  };
+  const auto direct_requests =
+      std::vector<EventRuntimeBagRequest>{
+          {"v3r15-direct-owner", 32035001, 0.0, 100.0, 1, 3,
+           "local"},
+          {"v3r15-direct-local", 32035002, 0.1, 10.0, 1, 3,
+           "local"},
+          {"v3r15-direct-external", 32035003, 0.2, 100.0, 0, 3,
+           "external"},
+      };
+  const auto direct_old = run(false, "closed_loop", direct_requests);
+  const auto direct_recheck =
+      run(false, "closed_loop_commit_recheck", direct_requests);
+  const auto source_arbitration_time = [](const auto& result,
+                                          const std::string& segment_id) {
+    const auto event = std::find_if(
+        result.events.begin(), result.events.end(),
+        [&](const auto& row) {
+          return row.segment_id == segment_id &&
+                 row.reason == "same_timestamp_source_arbitration";
+        });
+    return event == result.events.end()
+               ? std::numeric_limits<double>::infinity()
+               : event->time;
+  };
+  checks.require(
+      direct_old.summary.completed_count == 3 &&
+          direct_recheck.summary.completed_count == 3 &&
+          direct_old.summary.reservation_conflicts == 0 &&
+          direct_recheck.summary.reservation_conflicts == 0 &&
+          direct_old.summary
+                  .source_aware_destination_service_action_change_count ==
+              1 &&
+          direct_recheck.summary
+                  .source_aware_destination_service_action_change_count ==
+              1 &&
+          direct_recheck.summary
+                  .source_aware_destination_service_calendar_mutation_count ==
+              1 &&
+          direct_old.summary
+                  .superseded_arbitration_event_rejected_count == 0 &&
+          direct_recheck.summary
+                  .superseded_arbitration_event_rejected_count == 1 &&
+          std::abs(source_arbitration_time(
+                       direct_old, "v3r15-direct-local") -
+                   1.0) < 1.0e-12 &&
+          std::abs(source_arbitration_time(
+                       direct_recheck, "v3r15-direct-local") -
+                   0.201) < 1.0e-12,
+      "V3R15 DIRECT commit must retime exactly one pending source wake");
+
+  const auto no_source = run(
+      false,
+      "closed_loop_commit_recheck",
+      {{"v3r15-no-source-external", 32035008, 0.2, 100.0, 0, 3,
+        "external"}});
+  checks.require(
+      no_source.summary.completed_count == 1 &&
+          no_source.summary
+                  .source_aware_destination_service_action_change_count == 0 &&
+          no_source.summary
+                  .source_aware_destination_service_calendar_mutation_count ==
+              0 &&
+          no_source.summary
+                  .superseded_arbitration_event_rejected_count == 0,
+      "V3R15 commit recheck must be inert without a ready source queue");
+
+  const auto j2_requests =
+      std::vector<EventRuntimeBagRequest>{
+          {"v3r15-j2-owner", 32035004, 0.0, 100.0, 1, 3, "local"},
+          {"v3r15-j2-local", 32035005, 0.1, 10.0, 1, 3, "local"},
+          {"v3r15-j2-first", 32035006, 0.2, 50.0, 0, 3,
+           "external"},
+          {"v3r15-j2-later", 32035007, 0.3, 100.0, 4, 3,
+           "external"},
+      };
+  const auto j2_old = run(true, "closed_loop", j2_requests);
+  const auto j2_recheck =
+      run(true, "closed_loop_commit_recheck", j2_requests);
+  const auto find_bag = [](const auto& result,
+                           const std::string& segment_id) {
+    return std::find_if(
+        result.bags.begin(), result.bags.end(),
+        [&](const auto& bag) { return bag.segment_id == segment_id; });
+  };
+  const auto old_local = find_bag(j2_old, "v3r15-j2-local");
+  const auto new_local = find_bag(j2_recheck, "v3r15-j2-local");
+  const auto old_first = find_bag(j2_old, "v3r15-j2-first");
+  const auto new_first = find_bag(j2_recheck, "v3r15-j2-first");
+  const auto new_later = find_bag(j2_recheck, "v3r15-j2-later");
+  checks.require(
+      j2_old.summary.completed_count == 4 &&
+          j2_recheck.summary.completed_count == 4 &&
+          j2_old.summary.reservation_conflicts == 0 &&
+          j2_recheck.summary.reservation_conflicts == 0 &&
+          j2_recheck.summary
+                  .source_aware_destination_service_action_change_count ==
+              1 &&
+          j2_recheck.summary
+                  .source_aware_destination_service_calendar_mutation_count ==
+              1 &&
+          j2_recheck.summary
+                  .source_aware_destination_service_future_release_read_count ==
+              0 &&
+          j2_recheck.summary
+                  .source_aware_destination_service_global_scan_count == 0 &&
+          old_local != j2_old.bags.end() &&
+          new_local != j2_recheck.bags.end() &&
+          old_first != j2_old.bags.end() &&
+          new_first != j2_recheck.bags.end() &&
+          new_later != j2_recheck.bags.end() &&
+          std::abs(old_local->admitted_time - 3.0) < 1.0e-12 &&
+          std::abs(new_local->admitted_time - 2.0) < 1.0e-12 &&
+          std::abs(old_first->finish_time - new_first->finish_time) <
+              1.0e-12 &&
+          new_first->finish_time < new_local->finish_time &&
+          new_local->finish_time < new_later->finish_time,
+      "V3R15 J2 recheck must preserve the committed winner and one local owner");
+}
+
+void test_v3r14_uncovered_local_work_helper(Checks& checks) {
+  const auto work =
+      czr005::ics::event_runtime_detail::uncovered_local_work_seconds;
+  checks.require(
+      work(0, 1.0, true) == 0.0 &&
+          work(1, 1.0, true) == 1.0 &&
+          work(2, 1.0, true) == 2.0 &&
+          work(0, 3.0, true) == 0.0 &&
+          work(1, 3.0, true) == 3.0 &&
+          work(2, 3.0, true) == 6.0 &&
+          work(2, 3.0, false) == 0.0,
+      "V3R14 uncovered-work helper must be exact and resource-gated");
+}
+
+Graph v3r14_uncovered_work_graph() {
+  Graph graph;
+  for (int node = 0; node < 4; ++node) {
+    graph.add_node(czr005::ics::Node{
+        node, 0, node == 1 ? 3.0 : 0.001, 0, 0, {}});
+  }
+  for (const auto [start, end] :
+       std::vector<std::pair<int, int>>{
+           {0, 1}, {0, 2}, {1, 3}, {2, 3}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, 1.0, 1.0});
+  }
+  std::vector<std::vector<double>> heuristic(
+      4, std::vector<double>(4, 0.0));
+  heuristic[0][3] = 4.0;
+  heuristic[1][3] = 0.1;
+  heuristic[2][3] = 2.5;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_v3r14_candidate_b_score_and_ranking(Checks& checks) {
+  const auto graph = v3r14_uncovered_work_graph();
+  const auto run = [&](const std::string& scorer_mode,
+                       bool include_future_release) {
+    auto config = v3r2_shadow_config();
+    config.scorer_mode = scorer_mode;
+    config.source_aware_destination_service_mode = "off";
+    config.queue_discipline = "fifo";
+    config.storage_source_nodes = {1};
+    std::vector<EventRuntimeBagRequest> requests = {
+        {"v3r14-local-owner", 32034001, 0.0, 1000.0, 1, 3,
+         "synthetic"},
+        {"v3r14-local-uncovered", 32034002, 0.0, 1000.0, 1, 3,
+         "synthetic"},
+        {"v3r14-probe", 32034003, 0.1, 1000.0, 0, 3,
+         "synthetic"},
+    };
+    if (include_future_release) {
+      requests.push_back(
+          {"v3r14-future-local", 32034004, 100.0, 1000.0, 1, 3,
+           "synthetic"});
+    }
+    EventDrivenJunctionRuntime runtime(graph, config);
+    return runtime.run(requests);
+  };
+  const auto old_s4 = run("S4_queue_aware_rule_only", false);
+  const auto candidate_b = run(
+      "S4_uncovered_local_work_seconds_rule_only", false);
+  const auto candidate_b_with_future = run(
+      "S4_uncovered_local_work_seconds_rule_only", true);
+
+  const auto probe = [](const auto& result) {
+    return std::find_if(
+        result.decisions.begin(), result.decisions.end(), [](const auto& row) {
+          return row.segment_id == "v3r14-probe" && row.current_node == 0;
+        });
+  };
+  const auto candidate = [](const auto& decision, int next_node) {
+    return std::find_if(
+        decision.candidates.begin(), decision.candidates.end(),
+        [next_node](const auto& row) { return row.next_node == next_node; });
+  };
+  const auto old_probe = probe(old_s4);
+  const auto new_probe = probe(candidate_b);
+  const auto future_probe = probe(candidate_b_with_future);
+  checks.require(
+      old_probe != old_s4.decisions.end() &&
+          new_probe != candidate_b.decisions.end() &&
+          future_probe != candidate_b_with_future.decisions.end(),
+      "V3R14 score fixture must expose the probe decision");
+  if (old_probe == old_s4.decisions.end() ||
+      new_probe == candidate_b.decisions.end() ||
+      future_probe == candidate_b_with_future.decisions.end()) {
+    return;
+  }
+
+  const auto old_one = candidate(*old_probe, 1);
+  const auto new_one = candidate(*new_probe, 1);
+  const auto new_two = candidate(*new_probe, 2);
+  const auto future_one = candidate(*future_probe, 1);
+  checks.require(
+      old_one != old_probe->candidates.end() &&
+          new_one != new_probe->candidates.end() &&
+          new_two != new_probe->candidates.end() &&
+          future_one != future_probe->candidates.end(),
+      "V3R14 score fixture must retain both legal direct neighbours");
+  if (old_one == old_probe->candidates.end() ||
+      new_one == new_probe->candidates.end() ||
+      new_two == new_probe->candidates.end() ||
+      future_one == future_probe->candidates.end()) {
+    return;
+  }
+
+  const auto calendar_wait = [](const auto& decision, const auto& row) {
+    return std::max(
+               0.0, row.corridor_next_available - decision.event_time) +
+           std::max(0.0,
+                    row.target_next_available -
+                        (decision.event_time + row.travel_time));
+  };
+  const double old_expected =
+      old_one->travel_time + old_one->static_potential +
+      static_cast<double>(old_one->target_queue_length +
+                          old_one->target_scheduled_incoming) +
+      calendar_wait(*old_probe, *old_one);
+  const double new_expected =
+      new_one->travel_time + new_one->static_potential +
+      czr005::ics::event_runtime_detail::uncovered_local_work_seconds(
+          1, 3.0, true) +
+      calendar_wait(*new_probe, *new_one);
+  checks.require(
+      std::abs(old_one->scorer_raw_score - old_expected) < 1.0e-12,
+      "old S4 raw score must retain its exact frozen formula");
+  checks.require(
+      std::abs(new_one->scorer_raw_score - new_expected) < 1.0e-12 &&
+          new_one->target_queue_length == 0 &&
+          new_one->target_scheduled_incoming == 0 &&
+          calendar_wait(*new_probe, *new_one) > 0.0,
+      "Candidate B must add only ready uncovered work beside calendar wait");
+  checks.require(
+      old_probe->selected_next == 1 && new_probe->selected_next == 2 &&
+          old_probe->scorer_raw_prediction == 1 &&
+          new_probe->scorer_raw_prediction == 2,
+      "Candidate B must change ranking when only uncovered work differs");
+  checks.require(
+      std::abs(future_one->scorer_raw_score -
+               new_one->scorer_raw_score) < 1.0e-12,
+      "a future-release local bag must not contribute before release");
+  checks.require(
+      candidate_b.summary.scorer_id ==
+              "S4_uncovered_local_work_seconds_rule_only" &&
+          new_probe->scorer_id ==
+              "S4_uncovered_local_work_seconds_rule_only" &&
+          candidate_b.summary.completed_count == 3 &&
+          candidate_b.summary.failed_count == 0 &&
+          candidate_b.summary.reservation_conflicts == 0 &&
+          candidate_b.summary.runtime_full_astar_calls == 0 &&
+          candidate_b.summary.global_reservation_scan_count == 0 &&
+          candidate_b.summary.two_step_reservation_count == 0 &&
+          candidate_b.summary.max_edges_selected_per_arrive <= 1,
+      "Candidate B must remain the safe one-hop S4 family");
+}
+
+void test_v3r16_s4_plus_uncovered_local_work(Checks& checks) {
+  const auto graph = v3r14_uncovered_work_graph();
+  const auto run = [&](const std::string& scorer_mode,
+                       int uncovered_ready_count) {
+    auto config = v3r2_shadow_config();
+    config.scorer_mode = scorer_mode;
+    config.source_aware_destination_service_mode = "off";
+    config.queue_discipline = "fifo";
+    config.storage_source_nodes = {1};
+    std::vector<EventRuntimeBagRequest> requests = {
+        {"v3r16-local-owner", 32036001, 0.0, 1000.0, 1, 3,
+         "synthetic"},
+    };
+    for (int index = 0; index < uncovered_ready_count; ++index) {
+      requests.push_back(
+          {"v3r16-local-uncovered-" + std::to_string(index),
+           32036002 + index, 0.0, 1000.0, 1, 3, "synthetic"});
+    }
+    requests.push_back(
+        {"v3r16-probe", 32036010, 0.1, 1000.0, 0, 3,
+         "synthetic"});
+    EventDrivenJunctionRuntime runtime(graph, config);
+    return runtime.run(requests);
+  };
+  const auto probe = [](const auto& result) {
+    return std::find_if(
+        result.decisions.begin(), result.decisions.end(), [](const auto& row) {
+          return row.segment_id == "v3r16-probe" && row.current_node == 0;
+        });
+  };
+  const auto candidate = [](const auto& decision, int next_node) {
+    return std::find_if(
+        decision.candidates.begin(), decision.candidates.end(),
+        [next_node](const auto& row) { return row.next_node == next_node; });
+  };
+  const auto old_zero = run("S4_queue_aware_rule_only", 0);
+  const auto plus_zero = run(
+      "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only", 0);
+  const auto old_two = run("S4_queue_aware_rule_only", 2);
+  const auto plus_two = run(
+      "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only", 2);
+
+  const auto old_zero_probe = probe(old_zero);
+  const auto plus_zero_probe = probe(plus_zero);
+  const auto old_two_probe = probe(old_two);
+  const auto plus_two_probe = probe(plus_two);
+  checks.require(
+      old_zero_probe != old_zero.decisions.end() &&
+          plus_zero_probe != plus_zero.decisions.end() &&
+          old_two_probe != old_two.decisions.end() &&
+          plus_two_probe != plus_two.decisions.end(),
+      "V3R16 score fixture must expose every probe decision");
+  if (old_zero_probe == old_zero.decisions.end() ||
+      plus_zero_probe == plus_zero.decisions.end() ||
+      old_two_probe == old_two.decisions.end() ||
+      plus_two_probe == plus_two.decisions.end()) {
+    return;
+  }
+
+  const auto old_zero_target = candidate(*old_zero_probe, 1);
+  const auto plus_zero_target = candidate(*plus_zero_probe, 1);
+  const auto old_two_target = candidate(*old_two_probe, 1);
+  const auto plus_two_target = candidate(*plus_two_probe, 1);
+  checks.require(
+      old_zero_target != old_zero_probe->candidates.end() &&
+          plus_zero_target != plus_zero_probe->candidates.end() &&
+          old_two_target != old_two_probe->candidates.end() &&
+          plus_two_target != plus_two_probe->candidates.end(),
+      "V3R16 score fixture must retain the target candidate");
+  if (old_zero_target == old_zero_probe->candidates.end() ||
+      plus_zero_target == plus_zero_probe->candidates.end() ||
+      old_two_target == old_two_probe->candidates.end() ||
+      plus_two_target == plus_two_probe->candidates.end()) {
+    return;
+  }
+
+  checks.require(
+      plus_zero_target->scorer_raw_score ==
+              old_zero_target->scorer_raw_score &&
+          plus_zero_probe->selected_next == old_zero_probe->selected_next &&
+          plus_zero_probe->scorer_raw_prediction ==
+              old_zero_probe->scorer_raw_prediction,
+      "V3R16 must be score-exact to historical S4 with no source work");
+  const auto historical_s4_score = [](const auto& decision,
+                                      const auto& row) {
+    double score = row.travel_time + row.static_potential;
+    score +=
+        static_cast<double>(row.target_queue_length +
+                            row.target_scheduled_incoming) +
+        std::max(0.0,
+                 row.corridor_next_available - decision.event_time) +
+        std::max(0.0,
+                 row.target_next_available -
+                     (decision.event_time + row.travel_time));
+    return score;
+  };
+  checks.require(
+      plus_two_target->scorer_raw_score ==
+              historical_s4_score(*plus_two_probe, *plus_two_target) +
+                  czr005::ics::event_runtime_detail::
+                      uncovered_local_work_seconds(2, 3.0, true),
+      "V3R16 must add exactly one service quantum per ready source item");
+  checks.require(
+      old_two_probe->selected_next == 1 &&
+          plus_two_probe->selected_next == 2,
+      "V3R16 uncovered work must produce the registered ranking change");
+  checks.require(
+      plus_two.summary.scorer_id ==
+              "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only" &&
+          plus_two_probe->scorer_id ==
+              "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only" &&
+          plus_two.summary.completed_count == 4 &&
+          plus_two.summary.failed_count == 0 &&
+          plus_two.summary.reservation_conflicts == 0 &&
+          plus_two.summary.runtime_full_astar_calls == 0 &&
+          plus_two.summary.global_reservation_scan_count == 0 &&
+          plus_two.summary.two_step_reservation_count == 0 &&
+          plus_two.summary.max_edges_selected_per_arrive <= 1,
+      "V3R16 must remain the safe one-hop S4 family");
+}
+
+Graph typed_static_dominance_graph(double type2_service,
+                                   double type4_service) {
+  Graph graph;
+  graph.add_node(czr005::ics::Node{0, 7, 0.001, 0, 0, {}});
+  graph.add_node(czr005::ics::Node{1, 2, type2_service, 1, 0, {}});
+  graph.add_node(czr005::ics::Node{2, 4, type4_service, 0, 1, {}});
+  graph.add_node(czr005::ics::Node{3, 3, 0.001, 1, 1, {}});
+  for (const auto [start, end] :
+       std::vector<std::pair<int, int>>{
+           {0, 1}, {0, 2}, {1, 3}, {2, 3}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, 1.0, 1.0});
+  }
+  std::vector<std::vector<double>> heuristic(
+      4, std::vector<double>(4, 0.0));
+  heuristic[0][3] = 3.0;
+  heuristic[1][3] = 1.0;
+  heuristic[2][3] = 0.25;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_v3r17_typed_service_dominance(Checks& checks) {
+  const auto config_for = [](const std::string& scorer_mode) {
+    auto config = v3r2_shadow_config();
+    config.scorer_mode = scorer_mode;
+    config.storage_source_nodes = {2};
+    config.source_aware_destination_service_mode = "off";
+    return config;
+  };
+  const std::vector<EventRuntimeBagRequest> requests = {
+      {"v3r17-blocker", 32037001, 0.0, 1000.0, 2, 3,
+       "synthetic"},
+      {"v3r17-probe", 32037002, 0.1, 1000.0, 0, 3,
+       "synthetic"},
+  };
+  const std::vector<EventRuntimeFaultWindow> faults{
+      {2, 3, 0.0, 1.0, 0.0}};
+  const auto probe = [](const auto& result) {
+    return std::find_if(
+        result.decisions.begin(), result.decisions.end(), [](const auto& row) {
+          return row.segment_id == "v3r17-probe" && row.current_node == 0;
+        });
+  };
+  const auto candidate = [](const auto& decision, int next_node) {
+    return std::find_if(
+        decision.candidates.begin(), decision.candidates.end(),
+        [next_node](const auto& row) { return row.next_node == next_node; });
+  };
+
+  const auto graph = typed_static_dominance_graph(3.0, 0.01);
+  EventDrivenJunctionRuntime old_runtime(
+      graph, config_for("S4_queue_aware_rule_only"));
+  const auto old_result = old_runtime.run(requests, faults);
+  EventDrivenJunctionRuntime dominance_runtime(
+      graph, config_for("S4_typed_service_dominance_rule_only"));
+  const auto dominance_result = dominance_runtime.run(requests, faults);
+  const auto old_probe = probe(old_result);
+  const auto dominance_probe = probe(dominance_result);
+  checks.require(
+      old_probe != old_result.decisions.end() &&
+          dominance_probe != dominance_result.decisions.end(),
+      "V3R17 typed motif must expose both probe decisions");
+  if (old_probe == old_result.decisions.end() ||
+      dominance_probe == dominance_result.decisions.end()) {
+    return;
+  }
+  const auto old_type2 = candidate(*old_probe, 1);
+  const auto old_type4 = candidate(*old_probe, 2);
+  const auto dominance_type2 = candidate(*dominance_probe, 1);
+  const auto dominance_type4 = candidate(*dominance_probe, 2);
+  checks.require(
+      old_type2 != old_probe->candidates.end() &&
+          old_type4 != old_probe->candidates.end() &&
+          dominance_type2 != dominance_probe->candidates.end() &&
+          dominance_type4 != dominance_probe->candidates.end(),
+      "V3R17 typed motif must retain both materialized neighbours");
+  if (old_type2 == old_probe->candidates.end() ||
+      old_type4 == old_probe->candidates.end() ||
+      dominance_type2 == dominance_probe->candidates.end() ||
+      dominance_type4 == dominance_probe->candidates.end()) {
+    return;
+  }
+  checks.require(
+      old_probe->model_prediction == 1 && old_probe->selected_next == 1 &&
+          dominance_probe->scorer_raw_prediction == 1 &&
+          dominance_probe->model_prediction == 2 &&
+          dominance_probe->selected_next == 2 &&
+          dominance_type2->shield_allowed &&
+          dominance_type4->shield_allowed &&
+          !dominance_type2->advertised_fault &&
+          !dominance_type4->advertised_fault &&
+          dominance_type4->travel_time + dominance_type4->static_potential <
+              dominance_type2->travel_time +
+                  dominance_type2->static_potential &&
+          graph.service_time(2) < graph.service_time(1),
+      "V3R17 must move the strictly base-and-service-dominating type-4 neighbour to the front");
+  checks.require(
+      old_type2->scorer_raw_score == dominance_type2->scorer_raw_score &&
+          old_type4->scorer_raw_score == dominance_type4->scorer_raw_score &&
+          dominance_result.summary.scorer_id ==
+              "S4_typed_service_dominance_rule_only" &&
+          dominance_probe->scorer_id ==
+              "S4_typed_service_dominance_rule_only" &&
+          dominance_result.summary.runtime_full_astar_calls == 0 &&
+          dominance_result.summary.global_reservation_scan_count == 0 &&
+          dominance_result.summary.scorer_future_route_input_count == 0 &&
+          dominance_result.summary.scorer_future_schedule_input_count == 0 &&
+          dominance_result.summary.max_edges_selected_per_arrive <= 1,
+      "V3R17 must preserve historical S4 scores and the bounded one-hop authority");
+}
+
+void test_v3r20_service_aware_static_dominance(Checks& checks) {
+  const auto config_for = [](const std::string& scorer_mode) {
+    auto config = v3r2_shadow_config();
+    config.scorer_mode = scorer_mode;
+    config.storage_source_nodes = {2};
+    config.source_aware_destination_service_mode = "off";
+    return config;
+  };
+  const std::vector<EventRuntimeBagRequest> requests = {
+      {"v3r20-blocker", 32040001, 0.0, 1000.0, 2, 3, "synthetic"},
+      {"v3r20-probe", 32040002, 3.1, 1000.0, 0, 3, "synthetic"},
+  };
+  const std::vector<EventRuntimeFaultWindow> faults{
+      {2, 3, 0.0, 4.0, 0.0}};
+  const auto probe = [](const auto& result) {
+    return std::find_if(
+        result.decisions.begin(), result.decisions.end(), [](const auto& row) {
+          return row.segment_id == "v3r20-probe" && row.current_node == 0;
+        });
+  };
+  const auto candidate = [](const auto& decision, int next_node) {
+    return std::find_if(
+        decision.candidates.begin(), decision.candidates.end(),
+        [next_node](const auto& row) { return row.next_node == next_node; });
+  };
+
+  const auto graph = typed_static_dominance_graph(0.01, 3.0);
+  EventDrivenJunctionRuntime old_runtime(
+      graph, config_for("S4_queue_aware_rule_only"));
+  const auto old_result = old_runtime.run(requests, faults);
+  EventDrivenJunctionRuntime dominance_runtime(
+      graph, config_for("S4_service_aware_static_dominance_rule_only"));
+  const auto dominance_result = dominance_runtime.run(requests, faults);
+  const auto old_probe = probe(old_result);
+  const auto dominance_probe = probe(dominance_result);
+  checks.require(
+      old_probe != old_result.decisions.end() &&
+          dominance_probe != dominance_result.decisions.end(),
+      "V3R20 motif must expose both probe decisions");
+  if (old_probe == old_result.decisions.end() ||
+      dominance_probe == dominance_result.decisions.end()) {
+    return;
+  }
+  const auto old_type2 = candidate(*old_probe, 1);
+  const auto old_type4 = candidate(*old_probe, 2);
+  const auto dominance_type2 = candidate(*dominance_probe, 1);
+  const auto dominance_type4 = candidate(*dominance_probe, 2);
+  checks.require(
+      old_type2 != old_probe->candidates.end() &&
+          old_type4 != old_probe->candidates.end() &&
+          dominance_type2 != dominance_probe->candidates.end() &&
+          dominance_type4 != dominance_probe->candidates.end(),
+      "V3R20 motif must retain both materialized neighbours");
+  if (old_type2 == old_probe->candidates.end() ||
+      old_type4 == old_probe->candidates.end() ||
+      dominance_type2 == dominance_probe->candidates.end() ||
+      dominance_type4 == dominance_probe->candidates.end()) {
+    return;
+  }
+  checks.require(
+      old_probe->model_prediction == 1 && old_probe->selected_next == 1 &&
+          dominance_probe->scorer_raw_prediction == 1 &&
+          dominance_probe->model_prediction == 2 &&
+          dominance_probe->selected_next == 2 &&
+          dominance_type2->shield_allowed &&
+          dominance_type4->shield_allowed &&
+          !dominance_type2->advertised_fault &&
+          !dominance_type4->advertised_fault &&
+          !dominance_type2->first_edge_credit_valid &&
+          !dominance_type4->first_edge_credit_valid &&
+          dominance_type4->travel_time + dominance_type4->static_potential <
+              dominance_type2->travel_time +
+                  dominance_type2->static_potential &&
+          graph.service_time(2) > graph.service_time(1),
+      "V3R20 must prefer the lower canonical static completion cost despite longer immediate service");
+  checks.require(
+      old_type2->scorer_raw_score == dominance_type2->scorer_raw_score &&
+          old_type4->scorer_raw_score == dominance_type4->scorer_raw_score &&
+          dominance_result.summary.scorer_id ==
+              "S4_service_aware_static_dominance_rule_only" &&
+          dominance_probe->scorer_id ==
+              "S4_service_aware_static_dominance_rule_only" &&
+          dominance_result.summary.runtime_full_astar_calls == 0 &&
+          dominance_result.summary.global_reservation_scan_count == 0 &&
+          dominance_result.summary.scorer_future_route_input_count == 0 &&
+          dominance_result.summary.scorer_future_schedule_input_count == 0 &&
+          dominance_result.summary.max_edges_selected_per_arrive <= 1,
+      "V3R20 must preserve raw S4 scores and bounded one-hop authority");
+}
+
+Graph v3r18_source_release_tie_graph() {
+  Graph graph;
+  for (int node = 0; node < 9; ++node) {
+    const double service = node == 0 || node == 6 ? 1.0 : 0.001;
+    graph.add_node(czr005::ics::Node{node, 7, service, 0, 0, {}});
+  }
+  for (const auto [start, end] :
+       std::vector<std::pair<int, int>>{
+           {0, 1}, {0, 2}, {0, 3}, {4, 6}, {5, 6}, {6, 7}, {6, 8}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, 1.0, 1.0});
+  }
+  std::vector<std::vector<double>> heuristic(
+      9, std::vector<double>(9, 0.0));
+  heuristic[0][1] = 1.0;
+  heuristic[0][2] = 10.0;
+  heuristic[0][3] = 1.0;
+  heuristic[2][1] = 100.0;
+  heuristic[3][1] = 100.0;
+  heuristic[1][2] = 100.0;
+  heuristic[3][2] = 100.0;
+  heuristic[1][3] = 100.0;
+  heuristic[2][3] = 100.0;
+  heuristic[4][7] = 2.0;
+  heuristic[5][8] = 11.0;
+  heuristic[6][7] = 1.0;
+  heuristic[6][8] = 10.0;
+  heuristic[8][7] = 100.0;
+  heuristic[7][8] = 100.0;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_v3r18_source_release_tie(Checks& checks) {
+  const auto graph = v3r18_source_release_tie_graph();
+  const auto run = [&](const std::string& discipline,
+                       const std::vector<EventRuntimeBagRequest>& requests) {
+    auto config = v3r2_shadow_config();
+    config.queue_discipline = discipline;
+    config.event_semantics =
+        "E3_batch_source_and_junction_same_timestamp";
+    config.merge_grant_rule = "M1";
+    config.merge_grant_timing_mode = "eager";
+    config.source_aware_destination_service_mode = "off";
+    config.storage_source_nodes = {0, 4, 5};
+    config.max_events = 100000;
+    config.max_simulation_time = 100.0;
+    EventDrivenJunctionRuntime runtime(graph, config);
+    return runtime.run(requests);
+  };
+  const auto bag = [](const auto& result, const std::string& segment) {
+    return std::find_if(
+        result.bags.begin(), result.bags.end(), [&](const auto& row) {
+          return row.segment_id == segment;
+        });
+  };
+
+  const std::vector<EventRuntimeBagRequest> same_time = {
+      {"v3r18-blocker", 32038001, 0.0, 1000.0, 0, 3, "synthetic"},
+      {"v3r18-short", 32038002, 0.1, 1000.0, 0, 1, "synthetic"},
+      {"v3r18-long", 32038003, 0.1, 1000.0, 0, 2, "synthetic"},
+  };
+  const auto fifo = run("fifo", same_time);
+  const auto active =
+      run("fifo_source_longest_static_tie", same_time);
+  const auto fifo_short = bag(fifo, "v3r18-short");
+  const auto fifo_long = bag(fifo, "v3r18-long");
+  const auto active_short = bag(active, "v3r18-short");
+  const auto active_long = bag(active, "v3r18-long");
+  checks.require(
+      fifo_short != fifo.bags.end() && fifo_long != fifo.bags.end() &&
+          active_short != active.bags.end() &&
+          active_long != active.bags.end() &&
+          fifo_short->admitted_time < fifo_long->admitted_time &&
+          active_long->admitted_time < active_short->admitted_time,
+      "V3R18 must change only the same-time source FIFO ID tie to longest-static first");
+
+  auto different_time = same_time;
+  different_time[2].release_time = 0.2;
+  const auto older =
+      run("fifo_source_longest_static_tie", different_time);
+  const auto older_short = bag(older, "v3r18-short");
+  const auto later_long = bag(older, "v3r18-long");
+  checks.require(
+      older_short != older.bags.end() && later_long != older.bags.end() &&
+          older_short->admitted_time < later_long->admitted_time,
+      "V3R18 must retain FIFO across different source enqueue times");
+
+  const std::vector<EventRuntimeBagRequest> junction_pair = {
+      {"v3r18-junction-short", 32038004, 0.0, 1000.0, 4, 7,
+       "synthetic"},
+      {"v3r18-junction-long", 32038005, 0.0, 1000.0, 5, 8,
+       "synthetic"},
+  };
+  const auto junction_fifo = run("fifo", junction_pair);
+  const auto junction_active =
+      run("fifo_source_longest_static_tie", junction_pair);
+  bool junction_exact =
+      junction_fifo.decisions.size() == junction_active.decisions.size();
+  for (std::size_t index = 0;
+       junction_exact && index < junction_fifo.decisions.size(); ++index) {
+    const auto& before = junction_fifo.decisions[index];
+    const auto& after = junction_active.decisions[index];
+    junction_exact = before.segment_id == after.segment_id &&
+                     before.event_time == after.event_time &&
+                     before.current_node == after.current_node &&
+                     before.selected_next == after.selected_next;
+  }
+  checks.require(junction_exact,
+                 "V3R18 source-only spelling must leave junction FIFO exact");
+  checks.require(
+      active.summary.completed_count == 3 && active.summary.failed_count == 0 &&
+          active.summary.runtime_full_astar_calls == 0 &&
+          active.summary.global_reservation_scan_count == 0 &&
+          active.summary.scorer_future_route_input_count == 0 &&
+          active.summary.max_edges_selected_per_arrive <= 1,
+      "V3R18 must remain a bounded one-hop source ordering rule");
+}
+
+Graph v3r22_pending_request_hol_graph() {
+  Graph graph;
+  for (int node = 0; node < 5; ++node) {
+    const double service = node == 1 ? 10.0 : 0.001;
+    graph.add_node(czr005::ics::Node{
+        node, node == 1 ? 1 : 7, service, node, 0, {}});
+  }
+  for (const auto [start, end] :
+       std::vector<std::pair<int, int>>{
+           {4, 0}, {0, 1}, {3, 1}, {1, 2}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, 0.05, 1.0});
+  }
+  std::vector<std::vector<double>> heuristic(
+      5, std::vector<double>(5, 1000.0));
+  for (int node = 0; node < 5; ++node) {
+    heuristic[node][node] = 0.0;
+  }
+  heuristic[4][2] = 0.15;
+  heuristic[0][2] = 0.10;
+  heuristic[1][2] = 0.05;
+  heuristic[3][2] = 0.10;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_v3r22_pending_request_hol_bypass(Checks& checks) {
+  constexpr int kA = 1;
+  constexpr int kB = 2;
+  const auto graph = v3r22_pending_request_hol_graph();
+  const std::vector<EventRuntimeBagRequest> requests = {
+      {"v3r22-calendar-owner", 32042001, 0.0, 100.0, 1, 2,
+       "synthetic"},
+      {"v3r22-fifo-a", 32042002, 0.0, 100.0, 4, 2,
+       "synthetic"},
+      {"v3r22-fifo-b", 32042003, 0.0, 100.0, 4, 2,
+       "synthetic"},
+  };
+  const auto config_for = [](const std::string& discipline) {
+    auto config = v3r2_shadow_config();
+    config.queue_discipline = discipline;
+    config.source_aware_destination_service_mode = "off";
+    config.storage_source_nodes = {1, 4};
+    config.g4irsf20_event_hotpath_policy = "E0";
+    config.max_simulation_time = 100.0;
+    return config;
+  };
+  const auto junction_dispatches_at_zero = [](const auto& result) {
+    std::vector<const czr005::ics::EventRuntimeTraceRow*> rows;
+    for (const auto& row : result.events) {
+      if (row.event == "JUNCTION_ARBITRATION" && row.node == 0) {
+        rows.push_back(&row);
+      }
+    }
+    return rows;
+  };
+  const auto advance_until = [](EventDrivenJunctionRuntime& runtime,
+                                const auto& predicate) {
+    for (int step = 0; step < 10000; ++step) {
+      if (predicate()) {
+        return true;
+      }
+      if (!runtime.process_one_event()) {
+        return predicate();
+      }
+    }
+    return false;
+  };
+
+  EventDrivenJunctionRuntime fifo_runtime(graph, config_for("fifo"));
+  fifo_runtime.initialize(requests);
+  const bool fifo_first_request = advance_until(fifo_runtime, [&] {
+    return fifo_runtime
+               .g4irsf15_local_action_snapshot(kA)
+               .pending_merge_request_id != 0;
+  });
+  const auto fifo_a_before =
+      fifo_runtime.g4irsf15_local_action_snapshot(kA);
+  const auto fifo_b_before =
+      fifo_runtime.g4irsf15_local_action_snapshot(kB);
+  const bool fifo_duplicate_dispatch = advance_until(fifo_runtime, [&] {
+    return junction_dispatches_at_zero(
+               fifo_runtime.current_result()).size() >= 2U;
+  });
+  const auto fifo_a_after =
+      fifo_runtime.g4irsf15_local_action_snapshot(kA);
+  const auto fifo_b_after =
+      fifo_runtime.g4irsf15_local_action_snapshot(kB);
+  const auto fifo_dispatches =
+      junction_dispatches_at_zero(fifo_runtime.current_result());
+
+  EventDrivenJunctionRuntime active_runtime(
+      graph,
+      config_for("fifo_junction_skip_pending_merge_owner"));
+  active_runtime.initialize(requests);
+  const bool active_first_request = advance_until(active_runtime, [&] {
+    return active_runtime
+               .g4irsf15_local_action_snapshot(kA)
+               .pending_merge_request_id != 0;
+  });
+  const auto active_a_before =
+      active_runtime.g4irsf15_local_action_snapshot(kA);
+  const auto active_b_before =
+      active_runtime.g4irsf15_local_action_snapshot(kB);
+  const auto calendar_before =
+      active_runtime.g4irsf22_local_guidance_snapshot(1);
+  const auto calendar_generation_before =
+      active_runtime.test_service_calendar_generation(1);
+  const bool active_second_request = advance_until(active_runtime, [&] {
+    return active_runtime
+               .g4irsf15_local_action_snapshot(kB)
+               .pending_merge_request_id != 0;
+  });
+  const auto active_a_after =
+      active_runtime.g4irsf15_local_action_snapshot(kA);
+  const auto active_b_after =
+      active_runtime.g4irsf15_local_action_snapshot(kB);
+  const auto calendar_after =
+      active_runtime.g4irsf22_local_guidance_snapshot(1);
+  const auto calendar_generation_after =
+      active_runtime.test_service_calendar_generation(1);
+  const auto active_dispatches =
+      junction_dispatches_at_zero(active_runtime.current_result());
+  const auto active_boundary = active_runtime.peek_safe_boundary();
+  const bool b_entered_merge_edge = std::any_of(
+      active_runtime.current_result().events.begin(),
+      active_runtime.current_result().events.end(),
+      [=](const auto& row) {
+        return row.runtime_bag_id == kB && row.event == "EDGE_ENTER" &&
+               row.from_node == 0 && row.to_node == 1;
+      });
+
+  checks.require(
+      fifo_first_request && fifo_duplicate_dispatch &&
+          fifo_dispatches.size() >= 2U &&
+          fifo_dispatches[0]->runtime_bag_id == kA &&
+          fifo_dispatches[1]->runtime_bag_id == kA &&
+          fifo_dispatches[1]->selected_edge_count == 0 &&
+          fifo_a_before.pending_merge_request_id != 0 &&
+          fifo_a_after.pending_merge_request_id ==
+              fifo_a_before.pending_merge_request_id &&
+          fifo_a_after.pending_merge_lineage ==
+              fifo_a_before.pending_merge_lineage &&
+          fifo_b_before.pending_merge_request_id == 0 &&
+          fifo_b_after.pending_merge_request_id == 0,
+      "V3R22 historical FIFO must reselect the represented owner and publish no second request");
+  checks.require(
+      active_first_request && active_second_request &&
+          active_dispatches.size() >= 2U &&
+          active_dispatches[0]->runtime_bag_id == kA &&
+          active_dispatches[1]->runtime_bag_id == kB &&
+          active_dispatches[1]->selected_edge_count == 0 &&
+          active_a_before.pending_merge_request_id != 0 &&
+          active_a_after.pending_merge_request_id ==
+              active_a_before.pending_merge_request_id &&
+          active_a_after.pending_merge_lineage ==
+              active_a_before.pending_merge_lineage &&
+          active_b_before.pending_merge_request_id == 0 &&
+          active_b_after.pending_merge_request_id != 0 &&
+          active_a_after.status == "JUNCTION_QUEUE" &&
+          active_b_after.status == "JUNCTION_QUEUE" &&
+          !b_entered_merge_edge,
+      "V3R22 must publish B's request without cancelling A or bypassing M3 into an edge commit");
+  checks.require(
+      calendar_before.service_reservation_count ==
+              calendar_after.service_reservation_count &&
+          calendar_before.service_next_available ==
+              calendar_after.service_next_available &&
+          calendar_generation_before == calendar_generation_after &&
+          active_boundary.has_value() &&
+          active_boundary->pending_merge_request_count == 2 &&
+          active_boundary->active_merge_capability_count == 0 &&
+          !active_a_after.junction_wakeup_pending &&
+          !active_b_after.junction_wakeup_pending &&
+          active_runtime.test_choose_junction_bag_at_node(0) == kA,
+      "V3R22 all-pending fallback must retain FIFO with the calendar, generation, and JIT authority unchanged");
+  const auto fifo_a_outcome = fifo_runtime.g4irsf15_causal_bag_outcome(kA);
+  const auto fifo_b_outcome = fifo_runtime.g4irsf15_causal_bag_outcome(kB);
+  const auto active_a_outcome = active_runtime.g4irsf15_causal_bag_outcome(kA);
+  const auto active_b_outcome = active_runtime.g4irsf15_causal_bag_outcome(kB);
+  checks.require(
+      fifo_a_outcome.admitted_time == active_a_outcome.admitted_time &&
+          fifo_b_outcome.admitted_time == active_b_outcome.admitted_time &&
+          active_a_outcome.admitted_time < active_b_outcome.admitted_time,
+      "V3R22 junction-only spelling must leave source FIFO admission exact");
+
+  fifo_runtime.drain();
+  active_runtime.drain();
+  const auto fifo_result = fifo_runtime.finalize();
+  const auto active_result = active_runtime.finalize();
+  checks.require(
+      fifo_result.summary.completed_count == 3 &&
+          active_result.summary.completed_count == 3 &&
+          fifo_result.summary.failed_count == 0 &&
+          active_result.summary.failed_count == 0 &&
+          active_result.summary.merge_grant_conservation_holds &&
+          active_result.summary.merge_grant_active_bijection_holds &&
+          active_result.summary.runtime_full_astar_calls == 0 &&
+          active_result.summary.global_reservation_scan_count == 0 &&
+          active_result.summary.scorer_future_route_input_count == 0 &&
+          active_result.summary.scorer_future_schedule_input_count == 0 &&
+          active_result.summary.max_edges_selected_per_arrive <= 1 &&
+          active_result.summary.max_edges_selected_per_bag_per_decision <= 1,
+      "V3R22 motif must drain through unchanged M3 while retaining the bounded one-hop boundary");
+}
+
+void test_v3r2_j2_unique_and_rollbacks(Checks& checks) {
+  const auto graph = v3r2_slot_pair_graph(true);
+  auto config = v3r2_shadow_config();
+  config.storage_source_nodes = {0, 4};
+  EventDrivenJunctionRuntime runtime(graph, config);
+  const auto result = runtime.run(v3r2_slot_pair_requests());
+  const auto j2 = std::find_if(
+      result.source_aware_destination_service_shadow.begin(),
+      result.source_aware_destination_service_shadow.end(),
+      [](const auto& row) { return row.seam_kind_code == 2U; });
+  const bool j2_valid =
+      j2 != result.source_aware_destination_service_shadow.end() &&
+      j2->external_path_code == 2U && j2->has_j2_identity &&
+      !j2->has_direct_episode_identity &&
+      j2->external_direct_episode_event_seq == 0 &&
+      j2->external_request_id != 0 && j2->external_request_lineage != 0 &&
+      j2->local_guards_passed && j2->local_task_id == 32032002 &&
+      j2->local_runtime_bag_id == 1 && j2->local_choose_bag_index == 0 &&
+      j2->local_escape_token_runtime_bag_id == -1 &&
+      v3r4_local_telemetry_is_exact(*j2) &&
+      j2->local_source_ready_count == 1 &&
+      j2->destination_pending_count >= 1 &&
+      std::abs(j2->oldest_local_wait_age_seconds -
+               (j2->event_time - j2->local_source_enqueued_at)) <
+          1.0e-12 &&
+      std::abs(j2->local_release) < 1.0e-12 &&
+      std::abs(j2->local_deadline - 100.0) < 1.0e-12 &&
+      std::abs(j2->local_source_enqueued_at) < 1.0e-12 &&
+      std::abs(j2->L0 - 1.0) < 1.0e-12 &&
+      std::abs(j2->L1 - 2.0) < 1.0e-12 && j2->X_insert > 0.0;
+  checks.require(j2_valid, "V3R2 J2 must publish a real exact-request row");
+  v3r2_proof.j2_unique_publish = j2_valid;
+  int duplicates = 0;
+  if (j2 != result.source_aware_destination_service_shadow.end()) {
+    duplicates = static_cast<int>(std::count_if(
+        result.source_aware_destination_service_shadow.begin(),
+        result.source_aware_destination_service_shadow.end(),
+        [&](const auto& row) {
+          return row.external_runtime_bag_id == j2->external_runtime_bag_id &&
+                 row.node == j2->node &&
+                 std::abs(row.external_slot_start_seconds -
+                          j2->external_slot_start_seconds) < 1.0e-12 &&
+                 std::abs(row.external_slot_end_seconds -
+                          j2->external_slot_end_seconds) < 1.0e-12;
+        }));
+  }
+  const bool no_duplicate = duplicates == 1;
+  checks.require(no_duplicate, "V3R2 J2 authority must suppress DIRECT duplicate");
+  v3r2_proof.j2_direct_duplicate_suppressed = no_duplicate;
+
+  auto j2_failure = config;
+  j2_failure.test_merge_grant_fail_after_calendar_prepare = true;
+  EventDrivenJunctionRuntime failed_j2_runtime(graph, j2_failure);
+  failed_j2_runtime.initialize(v3r2_slot_pair_requests());
+  bool j2_injected = false;
+  try {
+    while (failed_j2_runtime.process_one_event()) {
+    }
+  } catch (const std::logic_error& error) {
+    j2_injected = std::string(error.what()) ==
+                  "G4IRSF32 V3R2 injected J2 failure after staging";
+  }
+  const auto& failed_j2 = failed_j2_runtime.current_result();
+  const bool j2_commit_published = std::any_of(
+      failed_j2.events.begin(), failed_j2.events.end(), [](const auto& row) {
+        return row.runtime_bag_id == 2 && row.event == "EDGE_ENTER" &&
+               row.from_node == 0 && row.to_node == 1;
+      });
+  const bool j2_exact =
+      j2_injected && !j2_commit_published &&
+      failed_j2.source_aware_destination_service_shadow.empty() &&
+      failed_j2.source_aware_destination_service_shadow.capacity() == 0 &&
+      v3r2_census_is_zero(failed_j2.summary) &&
+      v3r2_resource_fields_are_zero(failed_j2.summary);
+  checks.require(
+      j2_exact,
+      "V3R2 J2 staged failure must restore row, capacity, resources, census, and commit");
+
+  auto j2_rejection = config;
+  j2_rejection.test_merge_grant_flip_advertised_generation_before_commit =
+      true;
+  EventDrivenJunctionRuntime rejected_j2_runtime(graph, j2_rejection);
+  rejected_j2_runtime.initialize(v3r2_slot_pair_requests());
+  bool saw_post_stage_rejection = false;
+  for (int step = 0;
+       step < 10000 && !saw_post_stage_rejection &&
+       rejected_j2_runtime.process_one_event();
+       ++step) {
+    const auto& decisions =
+        rejected_j2_runtime.current_result().hold_attempts;
+    saw_post_stage_rejection = std::any_of(
+        decisions.begin(), decisions.end(), [](const auto& row) {
+          return row.runtime_bag_id == 2 &&
+                 row.rule_reason == "fault_generation_changed";
+        });
+  }
+  const auto& rejected_j2 = rejected_j2_runtime.current_result();
+  const bool j2_rejection_exact =
+      saw_post_stage_rejection &&
+      rejected_j2.source_aware_destination_service_shadow.empty() &&
+      rejected_j2.source_aware_destination_service_shadow.capacity() == 0 &&
+      v3r2_census_is_zero(rejected_j2.summary) &&
+      v3r2_resource_fields_are_zero(rejected_j2.summary);
+  checks.require(
+      j2_rejection_exact,
+      "V3R2 J2 post-stage recheck rejection must restore sidecar and census "
+      "saw=" + std::to_string(saw_post_stage_rejection) +
+          " size=" + std::to_string(
+              rejected_j2.source_aware_destination_service_shadow.size()) +
+          " capacity=" + std::to_string(
+              rejected_j2.source_aware_destination_service_shadow.capacity()) +
+          " considered=" + std::to_string(
+              rejected_j2.summary
+                  .source_aware_destination_service_external_commit_considered_count));
+  v3r2_proof.j2_after_stage_rollback_exact =
+      j2_exact && j2_rejection_exact;
+}
+
+void test_v3r2_direct_rollback_and_trace_limit(Checks& checks) {
+  const auto graph = v3r2_slot_pair_graph(false);
+  auto fail_config = v3r2_shadow_config();
+  fail_config.test_source_aware_destination_service_fail_direct_after_stage =
+      true;
+  fail_config.test_verify_pibt_rollback_logical_state = true;
+  EventDrivenJunctionRuntime failed_runtime(graph, fail_config);
+  failed_runtime.initialize(v3r2_slot_pair_requests());
+  bool injected = false;
+  try {
+    while (failed_runtime.process_one_event()) {
+    }
+  } catch (const std::logic_error& error) {
+    injected = std::string(error.what()) ==
+               "G4IRSF32 V3R2 injected DIRECT failure after staging";
+  }
+  const auto& failed = failed_runtime.current_result();
+  const bool external_enter_published = std::any_of(
+      failed.events.begin(), failed.events.end(), [](const auto& row) {
+        return row.runtime_bag_id == 2 && row.event == "EDGE_ENTER" &&
+               row.from_node == 0 && row.to_node == 1;
+      });
+  const bool direct_exact =
+      injected && !external_enter_published &&
+      failed.source_aware_destination_service_shadow.empty() &&
+      failed.source_aware_destination_service_shadow.capacity() == 0 &&
+      v3r2_census_is_zero(failed.summary) &&
+      v3r2_resource_fields_are_zero(failed.summary);
+  checks.require(
+      direct_exact,
+      "V3R2 DIRECT staged exception must restore row, capacity, resources, census, and publication");
+
+  auto pibt_failure = v3r2_shadow_config();
+  pibt_failure.local_queue_capacity = 1;
+  pibt_failure.event_semantics =
+      "E3_batch_source_and_junction_same_timestamp";
+  pibt_failure.merge_grant_rule = "M1";
+  pibt_failure.merge_grant_timing_mode = "eager";
+  pibt_failure.merge_grant_max_pending_requests = 64;
+  pibt_failure.merge_grant_lifecycle_limit = 1024;
+  pibt_failure.test_pibt_fail_after_commit_before_publication = true;
+  pibt_failure.test_verify_pibt_rollback_logical_state = true;
+  EventDrivenJunctionRuntime failed_pibt_runtime(graph, pibt_failure);
+  auto pibt_requests = v3r2_slot_pair_requests();
+  pibt_requests[2].release_time = 0.749;
+  failed_pibt_runtime.initialize(pibt_requests);
+  for (int step = 0;
+       step < 10000 &&
+       failed_pibt_runtime.current_result().summary
+               .bounded_local_pibt_post_commit_failure_injection_count == 0 &&
+       failed_pibt_runtime.process_one_event();
+       ++step) {
+  }
+  const auto& failed_pibt = failed_pibt_runtime.current_result();
+  const bool pibt_publish_rollback_exact =
+      failed_pibt.summary
+              .bounded_local_pibt_post_commit_failure_injection_count == 1 &&
+      failed_pibt.summary
+              .bounded_local_pibt_rollback_fingerprint_match_count == 1 &&
+      failed_pibt.source_aware_destination_service_shadow.empty() &&
+      failed_pibt.source_aware_destination_service_shadow.capacity() > 0 &&
+      failed_pibt.source_aware_destination_service_shadow.capacity() <=
+          static_cast<std::size_t>(
+              pibt_failure.source_aware_destination_service_trace_limit) &&
+      v3r2_census_is_zero(failed_pibt.summary) &&
+      v3r2_resource_fields_are_zero(failed_pibt.summary);
+  checks.require(
+      pibt_publish_rollback_exact,
+      "V3R2 PIBT post-commit injection must retain only bounded preflight "
+      "capacity and precede DIRECT sidecar publication "
+      "injected=" + std::to_string(
+          failed_pibt.summary
+              .bounded_local_pibt_post_commit_failure_injection_count) +
+          " rollback=" + std::to_string(
+              failed_pibt.summary
+                  .bounded_local_pibt_rollback_fingerprint_match_count) +
+          " rows=" + std::to_string(
+              failed_pibt.source_aware_destination_service_shadow.size()) +
+          " capacity=" + std::to_string(
+              failed_pibt.source_aware_destination_service_shadow.capacity()) +
+          " considered=" + std::to_string(
+              failed_pibt.summary
+                  .source_aware_destination_service_external_commit_considered_count));
+  v3r2_proof.direct_after_stage_rollback_exact =
+      direct_exact && pibt_publish_rollback_exact;
+
+  auto bounded = v3r2_shadow_config();
+  bounded.source_aware_destination_service_trace_limit = 1;
+  std::vector<EventRuntimeBagRequest> requests = {
+      {"v3r2-local-a", 32032101, 0.0, 100.0, 1, 3, "local"},
+      {"v3r2-local-b", 32032102, 0.0, 100.0, 1, 3, "local"},
+      {"v3r2-local-c", 32032103, 0.0, 100.0, 1, 3, "local"},
+      {"v3r2-external-a", 32032104, 0.699, 100.0, 0, 3, "external"},
+      {"v3r2-external-b", 32032105, 0.700, 100.0, 0, 3, "external"},
+  };
+  EventDrivenJunctionRuntime bounded_runtime(graph, bounded);
+  bounded_runtime.initialize(requests);
+  bool exhausted = false;
+  try {
+    while (bounded_runtime.process_one_event()) {
+    }
+  } catch (const std::runtime_error& error) {
+    exhausted = std::string(error.what()) ==
+                "G4IRSF32 V3R2 shadow trace limit exhausted before commit";
+  }
+  const auto& bounded_result = bounded_runtime.current_result();
+  const std::uint64_t partition_total =
+      bounded_result.summary.source_aware_destination_service_no_local_count +
+      bounded_result.summary
+          .source_aware_destination_service_local_guard_fail_count +
+      bounded_result.summary.source_aware_destination_service_non_overlap_count +
+      bounded_result.summary
+          .source_aware_destination_service_observation_stored_count;
+  const bool second_external_commit_published = std::any_of(
+      bounded_result.events.begin(),
+      bounded_result.events.end(),
+      [](const auto& row) {
+        return row.runtime_bag_id == 4 && row.event == "EDGE_ENTER" &&
+               row.from_node == 0 && row.to_node == 1;
+      });
+  const bool trace_exact =
+      exhausted &&
+      bounded_result.source_aware_destination_service_shadow.size() == 1 &&
+      bounded_result.source_aware_destination_service_shadow.capacity() == 1 &&
+      bounded_result.summary
+              .source_aware_destination_service_external_commit_considered_count ==
+          partition_total &&
+      bounded_result.summary
+              .source_aware_destination_service_observation_stored_count == 1 &&
+      bounded_result.summary
+              .source_aware_destination_service_observation_dropped_count == 0 &&
+      bounded_result.summary
+              .source_aware_destination_service_staged_rollback_count == 0 &&
+      !second_external_commit_published;
+  checks.require(trace_exact, "V3R2 trace exhaustion must fail before commit");
+  v3r2_proof.trace_limit_fail_before_commit = trace_exact;
+}
+
 }  // namespace
 
 int main() {
@@ -1389,9 +2976,52 @@ int main() {
     test_s4_local_descent_guard_uses_surviving_fault_potential(checks);
     test_goal_arrival_completion_is_exact_off_and_skips_busy_goal_service(
         checks);
+    test_v3r2_pure_helper_and_storage_roles(checks);
+    test_v3r2_direct_and_action_inert(checks);
+    test_v3r13_candidate_a_closed_loop(checks);
+    test_v3r15_candidate_a_commit_recheck(checks);
+    test_v3r14_uncovered_local_work_helper(checks);
+    test_v3r14_candidate_b_score_and_ranking(checks);
+    test_v3r16_s4_plus_uncovered_local_work(checks);
+    test_v3r17_typed_service_dominance(checks);
+    test_v3r20_service_aware_static_dominance(checks);
+    test_v3r18_source_release_tie(checks);
+    test_v3r22_pending_request_hol_bypass(checks);
+    test_v3r2_j2_unique_and_rollbacks(checks);
+    test_v3r2_direct_rollback_and_trace_limit(checks);
   } catch (const std::exception& error) {
     ++checks.failures;
     std::cerr << "FAIL: canonical map2 test setup/runtime exception: " << error.what() << '\n';
+  }
+  const bool proof_complete =
+      v3r2_proof.pure_calendar_helper &&
+      v3r2_proof.generic_storage_role_validation &&
+      v3r2_proof.direct_unique_publish &&
+      v3r2_proof.j2_unique_publish &&
+      v3r2_proof.j2_direct_duplicate_suppressed &&
+      v3r2_proof.direct_after_stage_rollback_exact &&
+      v3r2_proof.j2_after_stage_rollback_exact &&
+      v3r2_proof.trace_limit_fail_before_commit &&
+      v3r2_proof.action_inert_invariants;
+  if (checks.failures == 0 && !proof_complete) {
+    ++checks.failures;
+    std::cerr << "FAIL: V3R2 native proof is incomplete\n";
+  }
+  if (checks.failures == 0) {
+    std::cout
+        << "G4IRSF32_V3R2_NATIVE_PROOF_JSON="
+           "{\"action_inert_invariants\":true,"
+           "\"build_head\":\"" CZR005_G4IRSF32_BUILD_HEAD "\","
+           "\"direct_after_stage_rollback_exact\":true,"
+           "\"direct_unique_publish\":true,"
+           "\"generic_storage_role_validation\":true,"
+           "\"j2_after_stage_rollback_exact\":true,"
+           "\"j2_direct_duplicate_suppressed\":true,"
+           "\"j2_unique_publish\":true,"
+           "\"pure_calendar_helper\":true,"
+           "\"schema_id\":\"czr005.g4irsf32.native_proof.v3r2\","
+           "\"test_id\":\"g4irsf32_v3r2_focused_native\","
+           "\"trace_limit_fail_before_commit\":true}\n";
   }
   return checks.failures == 0 ? 0 : 1;
 }

@@ -1,0 +1,4146 @@
+{
+  "schema": "czr005.g4irsf32.v3r14.candidate_b_screen.v1",
+  "protocol_id": "G4IRSF32_V3R14_CANDIDATE_B_UNCOVERED_WORK_20260829",
+  "preregistration": "outputs/tables/g4irsf32_v3r13_stage2_preregistered_cases.json",
+  "binary": "C:\\PROGRAMING\\czr005\\.g4irsf32_v3r2_clean_worktree\\build_g32_v3r14\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+  "status": "NO_GO_V3R14_CANDIDATE_B",
+  "pass": false,
+  "core_screen_pass": false,
+  "measurement_only_support_required": false,
+  "formal_measurement_pass": null,
+  "stage3_authorized": false,
+  "semantic_case_count": 10,
+  "execution_count": 30,
+  "arms": [
+    "off",
+    "candidate_a",
+    "candidate_a_b"
+  ],
+  "primary_comparison": "candidate_a_b/off",
+  "attribution_only_comparison": "candidate_a_b/candidate_a",
+  "thresholds": {
+    "resource_ratio_max": 1.1,
+    "nanning_target_p95_reduction_min": 0.02,
+    "nanning_whole_mean_regression_max": 0.005,
+    "nanning_whole_p95_p99_regression_max": 0.01,
+    "map2_mean_p95_p99_regression_max": 0.005,
+    "peak_rss_core_gate": false,
+    "full_mixed_origin_integral_core_gate": false
+  },
+  "gates": {
+    "exact_ten_preregistered_semantic_cases": true,
+    "exact_thirty_fixed_arm_executions": true,
+    "all_nanning_core_gates": false,
+    "all_map2_core_gates": false
+  },
+  "cases": [
+    {
+      "case_id": "g4irsf32_s2_nanning_1x_stable_2p5",
+      "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+      "scale": 1,
+      "role": "NANNING_STABLE_TARGET",
+      "fault_scenario": null,
+      "fault_edges": [],
+      "population": {
+        "raw_task_count": 540,
+        "segment_count": 998,
+        "runtime_reachable_segment_count": 998,
+        "source_rejected_segment_count": 0,
+        "fault_reachable_raw_task_count": 540,
+        "fault_reachable_target_segment_count": 189,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 424.2306486111079,
+            "p95_seconds": 649.813720500004,
+            "p99_seconds": 703.6371511000073
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 337.9106373015864,
+              "p95_seconds": 493.80400000000225,
+              "p99_seconds": 522.7793200000053
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 396.14401999998154,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 396.14401999998154,
+            "local_network_time_seconds": 10467.875229999881,
+            "local_total_latency_seconds": 10864.019249999863,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3078.8940199999815,
+            "target_network_time_seconds": 60786.21642999991,
+            "target_total_latency_seconds": 63865.11044999989
+          },
+          "resources": {
+            "events_per_completed_segment": 149.84168336673346,
+            "wall_seconds": 1.000730499974452,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 140,
+              "merge_grant_stale_arbitration_count": 362,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 424.1417426851817,
+            "p95_seconds": 650.2925520000023,
+            "p99_seconds": 696.6752454999928
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 337.61964121692984,
+              "p95_seconds": 493.80400000000225,
+              "p99_seconds": 523.2177360000037
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 386.14401999998154,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 386.14401999998154,
+            "local_network_time_seconds": 10416.382369999792,
+            "local_total_latency_seconds": 10802.526389999774,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3068.8940199999815,
+            "target_network_time_seconds": 60741.218169999804,
+            "target_total_latency_seconds": 63810.11218999978
+          },
+          "resources": {
+            "events_per_completed_segment": 149.7695390781563,
+            "wall_seconds": 0.9997387999901548,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 140,
+              "merge_grant_stale_arbitration_count": 364,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 2,
+            "calendar_mutation_count": 2,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 421.68678431481175,
+            "p95_seconds": 644.8522864999909,
+            "p99_seconds": 691.5863547999948
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 334.621411746031,
+              "p95_seconds": 486.93086000000324,
+              "p99_seconds": 520.0978336000036
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 386.14401999998154,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 386.14401999998154,
+            "local_network_time_seconds": 10268.283039999904,
+            "local_total_latency_seconds": 10654.427059999885,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3068.8940199999815,
+            "target_network_time_seconds": 60174.552799999925,
+            "target_total_latency_seconds": 63243.4468199999
+          },
+          "resources": {
+            "events_per_completed_segment": 142.41082164328657,
+            "wall_seconds": 0.9737771999789402,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 138,
+              "merge_grant_stale_arbitration_count": 275,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 2,
+            "calendar_mutation_count": 2,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 0.9747566554204189,
+            "target_p95": 0.9860812387100976,
+            "whole_mean": 0.9940035820027985,
+            "whole_p95": 0.9923648365008428,
+            "whole_p99": 0.9828735644768425
+          },
+          "source_wait_reduced": true,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9504085808669136,
+          "wall_seconds": 0.9730663750168503,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 1.0,
+            "target_p95": 0.9860812387100976,
+            "whole_mean": 0.9942119387853032,
+            "whole_p95": 0.9916341260817464,
+            "whole_p99": 0.9926954621498776
+          },
+          "source_wait_reduced": false,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.950866394594233,
+          "wall_seconds": 0.9740316170469023,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "local_start49_source_wait_area_proxy": 0.9747566554204189,
+        "target_p95": 0.9860812387100976,
+        "whole_mean": 0.9940035820027985,
+        "whole_p95": 0.9923648365008428,
+        "whole_p99": 0.9828735644768425
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 0.9504085808669136,
+        "wall_seconds": 0.9730663750168503,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.0,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": -2,
+          "merge_grant_stale_arbitration_count": -87,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": true,
+        "core_resources_within_1p10": true,
+        "nanning_target_p95_improves_2pct": false,
+        "nanning_whole_mean_regression_at_most_0p5pct": true,
+        "nanning_whole_p95_regression_at_most_1pct": true,
+        "nanning_whole_p99_regression_at_most_1pct": true,
+        "nanning_no_source_to_network_unchanged_total_transfer": true
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_nanning_1x_fault_source_chain_active_single_1",
+      "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+      "scale": 1,
+      "role": "NANNING_SOURCE_CHAIN_ACTIVE_FAULT",
+      "fault_scenario": "single_1",
+      "fault_edges": [
+        [
+          50,
+          25
+        ]
+      ],
+      "population": {
+        "raw_task_count": 540,
+        "segment_count": 998,
+        "runtime_reachable_segment_count": 998,
+        "source_rejected_segment_count": 0,
+        "fault_reachable_raw_task_count": 540,
+        "fault_reachable_target_segment_count": 189,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 502.8734551851806,
+            "p95_seconds": 788.4999814999959,
+            "p99_seconds": 885.381496299989
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 389.02634878306844,
+              "p95_seconds": 574.770030000001,
+              "p99_seconds": 590.3108300000016
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 396.14401999998154,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 396.14401999998154,
+            "local_network_time_seconds": 10571.8253,
+            "local_total_latency_seconds": 10967.969319999982,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3078.8940199999815,
+            "target_network_time_seconds": 70447.08589999992,
+            "target_total_latency_seconds": 73525.97991999993
+          },
+          "resources": {
+            "events_per_completed_segment": 194.97995991983967,
+            "wall_seconds": 1.3369975000387058,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 214,
+              "merge_grant_stale_arbitration_count": 660,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 502.75049968518056,
+            "p95_seconds": 791.2101085000069,
+            "p99_seconds": 886.6060903999858
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 389.03752338624304,
+              "p95_seconds": 574.770030000001,
+              "p99_seconds": 592.3940300000029
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 386.14401999998154,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 386.14401999998154,
+            "local_network_time_seconds": 10569.817299999999,
+            "local_total_latency_seconds": 10955.96131999998,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3068.8940199999815,
+            "target_network_time_seconds": 70459.19789999991,
+            "target_total_latency_seconds": 73528.09191999992
+          },
+          "resources": {
+            "events_per_completed_segment": 194.93286573146293,
+            "wall_seconds": 1.3211714999051765,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 214,
+              "merge_grant_stale_arbitration_count": 663,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 2,
+            "calendar_mutation_count": 2,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 498.0385272036991,
+            "p95_seconds": 784.7976704999911,
+            "p99_seconds": 865.4243825999947
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 385.66173931216855,
+              "p95_seconds": 568.0409999999996,
+              "p99_seconds": 584.1940300000008
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 386.14401999998154,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 386.14401999998154,
+            "local_network_time_seconds": 10487.80037999999,
+            "local_total_latency_seconds": 10873.944399999971,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3068.8940199999815,
+            "target_network_time_seconds": 69821.1747099999,
+            "target_total_latency_seconds": 72890.06872999991
+          },
+          "resources": {
+            "events_per_completed_segment": 184.12625250501003,
+            "wall_seconds": 1.2908339999848977,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 208,
+              "merge_grant_stale_arbitration_count": 465,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 2,
+            "calendar_mutation_count": 2,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 0.9747566554204189,
+            "target_p95": 0.9882926568039718,
+            "whole_mean": 0.9903853982913037,
+            "whole_p95": 0.9953046149817762,
+            "whole_p99": 0.9774593056401166
+          },
+          "source_wait_reduced": true,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9443342412251401,
+          "wall_seconds": 0.965472261502006,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 1.0,
+            "target_p95": 0.9882926568039718,
+            "whole_mean": 0.9906276125345832,
+            "whole_p95": 0.9918954043545114,
+            "whole_p99": 0.9761092236683879
+          },
+          "source_wait_reduced": false,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9445623846656009,
+          "wall_seconds": 0.9770374247987819,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "local_start49_source_wait_area_proxy": 0.9747566554204189,
+        "target_p95": 0.9882926568039718,
+        "whole_mean": 0.9903853982913037,
+        "whole_p95": 0.9953046149817762,
+        "whole_p99": 0.9774593056401166
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 0.9443342412251401,
+        "wall_seconds": 0.965472261502006,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.0,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": -6,
+          "merge_grant_stale_arbitration_count": -195,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": true,
+        "core_resources_within_1p10": true,
+        "nanning_target_p95_improves_2pct": false,
+        "nanning_whole_mean_regression_at_most_0p5pct": true,
+        "nanning_whole_p95_regression_at_most_1pct": true,
+        "nanning_whole_p99_regression_at_most_1pct": true,
+        "nanning_no_source_to_network_unchanged_total_transfer": true
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_nanning_1x_fault_source_chain_inactive_single_8",
+      "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+      "scale": 1,
+      "role": "NANNING_SOURCE_CHAIN_INACTIVE_FAULT",
+      "fault_scenario": "single_8",
+      "fault_edges": [
+        [
+          100,
+          102
+        ]
+      ],
+      "population": {
+        "raw_task_count": 540,
+        "segment_count": 998,
+        "runtime_reachable_segment_count": 977,
+        "source_rejected_segment_count": 21,
+        "fault_reachable_raw_task_count": 519,
+        "fault_reachable_target_segment_count": 189,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 977,
+          "completed_raw_bag_count": 519,
+          "whole_system_java_release_latency": {
+            "count": 519,
+            "mean_seconds": 422.07940491329197,
+            "p95_seconds": 653.7956659999963,
+            "p99_seconds": 705.4545701999954
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 338.146339259259,
+              "p95_seconds": 493.144000000001,
+              "p99_seconds": 522.7793200000053
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 404.4325399999798,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 404.4325399999798,
+            "local_network_time_seconds": 10502.31321999992,
+            "local_total_latency_seconds": 10906.7457599999,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3087.18253999998,
+            "target_network_time_seconds": 60822.47558,
+            "target_total_latency_seconds": 63909.658119999986
+          },
+          "resources": {
+            "events_per_completed_segment": 148.44831115660185,
+            "wall_seconds": 0.9712810000637546,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 132,
+              "merge_grant_stale_arbitration_count": 355,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 977,
+          "completed_raw_bag_count": 519,
+          "whole_system_java_release_latency": {
+            "count": 519,
+            "mean_seconds": 422.0304777263941,
+            "p95_seconds": 653.7956659999963,
+            "p99_seconds": 703.4869145999972
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 337.9151025925924,
+              "p95_seconds": 493.144000000001,
+              "p99_seconds": 523.2177360000037
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 392.92061999997895,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 392.92061999997895,
+            "local_network_time_seconds": 10457.221499999941,
+            "local_total_latency_seconds": 10850.14211999992,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3075.670619999979,
+            "target_network_time_seconds": 60790.28377000004,
+            "target_total_latency_seconds": 63865.954390000006
+          },
+          "resources": {
+            "events_per_completed_segment": 148.45957011258955,
+            "wall_seconds": 0.9902634000172839,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 132,
+              "merge_grant_stale_arbitration_count": 355,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 3,
+            "calendar_mutation_count": 3,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 977,
+          "completed_raw_bag_count": 519,
+          "whole_system_java_release_latency": {
+            "count": 519,
+            "mean_seconds": 419.4867421965285,
+            "p95_seconds": 646.7896750000021,
+            "p99_seconds": 693.6875475999932
+          },
+          "target": {
+            "preregistered_segment_count": 189,
+            "fault_reachable_segment_count": 189,
+            "completed_segment_count": 189,
+            "latency": {
+              "count": 189,
+              "mean_seconds": 334.62334835978766,
+              "p95_seconds": 486.93086000000324,
+              "p99_seconds": 520.0978336000036
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 42,
+            "local_start49_source_wait_area_proxy_bag_seconds": 386.14401999998154,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 386.14401999998154,
+            "local_network_time_seconds": 10268.649059999902,
+            "local_total_latency_seconds": 10654.793079999883,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3068.8940199999815,
+            "target_network_time_seconds": 60174.918819999926,
+            "target_total_latency_seconds": 63243.812839999904
+          },
+          "resources": {
+            "events_per_completed_segment": 140.92016376663256,
+            "wall_seconds": 0.9567250999389216,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 110.0,
+            "merge_grant_peak_pending_requests": 3.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 134,
+              "merge_grant_stale_arbitration_count": 271,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 2,
+            "calendar_mutation_count": 2,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 0.9547798008538108,
+            "target_p95": 0.9874009619908227,
+            "whole_mean": 0.9938574052972424,
+            "whole_p95": 0.9892841274968099,
+            "whole_p99": 0.9833199427758101
+          },
+          "source_wait_reduced": true,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9492877532164872,
+          "wall_seconds": 0.9850137085726195,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 0.982753259424263,
+            "target_p95": 0.9874009619908227,
+            "whole_mean": 0.993972625997133,
+            "whole_p95": 0.9892841274968099,
+            "whole_p99": 0.9860702924295671
+          },
+          "source_wait_reduced": true,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9492157606260128,
+          "wall_seconds": 0.966131940170891,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "local_start49_source_wait_area_proxy": 0.9547798008538108,
+        "target_p95": 0.9874009619908227,
+        "whole_mean": 0.9938574052972424,
+        "whole_p95": 0.9892841274968099,
+        "whole_p99": 0.9833199427758101
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 0.9492877532164872,
+        "wall_seconds": 0.9850137085726195,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.0,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": 2,
+          "merge_grant_stale_arbitration_count": -84,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": false,
+        "core_resources_within_1p10": true,
+        "nanning_target_p95_improves_2pct": false,
+        "nanning_whole_mean_regression_at_most_0p5pct": true,
+        "nanning_whole_p95_regression_at_most_1pct": true,
+        "nanning_whole_p99_regression_at_most_1pct": true,
+        "nanning_no_source_to_network_unchanged_total_transfer": true
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_map2_1x_stable_2p5",
+      "map_id": "protected_map2_54_nodes_69_edges",
+      "scale": 1,
+      "role": "MAP2_STABLE_STRUCTURAL_SENTINEL",
+      "fault_scenario": null,
+      "fault_edges": [],
+      "population": {
+        "raw_task_count": 540,
+        "segment_count": 998,
+        "runtime_reachable_segment_count": 998,
+        "source_rejected_segment_count": 0,
+        "fault_reachable_raw_task_count": 540,
+        "fault_reachable_target_segment_count": 0,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 248.27708492592157,
+            "p95_seconds": 321.16822399999944,
+            "p99_seconds": 350.14647679999496
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 83.47394789579158,
+            "wall_seconds": 0.4948276000795886,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 101.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 0,
+              "merge_grant_stale_arbitration_count": 118,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 248.27708492592157,
+            "p95_seconds": 321.16822399999944,
+            "p99_seconds": 350.14647679999496
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 83.47394789579158,
+            "wall_seconds": 0.4817594999913126,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 101.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 0,
+              "merge_grant_stale_arbitration_count": 118,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 248.91797309258826,
+            "p95_seconds": 326.1388744999951,
+            "p99_seconds": 350.14647679999496
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 83.58216432865731,
+            "wall_seconds": 0.48274689994286746,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 101.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 0,
+              "merge_grant_stale_arbitration_count": 121,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "mean": 1.002581342401607,
+            "p95": 1.0154767817254413,
+            "p99": 1.0
+          }
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 1.0012964096654542,
+          "wall_seconds": 0.9755860422200013,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "mean": 1.002581342401607,
+            "p95": 1.0154767817254413,
+            "p99": 1.0
+          }
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 1.0012964096654542,
+          "wall_seconds": 1.0020495702763985,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "mean": 1.002581342401607,
+        "p95": 1.0154767817254413,
+        "p99": 1.0
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 1.0012964096654542,
+        "wall_seconds": 0.9755860422200013,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.0,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": 0,
+          "merge_grant_stale_arbitration_count": 3,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": true,
+        "core_resources_within_1p10": true,
+        "map2_mean_regression_at_most_0p5pct": true,
+        "map2_p95_regression_at_most_0p5pct": false,
+        "map2_p99_regression_at_most_0p5pct": true
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_map2_1x_fault_sentinel_single_1",
+      "map_id": "protected_map2_54_nodes_69_edges",
+      "scale": 1,
+      "role": "MAP2_FAULT_STRUCTURAL_SENTINEL",
+      "fault_scenario": "single_1",
+      "fault_edges": [
+        [
+          6,
+          12
+        ]
+      ],
+      "population": {
+        "raw_task_count": 540,
+        "segment_count": 998,
+        "runtime_reachable_segment_count": 998,
+        "source_rejected_segment_count": 0,
+        "fault_reachable_raw_task_count": 540,
+        "fault_reachable_target_segment_count": 0,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 248.21483912962532,
+            "p95_seconds": 320.7571884999932,
+            "p99_seconds": 350.14647679999496
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 83.70841683366733,
+            "wall_seconds": 0.4905352999921888,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 101.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 0,
+              "merge_grant_stale_arbitration_count": 113,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 248.21483912962532,
+            "p95_seconds": 320.7571884999932,
+            "p99_seconds": 350.14647679999496
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 83.70841683366733,
+            "wall_seconds": 0.48650809994433075,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 101.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 0,
+              "merge_grant_stale_arbitration_count": 113,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 998,
+          "completed_raw_bag_count": 540,
+          "whole_system_java_release_latency": {
+            "count": 540,
+            "mean_seconds": 248.62145401851427,
+            "p95_seconds": 323.86975249999466,
+            "p99_seconds": 350.14647679999496
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 83.7625250501002,
+            "wall_seconds": 0.47995409998111427,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 101.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 0,
+              "merge_grant_stale_arbitration_count": 116,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "mean": 1.0016381570510238,
+            "p95": 1.0097038012290767,
+            "p99": 1.0
+          }
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 1.0006463891981183,
+          "wall_seconds": 0.978429279174724,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "mean": 1.0016381570510238,
+            "p95": 1.0097038012290767,
+            "p99": 1.0
+          }
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 1.0006463891981183,
+          "wall_seconds": 0.9865284874723228,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "mean": 1.0016381570510238,
+        "p95": 1.0097038012290767,
+        "p99": 1.0
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 1.0006463891981183,
+        "wall_seconds": 0.978429279174724,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.0,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": 0,
+          "merge_grant_stale_arbitration_count": 3,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": true,
+        "core_resources_within_1p10": true,
+        "map2_mean_regression_at_most_0p5pct": true,
+        "map2_p95_regression_at_most_0p5pct": false,
+        "map2_p99_regression_at_most_0p5pct": true
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_nanning_2x_stable_2p5",
+      "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+      "scale": 2,
+      "role": "NANNING_STABLE_TARGET",
+      "fault_scenario": null,
+      "fault_edges": [],
+      "population": {
+        "raw_task_count": 877,
+        "segment_count": 1599,
+        "runtime_reachable_segment_count": 1599,
+        "source_rejected_segment_count": 0,
+        "fault_reachable_raw_task_count": 877,
+        "fault_reachable_target_segment_count": 218,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 567.714592326108,
+            "p95_seconds": 1077.3516559999885,
+            "p99_seconds": 1160.4445687999887
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 371.6286927522936,
+              "p95_seconds": 511.6244500000031,
+              "p99_seconds": 525.9422700000038
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 561.8851299999842,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 561.8851299999842,
+            "local_network_time_seconds": 22572.490469999862,
+            "local_total_latency_seconds": 23134.375599999847,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3244.635129999984,
+            "target_network_time_seconds": 77770.41989000006,
+            "target_total_latency_seconds": 81015.05502000004
+          },
+          "resources": {
+            "events_per_completed_segment": 158.27642276422765,
+            "wall_seconds": 1.8431197000900283,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 218.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 512,
+              "merge_grant_stale_arbitration_count": 899,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 568.5863268757091,
+            "p95_seconds": 1081.5930399999909,
+            "p99_seconds": 1163.5925687999897
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 371.2451698165139,
+              "p95_seconds": 511.6244500000031,
+              "p99_seconds": 527.9847700000038
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 554.7125899999846,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 554.7125899999846,
+            "local_network_time_seconds": 22486.8790099999,
+            "local_total_latency_seconds": 23041.591599999883,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3237.4625899999846,
+            "target_network_time_seconds": 77693.98443000011,
+            "target_total_latency_seconds": 80931.44702000011
+          },
+          "resources": {
+            "events_per_completed_segment": 158.2995622263915,
+            "wall_seconds": 1.7701340999919921,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 218.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 512,
+              "merge_grant_stale_arbitration_count": 897,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 5,
+            "calendar_mutation_count": 5,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 566.3033319612277,
+            "p95_seconds": 1083.5486539999904,
+            "p99_seconds": 1158.1476263999916
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 367.2027217431194,
+              "p95_seconds": 506.29017000000186,
+              "p99_seconds": 524.1592300000058
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 554.7125899999846,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 554.7125899999846,
+            "local_network_time_seconds": 22213.280069999895,
+            "local_total_latency_seconds": 22767.99265999988,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3237.4625899999846,
+            "target_network_time_seconds": 76812.73075000006,
+            "target_total_latency_seconds": 80050.19334000007
+          },
+          "resources": {
+            "events_per_completed_segment": 147.98749218261415,
+            "wall_seconds": 1.830985700013116,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 221.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 506,
+              "merge_grant_stale_arbitration_count": 673,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 5,
+            "calendar_mutation_count": 5,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 0.9872348641794457,
+            "target_p95": 0.9895738368250361,
+            "whole_mean": 0.997514137589633,
+            "whole_p95": 1.0057520661573123,
+            "whole_p99": 0.9980206358306521
+          },
+          "source_wait_reduced": true,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9349939150637734,
+          "wall_seconds": 0.9934165968296472,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0137614678899083,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 1.0,
+            "target_p95": 0.9895738368250361,
+            "whole_mean": 0.9959847875220179,
+            "whole_p95": 1.0018080867088415,
+            "whole_p99": 0.9953205765093417
+          },
+          "source_wait_reduced": false,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9348572421885186,
+          "wall_seconds": 1.0343768305584302,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0137614678899083,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "local_start49_source_wait_area_proxy": 0.9872348641794457,
+        "target_p95": 0.9895738368250361,
+        "whole_mean": 0.997514137589633,
+        "whole_p95": 1.0057520661573123,
+        "whole_p99": 0.9980206358306521
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 0.9349939150637734,
+        "wall_seconds": 0.9934165968296472,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.0137614678899083,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": -6,
+          "merge_grant_stale_arbitration_count": -226,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": true,
+        "core_resources_within_1p10": true,
+        "nanning_target_p95_improves_2pct": false,
+        "nanning_whole_mean_regression_at_most_0p5pct": true,
+        "nanning_whole_p95_regression_at_most_1pct": true,
+        "nanning_whole_p99_regression_at_most_1pct": true,
+        "nanning_no_source_to_network_unchanged_total_transfer": true
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_nanning_2x_fault_source_chain_active_single_1",
+      "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+      "scale": 2,
+      "role": "NANNING_SOURCE_CHAIN_ACTIVE_FAULT",
+      "fault_scenario": "single_1",
+      "fault_edges": [
+        [
+          50,
+          25
+        ]
+      ],
+      "population": {
+        "raw_task_count": 877,
+        "segment_count": 1599,
+        "runtime_reachable_segment_count": 1599,
+        "source_rejected_segment_count": 0,
+        "fault_reachable_raw_task_count": 877,
+        "fault_reachable_target_segment_count": 218,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 668.228697822117,
+            "p95_seconds": 1288.3230419999936,
+            "p99_seconds": 1354.1117499999953
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 451.98307899082545,
+              "p95_seconds": 654.2959999999999,
+              "p99_seconds": 673.3760000000011
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 561.8851299999842,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 561.8851299999842,
+            "local_network_time_seconds": 24852.150650000065,
+            "local_total_latency_seconds": 25414.03578000005,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3244.635129999984,
+            "target_network_time_seconds": 95287.67609000008,
+            "target_total_latency_seconds": 98532.31122
+          },
+          "resources": {
+            "events_per_completed_segment": 203.9612257661038,
+            "wall_seconds": 2.2944824000587687,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 221.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 576,
+              "merge_grant_stale_arbitration_count": 1275,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 667.8295242645345,
+            "p95_seconds": 1286.2758959999942,
+            "p99_seconds": 1352.611749999995
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 451.958226330275,
+              "p95_seconds": 654.2959999999999,
+              "p99_seconds": 673.3760000000011
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 554.7125899999846,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 554.7125899999846,
+            "local_network_time_seconds": 24849.90531000007,
+            "local_total_latency_seconds": 25404.617900000056,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3237.4625899999846,
+            "target_network_time_seconds": 95289.43075000003,
+            "target_total_latency_seconds": 98526.89333999998
+          },
+          "resources": {
+            "events_per_completed_segment": 203.9437148217636,
+            "wall_seconds": 2.281583799980581,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 221.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 576,
+              "merge_grant_stale_arbitration_count": 1275,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 5,
+            "calendar_mutation_count": 5,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 664.0471838312388,
+            "p95_seconds": 1286.2667359999919,
+            "p99_seconds": 1346.938505999993
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 450.5343643577987,
+              "p95_seconds": 650.6593200000016,
+              "p99_seconds": 664.9543200000016
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 554.7125899999846,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 554.7125899999846,
+            "local_network_time_seconds": 24884.905660000106,
+            "local_total_latency_seconds": 25439.61825000009,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3237.4625899999846,
+            "target_network_time_seconds": 94979.02884000001,
+            "target_total_latency_seconds": 98216.49143000002
+          },
+          "resources": {
+            "events_per_completed_segment": 190.4108818011257,
+            "wall_seconds": 2.2259505001129583,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 221.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 573,
+              "merge_grant_stale_arbitration_count": 870,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 5,
+            "calendar_mutation_count": 5,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 0.9872348641794457,
+            "target_p95": 0.994441842835661,
+            "whole_mean": 0.9937423908842787,
+            "whole_p95": 0.9984038894493344,
+            "whole_p99": 0.9947026203708798
+          },
+          "source_wait_reduced": true,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.933564117816603,
+          "wall_seconds": 0.9701318694167995,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 1.0,
+            "target_p95": 0.994441842835661,
+            "whole_mean": 0.9943363683457076,
+            "whole_p95": 0.9999928786662093,
+            "whole_p99": 0.9958057114319744
+          },
+          "source_wait_reduced": false,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9336442751743298,
+          "wall_seconds": 0.9756163679510277,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "local_start49_source_wait_area_proxy": 0.9872348641794457,
+        "target_p95": 0.994441842835661,
+        "whole_mean": 0.9937423908842787,
+        "whole_p95": 0.9984038894493344,
+        "whole_p99": 0.9947026203708798
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 0.933564117816603,
+        "wall_seconds": 0.9701318694167995,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.0,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": -3,
+          "merge_grant_stale_arbitration_count": -405,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": true,
+        "core_resources_within_1p10": true,
+        "nanning_target_p95_improves_2pct": false,
+        "nanning_whole_mean_regression_at_most_0p5pct": true,
+        "nanning_whole_p95_regression_at_most_1pct": true,
+        "nanning_whole_p99_regression_at_most_1pct": true,
+        "nanning_no_source_to_network_unchanged_total_transfer": true
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_nanning_2x_fault_source_chain_inactive_single_8",
+      "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+      "scale": 2,
+      "role": "NANNING_SOURCE_CHAIN_INACTIVE_FAULT",
+      "fault_scenario": "single_8",
+      "fault_edges": [
+        [
+          100,
+          102
+        ]
+      ],
+      "population": {
+        "raw_task_count": 877,
+        "segment_count": 1599,
+        "runtime_reachable_segment_count": 1561,
+        "source_rejected_segment_count": 38,
+        "fault_reachable_raw_task_count": 839,
+        "fault_reachable_target_segment_count": 218,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 1561,
+          "completed_raw_bag_count": 839,
+          "whole_system_java_release_latency": {
+            "count": 839,
+            "mean_seconds": 567.8767447199006,
+            "p95_seconds": 1081.2621969999886,
+            "p99_seconds": 1153.9558055999905
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 372.54869564220195,
+              "p95_seconds": 511.6244500000031,
+              "p99_seconds": 525.9422700000038
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 561.8851299999842,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 561.8851299999842,
+            "local_network_time_seconds": 22572.490469999862,
+            "local_total_latency_seconds": 23134.375599999847,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3244.635129999984,
+            "target_network_time_seconds": 77970.98052000007,
+            "target_total_latency_seconds": 81215.61565000002
+          },
+          "resources": {
+            "events_per_completed_segment": 157.61563100576552,
+            "wall_seconds": 1.8574772001011297,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 217.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 492,
+              "merge_grant_stale_arbitration_count": 823,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1561,
+          "completed_raw_bag_count": 839,
+          "whole_system_java_release_latency": {
+            "count": 839,
+            "mean_seconds": 568.8033292252644,
+            "p95_seconds": 1085.5397750000002,
+            "p99_seconds": 1157.1038055999916
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 372.1651727064222,
+              "p95_seconds": 511.6244500000031,
+              "p99_seconds": 527.9847700000038
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 554.7125899999846,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 554.7125899999846,
+            "local_network_time_seconds": 22486.8790099999,
+            "local_total_latency_seconds": 23041.591599999883,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3237.4625899999846,
+            "target_network_time_seconds": 77894.54506000012,
+            "target_total_latency_seconds": 81132.0076500001
+          },
+          "resources": {
+            "events_per_completed_segment": 157.63997437540039,
+            "wall_seconds": 1.8051739999791607,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 217.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 492,
+              "merge_grant_stale_arbitration_count": 821,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 5,
+            "calendar_mutation_count": 5,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1561,
+          "completed_raw_bag_count": 839,
+          "whole_system_java_release_latency": {
+            "count": 839,
+            "mean_seconds": 566.1838742431426,
+            "p95_seconds": 1087.1372460000007,
+            "p99_seconds": 1153.774834999991
+          },
+          "target": {
+            "preregistered_segment_count": 218,
+            "fault_reachable_segment_count": 218,
+            "completed_segment_count": 218,
+            "latency": {
+              "count": 218,
+              "mean_seconds": 367.2027217431194,
+              "p95_seconds": 506.29017000000186,
+              "p99_seconds": 524.1592300000058
+            },
+            "local_source_node": 49,
+            "local_completed_segment_count": 71,
+            "local_start49_source_wait_area_proxy_bag_seconds": 554.7125899999846,
+            "local_start49_source_wait_area_proxy_status": "BAG_TIMESTAMP_PROXY_NOT_COMPLETE_MIXED_ORIGIN_STATE_INTEGRAL",
+            "local_idle_while_ready_seconds": null,
+            "local_idle_while_ready_status": "NOT_MEASURABLE_WITHOUT_COMPLETE_ELIGIBLE_READY_STATE_TIMELINE",
+            "local_source_wait_seconds": 554.7125899999846,
+            "local_network_time_seconds": 22213.280069999895,
+            "local_total_latency_seconds": 22767.99265999988,
+            "local_start49_source_wait_area_proxy_semantics": "sum(admitted_time-pass_time) over preregistered target segments whose canonical start node is 49",
+            "target_source_wait_seconds": 3237.4625899999846,
+            "target_network_time_seconds": 76812.73075000006,
+            "target_total_latency_seconds": 80050.19334000007
+          },
+          "resources": {
+            "events_per_completed_segment": 146.85586162716208,
+            "wall_seconds": 1.709324000054039,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 219.0,
+            "merge_grant_peak_pending_requests": 5.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 487,
+              "merge_grant_stale_arbitration_count": 672,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 5,
+            "calendar_mutation_count": 5,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 0.9872348641794457,
+            "target_p95": 0.9895738368250361,
+            "whole_mean": 0.9970189473464123,
+            "whole_p95": 1.0054335100369851,
+            "whole_p99": 0.9998431737167739
+          },
+          "source_wait_reduced": true,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9317341223713411,
+          "wall_seconds": 0.9202395593124779,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0092165898617511,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "local_start49_source_wait_area_proxy": 1.0,
+            "target_p95": 0.9895738368250361,
+            "whole_mean": 0.9953947966765777,
+            "whole_p95": 1.0014715914025356,
+            "whole_p99": 0.9971230147339509
+          },
+          "source_wait_reduced": false,
+          "total_latency_not_lower": false,
+          "no_source_to_network_unchanged_total_transfer": true
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 0.9315902404135308,
+          "wall_seconds": 0.9469026254941473,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.0092165898617511,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "local_start49_source_wait_area_proxy": 0.9872348641794457,
+        "target_p95": 0.9895738368250361,
+        "whole_mean": 0.9970189473464123,
+        "whole_p95": 1.0054335100369851,
+        "whole_p99": 0.9998431737167739
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 0.9317341223713411,
+        "wall_seconds": 0.9202395593124779,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.0092165898617511,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": -5,
+          "merge_grant_stale_arbitration_count": -151,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": true,
+        "core_resources_within_1p10": true,
+        "nanning_target_p95_improves_2pct": false,
+        "nanning_whole_mean_regression_at_most_0p5pct": true,
+        "nanning_whole_p95_regression_at_most_1pct": true,
+        "nanning_whole_p99_regression_at_most_1pct": true,
+        "nanning_no_source_to_network_unchanged_total_transfer": true
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_map2_2x_stable_2p5",
+      "map_id": "protected_map2_54_nodes_69_edges",
+      "scale": 2,
+      "role": "MAP2_STABLE_STRUCTURAL_SENTINEL",
+      "fault_scenario": null,
+      "fault_edges": [],
+      "population": {
+        "raw_task_count": 877,
+        "segment_count": 1599,
+        "runtime_reachable_segment_count": 1599,
+        "source_rejected_segment_count": 0,
+        "fault_reachable_raw_task_count": 877,
+        "fault_reachable_target_segment_count": 0,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 288.4966732611133,
+            "p95_seconds": 426.55335199999604,
+            "p99_seconds": 447.8664239999952
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 86.4865540963102,
+            "wall_seconds": 0.868163900100626,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 127.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 158,
+              "merge_grant_stale_arbitration_count": 385,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 288.4966732611133,
+            "p95_seconds": 426.55335199999604,
+            "p99_seconds": 447.8664239999952
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 86.4865540963102,
+            "wall_seconds": 0.8525480000535026,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 127.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 158,
+              "merge_grant_stale_arbitration_count": 385,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 299.3228539680689,
+            "p95_seconds": 461.27645799999436,
+            "p99_seconds": 488.5419811999949
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 86.68855534709193,
+            "wall_seconds": 0.8454603999853134,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 153.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 214,
+              "merge_grant_stale_arbitration_count": 405,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": false,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "mean": 1.0375261890703225,
+            "p95": 1.0814038990367578,
+            "p99": 1.0908207336390998
+          }
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 1.0023356376363057,
+          "wall_seconds": 0.9738488318707088,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.204724409448819,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "mean": 1.0375261890703225,
+            "p95": 1.0814038990367578,
+            "p99": 1.0908207336390998
+          }
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 1.0023356376363057,
+          "wall_seconds": 0.9916865677149622,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.204724409448819,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "mean": 1.0375261890703225,
+        "p95": 1.0814038990367578,
+        "p99": 1.0908207336390998
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 1.0023356376363057,
+        "wall_seconds": 0.9738488318707088,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.204724409448819,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": 56,
+          "merge_grant_stale_arbitration_count": 20,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": false,
+        "core_resources_within_1p10": false,
+        "map2_mean_regression_at_most_0p5pct": false,
+        "map2_p95_regression_at_most_0p5pct": false,
+        "map2_p99_regression_at_most_0p5pct": false
+      },
+      "pass": false
+    },
+    {
+      "case_id": "g4irsf32_s2_map2_2x_fault_sentinel_single_1",
+      "map_id": "protected_map2_54_nodes_69_edges",
+      "scale": 2,
+      "role": "MAP2_FAULT_STRUCTURAL_SENTINEL",
+      "fault_scenario": "single_1",
+      "fault_edges": [
+        [
+          6,
+          12
+        ]
+      ],
+      "population": {
+        "raw_task_count": 877,
+        "segment_count": 1599,
+        "runtime_reachable_segment_count": 1599,
+        "source_rejected_segment_count": 0,
+        "fault_reachable_raw_task_count": 877,
+        "fault_reachable_target_segment_count": 0,
+        "ordered_segment_ids_exact": true
+      },
+      "arms": {
+        "off": {
+          "mode": "off",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 287.4391362713756,
+            "p95_seconds": 425.9303079999961,
+            "p99_seconds": 445.6141619999963
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 86.67854909318324,
+            "wall_seconds": 0.8685348000144586,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 122.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 154,
+              "merge_grant_stale_arbitration_count": 370,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "off",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 287.4391362713756,
+            "p95_seconds": 425.9303079999961,
+            "p99_seconds": 445.6141619999963
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 86.67854909318324,
+            "wall_seconds": 0.8567186000291258,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 122.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 154,
+              "merge_grant_stale_arbitration_count": 370,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a",
+          "scorer_mode": "S4_queue_aware_rule_only",
+          "scorer_mode_echo": "S4_queue_aware_rule_only",
+          "scorer_id": "S4_queue_aware_rule_only"
+        },
+        "candidate_a_b": {
+          "mode": "closed_loop",
+          "completed_segment_count": 1599,
+          "completed_raw_bag_count": 877,
+          "whole_system_java_release_latency": {
+            "count": 877,
+            "mean_seconds": 297.70936697833116,
+            "p95_seconds": 461.17336799999384,
+            "p99_seconds": 488.5419811999949
+          },
+          "target": null,
+          "resources": {
+            "events_per_completed_segment": 86.88555347091932,
+            "wall_seconds": 0.8544213999994099,
+            "wall_measurement_scope": "IN_PROCESS_PER_ARM_PERF_COUNTER",
+            "peak_rss_bytes": null,
+            "peak_rss_status": "NOT_MEASURED_ATTRIBUTABLY_IN_ISOLATED_WORKER",
+            "max_source_queue_length": 147.0,
+            "max_junction_queue_length": 146.0,
+            "merge_grant_peak_pending_requests": 2.0
+          },
+          "safety": {
+            "pass": true,
+            "gates": {
+              "action_plan_safety": true,
+              "extension_future_and_global_reads_zero": true,
+              "model_applied_zero": true,
+              "future_path_absent": true,
+              "generic_event_trace_suppressed": true,
+              "mode_surface_exact": true,
+              "action_calendar_counters_exact": true,
+              "map2_structural_negative_no_action": true
+            },
+            "base": {
+              "absolute_safety_global_future_counters_zero": true,
+              "safe_execution": true,
+              "one_hop_only": true,
+              "event_limit_not_reached": true,
+              "no_artificial_batch_delay": true,
+              "merge_integrity": true
+            },
+            "absolute_zero_counters": {
+              "failed_count": true,
+              "reservation_conflicts": true,
+              "physical_fault_edge_entry_violation_count": true,
+              "runtime_full_astar_calls": true,
+              "runtime_full_cie_astar_calls": true,
+              "unresolved_deadlock_count": true,
+              "global_reservation_scan_count": true,
+              "priority_global_scan_count": true,
+              "scorer_runtime_global_scan_count": true,
+              "microphase_runtime_global_scan_count": true,
+              "first_edge_credit_global_scan_count": true,
+              "scorer_future_route_input_count": true,
+              "priority_future_route_input_count": true,
+              "first_edge_credit_future_route_count": true,
+              "scorer_future_schedule_input_count": true,
+              "priority_teacher_input_count": true,
+              "scorer_teacher_input_count": true,
+              "two_step_reservation_count": true,
+              "full_future_routes_stored": true
+            },
+            "extension_zero_counters": {
+              "source_aware_destination_service_future_release_read_count": true,
+              "source_aware_destination_service_global_scan_count": true
+            },
+            "model_zero_counters": {
+              "g4irsf16_i3_applied_count": true,
+              "g4irsf16_i4_applied_count": true,
+              "g4irsf18_merge_model_applied_count": true
+            },
+            "diagnostic_counters": {
+              "starvation_count": 202,
+              "merge_grant_stale_arbitration_count": 392,
+              "stale_arbitration_event_count": 0
+            },
+            "diagnostic_flags": {
+              "time_limit_reached_after_reachable_population": true,
+              "event_trace_truncated_because_suppressed": true
+            },
+            "action_count": 0,
+            "calendar_mutation_count": 0,
+            "action_event_identity_status": "PROVEN_PRE_STAGE2_TRACE_SUPPRESSED_HERE"
+          },
+          "arm": "candidate_a_b",
+          "scorer_mode": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_mode_echo": "S4_uncovered_local_work_seconds_rule_only",
+          "scorer_id": "S4_uncovered_local_work_seconds_rule_only"
+        }
+      },
+      "primary_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "off",
+        "performance": {
+          "ratios": {
+            "mean": 1.0357301056501202,
+            "p95": 1.0827437243559528,
+            "p99": 1.0963340550204481
+          }
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 1.0023881846189366,
+          "wall_seconds": 0.9837503344542858,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.1967213114754098,
+          "merge_grant_peak_pending_requests": 1.0
+        }
+      },
+      "attribution_only_comparison": {
+        "candidate": "candidate_a_b",
+        "control": "candidate_a",
+        "performance": {
+          "ratios": {
+            "mean": 1.0357301056501202,
+            "p95": 1.0827437243559528,
+            "p99": 1.0963340550204481
+          }
+        },
+        "resource_ratios": {
+          "events_per_completed_segment": 1.0023881846189366,
+          "wall_seconds": 0.9973186060981543,
+          "max_source_queue_length": 1.0,
+          "max_junction_queue_length": 1.1967213114754098,
+          "merge_grant_peak_pending_requests": 1.0
+        },
+        "gate_bearing": false
+      },
+      "performance_ratios": {
+        "mean": 1.0357301056501202,
+        "p95": 1.0827437243559528,
+        "p99": 1.0963340550204481
+      },
+      "resource_ratios": {
+        "events_per_completed_segment": 1.0023881846189366,
+        "wall_seconds": 0.9837503344542858,
+        "max_source_queue_length": 1.0,
+        "max_junction_queue_length": 1.1967213114754098,
+        "merge_grant_peak_pending_requests": 1.0
+      },
+      "diagnostics": {
+        "safety_counter_deltas": {
+          "starvation_count": 48,
+          "merge_grant_stale_arbitration_count": 22,
+          "stale_arbitration_event_count": 0
+        },
+        "candidate_a_attribution_safety_pass": true,
+        "candidate_a_attribution_timing_cohort_matched": true,
+        "rss_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "mixed_origin_wait_area_status": "NOT_REQUIRED_BY_CORE_SCREEN_MEASUREMENT_PENDING",
+        "start49_source_wait_proxy_is_formal_mixed_integral": false
+      },
+      "gates": {
+        "completed_not_lower": true,
+        "static_fault_reachable_timing_cohort_complete_and_matched": true,
+        "hard_safety": true,
+        "no_new_starvation_threshold_crossings": false,
+        "core_resources_within_1p10": false,
+        "map2_mean_regression_at_most_0p5pct": false,
+        "map2_p95_regression_at_most_0p5pct": false,
+        "map2_p99_regression_at_most_0p5pct": false
+      },
+      "pass": false
+    }
+  ]
+}

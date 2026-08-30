@@ -1,0 +1,1709 @@
+{
+  "schema": "czr005.g4irsf32.candidate_a_closed_loop_stage01.v3r13",
+  "protocol_id": "G4IRSF32_V3R13_CANDIDATE_A_CLOSED_LOOP_STAGE2_20260829",
+  "preregistration": "docs/G4IRSF32_v3r13_candidate_a_closed_loop_stage2_preregistration.md",
+  "status": "PASS_V3R13_CANDIDATE_A_PRE_STAGE2_ACTION_GATE",
+  "pass": true,
+  "stage2_authorized": true,
+  "case_count": 8,
+  "execution_count": 24,
+  "modes": [
+    "off",
+    "shadow",
+    "closed_loop"
+  ],
+  "resource_ratio_limit": 1.1,
+  "gates": {
+    "exact_registered_case_population": true,
+    "all_case_gates": true,
+    "direct_action_observed": true,
+    "j2_action_observed": true,
+    "future_release_perturbation_exact": true
+  },
+  "cases": [
+    {
+      "case_id": "direct_mixed_contention",
+      "topology": "direct",
+      "control_kind": null,
+      "expected_action": true,
+      "pass": true,
+      "checks": {
+        "default_off_exact": true,
+        "shadow_action_inert_exact": true,
+        "all_complete_calendar_safe": true,
+        "hard_safety_zero": true,
+        "closed_loop_action_contract": true,
+        "registered_noop_exact": true,
+        "reverse_priority_external_wins": true,
+        "resources_within_1p10": true
+      },
+      "action": {
+        "pass": true,
+        "checks": {
+          "mode_closed_loop": true,
+          "counter_event_exact": true,
+          "expected_action": true,
+          "action_identity_interval_exact": true,
+          "future_and_global_zero": true,
+          "no_shadow_sidecar": true
+        },
+        "action_count": 1,
+        "calendar_mutation_count": 1,
+        "actions": [
+          {
+            "runtime_bag_id": 1,
+            "task_id": 33013001,
+            "segment_id": "direct:local",
+            "node": 1,
+            "start": 1.051,
+            "end": 2.051
+          }
+        ]
+      },
+      "completion_calendar": {
+        "off": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013000,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013002,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013001,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        },
+        "shadow": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013000,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013002,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013001,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        },
+        "closed_loop": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013000,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013001,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013002,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        }
+      },
+      "safety": {
+        "off": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "shadow": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "closed_loop": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        }
+      },
+      "resources": {
+        "off": {
+          "events_per_completed": 36.333333333333336,
+          "junction_local_accounted_bytes": 2224.0
+        },
+        "shadow": {
+          "events_per_completed": 36.333333333333336,
+          "junction_local_accounted_bytes": 2224.0
+        },
+        "closed_loop": {
+          "events_per_completed": 35.666666666666664,
+          "junction_local_accounted_bytes": 2220.0
+        }
+      },
+      "resource_ratios": {
+        "shadow": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        },
+        "closed_loop": {
+          "events_per_completed": 0.9816513761467889,
+          "junction_local_accounted_bytes": 0.9982014388489209
+        }
+      }
+    },
+    {
+      "case_id": "j2_mixed_contention",
+      "topology": "j2",
+      "control_kind": null,
+      "expected_action": true,
+      "pass": true,
+      "checks": {
+        "default_off_exact": true,
+        "shadow_action_inert_exact": true,
+        "all_complete_calendar_safe": true,
+        "hard_safety_zero": true,
+        "closed_loop_action_contract": true,
+        "registered_noop_exact": true,
+        "reverse_priority_external_wins": true,
+        "resources_within_1p10": true
+      },
+      "action": {
+        "pass": true,
+        "checks": {
+          "mode_closed_loop": true,
+          "counter_event_exact": true,
+          "expected_action": true,
+          "action_identity_interval_exact": true,
+          "future_and_global_zero": true,
+          "no_shadow_sidecar": true
+        },
+        "action_count": 1,
+        "calendar_mutation_count": 1,
+        "actions": [
+          {
+            "runtime_bag_id": 1,
+            "task_id": 33013101,
+            "segment_id": "j2:local_urgent",
+            "node": 1,
+            "start": 1.051,
+            "end": 2.051
+          }
+        ]
+      },
+      "completion_calendar": {
+        "off": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013100,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013102,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013101,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        },
+        "shadow": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013100,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013102,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013101,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        },
+        "closed_loop": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013100,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013101,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013102,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        }
+      },
+      "safety": {
+        "off": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "shadow": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "closed_loop": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        }
+      },
+      "resources": {
+        "off": {
+          "events_per_completed": 35.666666666666664,
+          "junction_local_accounted_bytes": 2780.0
+        },
+        "shadow": {
+          "events_per_completed": 35.666666666666664,
+          "junction_local_accounted_bytes": 2780.0
+        },
+        "closed_loop": {
+          "events_per_completed": 35.333333333333336,
+          "junction_local_accounted_bytes": 2776.0
+        }
+      },
+      "resource_ratios": {
+        "shadow": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        },
+        "closed_loop": {
+          "events_per_completed": 0.9906542056074767,
+          "junction_local_accounted_bytes": 0.9985611510791367
+        }
+      }
+    },
+    {
+      "case_id": "j2_reverse_priority_external",
+      "topology": "j2",
+      "control_kind": "reverse_priority",
+      "expected_action": null,
+      "pass": true,
+      "checks": {
+        "default_off_exact": true,
+        "shadow_action_inert_exact": true,
+        "all_complete_calendar_safe": true,
+        "hard_safety_zero": true,
+        "closed_loop_action_contract": true,
+        "registered_noop_exact": true,
+        "reverse_priority_external_wins": true,
+        "resources_within_1p10": true
+      },
+      "action": {
+        "pass": true,
+        "checks": {
+          "mode_closed_loop": true,
+          "counter_event_exact": true,
+          "expected_action": true,
+          "action_identity_interval_exact": true,
+          "future_and_global_zero": true,
+          "no_shadow_sidecar": true
+        },
+        "action_count": 1,
+        "calendar_mutation_count": 1,
+        "actions": [
+          {
+            "runtime_bag_id": 1,
+            "task_id": 33013201,
+            "segment_id": "j2_reverse:local_later",
+            "node": 1,
+            "start": 2.051,
+            "end": 3.051
+          }
+        ]
+      },
+      "completion_calendar": {
+        "off": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013200,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013202,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013201,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        },
+        "shadow": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013200,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013202,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013201,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        },
+        "closed_loop": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013200,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013202,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013201,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 2,
+            "local": 1
+          }
+        }
+      },
+      "safety": {
+        "off": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "shadow": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "closed_loop": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        }
+      },
+      "resources": {
+        "off": {
+          "events_per_completed": 35.666666666666664,
+          "junction_local_accounted_bytes": 2780.0
+        },
+        "shadow": {
+          "events_per_completed": 35.666666666666664,
+          "junction_local_accounted_bytes": 2780.0
+        },
+        "closed_loop": {
+          "events_per_completed": 35.333333333333336,
+          "junction_local_accounted_bytes": 2780.0
+        }
+      },
+      "resource_ratios": {
+        "shadow": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        },
+        "closed_loop": {
+          "events_per_completed": 0.9906542056074767,
+          "junction_local_accounted_bytes": 1.0
+        }
+      }
+    },
+    {
+      "case_id": "no_local",
+      "topology": "direct",
+      "control_kind": "no_local",
+      "expected_action": false,
+      "pass": true,
+      "checks": {
+        "default_off_exact": true,
+        "shadow_action_inert_exact": true,
+        "all_complete_calendar_safe": true,
+        "hard_safety_zero": true,
+        "closed_loop_action_contract": true,
+        "registered_noop_exact": true,
+        "reverse_priority_external_wins": true,
+        "resources_within_1p10": true
+      },
+      "action": {
+        "pass": true,
+        "checks": {
+          "mode_closed_loop": true,
+          "counter_event_exact": true,
+          "expected_action": true,
+          "action_identity_interval_exact": true,
+          "future_and_global_zero": true,
+          "no_shadow_sidecar": true
+        },
+        "action_count": 0,
+        "calendar_mutation_count": 0,
+        "actions": []
+      },
+      "completion_calendar": {
+        "off": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013300,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013301,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2
+          },
+          "completed_origins": {
+            "external": 2
+          }
+        },
+        "shadow": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013300,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013301,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2
+          },
+          "completed_origins": {
+            "external": 2
+          }
+        },
+        "closed_loop": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013300,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013301,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            }
+          ],
+          "requested_origins": {
+            "external": 2
+          },
+          "completed_origins": {
+            "external": 2
+          }
+        }
+      },
+      "safety": {
+        "off": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "shadow": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "closed_loop": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        }
+      },
+      "resources": {
+        "off": {
+          "events_per_completed": 39.5,
+          "junction_local_accounted_bytes": 2220.0
+        },
+        "shadow": {
+          "events_per_completed": 39.5,
+          "junction_local_accounted_bytes": 2220.0
+        },
+        "closed_loop": {
+          "events_per_completed": 39.5,
+          "junction_local_accounted_bytes": 2220.0
+        }
+      },
+      "resource_ratios": {
+        "shadow": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        },
+        "closed_loop": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        }
+      }
+    },
+    {
+      "case_id": "no_external",
+      "topology": "direct",
+      "control_kind": "no_external",
+      "expected_action": false,
+      "pass": true,
+      "checks": {
+        "default_off_exact": true,
+        "shadow_action_inert_exact": true,
+        "all_complete_calendar_safe": true,
+        "hard_safety_zero": true,
+        "closed_loop_action_contract": true,
+        "registered_noop_exact": true,
+        "reverse_priority_external_wins": true,
+        "resources_within_1p10": true
+      },
+      "action": {
+        "pass": true,
+        "checks": {
+          "mode_closed_loop": true,
+          "counter_event_exact": true,
+          "expected_action": true,
+          "action_identity_interval_exact": true,
+          "future_and_global_zero": true,
+          "no_shadow_sidecar": true
+        },
+        "action_count": 0,
+        "calendar_mutation_count": 0,
+        "actions": []
+      },
+      "completion_calendar": {
+        "off": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013400,
+              "node": 1,
+              "start": 0.0,
+              "end": 1.0
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013401,
+              "node": 1,
+              "start": 1.0,
+              "end": 2.0
+            }
+          ],
+          "requested_origins": {
+            "local": 2
+          },
+          "completed_origins": {
+            "local": 2
+          }
+        },
+        "shadow": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013400,
+              "node": 1,
+              "start": 0.0,
+              "end": 1.0
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013401,
+              "node": 1,
+              "start": 1.0,
+              "end": 2.0
+            }
+          ],
+          "requested_origins": {
+            "local": 2
+          },
+          "completed_origins": {
+            "local": 2
+          }
+        },
+        "closed_loop": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013400,
+              "node": 1,
+              "start": 0.0,
+              "end": 1.0
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013401,
+              "node": 1,
+              "start": 1.0,
+              "end": 2.0
+            }
+          ],
+          "requested_origins": {
+            "local": 2
+          },
+          "completed_origins": {
+            "local": 2
+          }
+        }
+      },
+      "safety": {
+        "off": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "shadow": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "closed_loop": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        }
+      },
+      "resources": {
+        "off": {
+          "events_per_completed": 28.0,
+          "junction_local_accounted_bytes": 1644.0
+        },
+        "shadow": {
+          "events_per_completed": 28.0,
+          "junction_local_accounted_bytes": 1644.0
+        },
+        "closed_loop": {
+          "events_per_completed": 28.0,
+          "junction_local_accounted_bytes": 1644.0
+        }
+      },
+      "resource_ratios": {
+        "shadow": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        },
+        "closed_loop": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        }
+      }
+    },
+    {
+      "case_id": "immediately_available",
+      "topology": "direct",
+      "control_kind": "immediately_available",
+      "expected_action": false,
+      "pass": true,
+      "checks": {
+        "default_off_exact": true,
+        "shadow_action_inert_exact": true,
+        "all_complete_calendar_safe": true,
+        "hard_safety_zero": true,
+        "closed_loop_action_contract": true,
+        "registered_noop_exact": true,
+        "reverse_priority_external_wins": true,
+        "resources_within_1p10": true
+      },
+      "action": {
+        "pass": true,
+        "checks": {
+          "mode_closed_loop": true,
+          "counter_event_exact": true,
+          "expected_action": true,
+          "action_identity_interval_exact": true,
+          "future_and_global_zero": true,
+          "no_shadow_sidecar": true
+        },
+        "action_count": 0,
+        "calendar_mutation_count": 0,
+        "actions": []
+      },
+      "completion_calendar": {
+        "off": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013500,
+              "node": 1,
+              "start": 0.0,
+              "end": 1.0
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013501,
+              "node": 1,
+              "start": 2.0509999999999997,
+              "end": 3.0509999999999997
+            }
+          ],
+          "requested_origins": {
+            "external": 1,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 1,
+            "local": 1
+          }
+        },
+        "shadow": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013500,
+              "node": 1,
+              "start": 0.0,
+              "end": 1.0
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013501,
+              "node": 1,
+              "start": 2.0509999999999997,
+              "end": 3.0509999999999997
+            }
+          ],
+          "requested_origins": {
+            "external": 1,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 1,
+            "local": 1
+          }
+        },
+        "closed_loop": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013500,
+              "node": 1,
+              "start": 0.0,
+              "end": 1.0
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013501,
+              "node": 1,
+              "start": 2.0509999999999997,
+              "end": 3.0509999999999997
+            }
+          ],
+          "requested_origins": {
+            "external": 1,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 1,
+            "local": 1
+          }
+        }
+      },
+      "safety": {
+        "off": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "shadow": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "closed_loop": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        }
+      },
+      "resources": {
+        "off": {
+          "events_per_completed": 33.0,
+          "junction_local_accounted_bytes": 2196.0
+        },
+        "shadow": {
+          "events_per_completed": 33.0,
+          "junction_local_accounted_bytes": 2196.0
+        },
+        "closed_loop": {
+          "events_per_completed": 33.0,
+          "junction_local_accounted_bytes": 2196.0
+        }
+      },
+      "resource_ratios": {
+        "shadow": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        },
+        "closed_loop": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        }
+      }
+    },
+    {
+      "case_id": "future_release_base",
+      "topology": "direct",
+      "control_kind": "future_release_base",
+      "expected_action": true,
+      "pass": true,
+      "checks": {
+        "default_off_exact": true,
+        "shadow_action_inert_exact": true,
+        "all_complete_calendar_safe": true,
+        "hard_safety_zero": true,
+        "closed_loop_action_contract": true,
+        "registered_noop_exact": true,
+        "reverse_priority_external_wins": true,
+        "resources_within_1p10": true
+      },
+      "action": {
+        "pass": true,
+        "checks": {
+          "mode_closed_loop": true,
+          "counter_event_exact": true,
+          "expected_action": true,
+          "action_identity_interval_exact": true,
+          "future_and_global_zero": true,
+          "no_shadow_sidecar": true
+        },
+        "action_count": 1,
+        "calendar_mutation_count": 1,
+        "actions": [
+          {
+            "runtime_bag_id": 1,
+            "task_id": 33013601,
+            "segment_id": "future:local",
+            "node": 1,
+            "start": 1.051,
+            "end": 2.051
+          }
+        ]
+      },
+      "completion_calendar": {
+        "off": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013600,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013602,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013601,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            },
+            {
+              "runtime_bag_id": 3,
+              "task_id": 33013603,
+              "node": 1,
+              "start": 5.051,
+              "end": 6.051
+            }
+          ],
+          "requested_origins": {
+            "external": 3,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 3,
+            "local": 1
+          }
+        },
+        "shadow": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013600,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013602,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013601,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            },
+            {
+              "runtime_bag_id": 3,
+              "task_id": 33013603,
+              "node": 1,
+              "start": 5.051,
+              "end": 6.051
+            }
+          ],
+          "requested_origins": {
+            "external": 3,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 3,
+            "local": 1
+          }
+        },
+        "closed_loop": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013600,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013601,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013602,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            },
+            {
+              "runtime_bag_id": 3,
+              "task_id": 33013603,
+              "node": 1,
+              "start": 5.051,
+              "end": 6.051
+            }
+          ],
+          "requested_origins": {
+            "external": 3,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 3,
+            "local": 1
+          }
+        }
+      },
+      "safety": {
+        "off": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "shadow": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "closed_loop": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        }
+      },
+      "resources": {
+        "off": {
+          "events_per_completed": 36.5,
+          "junction_local_accounted_bytes": 2224.0
+        },
+        "shadow": {
+          "events_per_completed": 36.5,
+          "junction_local_accounted_bytes": 2224.0
+        },
+        "closed_loop": {
+          "events_per_completed": 36.0,
+          "junction_local_accounted_bytes": 2220.0
+        }
+      },
+      "resource_ratios": {
+        "shadow": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        },
+        "closed_loop": {
+          "events_per_completed": 0.9863013698630136,
+          "junction_local_accounted_bytes": 0.9982014388489209
+        }
+      }
+    },
+    {
+      "case_id": "future_release_perturbed",
+      "topology": "direct",
+      "control_kind": "future_release_perturbed",
+      "expected_action": true,
+      "pass": true,
+      "checks": {
+        "default_off_exact": true,
+        "shadow_action_inert_exact": true,
+        "all_complete_calendar_safe": true,
+        "hard_safety_zero": true,
+        "closed_loop_action_contract": true,
+        "registered_noop_exact": true,
+        "reverse_priority_external_wins": true,
+        "resources_within_1p10": true
+      },
+      "action": {
+        "pass": true,
+        "checks": {
+          "mode_closed_loop": true,
+          "counter_event_exact": true,
+          "expected_action": true,
+          "action_identity_interval_exact": true,
+          "future_and_global_zero": true,
+          "no_shadow_sidecar": true
+        },
+        "action_count": 1,
+        "calendar_mutation_count": 1,
+        "actions": [
+          {
+            "runtime_bag_id": 1,
+            "task_id": 33013601,
+            "segment_id": "future:local",
+            "node": 1,
+            "start": 1.051,
+            "end": 2.051
+          }
+        ]
+      },
+      "completion_calendar": {
+        "off": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013600,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013602,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013601,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            },
+            {
+              "runtime_bag_id": 3,
+              "task_id": 33013603,
+              "node": 1,
+              "start": 9.051,
+              "end": 10.051
+            }
+          ],
+          "requested_origins": {
+            "external": 3,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 3,
+            "local": 1
+          }
+        },
+        "shadow": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013600,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013602,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013601,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            },
+            {
+              "runtime_bag_id": 3,
+              "task_id": 33013603,
+              "node": 1,
+              "start": 9.051,
+              "end": 10.051
+            }
+          ],
+          "requested_origins": {
+            "external": 3,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 3,
+            "local": 1
+          }
+        },
+        "closed_loop": {
+          "pass": true,
+          "checks": {
+            "all_completed": true,
+            "service_exactly_once": true,
+            "origins_complete": true,
+            "one_owner_intervals": true,
+            "calendar_count_exact": true,
+            "terminal_empty": true
+          },
+          "episodes": [
+            {
+              "runtime_bag_id": 0,
+              "task_id": 33013600,
+              "node": 1,
+              "start": 0.050999999999999934,
+              "end": 1.051
+            },
+            {
+              "runtime_bag_id": 1,
+              "task_id": 33013601,
+              "node": 1,
+              "start": 1.0510000000000002,
+              "end": 2.051
+            },
+            {
+              "runtime_bag_id": 2,
+              "task_id": 33013602,
+              "node": 1,
+              "start": 2.051,
+              "end": 3.051
+            },
+            {
+              "runtime_bag_id": 3,
+              "task_id": 33013603,
+              "node": 1,
+              "start": 9.051,
+              "end": 10.051
+            }
+          ],
+          "requested_origins": {
+            "external": 3,
+            "local": 1
+          },
+          "completed_origins": {
+            "external": 3,
+            "local": 1
+          }
+        }
+      },
+      "safety": {
+        "off": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "shadow": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        },
+        "closed_loop": {
+          "zero_safety_counters": true,
+          "safe_execution": true,
+          "one_hop_only": true,
+          "limits_not_reached": true,
+          "no_artificial_batch_delay": true,
+          "merge_integrity": true
+        }
+      },
+      "resources": {
+        "off": {
+          "events_per_completed": 36.5,
+          "junction_local_accounted_bytes": 2224.0
+        },
+        "shadow": {
+          "events_per_completed": 36.5,
+          "junction_local_accounted_bytes": 2224.0
+        },
+        "closed_loop": {
+          "events_per_completed": 36.0,
+          "junction_local_accounted_bytes": 2220.0
+        }
+      },
+      "resource_ratios": {
+        "shadow": {
+          "events_per_completed": 1.0,
+          "junction_local_accounted_bytes": 1.0
+        },
+        "closed_loop": {
+          "events_per_completed": 0.9863013698630136,
+          "junction_local_accounted_bytes": 0.9982014388489209
+        }
+      }
+    }
+  ]
+}

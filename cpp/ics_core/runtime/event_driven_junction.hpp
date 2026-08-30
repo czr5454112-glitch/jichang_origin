@@ -551,7 +551,7 @@ struct G4IRSF24DLPConfig {
 };
 
 struct EventDrivenJunctionConfig {
-  std::string queue_discipline = "aging";  // fifo, deadline, aging
+  std::string queue_discipline = "aging";  // fifo, deadline, aging, append-only local FIFO variants
   // R0 preserves the frozen G4IRSF11 negative control.  R1-R4 isolate one
   // resource-semantic change at a time without changing the event loop.
   std::string resource_semantics =
@@ -709,6 +709,11 @@ struct EventDrivenJunctionConfig {
   // default remains exact, while another dense graph can name its own EBS /
   // storage injection nodes without changing the local runtime policy.
   std::vector<int> storage_source_nodes{52};
+  // G4IRSF32 keeps "off" as the exact G31 compatibility path. "shadow"
+  // records fixed numeric rows only; "closed_loop" may reserve one exact
+  // next-free local destination-service interval.
+  std::string source_aware_destination_service_mode = "off";
+  int source_aware_destination_service_trace_limit = 200000;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
   // Native-only fault injection used to verify transaction rollback after
   // multiple action rows have been staged. It is absent from production
@@ -740,6 +745,7 @@ struct EventDrivenJunctionConfig {
   bool test_merge_grant_advance_live_calendar_generation_before_edge_exit =
       false;
   bool test_pibt_fail_after_commit_before_publication = false;
+  bool test_source_aware_destination_service_fail_direct_after_stage = false;
 #endif
 };
 
@@ -1438,7 +1444,109 @@ struct EventRuntimeSummary {
   std::uint64_t g4irsf24_dlp_margin_fallback_count = 0;
   std::uint64_t g4irsf24_dlp_detour_fallback_count = 0;
   std::uint64_t g4irsf24_dlp_shield_fault_fallback_count = 0;
+  // G4IRSF32 V3R2 fields remain empty/zero on the exact-off path.  Bindings
+  // omit the whole extension unless shadow is explicitly active.
+  std::string source_aware_destination_service_mode;
+  std::uint64_t
+      source_aware_destination_service_external_commit_considered_count = 0;
+  std::uint64_t
+      source_aware_destination_service_observation_stored_count = 0;
+  std::uint64_t
+      source_aware_destination_service_observation_dropped_count = 0;
+  std::uint64_t
+      source_aware_destination_service_direct_external_commit_count = 0;
+  std::uint64_t
+      source_aware_destination_service_j2_exact_commit_count = 0;
+  std::uint64_t source_aware_destination_service_no_local_count = 0;
+  std::uint64_t source_aware_destination_service_local_guard_fail_count = 0;
+  std::uint64_t source_aware_destination_service_non_overlap_count = 0;
+  std::uint64_t source_aware_destination_service_staged_rollback_count = 0;
+  std::uint64_t source_aware_destination_service_action_change_count = 0;
+  std::uint64_t source_aware_destination_service_calendar_mutation_count = 0;
+  int source_aware_destination_service_future_release_read_count = 0;
+  int source_aware_destination_service_global_scan_count = 0;
+  std::size_t
+      source_aware_destination_service_incremental_local_state_bytes = 0;
+  std::size_t
+      source_aware_destination_service_runtime_internal_accounted_bytes = 0;
+  std::size_t
+      source_aware_destination_service_trace_sidecar_accounted_bytes = 0;
+  std::size_t source_aware_destination_service_total_accounted_bytes = 0;
 };
+
+// One immutable V3R2 external-commit/local-virtual-slot observation.  It is a
+// fixed numeric POD so the runtime owns no per-row strings or side containers.
+struct EventRuntimeSourceAwareDestinationServiceShadowRow {
+  std::uint64_t observation_ordinal = 0;
+  std::uint64_t opportunity_id = 0;
+  double event_time = 0.0;
+  std::uint64_t event_seq = 0;
+  int node = -1;
+  std::uint64_t calendar_generation_before = 0;
+  std::uint32_t seam_kind_code = 0;
+  std::uint32_t external_path_code = 0;
+  int external_task_id = -1;
+  int external_runtime_bag_id = -1;
+  int external_upstream_node = -1;
+  double external_slot_start_seconds = 0.0;
+  double external_slot_end_seconds = 0.0;
+  double external_service_seconds = 0.0;
+  double external_projected_arrival = 0.0;
+  bool has_direct_episode_identity = false;
+  std::uint64_t external_direct_episode_event_seq = 0;
+  bool has_j2_identity = false;
+  std::uint64_t external_request_id = 0;
+  std::uint64_t external_request_lineage = 0;
+  std::uint64_t external_request_generation = 0;
+  std::uint64_t external_junction_queue_generation = 0;
+  int local_task_id = -1;
+  int local_runtime_bag_id = -1;
+  double local_service_seconds = 0.0;
+  // The source queue contains only released, ready work. Its bags have not
+  // yet made a destination-service reservation, so the whole count is
+  // uncovered at this observation seam.
+  std::uint64_t local_source_ready_count = 0;
+  double local_source_uncovered_service_work_seconds = 0.0;
+  int external_scheduled_incoming_count = 0;
+  std::uint64_t destination_pending_count = 0;
+  double oldest_local_wait_age_seconds = 0.0;
+  double oldest_external_wait_age_seconds = 0.0;
+  double local_source_enqueued_at = 0.0;
+  double local_release = 0.0;
+  double local_deadline = 0.0;
+  std::uint64_t local_choose_bag_index = 0;
+  int local_escape_token_runtime_bag_id = -1;
+  bool local_queue_nonempty = false;
+  bool local_bag_exists = false;
+  bool local_released_live = false;
+  bool local_source_queue_at_node = false;
+  bool local_distinct_from_external = false;
+  bool local_service_required = false;
+  bool local_guards_passed = false;
+  double L0 = 0.0;
+  // Absolute next-free start for one local service quantum: exactly L0.
+  double service_calendar_next_free_seconds = 0.0;
+  // Existing-calendar delay at the observation epoch: exactly L0 - event_time.
+  double existing_calendar_wait_seconds = 0.0;
+  double L1 = 0.0;
+  double X_insert = 0.0;
+  double H_gap = 0.0;
+  double overlap_seconds = 0.0;
+  double epsilon = 1.0e-9;
+  int selected_action_from_node = -1;
+  int selected_action_to_node = -1;
+  std::uint32_t selected_action_kind_code = 0;
+  std::uint32_t local_origin_code = 1;
+  std::uint32_t external_origin_code = 2;
+  bool action_changed = false;
+  int future_release_read_count = 0;
+  int global_scan_count = 0;
+  int calendar_mutation_count = 0;
+};
+
+static_assert(
+    std::is_trivially_copyable_v<
+        EventRuntimeSourceAwareDestinationServiceShadowRow>);
 
 struct EventRuntimeJunctionResult {
   int node = -1;
@@ -1753,6 +1861,8 @@ struct EventDrivenJunctionResult {
   std::vector<EventRuntimeEventSeqAuditRow> event_seq_ordering_audit;
   std::vector<EventRuntimeArbitrationBatchRow> arbitration_batch_cardinality;
   std::vector<DestinationMergeGrantLifecycleRow> merge_grant_lifecycle;
+  std::vector<EventRuntimeSourceAwareDestinationServiceShadowRow>
+      source_aware_destination_service_shadow;
 };
 
 enum class EventDrivenJunctionRuntimePhase {
@@ -1818,6 +1928,16 @@ struct EventDrivenJunctionSafeBoundary {
 namespace event_runtime_detail {
 
 constexpr double kEpsilon = 1.0e-9;
+
+inline double uncovered_local_work_seconds(
+    std::size_t ready_local_bag_count,
+    double service_quantum_seconds,
+    bool uses_destination_service) noexcept {
+  return uses_destination_service
+             ? static_cast<double>(ready_local_bag_count) *
+                   service_quantum_seconds
+             : 0.0;
+}
 
 inline std::uint64_t timestamp_bits(double value) noexcept {
   std::uint64_t bits = 0;
@@ -1935,6 +2055,22 @@ class LocalCalendar {
       }
     }
     return candidate;
+  }
+
+  // Pure V3R2 estimator for one stack-only hypothetical exact interval.
+  [[nodiscard]] double earliest_start_with_hypothetical(
+      double earliest,
+      double duration,
+      double hypothetical_start,
+      double hypothetical_end) const {
+    const double base = earliest_start(earliest, duration);
+    if (base < hypothetical_end - kEpsilon &&
+        hypothetical_start < base + duration - kEpsilon) {
+      // The caller has already proved the hypothetical interval exactly
+      // available in C, so restarting at E1 is equivalent to inserting it.
+      return earliest_start(hypothetical_end, duration);
+    }
+    return base;
   }
 
   [[nodiscard]] double reserved_until(double now) const noexcept {
@@ -2388,8 +2524,13 @@ inline constexpr std::size_t kPreG4IRSF17SummaryBytes =
         offsetof(EventRuntimeSummary,
                  g4irsf17_source_wait_telemetry_enabled),
         alignof(EventRuntimeSummary));
+inline constexpr std::size_t kPreG4IRSF32SummaryBytes =
+    align_accounted_size(
+        offsetof(EventRuntimeSummary,
+                 source_aware_destination_service_mode),
+        alignof(EventRuntimeSummary));
 inline constexpr std::size_t kG4IRSF17SummaryExtensionBytes =
-    sizeof(EventRuntimeSummary) - kPreG4IRSF17SummaryBytes;
+    kPreG4IRSF32SummaryBytes - kPreG4IRSF17SummaryBytes;
 inline constexpr std::size_t kG4IRSF17ConfigExtensionBytes =
     sizeof(bool) + (alignof(int) - sizeof(bool)) + sizeof(int) +
     sizeof(G4IRSF17SourcePolicyConfig) + sizeof(int)
@@ -2403,6 +2544,14 @@ inline constexpr std::size_t kG4IRSF17ResultExtensionBytes =
     sizeof(std::vector<EventRuntimeG4IRSF17SourcePolicyRow>);
 inline constexpr std::size_t kG4IRSF17RuntimeExtensionBytes =
     kG4IRSF17ConfigExtensionBytes + kG4IRSF17ResultExtensionBytes;
+inline constexpr std::size_t kG4IRSF32RuntimeExtensionBytes =
+    align_accounted_size(
+        sizeof(std::string) + sizeof(int),
+        alignof(EventDrivenJunctionConfig)) +
+    (sizeof(EventRuntimeSummary) - kPreG4IRSF32SummaryBytes) +
+    sizeof(std::vector<
+           EventRuntimeSourceAwareDestinationServiceShadowRow>);
+inline constexpr std::size_t kG4IRSF32MaxStagedPIBTActions = 8;
 
 struct RuntimeEvent {
   JunctionEventType type = JunctionEventType::kBagRelease;
@@ -2807,6 +2956,10 @@ class EventDrivenJunctionRuntime {
       result_.summary.g4irsf24_dlp_value_residual_count =
           static_cast<int>(
               config_.g4irsf24_dlp.value_residuals.size());
+    }
+    if (source_aware_destination_service_enabled()) {
+      result_.summary.source_aware_destination_service_mode =
+          canonical_source_aware_destination_service_mode();
     }
     result_.summary.opportunity_telemetry_enabled =
         config_.enable_opportunity_telemetry;
@@ -3553,6 +3706,30 @@ class EventDrivenJunctionRuntime {
       noexcept {
     return result_;
   }
+
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+  [[nodiscard]] int test_choose_junction_bag_at_node(int node) const {
+    const auto controller = junctions_.find(node);
+    if (controller == junctions_.end() ||
+        controller->second.queue.empty()) {
+      return -1;
+    }
+    const auto index = choose_junction_bag(
+        controller->second.queue,
+        now_,
+        controller->second.escape_token_task,
+        nullptr);
+    return controller->second.queue[index];
+  }
+
+  [[nodiscard]] std::uint64_t test_service_calendar_generation(
+      int node) const noexcept {
+    const auto controller = junctions_.find(node);
+    return controller == junctions_.end()
+               ? 0
+               : controller->second.service_calendar.generation();
+  }
+#endif
 
   [[nodiscard]] G4IRSF15CausalBagOutcome
   g4irsf15_causal_bag_outcome(int runtime_bag_id) const {
@@ -4329,6 +4506,45 @@ class EventDrivenJunctionRuntime {
            config_.enable_g4irsf17_causal_source_features;
   }
 
+  std::string canonical_source_aware_destination_service_mode() const {
+    if (config_.source_aware_destination_service_mode == "off") {
+      return "off";
+    }
+    if (config_.source_aware_destination_service_mode == "shadow") {
+      return "shadow";
+    }
+    if (config_.source_aware_destination_service_mode == "closed_loop") {
+      return "closed_loop";
+    }
+    if (config_.source_aware_destination_service_mode ==
+        "closed_loop_commit_recheck") {
+      return "closed_loop_commit_recheck";
+    }
+    throw std::invalid_argument(
+        "source_aware_destination_service_mode must be off, shadow, or "
+        "closed_loop; V3R15 also accepts closed_loop_commit_recheck");
+  }
+
+  bool source_aware_destination_service_enabled() const noexcept {
+    return config_.source_aware_destination_service_mode != "off";
+  }
+
+  bool source_aware_destination_service_shadow_enabled() const noexcept {
+    return config_.source_aware_destination_service_mode == "shadow";
+  }
+
+  bool source_aware_destination_service_closed_loop_enabled() const noexcept {
+    return config_.source_aware_destination_service_mode == "closed_loop" ||
+           config_.source_aware_destination_service_mode ==
+               "closed_loop_commit_recheck";
+  }
+
+  bool source_aware_destination_service_commit_recheck_enabled()
+      const noexcept {
+    return config_.source_aware_destination_service_mode ==
+           "closed_loop_commit_recheck";
+  }
+
   bool g4irsf20_prunes_redundant_beacons() const noexcept {
     return config_.g4irsf20_event_hotpath_policy == "E1" ||
            config_.g4irsf20_event_hotpath_policy == "E2";
@@ -4712,8 +4928,44 @@ class EventDrivenJunctionRuntime {
                 "S4_queue_aware_rule_only")) {
       return "S4";
     }
+    if (config_.scorer_mode ==
+        "S4_uncovered_local_work_seconds_rule_only") {
+      return "S4";
+    }
+    if (config_.scorer_mode ==
+        "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only") {
+      return "S4";
+    }
+    if (config_.scorer_mode ==
+        "S4_typed_service_dominance_rule_only") {
+      return "S4";
+    }
+    if (config_.scorer_mode ==
+        "S4_service_aware_static_dominance_rule_only") {
+      return "S4";
+    }
     throw std::invalid_argument(
         "unknown G4IRSF12 scorer_mode; expected S0..S4");
+  }
+
+  bool uses_s4_uncovered_local_work_seconds() const noexcept {
+    return config_.scorer_mode ==
+           "S4_uncovered_local_work_seconds_rule_only";
+  }
+
+  bool uses_s4_plus_uncovered_local_work_seconds() const noexcept {
+    return config_.scorer_mode ==
+           "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only";
+  }
+
+  bool uses_s4_typed_service_dominance() const noexcept {
+    return config_.scorer_mode ==
+           "S4_typed_service_dominance_rule_only";
+  }
+
+  bool uses_s4_service_aware_static_dominance() const noexcept {
+    return config_.scorer_mode ==
+           "S4_service_aware_static_dominance_rule_only";
   }
 
   std::string canonical_scorer_id() const {
@@ -4729,6 +4981,19 @@ class EventDrivenJunctionRuntime {
     }
     if (mode == "S3") {
       return "S3_shortest_potential_only";
+    }
+    if (uses_s4_uncovered_local_work_seconds()) {
+      return "S4_uncovered_local_work_seconds_rule_only";
+    }
+    if (uses_s4_plus_uncovered_local_work_seconds()) {
+      return
+          "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only";
+    }
+    if (uses_s4_typed_service_dominance()) {
+      return "S4_typed_service_dominance_rule_only";
+    }
+    if (uses_s4_service_aware_static_dominance()) {
+      return "S4_service_aware_static_dominance_rule_only";
     }
     return "S4_queue_aware_rule_only";
   }
@@ -4924,8 +5189,14 @@ class EventDrivenJunctionRuntime {
 
   void validate_config() const {
     if (config_.queue_discipline != "fifo" && config_.queue_discipline != "deadline" &&
-        config_.queue_discipline != "aging") {
-      throw std::invalid_argument("queue_discipline must be fifo, deadline, or aging");
+        config_.queue_discipline != "aging" &&
+        config_.queue_discipline != "fifo_source_longest_static_tie" &&
+        config_.queue_discipline !=
+            "fifo_junction_skip_pending_merge_owner") {
+      throw std::invalid_argument(
+          "queue_discipline must be fifo, deadline, aging, or "
+          "fifo_source_longest_static_tie, or "
+          "fifo_junction_skip_pending_merge_owner");
     }
     (void)canonical_resource_semantics();
     (void)canonical_pressure_mode();
@@ -4937,6 +5208,39 @@ class EventDrivenJunctionRuntime {
     (void)canonical_event_semantics();
     (void)canonical_merge_grant_timing_mode();
     (void)canonical_merge_grant_rule();
+    (void)canonical_source_aware_destination_service_mode();
+    if (source_aware_destination_service_enabled()) {
+      bool storage_roles_valid =
+          !config_.storage_source_nodes.empty();
+      for (auto current = config_.storage_source_nodes.cbegin();
+           current != config_.storage_source_nodes.cend(); ++current) {
+        const int node = *current;
+        if (std::find(config_.storage_source_nodes.cbegin(), current, node) !=
+            current) {
+          storage_roles_valid = false;
+          break;
+        }
+        try {
+          const int node_type = graph_.node(node).node_type;
+          if (node_type != 1 && node_type != 7) {
+            storage_roles_valid = false;
+            break;
+          }
+        } catch (const std::out_of_range&) {
+          storage_roles_valid = false;
+          break;
+        }
+      }
+      if (!storage_roles_valid ||
+          config_.pibt_max_ready_bags > static_cast<int>(
+              event_runtime_detail::kG4IRSF32MaxStagedPIBTActions) ||
+          config_.source_aware_destination_service_trace_limit <= 0) {
+        throw std::invalid_argument(
+          "G4IRSF32 requires a positive trace limit and "
+          "explicit nonempty unique storage start nodes, with at most "
+          "eight bounded PIBT-ready bags");
+      }
+    }
     if (config_.g4irsf20_event_hotpath_policy != "E0" &&
         config_.g4irsf20_event_hotpath_policy != "E1" &&
         config_.g4irsf20_event_hotpath_policy != "E2") {
@@ -6127,6 +6431,420 @@ class EventDrivenJunctionRuntime {
     return queue_indices[static_cast<std::size_t>(decision.chosen_index)];
   }
 
+  enum class SourceAwareDestinationServiceStageOutcome : std::uint8_t {
+    kDisabled,
+    kNoLocal,
+    kGuardFail,
+    kNonOverlap,
+    kStored,
+  };
+
+  struct SourceAwareDestinationServiceStagedObservation {
+    SourceAwareDestinationServiceStageOutcome outcome =
+        SourceAwareDestinationServiceStageOutcome::kDisabled;
+    std::uint32_t seam_kind_code = 0;
+    EventRuntimeSourceAwareDestinationServiceShadowRow row;
+  };
+
+  [[nodiscard]] SourceAwareDestinationServiceStagedObservation
+  stage_source_aware_destination_service_shadow(
+      const BagState& external_bag,
+      const JunctionState& local_controller,
+      int node,
+      double event_time,
+      std::uint64_t event_seq,
+      std::uint32_t seam_kind_code,
+      double external_slot_start_seconds,
+      double external_slot_end_seconds,
+      double external_projected_arrival,
+      int external_upstream_node,
+      const DestinationMergeRequest* j2_request = nullptr,
+      std::size_t transaction_staged_stored_count = 0) {
+    SourceAwareDestinationServiceStagedObservation staged;
+    if (!source_aware_destination_service_shadow_enabled()) {
+      return staged;
+    }
+    staged.seam_kind_code = seam_kind_code;
+    if (local_controller.source_queue.empty()) {
+      staged.outcome =
+          SourceAwareDestinationServiceStageOutcome::kNoLocal;
+      return staged;
+    }
+
+    const std::size_t local_index =
+        choose_source_bag(local_controller.source_queue,
+                          event_time,
+                          local_controller.escape_token_task);
+    const int local_runtime_bag_id =
+        local_controller.source_queue[local_index];
+    const auto local_found = bags_.find(local_runtime_bag_id);
+
+    auto& row = staged.row;
+    row.opportunity_id = event_seq;
+    row.event_time = event_time;
+    row.event_seq = event_seq;
+    row.node = node;
+    row.calendar_generation_before =
+        local_controller.service_calendar.generation();
+    row.seam_kind_code = seam_kind_code;
+    row.external_path_code = seam_kind_code;
+    row.external_task_id = external_bag.request.task_id;
+    row.external_runtime_bag_id =
+        external_bag.request.runtime_bag_id;
+    row.external_upstream_node = external_upstream_node;
+    row.selected_action_from_node = external_upstream_node;
+    row.selected_action_to_node = node;
+    row.selected_action_kind_code = seam_kind_code;
+    row.local_origin_code = 1U;
+    row.external_origin_code = 2U;
+    row.external_slot_start_seconds = external_slot_start_seconds;
+    row.external_slot_end_seconds = external_slot_end_seconds;
+    row.external_service_seconds =
+        external_slot_end_seconds - external_slot_start_seconds;
+    row.external_projected_arrival = external_projected_arrival;
+    row.has_direct_episode_identity = seam_kind_code == 1U;
+    row.external_direct_episode_event_seq =
+        row.has_direct_episode_identity ? event_seq : 0;
+    row.has_j2_identity = seam_kind_code == 2U;
+    if (row.has_j2_identity && j2_request != nullptr) {
+      row.external_request_id = j2_request->request_id;
+      row.external_request_lineage = j2_request->lineage;
+      row.external_request_generation =
+          j2_request->request_generation;
+      row.external_junction_queue_generation =
+          j2_request->junction_queue_generation;
+    }
+
+    row.local_queue_nonempty = true;
+    row.local_source_ready_count = static_cast<std::uint64_t>(
+        local_controller.source_queue.size());
+    row.external_scheduled_incoming_count =
+        local_controller.scheduled_incoming;
+    const auto destination_merge =
+        destination_merge_controllers_.find(node);
+    if (destination_merge != destination_merge_controllers_.end()) {
+      row.destination_pending_count = static_cast<std::uint64_t>(
+          destination_merge->second.pending_count());
+      // This scans only the controller's fixed-capacity local pending vector;
+      // it never inspects the global bag population.
+      row.oldest_external_wait_age_seconds =
+          destination_merge->second.oldest_pending_age(event_time);
+    }
+    const auto source_front = bags_.find(local_controller.source_queue.front());
+    if (source_front == bags_.end() ||
+        !std::isfinite(source_front->second.source_enqueued_at) ||
+        source_front->second.source_enqueued_at < 0.0 ||
+        source_front->second.source_enqueued_at >
+            event_time + event_runtime_detail::kEpsilon) {
+      throw std::logic_error(
+          "G4IRSF32 V3R4 source-front wait identity is invalid");
+    }
+    row.oldest_local_wait_age_seconds = std::max(
+        0.0, event_time - source_front->second.source_enqueued_at);
+    row.local_escape_token_runtime_bag_id =
+        local_controller.escape_token_task;
+    row.local_bag_exists = local_found != bags_.end();
+    if (row.local_bag_exists) {
+      const auto& local_bag = local_found->second;
+      row.local_task_id = local_bag.request.task_id;
+      row.local_runtime_bag_id =
+          local_bag.request.runtime_bag_id;
+      row.local_service_seconds = service_duration(node);
+      row.local_source_enqueued_at = local_bag.source_enqueued_at;
+      row.local_release = local_bag.request.release_time;
+      row.local_deadline = local_bag.request.deadline;
+      row.local_choose_bag_index =
+          static_cast<std::uint64_t>(local_index);
+      row.local_released_live =
+          local_bag.active_in_runtime &&
+          local_bag.request.release_time <=
+              event_time + event_runtime_detail::kEpsilon &&
+          local_bag.status != BagStatus::kPendingRelease &&
+          local_bag.status != BagStatus::kCompleted &&
+          local_bag.status != BagStatus::kFailed;
+      row.local_source_queue_at_node =
+          local_bag.status == BagStatus::kSourceQueue &&
+          local_bag.current == node && local_bag.request.start == node;
+      row.local_distinct_from_external =
+          local_bag.request.runtime_bag_id !=
+          external_bag.request.runtime_bag_id;
+      row.local_service_required =
+          uses_destination_calendar(node, local_bag.request.goal);
+      row.local_source_uncovered_service_work_seconds =
+          event_runtime_detail::uncovered_local_work_seconds(
+              row.local_source_ready_count,
+              row.local_service_seconds,
+              true);
+    }
+    row.local_guards_passed =
+        row.local_queue_nonempty && row.local_bag_exists &&
+        row.local_released_live && row.local_source_queue_at_node &&
+        row.local_distinct_from_external && row.local_service_required;
+    if (!row.local_guards_passed) {
+      staged.outcome =
+          SourceAwareDestinationServiceStageOutcome::kGuardFail;
+      return staged;
+    }
+
+    if (!std::isfinite(row.external_slot_start_seconds) ||
+        !std::isfinite(row.external_slot_end_seconds) ||
+        !std::isfinite(row.external_service_seconds) ||
+        std::abs(row.external_service_seconds -
+                 row.local_service_seconds) >
+            event_runtime_detail::kEpsilon ||
+        std::abs(row.external_service_seconds -
+                 service_duration(node)) >
+            event_runtime_detail::kEpsilon) {
+      throw std::logic_error(
+          "G4IRSF32 V3R2 external/local exact service mismatch");
+    }
+    row.L0 = local_controller.service_calendar.earliest_start(
+        event_time, row.local_service_seconds);
+    row.service_calendar_next_free_seconds = row.L0;
+    row.existing_calendar_wait_seconds = row.L0 - event_time;
+    const double local_slot_end = row.L0 + row.local_service_seconds;
+    const bool overlaps =
+        row.L0 < row.external_slot_end_seconds -
+                     event_runtime_detail::kEpsilon &&
+        row.external_slot_start_seconds <
+            local_slot_end - event_runtime_detail::kEpsilon;
+    if (!overlaps) {
+      staged.outcome =
+          SourceAwareDestinationServiceStageOutcome::kNonOverlap;
+      return staged;
+    }
+    row.overlap_seconds = std::max(
+        0.0,
+        std::min(local_slot_end, row.external_slot_end_seconds) -
+            std::max(row.L0, row.external_slot_start_seconds));
+    row.L1 =
+        local_controller.service_calendar
+            .earliest_start_with_hypothetical(
+                event_time,
+                row.local_service_seconds,
+                row.external_slot_start_seconds,
+                row.external_slot_end_seconds);
+    row.X_insert = row.L1 - row.L0;
+    row.H_gap = row.L1 - row.external_slot_start_seconds;
+    row.epsilon = event_runtime_detail::kEpsilon;
+    if (!std::isfinite(row.L0) || !std::isfinite(row.L1) ||
+        !std::isfinite(row.X_insert) || !std::isfinite(row.H_gap) ||
+        row.X_insert <= 0.0) {
+      throw std::logic_error(
+          "G4IRSF32 V3R2 virtual slot estimator is invalid");
+    }
+    const double expected_uncovered_work =
+        event_runtime_detail::uncovered_local_work_seconds(
+            row.local_source_ready_count,
+            row.local_service_seconds,
+            true);
+    if (row.local_source_ready_count == 0 ||
+        row.local_choose_bag_index >= row.local_source_ready_count ||
+        row.external_scheduled_incoming_count < 0 ||
+        !std::isfinite(row.local_source_uncovered_service_work_seconds) ||
+        !std::isfinite(row.oldest_local_wait_age_seconds) ||
+        !std::isfinite(row.oldest_external_wait_age_seconds) ||
+        !std::isfinite(row.service_calendar_next_free_seconds) ||
+        !std::isfinite(row.existing_calendar_wait_seconds) ||
+        row.local_source_uncovered_service_work_seconds < 0.0 ||
+        row.oldest_local_wait_age_seconds < 0.0 ||
+        row.oldest_external_wait_age_seconds < 0.0 ||
+        row.existing_calendar_wait_seconds < 0.0 ||
+        (row.destination_pending_count == 0 &&
+         row.oldest_external_wait_age_seconds != 0.0) ||
+        std::abs(row.local_source_uncovered_service_work_seconds -
+                 expected_uncovered_work) > event_runtime_detail::kEpsilon ||
+        std::abs(row.service_calendar_next_free_seconds - row.L0) >
+            event_runtime_detail::kEpsilon ||
+        std::abs(row.existing_calendar_wait_seconds -
+                 (row.L0 - row.event_time)) >
+            event_runtime_detail::kEpsilon ||
+        row.selected_action_from_node != row.external_upstream_node ||
+        row.selected_action_to_node != row.node ||
+        row.selected_action_kind_code != row.seam_kind_code ||
+        row.local_origin_code != 1U || row.external_origin_code != 2U) {
+      throw std::logic_error(
+          "G4IRSF32 V3R4 local telemetry identity is invalid");
+    }
+    // A nested J2 -> PIBT transaction can publish its DIRECT rows before the
+    // enclosing J2 row.  Bind the ordinal only at the unique final publish
+    // seam so it follows the actual append order.
+    row.observation_ordinal = 0;
+    auto& rows = result_.source_aware_destination_service_shadow;
+    const auto trace_limit = static_cast<std::size_t>(
+        config_.source_aware_destination_service_trace_limit);
+    if (rows.size() >= trace_limit ||
+        transaction_staged_stored_count >= trace_limit - rows.size()) {
+      throw std::runtime_error(
+          "G4IRSF32 V3R2 shadow trace limit exhausted before commit");
+    }
+    staged.outcome =
+        SourceAwareDestinationServiceStageOutcome::kStored;
+    return staged;
+  }
+
+  void preflight_source_aware_destination_service_shadow_capacity(
+      std::size_t additional_rows) {
+    if (!source_aware_destination_service_shadow_enabled() ||
+        additional_rows == 0) {
+      return;
+    }
+    auto& rows = result_.source_aware_destination_service_shadow;
+    const auto trace_limit = static_cast<std::size_t>(
+        config_.source_aware_destination_service_trace_limit);
+    if (rows.size() > trace_limit ||
+        additional_rows > trace_limit - rows.size()) {
+      throw std::runtime_error(
+          "G4IRSF32 V3R2 shadow trace limit exhausted before commit");
+    }
+    const std::size_t required = rows.size() + additional_rows;
+    if (rows.capacity() >= required) {
+      return;
+    }
+    const std::size_t grown =
+        rows.capacity() == 0
+            ? std::min<std::size_t>(8, trace_limit)
+            : std::min(trace_limit, rows.capacity() * 2);
+    rows.reserve(std::max(required, grown));
+  }
+
+  void account_source_aware_destination_service_stage(
+      const SourceAwareDestinationServiceStagedObservation& staged) noexcept {
+    auto& summary = result_.summary;
+    ++summary
+          .source_aware_destination_service_external_commit_considered_count;
+    if (staged.seam_kind_code == 1U) {
+      ++summary
+            .source_aware_destination_service_direct_external_commit_count;
+    } else if (staged.seam_kind_code == 2U) {
+      ++summary
+            .source_aware_destination_service_j2_exact_commit_count;
+    }
+  }
+
+  void publish_source_aware_destination_service_shadow(
+      SourceAwareDestinationServiceStagedObservation staged) {
+    if (staged.outcome ==
+        SourceAwareDestinationServiceStageOutcome::kDisabled) {
+      return;
+    }
+    auto& summary = result_.summary;
+    switch (staged.outcome) {
+      case SourceAwareDestinationServiceStageOutcome::kNoLocal:
+        account_source_aware_destination_service_stage(staged);
+        ++summary.source_aware_destination_service_no_local_count;
+        return;
+      case SourceAwareDestinationServiceStageOutcome::kGuardFail:
+        account_source_aware_destination_service_stage(staged);
+        ++summary.source_aware_destination_service_local_guard_fail_count;
+        return;
+      case SourceAwareDestinationServiceStageOutcome::kNonOverlap:
+        account_source_aware_destination_service_stage(staged);
+        ++summary.source_aware_destination_service_non_overlap_count;
+        return;
+      case SourceAwareDestinationServiceStageOutcome::kStored:
+        {
+          auto& rows = result_.source_aware_destination_service_shadow;
+          const auto trace_limit = static_cast<std::size_t>(
+              config_.source_aware_destination_service_trace_limit);
+          if (rows.size() >= trace_limit ||
+              rows.size() >= rows.capacity()) {
+            throw std::logic_error(
+                "G4IRSF32 V3R2 shadow capacity was not preflighted");
+          }
+          staged.row.observation_ordinal =
+              static_cast<std::uint64_t>(rows.size() + 1);
+          rows.push_back(std::move(staged.row));
+        }
+        account_source_aware_destination_service_stage(staged);
+        ++summary
+              .source_aware_destination_service_observation_stored_count;
+        return;
+      case SourceAwareDestinationServiceStageOutcome::kDisabled:
+        return;
+    }
+  }
+
+  bool source_aware_future_local_slot_exists(
+      const JunctionState& controller,
+      int node,
+      double time) const {
+    bool found = false;
+    controller.service_calendar.inspect(
+        [&](const CalendarInterval& interval) {
+          if (found || interval.start <=
+                           time + event_runtime_detail::kEpsilon) {
+            return;
+          }
+          const auto owner = bags_.find(interval.task_id);
+          found = owner != bags_.end() &&
+                  owner->second.status == BagStatus::kInService &&
+                  owner->second.current == node &&
+                  owner->second.request.start == node &&
+                  std::abs(owner->second.admitted_time - interval.start) <=
+                      event_runtime_detail::kEpsilon;
+        });
+    return found;
+  }
+
+  bool source_aware_local_strictly_precedes_pending_external(
+      int node,
+      const BagState& local_bag,
+      double time) {
+    auto controller =
+        destination_merge_controllers_.find(node);
+    if (controller == destination_merge_controllers_.end() ||
+        controller->second.pending_.empty()) {
+      return true;
+    }
+    const auto rule = uses_jit_destination_merge_grants()
+                          ? effective_merge_grant_rule()
+                          : canonical_merge_grant_rule();
+    const auto* best = controller->second.select(
+        rule, time, config_.starvation_threshold);
+    if (best == nullptr) {
+      return false;
+    }
+
+    // Comparison-only stack record: it is never submitted and owns no edge,
+    // lifecycle, reservation, or capability.
+    DestinationMergeRequest local;
+    local.request_id = local_bag.local_enqueue_sequence;
+    local.runtime_bag_id = local_bag.request.runtime_bag_id;
+    local.task_id = local_bag.request.task_id;
+    local.upstream_node = node;
+    local.request_time = time;
+    local.fifo_request_time = local_bag.source_enqueued_at;
+    local.projected_arrival = time;
+    local.deadline_slack =
+        local_bag.request.deadline >= 0.0
+            ? local_bag.request.deadline - time
+            : std::numeric_limits<double>::max();
+    local.wait_age =
+        std::max(0.0, time - local_bag.source_enqueued_at);
+    local.static_remaining =
+        static_potential(node, local_bag.request.goal);
+    local.destination_service_seconds = service_duration(node);
+    local.downstream_queue_pressure =
+        static_cast<int>(junctions_[node].queue.size()) +
+        junctions_[node].scheduled_incoming;
+    local.task_class = local_task_class_rank(local_bag);
+    local.storage_leg = is_storage_out_task(local_bag);
+    local.enqueue_sequence = local_bag.local_enqueue_sequence;
+    return destination_merge_request_less(
+               rule,
+               local,
+               best->request,
+               time,
+               config_.starvation_threshold) &&
+           !destination_merge_request_less(
+               rule,
+               best->request,
+               local,
+               time,
+               config_.starvation_threshold);
+  }
+
   int try_admit_source(
       int node,
       double time,
@@ -6173,10 +6891,11 @@ class EventDrivenJunctionRuntime {
             : 0;
     std::size_t queue_index = held_queue_index.has_value()
                                   ? *held_queue_index
-                                  : choose_bag(controller.source_queue,
-                                               time,
-                                               controller.escape_token_task,
-                                               priority_comparison_count);
+                                  : choose_source_bag(
+                                        controller.source_queue,
+                                        time,
+                                        controller.escape_token_task,
+                                        priority_comparison_count);
     std::optional<G4IRSF17SourceContextObservation>
         g4irsf17_pre_action_context;
     if (!force_source_a0_after_natural_hold &&
@@ -6308,8 +7027,38 @@ class EventDrivenJunctionRuntime {
           node, time, source_generation, task_id, blocker);
       return -1;
     }
+    double service_start = time;
+    bool source_aware_future_slot = false;
     if (!controller.service_calendar.available(
             time, time + duration, task_id)) {
+      const auto destination_merge =
+          destination_merge_controllers_.find(node);
+      const bool has_pending_external =
+          destination_merge != destination_merge_controllers_.end() &&
+          destination_merge->second.pending_count() > 0;
+      if (source_aware_destination_service_closed_loop_enabled() &&
+          canonical_admission_mode() == "off" &&
+          !uses_first_edge_credit() &&
+          config_.local_queue_capacity <= 0 &&
+          !g4irsf17_extensions_enabled() &&
+          !config_.enable_g4irsf23_source_admission_causal_action &&
+          uses_destination_calendar(node, bag.request.goal) &&
+          (controller.scheduled_incoming > 0 || has_pending_external) &&
+          !source_aware_future_local_slot_exists(controller, node, time) &&
+          source_aware_local_strictly_precedes_pending_external(
+              node, bag, time)) {
+        const double candidate =
+            controller.service_calendar.earliest_start(time, duration);
+        if (candidate > time + event_runtime_detail::kEpsilon &&
+            controller.service_calendar.available(
+                candidate, candidate + duration, task_id)) {
+          service_start = candidate;
+          source_aware_future_slot = true;
+        }
+      }
+    }
+    if (!controller.service_calendar.available(
+            service_start, service_start + duration, task_id)) {
       event_runtime_detail::G4IRSF17SourceBlockerObservation blocker;
       blocker.consider(
           G4IRSF17SourceWaitReason::kSourceServiceNotReady,
@@ -6405,12 +7154,20 @@ class EventDrivenJunctionRuntime {
       bag.first_edge_credit_consumed = true;
     }
 
-    controller.service_calendar.reserve(task_id, time, time + duration);
+    const double service_end = service_start + duration;
+    controller.service_calendar.reserve(
+        task_id, service_start, service_end);
+    if (source_aware_future_slot) {
+      ++result_.summary
+            .source_aware_destination_service_action_change_count;
+      ++result_.summary
+            .source_aware_destination_service_calendar_mutation_count;
+    }
     if (force_source_a0_after_natural_hold) {
       controller.source_natural_hold_runtime_bag_id = -1;
       controller.source_natural_hold_until = -1.0;
     }
-    controller.record_service_reservation(time, time + duration);
+    controller.record_service_reservation(service_start, service_end);
     update_calendar_maxima(controller, nullptr);
     controller.source_queue.erase(controller.source_queue.begin() + static_cast<std::ptrdiff_t>(queue_index));
     if (g4irsf17_source_policy_enabled() ||
@@ -6435,21 +7192,24 @@ class EventDrivenJunctionRuntime {
     }
     bag.status = BagStatus::kInService;
     bag.current = node;
-    bag.admitted_time = time;
-    bag.total_wait += std::max(0.0, time - bag.source_enqueued_at);
+    bag.admitted_time = service_start;
+    bag.total_wait +=
+        std::max(0.0, service_start - bag.source_enqueued_at);
     schedule(JunctionEventType::kJunctionServiceComplete,
-             time + duration,
+             service_end,
              task_id,
              node,
              -1,
              node);
     schedule_passive(JunctionEventType::kLocalQueueUpdate,
-                     time,
+                     source_aware_future_slot ? service_start : time,
                      task_id,
                      node,
                      -1,
                      node,
-                     "source_dequeue");
+                     source_aware_future_slot
+                         ? "source_closed_loop_future_slot"
+                         : "source_dequeue");
     if (g4irsf20_prunes_redundant_beacons()) {
       ++result_.summary.g4irsf20_redundant_beacon_suppressed_count;
     } else {
@@ -8779,6 +9539,19 @@ class EventDrivenJunctionRuntime {
           nullptr;
     }
 
+    auto source_aware_stage =
+        stage_source_aware_destination_service_shadow(
+            bag,
+            destination,
+            request.destination_merge_node,
+            event.time,
+            event.seq,
+            2U,
+            slot_start,
+            slot_end,
+            request.projected_arrival,
+            request.upstream_node,
+            &request);
     destination.scheduled_incoming_by_goal.reserve(
         destination.scheduled_incoming_by_goal.size() +
         1);
@@ -8792,11 +9565,15 @@ class EventDrivenJunctionRuntime {
     if (config_
             .test_merge_grant_fail_after_calendar_prepare &&
         !test_merge_grant_prepare_failure_injected_) {
-      test_merge_grant_prepare_failure_injected_ = true;
       if (inserted_goal_entry) {
         destination.scheduled_incoming_by_goal.erase(
             goal_entry.first);
       }
+      if (source_aware_destination_service_shadow_enabled()) {
+        throw std::logic_error(
+            "G4IRSF32 V3R2 injected J2 failure after staging");
+      }
+      test_merge_grant_prepare_failure_injected_ = true;
       reject_all_destination_merge_requests(
           controller,
           MergeGrantState::kRolledBack,
@@ -8895,6 +9672,20 @@ class EventDrivenJunctionRuntime {
       return;
     }
 
+    try {
+      preflight_source_aware_destination_service_shadow_capacity(
+          source_aware_stage.outcome ==
+                  SourceAwareDestinationServiceStageOutcome::kStored
+              ? 1U
+              : 0U);
+    } catch (...) {
+      if (inserted_goal_entry) {
+        destination.scheduled_incoming_by_goal.erase(
+            goal_entry.first);
+      }
+      throw;
+    }
+
     if (!destination.service_calendar
              .commit_exact_reservation(
                  std::move(*prepared))) {
@@ -8961,7 +9752,11 @@ class EventDrivenJunctionRuntime {
                 event.time,
                 event.seq,
                 nullptr,
-                &*bag_merge.capability);
+                &*bag_merge.capability,
+                source_aware_stage.outcome ==
+                        SourceAwareDestinationServiceStageOutcome::kStored
+                    ? 1U
+                    : 0U);
       } catch (...) {
         if (inserted_goal_entry &&
             goal_entry.first->second == 0) {
@@ -9034,6 +9829,8 @@ class EventDrivenJunctionRuntime {
         schedule_next_jit_destination_merge_opportunity(
             controller, event.time, true);
       }
+      publish_source_aware_destination_service_shadow(
+          std::move(source_aware_stage));
       return;
     }
 
@@ -9132,6 +9929,10 @@ class EventDrivenJunctionRuntime {
       schedule_next_jit_destination_merge_opportunity(
           controller, event.time, true);
     }
+    // Unique J2 publication seam.  The downstream PIBT dispatch received the
+    // exact grant authority, so its DIRECT hook is suppressed.
+    publish_source_aware_destination_service_shadow(
+        std::move(source_aware_stage));
   }
 
   void dispatch_junction_once(const RuntimeEvent& event,
@@ -9408,6 +10209,12 @@ class EventDrivenJunctionRuntime {
     std::map<int, PIBTJunctionSnapshot> junctions;
     std::map<long long, PIBTCorridorSnapshot> corridors;
     std::vector<PIBTActionDelta> action_deltas;
+    // The frozen P2 bound is eight actions.  Shadow rows stage in this fixed
+    // stack-owned array; the result sidecar remains the only new dynamic
+    // storage introduced by G32.
+    std::array<SourceAwareDestinationServiceStagedObservation,
+               event_runtime_detail::kG4IRSF32MaxStagedPIBTActions>
+        source_aware_destination_service_stages;
     std::vector<RuntimeEvent> staged_events;
     std::vector<PIBTStagedMergeVisibility>
         staged_merge_visibility;
@@ -9548,6 +10355,53 @@ class EventDrivenJunctionRuntime {
         ranking.end());
   }
 
+  void apply_s4_static_dominance_guard(
+      const EventDecisionTraceRow& trace,
+      bool first_edge_credit_active,
+      std::vector<std::size_t>& ranking) const {
+    const bool require_shorter_service =
+        uses_s4_typed_service_dominance();
+    if ((!require_shorter_service &&
+         !uses_s4_service_aware_static_dominance()) ||
+        first_edge_credit_active || ranking.empty()) {
+      return;
+    }
+    const auto& winner = trace.candidates[ranking.front()];
+    if (!winner.shield_allowed || winner.advertised_fault ||
+        winner.next_node == trace.goal_node ||
+        graph_.node(winner.next_node).node_type != 2) {
+      return;
+    }
+    const double winner_base =
+        winner.travel_time + winner.static_potential;
+    const double winner_service = service_duration(winner.next_node);
+    auto best = ranking.end();
+    std::tuple<double, double, int> best_key;
+    for (auto candidate = ranking.begin(); candidate != ranking.end();
+         ++candidate) {
+      const auto& record = trace.candidates[*candidate];
+      if (!record.shield_allowed || record.advertised_fault ||
+          graph_.node(record.next_node).node_type != 4) {
+        continue;
+      }
+      const double base = record.travel_time + record.static_potential;
+      const double service = service_duration(record.next_node);
+      if (!(base < winner_base &&
+            (!require_shorter_service || service < winner_service))) {
+        continue;
+      }
+      const auto key = std::make_tuple(
+          base, require_shorter_service ? service : 0.0, record.next_node);
+      if (best == ranking.end() || key < best_key) {
+        best = candidate;
+        best_key = key;
+      }
+    }
+    if (best != ranking.end()) {
+      std::rotate(ranking.begin(), best, best + 1);
+    }
+  }
+
   void apply_scorer(EventDecisionTraceRow& trace) {
     trace.scorer_id = canonical_scorer_id();
     trace.scorer_effective_id = trace.scorer_id;
@@ -9613,17 +10467,41 @@ class EventDrivenJunctionRuntime {
         double score =
             candidate.travel_time + candidate.static_potential;
         if (mode == "S4") {
-          score +=
-              static_cast<double>(
-                  candidate.target_queue_length +
-                  candidate.target_scheduled_incoming) +
-              std::max(0.0,
-                       candidate.corridor_next_available -
-                           trace.event_time) +
-              std::max(
-                  0.0,
-                  candidate.target_next_available -
-                      (trace.event_time + candidate.travel_time));
+          if (uses_s4_uncovered_local_work_seconds()) {
+            const auto& target = junctions_.at(candidate.next_node);
+            score += event_runtime_detail::uncovered_local_work_seconds(
+                         target.source_queue.size(),
+                         service_duration(candidate.next_node),
+                         uses_destination_calendar(candidate.next_node,
+                                                   trace.goal_node)) +
+                     std::max(0.0,
+                              candidate.corridor_next_available -
+                                  trace.event_time) +
+                     std::max(
+                         0.0,
+                         candidate.target_next_available -
+                             (trace.event_time + candidate.travel_time));
+          } else {
+            score +=
+                static_cast<double>(
+                    candidate.target_queue_length +
+                    candidate.target_scheduled_incoming) +
+                std::max(0.0,
+                         candidate.corridor_next_available -
+                             trace.event_time) +
+                std::max(
+                    0.0,
+                    candidate.target_next_available -
+                        (trace.event_time + candidate.travel_time));
+            if (uses_s4_plus_uncovered_local_work_seconds()) {
+              const auto& target = junctions_.at(candidate.next_node);
+              score += event_runtime_detail::uncovered_local_work_seconds(
+                  target.source_queue.size(),
+                  service_duration(candidate.next_node),
+                  uses_destination_calendar(candidate.next_node,
+                                            trace.goal_node));
+            }
+          }
         }
         candidate.pre_fault_policy_score = score;
         candidate.model_score =
@@ -10123,6 +11001,8 @@ class EventDrivenJunctionRuntime {
              std::tie(right_record.model_score, right_record.next_node);
     });
     apply_s4_local_potential_descent_guard(trace, ranking);
+    apply_s4_static_dominance_guard(
+        trace, credit.required, ranking);
     // model_prediction describes the scorer over the emitted candidate set.
     // Admission credit constrains the selected action, not the model output.
     if (!ranking.empty()) {
@@ -11559,7 +12439,37 @@ class EventDrivenJunctionRuntime {
   static bool test_transaction_summary_equal(
       const EventRuntimeSummary& left,
       const EventRuntimeSummary& right) noexcept {
-    return left.reservation_conflicts ==
+    const bool source_aware_equal =
+        left.source_aware_destination_service_mode ==
+            right.source_aware_destination_service_mode &&
+        left.source_aware_destination_service_external_commit_considered_count ==
+            right.source_aware_destination_service_external_commit_considered_count &&
+        left.source_aware_destination_service_observation_stored_count ==
+            right.source_aware_destination_service_observation_stored_count &&
+        left.source_aware_destination_service_observation_dropped_count ==
+            right.source_aware_destination_service_observation_dropped_count &&
+        left.source_aware_destination_service_direct_external_commit_count ==
+            right.source_aware_destination_service_direct_external_commit_count &&
+        left.source_aware_destination_service_j2_exact_commit_count ==
+            right.source_aware_destination_service_j2_exact_commit_count &&
+        left.source_aware_destination_service_no_local_count ==
+            right.source_aware_destination_service_no_local_count &&
+        left.source_aware_destination_service_local_guard_fail_count ==
+            right.source_aware_destination_service_local_guard_fail_count &&
+        left.source_aware_destination_service_non_overlap_count ==
+            right.source_aware_destination_service_non_overlap_count &&
+        left.source_aware_destination_service_staged_rollback_count ==
+            right.source_aware_destination_service_staged_rollback_count &&
+        left.source_aware_destination_service_action_change_count ==
+            right.source_aware_destination_service_action_change_count &&
+        left.source_aware_destination_service_calendar_mutation_count ==
+            right.source_aware_destination_service_calendar_mutation_count &&
+        left.source_aware_destination_service_future_release_read_count ==
+            right.source_aware_destination_service_future_release_read_count &&
+        left.source_aware_destination_service_global_scan_count ==
+            right.source_aware_destination_service_global_scan_count;
+    return source_aware_equal &&
+           left.reservation_conflicts ==
                right.reservation_conflicts &&
            left.decision_count == right.decision_count &&
            left.resolved_deadlock_count ==
@@ -12278,11 +13188,13 @@ class EventDrivenJunctionRuntime {
   bool commit_pibt_batch(
       const std::vector<BoundedLocalPIBTAction>& actions,
       double time,
+      std::uint64_t arrive_event_seq,
       PIBTTransactionSnapshot& snapshot,
       std::string& blocker,
       const MergeGrantCapability*
           merge_grant_authority = nullptr,
-      int merge_grant_trigger_bag_id = -1) {
+      int merge_grant_trigger_bag_id = -1,
+      std::size_t enclosing_source_aware_staged_stored_count = 0) {
     if (!prevalidate_pibt_batch(
             actions,
             time,
@@ -12290,6 +13202,54 @@ class EventDrivenJunctionRuntime {
             merge_grant_authority,
             merge_grant_trigger_bag_id)) {
       return false;
+    }
+    // Classify each distinct DIRECT opportunity exactly once against the
+    // immutable pre-transaction state, retain it in the existing fixed
+    // staging array, then reserve the exact aggregate sidecar capacity before
+    // any logical mutation. The enclosing J2 observation has already claimed
+    // one slot and its grant-owning action is not a second DIRECT opportunity.
+    std::size_t preflight_source_aware_stored_count =
+        enclosing_source_aware_staged_stored_count;
+    if (source_aware_destination_service_shadow_enabled()) {
+      for (std::size_t index = 0; index < actions.size(); ++index) {
+        const auto& action = actions[index];
+        const bool owns_enclosing_grant =
+            merge_grant_authority != nullptr &&
+            action.bag_id == merge_grant_trigger_bag_id;
+        const auto& bag = bags_.at(action.bag_id);
+        if (owns_enclosing_grant ||
+            !uses_destination_calendar(
+                action.next_node, bag.request.goal)) {
+          continue;
+        }
+        const auto& edge =
+            graph_.edge(action.from_node, action.next_node);
+        const double travel = std::max(
+            edge.travel_time(), config_.minimum_service_seconds);
+        const double slot_start = time + travel;
+        auto& staged =
+            snapshot.source_aware_destination_service_stages[index];
+        staged =
+            stage_source_aware_destination_service_shadow(
+                bag,
+                junctions_.at(action.next_node),
+                action.next_node,
+                time,
+                arrive_event_seq,
+                1U,
+                slot_start,
+                slot_start + service_duration(action.next_node),
+                slot_start,
+                action.from_node,
+                nullptr,
+                preflight_source_aware_stored_count);
+        if (staged.outcome ==
+            SourceAwareDestinationServiceStageOutcome::kStored) {
+          ++preflight_source_aware_stored_count;
+        }
+      }
+      preflight_source_aware_destination_service_shadow_capacity(
+          preflight_source_aware_stored_count);
     }
     const bool first_edge_credit_mode =
         uses_first_edge_credit();
@@ -12425,7 +13385,10 @@ class EventDrivenJunctionRuntime {
               action.from_node,
               action.next_node,
               time,
+              arrive_event_seq,
               &transaction_delta,
+              &snapshot.source_aware_destination_service_stages[
+                  snapshot.applied_action_count - 1],
               merge_grant_authority != nullptr &&
                   action.bag_id ==
                       merge_grant_trigger_bag_id
@@ -12618,7 +13581,8 @@ class EventDrivenJunctionRuntime {
       std::uint64_t arrive_event_seq,
       int* priority_comparison_count,
       const MergeGrantCapability*
-          merge_grant_authority = nullptr) {
+          merge_grant_authority = nullptr,
+      std::size_t enclosing_source_aware_staged_stored_count = 0) {
     auto& controller = junctions_[node];
     if (controller.queue.empty() ||
         time + event_runtime_detail::kEpsilon <
@@ -12852,10 +13816,12 @@ class EventDrivenJunctionRuntime {
           return commit_pibt_batch(
               actions,
               time,
+              arrive_event_seq,
               transaction,
               callback_blocker,
               merge_grant_authority,
-              trigger_runtime_bag_id);
+              trigger_runtime_bag_id,
+              enclosing_source_aware_staged_stored_count);
         };
     callbacks.rollback =
         [&](const std::vector<BoundedLocalPIBTAction>&) {
@@ -13119,8 +14085,23 @@ class EventDrivenJunctionRuntime {
       }
 
 #ifdef CZR005_EVENT_RUNTIME_TESTING
+      const bool source_aware_stored_observation_staged =
+          std::any_of(
+              transaction
+                  .source_aware_destination_service_stages.begin(),
+              std::next(
+                  transaction
+                      .source_aware_destination_service_stages.begin(),
+                  static_cast<std::ptrdiff_t>(
+                      transaction.action_deltas.size())),
+              [](const auto& staged) {
+                return staged.outcome ==
+                       SourceAwareDestinationServiceStageOutcome::kStored;
+              });
       if (config_
               .test_pibt_fail_after_commit_before_publication &&
+          (!source_aware_destination_service_shadow_enabled() ||
+           source_aware_stored_observation_staged) &&
           !test_pibt_post_commit_failure_injected_) {
         test_pibt_post_commit_failure_injected_ = true;
         throw PIBTPostCommitFailureInjection{};
@@ -13148,11 +14129,19 @@ class EventDrivenJunctionRuntime {
               static_cast<int>(resolved.actions.size()));
       record_decision_latency(decision_started);
 
-      // Point of no return for the complete PIBT transaction. Everything
-      // below is capacity-backed noexcept publication or best-effort
-      // telemetry that cannot escape.
+      // Point of no return for the complete PIBT transaction. G32 allocates
+      // and publishes only here; the remaining ordinary publications are
+      // capacity-backed noexcept or best-effort telemetry.
       transaction.applied_action_count = 0;
       transaction.mutated = false;
+      for (std::size_t index = 0;
+           index < transaction.action_deltas.size();
+           ++index) {
+        publish_source_aware_destination_service_shadow(
+            std::move(
+                transaction
+                    .source_aware_destination_service_stages[index]));
+      }
       [&]() noexcept {
         for (auto& event : transaction.staged_events) {
           publish_prepared_reserved_event(
@@ -13238,10 +14227,10 @@ class EventDrivenJunctionRuntime {
     }
 
     const std::size_t queue_index =
-        choose_bag(controller.queue,
-                   time,
-                   controller.escape_token_task,
-                   priority_comparison_count);
+        choose_junction_bag(controller.queue,
+                            time,
+                            controller.escape_token_task,
+                            priority_comparison_count);
     const auto decision_started = std::chrono::steady_clock::now();
     const int task_id = controller.queue[queue_index];
     auto& bag = bags_.at(task_id);
@@ -13367,6 +14356,8 @@ class EventDrivenJunctionRuntime {
       return left_record.next_node < right_record.next_node;
     });
     apply_s4_local_potential_descent_guard(trace, ranking);
+    apply_s4_static_dominance_guard(
+        trace, first_edge_credit_required, ranking);
     // Report the scorer's prediction over all emitted candidates before
     // applying the first-edge admission credit constraint.
     if (!ranking.empty()) {
@@ -14121,7 +15112,8 @@ class EventDrivenJunctionRuntime {
         ++result_.summary.g4irsf16_i3_applied_count;
         ++result_.summary.g4irsf16_action_change_count;
       }
-      dispatch_selected_edge(bag, node, selected, time);
+      dispatch_selected_edge(
+          bag, node, selected, time, arrive_event_seq);
       commit_g4irsf24_dlp_mutation(trace, selected);
       if (causal_i3_override_selected) {
         mark_causal_action_applied(
@@ -14710,9 +15702,17 @@ class EventDrivenJunctionRuntime {
       int current,
       int selected,
       double time,
+      std::uint64_t arrive_event_seq,
       PIBTActionDelta* transaction_delta = nullptr,
+      SourceAwareDestinationServiceStagedObservation*
+          transaction_source_aware_stage = nullptr,
       const MergeGrantCapability*
           destination_merge_grant_authority = nullptr) {
+    if ((transaction_delta == nullptr) !=
+        (transaction_source_aware_stage == nullptr)) {
+      throw std::logic_error(
+          "PIBT delta and fixed shadow staging slot must be paired");
+    }
     const auto& edge = graph_.edge(current, selected);
     const double travel = std::max(edge.travel_time(), config_.minimum_service_seconds);
     const double exit_time = time + travel;
@@ -14772,6 +15772,44 @@ class EventDrivenJunctionRuntime {
                             time,
                             exit_time,
                             service_end);
+    SourceAwareDestinationServiceStagedObservation direct_source_aware_stage;
+    auto* source_aware_stage =
+        transaction_source_aware_stage == nullptr
+            ? &direct_source_aware_stage
+            : transaction_source_aware_stage;
+    if (transaction_source_aware_stage == nullptr &&
+        destination_merge_grant_authority == nullptr &&
+        uses_destination_calendar(selected, bag.request.goal)) {
+      *source_aware_stage =
+          stage_source_aware_destination_service_shadow(
+              bag,
+              target,
+              selected,
+              time,
+              arrive_event_seq,
+              1U,
+              exit_time,
+              service_end,
+              exit_time,
+              current,
+              nullptr);
+    }
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    if (config_
+            .test_source_aware_destination_service_fail_direct_after_stage &&
+        source_aware_stage->outcome !=
+            SourceAwareDestinationServiceStageOutcome::kDisabled) {
+      throw std::logic_error(
+          "G4IRSF32 V3R2 injected DIRECT failure after staging");
+    }
+#endif
+    if (transaction_source_aware_stage == nullptr) {
+      preflight_source_aware_destination_service_shadow_capacity(
+          source_aware_stage->outcome ==
+                  SourceAwareDestinationServiceStageOutcome::kStored
+              ? 1U
+              : 0U);
+    }
     if (corridor != nullptr) {
       if (transaction_delta != nullptr) {
         transaction_delta->corridor_generation_before =
@@ -14844,6 +15882,12 @@ class EventDrivenJunctionRuntime {
              false,
              0,
              service_end);
+    // Unique DIRECT publication seam.  J2-owned dispatches carry a non-null
+    // authority and therefore cannot enter this hook.
+    if (transaction_delta == nullptr) {
+      publish_source_aware_destination_service_shadow(
+          std::move(*source_aware_stage));
+    }
   }
 
   void process_edge_enter(const RuntimeEvent& event) {
@@ -15412,6 +16456,19 @@ class EventDrivenJunctionRuntime {
           merge->second.pending_count() > 0) {
         schedule_next_jit_destination_merge_opportunity(
             merge->second, event.time, true);
+      }
+    }
+    if (source_aware_destination_service_commit_recheck_enabled() &&
+        event.reason == "incoming_reservation_snapshot" &&
+        !controller.source_queue.empty() &&
+        controller.source_wakeup_pending) {
+      const double local_service = service_duration(event.node);
+      if (controller.service_calendar.earliest_start(
+              event.time, local_service) >
+              event.time + event_runtime_detail::kEpsilon &&
+          !source_aware_future_local_slot_exists(
+              controller, event.node, event.time)) {
+        schedule_source_wakeup(event.node, event.time);
       }
     }
   }
@@ -16526,18 +17583,33 @@ class EventDrivenJunctionRuntime {
         generation);
   }
 
-  std::size_t choose_bag(const std::deque<int>& queue,
-                         double time,
-                         int escape_token_task,
-                         int* priority_comparison_count =
-                             nullptr) const {
+  template <typename Eligible>
+  std::size_t choose_bag_if(
+      const std::deque<int>& queue,
+      double time,
+      int escape_token_task,
+      int* priority_comparison_count,
+      Eligible eligible) const {
     if (queue.empty()) {
       throw std::logic_error("cannot choose from an empty local queue");
     }
     for (std::size_t index = 0; index < queue.size(); ++index) {
-      if (queue[index] == escape_token_task) {
+      if (eligible(queue[index]) &&
+          queue[index] == escape_token_task) {
         return index;
       }
+    }
+
+    std::size_t best = queue.size();
+    for (std::size_t index = 0; index < queue.size(); ++index) {
+      if (eligible(queue[index])) {
+        best = index;
+        break;
+      }
+    }
+    if (best == queue.size()) {
+      throw std::logic_error(
+          "cannot choose from a local queue without an eligible bag");
     }
 
     if (canonical_framework_mode() ==
@@ -16545,8 +17617,10 @@ class EventDrivenJunctionRuntime {
       // The legacy Java comparator is `(int)(left.pass_time-right.pass_time)`.
       // Scanning the stable local deque with that exact truncation preserves
       // sub-second ties without importing its A* or reservation table.
-      std::size_t best = 0;
-      for (std::size_t index = 1; index < queue.size(); ++index) {
+      for (std::size_t index = best + 1; index < queue.size(); ++index) {
+        if (!eligible(queue[index])) {
+          continue;
+        }
         if (priority_comparison_count != nullptr) {
           ++*priority_comparison_count;
         }
@@ -16564,8 +17638,10 @@ class EventDrivenJunctionRuntime {
 
     if (canonical_priority_mode() !=
         BoundedLocalPIBTPriorityMode::kQ0Current) {
-      std::size_t best = 0;
-      for (std::size_t index = 1; index < queue.size(); ++index) {
+      for (std::size_t index = best + 1; index < queue.size(); ++index) {
+        if (!eligible(queue[index])) {
+          continue;
+        }
         if (priority_comparison_count != nullptr) {
           ++*priority_comparison_count;
         }
@@ -16578,8 +17654,10 @@ class EventDrivenJunctionRuntime {
       return best;
     }
 
-    std::size_t best = 0;
-    for (std::size_t index = 1; index < queue.size(); ++index) {
+    for (std::size_t index = best + 1; index < queue.size(); ++index) {
+      if (!eligible(queue[index])) {
+        continue;
+      }
       if (priority_comparison_count != nullptr) {
         ++*priority_comparison_count;
       }
@@ -16592,6 +17670,101 @@ class EventDrivenJunctionRuntime {
       }
     }
     return best;
+  }
+
+  std::size_t choose_source_bag(
+      const std::deque<int>& queue,
+      double time,
+      int escape_token_task,
+      int* priority_comparison_count = nullptr) const {
+    if (config_.queue_discipline !=
+            "fifo_source_longest_static_tie" ||
+        canonical_priority_mode() !=
+            BoundedLocalPIBTPriorityMode::kQ0Current ||
+        canonical_framework_mode() ==
+            "legacy_order_one_step_diagnostic") {
+      return choose_bag(queue,
+                        time,
+                        escape_token_task,
+                        priority_comparison_count);
+    }
+    if (queue.empty()) {
+      throw std::logic_error("cannot choose from an empty source queue");
+    }
+    for (std::size_t index = 0; index < queue.size(); ++index) {
+      if (queue[index] == escape_token_task) {
+        return index;
+      }
+    }
+
+    std::size_t best = 0;
+    const auto priority = [&](std::size_t index) {
+      const auto& bag = bags_.at(queue[index]);
+      return std::tuple{
+          bag.source_enqueued_at,
+          -static_potential(bag.current, bag.request.goal),
+          bag.request.runtime_bag_id};
+    };
+    for (std::size_t index = 1; index < queue.size(); ++index) {
+      if (priority_comparison_count != nullptr) {
+        ++*priority_comparison_count;
+      }
+      if (priority(index) < priority(best)) {
+        best = index;
+      }
+    }
+    return best;
+  }
+
+  std::size_t choose_bag(const std::deque<int>& queue,
+                         double time,
+                         int escape_token_task,
+                         int* priority_comparison_count =
+                             nullptr) const {
+    return choose_bag_if(
+        queue,
+        time,
+        escape_token_task,
+        priority_comparison_count,
+        [](int) noexcept { return true; });
+  }
+
+  std::size_t choose_junction_bag(
+      const std::deque<int>& queue,
+      double time,
+      int escape_token_task,
+      int* priority_comparison_count = nullptr) const {
+    if (config_.queue_discipline !=
+            "fifo_junction_skip_pending_merge_owner" ||
+        !uses_jit_destination_merge_grants() ||
+        g4irsf14_state_ == nullptr) {
+      return choose_bag(queue,
+                        time,
+                        escape_token_task,
+                        priority_comparison_count);
+    }
+
+    const auto unrepresented = [&](int runtime_bag_id) noexcept {
+      const auto state =
+          g4irsf14_state_->destination_merge_bags.find(
+              runtime_bag_id);
+      return state ==
+                 g4irsf14_state_->destination_merge_bags.end() ||
+             state->second.pending_request_id == 0;
+    };
+    const bool has_unrepresented = std::any_of(
+        queue.begin(), queue.end(), unrepresented);
+    if (!has_unrepresented) {
+      return choose_bag(queue,
+                        time,
+                        escape_token_task,
+                        priority_comparison_count);
+    }
+    return choose_bag_if(queue,
+                         time,
+                         escape_token_task,
+                         priority_comparison_count,
+                         unrepresented);
   }
 
   double local_priority_slack(const BagState& bag, double time) const {
@@ -16763,7 +17936,11 @@ class EventDrivenJunctionRuntime {
   double bag_priority(const BagState& bag, double time) const {
     const double enqueued = bag.status == BagStatus::kSourceQueue ? bag.source_enqueued_at
                                                                  : bag.junction_enqueued_at;
-    if (config_.queue_discipline == "fifo") {
+    if (config_.queue_discipline == "fifo" ||
+        config_.queue_discipline ==
+            "fifo_source_longest_static_tie" ||
+        config_.queue_discipline ==
+            "fifo_junction_skip_pending_merge_owner") {
       return enqueued;
     }
     const double deadline = bag.request.deadline >= 0.0
@@ -17453,10 +18630,18 @@ class EventDrivenJunctionRuntime {
     // deterministic compatibility hash merely because their empty C++
     // container objects exist in the class layout.
     std::size_t runtime_object_bytes = sizeof(*this);
+    if (!source_aware_destination_service_shadow_enabled()) {
+      runtime_object_bytes -=
+          event_runtime_detail::kG4IRSF32RuntimeExtensionBytes;
+    }
 #if defined(_MSC_VER) && defined(_WIN64)
     if (!g4irsf14_extensions_enabled() &&
         !g4irsf17_extensions_enabled()) {
       runtime_object_bytes = 4496;
+      if (source_aware_destination_service_shadow_enabled()) {
+        runtime_object_bytes +=
+            event_runtime_detail::kG4IRSF32RuntimeExtensionBytes;
+      }
     }
 #endif
     if (!g4irsf17_extensions_enabled() &&
@@ -17565,6 +18750,9 @@ class EventDrivenJunctionRuntime {
     accounted +=
         result_.merge_grant_lifecycle.capacity() *
         sizeof(DestinationMergeGrantLifecycleRow);
+    accounted +=
+        result_.source_aware_destination_service_shadow.capacity() *
+        sizeof(EventRuntimeSourceAwareDestinationServiceShadowRow);
     if (g4irsf14_state_ != nullptr) {
       accounted +=
           sizeof(event_runtime_detail::G4IRSF14RuntimeState);
@@ -17640,6 +18828,32 @@ class EventDrivenJunctionRuntime {
           events_.dynamic_storage_accounted_bytes();
     }
     result_.summary.cpp_internal_accounted_bytes = accounted;
+    if (source_aware_destination_service_shadow_enabled()) {
+      const std::size_t trace_sidecar_bytes =
+          result_.source_aware_destination_service_shadow.capacity() *
+          sizeof(EventRuntimeSourceAwareDestinationServiceShadowRow);
+      auto& g32 = result_.summary;
+      g32.source_aware_destination_service_trace_sidecar_accounted_bytes =
+          trace_sidecar_bytes;
+      g32.source_aware_destination_service_runtime_internal_accounted_bytes =
+          accounted - trace_sidecar_bytes;
+      g32.source_aware_destination_service_total_accounted_bytes = accounted;
+      const std::uint64_t partition_total =
+          g32.source_aware_destination_service_no_local_count +
+          g32.source_aware_destination_service_local_guard_fail_count +
+          g32.source_aware_destination_service_non_overlap_count +
+          g32.source_aware_destination_service_staged_rollback_count +
+          g32.source_aware_destination_service_observation_stored_count +
+          g32.source_aware_destination_service_observation_dropped_count;
+      if (g32.source_aware_destination_service_external_commit_considered_count !=
+              partition_total ||
+          g32.source_aware_destination_service_external_commit_considered_count !=
+              g32.source_aware_destination_service_direct_external_commit_count +
+                  g32.source_aware_destination_service_j2_exact_commit_count) {
+        throw std::logic_error(
+            "G4IRSF32 V3R2 census conservation failed");
+      }
+    }
   }
 
   void record_decision_latency(std::chrono::steady_clock::time_point started) {
@@ -19429,7 +20643,6 @@ EventDrivenJunctionRuntime::compute_replay_hashes_projection() const {
     deterministic.i64(static_cast<int>(row.state));
     deterministic.i64(static_cast<int>(row.reason));
   }
-
   return G4IRSF14CloneReplayHashes{
       complete.sha256(),
       segments.sha256(),
@@ -20296,6 +21509,8 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
       config_.test_merge_grant_advance_live_calendar_generation_before_edge_exit);
   scorer.boolean(
       config_.test_pibt_fail_after_commit_before_publication);
+  scorer.boolean(
+      config_.test_source_aware_destination_service_fail_direct_after_stage);
 #endif
   scorer.u64(config_.scorer_w1.size());
   for (const auto& row : config_.scorer_w1) {

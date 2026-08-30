@@ -16,6 +16,10 @@
 #include <utility>
 #include <vector>
 
+#ifndef CZR005_G4IRSF32_BUILD_HEAD
+#define CZR005_G4IRSF32_BUILD_HEAD "UNBOUND"
+#endif
+
 #include "ics_core/io/canonical_map2_reader.hpp"
 #include "ics_core/runtime/destination_merge_grant.hpp"
 #include "ics_core/runtime/event_driven_junction.hpp"
@@ -2018,6 +2022,74 @@ EventDrivenJunctionResult run_post_grant_pibt(
           motif, block_all_split_edges));
 }
 
+std::vector<EventRuntimeBagRequest>
+post_grant_pibt_shadow_requests(
+    const RealPostGrantPIBTMotif& motif) {
+  auto requests = post_grant_pibt_requests(motif);
+  // A long but still local service duration keeps one released candidate in
+  // each full destination source queue while the real three-action P2 chain
+  // commits.  That makes the enclosing J2 row and one nested DIRECT row both
+  // eligible without changing the discovered map2 routing motif.
+  const double common_ready_time = 21.0;
+  for (auto& request : requests) {
+    if (request.task_id == 44003) {
+      request.release_time = common_ready_time - 1.0;
+    }
+  }
+  EventRuntimeBagRequest merge_local;
+  merge_local.segment_id = "map2-post-grant-shadow-merge-local";
+  merge_local.task_id = 44004;
+  merge_local.release_time = common_ready_time - 1.0e-3;
+  merge_local.deadline = 1000.0;
+  merge_local.start = motif.destination_merge;
+  merge_local.goal = motif.goal;
+  merge_local.source = "nested-shadow-merge-local";
+  requests.push_back(merge_local);
+
+  EventRuntimeBagRequest split_local;
+  split_local.segment_id = "map2-post-grant-shadow-split-local";
+  split_local.task_id = 44005;
+  split_local.release_time = common_ready_time - 1.0e-3;
+  split_local.deadline = 1000.0;
+  split_local.start = motif.downstream_split;
+  split_local.goal = motif.goal;
+  split_local.source = "nested-shadow-split-local";
+  requests.push_back(split_local);
+  return requests;
+}
+
+EventDrivenJunctionConfig post_grant_pibt_shadow_config(
+    int trace_limit) {
+  auto config = e4_config();
+  config.local_queue_capacity = 1;
+  config.enable_pibt_lite = false;
+  config.enable_fault_policy = false;
+  config.scorer_mode = "S0";
+  config.max_simulation_time = 500.0;
+  config.storage_source_nodes = {52};
+  config.source_aware_destination_service_mode = "shadow";
+  config.source_aware_destination_service_trace_limit = trace_limit;
+  return config;
+}
+
+Graph post_grant_pibt_shadow_graph(
+    const RealPostGrantPIBTMotif& motif) {
+  auto graph = canonical_map2().graph;
+  graph.node(motif.destination_merge).service_time = 20.0;
+  graph.node(motif.downstream_split).service_time = 20.0;
+  return graph;
+}
+
+std::vector<EventRuntimeFaultWindow>
+post_grant_pibt_shadow_faults(
+    const RealPostGrantPIBTMotif& motif) {
+  auto faults = post_grant_pibt_faults(motif, false);
+  for (auto& fault : faults) {
+    fault.repair_time = 80.0;
+  }
+  return faults;
+}
+
 void test_post_grant_pibt_no_alternative_prefilter(
     Checks& checks,
     const RealPostGrantPIBTMotif& motif) {
@@ -2163,6 +2235,157 @@ void test_post_grant_pibt_authority(
       result.summary.physical_fault_edge_entry_violation_count == 0,
       "the blocker alternate and exact grant action must preserve the "
       "physical interlock");
+}
+
+void test_post_grant_pibt_nested_shadow_budget(
+    Checks& checks,
+    const RealPostGrantPIBTMotif& motif) {
+  const auto requests =
+      post_grant_pibt_shadow_requests(motif);
+  const auto faults =
+      post_grant_pibt_shadow_faults(motif);
+
+  const auto exact_graph =
+      post_grant_pibt_shadow_graph(motif);
+  EventDrivenJunctionRuntime exact_runtime(
+      exact_graph,
+      post_grant_pibt_shadow_config(2));
+  exact_runtime.initialize(requests, faults);
+  for (int step = 0;
+       step < 500 &&
+       exact_runtime.current_result().summary
+               .bounded_local_pibt_committed_action_count < 3 &&
+       exact_runtime.process_one_event();
+       ++step) {
+  }
+  const auto& exact = exact_runtime.current_result();
+  const auto& rows =
+      exact.source_aware_destination_service_shadow;
+  const auto telemetry_exact = [](const auto& row) {
+    return row.local_source_ready_count > 0 &&
+           row.local_choose_bag_index < row.local_source_ready_count &&
+           std::abs(row.local_source_uncovered_service_work_seconds -
+                    static_cast<double>(row.local_source_ready_count) *
+                        row.local_service_seconds) < 1.0e-12 &&
+           row.external_scheduled_incoming_count >= 0 &&
+           std::isfinite(row.oldest_local_wait_age_seconds) &&
+           row.oldest_local_wait_age_seconds >= 0.0 &&
+           std::isfinite(row.oldest_external_wait_age_seconds) &&
+           row.oldest_external_wait_age_seconds >= 0.0 &&
+           (row.destination_pending_count != 0 ||
+            row.oldest_external_wait_age_seconds == 0.0) &&
+           std::abs(row.service_calendar_next_free_seconds - row.L0) <
+               1.0e-12 &&
+           std::abs(row.existing_calendar_wait_seconds -
+                    (row.L0 - row.event_time)) < 1.0e-12 &&
+           row.selected_action_from_node == row.external_upstream_node &&
+           row.selected_action_to_node == row.node &&
+           row.selected_action_kind_code == row.seam_kind_code &&
+           row.local_origin_code == 1U && row.external_origin_code == 2U;
+  };
+  const bool exact_nested_publish =
+      exact.summary.bounded_local_pibt_committed_action_count >= 3 &&
+      rows.size() == 2 &&
+      rows[0].seam_kind_code == 1U &&
+      rows[1].seam_kind_code == 2U &&
+      rows[0].observation_ordinal == 1 &&
+      rows[1].observation_ordinal == 2 &&
+      std::all_of(rows.begin(), rows.end(), telemetry_exact) &&
+      exact.summary
+              .source_aware_destination_service_observation_stored_count ==
+          2;
+  if (!exact_nested_publish) {
+    std::cerr << "nested shadow diagnostic actions="
+              << exact.summary.bounded_local_pibt_committed_action_count
+              << " rows=" << rows.size()
+              << " stored="
+              << exact.summary
+                     .source_aware_destination_service_observation_stored_count
+              << " considered="
+              << exact.summary
+                     .source_aware_destination_service_external_commit_considered_count
+              << " no_local="
+              << exact.summary.source_aware_destination_service_no_local_count
+              << " guard="
+              << exact.summary
+                     .source_aware_destination_service_local_guard_fail_count
+              << " non_overlap="
+              << exact.summary
+                     .source_aware_destination_service_non_overlap_count
+              << '\n';
+    for (const auto& row : rows) {
+      std::cerr << "  seam=" << row.seam_kind_code
+                << " ordinal=" << row.observation_ordinal
+                << " node=" << row.node
+                << " local=" << row.local_task_id
+                << " external=" << row.external_task_id
+                << " L0=" << row.L0
+                << " L1=" << row.L1
+                << " slot=[" << row.external_slot_start_seconds
+                << ',' << row.external_slot_end_seconds << "]\n";
+    }
+    for (const auto& audit : exact.pibt_events) {
+      if (audit.committed_action_count > 0) {
+        std::cerr << "  pibt time=" << audit.time
+                  << " actions=" << audit.committed_action_count
+                  << " outcome=" << audit.outcome
+                  << " blocker=" << audit.blocker << '\n';
+      }
+    }
+  }
+  checks.require(
+      exact_nested_publish,
+      "nested J2 -> PIBT publication must assign unique ordinals in actual "
+      "append order and consume the exact aggregate trace budget");
+
+  const auto bounded_graph =
+      post_grant_pibt_shadow_graph(motif);
+  EventDrivenJunctionRuntime bounded_runtime(
+      bounded_graph,
+      post_grant_pibt_shadow_config(1));
+  bounded_runtime.initialize(requests, faults);
+  bool exhausted = false;
+  std::string unexpected_error;
+  try {
+    while (bounded_runtime.process_one_event()) {
+    }
+  } catch (const std::runtime_error& error) {
+    exhausted = std::string(error.what()) ==
+                "G4IRSF32 V3R2 shadow trace limit exhausted before commit";
+  } catch (const std::exception& error) {
+    unexpected_error = error.what();
+  }
+  const auto& bounded = bounded_runtime.current_result();
+  const bool trigger_edge_published = std::any_of(
+      bounded.events.begin(), bounded.events.end(), [&](const auto& row) {
+        return row.event == "EDGE_ENTER" &&
+               row.from_node == motif.trigger_upstream &&
+               row.to_node == motif.destination_merge;
+      });
+  if (!exhausted ||
+      !bounded.source_aware_destination_service_shadow.empty() ||
+      trigger_edge_published) {
+    std::cerr << "nested bounded diagnostic exhausted=" << exhausted
+              << " error=" << unexpected_error
+              << " rows="
+              << bounded.source_aware_destination_service_shadow.size()
+              << " stored="
+              << bounded.summary
+                     .source_aware_destination_service_observation_stored_count
+              << " considered="
+              << bounded.summary
+                     .source_aware_destination_service_external_commit_considered_count
+              << " trigger_edge=" << trigger_edge_published << '\n';
+  }
+  checks.require(
+      exhausted &&
+          bounded.source_aware_destination_service_shadow.empty() &&
+          bounded.summary
+                  .source_aware_destination_service_observation_stored_count ==
+              0 &&
+          !trigger_edge_published,
+      "an enclosing J2 reservation must count against the nested PIBT trace "
+      "budget before either observation or the external edge is published");
 }
 
 void test_post_commit_pibt_rollback_fingerprint(
@@ -2368,6 +2591,13 @@ int main() {
       checks, motif);
   test_post_grant_pibt_authority(
       checks, pibt_motif);
+  try {
+    test_post_grant_pibt_nested_shadow_budget(
+        checks, pibt_motif);
+  } catch (const std::exception& error) {
+    std::cerr << "nested shadow exception: " << error.what() << '\n';
+    checks.require(false, "nested shadow regression must not throw");
+  }
   test_post_grant_pibt_no_alternative_prefilter(
       checks, pibt_motif);
   test_post_commit_pibt_rollback_fingerprint(
@@ -2380,6 +2610,12 @@ int main() {
               << " destination merge runtime checks failed\n";
     return 1;
   }
+  std::cout
+      << "G4IRSF32_V3R2_NESTED_PROOF_JSON="
+         "{\"build_head\":\"" CZR005_G4IRSF32_BUILD_HEAD "\","
+         "\"nested_shadow_budget\":true,"
+         "\"schema_id\":\"czr005.g4irsf32.nested_proof.v3r2\","
+         "\"test_id\":\"g4irsf32_v3r2_nested_j2_pibt\"}\n";
   std::cout
       << "Destination-owned E4 real-map runtime checks passed"
       << " destination=" << motif.destination

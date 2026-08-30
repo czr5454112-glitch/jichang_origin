@@ -109,6 +109,21 @@ def _run_real_map(
         ),
         ("S3_shortest_potential_only", "S3_shortest_potential_only", False),
         ("S4_queue_aware_rule_only", "S4_queue_aware_rule_only", False),
+        (
+            "S4_uncovered_local_work_seconds_rule_only",
+            "S4_uncovered_local_work_seconds_rule_only",
+            False,
+        ),
+        (
+            "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only",
+            "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only",
+            False,
+        ),
+        (
+            "S4_typed_service_dominance_rule_only",
+            "S4_typed_service_dominance_rule_only",
+            False,
+        ),
     ],
 )
 def test_s0_s4_real_backend_identity_echo_and_summary_only(

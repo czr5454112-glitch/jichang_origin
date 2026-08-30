@@ -29,6 +29,8 @@ from scripts.eval import run_g4irsf28_service_potential as g28
 NodeRecord = tuple[int, int, float, int, int, tuple[int, ...]]
 EdgeRecord = tuple[int, int, float, float]
 
+PORTABLE_MAP_SCHEMA = "czr005.g4irsf32.portable_map_profile.v1"
+
 # G31 models physical junction service through the R3 service calendar and
 # E4/J2 grants.  It does not impose an additional software bag-count cap.
 G31_LOCAL_QUEUE_CAPACITY = 0
@@ -36,6 +38,13 @@ G31_LOCAL_QUEUE_CAPACITY = 0
 
 class MapProfileError(ValueError):
     """Raised when a map profile cannot satisfy the native graph contract."""
+
+
+@dataclass(frozen=True)
+class RuntimeStoragePair:
+    pair_id: str
+    storage_in_goal: int
+    storage_out_start: int
 
 
 @dataclass(frozen=True)
@@ -47,6 +56,12 @@ class RuntimeMapProfile:
     start_nodes: tuple[int, ...]
     goal_nodes: tuple[int, ...]
     storage_source_nodes: tuple[int, ...]
+    schema: str = ""
+    map_id: str = ""
+    external_node_ids: tuple[str, ...] = ()
+    explicit_roles: bool = False
+    storage_mode: str = "legacy"
+    storage_pairs: tuple[RuntimeStoragePair, ...] = ()
 
 
 def _integer(value: Any, label: str) -> int:
@@ -81,6 +96,233 @@ def _role_nodes(
     return tuple(sorted(values))
 
 
+def _external_id(value: Any, label: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise MapProfileError(f"{label} must be a non-empty string")
+    return value
+
+
+def _external_role_ids(
+    raw: Any,
+    *,
+    label: str,
+    node_ids: set[str],
+) -> tuple[str, ...]:
+    if not isinstance(raw, list):
+        raise MapProfileError(f"{label} must be a list of external node IDs")
+    values = tuple(
+        _external_id(value, f"{label}[]") for value in raw
+    )
+    if len(set(values)) != len(values):
+        raise MapProfileError(f"{label} must not contain duplicates")
+    missing = sorted(set(values) - node_ids)
+    if missing:
+        raise MapProfileError(f"{label} references unknown nodes: {missing}")
+    return values
+
+
+def _load_portable_map_profile(
+    path: Path,
+    payload: Mapping[str, Any],
+) -> RuntimeMapProfile:
+    """Load the normalized third-map boundary without guessing business roles."""
+
+    map_id = _external_id(payload.get("map_id"), "map_id")
+    raw_nodes = payload.get("nodes")
+    raw_edges = payload.get("edges")
+    if not isinstance(raw_nodes, list) or not raw_nodes:
+        raise MapProfileError("map profile nodes must be a non-empty list")
+    if not isinstance(raw_edges, list):
+        raise MapProfileError("map profile edges must be a list")
+
+    parsed_nodes: dict[str, tuple[int, float, int, int, tuple[str, ...]]] = {}
+    for index, raw_node in enumerate(raw_nodes):
+        if not isinstance(raw_node, Mapping):
+            raise MapProfileError(f"nodes[{index}] must be an object")
+        external = _external_id(
+            raw_node.get("external_id"), f"nodes[{index}].external_id"
+        )
+        if external in parsed_nodes:
+            raise MapProfileError(f"duplicate external node ID: {external}")
+        node_type = _integer(
+            raw_node.get("node_type"), f"nodes[{index}].node_type"
+        )
+        service = _finite(
+            raw_node.get("service_time"), f"nodes[{index}].service_time"
+        )
+        if service < 0.0:
+            raise MapProfileError("node service_time must be non-negative")
+        x = _integer(raw_node.get("x", 0), f"nodes[{index}].x")
+        y = _integer(raw_node.get("y", 0), f"nodes[{index}].y")
+        raw_outgoing = raw_node.get("outgoing", [])
+        if not isinstance(raw_outgoing, list):
+            raise MapProfileError(f"nodes[{index}].outgoing must be a list")
+        outgoing = tuple(
+            _external_id(value, f"nodes[{index}].outgoing[]")
+            for value in raw_outgoing
+        )
+        if len(set(outgoing)) != len(outgoing):
+            raise MapProfileError(f"nodes[{index}].outgoing contains duplicates")
+        parsed_nodes[external] = (node_type, service, x, y, outgoing)
+
+    # Lexical external-ID order makes the remap independent of source row order.
+    external_ids = tuple(sorted(parsed_nodes))
+    external_to_dense = {
+        external: dense for dense, external in enumerate(external_ids)
+    }
+    node_ids = set(external_ids)
+
+    parsed_edges: list[EdgeRecord] = []
+    external_edge_pairs: set[tuple[str, str]] = set()
+    for index, raw_edge in enumerate(raw_edges):
+        if not isinstance(raw_edge, Mapping):
+            raise MapProfileError(f"edges[{index}] must be an object")
+        start_external = _external_id(
+            raw_edge.get("start"), f"edges[{index}].start"
+        )
+        end_external = _external_id(
+            raw_edge.get("end"), f"edges[{index}].end"
+        )
+        if start_external not in node_ids or end_external not in node_ids:
+            raise MapProfileError(f"edges[{index}] references an unknown node")
+        length = _finite(raw_edge.get("length"), f"edges[{index}].length")
+        speed = _finite(raw_edge.get("speed"), f"edges[{index}].speed")
+        if length <= 0.0 or speed <= 0.0:
+            raise MapProfileError("edge length and speed must be positive")
+        pair = (start_external, end_external)
+        if pair in external_edge_pairs:
+            raise MapProfileError(f"duplicate directed edge: {pair}")
+        external_edge_pairs.add(pair)
+        parsed_edges.append(
+            (
+                external_to_dense[start_external],
+                external_to_dense[end_external],
+                length,
+                speed,
+            )
+        )
+
+    declared_pairs = {
+        (external, target)
+        for external, attributes in parsed_nodes.items()
+        for target in attributes[4]
+    }
+    unknown_outgoing = sorted(
+        target for _source, target in declared_pairs if target not in node_ids
+    )
+    if unknown_outgoing:
+        raise MapProfileError(
+            f"node outgoing lists reference unknown nodes: {unknown_outgoing}"
+        )
+    if declared_pairs != external_edge_pairs:
+        raise MapProfileError("node outgoing lists and directed edge records differ")
+
+    roles = payload.get("roles")
+    if not isinstance(roles, Mapping):
+        raise MapProfileError("portable map profile roles must be an object")
+    sources_external = _external_role_ids(
+        roles.get("source_nodes"),
+        label="roles.source_nodes",
+        node_ids=node_ids,
+    )
+    goals_external = _external_role_ids(
+        roles.get("goal_nodes"),
+        label="roles.goal_nodes",
+        node_ids=node_ids,
+    )
+    if not sources_external or not goals_external:
+        raise MapProfileError(
+            "portable map profile must explicitly declare a source and goal"
+        )
+
+    raw_storage = roles.get("storage")
+    if not isinstance(raw_storage, Mapping):
+        raise MapProfileError("roles.storage must be an object")
+    storage_mode = raw_storage.get("mode")
+    if storage_mode not in {"none", "explicit_ebs"}:
+        raise MapProfileError(
+            "roles.storage.mode must be 'none' or 'explicit_ebs'"
+        )
+    raw_pairs = raw_storage.get("pairs", [])
+    if not isinstance(raw_pairs, list):
+        raise MapProfileError("roles.storage.pairs must be a list")
+    if storage_mode == "none" and raw_pairs:
+        raise MapProfileError("storage mode 'none' must not declare EBS pairs")
+    if storage_mode == "explicit_ebs" and not raw_pairs:
+        raise MapProfileError("storage mode 'explicit_ebs' requires a pair")
+
+    storage_pairs: list[RuntimeStoragePair] = []
+    pair_ids: set[str] = set()
+    for index, raw_pair in enumerate(raw_pairs):
+        if not isinstance(raw_pair, Mapping):
+            raise MapProfileError(f"roles.storage.pairs[{index}] must be an object")
+        pair_id = _external_id(
+            raw_pair.get("pair_id"), f"roles.storage.pairs[{index}].pair_id"
+        )
+        if pair_id in pair_ids:
+            raise MapProfileError(f"duplicate storage pair ID: {pair_id}")
+        pair_ids.add(pair_id)
+        storage_in_external = _external_id(
+            raw_pair.get("storage_in_goal"),
+            f"roles.storage.pairs[{index}].storage_in_goal",
+        )
+        storage_out_external = _external_id(
+            raw_pair.get("storage_out_start"),
+            f"roles.storage.pairs[{index}].storage_out_start",
+        )
+        missing = sorted(
+            {storage_in_external, storage_out_external} - node_ids
+        )
+        if missing:
+            raise MapProfileError(
+                f"roles.storage.pairs[{index}] references unknown nodes: {missing}"
+            )
+        storage_pairs.append(
+            RuntimeStoragePair(
+                pair_id=pair_id,
+                storage_in_goal=external_to_dense[storage_in_external],
+                storage_out_start=external_to_dense[storage_out_external],
+            )
+        )
+
+    node_records = tuple(
+        (
+            external_to_dense[external],
+            parsed_nodes[external][0],
+            parsed_nodes[external][1],
+            parsed_nodes[external][2],
+            parsed_nodes[external][3],
+            tuple(
+                external_to_dense[target]
+                for target in parsed_nodes[external][4]
+            ),
+        )
+        for external in external_ids
+    )
+    storage_source_nodes = tuple(
+        sorted({pair.storage_out_start for pair in storage_pairs})
+    )
+    return RuntimeMapProfile(
+        name=str(payload.get("name", map_id)),
+        source_path=path,
+        node_records=node_records,
+        edge_records=tuple(sorted(parsed_edges)),
+        start_nodes=tuple(
+            sorted(external_to_dense[value] for value in sources_external)
+        ),
+        goal_nodes=tuple(
+            sorted(external_to_dense[value] for value in goals_external)
+        ),
+        storage_source_nodes=storage_source_nodes,
+        schema=PORTABLE_MAP_SCHEMA,
+        map_id=map_id,
+        external_node_ids=external_ids,
+        explicit_roles=True,
+        storage_mode=str(storage_mode),
+        storage_pairs=tuple(storage_pairs),
+    )
+
+
 def load_map_profile(
     profile_path: str | Path,
     *,
@@ -100,6 +342,17 @@ def load_map_profile(
         raise MapProfileError(f"cannot load map profile {path}: {exc}") from exc
     if not isinstance(payload, Mapping):
         raise MapProfileError("map profile root must be an object")
+    schema = payload.get("schema")
+    if schema == PORTABLE_MAP_SCHEMA:
+        if storage_source_nodes is not None:
+            raise MapProfileError(
+                "portable map storage roles cannot be overridden at load time"
+            )
+        return _load_portable_map_profile(path, payload)
+    if isinstance(schema, str) and schema.startswith(
+        "czr005.g4irsf32.portable_map_profile."
+    ):
+        raise MapProfileError(f"unsupported portable map schema: {schema}")
     raw_nodes = payload.get("nodes")
     raw_edges = payload.get("edges")
     if not isinstance(raw_nodes, list) or not raw_nodes:
@@ -234,6 +487,9 @@ def load_map_profile(
         start_nodes=starts,
         goal_nodes=goals,
         storage_source_nodes=storage,
+        schema=str(schema or ""),
+        map_id=str(payload.get("map_id", payload.get("name", path.stem))),
+        external_node_ids=tuple(str(location) for location in locations),
     )
 
 

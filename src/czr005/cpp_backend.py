@@ -719,15 +719,19 @@ def g4irsf11_event_runtime_from_records(
     g4irsf24_dlp_artifact: Mapping[str, Any] | PathLike | None = None,
     legacy_observation_bias_max_seconds: float = 0.0,
     legacy_observation_bias_seed: int = 0,
-    storage_source_nodes: Sequence[int] = (52,),
+    storage_source_nodes: Sequence[int] | None = None,
     enable_s4_local_potential_descent_guard: bool = False,
     enable_s4_direct_neighbor_merge_calendar_visibility: bool = False,
     complete_on_goal_arrival: bool = False,
+    source_aware_destination_service_mode: str = "off",
+    source_aware_destination_service_trace_limit: int = 200_000,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
     ``bag_records`` contain only identity, release/deadline, current source and
-    final goal.  There is intentionally no future-route argument.
+    final goal.  There is intentionally no future-route argument.  G4IRSF32
+    V3R2 shadow mode records fixed numeric external-commit/local-virtual rows;
+    V3R13 closed-loop mode may reserve one exact next-free local service slot.
     """
 
     def strict_integer(value: Any, name: str) -> int:
@@ -955,6 +959,33 @@ def g4irsf11_event_runtime_from_records(
     )
     if legacy_observation_bias_seed < 0:
         raise ValueError("legacy_observation_bias_seed must be non-negative")
+    if not isinstance(source_aware_destination_service_mode, str):
+        raise TypeError("source_aware_destination_service_mode must be a string")
+    if source_aware_destination_service_mode not in {
+        "off",
+        "shadow",
+        "closed_loop",
+        "closed_loop_commit_recheck",
+    }:
+        raise ValueError(
+            "source_aware_destination_service_mode must be off, shadow, or "
+            "closed_loop; V3R15 also accepts closed_loop_commit_recheck"
+        )
+    source_aware_destination_service_trace_limit = strict_integer(
+        source_aware_destination_service_trace_limit,
+        "source_aware_destination_service_trace_limit",
+    )
+    if (
+        source_aware_destination_service_mode != "off"
+        and source_aware_destination_service_trace_limit <= 0
+    ):
+        raise ValueError(
+            "source_aware_destination_service_trace_limit must be positive "
+            "when G4IRSF32 is enabled"
+        )
+    storage_source_nodes_explicit = storage_source_nodes is not None
+    if storage_source_nodes is None:
+        storage_source_nodes = (52,)
     if isinstance(storage_source_nodes, (str, bytes)):
         raise TypeError("storage_source_nodes must be a sequence of integers")
     normalized_storage_source_nodes: list[int] = []
@@ -1198,7 +1229,14 @@ def g4irsf11_event_runtime_from_records(
             # Explicit off is semantically identical to None/{} and must keep
             # the historical positional call usable with older native ABIs.
             normalized_g4irsf24_dlp = {}
-        elif scorer_mode not in {"S4", "S4_queue_aware_rule_only"}:
+        elif scorer_mode not in {
+            "S4",
+            "S4_queue_aware_rule_only",
+            "S4_uncovered_local_work_seconds_rule_only",
+            "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only",
+            "S4_typed_service_dominance_rule_only",
+            "S4_service_aware_static_dominance_rule_only",
+        }:
             raise ValueError("G4IRSF24 DLP requires the frozen S4 scorer")
     if g4irsf17_source_policy_mode == "off":
         if normalized_g4irsf17_source_policy:
@@ -1323,6 +1361,10 @@ def g4irsf11_event_runtime_from_records(
             "S3_shortest_potential_only",
             "S4",
             "S4_queue_aware_rule_only",
+            "S4_uncovered_local_work_seconds_rule_only",
+            "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only",
+            "S4_typed_service_dominance_rule_only",
+            "S4_service_aware_static_dominance_rule_only",
         }:
             raise ValueError(
                 "E4 destination merge grants require an existing "
@@ -1360,6 +1402,10 @@ def g4irsf11_event_runtime_from_records(
         "S3_shortest_potential_only",
         "S4",
         "S4_queue_aware_rule_only",
+        "S4_uncovered_local_work_seconds_rule_only",
+        "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only",
+        "S4_typed_service_dominance_rule_only",
+        "S4_service_aware_static_dominance_rule_only",
     }
     if scorer_mode not in scorer_modes:
         raise ValueError("scorer_mode must be one of S0, S1, S2, S3, S4")
@@ -1522,6 +1568,25 @@ def g4irsf11_event_runtime_from_records(
                 ],
             )
         )
+    if source_aware_destination_service_mode != "off":
+        declared_start_nodes = {
+            location
+            for location, node_type, _service, _x, _y, _outgoing
+            in normalized_node_records
+            if node_type in {1, 7}
+        }
+        if (
+            not storage_source_nodes_explicit
+            or not normalized_storage_source_nodes
+            or any(
+                node not in declared_start_nodes
+                for node in normalized_storage_source_nodes
+            )
+        ):
+            raise ValueError(
+                "G4IRSF32 requires an explicit nonempty unique "
+                "storage_source_nodes subset of declared start nodes"
+            )
 
     normalized_edge_records: list[
         tuple[int, int, float, float]
@@ -1988,6 +2053,17 @@ def g4irsf11_event_runtime_from_records(
         # Append only through the last requested flag.  With every G31/map
         # option off, older native modules retain the historical call shape.
         native_event_tail = append_only_map_tail_base + map_tail_suffix
+    if source_aware_destination_service_mode != "off":
+        # G32 follows the complete G31 map tail.  Off keeps the historical
+        # positional call shape for exact compatibility with the parent pyd.
+        native_event_tail = append_only_map_tail_base + (
+            normalized_storage_source_nodes,
+            bool(enable_s4_local_potential_descent_guard),
+            bool(enable_s4_direct_neighbor_merge_calendar_visibility),
+            bool(complete_on_goal_arrival),
+            source_aware_destination_service_mode,
+            int(source_aware_destination_service_trace_limit),
+        )
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
             normalized_node_records,

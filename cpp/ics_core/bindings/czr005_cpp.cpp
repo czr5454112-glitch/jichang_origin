@@ -3535,6 +3535,55 @@ py::dict g4irsf11_event_runtime_summary_row(
     row["legacy_observation_bias_claim_boundary"] =
         "deterministic_local_observation_delay_only";
   }
+  if (!summary.source_aware_destination_service_mode.empty()) {
+    row["source_aware_destination_service_mode"] =
+        summary.source_aware_destination_service_mode;
+    row["source_aware_destination_service_external_commit_considered_count"] =
+        py::int_(summary
+                     .source_aware_destination_service_external_commit_considered_count);
+    row["source_aware_destination_service_observation_stored_count"] =
+        py::int_(summary
+                     .source_aware_destination_service_observation_stored_count);
+    row["source_aware_destination_service_observation_dropped_count"] =
+        py::int_(summary
+                     .source_aware_destination_service_observation_dropped_count);
+    row["source_aware_destination_service_direct_external_commit_count"] =
+        py::int_(summary
+                     .source_aware_destination_service_direct_external_commit_count);
+    row["source_aware_destination_service_j2_exact_commit_count"] =
+        py::int_(summary.source_aware_destination_service_j2_exact_commit_count);
+    row["source_aware_destination_service_no_local_count"] =
+        py::int_(summary.source_aware_destination_service_no_local_count);
+    row["source_aware_destination_service_local_guard_fail_count"] =
+        py::int_(summary
+                     .source_aware_destination_service_local_guard_fail_count);
+    row["source_aware_destination_service_non_overlap_count"] =
+        py::int_(summary.source_aware_destination_service_non_overlap_count);
+    row["source_aware_destination_service_staged_rollback_count"] =
+        py::int_(summary
+                     .source_aware_destination_service_staged_rollback_count);
+    row["source_aware_destination_service_action_change_count"] =
+        py::int_(summary.source_aware_destination_service_action_change_count);
+    row["source_aware_destination_service_calendar_mutation_count"] =
+        py::int_(summary
+                     .source_aware_destination_service_calendar_mutation_count);
+    row["source_aware_destination_service_future_release_read_count"] =
+        summary.source_aware_destination_service_future_release_read_count;
+    row["source_aware_destination_service_global_scan_count"] =
+        summary.source_aware_destination_service_global_scan_count;
+    row["source_aware_destination_service_incremental_local_state_bytes"] =
+        py::int_(summary
+                     .source_aware_destination_service_incremental_local_state_bytes);
+    row["source_aware_destination_service_runtime_internal_accounted_bytes"] =
+        py::int_(summary
+                     .source_aware_destination_service_runtime_internal_accounted_bytes);
+    row["source_aware_destination_service_trace_sidecar_accounted_bytes"] =
+        py::int_(summary
+                     .source_aware_destination_service_trace_sidecar_accounted_bytes);
+    row["source_aware_destination_service_total_accounted_bytes"] =
+        py::int_(summary
+                     .source_aware_destination_service_total_accounted_bytes);
+  }
   row["source_admission_enabled"] = summary.source_admission_enabled;
   row["source_admission_attempt_count"] =
       py::int_(summary.source_admission_attempt_count);
@@ -6141,6 +6190,93 @@ py::dict g4irsf19_progress_row(
   return row;
 }
 
+py::list source_aware_destination_service_shadow_rows(
+    const std::vector<
+        czr005::ics::EventRuntimeSourceAwareDestinationServiceShadowRow>&
+        events) {
+  py::list rows;
+  for (const auto& event : events) {
+    py::dict row;
+    row["observation_ordinal"] = py::int_(event.observation_ordinal);
+    row["opportunity_id"] = py::int_(event.opportunity_id);
+    row["event_time"] = event.event_time;
+    row["event_seq"] = py::int_(event.event_seq);
+    row["node"] = event.node;
+    row["calendar_generation_before"] =
+        py::int_(event.calendar_generation_before);
+    row["seam_kind_code"] = py::int_(event.seam_kind_code);
+    row["external_path_code"] = py::int_(event.external_path_code);
+    row["external_task_id"] = event.external_task_id;
+    row["external_runtime_bag_id"] = event.external_runtime_bag_id;
+    row["external_upstream_node"] = event.external_upstream_node;
+    row["external_slot_start_seconds"] = event.external_slot_start_seconds;
+    row["external_slot_end_seconds"] = event.external_slot_end_seconds;
+    row["external_service_seconds"] = event.external_service_seconds;
+    row["external_projected_arrival"] = event.external_projected_arrival;
+    row["has_direct_episode_identity"] = event.has_direct_episode_identity;
+    row["external_direct_episode_event_seq"] =
+        py::int_(event.external_direct_episode_event_seq);
+    row["has_j2_identity"] = event.has_j2_identity;
+    row["external_request_id"] = py::int_(event.external_request_id);
+    row["external_request_lineage"] =
+        py::int_(event.external_request_lineage);
+    row["external_request_generation"] =
+        py::int_(event.external_request_generation);
+    row["external_junction_queue_generation"] =
+        py::int_(event.external_junction_queue_generation);
+    row["local_task_id"] = event.local_task_id;
+    row["local_runtime_bag_id"] = event.local_runtime_bag_id;
+    row["local_service_seconds"] = event.local_service_seconds;
+    row["local_source_ready_count"] =
+        py::int_(event.local_source_ready_count);
+    row["local_source_uncovered_service_work_seconds"] =
+        event.local_source_uncovered_service_work_seconds;
+    row["external_scheduled_incoming_count"] =
+        event.external_scheduled_incoming_count;
+    row["destination_pending_count"] =
+        py::int_(event.destination_pending_count);
+    row["oldest_local_wait_age_seconds"] =
+        event.oldest_local_wait_age_seconds;
+    row["oldest_external_wait_age_seconds"] =
+        event.oldest_external_wait_age_seconds;
+    row["local_source_enqueued_at"] = event.local_source_enqueued_at;
+    row["local_release"] = event.local_release;
+    row["local_deadline"] = event.local_deadline;
+    row["local_choose_bag_index"] = py::int_(event.local_choose_bag_index);
+    row["local_escape_token_runtime_bag_id"] =
+        event.local_escape_token_runtime_bag_id;
+    row["local_queue_nonempty"] = event.local_queue_nonempty;
+    row["local_bag_exists"] = event.local_bag_exists;
+    row["local_released_live"] = event.local_released_live;
+    row["local_source_queue_at_node"] = event.local_source_queue_at_node;
+    row["local_distinct_from_external"] = event.local_distinct_from_external;
+    row["local_service_required"] = event.local_service_required;
+    row["local_guards_passed"] = event.local_guards_passed;
+    row["L0"] = event.L0;
+    row["service_calendar_next_free_seconds"] =
+        event.service_calendar_next_free_seconds;
+    row["existing_calendar_wait_seconds"] =
+        event.existing_calendar_wait_seconds;
+    row["L1"] = event.L1;
+    row["X_insert"] = event.X_insert;
+    row["H_gap"] = event.H_gap;
+    row["overlap_seconds"] = event.overlap_seconds;
+    row["epsilon"] = event.epsilon;
+    row["selected_action_from_node"] = event.selected_action_from_node;
+    row["selected_action_to_node"] = event.selected_action_to_node;
+    row["selected_action_kind_code"] =
+        py::int_(event.selected_action_kind_code);
+    row["local_origin_code"] = py::int_(event.local_origin_code);
+    row["external_origin_code"] = py::int_(event.external_origin_code);
+    row["action_changed"] = event.action_changed;
+    row["future_release_read_count"] = event.future_release_read_count;
+    row["global_scan_count"] = event.global_scan_count;
+    row["calendar_mutation_count"] = event.calendar_mutation_count;
+    rows.append(std::move(row));
+  }
+  return rows;
+}
+
 py::dict g4irsf11_event_runtime_from_records(
     const std::vector<NodeRecordTuple>& node_records,
     const std::vector<EdgeRecordTuple>& edge_records,
@@ -6232,7 +6368,9 @@ py::dict g4irsf11_event_runtime_from_records(
     const std::vector<int>& storage_source_nodes,
     bool enable_s4_local_potential_descent_guard,
     bool enable_s4_direct_neighbor_merge_calendar_visibility,
-    bool complete_on_goal_arrival) {
+    bool complete_on_goal_arrival,
+    const std::string& source_aware_destination_service_mode,
+    int source_aware_destination_service_trace_limit) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6306,7 +6444,12 @@ py::dict g4irsf11_event_runtime_from_records(
       scorer_mode == "S3" ||
       scorer_mode == "S3_shortest_potential_only" ||
       scorer_mode == "S4" ||
-      scorer_mode == "S4_queue_aware_rule_only";
+      scorer_mode == "S4_queue_aware_rule_only" ||
+      scorer_mode == "S4_uncovered_local_work_seconds_rule_only" ||
+      scorer_mode ==
+          "S4_queue_aware_plus_uncovered_local_work_seconds_rule_only" ||
+      scorer_mode == "S4_typed_service_dominance_rule_only" ||
+      scorer_mode == "S4_service_aware_static_dominance_rule_only";
   if (requested_destination_merge_grants &&
       !destination_merge_scorer_allowed) {
     throw std::invalid_argument(
@@ -6321,6 +6464,20 @@ py::dict g4irsf11_event_runtime_from_records(
   if (bounded_check_every_events <= 0) {
     throw py::value_error(
         "bounded_check_every_events must be positive");
+  }
+  if (source_aware_destination_service_mode != "off" &&
+      source_aware_destination_service_mode != "shadow" &&
+      source_aware_destination_service_mode != "closed_loop" &&
+      source_aware_destination_service_mode !=
+          "closed_loop_commit_recheck") {
+    throw py::value_error(
+        "source_aware_destination_service_mode must be off, shadow, or "
+        "closed_loop; V3R15 also accepts closed_loop_commit_recheck");
+  }
+  if (source_aware_destination_service_mode != "off" &&
+      source_aware_destination_service_trace_limit <= 0) {
+    throw py::value_error(
+        "source_aware_destination_service_trace_limit must be positive when G4IRSF32 is enabled");
   }
   if (g4irsf20_event_hotpath_policy != "E0" &&
       g4irsf20_event_hotpath_policy != "E1" &&
@@ -6471,6 +6628,10 @@ py::dict g4irsf11_event_runtime_from_records(
   config.enable_s4_direct_neighbor_merge_calendar_visibility =
       enable_s4_direct_neighbor_merge_calendar_visibility;
   config.complete_on_goal_arrival = complete_on_goal_arrival;
+  config.source_aware_destination_service_mode =
+      source_aware_destination_service_mode;
+  config.source_aware_destination_service_trace_limit =
+      source_aware_destination_service_trace_limit;
   // Append-only Table 5.4 reconstruction seam; zero remains exact-off.
   config.legacy_observation_bias_max_seconds =
       legacy_observation_bias_max_seconds;
@@ -6891,6 +7052,16 @@ py::dict g4irsf11_event_runtime_from_records(
     trace_context["g4irsf18_merge_future_schedule_input_count"] = 0;
     trace_context["g4irsf18_merge_full_astar_call_count"] = 0;
   }
+  if (!result.summary.source_aware_destination_service_mode.empty()) {
+    if (result.summary.source_aware_destination_service_mode == "shadow") {
+      trace_context["source_aware_destination_service_schema_id"] =
+          "czr005.g4irsf32.external_commit_local_virtual_slot_shadow.v3r4";
+    }
+    trace_context["source_aware_destination_service_mode"] =
+        result.summary.source_aware_destination_service_mode;
+    trace_context["source_aware_destination_service_trace_limit"] =
+        source_aware_destination_service_trace_limit;
+  }
 
   py::dict payload;
   payload["summary"] = g4irsf11_event_runtime_summary_row(
@@ -6914,6 +7085,11 @@ py::dict g4irsf11_event_runtime_from_records(
       g4irsf12_event_runtime_credit_rows(result.credit_events);
   payload["pibt_events"] =
       g4irsf12_event_runtime_pibt_rows(result.pibt_events);
+  if (result.summary.source_aware_destination_service_mode == "shadow") {
+    payload["source_aware_destination_service_shadow"] =
+        source_aware_destination_service_shadow_rows(
+            result.source_aware_destination_service_shadow);
+  }
   if (result.summary.g4irsf17_source_wait_telemetry_enabled) {
     payload["g4irsf17_source_wait_blockers"] =
         g4irsf17_source_wait_blocker_rows(
@@ -6957,6 +7133,10 @@ py::dict g4irsf11_event_runtime_from_records(
 
 PYBIND11_MODULE(czr005_cpp, module) {
   module.doc() = "Minimal czr005 C++ core bindings for Phase1D parity checks.";
+#ifndef CZR005_G4IRSF32_BUILD_HEAD
+#define CZR005_G4IRSF32_BUILD_HEAD "UNBOUND"
+#endif
+  module.attr("g4irsf32_v3r2_build_head") = CZR005_G4IRSF32_BUILD_HEAD;
   czr005::bindings::g4irsf15::register_causal_campaign_bindings(
       module);
   py::class_<czr005::ics::EdgeScoreModel>(module, "EdgeScoreRuntimeModel")
@@ -7235,7 +7415,11 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg(
                  "enable_s4_direct_neighbor_merge_calendar_visibility") =
                  false,
-             py::arg("complete_on_goal_arrival") = false);
+             py::arg("complete_on_goal_arrival") = false,
+             py::arg("source_aware_destination_service_mode") =
+                 std::string("off"),
+             py::arg("source_aware_destination_service_trace_limit") =
+                 200000);
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,
