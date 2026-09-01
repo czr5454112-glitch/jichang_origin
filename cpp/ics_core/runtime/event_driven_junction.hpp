@@ -4712,8 +4712,13 @@ class EventDrivenJunctionRuntime {
                 "S4_queue_aware_rule_only")) {
       return "S4";
     }
+    if (mode_is(config_.scorer_mode,
+                "S5",
+                "S5_dynamic_workload_oracle")) {
+      return "S5";
+    }
     throw std::invalid_argument(
-        "unknown G4IRSF12 scorer_mode; expected S0..S4");
+        "unknown G4IRSF12 scorer_mode; expected S0..S5");
   }
 
   std::string canonical_scorer_id() const {
@@ -4730,7 +4735,10 @@ class EventDrivenJunctionRuntime {
     if (mode == "S3") {
       return "S3_shortest_potential_only";
     }
-    return "S4_queue_aware_rule_only";
+    if (mode == "S4") {
+      return "S4_queue_aware_rule_only";
+    }
+    return "S5_dynamic_workload_oracle";
   }
 
   static void scorer_fingerprint_u64(std::string& payload,
@@ -9519,6 +9527,133 @@ class EventDrivenJunctionRuntime {
     return base + residual->residual_seconds;
   }
 
+  // Attribute queued work to the service resource that will actually drain
+  // it. A bag waiting at u has already completed u's service, so charging its
+  // delay to u would make a path that merely detours and rejoins the same
+  // downstream server look artificially attractive. Instead, one service
+  // quantum is charged to the bag's static shortest next resource. Existing
+  // in-flight reservations contribute one service quantum at their exact
+  // destination. This is a fluid workload label, not a second reservation.
+  std::unordered_map<int, double>
+  dynamic_workload_oracle_resource_work(
+      int excluded_runtime_bag_id,
+      int decision_node) const {
+    std::unordered_map<int, double> work;
+    work.reserve(graph_.node_count());
+    for (const auto& [node, controller] : junctions_) {
+      if (controller.scheduled_incoming > 0) {
+        work[node] += service_duration(node) *
+                      static_cast<double>(
+                          controller.scheduled_incoming);
+      }
+      // The current decision owner has already won this node's arbitration.
+      // Bags behind it in the same FIFO cannot reach any next resource first,
+      // so treating them as blocking demand is non-causal. Remote queues do
+      // remain ahead of this bag's future arrival and are fully attributed.
+      if (node == decision_node) {
+        continue;
+      }
+      for (const int runtime_bag_id : controller.queue) {
+        if (runtime_bag_id == excluded_runtime_bag_id) {
+          continue;
+        }
+        const auto bag = bags_.find(runtime_bag_id);
+        if (bag == bags_.end() || node == bag->second.request.goal) {
+          continue;
+        }
+        std::optional<std::pair<double, int>> best;
+        for (const int downstream : graph_.outgoing(node)) {
+          const auto physical = physical_faults_.find(
+              event_runtime_detail::directed_key(node, downstream));
+          if (physical != physical_faults_.end() &&
+              physical->second.active_count > 0) {
+            continue;
+          }
+          const double travel = std::max(
+              graph_.edge(node, downstream).travel_time(),
+              config_.minimum_service_seconds);
+          const auto candidate = std::make_pair(
+              travel + static_potential(
+                           downstream, bag->second.request.goal),
+              downstream);
+          if (!best.has_value() || candidate < *best) {
+            best = candidate;
+          }
+        }
+        if (best.has_value()) {
+          work[best->second] += service_duration(best->second);
+        }
+      }
+    }
+    return work;
+  }
+
+  // Research oracle for the G35 bottleneck diagnostic. Every edge retains
+  // its physical travel time and every non-goal node contributes its own
+  // service time plus the currently attributed work at that exact resource.
+  // The result is measured in seconds and has no fitted weight or map/node
+  // special case. This scans the live graph and is deliberately accounted as
+  // a full-route call; it is not the eventual decentralized beacon version.
+  double dynamic_workload_oracle_cost(
+      int start,
+      int goal,
+      double start_arrival_time,
+      double now,
+      const std::unordered_map<int, double>& resource_work) const {
+    using QueueItem = std::pair<double, int>;
+    std::priority_queue<QueueItem,
+                        std::vector<QueueItem>,
+                        std::greater<QueueItem>> frontier;
+    std::unordered_map<int, double> distance;
+    distance.reserve(graph_.node_count());
+    distance.emplace(start, start_arrival_time);
+    frontier.emplace(start_arrival_time, start);
+    while (!frontier.empty()) {
+      const auto [cost, node] = frontier.top();
+      frontier.pop();
+      const auto known = distance.find(node);
+      if (known == distance.end() ||
+          cost > known->second + event_runtime_detail::kEpsilon) {
+        continue;
+      }
+      if (node == goal) {
+        return cost - now;
+      }
+      const double service = service_duration(node);
+      const auto attributed = resource_work.find(node);
+      const double queued_work =
+          attributed == resource_work.end() ? 0.0 : attributed->second;
+      // The current workload drains at one service-second per simulated
+      // second while this bag travels. Thus a resource becomes available at
+      // max(arrival, now + work); this is the standard fluid-workload
+      // earliest-completion projection and avoids charging work that will
+      // have cleared before arrival.
+      const double ready_to_depart =
+          std::max(cost, now + queued_work) + service;
+      for (const int downstream : graph_.outgoing(node)) {
+        const auto physical = physical_faults_.find(
+            event_runtime_detail::directed_key(node, downstream));
+        if (physical != physical_faults_.end() &&
+            physical->second.active_count > 0) {
+          continue;
+        }
+        const double travel = std::max(
+            graph_.edge(node, downstream).travel_time(),
+            config_.minimum_service_seconds);
+        const double next_cost = ready_to_depart + travel;
+        const auto previous = distance.find(downstream);
+        if (previous != distance.end() &&
+            next_cost + event_runtime_detail::kEpsilon >=
+                previous->second) {
+          continue;
+        }
+        distance[downstream] = next_cost;
+        frontier.emplace(next_cost, downstream);
+      }
+    }
+    return std::numeric_limits<double>::infinity();
+  }
+
   bool s4_local_potential_descent_allowed(
       const EventDecisionTraceRow& trace,
       const EventCandidateRecord& candidate) const {
@@ -9608,10 +9743,28 @@ class EventDrivenJunctionRuntime {
                              candidate.model_score);
     }
 
-    if (mode == "S3" || mode == "S4") {
+    if (mode == "S3" || mode == "S4" || mode == "S5") {
+      std::unordered_map<int, double> resource_work;
+      if (mode == "S5") {
+        trace.full_astar_used = true;
+        ++result_.summary.scorer_runtime_global_scan_count;
+        result_.summary.runtime_full_astar_calls +=
+            static_cast<int>(trace.candidates.size());
+        resource_work = dynamic_workload_oracle_resource_work(
+            trace.runtime_bag_id,
+            trace.current_node);
+      }
       for (auto& candidate : trace.candidates) {
-        double score =
-            candidate.travel_time + candidate.static_potential;
+        double score = mode == "S5"
+                           ? dynamic_workload_oracle_cost(
+                                 candidate.next_node,
+                                 trace.goal_node,
+                                 trace.event_time +
+                                     candidate.travel_time,
+                                 trace.event_time,
+                                 resource_work)
+                           : candidate.travel_time +
+                                 candidate.static_potential;
         if (mode == "S4") {
           score +=
               static_cast<double>(

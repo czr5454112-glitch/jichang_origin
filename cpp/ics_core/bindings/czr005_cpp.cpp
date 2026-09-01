@@ -5019,7 +5019,7 @@ py::list g4irsf11_event_decision_rows(
     row["rule_reason"] = decision.rule_reason;
     row["local_snapshot"] = std::move(local_snapshot);
     row["short_history"] = decision.short_history;
-    row["full_astar_used"] = false;
+    row["full_astar_used"] = decision.full_astar_used;
     row["model_fallback_disagreement"] =
         decision.fallback_selected_next >= 0 &&
         decision.fallback_selected_next != decision.model_prediction;
@@ -6306,12 +6306,14 @@ py::dict g4irsf11_event_runtime_from_records(
       scorer_mode == "S3" ||
       scorer_mode == "S3_shortest_potential_only" ||
       scorer_mode == "S4" ||
-      scorer_mode == "S4_queue_aware_rule_only";
+      scorer_mode == "S4_queue_aware_rule_only" ||
+      scorer_mode == "S5" ||
+      scorer_mode == "S5_dynamic_workload_oracle";
   if (requested_destination_merge_grants &&
       !destination_merge_scorer_allowed) {
     throw std::invalid_argument(
-        "E4 destination merge grants require an existing S1/S2/S3/S4 "
-        "legal-local scorer");
+        "E4 destination merge grants require an existing S1/S2/S3/S4/S5 "
+        "routing scorer");
   }
   if (!std::isfinite(bounded_wall_seconds) ||
       (bounded_wall_seconds != -1.0 && bounded_wall_seconds <= 0.0)) {
@@ -6576,7 +6578,8 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["scorer_future_route_input_count"] = 0;
   trace_context["scorer_future_schedule_input_count"] = 0;
   trace_context["scorer_posthoc_input_count"] = 0;
-  trace_context["scorer_runtime_global_scan_count"] = 0;
+  trace_context["scorer_runtime_global_scan_count"] =
+      result.summary.scorer_runtime_global_scan_count;
   trace_context["reservation_depth"] = 1;
   trace_context["diagnostic_hops"] = diagnostic_hops;
   trace_context["trace_limit"] = trace_limit;
@@ -6587,7 +6590,8 @@ py::dict g4irsf11_event_runtime_from_records(
   trace_context["trace_shard_count"] = trace_shard_count;
   trace_context["trace_shard_index"] = trace_shard_index;
   trace_context["trace_sampling"] = "deterministic_task_id_modulo_shard_then_limit";
-  trace_context["full_astar_used"] = false;
+  trace_context["full_astar_used"] =
+      result.summary.runtime_full_astar_calls > 0;
   trace_context["global_reservation_scan_used"] = false;
   trace_context["bag_future_path_field_present"] = false;
   trace_context["hold_attempts_are_not_training_actions"] = true;

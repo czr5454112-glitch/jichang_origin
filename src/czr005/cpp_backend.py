@@ -1323,10 +1323,12 @@ def g4irsf11_event_runtime_from_records(
             "S3_shortest_potential_only",
             "S4",
             "S4_queue_aware_rule_only",
+            "S5",
+            "S5_dynamic_workload_oracle",
         }:
             raise ValueError(
                 "E4 destination merge grants require an existing "
-                "S1/S2/S3/S4 legal-local scorer"
+                "S1/S2/S3/S4/S5 routing scorer"
             )
         if priority_mode not in {"Q0", "current_f2"}:
             raise ValueError(
@@ -1360,9 +1362,13 @@ def g4irsf11_event_runtime_from_records(
         "S3_shortest_potential_only",
         "S4",
         "S4_queue_aware_rule_only",
+        "S5",
+        "S5_dynamic_workload_oracle",
     }
     if scorer_mode not in scorer_modes:
-        raise ValueError("scorer_mode must be one of S0, S1, S2, S3, S4")
+        raise ValueError(
+            "scorer_mode must be one of S0, S1, S2, S3, S4, S5"
+        )
     frozen_mode = scorer_mode in {
         "S1",
         "S1_frozen_g4e_legal_local_adapter",
