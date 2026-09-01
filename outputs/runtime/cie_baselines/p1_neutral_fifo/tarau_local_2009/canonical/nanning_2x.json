@@ -1,0 +1,141 @@
+{
+  "schema": "czr005.g4irsf35.full_population_single_arm.v1",
+  "case_id": "t5_2_nanning_2x_speed_2p5",
+  "map": "nanning",
+  "scale": 2,
+  "arm": "tarau_local_2009",
+  "arm_label": "TARAU_LOCAL_2009_CIE_DH_ADAPTED_NOT_EXACT",
+  "population": {
+    "raw_bag_count": 57012,
+    "segment_count": 87206,
+    "whole_population": true
+  },
+  "fixed_window": {
+    "start_epoch": 8260.0,
+    "max_epochs": 90000,
+    "end_epoch": 98259.0,
+    "max_events": 60000000,
+    "speed_mps": 2.5
+  },
+  "release_protocol": {
+    "mode": "canonical",
+    "same_hca_release_trace_pass": false,
+    "formal_same_hca_release_input": false,
+    "request_delta_from_g31": {
+      "scorer_mode": "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED",
+      "enable_s4_local_potential_descent_guard": false,
+      "enable_s4_direct_neighbor_merge_calendar_visibility": false,
+      "merge_grant_rule": "M1",
+      "merge_grant_timing_mode": "jit_fifo"
+    },
+    "removed_request_fields_from_g31": []
+  },
+  "binary": {
+    "requested_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_cie_ablation\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "sha256": "884f36f0ceebdb0fd56924fd00fe5c8a1ebef56eb05fac4f53d66306de647155",
+    "same_binary_required_for_arm_comparison": true
+  },
+  "algorithm": {
+    "label": "TARAU_LOCAL_2009_CIE_DH_ADAPTED_NOT_EXACT",
+    "scorer_mode": "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED",
+    "enable_s4_local_potential_descent_guard": false,
+    "enable_s4_direct_neighbor_merge_calendar_visibility": false,
+    "request_delta_from_g31": {
+      "scorer_mode": "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED",
+      "enable_s4_local_potential_descent_guard": false,
+      "enable_s4_direct_neighbor_merge_calendar_visibility": false,
+      "merge_grant_rule": "M1",
+      "merge_grant_timing_mode": "jit_fifo"
+    },
+    "removed_request_fields_from_g31": [],
+    "baseline_family": "TARAU_LOCAL_2009_CIE_DH",
+    "aliases_not_independent_methods": [
+      "TARAU_LOCAL_2009",
+      "CIE_DH_2009",
+      "FENG_DH"
+    ],
+    "coordination_protocol": "neutral_fifo",
+    "s4_ablation": "none",
+    "literature_reimplementation": {
+      "exact_reproduction": false,
+      "reason": "moving/stopped penalty coefficients are undisclosed",
+      "frozen_before_outcomes": true,
+      "posthoc_tuning": false,
+      "moving_weight": 1.0,
+      "stopped_weight": 2.0,
+      "score_formula": "travel(u,v)+H_service_aware(v,g)+sum_path_r_not_goal(q_r*(M_r+2*S_r))",
+      "q_r": "max(node_service_time,minimum_service_seconds)",
+      "path_tie_break": "lowest_next_node_id",
+      "live_state_included": [
+        "scheduled_incoming_on_free_flow_path",
+        "junction_queue_on_free_flow_path"
+      ],
+      "live_state_excluded": [
+        "source_queue",
+        "pending_release",
+        "completed",
+        "failed"
+      ]
+    }
+  },
+  "status": "COMPLETE",
+  "native_execution_started": true,
+  "paper_subjects": {
+    "fixed_horizon_capacity": {
+      "formal_fixed_horizon_eligible": true,
+      "denominator_raw_bags": 57012,
+      "completed_raw_bag_count": 49038,
+      "completion_rate": 0.8601347084824248,
+      "finish_le_std": {
+        "count": 16525,
+        "rate": 0.2898512593839893,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD"
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 14614,
+        "rate": 0.2563320002806427,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds"
+      }
+    },
+    "full_population_raw_bag_timing": {
+      "status": "NOT_MEASURED_FULL_POPULATION_INCOMPLETE",
+      "raw_bag_count": null,
+      "survivor_or_common_cohort_used": false,
+      "formal_same_hca_release_arm_eligible": false,
+      "formal_comparison_requires_matching_other_arm": true,
+      "metrics_seconds": null
+    }
+  },
+  "execution_integrity": {
+    "pass": true,
+    "gates": {
+      "returned_exact_selected_segments": true,
+      "terminal_segment_partition": true,
+      "fixed_end_epoch_echo": true,
+      "max_events_echo": true,
+      "event_limit_not_reached": true,
+      "reservation_conflicts_zero": true,
+      "stable_fault_events_zero": true,
+      "stable_repair_events_zero": true,
+      "loaded_expected_binary": true,
+      "scorer_mode_echo": true,
+      "scorer_id_present": true
+    }
+  },
+  "runtime": {
+    "wall_seconds": 1744.4081177001353,
+    "cpu_seconds": 1703.59375,
+    "completed_count": 79232,
+    "failed_count": 7974,
+    "event_count": 17072608,
+    "decision_count": 1263794,
+    "event_limit_reached": false,
+    "time_limit_reached": true,
+    "reservation_conflicts": 0,
+    "loop_count": 0,
+    "runtime_full_astar_calls": 0,
+    "scorer_runtime_global_scan_count": 3300395,
+    "loaded_cpp_binary_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_cie_ablation\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "loaded_cpp_binary_sha256": "884f36f0ceebdb0fd56924fd00fe5c8a1ebef56eb05fac4f53d66306de647155"
+  }
+}

@@ -1,0 +1,32 @@
+schema: czr005.cie_baseline_policy.v1
+family: TARAU_DISTRIBUTED_2010
+formal_name: TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY
+evidence_label: ADAPTED_BASELINE
+exact_reproduction: false
+implementation:
+  scorer_mode: TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY
+  tau_pred_seconds: 5.0
+  dynamic_link_radius: 2
+  switch_cost_seconds: 0.0
+  tie_break: lowest_next_node_id
+  high_degree_adaptation: stable_argmin_all_legal_outgoing_edges
+  goal_arrival_cost: travel_only_no_goal_queue_or_service
+  weights_frozen_before_formal_runs: true
+  posthoc_tuning: false
+information_scope:
+  included:
+    - event_driven_direct_neighbor_congestion_beacon
+    - physical_service_rate
+    - static_free_flow_remaining_time
+  excluded:
+    - global_future_tasks
+    - global_reservation_table
+    - successor_service_calendar
+    - strict_potential_descent
+    - fault_residual
+physical_execution_boundary:
+  common_shield_reads_calendar_for_feasibility: true
+  calendar_values_enter_route_score: false
+limitations:
+  - Original switch-in weights, flight priorities, branching rates, and mechanical switch state are unavailable.
+  - This is the route/switch-out isolation only; it is not a native end-to-end reproduction.

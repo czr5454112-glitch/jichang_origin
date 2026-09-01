@@ -1,0 +1,367 @@
+{
+  "schema": "czr005.g4irsf31.nanning_s4_case.v1",
+  "case_id": "t5_2_nanning_1x_speed_2p5",
+  "case": {
+    "case_id": "t5_2_nanning_1x_speed_2p5",
+    "paper_table": "5.2",
+    "group": "stable_speed",
+    "scale": 1,
+    "speed_mps": 2.5,
+    "fault_scenario": null
+  },
+  "map_id": "nanning_topology_examples_1_2_namespaced_ics156",
+  "workload_protocol": "FLIGHT_TIMETABLE_PRESERVING_NANNING_OD_PROJECTION_1X",
+  "selection": {
+    "mode": "full",
+    "scale": 1,
+    "selected_raw_bag_count": 28506,
+    "selected_segment_count": 43603,
+    "scheduled_arrival_source": "canonical_pass_time",
+    "hca_release_trace_applied": false,
+    "whole_population_fixed_denominator": true
+  },
+  "comparison_contract": {
+    "capacity": {
+      "protocol": "SAME_CANONICAL_SCHEDULE_EACH_FRAMEWORK_OWN_SOURCE",
+      "raw_bag_denominator": 28506,
+      "fixed_start_epoch": 8260.0,
+      "hca_max_epochs": 90000,
+      "fixed_end_epoch": 98259.0,
+      "speed_mps": 2.5,
+      "fault_scenario": null,
+      "hca_release_dependency": false,
+      "comparison_allowed_after_matching_hca_cell_exists": true
+    },
+    "timing": {
+      "comparison_allowed_in_s4_artifact": false,
+      "requires_both_frameworks_complete_full_population": true,
+      "pairing": "own_source_raw_entry_to_completion_not_release_trace_paired",
+      "survivor_only_timing_allowed": false
+    }
+  },
+  "request_contract": {
+    "node_count": 151,
+    "directed_edge_count": 227,
+    "runtime_requested_segment_count": 43603,
+    "source_rejected_unreachable_segment_count": 0,
+    "edge_speeds_mps": [
+      2.5
+    ],
+    "storage_source_nodes": [
+      53
+    ],
+    "max_simulation_time": 98259.0,
+    "max_events": 60000000,
+    "local_queue_capacity": 0,
+    "fault_windows": [],
+    "policy": {
+      "scorer_mode": "S4_queue_aware_rule_only",
+      "queue_discipline": "fifo",
+      "merge_grant_rule": "M3",
+      "merge_grant_timing_mode": "jit_fair_aging_deadline",
+      "event_hotpath_policy": "E2",
+      "decision_scope": "one_next_edge_at_current_junction",
+      "learning_active": false,
+      "local_potential_descent_guard": {
+        "enabled": true,
+        "rule": "H_eff(next,goal)+epsilon<H_eff(current,goal)",
+        "read_scope": "current_and_direct_outgoing_neighbors",
+        "decision_scope": "one_next_edge_at_current_junction",
+        "no_descending_action": "hold_retry",
+        "learning_active": false,
+        "learned_values_allowed": false
+      },
+      "local_software_queue_cap": {
+        "local_queue_capacity": 0,
+        "semantics": "no configured software queue cap; service calendar/R3 and E4/J2 retained; capacity-triggered PIBT relief inactive"
+      },
+      "direct_neighbor_merge_calendar_visibility": {
+        "enabled": true,
+        "read_scope": "direct_outgoing_merge_neighbor_service_calendar_scalar",
+        "score_input": "existing_target_next_available_calendar_wait",
+        "score_weight": "existing_calendar_wait_weight",
+        "merge_authority": "E4/J2_unchanged",
+        "decision_scope": "one_next_edge_at_current_junction",
+        "learning_active": false
+      },
+      "goal_arrival_completion": {
+        "enabled": true,
+        "terminal_event": "physical_goal_edge_exit",
+        "goal_service": "not_reserved_or_executed",
+        "legacy_reference": "HCA_Tasks_ICS_goal_arrival_completion"
+      }
+    },
+    "local_values": {
+      "activation": "FAULT_STRUCTURAL_VALUES_EXACT_OFF",
+      "learned_from_runtime_data": false,
+      "fault_edges": [],
+      "source_rejected_unreachable_segment_count": 0,
+      "runtime_reachable_segment_count": 43603,
+      "artifact_contract": null,
+      "service_aware_potential": {
+        "mode": "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL",
+        "formula": "H(g,g)=0; H(u,g)=service_duration(u)+min_(u,v)(travel(u,v)+H(v,g))",
+        "service_duration": "max(map_node_service,minimum_service_seconds)",
+        "minimum_service_seconds": 0.001,
+        "candidate_score_identity": "travel(current,candidate)+H(candidate,goal) includes candidate and later non-goal service",
+        "precomputation": "reverse_dijkstra_once_per_goal",
+        "node_count": 151,
+        "directed_edge_count": 227,
+        "unreachable_finite_value_seconds": 3395.753999999998,
+        "runtime_read_scope": "direct_outgoing_candidates_and_one_scalar_each",
+        "runtime_decision_complexity": "O(outdegree)",
+        "runtime_full_astar_required": false,
+        "future_route_materialized": false,
+        "global_reservation_table_required": false
+      },
+      "local_potential_descent_guard": {
+        "enabled": true,
+        "rule": "H_eff(next,goal)+epsilon<H_eff(current,goal)",
+        "read_scope": "current_and_direct_outgoing_neighbors",
+        "decision_scope": "one_next_edge_at_current_junction",
+        "no_descending_action": "hold_retry",
+        "learning_active": false,
+        "learned_values_allowed": false
+      },
+      "direct_neighbor_merge_calendar_visibility": {
+        "enabled": true,
+        "read_scope": "direct_outgoing_merge_neighbor_service_calendar_scalar",
+        "score_input": "existing_target_next_available_calendar_wait",
+        "score_weight": "existing_calendar_wait_weight",
+        "merge_authority": "E4/J2_unchanged",
+        "decision_scope": "one_next_edge_at_current_junction",
+        "learning_active": false
+      },
+      "goal_arrival_completion": {
+        "enabled": true,
+        "terminal_event": "physical_goal_edge_exit",
+        "goal_service": "not_reserved_or_executed",
+        "legacy_reference": "HCA_Tasks_ICS_goal_arrival_completion"
+      }
+    }
+  },
+  "status": "COMPLETE_G31_FIXED_HORIZON_CAPACITY_EVIDENCE",
+  "native_execution_started": true,
+  "outcome": {
+    "requested_segment_count": 43603,
+    "runtime_requested_reachable_segment_count": 43603,
+    "source_rejected_unreachable_segment_count": 0,
+    "selected_raw_bag_count": 28506,
+    "completed_raw_bag_count": 28506,
+    "paper_raw_bag_tth": {
+      "denominator": "sum_over_segments(finish_time-admitted_time)",
+      "scope": "complete_raw_bags_only",
+      "distribution": {
+        "count": 28506,
+        "seconds": {
+          "min": 48.40099999999802,
+          "p50": 418.8126899999952,
+          "mean": 616.0590019659043,
+          "p95": 2378.668284999999,
+          "p99": 2781.375951500004,
+          "max": 4642.761409999999
+        },
+        "minutes": {
+          "min": 0.8066833333333003,
+          "p50": 6.98021149999992,
+          "mean": 10.26765003276507,
+          "p95": 39.64447141666665,
+          "p99": 46.356265858333394,
+          "max": 77.37935683333332
+        }
+      }
+    },
+    "success": {
+      "denominator_raw_bags": 28506,
+      "primary_completed_raw_bags": {
+        "count": 28506,
+        "rate": 1.0,
+        "definition": "all_selected_segments_completed"
+      },
+      "finish_le_std": {
+        "count": 28395,
+        "rate": 0.9961060829299095,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD"
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 11634,
+        "rate": 0.4081246053462429,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds"
+      }
+    }
+  },
+  "timing": {
+    "status": "S4_FULL_POPULATION_DESCRIPTIVE",
+    "population": "all_selected_raw_bags_complete",
+    "raw_bag_count": 28506,
+    "display_aliases": {
+      "java_release": "scheduled_segment_arrival"
+    },
+    "distributions": {
+      "processed_attempt": {
+        "count": 28506,
+        "min_seconds": 48.40099999999802,
+        "mean_seconds": 616.0590019659043,
+        "median_seconds": 418.8126899999952,
+        "p95_seconds": 2378.668284999999,
+        "p99_seconds": 2781.375951500004,
+        "max_seconds": 4642.761409999999
+      },
+      "java_release": {
+        "count": 28506,
+        "min_seconds": 48.40099999999802,
+        "mean_seconds": 627.7134405297154,
+        "median_seconds": 426.0645150000091,
+        "p95_seconds": 2399.5741524999967,
+        "p99_seconds": 2804.6207730000015,
+        "max_seconds": 4812.814249999999
+      },
+      "original_entry": {
+        "count": 28506,
+        "min_seconds": 48.40099999999802,
+        "mean_seconds": 2869.9735325890365,
+        "median_seconds": 2913.8837650000205,
+        "p95_seconds": 8524.889007500007,
+        "p99_seconds": 11214.13091550001,
+        "max_seconds": 14020.680409999997
+      }
+    },
+    "full_outcome_timing_comparison_allowed": false,
+    "comparison_requires_matching_full_population_hca_timing": true
+  },
+  "safety": {
+    "pass": true,
+    "mode": "FULL_POPULATION_FIXED_HORIZON_CAPACITY",
+    "gates": {
+      "full_registered_population": true,
+      "selected_partition": true,
+      "runtime_terminal_partition": true,
+      "runtime_returned_exact_segment_ids": true,
+      "fixed_horizon_request": true,
+      "fixed_horizon_echo": true,
+      "event_budget_request": true,
+      "event_budget_echo": true,
+      "event_count_within_budget": true,
+      "event_limit_not_reached": true,
+      "time_limit_is_reported": true,
+      "fault_event_count": true,
+      "repair_event_count": true,
+      "reservation_conflicts_zero": true,
+      "fault_edge_entry_violations_zero": true,
+      "runtime_full_astar_zero": true,
+      "runtime_full_cie_astar_zero": true,
+      "global_reservation_scan_zero": true,
+      "s4_j2_e2_echo": true,
+      "fault_value_echo": true,
+      "local_potential_descent_guard": true,
+      "local_software_queue_cap": true,
+      "direct_neighbor_merge_calendar_visibility": true,
+      "goal_arrival_completion": true,
+      "topology_bound": true
+    },
+    "runtime_echo_gates": {
+      "active_s4_scorer": true,
+      "active_j2_timing": true,
+      "active_e2_hotpath": true
+    },
+    "fault_value_echo": {
+      "active": false,
+      "pass": true,
+      "gates": {
+        "fault_artifact_mode_echoed": true,
+        "edge_residual_count_echoed": true,
+        "value_residual_count_echoed": true
+      },
+      "mode": null,
+      "claim_boundary": null,
+      "counters": {
+        "g4irsf24_dlp_route_evaluation_count": 0,
+        "g4irsf24_dlp_eligible_candidate_count": 0,
+        "g4irsf24_dlp_supported_candidate_count": 0,
+        "g4irsf24_dlp_proposal_count": 0,
+        "g4irsf24_dlp_committed_mutation_count": 0,
+        "g4irsf24_dlp_fallback_s4_count": 0,
+        "g4irsf24_dlp_same_action_count": 0,
+        "g4irsf24_dlp_unsupported_fallback_count": 0,
+        "g4irsf24_dlp_low_support_fallback_count": 0,
+        "g4irsf24_dlp_margin_fallback_count": 0,
+        "g4irsf24_dlp_detour_fallback_count": 0,
+        "g4irsf24_dlp_shield_fault_fallback_count": 0
+      }
+    },
+    "local_potential_descent_guard": {
+      "pass": true,
+      "enabled": true,
+      "learning_active": false,
+      "decision_scope": "one_next_edge_at_current_junction",
+      "rule": "H_eff(next,goal)+epsilon<H_eff(current,goal)",
+      "gates": {
+        "request_enabled": true,
+        "summary_enabled": true,
+        "summary_nonlearning": true,
+        "summary_one_hop_strict_descent": true,
+        "protocol_nonlearning": true,
+        "fault_values_deterministic": true
+      }
+    },
+    "local_software_queue_cap": {
+      "pass": true,
+      "local_queue_capacity": 0,
+      "semantics": "no configured software queue cap; service calendar/R3 and E4/J2 retained; capacity-triggered PIBT relief inactive",
+      "summary_local_queue_capacity": 0.0,
+      "gates": {
+        "request_zero": true,
+        "summary_zero": true
+      }
+    },
+    "direct_neighbor_merge_calendar_visibility": {
+      "pass": true,
+      "enabled": true,
+      "read_scope": "direct_outgoing_merge_neighbor_service_calendar_scalar",
+      "score_input": "existing_target_next_available_calendar_wait",
+      "score_weight": "existing_calendar_wait_weight",
+      "merge_authority": "E4/J2_unchanged",
+      "decision_scope": "one_next_edge_at_current_junction",
+      "learning_active": false,
+      "gates": {
+        "request_enabled": true,
+        "summary_enabled": true,
+        "summary_nonlearning": true,
+        "summary_direct_neighbor_existing_weight_j2": true,
+        "protocol_exact": true
+      }
+    },
+    "goal_arrival_completion": {
+      "pass": true,
+      "enabled": true,
+      "terminal_event": "physical_goal_edge_exit",
+      "goal_service": "not_reserved_or_executed",
+      "legacy_reference": "HCA_Tasks_ICS_goal_arrival_completion",
+      "claim_boundary": "physical_goal_edge_exit_terminal;goal_service_not_reserved;legacy_HCA_Tasks_ICS_completion_semantics",
+      "gates": {
+        "request_enabled": true,
+        "summary_enabled": true,
+        "summary_legacy_completion_seam": true,
+        "protocol_exact": true
+      }
+    },
+    "topology": null,
+    "topology_gates": {},
+    "operational_outcome_not_structural_veto": {
+      "completed_segment_count": 43603,
+      "failed_segment_count": 0,
+      "unresolved_deadlock_count": 0,
+      "time_limit_reached": false
+    }
+  },
+  "runtime": {
+    "wall_seconds": 51.03884880011901,
+    "cpu_seconds": 49.90625,
+    "event_count": 7087605,
+    "decision_count": 588936,
+    "declared_max_events": 60000000,
+    "declared_max_simulation_time": 98259.0,
+    "event_limit_reached": false,
+    "time_limit_reached": false
+  }
+}

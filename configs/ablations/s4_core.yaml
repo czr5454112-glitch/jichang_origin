@@ -1,0 +1,34 @@
+schema: czr005.cie_s4_ablation_set.v1
+base: G31_S4
+fixed_terms:
+  - edge_travel_time
+  - static_free_flow_potential
+component_bits:
+  Q: 1
+  I: 2
+  corridor_wait: 4
+  successor_service_wait: 8
+unique_variants:
+  A0_H_ONLY: {s4_score_component_mask: 0}
+  A1_H_Q: {s4_score_component_mask: 1}
+  A2_H_Q_I: {s4_score_component_mask: 3}
+  A4_FULL: {s4_score_component_mask: 15}
+  B1_FULL_MINUS_Q: {s4_score_component_mask: 14}
+  B2_FULL_MINUS_I: {s4_score_component_mask: 13}
+  B5_FULL_MINUS_STRICT_DESCENT:
+    s4_score_component_mask: 15
+    enable_s4_local_potential_descent_guard: false
+  C_FIFO:
+    merge_grant_rule: M1
+    merge_grant_timing_mode: jit_fifo
+  F1_SERVICE_RATE_NORMALIZED:
+    queue_time_scaling: service_rate_normalized
+structural_equivalences:
+  A3_H_Q_I_WC: A2_H_Q_I
+  B3_FULL_MINUS_WC: A4_FULL
+  B4_FULL_MINUS_WS: A2_H_Q_I
+not_in_stable_matrix:
+  C2_M3_AGING_OFF: independent_aging_only_switch_not_implemented
+  D0_D1: no_fault_event_in_stable_cells
+  P0_P1_P2: local_queue_capacity_zero_so_never_triggered
+stopping_rule: expand_to_2x_only_after_attributable_dual_map_1x_signal

@@ -10,6 +10,7 @@
 #include <tuple>
 #include <vector>
 
+#define CZR005_EVENT_RUNTIME_TESTING 1
 #include "ics_core/io/canonical_map2_reader.hpp"
 #include "ics_core/runtime/event_driven_junction.hpp"
 
@@ -22,9 +23,15 @@ namespace {
 using czr005::ics::CanonicalMap2ReadResult;
 using czr005::ics::EventDrivenJunctionConfig;
 using czr005::ics::EventDrivenJunctionRuntime;
+using czr005::ics::EventCandidateRecord;
 using czr005::ics::EventRuntimeBagRequest;
 using czr005::ics::EventRuntimeFaultWindow;
 using czr005::ics::Graph;
+using czr005::ics::kS4ScoreAllComponentsMask;
+using czr005::ics::kS4ScoreCorridorWaitMask;
+using czr005::ics::kS4ScoreTargetQueueMask;
+using czr005::ics::kS4ScoreTargetServiceWaitMask;
+using czr005::ics::s4_queue_aware_score;
 
 struct Checks {
   int failures = 0;
@@ -559,6 +566,55 @@ void test_non_goal_terminal_sink_is_locally_shielded(Checks& checks) {
   }
   checks.require(saw_dead_end_rejection,
                  "candidate trace must reject real non-goal terminal 47");
+
+  auto feng_config = test_config();
+  feng_config.scorer_mode =
+      "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED";
+  EventDrivenJunctionRuntime feng_runtime(graph, feng_config);
+  const auto feng = feng_runtime.run(
+      {{"feng-real-cross-terminal", 252, 0.0, 10000.0, 28, 49,
+        "canonical-map2"}});
+  check_core_invariants(checks, feng, 1);
+  checks.require(
+      !feng.decisions.empty() && feng.decisions.front().selected_next == 29,
+      "an unreachable cross-terminal Feng-DH candidate must not abort or "
+      "displace the reachable candidate");
+  const auto cross_terminal = std::find_if(
+      feng.decisions.front().candidates.begin(),
+      feng.decisions.front().candidates.end(),
+      [](const auto& candidate) { return candidate.next_node == 47; });
+  checks.require(
+      cross_terminal != feng.decisions.front().candidates.end() &&
+          std::isinf(cross_terminal->scorer_raw_score) &&
+          cross_terminal->scorer_raw_score > 0.0 &&
+          !cross_terminal->shield_allowed,
+      "the real map2 cross-terminal continuation must receive +infinity and "
+      "remain shielded");
+
+  auto tarau_config = test_config();
+  tarau_config.scorer_mode =
+      "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY";
+  EventDrivenJunctionRuntime tarau_runtime(graph, tarau_config);
+  const auto tarau = tarau_runtime.run(
+      {{"tarau-real-cross-terminal", 253, 0.0, 10000.0, 28, 49,
+        "canonical-map2"}});
+  check_core_invariants(checks, tarau, 1);
+  checks.require(
+      !tarau.decisions.empty() &&
+          tarau.decisions.front().selected_next == 29,
+      "the Tarau route-only adaptation must retain the reachable real map2 "
+      "candidate");
+  const auto tarau_cross_terminal = std::find_if(
+      tarau.decisions.front().candidates.begin(),
+      tarau.decisions.front().candidates.end(),
+      [](const auto& candidate) { return candidate.next_node == 47; });
+  checks.require(
+      tarau_cross_terminal != tarau.decisions.front().candidates.end() &&
+          std::isinf(tarau_cross_terminal->scorer_raw_score) &&
+          tarau_cross_terminal->scorer_raw_score > 0.0 &&
+          !tarau_cross_terminal->shield_allowed,
+      "the Tarau route-only score must map a real wrong terminal to "
+      "+infinity without aborting");
 }
 
 void test_non_goal_terminal_successor_trap_is_locally_shielded(Checks& checks) {
@@ -1004,6 +1060,73 @@ void test_storage_source_role_default_is_map2_compatible(Checks& checks) {
       "storage source role must retain the legacy map2 node-52 default");
 }
 
+void test_s4_component_mask_and_queue_time_scaling_motif(Checks& checks) {
+  EventCandidateRecord candidate;
+  candidate.travel_time = 2.0;
+  candidate.static_potential = 3.0;
+  candidate.target_queue_length = 4;
+  candidate.target_scheduled_incoming = 6;
+  candidate.corridor_next_available = 17.0;
+  candidate.target_next_available = 20.0;
+  candidate.estimated_service_rate = 2.0;
+  constexpr double event_time = 10.0;
+  constexpr std::array<double, 4> raw_terms = {4.0, 6.0, 7.0, 8.0};
+  constexpr std::array<double, 4> normalized_terms = {2.0, 3.0, 7.0, 8.0};
+
+  const double historical =
+      candidate.travel_time + candidate.static_potential +
+      static_cast<double>(candidate.target_queue_length +
+                          candidate.target_scheduled_incoming) +
+      (candidate.corridor_next_available - event_time) +
+      (candidate.target_next_available -
+       (event_time + candidate.travel_time));
+  checks.require(
+      s4_queue_aware_score(candidate, event_time,
+                           kS4ScoreAllComponentsMask, false) == historical,
+      "mask 15 with raw count-as-seconds must preserve the historical S4 "
+      "expression exactly");
+
+  for (int mask = 0; mask <= kS4ScoreAllComponentsMask; ++mask) {
+    double expected_raw = 5.0;
+    double expected_normalized = 5.0;
+    for (int bit = 0; bit < 4; ++bit) {
+      if ((mask & (1 << bit)) != 0) {
+        expected_raw += raw_terms[static_cast<std::size_t>(bit)];
+        expected_normalized +=
+            normalized_terms[static_cast<std::size_t>(bit)];
+      }
+    }
+    checks.require(
+        s4_queue_aware_score(candidate, event_time, mask, false) ==
+            expected_raw,
+        "every S4 component mask must include exactly its enabled raw terms");
+    checks.require(
+        s4_queue_aware_score(candidate, event_time, mask, true) ==
+            expected_normalized,
+        "F1 must divide each enabled Q/I term by estimated service rate and "
+        "leave WC/WS in seconds");
+  }
+
+  candidate.estimated_service_rate = 0.0;
+  checks.require(
+      s4_queue_aware_score(
+          candidate, event_time,
+          kS4ScoreCorridorWaitMask | kS4ScoreTargetServiceWaitMask,
+          true) == 20.0,
+      "F1 must not read service rate when both queue-count terms are masked");
+  bool rejected_invalid_rate = false;
+  try {
+    (void)s4_queue_aware_score(
+        candidate, event_time, kS4ScoreTargetQueueMask, true);
+  } catch (const std::logic_error&) {
+    rejected_invalid_rate = true;
+  }
+  checks.require(
+      rejected_invalid_rate,
+      "F1 must fail closed if an enabled queue-count term lacks a positive "
+      "finite service rate");
+}
+
 Graph s4_merge_calendar_visibility_graph() {
   Graph graph;
   for (int node = 0; node < 6; ++node) {
@@ -1053,6 +1176,12 @@ void test_s4_direct_neighbor_merge_calendar_visibility_is_exact_off_and_local(
       implicit_off.decisions.size() == explicit_off.decisions.size() &&
           implicit_off.bags.size() == explicit_off.bags.size(),
       "default-off merge-calendar visibility must preserve result shape");
+  checks.require(
+      implicit_off.summary.s4_score_component_mask ==
+              kS4ScoreAllComponentsMask &&
+          implicit_off.summary.queue_time_scaling ==
+              "raw_count_as_seconds",
+      "the S4 summary must echo the compatibility-default score controls");
   if (implicit_off.decisions.size() == explicit_off.decisions.size()) {
     for (std::size_t index = 0; index < implicit_off.decisions.size(); ++index) {
       checks.require(
@@ -1275,6 +1404,392 @@ void test_s4_local_descent_guard_uses_surviving_fault_potential(
       "fault guard must use surviving H and permit the static-uphill detour");
 }
 
+Graph feng_dh_reimplementation_graph() {
+  Graph graph;
+  for (int node = 0; node < 8; ++node) {
+    const double service = node == 3 || node == 4 ? 1.0 : 0.001;
+    graph.add_node(czr005::ics::Node{node, 0, service, 0, 0, {}});
+  }
+  // Insert the larger tied continuation first: the baseline must still use
+  // node 3, the lower next-node ID, for its deterministic free-flow path.
+  for (const auto [start, end, length] :
+       std::vector<std::tuple<int, int, double>>{
+           {0, 1, 0.1}, {0, 2, 0.1}, {1, 4, 0.1}, {1, 3, 0.1},
+           {3, 6, 0.1}, {4, 6, 0.1}, {5, 3, 0.1}, {2, 7, 0.1},
+           {7, 6, 1.899}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, length, 1.0});
+  }
+  std::vector<std::vector<double>> heuristic(
+      8, std::vector<double>(8, 0.0));
+  heuristic[1][6] = 1.201;
+  heuristic[2][6] = 2.001;
+  heuristic[3][6] = 1.1;
+  heuristic[4][6] = 1.1;
+  heuristic[5][6] = 1.201;
+  heuristic[7][6] = 1.9;
+  graph.set_heuristic(std::move(heuristic));
+  return graph;
+}
+
+void test_feng_dh_reimplementation_uses_frozen_moving_stopped_weights(
+    Checks& checks) {
+  const auto graph = feng_dh_reimplementation_graph();
+  const auto run = [&](const std::string& mode,
+                       double probe_release,
+                       bool stop_at_bottleneck) {
+    auto config = test_config();
+    config.scorer_mode = mode;
+    config.enable_source_admission = false;
+    config.enable_backpressure = false;
+    config.enable_pibt_lite = false;
+    EventDrivenJunctionRuntime runtime(graph, config);
+    const std::vector<EventRuntimeBagRequest> requests = {
+        {"path-blocker", 9101, 0.0, 1000.0, 5, 6, "synthetic"},
+        {"path-probe", 9102, probe_release, 1000.0, 0, 6, "synthetic"},
+    };
+    return stop_at_bottleneck
+               ? runtime.run(
+                     requests,
+                     {{3, 6, 0.0, 3.0, 0.0, false}})
+               : runtime.run(requests);
+  };
+
+  const auto control = run("S3_shortest_potential_only", 0.05, false);
+  const auto moving = run(
+      "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED", 0.05, false);
+  const auto stopped = run(
+      "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED", 1.2, true);
+  const auto probe_at_zero = [](const auto& result) {
+    return std::find_if(result.decisions.begin(), result.decisions.end(),
+                        [](const auto& row) {
+                          return row.segment_id == "path-probe" &&
+                                 row.current_node == 0;
+                        });
+  };
+  const auto control_probe = probe_at_zero(control);
+  const auto moving_probe = probe_at_zero(moving);
+  const auto stopped_probe = probe_at_zero(stopped);
+  checks.require(
+      control_probe != control.decisions.end() &&
+          control_probe->selected_next == 1,
+      "static shortest potential must select the uncongested shorter branch");
+  checks.require(
+      moving_probe != moving.decisions.end() &&
+          moving_probe->selected_next == 2 &&
+          stopped_probe != stopped.decisions.end() &&
+          stopped_probe->selected_next == 2,
+      "Feng-DH reimplementation must divert around both moving and stopped "
+      "work on its deterministic free-flow path");
+
+  const auto raw_score = [](const auto& decision, int next) {
+    const auto candidate = std::find_if(
+        decision.candidates.begin(), decision.candidates.end(),
+        [&](const auto& row) { return row.next_node == next; });
+    return candidate == decision.candidates.end()
+               ? -1.0
+               : candidate->scorer_raw_score;
+  };
+  if (moving_probe != moving.decisions.end() &&
+      stopped_probe != stopped.decisions.end()) {
+    checks.require(
+        std::abs(raw_score(*moving_probe, 1) - 2.301) <= 1.0e-9,
+        "moving work must add exactly service_time * 1 on the lower-ID tied "
+        "free-flow continuation");
+    checks.require(
+        std::abs(raw_score(*stopped_probe, 1) - 3.301) <= 1.0e-9,
+        "stopped work must add exactly service_time * 2");
+  }
+  checks.require(
+      moving.summary.completed_count == 2 &&
+          stopped.summary.completed_count == 2 &&
+          moving.summary.failed_count == 0 && stopped.summary.failed_count == 0,
+      "Feng-DH moving/stopped motif must fully drain");
+  checks.require(
+      moving.summary.scorer_id ==
+              "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED_NOT_EXACT" &&
+          moving.summary.scorer_runtime_global_scan_count > 0 &&
+          moving.summary.runtime_full_astar_calls == 0,
+      "Feng-DH summary must disclose non-exact identity and account live "
+      "path scans without claiming A*");
+}
+
+Graph tarau_route_only_motif_graph() {
+  Graph graph;
+  for (int node = 0; node < 8; ++node) {
+    const double service = node == 0 ? 0.001 : 1.0;
+    graph.add_node(czr005::ics::Node{node, 0, service, 0, 0, {}});
+  }
+  for (const auto [start, end] :
+       std::vector<std::pair<int, int>>{
+           {0, 2}, {0, 1}, {1, 3}, {2, 4},
+           {3, 5}, {4, 5}, {5, 6}, {3, 7}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, 1.0, 1.0});
+  }
+  graph.set_heuristic(
+      std::vector<std::vector<double>>(8, std::vector<double>(8, 0.0)));
+  return graph;
+}
+
+void test_tarau_route_only_uses_only_bounded_beacons(Checks& checks) {
+  const auto graph = tarau_route_only_motif_graph();
+  const auto run = [&](int beacon_node,
+                       int queue_length,
+                       int queued_goal,
+                       int queue_length_for_goal) {
+    auto config = test_config();
+    config.scorer_mode =
+        "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY";
+    config.enable_source_admission = false;
+    config.enable_backpressure = false;
+    config.enable_pibt_lite = false;
+    EventDrivenJunctionRuntime runtime(graph, config);
+    runtime.initialize(
+        {{"tarau-probe", 9201, 0.0, 1000.0, 0, 6, "synthetic"}});
+    while (const auto boundary = runtime.peek_safe_boundary()) {
+      if (boundary->next_event_type !=
+          czr005::ics::JunctionEventType::kCongestionBeaconUpdate) {
+        break;
+      }
+      runtime.process_one_event();
+    }
+    if (beacon_node >= 0) {
+      runtime.test_set_tarau_congestion_beacon(
+          beacon_node,
+          queue_length,
+          queued_goal,
+          queue_length_for_goal);
+    }
+    runtime.drain();
+    checks.require(
+        runtime.test_tarau_forbidden_candidate_dynamic_read_count() == 0,
+        "Tarau candidate construction must bypass the common live queue, "
+        "scheduled-incoming, calendar, and two-hop snapshot path");
+    return runtime.finalize();
+  };
+
+  const auto zero_flow = run(-1, 0, 6, 0);
+  const auto two_hop_live = run(3, 5, 6, 0);
+  // These bags have another destination, but their static next hop from v=1
+  // is still w=3, so they consume the same physical v->w flow capacity.
+  const auto other_goal_neighbor_flow = run(1, 5, 7, 5);
+  const auto radius_three_only = run(5, 100, 6, 100);
+  const auto check_motif_run = [&](const auto& result) {
+    checks.require(
+        result.summary.completed_count == 1 &&
+            result.summary.failed_count == 0 &&
+            result.summary.reservation_conflicts == 0 &&
+            result.summary.runtime_full_astar_calls == 0 &&
+            result.summary.global_reservation_scan_count == 0,
+        "Tarau bounded-beacon motif must complete without global routing or "
+        "reservation conflicts");
+    for (const auto& decision : result.decisions) {
+      checks.require(
+          graph.has_edge(decision.current_node, decision.selected_next),
+          "Tarau motif must select one real outgoing synthetic edge");
+      for (const auto& candidate : decision.candidates) {
+        checks.require(
+            candidate.target_queue_length == 0 &&
+                candidate.target_scheduled_incoming == 0 &&
+                candidate.corridor_next_available == 0.0 &&
+                candidate.target_next_available == 0.0 &&
+                candidate.two_hop_queue_pressure == 0,
+            "Tarau trace candidates must not materialize forbidden common "
+            "dynamic-state features");
+      }
+    }
+  };
+  check_motif_run(zero_flow);
+  check_motif_run(two_hop_live);
+  check_motif_run(other_goal_neighbor_flow);
+  check_motif_run(radius_three_only);
+
+  const auto first_probe = [](const auto& result) {
+    return std::find_if(result.decisions.begin(), result.decisions.end(),
+                        [](const auto& row) {
+                          return row.segment_id == "tarau-probe" &&
+                                 row.current_node == 0;
+                        });
+  };
+  const auto zero_decision = first_probe(zero_flow);
+  const auto live_decision = first_probe(two_hop_live);
+  const auto other_goal_decision = first_probe(other_goal_neighbor_flow);
+  const auto far_decision = first_probe(radius_three_only);
+  checks.require(
+      zero_decision != zero_flow.decisions.end() &&
+          zero_decision->selected_next == 1,
+      "zero neighbour flow must reduce to the stable local free-flow "
+      "Tarau route-only action");
+  checks.require(
+      live_decision != two_hop_live.decisions.end() &&
+          live_decision->selected_next == 2,
+      "changing only the radius-two w beacon must be able to change the "
+      "route-only action");
+  checks.require(
+      other_goal_decision != other_goal_neighbor_flow.decisions.end() &&
+          other_goal_decision->selected_next == 2,
+      "other-goal bags advertised at v must count when their static next "
+      "hop uses the same v->w flow");
+  checks.require(
+      far_decision != radius_three_only.decisions.end() &&
+          far_decision->selected_next == 1,
+      "a radius-three-only beacon change must not affect the current Tarau "
+      "route-only action");
+  if (zero_decision != zero_flow.decisions.end()) {
+    for (const auto& candidate : zero_decision->candidates) {
+      checks.require(
+          std::abs(candidate.scorer_raw_score - 4.0) <= 1.0e-9,
+          "zero-flow motif must implement tau(u,v)+max(tau(v,w),1/mu_w)"
+          "+H_ff(w,g) exactly");
+    }
+  }
+  checks.require(
+      zero_flow.summary.scorer_id ==
+              "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY" &&
+          zero_flow.summary.scorer_runtime_global_scan_count == 0 &&
+          two_hop_live.summary.scorer_runtime_global_scan_count == 0 &&
+          other_goal_neighbor_flow.summary.scorer_runtime_global_scan_count ==
+              0 &&
+          radius_three_only.summary.scorer_runtime_global_scan_count == 0 &&
+          zero_flow.summary.runtime_full_astar_calls == 0,
+      "Tarau route-only evaluation must disclose its canonical ID and never "
+      "perform a live global scan or runtime A*");
+}
+
+Graph tarau_goal_service_inversion_graph() {
+  Graph graph;
+  graph.add_node(czr005::ics::Node{0, 0, 0.001, 0, 0, {}});
+  graph.add_node(czr005::ics::Node{1, 0, 0.001, 0, 0, {}});
+  graph.add_node(czr005::ics::Node{2, 0, 0.001, 0, 0, {}});
+  // A deliberately large goal service time must be irrelevant when goal
+  // arrival itself completes the bag.
+  graph.add_node(czr005::ics::Node{3, 0, 10.0, 0, 0, {}});
+  for (const auto [start, end, travel] :
+       std::vector<std::tuple<int, int, double>>{
+           {0, 1, 2.0}, {0, 2, 1.0}, {1, 3, 0.1}, {2, 3, 2.0}}) {
+    graph.add_edge(czr005::ics::Edge{start, end, travel, 1.0});
+  }
+  graph.set_heuristic(
+      std::vector<std::vector<double>>(4, std::vector<double>(4, 0.0)));
+  return graph;
+}
+
+void test_tarau_two_hop_goal_skips_goal_service_and_queue(Checks& checks) {
+  const auto graph = tarau_goal_service_inversion_graph();
+  auto config = test_config();
+  config.scorer_mode =
+      "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY";
+  config.complete_on_goal_arrival = true;
+  config.enable_source_admission = false;
+  config.enable_backpressure = false;
+  config.enable_pibt_lite = false;
+  EventDrivenJunctionRuntime runtime(graph, config);
+  runtime.initialize(
+      {{"tarau-goal-service-inversion", 9203, 0.0, 1000.0, 0, 3,
+        "synthetic"}});
+  while (const auto boundary = runtime.peek_safe_boundary()) {
+    if (boundary->next_event_type !=
+        czr005::ics::JunctionEventType::kCongestionBeaconUpdate) {
+      break;
+    }
+    runtime.process_one_event();
+  }
+  runtime.test_set_tarau_congestion_beacon(3, 1000, 3, 1000);
+  runtime.drain();
+  const auto result = runtime.finalize();
+
+  const auto decision = std::find_if(
+      result.decisions.begin(), result.decisions.end(), [](const auto& row) {
+        return row.segment_id == "tarau-goal-service-inversion" &&
+               row.current_node == 0;
+      });
+  checks.require(
+      result.summary.completed_count == 1 &&
+          result.summary.failed_count == 0 &&
+          decision != result.decisions.end() &&
+          decision->selected_next == 1,
+      "Tarau must select the physically faster 2.1-second route instead of "
+      "charging nonexistent goal service and selecting the 3-second route");
+  if (decision != result.decisions.end()) {
+    const auto score_for = [&](int next) {
+      const auto candidate = std::find_if(
+          decision->candidates.begin(),
+          decision->candidates.end(),
+          [&](const auto& row) { return row.next_node == next; });
+      return candidate == decision->candidates.end()
+                 ? -1.0
+                 : candidate->scorer_raw_score;
+    };
+    checks.require(
+        std::abs(score_for(1) - 2.1) <= 1.0e-9 &&
+            std::abs(score_for(2) - 3.0) <= 1.0e-9,
+        "a two-hop goal continuation must be pure travel time regardless of "
+        "the goal service duration or goal beacon queue");
+  }
+  checks.require(
+      runtime.test_tarau_forbidden_candidate_dynamic_read_count() == 0 &&
+          result.summary.scorer_runtime_global_scan_count == 0,
+      "the goal regression must retain the Tarau information boundary");
+}
+
+Graph tarau_high_outdegree_graph() {
+  Graph graph;
+  graph.add_node(czr005::ics::Node{0, 0, 0.001, 0, 0, {}});
+  // Reverse insertion order deliberately differs from the required stable
+  // next-node tie break.
+  graph.add_node(czr005::ics::Node{100, 0, 1.0, 0, 0, {}});
+  for (int node = 64; node >= 1; --node) {
+    graph.add_node(czr005::ics::Node{node, 0, 1.0, 0, 0, {}});
+    graph.add_edge(czr005::ics::Edge{node, 100, 1.0, 1.0});
+    graph.add_edge(czr005::ics::Edge{0, node, 1.0, 1.0});
+  }
+  graph.set_heuristic(std::vector<std::vector<double>>(
+      101, std::vector<double>(101, 0.0)));
+  return graph;
+}
+
+void test_tarau_route_only_high_outdegree_stable_argmin(Checks& checks) {
+  const auto graph = tarau_high_outdegree_graph();
+  auto config = test_config();
+  config.scorer_mode =
+      "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY";
+  config.enable_source_admission = false;
+  config.enable_backpressure = false;
+  config.enable_pibt_lite = false;
+  EventDrivenJunctionRuntime runtime(graph, config);
+  const auto result = runtime.run(
+      {{"tarau-high-degree", 9202, 0.0, 1000.0, 0, 100, "synthetic"}});
+  checks.require(
+      result.summary.completed_count == 1 &&
+          result.summary.failed_count == 0 &&
+          result.summary.runtime_full_astar_calls == 0 &&
+          result.summary.scorer_runtime_global_scan_count == 0,
+      "Tarau high-outdegree motif must complete without a live global scan");
+  const auto decision = std::find_if(
+      result.decisions.begin(), result.decisions.end(), [](const auto& row) {
+        return row.segment_id == "tarau-high-degree" &&
+               row.current_node == 0;
+      });
+  checks.require(
+      decision != result.decisions.end() &&
+          decision->candidates.size() == 64 &&
+          decision->selected_next == 1,
+      "Tarau route-only must inspect all outgoing candidates and break an "
+      "equal-cost high-degree tie by stable next-node ID");
+  const auto goal_decision = std::find_if(
+      result.decisions.begin(), result.decisions.end(), [](const auto& row) {
+        return row.segment_id == "tarau-high-degree" &&
+               row.current_node == 1;
+      });
+  checks.require(
+      goal_decision != result.decisions.end() &&
+          goal_decision->candidates.size() == 1 &&
+          goal_decision->candidates.front().next_node == 100 &&
+          std::abs(goal_decision->candidates.front().scorer_raw_score - 1.0) <=
+              1.0e-9,
+      "a direct goal candidate must use tau(u,g) without a second-hop "
+      "service term");
+}
+
 Graph goal_arrival_completion_graph() {
   Graph graph;
   graph.add_node(czr005::ics::Node{0, 1, 1.0, 0, 0, {}});
@@ -1383,10 +1898,15 @@ int main() {
     test_g4irsf16_learned_model_closed_loop_is_not_self_authorizing(checks);
     test_legacy_observation_bias_is_local_deterministic_and_exact_off(checks);
     test_storage_source_role_default_is_map2_compatible(checks);
+    test_s4_component_mask_and_queue_time_scaling_motif(checks);
     test_s4_direct_neighbor_merge_calendar_visibility_is_exact_off_and_local(
         checks);
     test_s4_local_descent_guard_is_exact_off_and_blocks_cycle(checks);
     test_s4_local_descent_guard_uses_surviving_fault_potential(checks);
+    test_feng_dh_reimplementation_uses_frozen_moving_stopped_weights(checks);
+    test_tarau_route_only_uses_only_bounded_beacons(checks);
+    test_tarau_two_hop_goal_skips_goal_service_and_queue(checks);
+    test_tarau_route_only_high_outdegree_stable_argmin(checks);
     test_goal_arrival_completion_is_exact_off_and_skips_busy_goal_service(
         checks);
   } catch (const std::exception& error) {

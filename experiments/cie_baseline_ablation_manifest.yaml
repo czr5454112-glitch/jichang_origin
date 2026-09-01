@@ -1,0 +1,264 @@
+schema: czr005.cie_baseline_ablation_manifest.v1
+manifest_status: PREREGISTERED_PROTOCOL_NO_RESULTS
+created_from_git_base: e58876320d6d72c185a702ef8a1e38b2fad7e344
+
+scope:
+  purpose: "Compare one literature-family adaptation and one frozen distributed route-only adaptation under a common runtime without survivor bias."
+  existing_exploratory_outputs: NOT_FORMAL_PREREGISTERED_EVIDENCE
+  result_fields_in_this_manifest: FORBIDDEN
+  code_or_runner_change_authorized_by_this_manifest: false
+
+method_registry:
+  - method_id: HCA_NATIVE
+    role: end_to_end_reference
+    implementation_status: EXISTING
+    included_in_formal_route_only_matrix: false
+  - method_id: FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED_NOT_EXACT
+    role: baseline_a
+    literature_family: TARAU_LOCAL_2009
+    implementation_status: ADAPTED_BASELINE_EXISTING
+    included_in_formal_route_only_matrix: true
+    aliases:
+      - TARAU_LOCAL_2009
+      - CIE_DH_2009
+      - CIE_DH_REPLICA
+    count_as_independent_methods: 1
+    executable_scorer_mode: FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED
+    coefficients:
+      moving_weight: 1.0
+      stopped_weight: 2.0
+      provenance: FROZEN_ORDINAL_ADAPTATION_NOT_PUBLISHED_EXACT_COEFFICIENTS
+    result_label_required: FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED_NOT_EXACT
+  - method_id: TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY
+    role: baseline_b
+    implementation_status: FROZEN_ADAPTATION_SPEC_NOT_EXACT
+    included_in_formal_route_only_matrix: true
+    exact_reproduction_status: BLOCKED
+    adaptation_reproduction_status: ADAPTED_BASELINE_NOT_EXACT
+    blockers:
+      - mechanical_switch_state_and_flip_time_missing
+      - five_offline_calibrated_weights_missing
+      - eta_and_route_history_missing
+    formula: "tau(u,v) + min_w(max(tau(v,w),(1+Npred(v,w,t;5s))/mu(w)) + Hff(w,g))"
+    tau_pred_seconds: 5.0
+    dynamic_information_radius: 2
+    npred_projection:
+      source: direct_neighbor_bounded_beacon
+      fields: [live, arrive_within_5s, drain_by_service_rate]
+      global_future_task_or_reservation_read: false
+    switch_cost_seconds: 0.0
+    merge_policy: NEUTRAL_FIFO
+    eta_used: false
+    route_history_used: false
+    arbitrary_degree_rule: STABLE_ARGMIN_THEN_LOWEST_NODE_ID
+    formula_freeze_status: FROZEN_BEFORE_ANY_FORMAL_RESULT
+    formal_execution_allowed: AFTER_IMPLEMENTATION_AND_FORMAL_RUN_GATES_ONLY
+  - method_id: S4_ROUTE_ONLY_NEUTRAL_FIFO
+    role: proposed_route_policy_reference
+    source_family: G31_S4
+    implementation_status: COMMON_RUNTIME_CONFIGURATION_REQUIRED
+    included_in_formal_route_only_matrix: true
+
+excluded_methods:
+  - method_id: SOHRT_PTW
+    disposition: EXCLUDED_THIS_ROUND
+    reason: full_path_handshake_architecture_incompatible_with_one_next_hop_common_runtime
+  - method_id: SORENSEN_DSP_100
+    disposition: RELATED_WORK_ONLY
+    reason: not_one_of_the_two_new_literature_baselines
+
+protocol:
+  comparison_layer: P1_NEXT_HOP_ROUTE_ONLY
+  formal_method_ids:
+    - FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED_NOT_EXACT
+    - TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY
+    - S4_ROUTE_ONLY_NEUTRAL_FIFO
+  release_protocol: CANONICAL_SCHEDULED_ARRIVALS
+  paired_input_requirement: SAME_MAP_TASK_POPULATION_SPEED_WINDOW_AND_SEED_FOR_ALL_METHODS
+  stable_only: true
+  dynamic_faults: false
+  common_physical_invariants:
+    - healthy_directed_edge_existence
+    - physical_fault_edge_filter
+    - R3_physical_service_feasibility_and_mutual_exclusion
+    - terminal_completion_semantics
+    - fixed_event_and_time_limits
+  common_nonroute_control:
+    source_admission: NEUTRAL_COMMON_RULE
+    merge_policy: NEUTRAL_FIFO
+  forbidden_information_transfer:
+    - do_not_give_S4_service_calendar_features_to_literature_baselines
+    - do_not_give_global_future_reservations_to_TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY
+
+development_protocol:
+  cell_id: map2_1x_2p0_stable_development
+  map: map2
+  scale: 1
+  raw_bag_population: 28506
+  segment_population: 43603
+  speed_mps: 2.0
+  start_epoch: 8260.0
+  end_epoch: 98259.0
+  max_epochs: 90000
+  max_events: 60000000
+  seed: 0
+  use_for_baseline_a_tuning: false
+  baseline_b_action: IMPLEMENT_ONLY_THE_FROZEN_SPEC_WITH_NO_WEIGHT_SEARCH
+  formal_cell_overlap: false
+
+formal_cells:
+  - cell_id: map2_1x_2p5_stable
+    map: map2
+    scale: 1
+    raw_bag_population: 28506
+    segment_population: 43603
+    speed_mps: 2.5
+    start_epoch: 8260.0
+    end_epoch: 98259.0
+    max_epochs: 90000
+    max_events: 60000000
+    seed: 0
+  - cell_id: map2_2x_2p5_stable
+    map: map2
+    scale: 2
+    raw_bag_population: 57012
+    segment_population: 87206
+    speed_mps: 2.5
+    start_epoch: 8260.0
+    end_epoch: 98259.0
+    max_epochs: 90000
+    max_events: 60000000
+    seed: 0
+  - cell_id: nanning_1x_2p5_stable
+    map: nanning
+    scale: 1
+    raw_bag_population: 28506
+    segment_population: 43603
+    speed_mps: 2.5
+    start_epoch: 8260.0
+    end_epoch: 98259.0
+    max_epochs: 90000
+    max_events: 60000000
+    seed: 0
+  - cell_id: nanning_2x_2p5_stable
+    map: nanning
+    scale: 2
+    raw_bag_population: 57012
+    segment_population: 87206
+    speed_mps: 2.5
+    start_epoch: 8260.0
+    end_epoch: 98259.0
+    max_epochs: 90000
+    max_events: 60000000
+    seed: 0
+
+seed_contract:
+  paired_seeds: [0]
+  meaning: deterministic_stable_execution_no_stochastic_perturbation
+  event_order: frozen_existing_runtime_order
+  post_result_seed_addition: forbidden
+
+population_and_latency_contract:
+  denominator: full_raw_bag_population
+  survivor_subset_metrics: forbidden
+  common_completed_cohort_metrics: forbidden
+  full_population_latency_allowed_only_if: completed_raw_bags_equals_raw_bag_population
+  incomplete_run_reporting:
+    - completed_raw_bags
+    - completion_rate
+    - unfinished_raw_bags
+    - deadline_success_rate
+    - oldest_unfinished_age_seconds
+    - cumulative_unfinished_wait_seconds_at_horizon
+
+metrics:
+  primary:
+    - completed_raw_bags
+    - completion_rate
+    - deadline_success_rate
+    - unfinished_raw_bags
+  full_population_latency_when_eligible:
+    - mean_seconds
+    - median_seconds
+    - p95_seconds
+    - p99_seconds
+    - max_seconds
+  mechanism:
+    - hold_count
+    - hold_time_seconds
+    - mean_hops
+    - p95_hops
+    - node_revisit_count
+    - cycle_count
+    - queue_area_under_curve
+    - queue_peak_by_node
+    - merge_wait_seconds
+    - source_backlog_at_horizon
+    - network_backlog_at_horizon
+  computation:
+    - wall_clock_seconds
+    - event_count
+    - next_hop_decision_latency_mean_seconds
+    - next_hop_decision_latency_p95_seconds
+    - next_hop_decision_latency_p99_seconds
+    - scorer_runtime_global_scan_count
+    - neighbor_message_count
+    - neighbor_message_payload_bytes
+  safety_gate_zero_required:
+    - illegal_edge_moves
+    - failed_edge_commits
+    - physical_capacity_violations
+    - mutual_resource_conflicts
+    - wrong_terminal_completions
+    - stale_commit_accepted
+
+ablation_execution_equivalences:
+  run_once_reuse_result:
+    - canonical_execution: A4_S4_FULL_SCORE
+      aliases: [B0_FULL_REFERENCE, C0_S4_FULL_COORDINATION, F0_RAW_COUNT_AS_SECONDS]
+      condition: exact_executable_config_hash_and_input_hash_match
+    - canonical_execution: A3_H_Q_I_WC
+      aliases: [B4_FULL_MINUS_WS]
+      condition: exact_executable_config_hash_and_input_hash_match
+    - canonical_execution: FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED_NOT_EXACT
+      aliases: [TARAU_LOCAL_2009, CIE_DH_2009, CIE_DH_REPLICA]
+      condition: always_same_baseline_family_and_implementation
+  do_not_run_in_stable_formal_cells:
+    - pair: [D0_FAULT_FILTER_ONLY, D1_FAULT_FILTER_PLUS_SURVIVING_GRAPH_POTENTIAL]
+      reason: no_active_fault_means_no_fault_mechanism_contrast
+    - pair: [E0_P2_OFF, E2_P2_DEPTH_2_FULL]
+      reason: main_runtime_has_no_software_queue_cap_and_P2_trigger_count_is_zero
+      redirect_to: finite_buffer_P2_motifs_only
+  not_reusable_despite_expected_physical_equivalence:
+    - pair: [C4_E2_PRUNING_OFF, C0_S4_FULL_COORDINATION]
+      reason: physical_trace_must_match_but_event_count_and_wall_clock_are_target_metrics
+      scope: one_predeclared_diagnostic_cell_not_full_formal_matrix
+  conditional_equivalence_tests:
+    - pair: [TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY_ZERO_NPRED, FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED_NOT_EXACT]
+      rule: reuse_only_if_the_frozen_formula_and_exact_action_trace_are_identical
+
+formal_run_gates:
+  - baseline_b_executable_formula_matches_the_frozen_manifest_definition
+  - baseline_b_tau_pred_radius_switch_cost_and_neutral_FIFO_match_the_frozen_spec
+  - no_parameter_change_after_any_formal_cell_result
+  - executable_config_hash_recorded
+  - map_hash_and_task_stream_hash_recorded
+  - same_binary_used_for_comparable_runtime_arms
+  - safety_gate_all_zero
+  - full_population_denominator_preserved
+
+stop_rules:
+  - if_the_frozen_baseline_b_adaptation_cannot_be_implemented_without_extra_terms_report_BLOCKED
+  - if_any_method_reads_forbidden_information_report_INVALID_AND_STOP
+  - if_any_safety_gate_is_nonzero_report_INVALID_SAFETY_AND_STOP
+  - if_a_formal_result_influences_parameter_choice_discard_confirmation_claim
+  - never_replace_missing_baseline_b_terms_with_S4_features
+
+protocol_amendments:
+  - amendment_id: TARAU_GOAL_ARRIVAL_SEMANTIC_CORRECTION
+    timing: BEFORE_FINAL_CONFIRMATION_MATRIX
+    reason: "complete_on_goal_arrival makes w==goal terminal; goal queue/service must not enter the two-hop continuation"
+    old_result_disposition: QUARANTINED_AND_RERUN
+    formula_special_case: "if w == goal: continuation = tau(v,w)"
+    information_boundary: "common physical shield may read calendars for feasibility; those values are not materialized in the Tarau candidate record or route score"
+    parameter_change: false

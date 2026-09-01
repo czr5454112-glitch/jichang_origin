@@ -1,0 +1,137 @@
+{
+  "schema": "czr005.g4irsf35.full_population_single_arm.v1",
+  "case_id": "t5_2_map2_1x_speed_2p5",
+  "map": "map2",
+  "scale": 1,
+  "arm": "g31",
+  "arm_label": "G31_S4",
+  "population": {
+    "raw_bag_count": 28506,
+    "segment_count": 43603,
+    "whole_population": true
+  },
+  "fixed_window": {
+    "start_epoch": 8260.0,
+    "max_epochs": 90000,
+    "end_epoch": 98259.0,
+    "max_events": 60000000,
+    "speed_mps": 2.5
+  },
+  "release_protocol": {
+    "mode": "same_hca",
+    "same_hca_release_trace_pass": true,
+    "formal_same_hca_release_input": true,
+    "evidence": {
+      "status": "ELIGIBLE_EXACT_HCA_RELEASE_TRACE",
+      "pass": true,
+      "reference_run_id": "run_01",
+      "hca_full_population_timing_pass": true,
+      "source_root": "C:\\PROGRAMING\\czr005\\.g4irsf24_worktree\\build\\g4irsf24_fresh_hca_full"
+    },
+    "request_delta_from_g31": {
+      "s4_score_component_mask": 0
+    },
+    "removed_request_fields_from_g31": []
+  },
+  "binary": {
+    "requested_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_cie_ablation\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "sha256": "884f36f0ceebdb0fd56924fd00fe5c8a1ebef56eb05fac4f53d66306de647155",
+    "same_binary_required_for_arm_comparison": true
+  },
+  "algorithm": {
+    "label": "G31_S4",
+    "scorer_mode": "S4_queue_aware_rule_only",
+    "enable_s4_local_potential_descent_guard": true,
+    "enable_s4_direct_neighbor_merge_calendar_visibility": true,
+    "request_delta_from_g31": {
+      "s4_score_component_mask": 0
+    },
+    "removed_request_fields_from_g31": [],
+    "baseline_family": null,
+    "aliases_not_independent_methods": [],
+    "coordination_protocol": "g31",
+    "s4_ablation": "a0_h_only"
+  },
+  "status": "COMPLETE",
+  "native_execution_started": true,
+  "paper_subjects": {
+    "fixed_horizon_capacity": {
+      "formal_fixed_horizon_eligible": true,
+      "denominator_raw_bags": 28506,
+      "completed_raw_bag_count": 28506,
+      "completion_rate": 1.0,
+      "finish_le_std": {
+        "count": 28506,
+        "rate": 1.0,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD"
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 12239,
+        "rate": 0.4293482073949344,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds"
+      }
+    },
+    "full_population_raw_bag_timing": {
+      "status": "FULL_POPULATION_RAW_BAG_TIMING",
+      "raw_bag_count": 28506,
+      "survivor_or_common_cohort_used": false,
+      "formal_same_hca_release_arm_eligible": true,
+      "formal_comparison_requires_matching_other_arm": true,
+      "metrics_seconds": {
+        "paper_network_from_admission": {
+          "min": 188.0009999999893,
+          "mean": 210.76754202624144,
+          "p95": 247.20200000003388,
+          "p99": 259.2019999999937,
+          "max": 292.60199999999895
+        },
+        "segment_release": {
+          "min": 188.0009999999893,
+          "mean": 210.76754202624144,
+          "p95": 247.20200000003388,
+          "p99": 259.2019999999937,
+          "max": 292.60199999999895
+        },
+        "original_entry": {
+          "min": 187.0118899999943,
+          "mean": 2557.4573054899333,
+          "p95": 7516.922384999998,
+          "p99": 10818.982652999985,
+          "max": 12402.131459999997
+        }
+      }
+    }
+  },
+  "execution_integrity": {
+    "pass": true,
+    "gates": {
+      "returned_exact_selected_segments": true,
+      "terminal_segment_partition": true,
+      "fixed_end_epoch_echo": true,
+      "max_events_echo": true,
+      "event_limit_not_reached": true,
+      "reservation_conflicts_zero": true,
+      "stable_fault_events_zero": true,
+      "stable_repair_events_zero": true,
+      "loaded_expected_binary": true,
+      "scorer_mode_echo": true,
+      "scorer_id_present": true
+    }
+  },
+  "runtime": {
+    "wall_seconds": 25.495373100042343,
+    "cpu_seconds": 25.15625,
+    "completed_count": 43603,
+    "failed_count": 0,
+    "event_count": 3887176,
+    "decision_count": 336773,
+    "event_limit_reached": false,
+    "time_limit_reached": false,
+    "reservation_conflicts": 0,
+    "loop_count": 0,
+    "runtime_full_astar_calls": 0,
+    "scorer_runtime_global_scan_count": 0,
+    "loaded_cpp_binary_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_cie_ablation\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "loaded_cpp_binary_sha256": "884f36f0ceebdb0fd56924fd00fe5c8a1ebef56eb05fac4f53d66306de647155"
+  }
+}

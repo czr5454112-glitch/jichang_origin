@@ -1,0 +1,120 @@
+{
+  "schema": "czr005.g4irsf35.full_population_single_arm.v1",
+  "case_id": "t5_2_map2_1x_speed_2p5",
+  "map": "map2",
+  "scale": 1,
+  "arm": "g31",
+  "arm_label": "G31_S4",
+  "population": {
+    "raw_bag_count": 28506,
+    "segment_count": 43603,
+    "whole_population": true
+  },
+  "fixed_window": {
+    "start_epoch": 8260.0,
+    "max_epochs": 90000,
+    "end_epoch": 98259.0,
+    "max_events": 60000000,
+    "speed_mps": 2.5
+  },
+  "release_protocol": {
+    "mode": "canonical",
+    "same_hca_release_trace_pass": false,
+    "formal_same_hca_release_input": false,
+    "request_delta_from_g31": {},
+    "removed_request_fields_from_g31": []
+  },
+  "binary": {
+    "requested_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_g35_literature\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "sha256": "d08504ea570511048a112626b7c6b510b8e6808eac242af748520d41383fee04",
+    "same_binary_required_for_arm_comparison": true
+  },
+  "algorithm": {
+    "label": "G31_S4",
+    "scorer_mode": "S4_queue_aware_rule_only",
+    "enable_s4_local_potential_descent_guard": true,
+    "enable_s4_direct_neighbor_merge_calendar_visibility": true,
+    "request_delta_from_g31": {},
+    "removed_request_fields_from_g31": []
+  },
+  "status": "COMPLETE",
+  "native_execution_started": true,
+  "paper_subjects": {
+    "fixed_horizon_capacity": {
+      "formal_fixed_horizon_eligible": true,
+      "denominator_raw_bags": 28506,
+      "completed_raw_bag_count": 28506,
+      "completion_rate": 1.0,
+      "finish_le_std": {
+        "count": 28506,
+        "rate": 1.0,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD"
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 12242,
+        "rate": 0.42945344839682875,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds"
+      }
+    },
+    "full_population_raw_bag_timing": {
+      "status": "FULL_POPULATION_RAW_BAG_TIMING",
+      "raw_bag_count": 28506,
+      "survivor_or_common_cohort_used": false,
+      "formal_same_hca_release_arm_eligible": false,
+      "formal_comparison_requires_matching_other_arm": true,
+      "metrics_seconds": {
+        "paper_network_from_admission": {
+          "min": 188.0009999999893,
+          "mean": 237.41280897039394,
+          "p95": 339.7229675000199,
+          "p99": 401.8339754999956,
+          "max": 527.0250299999898
+        },
+        "segment_release": {
+          "min": 188.0009999999893,
+          "mean": 246.03444125833332,
+          "p95": 374.1606799999945,
+          "p99": 453.38690699999574,
+          "max": 604.0250299999898
+        },
+        "original_entry": {
+          "min": 188.0009999999893,
+          "mean": 2488.294533317654,
+          "p95": 7324.758385000001,
+          "p99": 10787.555067,
+          "max": 11798.450459999996
+        }
+      }
+    }
+  },
+  "execution_integrity": {
+    "pass": true,
+    "gates": {
+      "returned_exact_selected_segments": true,
+      "terminal_segment_partition": true,
+      "fixed_end_epoch_echo": true,
+      "max_events_echo": true,
+      "event_limit_not_reached": true,
+      "reservation_conflicts_zero": true,
+      "stable_fault_events_zero": true,
+      "stable_repair_events_zero": true,
+      "loaded_expected_binary": true
+    }
+  },
+  "runtime": {
+    "wall_seconds": 28.9125288000796,
+    "cpu_seconds": 28.296875,
+    "completed_count": 43603,
+    "failed_count": 0,
+    "event_count": 3997648,
+    "decision_count": 336638,
+    "event_limit_reached": false,
+    "time_limit_reached": false,
+    "reservation_conflicts": 0,
+    "loop_count": 0,
+    "runtime_full_astar_calls": 0,
+    "scorer_runtime_global_scan_count": 0,
+    "loaded_cpp_binary_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_g35_literature\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "loaded_cpp_binary_sha256": "d08504ea570511048a112626b7c6b510b8e6808eac242af748520d41383fee04"
+  }
+}

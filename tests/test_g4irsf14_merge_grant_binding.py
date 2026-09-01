@@ -379,7 +379,15 @@ def test_e4_rejects_non_p2_pibt_mode(pibt_mode: str) -> None:
         _e4_run(pibt_mode=pibt_mode)
 
 
-@pytest.mark.parametrize("scorer_mode", ["S2", "S3", "S4"])
+@pytest.mark.parametrize(
+    "scorer_mode",
+    [
+        "S2",
+        "S3",
+        "S4",
+        "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY",
+    ],
+)
 def test_e4_accepts_existing_decentralized_scorers(
     scorer_mode: str,
 ) -> None:
@@ -549,6 +557,33 @@ def test_direct_pybind_e4_entrypoint_enforces_frozen_stage_d_tuple(
         )
 
 
+def test_direct_pybind_accepts_and_echoes_tarau_route_only() -> None:
+    nodes, edges, heuristic = canonical_graph_records()
+    mode = "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY"
+    module = cpp_backend.load_cpp_module()
+    payload = module.g4irsf11_event_runtime_from_records(
+        nodes,
+        edges,
+        heuristic,
+        [_contested_bags()[0]],
+        event_semantics="E4",
+        resource_semantics="R3",
+        pibt_mode="P2",
+        scorer_mode=mode,
+        priority_mode="Q0",
+        enable_source_admission=False,
+        admission_mode="off",
+    )
+    summary = payload["summary"]
+    assert summary["completed_count"] == 1
+    assert summary["failed_count"] == 0
+    assert summary["scorer_mode"] == mode
+    assert summary["scorer_mode_echo"] == mode
+    assert summary["scorer_id"] == mode
+    assert summary["scorer_runtime_global_scan_count"] == 0
+    assert "information_radius_2" in summary["scorer_claim_boundary"]
+
+
 @pytest.mark.parametrize("rule", ["M7", "M8", "M9"])
 def test_direct_pybind_e4_fails_closed_for_non_online_rules(
     rule: str,
@@ -644,3 +679,74 @@ def test_direct_pybind_rejects_merge_controls_outside_e4() -> None:
             event_semantics="E3",
             merge_grant_rule="M2",
         )
+
+
+@pytest.mark.parametrize(
+    ("override", "exception", "message"),
+    [
+        (
+            {"s4_score_component_mask": True},
+            TypeError,
+            "must be an integer, not bool",
+        ),
+        (
+            {"s4_score_component_mask": -1},
+            ValueError,
+            r"\[0, 15\]",
+        ),
+        (
+            {"s4_score_component_mask": 16},
+            ValueError,
+            r"\[0, 15\]",
+        ),
+        (
+            {"queue_time_scaling": "per_node_tuned"},
+            ValueError,
+            "raw_count_as_seconds",
+        ),
+        (
+            {"scorer_mode": "S3", "s4_score_component_mask": 1},
+            ValueError,
+            "require the S4 scorer",
+        ),
+    ],
+)
+def test_direct_pybind_validates_s4_ablation_controls(
+    override: dict[str, object],
+    exception: type[Exception],
+    message: str,
+) -> None:
+    nodes, edges, heuristic = canonical_graph_records()
+    module = cpp_backend.load_cpp_module()
+    kwargs: dict[str, object] = {"scorer_mode": "S4"}
+    kwargs.update(override)
+    with pytest.raises(exception, match=message):
+        module.g4irsf11_event_runtime_from_records(
+            nodes,
+            edges,
+            heuristic,
+            [_contested_bags()[0]],
+            **kwargs,
+        )
+
+
+def test_direct_pybind_echoes_active_s4_ablation_controls() -> None:
+    nodes, edges, heuristic = canonical_graph_records()
+    module = cpp_backend.load_cpp_module()
+    payload = module.g4irsf11_event_runtime_from_records(
+        nodes,
+        edges,
+        heuristic,
+        [_contested_bags()[0]],
+        scorer_mode="S4",
+        s4_score_component_mask=1,
+        queue_time_scaling="service_rate_normalized",
+    )
+    assert payload["summary"]["s4_score_component_mask"] == 1
+    assert payload["summary"]["queue_time_scaling"] == (
+        "service_rate_normalized"
+    )
+    assert payload["trace_context"]["s4_score_component_mask"] == 1
+    assert payload["trace_context"]["queue_time_scaling"] == (
+        "service_rate_normalized"
+    )

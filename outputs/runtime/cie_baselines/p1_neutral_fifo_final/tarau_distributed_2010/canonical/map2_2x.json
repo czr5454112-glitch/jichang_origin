@@ -1,0 +1,161 @@
+{
+  "schema": "czr005.g4irsf35.full_population_single_arm.v1",
+  "case_id": "t5_2_map2_2x_speed_2p5",
+  "map": "map2",
+  "scale": 2,
+  "arm": "tarau_distributed_2010",
+  "arm_label": "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY_NOT_EXACT",
+  "population": {
+    "raw_bag_count": 57012,
+    "segment_count": 87206,
+    "whole_population": true
+  },
+  "fixed_window": {
+    "start_epoch": 8260.0,
+    "max_epochs": 90000,
+    "end_epoch": 98259.0,
+    "max_events": 60000000,
+    "speed_mps": 2.5
+  },
+  "release_protocol": {
+    "mode": "canonical",
+    "same_hca_release_trace_pass": false,
+    "formal_same_hca_release_input": false,
+    "request_delta_from_g31": {
+      "scorer_mode": "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY",
+      "enable_s4_local_potential_descent_guard": false,
+      "enable_s4_direct_neighbor_merge_calendar_visibility": false,
+      "merge_grant_rule": "M1",
+      "merge_grant_timing_mode": "jit_fifo"
+    },
+    "removed_request_fields_from_g31": []
+  },
+  "binary": {
+    "requested_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_cie_baselines\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "sha256": "17d73f94863e1de71e3ba8f1b41d01c25c3173614ae3edfbb071119265ceb279",
+    "same_binary_required_for_arm_comparison": true
+  },
+  "algorithm": {
+    "label": "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY_NOT_EXACT",
+    "scorer_mode": "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY",
+    "enable_s4_local_potential_descent_guard": false,
+    "enable_s4_direct_neighbor_merge_calendar_visibility": false,
+    "request_delta_from_g31": {
+      "scorer_mode": "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY",
+      "enable_s4_local_potential_descent_guard": false,
+      "enable_s4_direct_neighbor_merge_calendar_visibility": false,
+      "merge_grant_rule": "M1",
+      "merge_grant_timing_mode": "jit_fifo"
+    },
+    "removed_request_fields_from_g31": [],
+    "baseline_family": "TARAU_DISTRIBUTED_2010",
+    "aliases_not_independent_methods": [],
+    "coordination_protocol": "neutral_fifo",
+    "s4_ablation": "none",
+    "literature_adaptation": {
+      "exact_reproduction": false,
+      "formal_name": "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY",
+      "reason": "published calibrated weights, mechanical switch state, historical branching rates, and route-time data are unavailable",
+      "frozen_before_outcomes": true,
+      "posthoc_tuning": false,
+      "tau_pred_seconds": 5.0,
+      "dynamic_link_radius": 2,
+      "switch_cost": 0.0,
+      "high_degree_adaptation": "stable argmin over every legal outgoing edge",
+      "excluded_information": [
+        "global future tasks",
+        "global reservation tables",
+        "S4 strict-potential residuals",
+        "S4 service-calendar score"
+      ]
+    }
+  },
+  "status": "COMPLETE",
+  "native_execution_started": true,
+  "paper_subjects": {
+    "fixed_horizon_capacity": {
+      "formal_fixed_horizon_eligible": true,
+      "denominator_raw_bags": 57012,
+      "completed_raw_bag_count": 57012,
+      "completion_rate": 1.0,
+      "finish_le_std": {
+        "count": 57012,
+        "rate": 1.0,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD"
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 24265,
+        "rate": 0.4256121518276854,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds"
+      }
+    },
+    "full_population_raw_bag_timing": {
+      "status": "FULL_POPULATION_RAW_BAG_TIMING",
+      "raw_bag_count": 57012,
+      "survivor_or_common_cohort_used": false,
+      "formal_same_hca_release_arm_eligible": false,
+      "formal_comparison_requires_matching_other_arm": true,
+      "metrics_seconds": {
+        "paper_network_from_admission": {
+          "min": 188.0009999999893,
+          "mean": 389.1865197302343,
+          "p95": 1337.6330174999944,
+          "p99": 2065.6648495999934,
+          "max": 3174.962539999993
+        },
+        "segment_release": {
+          "min": 188.0009999999893,
+          "mean": 399.1109215826514,
+          "p95": 1363.6839989999908,
+          "p99": 2099.3665860999895,
+          "max": 3255.9806399999943
+        },
+        "original_entry": {
+          "min": 188.0009999999893,
+          "mean": 2641.3710136419722,
+          "p95": 7874.0322174999965,
+          "p99": 10886.707877000003,
+          "max": 13302.388359999995
+        }
+      }
+    }
+  },
+  "execution_integrity": {
+    "pass": true,
+    "gates": {
+      "returned_exact_selected_segments": true,
+      "terminal_segment_partition": true,
+      "fixed_end_epoch_echo": true,
+      "max_events_echo": true,
+      "event_limit_not_reached": true,
+      "reservation_conflicts_zero": true,
+      "stable_fault_events_zero": true,
+      "stable_repair_events_zero": true,
+      "loaded_expected_binary": true,
+      "scorer_mode_echo": true,
+      "scorer_id_present": true,
+      "tarau_neutral_fifo_merge_rule": true,
+      "tarau_neutral_fifo_timing": true,
+      "tarau_s4_local_guard_disabled": true,
+      "tarau_s4_calendar_visibility_disabled": true,
+      "tarau_runtime_full_astar_zero": true,
+      "tarau_runtime_global_scan_zero": true
+    }
+  },
+  "runtime": {
+    "wall_seconds": 56.60255530010909,
+    "cpu_seconds": 55.609375,
+    "completed_count": 87206,
+    "failed_count": 0,
+    "event_count": 8476044,
+    "decision_count": 683767,
+    "event_limit_reached": false,
+    "time_limit_reached": false,
+    "reservation_conflicts": 0,
+    "loop_count": 0,
+    "runtime_full_astar_calls": 0,
+    "scorer_runtime_global_scan_count": 0,
+    "loaded_cpp_binary_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_cie_baselines\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "loaded_cpp_binary_sha256": "17d73f94863e1de71e3ba8f1b41d01c25c3173614ae3edfbb071119265ceb279"
+  }
+}

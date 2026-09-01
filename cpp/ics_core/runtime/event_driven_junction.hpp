@@ -632,6 +632,13 @@ struct EventDrivenJunctionConfig {
   // completion seam: crossing the final physical edge completes the bag at
   // goal arrival, without reserving or executing goal-node service.
   bool complete_on_goal_arrival = false;
+  // Append-only S4 ablation controls.  Tau plus H are always present.  The
+  // low four bits select Q, I, corridor wait, and target-service wait.
+  int s4_score_component_mask = 15;
+  // Queue counts retain the historical count-as-seconds interpretation by
+  // default.  The normalized alternative converts each enabled Q/I count
+  // independently with the candidate's existing estimated service rate.
+  std::string queue_time_scaling = "raw_count_as_seconds";
   std::vector<std::vector<double>> scorer_w1;
   std::vector<double> scorer_b1;
   std::vector<double> scorer_w2;
@@ -774,6 +781,66 @@ struct EventCandidateRecord {
   bool shield_allowed = false;
   std::string shield_reason;
 };
+
+inline constexpr int kS4ScoreTargetQueueMask = 1;
+inline constexpr int kS4ScoreScheduledIncomingMask = 2;
+inline constexpr int kS4ScoreCorridorWaitMask = 4;
+inline constexpr int kS4ScoreTargetServiceWaitMask = 8;
+inline constexpr int kS4ScoreAllComponentsMask = 15;
+
+inline double s4_queue_aware_score(
+    const EventCandidateRecord& candidate,
+    double event_time,
+    int component_mask,
+    bool service_rate_normalized) {
+  double score = candidate.travel_time + candidate.static_potential;
+  const double corridor_wait = std::max(
+      0.0, candidate.corridor_next_available - event_time);
+  const double target_wait = std::max(
+      0.0,
+      candidate.target_next_available -
+          (event_time + candidate.travel_time));
+
+  // Preserve the historical expression and addition order exactly for the
+  // compatibility default.
+  if (!service_rate_normalized &&
+      component_mask == kS4ScoreAllComponentsMask) {
+    score +=
+        static_cast<double>(candidate.target_queue_length +
+                            candidate.target_scheduled_incoming) +
+        corridor_wait + target_wait;
+    return score;
+  }
+
+  if (service_rate_normalized &&
+      (component_mask & (kS4ScoreTargetQueueMask |
+                         kS4ScoreScheduledIncomingMask)) != 0 &&
+      (!std::isfinite(candidate.estimated_service_rate) ||
+       candidate.estimated_service_rate <= 0.0)) {
+    throw std::logic_error(
+        "S4 service-rate normalization requires a positive finite "
+        "estimated_service_rate");
+  }
+  const auto queue_count_as_time = [&](int count) {
+    const double value = static_cast<double>(count);
+    return service_rate_normalized
+               ? value / candidate.estimated_service_rate
+               : value;
+  };
+  if ((component_mask & kS4ScoreTargetQueueMask) != 0) {
+    score += queue_count_as_time(candidate.target_queue_length);
+  }
+  if ((component_mask & kS4ScoreScheduledIncomingMask) != 0) {
+    score += queue_count_as_time(candidate.target_scheduled_incoming);
+  }
+  if ((component_mask & kS4ScoreCorridorWaitMask) != 0) {
+    score += corridor_wait;
+  }
+  if ((component_mask & kS4ScoreTargetServiceWaitMask) != 0) {
+    score += target_wait;
+  }
+  return score;
+}
 
 struct EventDecisionTraceRow {
   std::uint64_t decision_id = 0;
@@ -996,6 +1063,8 @@ struct EventRuntimeSummary {
   std::string s4_direct_neighbor_merge_calendar_visibility_claim_boundary;
   bool complete_on_goal_arrival_enabled = false;
   std::string complete_on_goal_arrival_claim_boundary;
+  int s4_score_component_mask = kS4ScoreAllComponentsMask;
+  std::string queue_time_scaling = "raw_count_as_seconds";
   bool scorer_out_of_distribution_diagnostic = false;
   bool scorer_promotion_eligible = false;
   bool scorer_absolute_node_ids_enabled = false;
@@ -2909,6 +2978,9 @@ class EventDrivenJunctionRuntime {
     result_.summary.credit_mode = canonical_credit_mode();
     result_.summary.scorer_mode = config_.scorer_mode;
     result_.summary.scorer_mode_echo = config_.scorer_mode;
+    result_.summary.s4_score_component_mask =
+        config_.s4_score_component_mask;
+    result_.summary.queue_time_scaling = config_.queue_time_scaling;
     if (config_.enable_s4_local_potential_descent_guard) {
       result_.summary.s4_local_potential_descent_guard_enabled = true;
       result_.summary.s4_local_potential_descent_guard_learning_active =
@@ -2958,12 +3030,27 @@ class EventDrivenJunctionRuntime {
               "unless_risk_gate_restores_exact_s0_cost"
             : "raw_and_effective_scores_are_lower_is_better_cost";
     result_.summary.scorer_claim_boundary =
-        "current_event_real_outgoing_candidates_only;"
-        "static_map_attributes_and_current_local_candidate_snapshot;"
-        "no_teacher_next_or_path;no_future_route_or_schedule;"
-        "no_posthoc_outcome_or_label_source;"
-        "S1_S2_are_out_of_distribution_not_promotion_eligible_but_"
-        "drive_ablation_selection_when_the_risk_gate_allows";
+        canonical_scorer_mode() ==
+                "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY"
+            ? "Tarau_2010_adapted_route_only_not_exact_reproduction;"
+              "tau_pred_5_seconds;information_radius_2;switch_cost_0;"
+              "all_outdegree_stable_argmin;event_driven_queue_beacons_"
+              "only;physical_service_rates;no_scheduled_incoming_or_"
+              "service_calendar;no_global_live_scan;no_S4_DLP_or_"
+              "strict_descent_components;no_posthoc_tuning"
+            : canonical_scorer_mode() == "FENG_DH"
+            ? "Feng_DH_reimplementation_not_exact;penalty_coefficients_"
+              "undisclosed_in_source_and_frozen_wm_1_ws_2;deterministic_"
+              "free_flow_shortest_path;live_path_queue_and_scheduled_"
+              "incoming_scan;source_queue_pending_release_completed_failed_"
+              "excluded;"
+              "no_posthoc_tuning"
+            : "current_event_real_outgoing_candidates_only;"
+              "static_map_attributes_and_current_local_candidate_snapshot;"
+              "no_teacher_next_or_path;no_future_route_or_schedule;"
+              "no_posthoc_outcome_or_label_source;"
+              "S1_S2_are_out_of_distribution_not_promotion_eligible_but_"
+              "drive_ablation_selection_when_the_risk_gate_allows";
     result_.summary.scorer_out_of_distribution_diagnostic =
         canonical_scorer_mode() == "S1" ||
         canonical_scorer_mode() == "S2";
@@ -3749,6 +3836,30 @@ class EventDrivenJunctionRuntime {
   }
 
 #ifdef CZR005_EVENT_RUNTIME_TESTING
+  void test_set_tarau_congestion_beacon(int node,
+                                        int queue_length,
+                                        int goal,
+                                        int queue_length_for_goal) {
+    (void)graph_.node(node);
+    if (queue_length < 0 || queue_length_for_goal < 0) {
+      throw std::invalid_argument(
+          "Tarau test beacon queue lengths must be non-negative");
+    }
+    auto& beacon = congestion_beacons_[node];
+    beacon.queue_length = queue_length;
+    beacon.queue_length_by_goal.clear();
+    if (queue_length_for_goal > 0) {
+      beacon.queue_length_by_goal.emplace(goal, queue_length_for_goal);
+    }
+    beacon.received_at = now_;
+    ++beacon.generation;
+  }
+
+  [[nodiscard]] std::uint64_t
+  test_tarau_forbidden_candidate_dynamic_read_count() const noexcept {
+    return test_tarau_forbidden_candidate_dynamic_read_count_;
+  }
+
   void test_mutate_final_result_hash_field(
       std::string_view family) {
     if (runtime_phase_ !=
@@ -4717,8 +4828,17 @@ class EventDrivenJunctionRuntime {
                 "S5_dynamic_workload_oracle")) {
       return "S5";
     }
+    if (config_.scorer_mode ==
+        "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED") {
+      return "FENG_DH";
+    }
+    if (config_.scorer_mode ==
+        "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY") {
+      return "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY";
+    }
     throw std::invalid_argument(
-        "unknown G4IRSF12 scorer_mode; expected S0..S5");
+        "unknown G4IRSF12 scorer_mode; expected S0..S5 or the frozen "
+        "Feng-DH/Tarau-2010 adapted baseline");
   }
 
   std::string canonical_scorer_id() const {
@@ -4738,7 +4858,13 @@ class EventDrivenJunctionRuntime {
     if (mode == "S4") {
       return "S4_queue_aware_rule_only";
     }
-    return "S5_dynamic_workload_oracle";
+    if (mode == "S5") {
+      return "S5_dynamic_workload_oracle";
+    }
+    if (mode == "FENG_DH") {
+      return "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED_NOT_EXACT";
+    }
+    return "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY";
   }
 
   static void scorer_fingerprint_u64(std::string& payload,
@@ -4830,6 +4956,67 @@ class EventDrivenJunctionRuntime {
 
   void initialize_scorer() {
     const auto mode = canonical_scorer_mode();
+    if (mode == "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY") {
+      // Route-only Tarau adaptation: H_ff is immutable free-flow topology,
+      // precomputed once.  Runtime evaluation therefore reads no live state
+      // outside the candidate's direct and two-hop beacon neighbourhood.
+      using QueueItem = std::pair<double, int>;
+      std::map<int, std::vector<std::pair<int, double>>> reverse_edges;
+      const auto nodes = graph_.node_locations();
+      for (const int node : nodes) {
+        reverse_edges.emplace(node,
+                              std::vector<std::pair<int, double>>{});
+      }
+      for (const int node : nodes) {
+        for (const int next : graph_.outgoing(node)) {
+          reverse_edges.at(next).emplace_back(
+              node,
+              std::max(graph_.edge(node, next).travel_time(),
+                       config_.minimum_service_seconds));
+        }
+      }
+      for (auto& [node, incoming] : reverse_edges) {
+        (void)node;
+        std::sort(incoming.begin(), incoming.end());
+      }
+      for (const int goal : nodes) {
+        std::priority_queue<QueueItem,
+                            std::vector<QueueItem>,
+                            std::greater<QueueItem>> frontier;
+        std::map<int, double> distance;
+        distance.emplace(goal, 0.0);
+        frontier.emplace(0.0, goal);
+        while (!frontier.empty()) {
+          const auto [cost, node] = frontier.top();
+          frontier.pop();
+          const auto known = distance.find(node);
+          if (known == distance.end() ||
+              cost > known->second + event_runtime_detail::kEpsilon) {
+            continue;
+          }
+          for (const auto& [predecessor, travel] :
+               reverse_edges.at(node)) {
+            const double next_cost = cost + travel;
+            const auto previous = distance.find(predecessor);
+            if (previous != distance.end() &&
+                next_cost + event_runtime_detail::kEpsilon >=
+                    previous->second) {
+              continue;
+            }
+            distance[predecessor] = next_cost;
+            frontier.emplace(next_cost, predecessor);
+          }
+        }
+        for (const int node : nodes) {
+          const auto found = distance.find(node);
+          tarau_free_flow_times_[{node, goal}] =
+              found == distance.end()
+                  ? std::numeric_limits<double>::infinity()
+                  : found->second;
+        }
+      }
+      return;
+    }
     if (mode != "S1" && mode != "S2") {
       return;
     }
@@ -4945,6 +5132,25 @@ class EventDrivenJunctionRuntime {
     (void)canonical_event_semantics();
     (void)canonical_merge_grant_timing_mode();
     (void)canonical_merge_grant_rule();
+    if (config_.s4_score_component_mask < 0 ||
+        config_.s4_score_component_mask > kS4ScoreAllComponentsMask) {
+      throw std::invalid_argument(
+          "s4_score_component_mask must be an integer in [0, 15]");
+    }
+    if (config_.queue_time_scaling != "raw_count_as_seconds" &&
+        config_.queue_time_scaling != "service_rate_normalized") {
+      throw std::invalid_argument(
+          "queue_time_scaling must be raw_count_as_seconds or "
+          "service_rate_normalized");
+    }
+    if ((config_.s4_score_component_mask !=
+             kS4ScoreAllComponentsMask ||
+         config_.queue_time_scaling != "raw_count_as_seconds") &&
+        canonical_scorer_mode() != "S4") {
+      throw std::invalid_argument(
+          "non-default S4 component or queue-time controls require the S4 "
+          "scorer");
+    }
     if (config_.g4irsf20_event_hotpath_policy != "E0" &&
         config_.g4irsf20_event_hotpath_policy != "E1" &&
         config_.g4irsf20_event_hotpath_policy != "E2") {
@@ -9654,6 +9860,172 @@ class EventDrivenJunctionRuntime {
     return std::numeric_limits<double>::infinity();
   }
 
+  // Best-effort reconstruction of the traditional decentralized heuristic
+  // used as the comparison arm in Feng et al.  The source paper describes a
+  // larger penalty for stopped than moving bags but does not disclose the
+  // coefficients.  The experiment therefore freezes the simplest ordinal
+  // choice (moving=1, stopped=2) before observing outcomes; this is explicitly
+  // a reimplementation baseline, not an exact reproduction.
+  double feng_dh_reimplementation_path_penalty(int start, int goal) const {
+    static constexpr double kMovingBagWeight = 1.0;
+    static constexpr double kStoppedBagWeight = 2.0;
+    double penalty = 0.0;
+    int node = start;
+    std::unordered_set<int> visited;
+    visited.reserve(graph_.node_count());
+    while (node != goal) {
+      if (!visited.insert(node).second ||
+          visited.size() > graph_.node_count()) {
+        return std::numeric_limits<double>::infinity();
+      }
+      const auto controller = junctions_.find(node);
+      if (controller != junctions_.end()) {
+        const double moving = static_cast<double>(
+            controller->second.scheduled_incoming);
+        const double stopped = static_cast<double>(
+            controller->second.queue.size());
+        penalty += service_duration(node) *
+                   (kMovingBagWeight * moving +
+                    kStoppedBagWeight * stopped);
+      }
+
+      std::optional<std::pair<double, int>> best;
+      for (const int next : graph_.outgoing(node)) {
+        const auto candidate = std::make_pair(
+            graph_.edge(node, next).travel_time() +
+                static_potential(next, goal),
+            next);
+        if (!best.has_value() || candidate < *best) {
+          best = candidate;
+        }
+      }
+      if (!best.has_value()) {
+        return std::numeric_limits<double>::infinity();
+      }
+      node = best->second;
+    }
+    return penalty;
+  }
+
+  double tarau_free_flow_time(int start, int goal) const {
+    const auto found = tarau_free_flow_times_.find({start, goal});
+    if (found == tarau_free_flow_times_.end()) {
+      throw std::logic_error(
+          "Tarau route-only free-flow table is incomplete");
+    }
+    return found->second;
+  }
+
+  std::optional<int> tarau_static_free_flow_next_hop(int node,
+                                                     int goal) const {
+    std::optional<std::pair<double, int>> best;
+    for (const int next : graph_.outgoing(node)) {
+      const double remaining = tarau_free_flow_time(next, goal);
+      if (!std::isfinite(remaining)) {
+        continue;
+      }
+      const double travel = std::max(
+          graph_.edge(node, next).travel_time(),
+          config_.minimum_service_seconds);
+      const auto candidate = std::make_pair(travel + remaining, next);
+      if (!best.has_value() || candidate < *best) {
+        best = candidate;
+      }
+    }
+    return best.has_value() ? std::optional<int>(best->second)
+                            : std::nullopt;
+  }
+
+  // Bounded route-only adaptation of the distributed heuristic in Tarau
+  // (2010).  The paper's undisclosed priority weights and mechanical-switch
+  // state are intentionally absent.  At runtime this reads only the latest
+  // event-driven beacon for v and each real successor w of v.  In particular,
+  // scheduled_incoming, service calendars, reservations, DLP/S4 components,
+  // and any live graph-wide task scan are outside this implementation.
+  double tarau_distributed_2010_adapted_route_only_cost(
+      int candidate_node,
+      int goal,
+      double first_travel) const {
+    static constexpr double kPredictionHorizonSeconds = 5.0;
+    if (candidate_node == goal) {
+      return first_travel;
+    }
+
+    const auto candidate_beacon =
+        congestion_beacons_.find(candidate_node);
+    double best_continuation =
+        std::numeric_limits<double>::infinity();
+    int best_next = std::numeric_limits<int>::max();
+    for (const int next : graph_.outgoing(candidate_node)) {
+      const double remaining = tarau_free_flow_time(next, goal);
+      if (!std::isfinite(remaining)) {
+        continue;
+      }
+      const double second_travel = std::max(
+          graph_.edge(candidate_node, next).travel_time(),
+          config_.minimum_service_seconds);
+
+      // Goal arrival is terminal under the formal runner contract.  It has
+      // neither a goal queue nor a service operation, so do not let the
+      // configured goal-node service duration distort the two-hop argmin.
+      if (next == goal) {
+        const double continuation = second_travel;
+        if (std::tie(continuation, next) <
+            std::tie(best_continuation, best_next)) {
+          best_continuation = continuation;
+          best_next = next;
+        }
+        continue;
+      }
+
+      int live_queue = 0;
+      const auto next_beacon = congestion_beacons_.find(next);
+      if (next_beacon != congestion_beacons_.end()) {
+        live_queue = std::max(0, next_beacon->second.queue_length);
+      }
+
+      int predicted_arrivals = 0;
+      if (candidate_beacon != congestion_beacons_.end()) {
+        long long routed_queue = 0;
+        for (const auto& [queued_goal, queued_count] :
+             candidate_beacon->second.queue_length_by_goal) {
+          const auto queued_next = tarau_static_free_flow_next_hop(
+              candidate_node, queued_goal);
+          if (queued_next.has_value() && *queued_next == next) {
+            routed_queue += std::max(0, queued_count);
+          }
+        }
+        const double service_budget = std::max(
+            0.0, kPredictionHorizonSeconds - second_travel);
+        const int physical_departure_cap = static_cast<int>(std::floor(
+            (service_budget + event_runtime_detail::kEpsilon) /
+            service_duration(candidate_node)));
+        predicted_arrivals = static_cast<int>(std::min<long long>(
+            routed_queue, std::max(0, physical_departure_cap)));
+      }
+
+      // Work advertised at w can drain while the decision owner traverses
+      // u->v->w.  This is a physical-rate projection, not a calendar lookup.
+      const double arrival_delay = first_travel + second_travel;
+      const int physical_drain_cap = static_cast<int>(std::floor(
+          (arrival_delay + event_runtime_detail::kEpsilon) /
+          service_duration(next)));
+      const int predicted_queue = std::max(
+          0, live_queue + predicted_arrivals - physical_drain_cap);
+      const double service_term =
+          (1.0 + static_cast<double>(predicted_queue)) *
+          service_duration(next);
+      const double continuation =
+          std::max(second_travel, service_term) + remaining;
+      if (std::tie(continuation, next) <
+          std::tie(best_continuation, best_next)) {
+        best_continuation = continuation;
+        best_next = next;
+      }
+    }
+    return first_travel + best_continuation;
+  }
+
   bool s4_local_potential_descent_allowed(
       const EventDecisionTraceRow& trace,
       const EventCandidateRecord& candidate) const {
@@ -9743,7 +10115,9 @@ class EventDrivenJunctionRuntime {
                              candidate.model_score);
     }
 
-    if (mode == "S3" || mode == "S4" || mode == "S5") {
+    if (mode == "S3" || mode == "S4" || mode == "S5" ||
+        mode == "FENG_DH" ||
+        mode == "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY") {
       std::unordered_map<int, double> resource_work;
       if (mode == "S5") {
         trace.full_astar_used = true;
@@ -9753,30 +10127,41 @@ class EventDrivenJunctionRuntime {
         resource_work = dynamic_workload_oracle_resource_work(
             trace.runtime_bag_id,
             trace.current_node);
+      } else if (mode == "FENG_DH") {
+        // Each decision reads live moving/stopped counts along the complete
+        // deterministic free-flow continuation.  Account this honestly as a
+        // runtime global scan; no A* or reservation-table scan is performed.
+        ++result_.summary.scorer_runtime_global_scan_count;
       }
+      const bool s4_service_rate_normalized =
+          mode == "S4" &&
+          config_.queue_time_scaling == "service_rate_normalized";
       for (auto& candidate : trace.candidates) {
-        double score = mode == "S5"
-                           ? dynamic_workload_oracle_cost(
-                                 candidate.next_node,
-                                 trace.goal_node,
-                                 trace.event_time +
-                                     candidate.travel_time,
-                                 trace.event_time,
-                                 resource_work)
-                           : candidate.travel_time +
-                                 candidate.static_potential;
+        double score = candidate.travel_time +
+                       candidate.static_potential;
+        if (mode == "S5") {
+          score = dynamic_workload_oracle_cost(
+              candidate.next_node,
+              trace.goal_node,
+              trace.event_time + candidate.travel_time,
+              trace.event_time,
+              resource_work);
+        } else if (mode == "FENG_DH") {
+          score += feng_dh_reimplementation_path_penalty(
+              candidate.next_node, trace.goal_node);
+        } else if (
+            mode == "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY") {
+          score = tarau_distributed_2010_adapted_route_only_cost(
+              candidate.next_node,
+              trace.goal_node,
+              candidate.travel_time);
+        }
         if (mode == "S4") {
-          score +=
-              static_cast<double>(
-                  candidate.target_queue_length +
-                  candidate.target_scheduled_incoming) +
-              std::max(0.0,
-                       candidate.corridor_next_available -
-                           trace.event_time) +
-              std::max(
-                  0.0,
-                  candidate.target_next_available -
-                      (trace.event_time + candidate.travel_time));
+          score = s4_queue_aware_score(
+              candidate,
+              trace.event_time,
+              config_.s4_score_component_mask,
+              s4_service_rate_normalized);
         }
         candidate.pre_fault_policy_score = score;
         candidate.model_score =
@@ -10246,7 +10631,7 @@ class EventDrivenJunctionRuntime {
         std::max(result_.summary.max_candidate_count,
                  static_cast<int>(outgoing.size()));
     for (const int candidate : outgoing) {
-      trace.candidates.push_back(candidate_record(
+      trace.candidates.push_back(scorer_candidate_record(
           bag,
           node,
           candidate,
@@ -13471,14 +13856,15 @@ class EventDrivenJunctionRuntime {
     const bool escape_active = config_.enable_deadlock_escape &&
                                controller.escape_token_task == task_id;
     for (const int candidate : outgoing) {
-      trace.candidates.push_back(candidate_record(bag,
-                                                  node,
-                                                  candidate,
-                                                  time,
-                                                  escape_active,
-                                                  first_edge_credit_required,
-                                                  first_edge_credit_ready,
-                                                  first_edge_credit_to));
+      trace.candidates.push_back(scorer_candidate_record(
+          bag,
+          node,
+          candidate,
+          time,
+          escape_active,
+          first_edge_credit_required,
+          first_edge_credit_ready,
+          first_edge_credit_to));
       const auto& record = trace.candidates.back();
       if (record.advertised_fault) {
         ++trace.advertised_faulted_outgoing_count;
@@ -14621,6 +15007,81 @@ class EventDrivenJunctionRuntime {
     return features;
   }
 
+  EventCandidateRecord tarau_route_only_candidate_record(
+      const BagState& bag,
+      int current,
+      int candidate,
+      double time,
+      bool first_edge_credit_required,
+      bool first_edge_credit_ready,
+      int first_edge_credit_to) {
+    EventCandidateRecord record;
+    record.next_node = candidate;
+    const auto& edge = graph_.edge(current, candidate);
+    record.travel_time =
+        std::max(edge.travel_time(), config_.minimum_service_seconds);
+    record.static_potential = static_potential(candidate, bag.request.goal);
+    record.first_edge_credit_required = first_edge_credit_required;
+    record.first_edge_credit_matches =
+        first_edge_credit_required && candidate == first_edge_credit_to;
+    record.first_edge_credit_valid =
+        record.first_edge_credit_matches && first_edge_credit_ready;
+    if (record.first_edge_credit_valid) {
+      const auto* credit = credit_ledger_.find(bag.first_edge_credit_id);
+      if (credit != nullptr) {
+        record.first_edge_credit_slack_seconds =
+            std::max(0.0, std::min(credit->latest, credit->expiry) - time);
+      }
+    }
+
+    record.pre_fault_policy_score =
+        record.travel_time + record.static_potential;
+    record.model_score = record.pre_fault_policy_score;
+    // Keep the common physical feasibility interlock.  Calendar/queue state
+    // may hold the already-scored route, but none of it is materialized into
+    // this record or made available to the Tarau numerical argmin.
+    record.shield_reason = shield_reason(
+        bag,
+        current,
+        candidate,
+        time,
+        first_edge_credit_required,
+        first_edge_credit_ready,
+        first_edge_credit_to);
+    record.shield_allowed = record.shield_reason == "allowed";
+    return record;
+  }
+
+  EventCandidateRecord scorer_candidate_record(
+      const BagState& bag,
+      int current,
+      int candidate,
+      double time,
+      bool escape_active,
+      bool first_edge_credit_required,
+      bool first_edge_credit_ready,
+      int first_edge_credit_to) {
+    if (canonical_scorer_mode() ==
+        "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY") {
+      return tarau_route_only_candidate_record(
+          bag,
+          current,
+          candidate,
+          time,
+          first_edge_credit_required,
+          first_edge_credit_ready,
+          first_edge_credit_to);
+    }
+    return candidate_record(bag,
+                            current,
+                            candidate,
+                            time,
+                            escape_active,
+                            first_edge_credit_required,
+                            first_edge_credit_ready,
+                            first_edge_credit_to);
+  }
+
   EventCandidateRecord candidate_record(const BagState& bag,
                                         int current,
                                         int candidate,
@@ -14629,6 +15090,12 @@ class EventDrivenJunctionRuntime {
                                         bool first_edge_credit_required,
                                         bool first_edge_credit_ready,
                                         int first_edge_credit_to) {
+#ifdef CZR005_EVENT_RUNTIME_TESTING
+    if (canonical_scorer_mode() ==
+        "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY") {
+      ++test_tarau_forbidden_candidate_dynamic_read_count_;
+    }
+#endif
     EventCandidateRecord record;
     record.next_node = candidate;
     const auto& edge = graph_.edge(current, candidate);
@@ -17968,6 +18435,7 @@ class EventDrivenJunctionRuntime {
   std::unordered_map<int, std::uint64_t>
       g4irsf16_physical_fault_generation_by_bag_;
   std::map<std::pair<int, int>, int> scorer_static_hops_;
+  std::map<std::pair<int, int>, double> tarau_free_flow_times_;
   std::map<std::tuple<int, int, int>, double>
       pibt_regret_prior_;
   EventDrivenJunctionResult result_;
@@ -18004,6 +18472,7 @@ class EventDrivenJunctionRuntime {
   // CheckpointStorage and every deterministic state digest.
   ActiveCausalStep* active_causal_step_ = nullptr;
 #ifdef CZR005_EVENT_RUNTIME_TESTING
+  std::uint64_t test_tarau_forbidden_candidate_dynamic_read_count_ = 0;
   bool test_pibt_logical_failure_injected_ = false;
   bool test_merge_grant_prepare_failure_injected_ = false;
   bool test_merge_grant_advertised_flip_injected_ = false;
@@ -18310,6 +18779,7 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
   validate_config();
   scorer_model_.reset();
   scorer_static_hops_.clear();
+  tarau_free_flow_times_.clear();
   pibt_regret_prior_.clear();
   initialize_regret_prior();
   initialize_scorer();
@@ -18598,6 +19068,12 @@ fingerprint_deterministic_summary(
   writer.string(summary.scorer_model_sha256);
   writer.string(summary.scorer_score_direction);
   writer.string(summary.scorer_claim_boundary);
+  if (summary.s4_score_component_mask != kS4ScoreAllComponentsMask ||
+      summary.queue_time_scaling != "raw_count_as_seconds") {
+    writer.string("s4_score_ablation_v1");
+    writer.i64(summary.s4_score_component_mask);
+    writer.string(summary.queue_time_scaling);
+  }
   writer.boolean(summary.scorer_out_of_distribution_diagnostic);
   writer.boolean(summary.scorer_promotion_eligible);
   writer.boolean(summary.scorer_absolute_node_ids_enabled);
@@ -20338,6 +20814,12 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
   scorer.string(config_.priority_mode);
   scorer.string(config_.pibt_preference_mode);
   scorer.string(config_.scorer_mode);
+  if (config_.s4_score_component_mask != kS4ScoreAllComponentsMask ||
+      config_.queue_time_scaling != "raw_count_as_seconds") {
+    scorer.string("s4_score_ablation_v1");
+    scorer.i64(config_.s4_score_component_mask);
+    scorer.string(config_.queue_time_scaling);
+  }
   if (config_.enable_s4_local_potential_descent_guard) {
     scorer.string("s4_local_potential_descent_guard_v1");
     scorer.boolean(

@@ -1,0 +1,136 @@
+{
+  "schema": "czr005.g4irsf35.full_population_single_arm.v1",
+  "case_id": "t5_2_nanning_1x_speed_2p5",
+  "map": "nanning",
+  "scale": 1,
+  "arm": "ssp_time",
+  "arm_label": "SSP_TIME_ADAPTATION_NOT_FENG_DHA",
+  "population": {
+    "raw_bag_count": 28506,
+    "segment_count": 43603,
+    "whole_population": true
+  },
+  "fixed_window": {
+    "start_epoch": 8260.0,
+    "max_epochs": 90000,
+    "end_epoch": 98259.0,
+    "max_events": 60000000,
+    "speed_mps": 2.5
+  },
+  "release_protocol": {
+    "mode": "same_hca",
+    "same_hca_release_trace_pass": true,
+    "formal_same_hca_release_input": true,
+    "evidence": {
+      "status": "ELIGIBLE_EXACT_HCA_RELEASE_TRACE",
+      "pass": true,
+      "hca_case_id": "nanning_1x_t5_2_speed_2p5",
+      "reference_run_id": "run_01",
+      "hca_full_population_timing_pass": true,
+      "source_root": "C:\\PROGRAMING\\czr005\\.g4irsf24_worktree\\outputs\\runtime\\g4irsf31_nanning_hca"
+    },
+    "request_delta_from_g31": {
+      "scorer_mode": "S3_shortest_potential_only",
+      "enable_s4_local_potential_descent_guard": false,
+      "enable_s4_direct_neighbor_merge_calendar_visibility": false
+    },
+    "removed_request_fields_from_g31": []
+  },
+  "binary": {
+    "requested_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_g35_oracle\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "sha256": "639a6af52c3fe707ae929f148b485694c4a3577140e96cf06c41a338b09b9a31",
+    "same_binary_required_for_arm_comparison": true
+  },
+  "algorithm": {
+    "label": "SSP_TIME_ADAPTATION_NOT_FENG_DHA",
+    "scorer_mode": "S3_shortest_potential_only",
+    "enable_s4_local_potential_descent_guard": false,
+    "enable_s4_direct_neighbor_merge_calendar_visibility": false,
+    "request_delta_from_g31": {
+      "scorer_mode": "S3_shortest_potential_only",
+      "enable_s4_local_potential_descent_guard": false,
+      "enable_s4_direct_neighbor_merge_calendar_visibility": false
+    },
+    "removed_request_fields_from_g31": []
+  },
+  "status": "COMPLETE",
+  "native_execution_started": true,
+  "paper_subjects": {
+    "fixed_horizon_capacity": {
+      "formal_fixed_horizon_eligible": true,
+      "denominator_raw_bags": 28506,
+      "completed_raw_bag_count": 28506,
+      "completion_rate": 1.0,
+      "finish_le_std": {
+        "count": 18476,
+        "rate": 0.6481442503332632,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD"
+      },
+      "finish_le_std_minus_2700_literal": {
+        "count": 10983,
+        "rate": 0.3852873079351715,
+        "definition": "complete_raw_bag_and_max_segment_finish_time<=STD-2700_seconds"
+      }
+    },
+    "full_population_raw_bag_timing": {
+      "status": "FULL_POPULATION_RAW_BAG_TIMING",
+      "raw_bag_count": 28506,
+      "survivor_or_common_cohort_used": false,
+      "formal_same_hca_release_arm_eligible": true,
+      "formal_comparison_requires_matching_other_arm": true,
+      "metrics_seconds": {
+        "paper_network_from_admission": {
+          "min": 48.40099999999802,
+          "mean": 281.7237447204141,
+          "p95": 473.15199999998913,
+          "p99": 552.3691999999978,
+          "max": 808.585000000021
+        },
+        "segment_release": {
+          "min": 48.40099999999802,
+          "mean": 281.7248277204843,
+          "p95": 473.15374999999494,
+          "p99": 552.3691999999978,
+          "max": 808.585000000021
+        },
+        "original_entry": {
+          "min": 47.41573000000062,
+          "mean": 7163.857936444823,
+          "p95": 36010.781167500034,
+          "p99": 52734.63115200002,
+          "max": 65768.26395999998
+        }
+      }
+    }
+  },
+  "execution_integrity": {
+    "pass": true,
+    "gates": {
+      "returned_exact_selected_segments": true,
+      "terminal_segment_partition": true,
+      "fixed_end_epoch_echo": true,
+      "max_events_echo": true,
+      "event_limit_not_reached": true,
+      "reservation_conflicts_zero": true,
+      "stable_fault_events_zero": true,
+      "stable_repair_events_zero": true,
+      "loaded_expected_binary": true
+    }
+  },
+  "runtime": {
+    "wall_seconds": 39.880525400163606,
+    "cpu_seconds": 39.109375,
+    "completed_count": 43603,
+    "failed_count": 0,
+    "event_count": 6336627,
+    "decision_count": 552825,
+    "event_limit_reached": false,
+    "time_limit_reached": false,
+    "reservation_conflicts": 0,
+    "loop_count": 0,
+    "runtime_full_astar_calls": 0,
+    "scorer_runtime_global_scan_count": 0,
+    "loaded_cpp_binary_path": "C:\\PROGRAMING\\czr005\\.g4irsf35_worktree\\build_g35_oracle\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "loaded_cpp_binary_sha256": "639a6af52c3fe707ae929f148b485694c4a3577140e96cf06c41a338b09b9a31"
+  }
+}

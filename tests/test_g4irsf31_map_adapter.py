@@ -269,6 +269,101 @@ def test_goal_arrival_completion_is_final_append_only_default_off_tail(
     assert len(active) == len(omitted) + 7
 
 
+def test_s4_ablation_controls_are_default_compatible_append_only_tail(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    common, captured = _backend_capture(monkeypatch)
+    cpp_backend.g4irsf11_event_runtime_from_records(**common)
+    cpp_backend.g4irsf11_event_runtime_from_records(
+        **common,
+        s4_score_component_mask=15,
+        queue_time_scaling="raw_count_as_seconds",
+    )
+    cpp_backend.g4irsf11_event_runtime_from_records(
+        **common,
+        s4_score_component_mask=3,
+    )
+    cpp_backend.g4irsf11_event_runtime_from_records(
+        **common,
+        queue_time_scaling="service_rate_normalized",
+    )
+
+    omitted, explicit_defaults, masked, normalized = captured
+    assert omitted == explicit_defaults
+    assert masked[-8:] == (
+        {},
+        0.0,
+        0,
+        [52],
+        False,
+        False,
+        False,
+        3,
+    )
+    assert normalized[-9:] == (
+        {},
+        0.0,
+        0,
+        [52],
+        False,
+        False,
+        False,
+        15,
+        "service_rate_normalized",
+    )
+    # The active G31 tail also materializes the three intervening
+    # G24/observation-bias defaults before the five/six new suffix values.
+    assert len(masked) == len(omitted) + 8
+    assert len(normalized) == len(omitted) + 9
+
+
+@pytest.mark.parametrize(
+    ("override", "exception", "message"),
+    [
+        (
+            {"s4_score_component_mask": True},
+            TypeError,
+            "must be an integer, not bool",
+        ),
+        (
+            {"s4_score_component_mask": -1},
+            ValueError,
+            r"\[0, 15\]",
+        ),
+        (
+            {"s4_score_component_mask": 16},
+            ValueError,
+            r"\[0, 15\]",
+        ),
+        (
+            {"queue_time_scaling": 1},
+            TypeError,
+            "must be a string",
+        ),
+        (
+            {"queue_time_scaling": "per_node_tuned"},
+            ValueError,
+            "raw_count_as_seconds",
+        ),
+        (
+            {"scorer_mode": "S3", "s4_score_component_mask": 1},
+            ValueError,
+            "require the S4 scorer",
+        ),
+    ],
+)
+def test_python_wrapper_validates_s4_ablation_controls(
+    monkeypatch: pytest.MonkeyPatch,
+    override: dict[str, object],
+    exception: type[Exception],
+    message: str,
+) -> None:
+    common, _captured = _backend_capture(monkeypatch)
+    common.update(override)
+    with pytest.raises(exception, match=message):
+        cpp_backend.g4irsf11_event_runtime_from_records(**common)
+
+
 def test_storage_role_tail_rejects_negative_or_duplicate_ids(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

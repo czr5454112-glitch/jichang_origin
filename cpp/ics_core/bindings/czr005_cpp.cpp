@@ -3382,6 +3382,9 @@ py::dict g4irsf11_event_runtime_summary_row(
       summary.scorer_score_direction;
   row["scorer_claim_boundary"] =
       summary.scorer_claim_boundary;
+  row["s4_score_component_mask"] =
+      summary.s4_score_component_mask;
+  row["queue_time_scaling"] = summary.queue_time_scaling;
   if (summary.s4_local_potential_descent_guard_enabled) {
     row["s4_local_potential_descent_guard_enabled"] = true;
     row["s4_local_potential_descent_guard_learning_active"] =
@@ -6232,7 +6235,9 @@ py::dict g4irsf11_event_runtime_from_records(
     const std::vector<int>& storage_source_nodes,
     bool enable_s4_local_potential_descent_guard,
     bool enable_s4_direct_neighbor_merge_calendar_visibility,
-    bool complete_on_goal_arrival) {
+    bool complete_on_goal_arrival,
+    const py::object& s4_score_component_mask_value,
+    const std::string& queue_time_scaling) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6243,6 +6248,30 @@ py::dict g4irsf11_event_runtime_from_records(
       strict_python_integer_argument(
           merge_grant_lifecycle_limit_value,
           "merge_grant_lifecycle_limit");
+  const int s4_score_component_mask =
+      strict_python_integer_argument(
+          s4_score_component_mask_value,
+          "s4_score_component_mask");
+  if (s4_score_component_mask < 0 || s4_score_component_mask > 15) {
+    throw py::value_error(
+        "s4_score_component_mask must be an integer in [0, 15]");
+  }
+  if (queue_time_scaling != "raw_count_as_seconds" &&
+      queue_time_scaling != "service_rate_normalized") {
+    throw py::value_error(
+        "queue_time_scaling must be raw_count_as_seconds or "
+        "service_rate_normalized");
+  }
+  const bool s4_scorer =
+      scorer_mode == "S4" ||
+      scorer_mode == "S4_queue_aware_rule_only";
+  if ((s4_score_component_mask != 15 ||
+       queue_time_scaling != "raw_count_as_seconds") &&
+      !s4_scorer) {
+    throw py::value_error(
+        "non-default S4 component or queue-time controls require the S4 "
+        "scorer");
+  }
   const bool requested_destination_merge_grants =
       event_semantics == "E4" ||
       event_semantics ==
@@ -6308,12 +6337,16 @@ py::dict g4irsf11_event_runtime_from_records(
       scorer_mode == "S4" ||
       scorer_mode == "S4_queue_aware_rule_only" ||
       scorer_mode == "S5" ||
-      scorer_mode == "S5_dynamic_workload_oracle";
+      scorer_mode == "S5_dynamic_workload_oracle" ||
+      scorer_mode ==
+          "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED" ||
+      scorer_mode ==
+          "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY";
   if (requested_destination_merge_grants &&
       !destination_merge_scorer_allowed) {
     throw std::invalid_argument(
         "E4 destination merge grants require an existing S1/S2/S3/S4/S5 "
-        "routing scorer");
+        "routing scorer or a frozen Feng-DH/Tarau-2010 baseline");
   }
   if (!std::isfinite(bounded_wall_seconds) ||
       (bounded_wall_seconds != -1.0 && bounded_wall_seconds <= 0.0)) {
@@ -6473,6 +6506,8 @@ py::dict g4irsf11_event_runtime_from_records(
   config.enable_s4_direct_neighbor_merge_calendar_visibility =
       enable_s4_direct_neighbor_merge_calendar_visibility;
   config.complete_on_goal_arrival = complete_on_goal_arrival;
+  config.s4_score_component_mask = s4_score_component_mask;
+  config.queue_time_scaling = queue_time_scaling;
   // Append-only Table 5.4 reconstruction seam; zero remains exact-off.
   config.legacy_observation_bias_max_seconds =
       legacy_observation_bias_max_seconds;
@@ -6571,6 +6606,10 @@ py::dict g4irsf11_event_runtime_from_records(
       result.summary.scorer_score_direction;
   trace_context["scorer_claim_boundary"] =
       result.summary.scorer_claim_boundary;
+  trace_context["s4_score_component_mask"] =
+      result.summary.s4_score_component_mask;
+  trace_context["queue_time_scaling"] =
+      result.summary.queue_time_scaling;
   trace_context["scorer_out_of_distribution_diagnostic"] =
       result.summary.scorer_out_of_distribution_diagnostic;
   trace_context["scorer_promotion_eligible"] = false;
@@ -7236,10 +7275,13 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg("storage_source_nodes") =
                  std::vector<int>{52},
              py::arg("enable_s4_local_potential_descent_guard") = false,
-             py::arg(
-                 "enable_s4_direct_neighbor_merge_calendar_visibility") =
-                 false,
-             py::arg("complete_on_goal_arrival") = false);
+              py::arg(
+                  "enable_s4_direct_neighbor_merge_calendar_visibility") =
+                  false,
+              py::arg("complete_on_goal_arrival") = false,
+              py::arg("s4_score_component_mask") = 15,
+              py::arg("queue_time_scaling") =
+                  std::string("raw_count_as_seconds"));
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

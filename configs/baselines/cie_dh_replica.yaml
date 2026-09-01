@@ -1,0 +1,27 @@
+schema: czr005.cie_baseline_policy.v1
+family: TARAU_LOCAL_2009_CIE_DH
+formal_name: TARAU_LOCAL_2009
+aliases:
+  - CIE_DH_2009
+  - FENG_DH
+count_as_independent_methods: 1
+implementation:
+  scorer_mode: FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED
+  evidence_label: ADAPTED_BASELINE
+  exact_reproduction: false
+  moving_weight: 1.0
+  stopped_weight: 2.0
+  weights_frozen_before_formal_runs: true
+  posthoc_tuning: false
+information_scope:
+  continuation: deterministic_free_flow_path
+  included:
+    - scheduled_incoming_as_moving
+    - junction_queue_as_stopped
+  excluded:
+    - global_future_tasks
+    - reservation_calendar
+    - fault_residual
+limitations:
+  - Published final congestion coefficients are unavailable.
+  - The shared event-driven executor replaces the original discrete-cell switch hardware.

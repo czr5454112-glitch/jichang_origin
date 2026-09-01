@@ -723,6 +723,8 @@ def g4irsf11_event_runtime_from_records(
     enable_s4_local_potential_descent_guard: bool = False,
     enable_s4_direct_neighbor_merge_calendar_visibility: bool = False,
     complete_on_goal_arrival: bool = False,
+    s4_score_component_mask: int = 15,
+    queue_time_scaling: str = "raw_count_as_seconds",
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -776,6 +778,23 @@ def g4irsf11_event_runtime_from_records(
     diagnostic_hops = strict_integer(
         diagnostic_hops, "diagnostic_hops"
     )
+    s4_score_component_mask = strict_integer(
+        s4_score_component_mask, "s4_score_component_mask"
+    )
+    if not 0 <= s4_score_component_mask <= 15:
+        raise ValueError(
+            "s4_score_component_mask must be an integer in [0, 15]"
+        )
+    if not isinstance(queue_time_scaling, str):
+        raise TypeError("queue_time_scaling must be a string")
+    if queue_time_scaling not in {
+        "raw_count_as_seconds",
+        "service_rate_normalized",
+    }:
+        raise ValueError(
+            "queue_time_scaling must be raw_count_as_seconds or "
+            "service_rate_normalized"
+        )
     credit_capacity_per_edge = strict_integer(
         credit_capacity_per_edge, "credit_capacity_per_edge"
     )
@@ -1325,10 +1344,13 @@ def g4irsf11_event_runtime_from_records(
             "S4_queue_aware_rule_only",
             "S5",
             "S5_dynamic_workload_oracle",
+            "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED",
+            "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY",
         }:
             raise ValueError(
                 "E4 destination merge grants require an existing "
-                "S1/S2/S3/S4/S5 routing scorer"
+                "S1/S2/S3/S4/S5 routing scorer or a frozen "
+                "Feng-DH/Tarau-2010 baseline"
             )
         if priority_mode not in {"Q0", "current_f2"}:
             raise ValueError(
@@ -1364,10 +1386,21 @@ def g4irsf11_event_runtime_from_records(
         "S4_queue_aware_rule_only",
         "S5",
         "S5_dynamic_workload_oracle",
+        "FENG_DH_REIMPLEMENTATION_COEFFICIENTS_UNDISCLOSED",
+        "TARAU_DISTRIBUTED_2010_ADAPTED_ROUTE_ONLY",
     }
     if scorer_mode not in scorer_modes:
         raise ValueError(
-            "scorer_mode must be one of S0, S1, S2, S3, S4, S5"
+            "scorer_mode must be one of S0, S1, S2, S3, S4, S5, "
+            "or a frozen Feng-DH/Tarau-2010 baseline"
+        )
+    if (
+        s4_score_component_mask != 15
+        or queue_time_scaling != "raw_count_as_seconds"
+    ) and scorer_mode not in {"S4", "S4_queue_aware_rule_only"}:
+        raise ValueError(
+            "non-default S4 component or queue-time controls require the "
+            "S4 scorer"
         )
     frozen_mode = scorer_mode in {
         "S1",
@@ -1968,7 +2001,24 @@ def g4irsf11_event_runtime_from_records(
         int(legacy_observation_bias_seed),
     )
     map_tail_suffix: tuple[Any, ...] = ()
-    if complete_on_goal_arrival:
+    if queue_time_scaling != "raw_count_as_seconds":
+        map_tail_suffix = (
+            normalized_storage_source_nodes,
+            bool(enable_s4_local_potential_descent_guard),
+            bool(enable_s4_direct_neighbor_merge_calendar_visibility),
+            bool(complete_on_goal_arrival),
+            int(s4_score_component_mask),
+            str(queue_time_scaling),
+        )
+    elif s4_score_component_mask != 15:
+        map_tail_suffix = (
+            normalized_storage_source_nodes,
+            bool(enable_s4_local_potential_descent_guard),
+            bool(enable_s4_direct_neighbor_merge_calendar_visibility),
+            bool(complete_on_goal_arrival),
+            int(s4_score_component_mask),
+        )
+    elif complete_on_goal_arrival:
         map_tail_suffix = (
             normalized_storage_source_nodes,
             bool(enable_s4_local_potential_descent_guard),
@@ -1991,8 +2041,9 @@ def g4irsf11_event_runtime_from_records(
             normalized_storage_source_nodes,
         )
     if map_tail_suffix:
-        # Append only through the last requested flag.  With every G31/map
-        # option off, older native modules retain the historical call shape.
+        # Append only through the last non-default field.  With every G31/map
+        # and S4-ablation option at its compatibility default, older native
+        # modules retain the historical call shape.
         native_event_tail = append_only_map_tail_base + map_tail_suffix
     payload = dict(
         module.g4irsf11_event_runtime_from_records(
