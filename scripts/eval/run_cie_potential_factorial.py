@@ -32,6 +32,7 @@ for _bootstrap in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(_bootstrap))
 
 from czr005 import cpp_backend  # noqa: E402
+from scripts.eval import cie_fixed_denominator_business as cie_business  # noqa: E402
 from scripts.eval import run_g4irsf24_native_race as g24  # noqa: E402
 from scripts.eval import run_g4irsf26_paper_experiments as g26  # noqa: E402
 from scripts.eval import run_g4irsf28_service_potential as g28  # noqa: E402
@@ -518,6 +519,11 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
         request,
         release,
         formal_timing_eligible=args.scale == 1,
+    )
+    paper_subjects["fixed_denominator_business"] = cie_business.summarize(
+        workload.rows,
+        bags,
+        fixed_horizon=g35.nanning_native.FIXED_END_EPOCH,
     )
     native_summary = dict(summary)
     return {

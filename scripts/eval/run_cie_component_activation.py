@@ -42,6 +42,7 @@ from czr005.io.legacy_tasks import (  # noqa: E402
     parse_legacy_tasks,
     write_task_jsonl,
 )
+from scripts.eval import cie_fixed_denominator_business as cie_business  # noqa: E402
 from scripts.eval import g4irsf31_map_adapter as map_adapter  # noqa: E402
 from scripts.eval import run_g4irsf24_native_race as g24  # noqa: E402
 from scripts.eval import run_g4irsf26_paper_experiments as g26  # noqa: E402
@@ -783,6 +784,9 @@ def execute_run(
     )
     timing = _timing_payload(rows, bags, complete=complete, factor=factor)
     on_time = outcome["success"]["finish_le_std"]
+    fixed_business = cie_business.summarize(
+        rows, bags, fixed_horizon=FIXED_END_EPOCH
+    )
     return {
         **common,
         "status": "COMPLETE" if integrity["pass"] else "FAILED_INTEGRITY",
@@ -794,6 +798,7 @@ def execute_run(
             "literal_early_margin": outcome["success"][
                 "finish_le_std_minus_2700_literal"
             ],
+            "detailed": fixed_business,
         },
         "full_population_timing": timing,
         "execution_integrity": integrity,
