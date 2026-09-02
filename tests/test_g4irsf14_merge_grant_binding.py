@@ -709,6 +709,11 @@ def test_direct_pybind_rejects_merge_controls_outside_e4() -> None:
             ValueError,
             "require the S4 scorer",
         ),
+        (
+            {"scorer_mode": "S3", "enable_cie_component_activation": True},
+            ValueError,
+            "activation telemetry requires the S4 scorer",
+        ),
     ],
 )
 def test_direct_pybind_validates_s4_ablation_controls(
@@ -750,3 +755,38 @@ def test_direct_pybind_echoes_active_s4_ablation_controls() -> None:
     assert payload["trace_context"]["queue_time_scaling"] == (
         "service_rate_normalized"
     )
+
+
+def test_cie_component_activation_is_opt_in_and_streaming() -> None:
+    nodes, edges, heuristic = canonical_graph_records()
+    module = cpp_backend.load_cpp_module()
+    kwargs = dict(
+        scorer_mode="S4",
+        trace_limit=0,
+        event_trace_limit=0,
+    )
+    off = module.g4irsf11_event_runtime_from_records(
+        nodes, edges, heuristic, [_contested_bags()[0]], **kwargs
+    )
+    assert "cie_component_activation" not in off["summary"]
+
+    on = module.g4irsf11_event_runtime_from_records(
+        nodes,
+        edges,
+        heuristic,
+        [_contested_bags()[0]],
+        enable_cie_component_activation=True,
+        **kwargs,
+    )
+    activation = on["summary"]["cie_component_activation"]
+    assert activation["decision_count"] > 0
+    assert activation["multi_candidate_decision_count"] >= 0
+    assert set(activation["components"]) == {"Q", "I", "wc", "ws"}
+    assert activation["counterfactual_scope"].startswith(
+        "same_state_pre_feasibility_raw_scorer"
+    )
+    for component in activation["components"].values():
+        assert component["candidate_nonzero_count"] >= 0
+        assert component["decision_any_candidate_nonzero_count"] >= 0
+        assert component["counterfactual_any_ranking_change_count"] >= 0
+        assert component["counterfactual_raw_argmin_change_count"] >= 0

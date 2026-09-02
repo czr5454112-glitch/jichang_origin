@@ -3421,6 +3421,46 @@ py::dict g4irsf11_event_runtime_summary_row(
       py::int_(summary.scorer_decision_evaluation_count);
   row["scorer_candidate_evaluation_count"] =
       py::int_(summary.scorer_candidate_evaluation_count);
+  if (summary.cie_component_activation_enabled) {
+    py::dict s4_activation;
+    s4_activation["decision_count"] =
+        py::int_(summary.s4_activation_decision_count);
+    s4_activation["multi_candidate_decision_count"] =
+        py::int_(summary.s4_activation_multi_candidate_decision_count);
+    s4_activation["counterfactual_scope"] =
+        "same_state_pre_feasibility_raw_scorer;full_mask15_vs_one_term_removed";
+    py::dict components;
+    static constexpr std::array<const char*, 4> kS4ComponentNames{
+        "Q", "I", "wc", "ws"};
+    for (std::size_t index = 0; index < kS4ComponentNames.size(); ++index) {
+      py::dict component;
+      component["candidate_nonzero_count"] = py::int_(
+          summary.s4_component_candidate_nonzero_count[index]);
+      component["decision_any_candidate_nonzero_count"] = py::int_(
+          summary.s4_component_decision_any_candidate_nonzero_count[index]);
+      component["raw_argmin_nonzero_count"] = py::int_(
+          summary.s4_component_raw_argmin_nonzero_count[index]);
+      component["counterfactual_any_ranking_change_count"] = py::int_(
+          summary.s4_component_counterfactual_any_ranking_change_count[index]);
+      component["counterfactual_raw_argmin_change_count"] = py::int_(
+          summary.s4_component_counterfactual_raw_argmin_change_count[index]);
+      component["value_sum"] = summary.s4_component_value_sum[index];
+      component["value_max"] = summary.s4_component_value_max[index];
+      components[kS4ComponentNames[index]] = std::move(component);
+    }
+    s4_activation["components"] = std::move(components);
+    py::dict strict_descent;
+    strict_descent["evaluation_count"] = py::int_(
+        summary.s4_strict_descent_evaluation_count);
+    strict_descent["filtered_candidate_count"] = py::int_(
+        summary.s4_strict_descent_filtered_candidate_count);
+    strict_descent["filtered_decision_count"] = py::int_(
+        summary.s4_strict_descent_filtered_decision_count);
+    strict_descent["empty_ranking_count"] = py::int_(
+        summary.s4_strict_descent_empty_ranking_count);
+    s4_activation["strict_descent"] = std::move(strict_descent);
+    row["cie_component_activation"] = std::move(s4_activation);
+  }
   row["scorer_risk_abstain_count"] =
       py::int_(summary.scorer_risk_abstain_count);
   row["scorer_teacher_input_count"] =
@@ -6237,7 +6277,8 @@ py::dict g4irsf11_event_runtime_from_records(
     bool enable_s4_direct_neighbor_merge_calendar_visibility,
     bool complete_on_goal_arrival,
     const py::object& s4_score_component_mask_value,
-    const std::string& queue_time_scaling) {
+    const std::string& queue_time_scaling,
+    bool enable_cie_component_activation) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6271,6 +6312,10 @@ py::dict g4irsf11_event_runtime_from_records(
     throw py::value_error(
         "non-default S4 component or queue-time controls require the S4 "
         "scorer");
+  }
+  if (enable_cie_component_activation && !s4_scorer) {
+    throw py::value_error(
+        "CIE component activation telemetry requires the S4 scorer");
   }
   const bool requested_destination_merge_grants =
       event_semantics == "E4" ||
@@ -6508,6 +6553,8 @@ py::dict g4irsf11_event_runtime_from_records(
   config.complete_on_goal_arrival = complete_on_goal_arrival;
   config.s4_score_component_mask = s4_score_component_mask;
   config.queue_time_scaling = queue_time_scaling;
+  config.enable_cie_component_activation =
+      enable_cie_component_activation;
   // Append-only Table 5.4 reconstruction seam; zero remains exact-off.
   config.legacy_observation_bias_max_seconds =
       legacy_observation_bias_max_seconds;
@@ -7281,7 +7328,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
               py::arg("complete_on_goal_arrival") = false,
               py::arg("s4_score_component_mask") = 15,
               py::arg("queue_time_scaling") =
-                  std::string("raw_count_as_seconds"));
+                  std::string("raw_count_as_seconds"),
+              py::arg("enable_cie_component_activation") = false);
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

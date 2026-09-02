@@ -639,6 +639,9 @@ struct EventDrivenJunctionConfig {
   // default.  The normalized alternative converts each enabled Q/I count
   // independently with the candidate's existing estimated service rate.
   std::string queue_time_scaling = "raw_count_as_seconds";
+  // Exact-off by default.  When enabled, collect bounded streaming counters
+  // for the CIE revision's activation-first analysis; routing is unchanged.
+  bool enable_cie_component_activation = false;
   std::vector<std::vector<double>> scorer_w1;
   std::vector<double> scorer_b1;
   std::vector<double> scorer_w2;
@@ -1065,6 +1068,7 @@ struct EventRuntimeSummary {
   std::string complete_on_goal_arrival_claim_boundary;
   int s4_score_component_mask = kS4ScoreAllComponentsMask;
   std::string queue_time_scaling = "raw_count_as_seconds";
+  bool cie_component_activation_enabled = false;
   bool scorer_out_of_distribution_diagnostic = false;
   bool scorer_promotion_eligible = false;
   bool scorer_absolute_node_ids_enabled = false;
@@ -1073,6 +1077,22 @@ struct EventRuntimeSummary {
   int scorer_explicit_default_feature_count = 0;
   std::uint64_t scorer_decision_evaluation_count = 0;
   std::uint64_t scorer_candidate_evaluation_count = 0;
+  // Exact streaming activation census for the four S4 dynamic terms in mask
+  // order Q, I, corridor wait, destination-service wait.  These counters do
+  // not retain candidate traces and therefore remain bounded at full scale.
+  std::uint64_t s4_activation_decision_count = 0;
+  std::uint64_t s4_activation_multi_candidate_decision_count = 0;
+  std::array<std::uint64_t, 4> s4_component_candidate_nonzero_count{};
+  std::array<std::uint64_t, 4>
+      s4_component_decision_any_candidate_nonzero_count{};
+  std::array<std::uint64_t, 4>
+      s4_component_raw_argmin_nonzero_count{};
+  std::array<std::uint64_t, 4>
+      s4_component_counterfactual_any_ranking_change_count{};
+  std::array<std::uint64_t, 4>
+      s4_component_counterfactual_raw_argmin_change_count{};
+  std::array<double, 4> s4_component_value_sum{};
+  std::array<double, 4> s4_component_value_max{};
   std::uint64_t scorer_risk_abstain_count = 0;
   int scorer_teacher_input_count = 0;
   int scorer_future_route_input_count = 0;
@@ -1233,6 +1253,10 @@ struct EventRuntimeSummary {
   int deadlock_escape_activation_count = 0;
   int starvation_count = 0;
   int loop_count = 0;
+  std::uint64_t s4_strict_descent_evaluation_count = 0;
+  std::uint64_t s4_strict_descent_filtered_candidate_count = 0;
+  std::uint64_t s4_strict_descent_filtered_decision_count = 0;
+  std::uint64_t s4_strict_descent_empty_ranking_count = 0;
   int runtime_full_astar_calls = 0;
   int global_reservation_scan_count = 0;
   int max_edges_selected_per_arrive = 0;
@@ -2981,6 +3005,8 @@ class EventDrivenJunctionRuntime {
     result_.summary.s4_score_component_mask =
         config_.s4_score_component_mask;
     result_.summary.queue_time_scaling = config_.queue_time_scaling;
+    result_.summary.cie_component_activation_enabled =
+        config_.enable_cie_component_activation;
     if (config_.enable_s4_local_potential_descent_guard) {
       result_.summary.s4_local_potential_descent_guard_enabled = true;
       result_.summary.s4_local_potential_descent_guard_learning_active =
@@ -5150,6 +5176,11 @@ class EventDrivenJunctionRuntime {
       throw std::invalid_argument(
           "non-default S4 component or queue-time controls require the S4 "
           "scorer");
+    }
+    if (config_.enable_cie_component_activation &&
+        canonical_scorer_mode() != "S4") {
+      throw std::invalid_argument(
+          "CIE component activation telemetry requires the S4 scorer");
     }
     if (config_.g4irsf20_event_hotpath_policy != "E0" &&
         config_.g4irsf20_event_hotpath_policy != "E1" &&
@@ -10042,10 +10073,14 @@ class EventDrivenJunctionRuntime {
 
   void apply_s4_local_potential_descent_guard(
       const EventDecisionTraceRow& trace,
-      std::vector<std::size_t>& ranking) const {
+      std::vector<std::size_t>& ranking) {
     if (!config_.enable_s4_local_potential_descent_guard) {
       return;
     }
+    if (config_.enable_cie_component_activation) {
+      ++result_.summary.s4_strict_descent_evaluation_count;
+    }
+    const std::size_t before = ranking.size();
     ranking.erase(
         std::remove_if(
             ranking.begin(), ranking.end(), [&](std::size_t index) {
@@ -10053,6 +10088,122 @@ class EventDrivenJunctionRuntime {
                   trace, trace.candidates[index]);
             }),
         ranking.end());
+    const std::size_t filtered = before - ranking.size();
+    if (config_.enable_cie_component_activation) {
+      result_.summary.s4_strict_descent_filtered_candidate_count += filtered;
+      if (filtered > 0U) {
+        ++result_.summary.s4_strict_descent_filtered_decision_count;
+      }
+      if (before > 0U && ranking.empty()) {
+        ++result_.summary.s4_strict_descent_empty_ranking_count;
+      }
+    }
+  }
+
+  void record_s4_component_activation(
+      const EventDecisionTraceRow& trace,
+      bool service_rate_normalized) {
+    if (trace.candidates.empty()) {
+      return;
+    }
+    ++result_.summary.s4_activation_decision_count;
+    if (trace.candidates.size() > 1U) {
+      ++result_.summary.s4_activation_multi_candidate_decision_count;
+    }
+
+    const auto component_values = [&](const EventCandidateRecord& candidate) {
+      const double queue_scale =
+          service_rate_normalized
+              ? 1.0 / candidate.estimated_service_rate
+              : 1.0;
+      return std::array<double, 4>{
+          static_cast<double>(candidate.target_queue_length) * queue_scale,
+          static_cast<double>(candidate.target_scheduled_incoming) * queue_scale,
+          std::max(0.0,
+                   candidate.corridor_next_available - trace.event_time),
+          std::max(0.0,
+                   candidate.target_next_available -
+                       (trace.event_time + candidate.travel_time))};
+    };
+
+    std::array<bool, 4> decision_nonzero{};
+    for (const auto& candidate : trace.candidates) {
+      const auto values = component_values(candidate);
+      for (std::size_t component = 0; component < values.size(); ++component) {
+        const double value = values[component];
+        result_.summary.s4_component_value_sum[component] += value;
+        result_.summary.s4_component_value_max[component] =
+            std::max(result_.summary.s4_component_value_max[component], value);
+        if (value > event_runtime_detail::kEpsilon) {
+          ++result_.summary
+                .s4_component_candidate_nonzero_count[component];
+          decision_nonzero[component] = true;
+        }
+      }
+    }
+    for (std::size_t component = 0;
+         component < decision_nonzero.size();
+         ++component) {
+      if (decision_nonzero[component]) {
+        ++result_.summary
+              .s4_component_decision_any_candidate_nonzero_count[component];
+      }
+    }
+
+    const auto ranking_for_mask = [&](int mask) {
+      std::vector<std::pair<std::pair<double, int>, std::size_t>> scored;
+      scored.reserve(trace.candidates.size());
+      for (std::size_t index = 0; index < trace.candidates.size(); ++index) {
+        const auto& candidate = trace.candidates[index];
+        double score = s4_queue_aware_score(
+            candidate, trace.event_time, mask, service_rate_normalized);
+        if (config_.enable_fault_policy && candidate.advertised_fault) {
+          score += 1.0e12;
+        }
+        scored.push_back({{score, candidate.next_node}, index});
+      }
+      std::sort(scored.begin(), scored.end());
+      std::vector<std::size_t> ranking;
+      ranking.reserve(scored.size());
+      for (const auto& item : scored) {
+        ranking.push_back(item.second);
+      }
+      return ranking;
+    };
+    const auto full_ranking = ranking_for_mask(kS4ScoreAllComponentsMask);
+    if (full_ranking.empty()) {
+      return;
+    }
+    const std::size_t full_best = full_ranking.front();
+    const auto full_best_values = component_values(trace.candidates[full_best]);
+    for (std::size_t component = 0;
+         component < full_best_values.size();
+         ++component) {
+      if (full_best_values[component] > event_runtime_detail::kEpsilon) {
+        ++result_.summary
+              .s4_component_raw_argmin_nonzero_count[component];
+      }
+    }
+    if (trace.candidates.size() < 2U) {
+      return;
+    }
+    const std::array<int, 4> bits{
+        kS4ScoreTargetQueueMask,
+        kS4ScoreScheduledIncomingMask,
+        kS4ScoreCorridorWaitMask,
+        kS4ScoreTargetServiceWaitMask};
+    for (std::size_t component = 0; component < bits.size(); ++component) {
+      const auto without = ranking_for_mask(
+          kS4ScoreAllComponentsMask & ~bits[component]);
+      if (without != full_ranking) {
+        ++result_.summary
+              .s4_component_counterfactual_any_ranking_change_count[component];
+      }
+      if (without.front() != full_best) {
+        ++result_.summary
+              .s4_component_counterfactual_raw_argmin_change_count[component];
+      }
+    }
   }
 
   void apply_scorer(EventDecisionTraceRow& trace) {
@@ -10172,6 +10323,10 @@ class EventDrivenJunctionRuntime {
                  : 0.0);
         candidate.scorer_raw_score = score;
         candidate.scorer_raw_score_available = true;
+      }
+      if (mode == "S4" && config_.enable_cie_component_activation) {
+        record_s4_component_activation(
+            trace, s4_service_rate_normalized);
       }
     } else {
       if (!scorer_model_.has_value()) {

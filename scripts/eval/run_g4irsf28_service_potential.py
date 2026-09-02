@@ -56,6 +56,72 @@ class ServicePotentialError(RuntimeError):
     """Raised when the static service-aware potential cannot be evaluated."""
 
 
+def free_flow_potential(
+    node_records: Sequence[Sequence[Any]],
+    edge_records: Sequence[Sequence[Any]],
+) -> tuple[list[list[float]], dict[str, Any]]:
+    """Return an edge-travel-only all-pairs potential.
+
+    This is the strict ``H_FF`` control used by the CIE revision experiments.
+    Node service, queues, calendars, scheduled arrivals, and faults are not
+    read.  The deliberately separate implementation makes it difficult to
+    accidentally donate the service-aware contribution to a control arm.
+    """
+
+    nodes = sorted(int(row[0]) for row in node_records)
+    if nodes != list(range(len(nodes))):
+        raise ServicePotentialError("node IDs must be dense zero-based heuristic indices")
+
+    incoming: dict[int, list[tuple[int, float]]] = {node: [] for node in nodes}
+    edge_cost_sum = 0.0
+    for edge in edge_records:
+        source, target = int(edge[0]), int(edge[1])
+        length, speed = float(edge[2]), float(edge[3])
+        if length <= 0.0 or speed <= 0.0:
+            raise ServicePotentialError("edge length and speed must be positive")
+        travel = length / speed
+        incoming[target].append((source, travel))
+        edge_cost_sum += travel
+    for values in incoming.values():
+        values.sort()
+
+    node_count = len(nodes)
+    unreachable = edge_cost_sum + 1.0
+    matrix = [[unreachable] * node_count for _ in nodes]
+    for goal in nodes:
+        distances = [math.inf] * node_count
+        distances[goal] = 0.0
+        heap: list[tuple[float, int]] = [(0.0, goal)]
+        while heap:
+            cost, node = heapq.heappop(heap)
+            if cost > distances[node]:
+                continue
+            for predecessor, travel in incoming[node]:
+                candidate = cost + travel
+                if candidate < distances[predecessor]:
+                    distances[predecessor] = candidate
+                    heapq.heappush(heap, (candidate, predecessor))
+        for source, value in enumerate(distances):
+            matrix[source][goal] = value if math.isfinite(value) else unreachable
+
+    return matrix, {
+        "mode": "FREE_FLOW_EDGE_TRAVEL_ONLY_POTENTIAL",
+        "formula": "H(g,g)=0; H(u,g)=min_(u,v)(travel(u,v)+H(v,g))",
+        "node_service_time_included": False,
+        "queue_or_calendar_state_included": False,
+        "fault_runtime_state_included": False,
+        "precomputation": "reverse_dijkstra_once_per_goal",
+        "node_count": node_count,
+        "directed_edge_count": len(edge_records),
+        "unreachable_finite_value_seconds": unreachable,
+        "runtime_read_scope": "direct_outgoing_candidates_and_one_scalar_each",
+        "runtime_decision_complexity": "O(outdegree)",
+        "runtime_full_astar_required": False,
+        "future_route_materialized": False,
+        "global_reservation_table_required": False,
+    }
+
+
 def service_aware_potential(
     node_records: Sequence[Sequence[Any]],
     edge_records: Sequence[Sequence[Any]],
@@ -148,6 +214,19 @@ def apply_service_aware_potential(
         prepared["node_records"],
         prepared["edge_records"],
         minimum_service_seconds=minimum_service,
+    )
+    prepared["heuristic_time"] = potential
+    return prepared, contract
+
+
+def apply_free_flow_potential(
+    request: Mapping[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Copy a native request and replace only its static heuristic matrix."""
+
+    prepared = dict(request)
+    potential, contract = free_flow_potential(
+        prepared["node_records"], prepared["edge_records"]
     )
     prepared["heuristic_time"] = potential
     return prepared, contract

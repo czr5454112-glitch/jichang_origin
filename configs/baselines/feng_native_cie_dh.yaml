@@ -1,0 +1,119 @@
+schema: czr005.feng_native_cie_dh_recovery.v1
+baseline_family: FENG_CIE
+formal_name: FENG_NATIVE_CIE_DH
+evidence_label: BLOCKED_FENG_NATIVE_DH_SOURCE_NOT_RECOVERED
+exact_reproduction: false
+comparison_eligible: false
+
+source_provenance:
+  independent_original:
+    path: 'C:\PROGRAMING\czr004\jichang_origin'
+    git_branch: main
+    git_commit: c5c2d2cb050f62b5160cdfb6c29895f03af12486
+    mutation_allowed: false
+  frozen_repository_mirror:
+    path: legacy/jichang_origin_readonly
+    mutation_allowed: false
+  recovered_algorithm: FENG_NATIVE_HCA_ONLY
+  native_cie_dh_source_recovered: false
+
+source_search:
+  roots:
+    - 'C:\PROGRAMING\czr004\jichang_origin\src'
+    - legacy/jichang_origin_readonly/src
+  file_glob: '*.java'
+  java_file_count_per_root: 15
+  terms:
+    - CIE-DH
+    - CIE_DH
+    - decentralized
+    - decentralised
+    - moving
+    - stopped
+    - HOLD
+    - BTI
+    - DDI
+    - 0.2_seconds_with_unit
+    - 200_ms
+  matching_files: 0
+  scope_note: Absence is established only for the two recorded source trees.
+
+native_hca:
+  status: BUILDABLE
+  source_entry: legacy/jichang_origin_readonly/src/RUN/Main.java
+  algorithm_entry: legacy/jichang_origin_readonly/src/App/ICS_PathFinding.java
+  planner_entry: legacy/jichang_origin_readonly/src/App/Astar.java
+  headless_observer: benchmarks/java/LegacyIcsNoFaultWindowBenchmark.java
+  runner: scripts/eval/run_g4irsf24_fresh_hca.py
+  invocation_chain:
+    - Tasks.generate_tasks
+    - ICS_PathFinding.ICS_path_finding
+    - Astar.research
+    - saved_routes_and_completion_outputs
+  build:
+    jdk: 'C:\PROGRAMING\jdk-18'
+    target_release: 8
+    command: >-
+      C:\PROGRAMING\jdk-18\bin\javac.exe --release 8 -encoding UTF-8
+      -d build\feng_native_hca_java <App/*.java> <ICS_GUI.java>
+      <LegacyIcsNoFaultWindowBenchmark.java>
+
+native_cie_dh:
+  status: BLOCKED_FENG_NATIVE_DH_SOURCE_NOT_RECOVERED
+  implementation_path: null
+  missing_contracts:
+    - 0.2_second_position_level_execution
+    - moving_and_stopped_state_semantics
+    - HOLD_rule
+    - BTI_definition_and_update
+    - DDI_definition_and_update
+    - published_congestion_coefficients
+    - native_local_next_hop_call_chain
+  substitute_common_executor_results: false
+  blocked_metric_value: 'N/A (BLOCKED_FENG_NATIVE_DH_SOURCE_NOT_RECOVERED)'
+
+protocols:
+  P0:
+    executor: FENG_NATIVE_JAVA
+    map: map2
+    load: 1.0
+    speed_mps: 2.5
+    eligible_methods:
+      - FENG_NATIVE_HCA
+    blocked_methods:
+      - FENG_NATIVE_CIE_DH
+  P1:
+    executor: COMMON_CPP_EVENT_EXECUTOR
+    coordination: neutral_fifo
+    adapted_family_name: TARAU_LOCAL_2009_CIE_DH
+    native_claim_allowed: false
+  P2:
+    comparison:
+      - FENG_NATIVE_HCA
+      - G31_S4_NATIVE
+    interpretation: END_TO_END_SYSTEM_COMPARISON_ONLY
+
+claim_constraints:
+  no_cross_protocol_ranking: true
+  no_survivor_timing: true
+  no_adapted_as_native: true
+  no_alias_double_counting: true
+  no_hand_filled_metrics: true
+
+full_map2_1x_hca_regression:
+  status: FENG_NATIVE_HCA_REGRESSION_PASS
+  run_artifact_identity: outputs/runtime/cie_revision/feng_native_hca_regression.json
+  java_runtime_identity: OpenJDK_18_javac_release_8
+  canonical_segment_population: 43603
+  canonical_raw_bag_population: 28506
+  released_segment_count: 43603
+  completed_segment_count: 43603
+  released_raw_bag_count: 28506
+  completed_raw_bag_count: 28506
+  deadline_success_raw_bag_count: NOT_MEASURED
+  full_population_mean_seconds: 236.710166280783
+  full_population_p95_seconds: 299.0
+  full_population_p99_seconds: 330.0
+  full_population_max_seconds: 357.0
+  wall_time_seconds: 243.78774299984798
+  comparison_eligible: true
