@@ -39,14 +39,41 @@ from czr005 import cpp_backend  # noqa: E402
 from scripts.eval import run_cie_component_activation as activation  # noqa: E402
 
 
-SCHEMA_RUN = "czr005.cie_e2_equivalence.run.v1"
-SCHEMA_AGGREGATE = "czr005.cie_e2_equivalence.aggregate.v1"
+SCHEMA_RUN = "czr005.cie_e2_equivalence.run.v2"
+SCHEMA_AGGREGATE = "czr005.cie_e2_equivalence.aggregate.v2"
 MAPS = ("map2", "nanning")
 POLICIES = ("E0", "E2")
 LOAD_FACTOR = 1.0
 TRACE_LIMIT = activation.MAX_EVENTS
 TIME_ABS_TOLERANCE_SECONDS = 1.0e-9
 NOT_MEASURED = "N/M"
+
+PHYSICAL_CAUSAL_EVENT_COMPONENTS = (
+    "bag_release_event_count",
+    "arrive_junction_event_count",
+    "junction_service_complete_event_count",
+    "edge_enter_event_count",
+    "edge_exit_event_count",
+    "fault_event_count",
+    "repair_event_count",
+)
+PHYSICAL_CAUSAL_EVENT_TOTAL = "physical_causal_event_count_total"
+STALE_EVENT_COMPONENTS = (
+    "stale_arbitration_event_count",
+    "merge_grant_stale_arbitration_count",
+    "merge_grant_stale_wakeup_count",
+)
+STALE_EVENT_TOTAL = "stale_event_count_total"
+WAKEUP_EVENT_METRICS = (
+    "merge_grant_wakeup_scheduled_count",
+    "merge_grant_wakeup_coalesced_count",
+    "merge_grant_duplicate_wakeup_prevented_count",
+)
+BEACON_SUPPRESSION_METRICS = (
+    "redundant_beacon_suppressed_count",
+    "same_state_beacon_suppressed_count",
+)
+BEACON_SUPPRESSION_SEMANTICS = "beacon_suppression_count_semantics"
 
 DEFAULT_NANNING_PROFILE = activation.DEFAULT_NANNING_PROFILE
 DEFAULT_RESULT_ROOT = ROOT / "outputs/runtime/cie_revision/e2_equivalence"
@@ -130,6 +157,24 @@ def _integer(value: Any) -> int | None:
 def _measured(source: Mapping[str, Any], key: str) -> Any:
     value = source.get(key, NOT_MEASURED)
     return NOT_MEASURED if value is None else value
+
+
+def _counter_total(values: Mapping[str, Any], names: Sequence[str]) -> int | str:
+    measured = [_integer(values.get(name)) for name in names]
+    if any(value is None for value in measured):
+        return NOT_MEASURED
+    return sum(value for value in measured if value is not None)
+
+
+def _beacon_suppression_count(
+    summary: Mapping[str, Any], native_name: str, policy: str
+) -> int | str:
+    if policy == "E0":
+        # The binding omits G20 counters under E0.  The policy performs no
+        # suppression, so zero is a definition-level value rather than an
+        # imputation from a missing runtime field.
+        return 0
+    return _measured(summary, native_name)
 
 
 def _normalized_pair_request(request: Mapping[str, Any]) -> dict[str, Any]:
@@ -637,6 +682,11 @@ def execute_run(
     else:
         status = "COMPLETE_TRACE_CAPTURE"
 
+    physical_causal_events = {
+        name: _measured(summary, name) for name in PHYSICAL_CAUSAL_EVENT_COMPONENTS
+    }
+    stale_events = {name: _measured(summary, name) for name in STALE_EVENT_COMPONENTS}
+    wakeup_events = {name: _measured(summary, name) for name in WAKEUP_EVENT_METRICS}
     runtime = {
         "event_count": _measured(summary, "event_count"),
         "decision_count": _measured(summary, "decision_count"),
@@ -646,12 +696,24 @@ def execute_run(
         "congestion_beacon_update_event_count": _measured(
             summary, "congestion_beacon_update_event_count"
         ),
-        "redundant_beacon_suppressed_count": _measured(
-            summary, "g4irsf20_redundant_beacon_suppressed_count"
+        "redundant_beacon_suppressed_count": _beacon_suppression_count(
+            summary, "g4irsf20_redundant_beacon_suppressed_count", policy
         ),
-        "same_state_beacon_suppressed_count": _measured(
-            summary, "g4irsf20_same_state_beacon_suppressed_count"
+        "same_state_beacon_suppressed_count": _beacon_suppression_count(
+            summary, "g4irsf20_same_state_beacon_suppressed_count", policy
         ),
+        BEACON_SUPPRESSION_SEMANTICS: (
+            "DEFINITIONALLY_ZERO_UNDER_E0_POLICY;NATIVE_BINDING_OMITS_COUNTERS"
+            if policy == "E0"
+            else "NATIVE_E2_SUMMARY_COUNTERS"
+        ),
+        **physical_causal_events,
+        PHYSICAL_CAUSAL_EVENT_TOTAL: _counter_total(
+            physical_causal_events, PHYSICAL_CAUSAL_EVENT_COMPONENTS
+        ),
+        **stale_events,
+        STALE_EVENT_TOTAL: _counter_total(stale_events, STALE_EVENT_COMPONENTS),
+        **wakeup_events,
         "max_junction_queue_length": _measured(
             summary, "max_junction_queue_length"
         ),
@@ -809,8 +871,12 @@ COMPUTE_METRICS = (
     "decision_count",
     "decision_attempt_count",
     "congestion_beacon_update_event_count",
-    "redundant_beacon_suppressed_count",
-    "same_state_beacon_suppressed_count",
+    *BEACON_SUPPRESSION_METRICS,
+    *PHYSICAL_CAUSAL_EVENT_COMPONENTS,
+    PHYSICAL_CAUSAL_EVENT_TOTAL,
+    *STALE_EVENT_COMPONENTS,
+    STALE_EVENT_TOTAL,
+    *WAKEUP_EVENT_METRICS,
     "max_junction_queue_length",
     "max_source_queue_length",
     "event_queue_peak",
@@ -818,6 +884,8 @@ COMPUTE_METRICS = (
     "cpu_seconds",
     "peak_rss_bytes",
 )
+
+CSV_RUNTIME_FIELDS = (*COMPUTE_METRICS, BEACON_SUPPRESSION_SEMANTICS)
 
 
 def _compute_comparison(e0: Mapping[str, Any], e2: Mapping[str, Any]) -> dict[str, Any]:
@@ -845,6 +913,65 @@ def _compute_comparison(e0: Mapping[str, Any], e2: Mapping[str, Any]) -> dict[st
     return result
 
 
+def _physical_causal_event_comparison(
+    e0: Mapping[str, Any], e2: Mapping[str, Any]
+) -> dict[str, Any]:
+    fields = (*PHYSICAL_CAUSAL_EVENT_COMPONENTS, PHYSICAL_CAUSAL_EVENT_TOTAL)
+    counts: dict[str, dict[str, Any]] = {}
+    mismatched_fields: list[str] = []
+    all_fields_measured = True
+    for name in fields:
+        left = _integer(e0.get(name))
+        right = _integer(e2.get(name))
+        measured = left is not None and right is not None
+        equal = measured and left == right
+        counts[name] = {
+            "E0": left if left is not None else NOT_MEASURED,
+            "E2": right if right is not None else NOT_MEASURED,
+            "equal": equal,
+        }
+        all_fields_measured = all_fields_measured and measured
+        if not equal:
+            mismatched_fields.append(name)
+
+    e0_component_values = [
+        _integer(e0.get(name)) for name in PHYSICAL_CAUSAL_EVENT_COMPONENTS
+    ]
+    e2_component_values = [
+        _integer(e2.get(name)) for name in PHYSICAL_CAUSAL_EVENT_COMPONENTS
+    ]
+    e0_total = _integer(e0.get(PHYSICAL_CAUSAL_EVENT_TOTAL))
+    e2_total = _integer(e2.get(PHYSICAL_CAUSAL_EVENT_TOTAL))
+    e0_total_consistent = (
+        e0_total is not None
+        and all(value is not None for value in e0_component_values)
+        and e0_total == sum(value for value in e0_component_values if value is not None)
+    )
+    e2_total_consistent = (
+        e2_total is not None
+        and all(value is not None for value in e2_component_values)
+        and e2_total == sum(value for value in e2_component_values if value is not None)
+    )
+    passed = (
+        all_fields_measured
+        and not mismatched_fields
+        and e0_total_consistent
+        and e2_total_consistent
+    )
+    return {
+        "pass": passed,
+        "all_fields_measured": all_fields_measured,
+        "E0_total_consistent": e0_total_consistent,
+        "E2_total_consistent": e2_total_consistent,
+        "mismatched_fields": mismatched_fields,
+        "counts": counts,
+        "claim_boundary": (
+            "Only physical-causal event components are an equivalence diagnostic; "
+            "stale and wakeup counters are compute telemetry and are not gates."
+        ),
+    }
+
+
 def _pair_result(map_name: str, e0: Mapping[str, Any], e2: Mapping[str, Any]) -> dict[str, Any]:
     terminal = _compare_segments(
         e0.get("per_segment_terminal_timing", []),
@@ -857,6 +984,9 @@ def _pair_result(map_name: str, e0: Mapping[str, Any], e2: Mapping[str, Any]) ->
     e0_safety = e0.get("execution_integrity", {}).get("safety", {})
     e2_safety = e2.get("execution_integrity", {}).get("safety", {})
     safety_equal = e0_safety.get("measurements") == e2_safety.get("measurements")
+    physical_causal_events = _physical_causal_event_comparison(
+        e0.get("runtime_compute", {}), e2.get("runtime_compute", {})
+    )
     e0_pair_hash = e0.get("provenance", {}).get("pair_control_sha256")
     e2_pair_hash = e2.get("provenance", {}).get("pair_control_sha256")
     e0_provenance = e0.get("provenance", {})
@@ -899,6 +1029,7 @@ def _pair_result(map_name: str, e0: Mapping[str, Any], e2: Mapping[str, Any]) ->
         and e2.get("full_action_attempt_trace", {}).get("complete_capture") is True,
         "terminal_and_timing_equal": terminal["pass"],
         "full_physical_action_attempt_sequence_equal": traces["pass"],
+        "physical_causal_event_counts_equal": physical_causal_events["pass"],
         "safety_pass_both": e0_safety.get("pass") is True
         and e2_safety.get("pass") is True,
         "safety_measurements_equal": safety_equal,
@@ -919,6 +1050,7 @@ def _pair_result(map_name: str, e0: Mapping[str, Any], e2: Mapping[str, Any]) ->
         "blockers": blockers,
         "terminal_timing_comparison": terminal,
         "action_attempt_trace_comparison": traces,
+        "physical_causal_event_comparison": physical_causal_events,
         "compute_comparison": _compute_comparison(
             e0.get("runtime_compute", {}), e2.get("runtime_compute", {})
         ),
@@ -954,7 +1086,12 @@ def _csv_rows(
                     "pair_control_sha256"
                 ),
             }
-            row.update({metric: runtime.get(metric, NOT_MEASURED) for metric in COMPUTE_METRICS})
+            row.update(
+                {
+                    metric: runtime.get(metric, NOT_MEASURED)
+                    for metric in CSV_RUNTIME_FIELDS
+                }
+            )
             rows.append(row)
     return rows
 
@@ -1004,6 +1141,18 @@ def aggregate_results(
         "measurement_limitations": {
             "event_queue_peak": (
                 "N/M: current public response does not expose event-queue peak"
+            ),
+            "beacon_suppression_E0": (
+                "definitionally zero under E0; native binding omits G20 "
+                "suppression counters for that policy"
+            ),
+            "physical_causal_event_total": (
+                "sum of release, arrival, service-complete, edge-enter, "
+                "edge-exit, fault and repair event counts"
+            ),
+            "stale_and_wakeup_counters": (
+                "paired compute diagnostics only; they are not physical-"
+                "equivalence gates"
             ),
             "peak_rss": (
                 "process-lifetime peak; arms must be separate CLI processes"
@@ -1055,6 +1204,76 @@ def _report_text(aggregate: Mapping[str, Any]) -> str:
         )
     lines.extend(
         [
+            "",
+            "## Physical-causal event count audit",
+            "",
+            "Each count is shown as `E0 / E2`.",
+            "",
+            "| Map | Release | Arrive | Service complete | Edge enter | "
+            "Edge exit | Fault | Repair | Total | Equality gate |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for pair in aggregate["pairs"]:
+        compute = pair["compute_comparison"]
+
+        def paired(metric: str) -> str:
+            values = compute[metric]
+            return f"{values['E0']} / {values['E2']}"
+
+        lines.append(
+            f"| {pair['map']} | {paired('bag_release_event_count')} | "
+            f"{paired('arrive_junction_event_count')} | "
+            f"{paired('junction_service_complete_event_count')} | "
+            f"{paired('edge_enter_event_count')} | "
+            f"{paired('edge_exit_event_count')} | {paired('fault_event_count')} | "
+            f"{paired('repair_event_count')} | "
+            f"{paired(PHYSICAL_CAUSAL_EVENT_TOTAL)} | "
+            f"{pair['gates']['physical_causal_event_counts_equal']} |"
+        )
+    lines.extend(
+        [
+            "",
+            "The physical-causal total is the sum of release, arrival, "
+            "service-complete, edge-enter, edge-exit, fault and repair events. "
+            "Equality of these components is a strict paired diagnostic gate.",
+            "",
+            "## Beacon, stale-event and wakeup telemetry",
+            "",
+            "Each count is shown as `E0 / E2`.",
+            "",
+            "| Map | Redundant beacon suppressed | Same-state beacon suppressed | "
+            "Stale arbitration | Merge stale arbitration | Merge stale wakeup | "
+            "Stale total | Wakeup scheduled | Wakeup coalesced | "
+            "Duplicate wakeup prevented |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for pair in aggregate["pairs"]:
+        compute = pair["compute_comparison"]
+
+        def paired(metric: str) -> str:
+            values = compute[metric]
+            return f"{values['E0']} / {values['E2']}"
+
+        lines.append(
+            f"| {pair['map']} | {paired('redundant_beacon_suppressed_count')} | "
+            f"{paired('same_state_beacon_suppressed_count')} | "
+            f"{paired('stale_arbitration_event_count')} | "
+            f"{paired('merge_grant_stale_arbitration_count')} | "
+            f"{paired('merge_grant_stale_wakeup_count')} | "
+            f"{paired(STALE_EVENT_TOTAL)} | "
+            f"{paired('merge_grant_wakeup_scheduled_count')} | "
+            f"{paired('merge_grant_wakeup_coalesced_count')} | "
+            f"{paired('merge_grant_duplicate_wakeup_prevented_count')} |"
+        )
+    lines.extend(
+        [
+            "",
+            "E0 performs no G20 beacon suppression, so both E0 suppression "
+            "counts are definitionally zero; the native binding omits those "
+            "counters under E0. Stale and wakeup counts are paired compute "
+            "diagnostics and are not physical-equivalence gates.",
             "",
             "Strict equivalence requires identical per-segment terminal states, "
             "completion/admission/release times (absolute tolerance 1e-9 s), and "

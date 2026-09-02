@@ -136,6 +136,19 @@ def _payload(request: dict[str, Any]) -> dict[str, Any]:
         "event_count": 80 if policy == "E2" else 100,
         "decision_count": 2,
         "congestion_beacon_update_event_count": 20 if policy == "E2" else 40,
+        "bag_release_event_count": 2,
+        "arrive_junction_event_count": 2,
+        "junction_service_complete_event_count": 2,
+        "edge_enter_event_count": 2,
+        "edge_exit_event_count": 2,
+        "stale_arbitration_event_count": 3 if policy == "E2" else 4,
+        "merge_grant_stale_arbitration_count": 2 if policy == "E2" else 3,
+        "merge_grant_stale_wakeup_count": 1 if policy == "E2" else 2,
+        "merge_grant_wakeup_scheduled_count": 12 if policy == "E2" else 10,
+        "merge_grant_wakeup_coalesced_count": 5 if policy == "E2" else 4,
+        "merge_grant_duplicate_wakeup_prevented_count": (
+            5 if policy == "E2" else 4
+        ),
         "max_junction_queue_length": 7,
         "max_source_queue_length": 9,
     }
@@ -276,6 +289,14 @@ def test_run_captures_complete_trace_terminal_times_safety_and_compute(
     assert result["full_action_attempt_trace"]["stored_hold_count"] == 1
     assert result["per_segment_terminal_timing"][0]["finish_time"] == 30.0
     assert result["runtime_compute"]["event_count"] == 80
+    assert result["runtime_compute"]["physical_causal_event_count_total"] == 10
+    assert result["runtime_compute"]["stale_event_count_total"] == 6
+    assert result["runtime_compute"]["merge_grant_wakeup_scheduled_count"] == 12
+    assert result["runtime_compute"]["merge_grant_wakeup_coalesced_count"] == 5
+    assert (
+        result["runtime_compute"]["merge_grant_duplicate_wakeup_prevented_count"]
+        == 5
+    )
     assert result["runtime_compute"]["peak_rss_bytes"] == 123456
     assert result["runtime_compute"]["event_queue_peak"] == "N/M"
     assert (
@@ -297,6 +318,69 @@ def test_aggregate_passes_only_for_matching_complete_physical_pair(
         0.2
     )
     assert pair["compute_comparison"]["event_queue_peak"]["E2_minus_E0"] == "N/M"
+    assert pair["gates"]["physical_causal_event_counts_equal"] is True
+    assert pair["physical_causal_event_comparison"]["pass"] is True
+    assert pair["compute_comparison"]["stale_event_count_total"][
+        "E2_minus_E0"
+    ] == -3.0
+    assert aggregate["rows"][0]["redundant_beacon_suppressed_count"] == 0
+    assert aggregate["rows"][0]["same_state_beacon_suppressed_count"] == 0
+    assert aggregate["rows"][0]["beacon_suppression_count_semantics"] == (
+        "DEFINITIONALLY_ZERO_UNDER_E0_POLICY;NATIVE_BINDING_OMITS_COUNTERS"
+    )
+
+
+def test_physical_event_count_mismatch_fails_equivalence_gate(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    e0 = _run(monkeypatch, tmp_path, "E0")
+    e2_run = deepcopy(_run(monkeypatch, tmp_path, "E2"))
+    e2_run["runtime_compute"]["edge_enter_event_count"] += 1
+
+    aggregate = e2.aggregate_results([e0, e2_run], expected_maps=("map2",))
+
+    assert aggregate["status"] == "PHYSICAL_EQUIVALENCE_FAILED"
+    pair = aggregate["pairs"][0]
+    assert pair["gates"]["physical_causal_event_counts_equal"] is False
+    assert "edge_enter_event_count" in pair[
+        "physical_causal_event_comparison"
+    ]["mismatched_fields"]
+
+
+def test_stale_and_wakeup_differences_are_compute_diagnostics_not_gates(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    e0 = _run(monkeypatch, tmp_path, "E0")
+    e2_run = deepcopy(_run(monkeypatch, tmp_path, "E2"))
+    e2_run["runtime_compute"]["stale_arbitration_event_count"] += 100
+    e2_run["runtime_compute"]["stale_event_count_total"] += 100
+    e2_run["runtime_compute"]["merge_grant_wakeup_scheduled_count"] += 100
+
+    aggregate = e2.aggregate_results([e0, e2_run], expected_maps=("map2",))
+
+    assert aggregate["status"] == "COMPLETE_STRICT_PHYSICAL_EQUIVALENCE"
+    pair = aggregate["pairs"][0]
+    assert pair["strict_physical_equivalence"] is True
+    assert pair["compute_comparison"]["stale_event_count_total"][
+        "E2_minus_E0"
+    ] == 97.0
+
+
+def test_report_presents_physical_stale_wakeup_and_e0_zero_semantics(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    aggregate = e2.aggregate_results(
+        [_run(monkeypatch, tmp_path, "E0"), _run(monkeypatch, tmp_path, "E2")],
+        expected_maps=("map2",),
+    )
+
+    report = e2._report_text(aggregate)
+
+    assert "Physical-causal event count audit" in report
+    assert "Stale arbitration" in report
+    assert "Wakeup coalesced" in report
+    assert "definitionally zero" in report
+    assert "not physical-equivalence gates" in report
 
 
 @pytest.mark.parametrize(
