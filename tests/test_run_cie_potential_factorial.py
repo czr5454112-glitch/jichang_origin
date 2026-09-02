@@ -207,6 +207,17 @@ def test_two_x_paper_timing_is_na_even_when_full_population_completes(
     assert timing["metrics_seconds"] is None
 
 
+def test_nanning_workload_uses_canonical_path_for_provenance(tmp_path: Path) -> None:
+    canonical = tmp_path / "nanning.jsonl"
+    canonical.write_text("{}\n", encoding="utf-8")
+
+    resolved = runner._workload_source_path(
+        SimpleNamespace(canonical_path=canonical)
+    )
+
+    assert resolved == canonical.resolve()
+
+
 def test_cie_dh_cannot_be_mislabeled_as_dynamic_off(tmp_path: Path) -> None:
     with pytest.raises(runner.PotentialFactorialError, match="not an S4 dynamic"):
         runner.execute(_args(tmp_path, policy="cie_dh", dynamic="off"))

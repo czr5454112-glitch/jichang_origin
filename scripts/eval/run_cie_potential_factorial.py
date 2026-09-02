@@ -85,6 +85,17 @@ def _file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _workload_source_path(workload: Any) -> Path:
+    source = getattr(workload, "source_path", None)
+    if source is None:
+        source = getattr(workload, "canonical_path", None)
+    if source is None:
+        raise PotentialFactorialError(
+            "workload must expose source_path or canonical_path for provenance"
+        )
+    return Path(source).resolve(strict=True)
+
+
 def _validate_args(args: argparse.Namespace) -> None:
     service_multiplier = _finite(
         getattr(args, "service_multiplier", 1.0), "service_multiplier"
@@ -418,6 +429,7 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
     binary = g35._resolve_from_root(Path(args.binary)).resolve(strict=True)
     args.binary = binary
     case_id, workload, request, release, prepared = prepare_cell(args)
+    workload_source = _workload_source_path(workload)
     control_projection = _control_projection(request)
     common = {
         "schema": SCHEMA,
@@ -435,8 +447,8 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
             "git_branch": _git_value("branch", "--show-current"),
             "experiment_manifest_path": str(REVISION_MANIFEST.resolve()),
             "experiment_manifest_sha256": _file_sha256(REVISION_MANIFEST),
-            "workload_path": str(workload.source_path.resolve()),
-            "workload_sha256": _file_sha256(workload.source_path.resolve()),
+            "workload_path": str(workload_source),
+            "workload_sha256": _file_sha256(workload_source),
             "executor_identity": "COMMON_CPP_EVENT_EXECUTOR",
             "random_seed": None,
             "survivor_timing_used": False,
