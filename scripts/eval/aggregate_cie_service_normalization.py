@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Aggregate the frozen CIE service-rate-normalization three-arm study.
 
-Every comparison requires all three arms, a common binary/workload/request
-identity, and passing native integrity.  Missing, failed, or non-full-population
-timing cells remain explicit N/M values; they are never replaced with survivor
-or common-cohort timing.
+The three-arm group must have a common binary/workload/request identity and
+passing native integrity.  Within such a group, RAW -> NORMALIZED and RAW ->
+NO_QI are admitted independently for each available full-population metric.
+Missing, failed, or non-full-population timing remains explicit N/M; it is never
+replaced with survivor or common-cohort timing.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ from scripts.eval import aggregate_cie_potential_factorial as common  # noqa: E4
 from scripts.eval import run_cie_service_normalization as runner  # noqa: E402
 
 
-SUMMARY_SCHEMA = "czr005.cie_service_normalization.summary.v1"
+SUMMARY_SCHEMA = "czr005.cie_service_normalization.summary.v2"
 DEFAULT_SUMMARY = ROOT / "outputs/tables/cie_service_normalization_summary.csv"
 DEFAULT_REPORT = ROOT / "outputs/reports/cie_service_normalization_report.md"
 
@@ -134,6 +135,10 @@ FIELDS = (
     "service_time_multiplier",
     "comparison_status",
     "missing_or_failed_arms",
+    "normalized_pair_status",
+    "normalized_pair_status_detail",
+    "no_qi_pair_status",
+    "no_qi_pair_status_detail",
     "metric",
     "metric_label",
     "preferred_direction",
@@ -245,6 +250,23 @@ def _outcome(delta: float | None, preferred: str) -> str:
     if preferred == "lower":
         return "IMPROVED" if delta < 0.0 else "WORSE"
     return "DIAGNOSTIC_ONLY"
+
+
+def _pair_metric_status(
+    group_status: str,
+    group_detail: Sequence[str],
+    values: Mapping[str, int | float | None],
+    treatment_arm: str,
+) -> tuple[str, list[str]]:
+    """Gate one RAW-versus-treatment contrast without consulting the other."""
+
+    if group_status != "COMPLETE":
+        return group_status, list(group_detail)
+    required_arms = ("RAW_COUNT_AS_SECONDS", treatment_arm)
+    missing = [arm for arm in required_arms if values.get(arm) is None]
+    if missing:
+        return "N_M_METRIC_NOT_AVAILABLE", missing
+    return "COMPLETE", []
 
 
 def _atomic_text(path: Path, text: str) -> None:
@@ -392,28 +414,59 @@ def aggregate(
                 values = {
                     arm: _number(extracted[arm].get(metric)) for arm in arm_order
                 }
-                metric_status = group_status
-                metric_detail = list(detail)
-                if group_status == "COMPLETE" and any(
-                    value is None for value in values.values()
+                normalized_pair_status, normalized_pair_detail = (
+                    _pair_metric_status(
+                        group_status,
+                        detail,
+                        values,
+                        "SERVICE_RATE_NORMALIZED",
+                    )
+                )
+                no_qi_pair_status, no_qi_pair_detail = _pair_metric_status(
+                    group_status,
+                    detail,
+                    values,
+                    "NO_QI_BUT_CALENDAR",
+                )
+                if group_status != "COMPLETE":
+                    metric_status = group_status
+                    metric_detail = list(detail)
+                elif (
+                    normalized_pair_status == "COMPLETE"
+                    and no_qi_pair_status == "COMPLETE"
                 ):
+                    metric_status = "COMPLETE"
+                    metric_detail = []
+                elif (
+                    normalized_pair_status == "COMPLETE"
+                    or no_qi_pair_status == "COMPLETE"
+                ):
+                    metric_status = "PARTIAL_PAIR_METRIC_AVAILABLE"
+                    metric_detail = list(
+                        dict.fromkeys(
+                            normalized_pair_detail + no_qi_pair_detail
+                        )
+                    )
+                else:
                     metric_status = "N_M_METRIC_NOT_AVAILABLE"
-                    metric_detail = [
-                        arm for arm, value in values.items() if value is None
-                    ]
+                    metric_detail = list(
+                        dict.fromkeys(
+                            normalized_pair_detail + no_qi_pair_detail
+                        )
+                    )
                 raw = values["RAW_COUNT_AS_SECONDS"]
                 normalized = values["SERVICE_RATE_NORMALIZED"]
                 no_qi = values["NO_QI_BUT_CALENDAR"]
                 normalized_delta = (
                     float(normalized) - float(raw)
-                    if metric_status == "COMPLETE"
+                    if normalized_pair_status == "COMPLETE"
                     and normalized is not None
                     and raw is not None
                     else None
                 )
                 no_qi_delta = (
                     float(no_qi) - float(raw)
-                    if metric_status == "COMPLETE"
+                    if no_qi_pair_status == "COMPLETE"
                     and no_qi is not None
                     and raw is not None
                     else None
@@ -427,6 +480,14 @@ def aggregate(
                         "service_time_multiplier": expected_multiplier,
                         "comparison_status": metric_status,
                         "missing_or_failed_arms": ";".join(metric_detail),
+                        "normalized_pair_status": normalized_pair_status,
+                        "normalized_pair_status_detail": ";".join(
+                            normalized_pair_detail
+                        ),
+                        "no_qi_pair_status": no_qi_pair_status,
+                        "no_qi_pair_status_detail": ";".join(
+                            no_qi_pair_detail
+                        ),
                         "metric": metric,
                         "metric_label": label,
                         "preferred_direction": preferred,
@@ -478,20 +539,35 @@ def aggregate(
         "",
         "## Fixed comparisons",
         "",
-        "| Map | Service | Metric | Status | Raw | Normalized | No Q/I | "
+        "Each pair status is evaluated independently after the common "
+        "three-arm identity and integrity gate.",
+        "",
+        "| Map | Service | Metric | Normalized pair status | "
+        "No-Q/I pair status | Raw | Normalized | No Q/I | "
         "Norm - raw | No Q/I - raw |",
-        "|---|---|---|---|---:|---:|---:|---:|---:|",
+        "|---|---|---|---|---|---:|---:|---:|---:|---:|",
     ]
     for row in rows:
+        normalized_pair_display = str(row["normalized_pair_status"])
+        if row["normalized_pair_status_detail"]:
+            normalized_pair_display += (
+                f" ({row['normalized_pair_status_detail']})"
+            )
+        no_qi_pair_display = str(row["no_qi_pair_status"])
+        if row["no_qi_pair_status_detail"]:
+            no_qi_pair_display += f" ({row['no_qi_pair_status_detail']})"
         report_lines.append(
             "| {map} | {service_condition} | {metric_label} | "
-            "{comparison_status} | {raw_count_as_seconds} | "
+            "{normalized_pair_display} | {no_qi_pair_display} | "
+            "{raw_count_as_seconds} | "
             "{service_rate_normalized} | {no_qi_but_calendar} | "
             "{normalized_minus_raw} | {no_qi_minus_raw} |".format(
                 **{
                     key: "N/M" if row.get(key) is None else row.get(key)
                     for key in row
-                }
+                },
+                normalized_pair_display=normalized_pair_display,
+                no_qi_pair_display=no_qi_pair_display,
             )
         )
     report_lines.extend(

@@ -482,6 +482,10 @@ def test_aggregate_writes_exact_three_arm_deltas_and_audit(tmp_path: Path) -> No
         and row["metric"] == "population_latency_mean_seconds"
     )
     assert mean_row["comparison_status"] == "COMPLETE"
+    assert mean_row["normalized_pair_status"] == "COMPLETE"
+    assert mean_row["normalized_pair_status_detail"] == ""
+    assert mean_row["no_qi_pair_status"] == "COMPLETE"
+    assert mean_row["no_qi_pair_status_detail"] == ""
     assert float(mean_row["normalized_minus_raw"]) == pytest.approx(-10.0)
     assert float(mean_row["normalized_relative_to_raw_percent"]) == pytest.approx(
         -10.0
@@ -491,6 +495,87 @@ def test_aggregate_writes_exact_three_arm_deltas_and_audit(tmp_path: Path) -> No
     assert mean_row["no_qi_outcome"] == "WORSE"
     text = report.read_text(encoding="utf-8")
     assert "mask 12" in text
+    assert "no survivor/common cohort" in text
+
+
+@pytest.mark.parametrize(
+    (
+        "unavailable_arm",
+        "expected_computed_pair",
+        "expected_delta_field",
+        "expected_delta",
+    ),
+    (
+        (
+            "SERVICE_RATE_NORMALIZED",
+            "no_qi_pair_status",
+            "no_qi_minus_raw",
+            -5.0,
+        ),
+        (
+            "NO_QI_BUT_CALENDAR",
+            "normalized_pair_status",
+            "normalized_minus_raw",
+            -10.0,
+        ),
+    ),
+)
+def test_aggregate_gates_each_full_population_pair_independently(
+    tmp_path: Path,
+    unavailable_arm: str,
+    expected_computed_pair: str,
+    expected_delta_field: str,
+    expected_delta: float,
+) -> None:
+    inputs = tmp_path / "inputs"
+    inputs.mkdir()
+    means = {
+        "RAW_COUNT_AS_SECONDS": 100.0,
+        "SERVICE_RATE_NORMALIZED": 90.0,
+        "NO_QI_BUT_CALENDAR": 95.0,
+    }
+    for arm, mean in means.items():
+        payload = _aggregate_payload(arm=arm, mean=mean)
+        if arm == unavailable_arm:
+            timing = payload["paper_subjects"]["full_population_raw_bag_timing"]
+            timing["status"] = "NOT_MEASURED_FULL_POPULATION_INCOMPLETE"
+            timing["raw_bag_count"] = None
+            timing["metrics_seconds"] = None
+        _write_payload(inputs / f"{arm}.json", payload)
+
+    summary = tmp_path / "summary.csv"
+    report = tmp_path / "report.md"
+    _count, complete_groups = aggregate.aggregate([inputs], summary, report)
+
+    assert complete_groups == 1
+    rows = list(csv.DictReader(summary.open(encoding="utf-8")))
+    mean_row = next(
+        row
+        for row in rows
+        if row["map"] == "map2"
+        and row["service_condition"] == "REAL_SERVICE"
+        and row["metric"] == "population_latency_mean_seconds"
+    )
+    unavailable_pair = (
+        "normalized_pair_status"
+        if unavailable_arm == "SERVICE_RATE_NORMALIZED"
+        else "no_qi_pair_status"
+    )
+    unavailable_detail = unavailable_pair.replace("status", "status_detail")
+    unavailable_delta = (
+        "normalized_minus_raw"
+        if unavailable_arm == "SERVICE_RATE_NORMALIZED"
+        else "no_qi_minus_raw"
+    )
+    assert mean_row["comparison_status"] == "PARTIAL_PAIR_METRIC_AVAILABLE"
+    assert mean_row[unavailable_pair] == "N_M_METRIC_NOT_AVAILABLE"
+    assert mean_row[unavailable_detail] == unavailable_arm
+    assert mean_row[unavailable_delta] == ""
+    assert mean_row[expected_computed_pair] == "COMPLETE"
+    assert float(mean_row[expected_delta_field]) == pytest.approx(expected_delta)
+    text = report.read_text(encoding="utf-8")
+    assert "Normalized pair status" in text
+    assert "No-Q/I pair status" in text
     assert "no survivor/common cohort" in text
 
 
@@ -524,6 +609,8 @@ def test_aggregate_does_not_form_contrast_with_failed_or_mismatched_cell(
         and row["metric"] == "population_latency_mean_seconds"
     )
     assert mean_row["comparison_status"] == "FAILED_CELLS"
+    assert mean_row["normalized_pair_status"] == "FAILED_CELLS"
+    assert mean_row["no_qi_pair_status"] == "FAILED_CELLS"
     assert mean_row["normalized_minus_raw"] == ""
     assert mean_row["no_qi_minus_raw"] == ""
 
@@ -557,6 +644,11 @@ def test_aggregate_does_not_form_contrast_across_request_identities(
         and row["metric"] == "population_latency_mean_seconds"
     )
     assert mean_row["comparison_status"] == "COMPARISON_IDENTITY_MISMATCH"
+    assert (
+        mean_row["normalized_pair_status"]
+        == "COMPARISON_IDENTITY_MISMATCH"
+    )
+    assert mean_row["no_qi_pair_status"] == "COMPARISON_IDENTITY_MISMATCH"
     assert mean_row["normalized_minus_raw"] == ""
 
 
