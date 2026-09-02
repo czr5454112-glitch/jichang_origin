@@ -557,3 +557,31 @@ def test_aggregate_includes_full_population_mean_and_tail_effects(
     assert effect["metrics"]["population_latency_mean_seconds"]["absolute"] == -10.0
     assert effect["metrics"]["population_latency_p95_seconds"]["absolute"] == -10.0
     assert "Δ mean/P95/P99/max" in runner.render_report(aggregate)
+
+
+def test_fault_table_uses_corrected_legacy_incomplete_backlog_area() -> None:
+    payload = _minimal_artifact(
+        study="strict",
+        arm="FULL_WITH_STRICT_DESCENT",
+        completion=1,
+        cohort_same=True,
+        timing_mean=None,
+    )
+    detailed = payload["fixed_denominator_business"]["detailed"]
+    detailed["fixed_horizon_seconds"] = 98_259.0
+    backlog = detailed["backlog"]["raw_bag_total"]
+    backlog.update(
+        arrival_count=2,
+        departure_count=1,
+        end_backlog=1,
+        drain_time_seconds=5.0,
+    )
+
+    row = runner.result_table_row(payload)
+    expected = 1.0 + 98_259.0 - (81_503.72582 + 5.0)
+
+    assert row["raw_bag_backlog_area_seconds"] == pytest.approx(expected)
+    assert row["raw_bag_backlog_area_legacy_seconds"] == 1.0
+    assert row["raw_bag_backlog_area_status"] == (
+        "EXACT_LEGACY_TAIL_CORRECTED_V1"
+    )

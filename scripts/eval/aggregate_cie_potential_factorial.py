@@ -16,6 +16,8 @@ import os
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
+from scripts.eval import cie_backlog_area_correction as backlog_correction
+
 
 SCHEMA = "czr005.cie_potential_factorial.single_cell.v1"
 TARGET_MAPS = ("map2", "nanning")
@@ -206,12 +208,21 @@ LONG_FIELDS = (
     "business_time_to_99_percent_status",
     "business_time_to_99_percent_elapsed_seconds",
     "business_raw_total_backlog_area_seconds",
+    "business_raw_total_backlog_area_legacy_seconds",
+    "business_raw_total_backlog_area_status",
+    "business_raw_total_backlog_area_method",
     "business_raw_total_backlog_peak",
     "business_raw_total_backlog_end",
     "business_raw_source_backlog_area_seconds",
+    "business_raw_source_backlog_area_legacy_seconds",
+    "business_raw_source_backlog_area_status",
+    "business_raw_source_backlog_area_method",
     "business_raw_source_backlog_peak",
     "business_raw_source_backlog_end",
     "business_raw_network_backlog_area_seconds",
+    "business_raw_network_backlog_area_legacy_seconds",
+    "business_raw_network_backlog_area_status",
+    "business_raw_network_backlog_area_method",
     "business_raw_network_backlog_peak",
     "business_raw_network_backlog_end",
     "pre_feasibility_component_raw_argmin_counterfactual_scope",
@@ -355,6 +366,26 @@ def _run_row(path: Path, data: Mapping[str, Any]) -> dict[str, Any]:
     source_backlog = source_backlog if isinstance(source_backlog, Mapping) else {}
     network_backlog = backlog.get("raw_bag_network_after_all_segments_admitted")
     network_backlog = network_backlog if isinstance(network_backlog, Mapping) else {}
+    try:
+        corrected_backlog = backlog_correction.artifact_correction(data)["groups"]
+    except backlog_correction.BacklogAreaCorrectionError as exc:
+        corrected_backlog = {
+            group: {
+                "corrected_area_seconds": None,
+                "legacy_area_seconds": _number(metric.get("backlog_area_seconds")),
+                "status": f"N_M_{type(exc).__name__}",
+                "reported_method": None,
+            }
+            for group, metric in (
+                ("raw_bag_total", total_backlog),
+                ("raw_bag_source_until_all_segments_admitted", source_backlog),
+                ("raw_bag_network_after_all_segments_admitted", network_backlog),
+            )
+        }
+
+    def corrected(group: str, field: str) -> Any:
+        value = corrected_backlog.get(group)
+        return value.get(field) if isinstance(value, Mapping) else None
     target_90_status, target_90_elapsed = _completion_target(business, "90")
     target_95_status, target_95_elapsed = _completion_target(business, "95")
     target_99_status, target_99_elapsed = _completion_target(business, "99")
@@ -466,7 +497,16 @@ def _run_row(path: Path, data: Mapping[str, Any]) -> dict[str, Any]:
         "business_time_to_99_percent_status": target_99_status,
         "business_time_to_99_percent_elapsed_seconds": target_99_elapsed,
         "business_raw_total_backlog_area_seconds": _number(
-            total_backlog.get("backlog_area_seconds")
+            corrected("raw_bag_total", "corrected_area_seconds")
+        ),
+        "business_raw_total_backlog_area_legacy_seconds": _number(
+            corrected("raw_bag_total", "legacy_area_seconds")
+        ),
+        "business_raw_total_backlog_area_status": corrected(
+            "raw_bag_total", "status"
+        ),
+        "business_raw_total_backlog_area_method": corrected(
+            "raw_bag_total", "reported_method"
         ),
         "business_raw_total_backlog_peak": _number(
             total_backlog.get("peak_backlog")
@@ -475,7 +515,22 @@ def _run_row(path: Path, data: Mapping[str, Any]) -> dict[str, Any]:
             total_backlog.get("end_backlog")
         ),
         "business_raw_source_backlog_area_seconds": _number(
-            source_backlog.get("backlog_area_seconds")
+            corrected(
+                "raw_bag_source_until_all_segments_admitted",
+                "corrected_area_seconds",
+            )
+        ),
+        "business_raw_source_backlog_area_legacy_seconds": _number(
+            corrected(
+                "raw_bag_source_until_all_segments_admitted",
+                "legacy_area_seconds",
+            )
+        ),
+        "business_raw_source_backlog_area_status": corrected(
+            "raw_bag_source_until_all_segments_admitted", "status"
+        ),
+        "business_raw_source_backlog_area_method": corrected(
+            "raw_bag_source_until_all_segments_admitted", "reported_method"
         ),
         "business_raw_source_backlog_peak": _number(
             source_backlog.get("peak_backlog")
@@ -484,7 +539,22 @@ def _run_row(path: Path, data: Mapping[str, Any]) -> dict[str, Any]:
             source_backlog.get("end_backlog")
         ),
         "business_raw_network_backlog_area_seconds": _number(
-            network_backlog.get("backlog_area_seconds")
+            corrected(
+                "raw_bag_network_after_all_segments_admitted",
+                "corrected_area_seconds",
+            )
+        ),
+        "business_raw_network_backlog_area_legacy_seconds": _number(
+            corrected(
+                "raw_bag_network_after_all_segments_admitted",
+                "legacy_area_seconds",
+            )
+        ),
+        "business_raw_network_backlog_area_status": corrected(
+            "raw_bag_network_after_all_segments_admitted", "status"
+        ),
+        "business_raw_network_backlog_area_method": corrected(
+            "raw_bag_network_after_all_segments_admitted", "reported_method"
         ),
         "business_raw_network_backlog_peak": _number(
             network_backlog.get("peak_backlog")
@@ -766,7 +836,7 @@ def _write_report(
             "",
             "## Interpretation boundary",
             "",
-            "Missing, duplicate, contract-mismatched, incomplete-population, and unreported cells remain explicit in the tables. No value is imputed, no survivor/common-cohort latency is substituted, and runtime cost is not treated as an algorithm-quality victory metric.",
+            "Missing, duplicate, contract-mismatched, incomplete-population, and unreported cells remain explicit in the tables. Legacy incomplete backlog areas are used only after an exact fixed-horizon tail correction; an unrecoverable tail is N/M. The long table preserves the legacy area and correction method. No value is imputed, no survivor/common-cohort latency is substituted, and runtime cost is not treated as an algorithm-quality victory metric.",
             "",
         ]
     )

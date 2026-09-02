@@ -49,3 +49,22 @@ def test_incomplete_bags_remain_in_business_denominator() -> None:
     )
     assert result["completion_targets"]["time_to_90_percent"]["reached"] is False
     assert result["backlog"]["raw_bag_total"]["end_backlog"] == 1
+    assert result["backlog"]["raw_bag_total"]["backlog_area_seconds"] == 15.0
+    assert (
+        result["backlog_area_contract"][
+            "tail_backlog_integrated_to_observation_end"
+        ]
+        is True
+    )
+    assert set(result["backlog"]) == {
+        "raw_bag_total",
+        "raw_bag_source_until_all_segments_admitted",
+        "raw_bag_network_after_all_segments_admitted",
+        "segment_source",
+        "segment_network",
+    }
+    assert all(
+        value["observation_end_seconds"] == 10.0
+        and value["area_includes_residual_to_observation_end"] is True
+        for value in result["backlog"].values()
+    )

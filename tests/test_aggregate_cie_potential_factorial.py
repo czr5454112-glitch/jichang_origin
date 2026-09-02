@@ -128,18 +128,37 @@ def _add_business_metrics(
                 "backlog_area_seconds": value * 1000.0,
                 "peak_backlog": int(value * 2),
                 "end_backlog": int(value),
+                "arrival_count": 100,
+                "departure_count": 100 - int(value),
+                "observation_end_seconds": 98_259.0,
+                "last_event_time_seconds": 90_000.0,
+                "backlog_area_method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
+                "area_includes_residual_to_observation_end": True,
             },
             "raw_bag_source_until_all_segments_admitted": {
                 "backlog_area_seconds": value * 600.0,
                 "peak_backlog": int(value * 3),
                 "end_backlog": int(value + 1),
+                "arrival_count": 100,
+                "departure_count": 100 - int(value + 1),
+                "observation_end_seconds": 98_259.0,
+                "last_event_time_seconds": 90_000.0,
+                "backlog_area_method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
+                "area_includes_residual_to_observation_end": True,
             },
             "raw_bag_network_after_all_segments_admitted": {
                 "backlog_area_seconds": value * 400.0,
                 "peak_backlog": int(value * 4),
                 "end_backlog": int(value + 2),
+                "arrival_count": 100,
+                "departure_count": 100 - int(value + 2),
+                "observation_end_seconds": 98_259.0,
+                "last_event_time_seconds": 90_000.0,
+                "backlog_area_method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
+                "area_includes_residual_to_observation_end": True,
             },
         },
+        "fixed_horizon_seconds": 98_259.0,
         "fixed_denominator": True,
         "survivor_or_common_cohort_used": False,
     }
@@ -376,6 +395,36 @@ def test_two_x_fixed_denominator_business_metrics_enter_factorial(
     )
     assert component["comparison_status"] == "COMPLETE"
     assert "not final-action changes" in report.read_text(encoding="utf-8")
+
+
+def test_legacy_incomplete_backlog_area_is_corrected_before_aggregation(
+    tmp_path: Path,
+) -> None:
+    payload = _payload(policy="s4", potential="ff", dynamic="off", mean=70.0)
+    payload["scale"] = 2
+    _add_business_metrics(payload, value=2.0)
+    business = payload["paper_subjects"]["fixed_denominator_business"]
+    backlog = business["backlog"]
+    for metric in backlog.values():
+        metric.pop("backlog_area_method")
+        metric.pop("observation_end_seconds")
+        metric.pop("area_includes_residual_to_observation_end")
+    backlog["raw_bag_total"]["drain_time_seconds"] = 5.0
+    backlog["raw_bag_source_until_all_segments_admitted"][
+        "drain_time_seconds"
+    ] = 3.0
+    path = tmp_path / "legacy.json"
+    _write(path, payload)
+
+    row = aggregate._run_row(path, payload)
+    expected = 2_000.0 + 2.0 * (98_259.0 - (82_403.72582 + 5.0))
+
+    assert row["business_raw_total_backlog_area_legacy_seconds"] == 2_000.0
+    assert row["business_raw_total_backlog_area_seconds"] == pytest.approx(expected)
+    assert (
+        row["business_raw_total_backlog_area_status"]
+        == "EXACT_LEGACY_TAIL_CORRECTED_V1"
+    )
 
 
 def test_unreached_completion_target_is_blank_and_statused(tmp_path: Path) -> None:

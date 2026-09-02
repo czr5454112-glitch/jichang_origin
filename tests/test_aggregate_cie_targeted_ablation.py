@@ -74,8 +74,12 @@ def _artifact(
                         "backlog_area_seconds": float(missed * 100),
                         "peak_backlog": missed,
                         "end_backlog": denominator - completed,
+                        "arrival_count": denominator,
+                        "departure_count": completed,
+                        "drain_time_seconds": 0.0,
                     }
                 },
+                "fixed_horizon_seconds": 98_259.0,
                 "fixed_denominator": True,
                 "survivor_or_common_cohort_used": False,
             }
@@ -104,6 +108,25 @@ def _write_artifact(root: Path, payload: dict[str, object]) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload), encoding="utf-8")
     return path
+
+
+def test_targeted_legacy_incomplete_area_uses_corrected_view(tmp_path: Path) -> None:
+    denominator = aggregate.targeted.REGISTERED_2X_RAW_BAG_COUNT
+    payload = _artifact(
+        map_name="map2",
+        arm="FULL_S4",
+        completed=denominator - 2,
+        on_time=denominator - 5,
+    )
+    path = _write_artifact(tmp_path, payload)
+
+    row = aggregate._read_cell(path, "map2", "FULL_S4")
+    legacy = 5.0 * 100.0
+    expected = legacy + 2.0 * (98_259.0 - 82_403.72582)
+
+    assert row["backlog_area_legacy_seconds"] == legacy
+    assert row["backlog_area_seconds"] == pytest.approx(expected)
+    assert row["backlog_area_status"] == "EXACT_LEGACY_TAIL_CORRECTED_V1"
 
 
 def test_matrix_enumeration_keeps_missing_cells_na_and_selects_no_arm(

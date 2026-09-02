@@ -715,3 +715,44 @@ def test_aggregate_rejects_duplicate_cell(tmp_path: Path) -> None:
         aggregate.aggregate(
             [tmp_path], tmp_path / "summary.csv", tmp_path / "report.md"
         )
+
+
+def test_service_aggregate_uses_corrected_legacy_incomplete_backlog_area(
+    tmp_path: Path,
+) -> None:
+    payload = _aggregate_payload(arm="RAW_COUNT_AS_SECONDS", mean=100.0)
+    business = payload["paper_subjects"]["fixed_denominator_business"]
+    business["fixed_horizon_seconds"] = 98_259.0
+    total = business["backlog"]["raw_bag_total"]
+    total.update(
+        arrival_count=10,
+        departure_count=9,
+        end_backlog=1,
+        drain_time_seconds=5.0,
+    )
+    source = business["backlog"]["raw_bag_source_until_all_segments_admitted"]
+    source.update(
+        arrival_count=10,
+        departure_count=10,
+        end_backlog=0,
+        drain_time_seconds=0.0,
+    )
+    network = business["backlog"]["raw_bag_network_after_all_segments_admitted"]
+    network.update(
+        arrival_count=10,
+        departure_count=9,
+        end_backlog=1,
+        drain_time_seconds=5.0,
+    )
+
+    values = aggregate._metric_values(tmp_path / "legacy.json", payload)
+    expected = 10_000.0 + 98_259.0 - (81_503.72582 + 5.0)
+
+    assert values["business_raw_total_backlog_area_seconds"] == pytest.approx(
+        expected
+    )
+    assert values["business_raw_total_backlog_area_legacy_seconds"] == 10_000.0
+    assert (
+        values["business_raw_total_backlog_area_status"]
+        == "EXACT_LEGACY_TAIL_CORRECTED_V1"
+    )

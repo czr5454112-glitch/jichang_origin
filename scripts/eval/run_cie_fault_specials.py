@@ -44,6 +44,7 @@ for _bootstrap in (ROOT, ROOT / "src"):
 
 from czr005 import cpp_backend  # noqa: E402
 from scripts.eval import cie_fixed_denominator_business as cie_business  # noqa: E402
+from scripts.eval import cie_backlog_area_correction as backlog_correction  # noqa: E402
 from scripts.eval import g4irsf31_map_adapter as map_adapter  # noqa: E402
 from scripts.eval import run_g4irsf24_native_race as g24  # noqa: E402
 from scripts.eval import run_g4irsf26_paper_experiments as g26  # noqa: E402
@@ -1109,6 +1110,9 @@ TABLE_FIELDS = (
     "raw_bag_peak_backlog",
     "raw_bag_end_backlog",
     "raw_bag_backlog_area_seconds",
+    "raw_bag_backlog_area_legacy_seconds",
+    "raw_bag_backlog_area_status",
+    "raw_bag_backlog_area_method",
     "timing_status",
     "population_latency_mean_seconds",
     "population_latency_p95_seconds",
@@ -1145,6 +1149,27 @@ def result_table_row(value: Mapping[str, Any]) -> dict[str, Any]:
         "distributions",
         "processed_attempt",
     ) or {}
+    legacy_backlog = _nested(
+        value,
+        "fixed_denominator_business",
+        "detailed",
+        "backlog",
+        "raw_bag_total",
+    )
+    legacy_backlog = legacy_backlog if isinstance(legacy_backlog, Mapping) else {}
+    try:
+        backlog_area = backlog_correction.artifact_correction(value)["groups"][
+            "raw_bag_total"
+        ]
+    except backlog_correction.BacklogAreaCorrectionError as exc:
+        backlog_area = {
+            "corrected_area_seconds": None,
+            "legacy_area_seconds": _number(
+                legacy_backlog.get("backlog_area_seconds")
+            ),
+            "status": f"N_M_{type(exc).__name__}",
+            "reported_method": None,
+        }
     return {
         "case_key": value.get("case_key"),
         "study": value.get("study"),
@@ -1237,14 +1262,14 @@ def result_table_row(value: Mapping[str, Any]) -> dict[str, Any]:
             "raw_bag_total",
             "end_backlog",
         ),
-        "raw_bag_backlog_area_seconds": _nested(
-            value,
-            "fixed_denominator_business",
-            "detailed",
-            "backlog",
-            "raw_bag_total",
-            "backlog_area_seconds",
+        "raw_bag_backlog_area_seconds": backlog_area.get(
+            "corrected_area_seconds"
         ),
+        "raw_bag_backlog_area_legacy_seconds": backlog_area.get(
+            "legacy_area_seconds"
+        ),
+        "raw_bag_backlog_area_status": backlog_area.get("status"),
+        "raw_bag_backlog_area_method": backlog_area.get("reported_method"),
         "timing_status": _nested(value, "full_population_timing", "status"),
         "population_latency_mean_seconds": paper_network.get("mean_seconds"),
         "population_latency_p95_seconds": paper_network.get("p95_seconds"),
@@ -1717,6 +1742,8 @@ def render_report(aggregate: Mapping[str, Any]) -> str:
             f"Missing: {', '.join(aggregate.get('missing_case_keys', [])) or 'none'}",
             "",
             f"Invalid: {', '.join(aggregate.get('invalid_case_keys', [])) or 'none'}",
+            "",
+            "Backlog-area values in the CSV are fixed-horizon corrected views. Legacy last-event values and method identities are retained in adjacent columns; an unrecoverable incomplete tail is N/M and is never reused as if it covered the horizon.",
             "",
         ]
     )

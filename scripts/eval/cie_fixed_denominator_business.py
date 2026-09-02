@@ -56,8 +56,19 @@ def _describe(values: Sequence[float]) -> dict[str, Any]:
     }
 
 
-def _backlog(arrivals: Sequence[float], departures: Sequence[float]) -> dict[str, Any]:
-    return vars(capacity.backlog_metrics(arrivals, departures))
+def _backlog(
+    arrivals: Sequence[float],
+    departures: Sequence[float],
+    *,
+    observation_end: float,
+) -> dict[str, Any]:
+    return vars(
+        capacity.backlog_metrics(
+            arrivals,
+            departures,
+            observation_end=observation_end,
+        )
+    )
 
 
 def summarize(
@@ -193,15 +204,27 @@ def summarize(
         "per_flight_missed_bag_count": _describe(list(missed_by_flight.values())),
         "completion_targets": completion_targets,
         "backlog": {
-            "raw_bag_total": _backlog(arrivals, finishes),
+            "raw_bag_total": _backlog(
+                arrivals, finishes, observation_end=horizon
+            ),
             "raw_bag_source_until_all_segments_admitted": _backlog(
-                arrivals, fully_admitted
+                arrivals, fully_admitted, observation_end=horizon
             ),
             "raw_bag_network_after_all_segments_admitted": _backlog(
-                fully_admitted, finishes
+                fully_admitted, finishes, observation_end=horizon
             ),
-            "segment_source": _backlog(segment_arrivals, segment_admissions),
-            "segment_network": _backlog(segment_admissions, segment_finishes),
+            "segment_source": _backlog(
+                segment_arrivals, segment_admissions, observation_end=horizon
+            ),
+            "segment_network": _backlog(
+                segment_admissions, segment_finishes, observation_end=horizon
+            ),
+        },
+        "backlog_area_contract": {
+            "method": capacity.BACKLOG_AREA_METHOD_OBSERVATION_END_V2,
+            "observation_end_seconds": horizon,
+            "tail_backlog_integrated_to_observation_end": True,
+            "legacy_incomplete_last_event_area_is_not_reportable_without_exact_correction": True,
         },
         "fixed_horizon_seconds": horizon,
         "fixed_denominator": True,

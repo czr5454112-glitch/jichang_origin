@@ -394,6 +394,51 @@ def _business(value: float) -> dict[str, object]:
     }
 
 
+def test_random_metric_extractor_rejects_uncorrected_incomplete_legacy_area() -> None:
+    business = _business(0.0)
+    business["fixed_horizon_seconds"] = 100.0
+    backlog = business["backlog"]
+    backlog["raw_bag_total"].update(
+        arrival_count=10,
+        departure_count=8,
+        end_backlog=2,
+        drain_time_seconds=5.0,
+    )
+    backlog["raw_bag_source_until_all_segments_admitted"].update(
+        arrival_count=10,
+        departure_count=9,
+        end_backlog=1,
+        drain_time_seconds=3.0,
+    )
+    backlog["raw_bag_network_after_all_segments_admitted"].update(
+        arrival_count=9,
+        departure_count=8,
+        end_backlog=1,
+        drain_time_seconds=2.0,
+    )
+    artifact = {
+        "load_factor": 2.0,
+        "paper_subjects": {
+            "fixed_denominator_business": business,
+            "full_population_raw_bag_timing": {
+                "status": "FORMAL_2X_TIMING_NA_BY_PROTOCOL",
+                "metrics_seconds": None,
+            },
+        },
+    }
+
+    uncorrected = runner._metrics_from_run(artifact)
+    view = runner.backlog_correction.correction_view(
+        business, raw_last_arrival=80.0
+    )
+    corrected = runner._metrics_from_run(artifact, backlog_view=view)
+
+    assert uncorrected["total_backlog_area_seconds"] is None
+    assert corrected["total_backlog_area_seconds"] == 5030.0
+    assert corrected["source_backlog_area_seconds"] == 3017.0
+    assert corrected["network_backlog_area_seconds"] == 2015.0
+
+
 def _fake_run(manifest: Path, seed: int, arm: str, value: float) -> dict[str, object]:
     contract = runner.load_random_contract(manifest)
     return {

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from scripts.eval.g4irsf11_capacity_metrics import (
+    BACKLOG_AREA_METHOD_OBSERVATION_END_V2,
     CapacityGateConfig,
     backlog_metrics,
     capacity_metrics,
@@ -77,6 +78,61 @@ def test_backlog_keeps_unfinished_work_at_end() -> None:
     assert metrics.end_backlog == 2
     assert metrics.peak_backlog == 3
     assert metrics.drain_time_seconds == 1.0
+
+
+def test_incomplete_backlog_tail_is_integrated_to_observation_end() -> None:
+    metrics = backlog_metrics(
+        [0.0, 1.0, 2.0], [3.0], observation_end=10.0
+    )
+
+    # Legacy area through the last event is 6 bag-seconds. Two bags remain
+    # for the seven-second observation tail, so the fixed-horizon area is 20.
+    assert metrics.backlog_area_seconds == 20.0
+    assert metrics.observation_end_seconds == 10.0
+    assert metrics.last_event_time_seconds == 3.0
+    assert metrics.backlog_area_method == BACKLOG_AREA_METHOD_OBSERVATION_END_V2
+    assert metrics.tail_extension_area_seconds == 14.0
+
+
+def test_complete_backlog_area_is_unchanged_by_later_observation_end() -> None:
+    legacy = backlog_metrics([0.0, 1.0], [2.0, 3.0])
+    fixed = backlog_metrics(
+        [0.0, 1.0], [2.0, 3.0], observation_end=10.0
+    )
+
+    assert fixed.end_backlog == 0
+    assert fixed.backlog_area_seconds == legacy.backlog_area_seconds
+    assert fixed.tail_extension_area_seconds == 0.0
+
+
+def test_observation_end_before_last_event_is_rejected() -> None:
+    try:
+        backlog_metrics([0.0, 2.0], [3.0], observation_end=2.5)
+    except ValueError as exc:
+        assert "last event" in str(exc)
+    else:
+        raise AssertionError("observation_end before the last event was accepted")
+
+
+def test_fixed_horizon_examples_cover_late_arrival_and_no_departure() -> None:
+    assert (
+        backlog_metrics([0.0, 10.0], [5.0], observation_end=20.0)
+        .backlog_area_seconds
+        == 15.0
+    )
+    no_departure = backlog_metrics([2.0, 4.0], [], observation_end=10.0)
+    assert no_departure.backlog_area_seconds == 14.0
+    assert no_departure.tail_extension_area_seconds == 12.0
+
+
+def test_nonfinite_observation_end_is_rejected() -> None:
+    for value in (float("nan"), float("inf"), True):
+        try:
+            backlog_metrics([0.0], [], observation_end=value)
+        except ValueError as exc:
+            assert "finite" in str(exc)
+        else:
+            raise AssertionError(f"invalid observation_end was accepted: {value!r}")
 
 
 def test_peak_memory_is_os_measurement() -> None:

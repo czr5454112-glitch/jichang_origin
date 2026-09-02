@@ -42,6 +42,7 @@ for _bootstrap in (ROOT, ROOT / "src"):
 
 from czr005 import cpp_backend  # noqa: E402
 from scripts.eval import cie_fixed_denominator_business as cie_business  # noqa: E402
+from scripts.eval import cie_backlog_area_correction as backlog_correction  # noqa: E402
 from scripts.eval import run_cie_component_activation as activation  # noqa: E402
 from scripts.eval import run_cie_potential_factorial as factorial  # noqa: E402
 
@@ -833,7 +834,11 @@ def _number(value: Any) -> float | None:
     return result if math.isfinite(result) else None
 
 
-def _metrics_from_run(data: Mapping[str, Any]) -> dict[str, float | None]:
+def _metrics_from_run(
+    data: Mapping[str, Any],
+    *,
+    backlog_view: Mapping[str, Any] | None = None,
+) -> dict[str, float | None]:
     business = _get(data, "paper_subjects", "fixed_denominator_business")
     business = business if isinstance(business, Mapping) else {}
     tardiness = _get(
@@ -852,8 +857,25 @@ def _metrics_from_run(data: Mapping[str, Any]) -> dict[str, float | None]:
         return _number(value.get("elapsed_from_first_arrival_seconds"))
 
     def backlog_value(group: str, field: str) -> float | None:
+        if field == "backlog_area_seconds" and isinstance(backlog_view, Mapping):
+            groups = backlog_view.get("groups")
+            correction = groups.get(group) if isinstance(groups, Mapping) else None
+            if isinstance(correction, Mapping):
+                return _number(correction.get("corrected_area_seconds"))
         value = backlog.get(group)
-        return _number(value.get(field)) if isinstance(value, Mapping) else None
+        if not isinstance(value, Mapping):
+            return None
+        # Never consume an incomplete legacy last-event area without a
+        # versioned fixed-horizon view supplied by the aggregate path.
+        if field == "backlog_area_seconds":
+            end = _number(value.get("end_backlog"))
+            # A supplied correction view has already validated method,
+            # horizon, counters and (for legacy random tails) the regenerated
+            # realization identity.  Without that view only a zero tail is
+            # intrinsically safe.
+            if end != 0.0:
+                return None
+        return _number(value.get(field))
 
     timing = _get(data, "paper_subjects", "full_population_raw_bag_timing")
     timing = timing if isinstance(timing, Mapping) else {}
@@ -1120,6 +1142,49 @@ def _aggregate_for_scenarios(
             if complete
             else "INCOMPLETE_NO_BOOTSTRAP_SEED_REMOVAL_FORBIDDEN"
         )
+        correction_views: dict[tuple[int, str], Mapping[str, Any] | None] = {}
+        correction_status_counts: dict[str, int] = {}
+        random_reconstruction_count = 0
+        for seed, pair in valid_pairs.items():
+            needs_reconstruction = any(
+                backlog_correction.requires_legacy_tail_reconstruction(run)
+                for run in pair
+            )
+            if needs_reconstruction:
+                raw_last_arrival, _identity = (
+                    backlog_correction.regenerate_random_last_raw_arrival(
+                        pair[0], manifest_path=manifest_path
+                    )
+                )
+                random_reconstruction_count += 1
+            else:
+                raw_last_arrival = (
+                    backlog_correction.embedded_or_zero_tail_last_arrival(
+                        pair[0]
+                    )
+                )
+            for arm, run in zip(("P0D0", "P1D1"), pair):
+                try:
+                    view: Mapping[str, Any] | None = (
+                        backlog_correction.correction_view(
+                            backlog_correction.business_payload(run),
+                            raw_last_arrival=raw_last_arrival,
+                        )
+                    )
+                    statuses = {
+                        str(item.get("status"))
+                        for item in view["groups"].values()
+                        if isinstance(item, Mapping)
+                    }
+                    status = ";".join(sorted(statuses))
+                except backlog_correction.BacklogAreaCorrectionError as exc:
+                    view = None
+                    status = f"N_M_{type(exc).__name__}"
+                correction_views[(seed, arm)] = view
+                correction_status_counts[status] = (
+                    correction_status_counts.get(status, 0) + 1
+                )
+
         scenario_audit.append(
             {
                 "map": map_name,
@@ -1130,10 +1195,22 @@ def _aggregate_for_scenarios(
                 "failed_seeds": sorted(failed),
                 "failed_seed_count": len(failed),
                 "failed_seed_rate": len(failed) / len(contract.seeds),
+                "backlog_area_random_last_arrival_reconstruction_count": (
+                    random_reconstruction_count
+                ),
+                "backlog_area_correction_status_counts": correction_status_counts,
+                "legacy_incomplete_backlog_area_used_without_exact_correction": False,
             }
         )
         metric_values = {
-            seed: (_metrics_from_run(pair[0]), _metrics_from_run(pair[1]))
+            seed: (
+                _metrics_from_run(
+                    pair[0], backlog_view=correction_views.get((seed, "P0D0"))
+                ),
+                _metrics_from_run(
+                    pair[1], backlog_view=correction_views.get((seed, "P1D1"))
+                ),
+            )
             for seed, pair in valid_pairs.items()
         }
         for metric in METRICS:
@@ -1325,17 +1402,19 @@ def _write_report(
         "population before the same paired jitter contract is applied",
         "- 2x THT is N/A even when every bag completes; fixed-denominator capacity, "
         "deadline, tardiness, completion-target and backlog metrics remain eligible",
+        "- legacy incomplete backlog areas enter estimates only after frozen-seed jitter regeneration, identity verification, and exact fixed-horizon tail correction; ambiguous tails remain N/M",
         "",
         "## Scenario gates",
         "",
-        "| Map | Load | Status | Valid pairs | Missing seeds | Failed seeds | Failure rate |",
-        "|---|---:|---|---:|---|---|---:|",
+        "| Map | Load | Status | Valid pairs | Missing seeds | Failed seeds | Failure rate | Reconstructed tails |",
+        "|---|---:|---|---:|---|---|---:|---:|",
     ]
     for item in audit["scenario_audit"]:
         lines.append(
             f"| {item['map']} | {item['load_factor']:.2f}x | {item['status']} | "
             f"{item['valid_seed_count']} | {item['missing_seeds'] or 'none'} | "
-            f"{item['failed_seeds'] or 'none'} | {item['failed_seed_rate']:.3f} |"
+            f"{item['failed_seeds'] or 'none'} | {item['failed_seed_rate']:.3f} | "
+            f"{item['backlog_area_random_last_arrival_reconstruction_count']} |"
         )
     lines.extend(
         [

@@ -26,6 +26,7 @@ for _bootstrap in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(_bootstrap))
 
 from scripts.eval import run_cie_targeted_ablation as targeted
+from scripts.eval import cie_backlog_area_correction as backlog_correction
 
 
 MAPS = ("map2", "nanning")
@@ -93,6 +94,9 @@ RUN_FIELDS = (
     "tardiness_p95_seconds",
     "tardiness_p99_seconds",
     "backlog_area_seconds",
+    "backlog_area_legacy_seconds",
+    "backlog_area_status",
+    "backlog_area_method",
     "backlog_peak",
     "backlog_end",
     "base_full_s4_request_sha256",
@@ -247,7 +251,11 @@ def _cell_status(
         != row.get("population_raw_bag_count")
     ):
         return "INVALID_FIXED_DENOMINATOR"
-    if any(_number(row.get(name)) is None for name, _label, _direction in METRICS):
+    required_metrics = [
+        name for name, _label, _direction in METRICS
+        if name != "backlog_area_seconds"
+    ]
+    if any(_number(row.get(name)) is None for name in required_metrics):
         return "BUSINESS_METRIC_NOT_REPORTED"
     denominator = int(row["business_denominator_raw_bags"])
     completed = int(row["completed_raw_bag_count"])
@@ -283,6 +291,17 @@ def _read_cell(path: Path, map_name: str, arm: str) -> dict[str, Any]:
     tardiness = tardiness if isinstance(tardiness, Mapping) else {}
     backlog = _nested(business, "backlog", "raw_bag_total")
     backlog = backlog if isinstance(backlog, Mapping) else {}
+    try:
+        correction = backlog_correction.artifact_correction(data)["groups"][
+            "raw_bag_total"
+        ]
+    except backlog_correction.BacklogAreaCorrectionError as exc:
+        correction = {
+            "corrected_area_seconds": None,
+            "legacy_area_seconds": _number(backlog.get("backlog_area_seconds")),
+            "status": f"N_M_{type(exc).__name__}",
+            "reported_method": None,
+        }
     provenance = data.get("provenance")
     provenance = provenance if isinstance(provenance, Mapping) else {}
     runtime = data.get("runtime")
@@ -351,7 +370,14 @@ def _read_cell(path: Path, map_name: str, arm: str) -> dict[str, Any]:
             "tardiness_mean_seconds": _number(tardiness.get("mean")),
             "tardiness_p95_seconds": _number(tardiness.get("p95")),
             "tardiness_p99_seconds": _number(tardiness.get("p99")),
-            "backlog_area_seconds": _number(backlog.get("backlog_area_seconds")),
+            "backlog_area_seconds": _number(
+                correction.get("corrected_area_seconds")
+            ),
+            "backlog_area_legacy_seconds": _number(
+                correction.get("legacy_area_seconds")
+            ),
+            "backlog_area_status": correction.get("status", NA),
+            "backlog_area_method": correction.get("reported_method", NA),
             "backlog_peak": _number(backlog.get("peak_backlog")),
             "backlog_end": _number(backlog.get("end_backlog")),
             "base_full_s4_request_sha256": _nested(
@@ -607,6 +633,8 @@ def _write_report(
             + ".",
             "",
             "Every reported difference is `arm − FULL_S4` within the same map, binary, workload and fixed-population protocol. A raw sign is not a significance claim.",
+            "",
+            "Backlog area is the fixed-horizon corrected view. The run table preserves the legacy value and method; an incomplete legacy tail that cannot be reconstructed exactly is reported as N/M for that metric only.",
             "",
         ]
     )

@@ -577,6 +577,10 @@ def aggregate(
             "",
             "No incomplete timing cell is replaced by survivor timing; no "
             "survivor/common cohort is used. This "
+            "aggregate consumes the fixed-horizon backlog correction view from "
+            "the common extractor; legacy incomplete last-event areas are never "
+            "used without an exact tail reconstruction, and ambiguous tails are N/M. "
+            "The standalone correction supplement retains legacy values and methods. This "
             "aggregate does not select a winning arm or tune a parameter. A "
             "general service-normalization claim requires attributable, "
             "directionally consistent evidence on both real maps and the "

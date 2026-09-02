@@ -94,6 +94,19 @@ class BacklogMetrics:
     arrival_rate_per_second: float
     departure_rate_during_arrivals_per_second: float
     drain_time_seconds: float
+    last_arrival_time_seconds: float | None
+    last_departure_time_seconds: float | None
+    last_event_time_seconds: float | None
+    observation_end_seconds: float | None
+    backlog_area_method: str
+    area_includes_residual_to_observation_end: bool
+    tail_extension_area_seconds: float
+
+
+BACKLOG_AREA_METHOD_LAST_EVENT_V1 = "EVENT_STEP_INTEGRAL_THROUGH_LAST_EVENT_V1"
+BACKLOG_AREA_METHOD_OBSERVATION_END_V2 = (
+    "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2"
+)
 
 
 def backlog_metrics(
@@ -101,11 +114,57 @@ def backlog_metrics(
     departures: Sequence[float],
     *,
     sample_count: int = 201,
+    observation_end: float | None = None,
 ) -> BacklogMetrics:
     arrival_times = sorted(float(value) for value in arrivals)
     departure_times = sorted(float(value) for value in departures)
+    if observation_end is not None:
+        if isinstance(observation_end, bool):
+            raise ValueError("observation_end must be a finite number")
+        observation_end = float(observation_end)
+        if not math.isfinite(observation_end):
+            raise ValueError("observation_end must be a finite number")
+    last_arrival = arrival_times[-1] if arrival_times else None
+    last_departure = departure_times[-1] if departure_times else None
+    event_endpoints = [
+        value for value in (last_arrival, last_departure) if value is not None
+    ]
+    last_event = max(event_endpoints) if event_endpoints else None
+    if (
+        observation_end is not None
+        and last_event is not None
+        and observation_end < last_event
+    ):
+        raise ValueError(
+            "observation_end must be greater than or equal to the last event "
+            f"time ({last_event})"
+        )
+    area_method = (
+        BACKLOG_AREA_METHOD_OBSERVATION_END_V2
+        if observation_end is not None
+        else BACKLOG_AREA_METHOD_LAST_EVENT_V1
+    )
     if not arrival_times:
-        return BacklogMetrics(0, len(departure_times), 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        return BacklogMetrics(
+            0,
+            len(departure_times),
+            0,
+            0,
+            0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            last_arrival,
+            last_departure,
+            last_event,
+            observation_end,
+            area_method,
+            observation_end is not None,
+            0.0,
+        )
 
     events = sorted(
         [(time, 1) for time in arrival_times] + [(time, -1) for time in departure_times],
@@ -120,6 +179,10 @@ def backlog_metrics(
         backlog += delta
         peak = max(peak, backlog)
         previous_time = event_time
+    tail_extension_area = 0.0
+    if observation_end is not None:
+        tail_extension_area = backlog * (observation_end - previous_time)
+        area += tail_extension_area
 
     first_arrival = arrival_times[0]
     last_arrival = arrival_times[-1]
@@ -162,6 +225,13 @@ def backlog_metrics(
         arrival_rate_per_second=arrival_rate,
         departure_rate_during_arrivals_per_second=departure_rate,
         drain_time_seconds=drain_time,
+        last_arrival_time_seconds=last_arrival,
+        last_departure_time_seconds=last_departure,
+        last_event_time_seconds=last_event,
+        observation_end_seconds=observation_end,
+        backlog_area_method=area_method,
+        area_includes_residual_to_observation_end=observation_end is not None,
+        tail_extension_area_seconds=tail_extension_area,
     )
 
 
