@@ -31,6 +31,116 @@ METRICS = (
     ("population_latency_p95_seconds", "population latency P95 (s)", "lower"),
     ("population_latency_p99_seconds", "population latency P99 (s)", "lower"),
     ("population_latency_max_seconds", "population latency max (s)", "lower"),
+    (
+        "business_on_time_raw_bag_count",
+        "fixed-denominator on-time raw bags",
+        "higher",
+    ),
+    (
+        "business_on_time_rate",
+        "fixed-denominator on-time rate",
+        "higher",
+    ),
+    (
+        "business_missed_raw_bag_count",
+        "fixed-denominator missed raw bags",
+        "lower",
+    ),
+    (
+        "business_missed_rate",
+        "fixed-denominator missed rate",
+        "lower",
+    ),
+    (
+        "business_fixed_horizon_tardiness_sum_seconds",
+        "fixed-horizon all-population tardiness sum (s)",
+        "lower",
+    ),
+    (
+        "business_fixed_horizon_tardiness_mean_seconds",
+        "fixed-horizon all-population tardiness mean (s)",
+        "lower",
+    ),
+    (
+        "business_fixed_horizon_tardiness_p95_seconds",
+        "fixed-horizon all-population tardiness P95 (s)",
+        "lower",
+    ),
+    (
+        "business_fixed_horizon_tardiness_p99_seconds",
+        "fixed-horizon all-population tardiness P99 (s)",
+        "lower",
+    ),
+    (
+        "business_fixed_horizon_tardiness_max_seconds",
+        "fixed-horizon all-population tardiness max (s)",
+        "lower",
+    ),
+    (
+        "business_time_to_90_percent_elapsed_seconds",
+        "time to 90% completion from first arrival (s)",
+        "lower",
+    ),
+    (
+        "business_time_to_95_percent_elapsed_seconds",
+        "time to 95% completion from first arrival (s)",
+        "lower",
+    ),
+    (
+        "business_time_to_99_percent_elapsed_seconds",
+        "time to 99% completion from first arrival (s)",
+        "lower",
+    ),
+    (
+        "business_raw_total_backlog_area_seconds",
+        "raw-bag total backlog area (bag-s)",
+        "lower",
+    ),
+    (
+        "business_raw_total_backlog_peak",
+        "raw-bag total backlog peak",
+        "lower",
+    ),
+    (
+        "business_raw_total_backlog_end",
+        "raw-bag total backlog at horizon end",
+        "lower",
+    ),
+    (
+        "business_raw_source_backlog_area_seconds",
+        "raw-bag source backlog area (bag-s)",
+        "lower",
+    ),
+    (
+        "business_raw_source_backlog_peak",
+        "raw-bag source backlog peak",
+        "lower",
+    ),
+    (
+        "business_raw_source_backlog_end",
+        "raw-bag source backlog at horizon end",
+        "lower",
+    ),
+    (
+        "business_raw_network_backlog_area_seconds",
+        "raw-bag network backlog area (bag-s)",
+        "lower",
+    ),
+    (
+        "business_raw_network_backlog_peak",
+        "raw-bag network backlog peak",
+        "lower",
+    ),
+    (
+        "business_raw_network_backlog_end",
+        "raw-bag network backlog at horizon end",
+        "lower",
+    ),
+    (
+        "pre_feasibility_component_raw_argmin_change_count_total",
+        "pre-feasibility component raw-argmin counterfactual changes (total)",
+        "diagnostic only",
+    ),
     ("wall_seconds", "wall time (s)", "lower is compute only"),
     ("cpu_seconds", "CPU time (s)", "lower is compute only"),
 )
@@ -39,6 +149,17 @@ TIMING_METRICS = {
     "population_latency_p95_seconds",
     "population_latency_p99_seconds",
     "population_latency_max_seconds",
+}
+TARGET_STATUS_FIELDS = {
+    "business_time_to_90_percent_elapsed_seconds": (
+        "business_time_to_90_percent_status"
+    ),
+    "business_time_to_95_percent_elapsed_seconds": (
+        "business_time_to_95_percent_status"
+    ),
+    "business_time_to_99_percent_elapsed_seconds": (
+        "business_time_to_99_percent_status"
+    ),
 }
 
 LONG_FIELDS = (
@@ -69,6 +190,32 @@ LONG_FIELDS = (
     "population_latency_p95_seconds",
     "population_latency_p99_seconds",
     "population_latency_max_seconds",
+    "business_on_time_raw_bag_count",
+    "business_on_time_rate",
+    "business_missed_raw_bag_count",
+    "business_missed_rate",
+    "business_fixed_horizon_tardiness_sum_seconds",
+    "business_fixed_horizon_tardiness_mean_seconds",
+    "business_fixed_horizon_tardiness_p95_seconds",
+    "business_fixed_horizon_tardiness_p99_seconds",
+    "business_fixed_horizon_tardiness_max_seconds",
+    "business_time_to_90_percent_status",
+    "business_time_to_90_percent_elapsed_seconds",
+    "business_time_to_95_percent_status",
+    "business_time_to_95_percent_elapsed_seconds",
+    "business_time_to_99_percent_status",
+    "business_time_to_99_percent_elapsed_seconds",
+    "business_raw_total_backlog_area_seconds",
+    "business_raw_total_backlog_peak",
+    "business_raw_total_backlog_end",
+    "business_raw_source_backlog_area_seconds",
+    "business_raw_source_backlog_peak",
+    "business_raw_source_backlog_end",
+    "business_raw_network_backlog_area_seconds",
+    "business_raw_network_backlog_peak",
+    "business_raw_network_backlog_end",
+    "pre_feasibility_component_raw_argmin_counterfactual_scope",
+    "pre_feasibility_component_raw_argmin_change_count_total",
     "wall_seconds",
     "cpu_seconds",
 )
@@ -117,6 +264,47 @@ def _number(value: Any) -> int | float | None:
     return int(value) if isinstance(value, int) else result
 
 
+def _completion_target(
+    business: Mapping[str, Any], percentage: str
+) -> tuple[str, int | float | None]:
+    target = _get(
+        business, "completion_targets", f"time_to_{percentage}_percent"
+    )
+    if not isinstance(target, Mapping):
+        return "NOT_REPORTED", None
+    reached = target.get("reached")
+    if reached is False:
+        return "NOT_REACHED", None
+    if reached is not True:
+        return "REACH_STATUS_NOT_REPORTED", None
+    elapsed = _number(target.get("elapsed_from_first_arrival_seconds"))
+    if elapsed is None:
+        return "REACHED_ELAPSED_NOT_REPORTED", None
+    return "REACHED", elapsed
+
+
+def _pre_feasibility_raw_argmin_change_total(
+    native: Mapping[str, Any],
+) -> tuple[str, int | float | None]:
+    activation = native.get("cie_component_activation")
+    if not isinstance(activation, Mapping):
+        return "NOT_REPORTED", None
+    scope = str(activation.get("counterfactual_scope", "NOT_REPORTED"))
+    if "pre_feasibility" not in scope:
+        return scope, None
+    components = activation.get("components")
+    if not isinstance(components, Mapping) or not components:
+        return scope, None
+    values = [
+        _number(component.get("counterfactual_raw_argmin_change_count"))
+        for component in components.values()
+        if isinstance(component, Mapping)
+    ]
+    if len(values) != len(components) or any(value is None for value in values):
+        return scope, None
+    return scope, sum(value for value in values if value is not None)
+
+
 def _discover(input_roots: Iterable[Path]) -> list[tuple[Path, Mapping[str, Any]]]:
     paths: set[Path] = set()
     for root in input_roots:
@@ -151,6 +339,28 @@ def _run_row(path: Path, data: Mapping[str, Any]) -> dict[str, Any]:
     runtime = runtime if isinstance(runtime, Mapping) else {}
     native = runtime.get("native_summary")
     native = native if isinstance(native, Mapping) else runtime
+    business = _get(data, "paper_subjects", "fixed_denominator_business")
+    business = business if isinstance(business, Mapping) else {}
+    tardiness = _get(
+        business,
+        "tardiness_seconds",
+        "fixed_horizon_all_population_lower_bound",
+    )
+    tardiness = tardiness if isinstance(tardiness, Mapping) else {}
+    backlog = business.get("backlog")
+    backlog = backlog if isinstance(backlog, Mapping) else {}
+    total_backlog = backlog.get("raw_bag_total")
+    total_backlog = total_backlog if isinstance(total_backlog, Mapping) else {}
+    source_backlog = backlog.get("raw_bag_source_until_all_segments_admitted")
+    source_backlog = source_backlog if isinstance(source_backlog, Mapping) else {}
+    network_backlog = backlog.get("raw_bag_network_after_all_segments_admitted")
+    network_backlog = network_backlog if isinstance(network_backlog, Mapping) else {}
+    target_90_status, target_90_elapsed = _completion_target(business, "90")
+    target_95_status, target_95_elapsed = _completion_target(business, "95")
+    target_99_status, target_99_elapsed = _completion_target(business, "99")
+    component_scope, component_change_total = (
+        _pre_feasibility_raw_argmin_change_total(native)
+    )
 
     segment_population = _number(population.get("segment_count"))
     completed_segments = _number(native.get("completed_count"))
@@ -226,6 +436,68 @@ def _run_row(path: Path, data: Mapping[str, Any]) -> dict[str, Any]:
         "population_latency_p95_seconds": _number(series.get("p95")),
         "population_latency_p99_seconds": _number(series.get("p99")),
         "population_latency_max_seconds": _number(series.get("max")),
+        "business_on_time_raw_bag_count": _number(
+            business.get("on_time_raw_bag_count")
+        ),
+        "business_on_time_rate": _number(business.get("on_time_rate")),
+        "business_missed_raw_bag_count": _number(
+            business.get("missed_bag_count")
+        ),
+        "business_missed_rate": _number(business.get("missed_bag_rate")),
+        "business_fixed_horizon_tardiness_sum_seconds": _number(
+            tardiness.get("sum")
+        ),
+        "business_fixed_horizon_tardiness_mean_seconds": _number(
+            tardiness.get("mean")
+        ),
+        "business_fixed_horizon_tardiness_p95_seconds": _number(
+            tardiness.get("p95")
+        ),
+        "business_fixed_horizon_tardiness_p99_seconds": _number(
+            tardiness.get("p99")
+        ),
+        "business_fixed_horizon_tardiness_max_seconds": _number(
+            tardiness.get("max")
+        ),
+        "business_time_to_90_percent_status": target_90_status,
+        "business_time_to_90_percent_elapsed_seconds": target_90_elapsed,
+        "business_time_to_95_percent_status": target_95_status,
+        "business_time_to_95_percent_elapsed_seconds": target_95_elapsed,
+        "business_time_to_99_percent_status": target_99_status,
+        "business_time_to_99_percent_elapsed_seconds": target_99_elapsed,
+        "business_raw_total_backlog_area_seconds": _number(
+            total_backlog.get("backlog_area_seconds")
+        ),
+        "business_raw_total_backlog_peak": _number(
+            total_backlog.get("peak_backlog")
+        ),
+        "business_raw_total_backlog_end": _number(
+            total_backlog.get("end_backlog")
+        ),
+        "business_raw_source_backlog_area_seconds": _number(
+            source_backlog.get("backlog_area_seconds")
+        ),
+        "business_raw_source_backlog_peak": _number(
+            source_backlog.get("peak_backlog")
+        ),
+        "business_raw_source_backlog_end": _number(
+            source_backlog.get("end_backlog")
+        ),
+        "business_raw_network_backlog_area_seconds": _number(
+            network_backlog.get("backlog_area_seconds")
+        ),
+        "business_raw_network_backlog_peak": _number(
+            network_backlog.get("peak_backlog")
+        ),
+        "business_raw_network_backlog_end": _number(
+            network_backlog.get("end_backlog")
+        ),
+        "pre_feasibility_component_raw_argmin_counterfactual_scope": (
+            component_scope
+        ),
+        "pre_feasibility_component_raw_argmin_change_count_total": (
+            component_change_total
+        ),
         "wall_seconds": _number(runtime.get("wall_seconds")),
         "cpu_seconds": _number(runtime.get("cpu_seconds")),
     }
@@ -276,6 +548,27 @@ def _effect_status(
     if len({_contract(row) for row in selected.values()}) != 1:
         return "INCOMPARABLE_CONTRACT_MISMATCH", "", selected
     if any(_number(row.get(metric)) is None for row in selected.values()):
+        target_status_field = TARGET_STATUS_FIELDS.get(metric)
+        if target_status_field is not None:
+            unavailable = [
+                cell
+                for cell, row in selected.items()
+                if _number(row.get(metric)) is None
+            ]
+            target_statuses = {
+                str(selected[cell].get(target_status_field, "NOT_REPORTED"))
+                for cell in unavailable
+            }
+            status = (
+                "METRIC_NOT_AVAILABLE_TARGET_NOT_REACHED"
+                if "NOT_REACHED" in target_statuses
+                else "METRIC_NOT_REPORTED"
+            )
+            return (
+                status,
+                ";".join(_cell_label(cell) for cell in unavailable),
+                selected,
+            )
         status = (
             "METRIC_NOT_AVAILABLE_FULL_POPULATION_REQUIRED"
             if metric in TIMING_METRICS
@@ -406,7 +699,9 @@ def _write_report(
         f"- Executed input runs discovered: **{len(rows)}**; status COMPLETE: **{complete_runs}**.",
         f"- Verified full-population timing runs: **{timing_runs}**.",
         f"- Figure: `{figure_status}`.",
-        "- Population latency is reported only for integrity-passing, fully completed raw-bag populations with an explicit non-survivor timing contract.",
+        "- Population latency is reported only for integrity-passing, fully completed raw-bag populations with an explicit non-survivor timing contract; the 2× THT gate remains N/A.",
+        "- Fixed-denominator business outcomes retain incomplete bags and are comparable at 1× and 2×. Unreached 90/95/99% completion targets stay blank with an explicit status.",
+        "- Component raw-argmin changes are pre-feasibility counterfactual scorer diagnostics, not final-action changes.",
         "- Effect signs are raw differences, not claims of statistical significance. For completion, higher is preferred; for latency, lower is preferred; wall/CPU are compute cost only.",
         "",
         "## S4 neutral-FIFO 2×2 potential × dynamic factorial",
