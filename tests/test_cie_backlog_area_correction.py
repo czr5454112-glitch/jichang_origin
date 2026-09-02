@@ -242,3 +242,99 @@ def test_random_last_arrival_requires_reproduced_manifest_and_hashes(
     assert last_arrival == 200.0
     assert identity["pass"] is True
     assert all(identity["gates"].values())
+
+
+def test_random_regeneration_reuses_recorded_same_hca_source_root(
+    tmp_path: Path,
+) -> None:
+    manifest = random_runner.REVISION_MANIFEST.resolve(strict=True)
+    source_root = tmp_path / "frozen-hca"
+    source_root.mkdir()
+    artifact = {
+        "map": "map2",
+        "load_factor": 1.0,
+        "seed": 104729,
+        "arm": "P0D0",
+        "provenance": {"binary_path": str(tmp_path / "binary.pyd")},
+        "release_protocol": {
+            "base_release_mode_before_random_jitter": "same_hca",
+            "base_same_hca_release_trace_pass": True,
+            "evidence": {
+                "pass": True,
+                "status": "ELIGIBLE_EXACT_HCA_RELEASE_TRACE",
+                "source_root": str(source_root),
+            },
+        },
+    }
+
+    args = correction._random_args(artifact, manifest)
+
+    assert args.map2_hca_case_root == source_root
+    assert args.nanning_hca_root != source_root
+
+
+def test_random_1x_regeneration_rejects_missing_release_evidence(
+    tmp_path: Path,
+) -> None:
+    manifest = random_runner.REVISION_MANIFEST.resolve(strict=True)
+    artifact = {
+        "map": "map2",
+        "load_factor": 1.0,
+        "seed": 104729,
+        "arm": "P0D0",
+        "provenance": {"binary_path": str(tmp_path / "binary.pyd")},
+        "release_protocol": {
+            "base_release_mode_before_random_jitter": "same_hca",
+            "base_same_hca_release_trace_pass": True,
+        },
+    }
+
+    with pytest.raises(
+        correction.BacklogAreaCorrectionError,
+        match="recorded, eligible same-HCA release root",
+    ):
+        correction._random_args(artifact, manifest)
+
+
+def test_random_regeneration_reuses_recorded_map2_2x_workload(
+    tmp_path: Path,
+) -> None:
+    manifest = random_runner.REVISION_MANIFEST.resolve(strict=True)
+    workload = tmp_path / "frozen-map2-2x.jsonl"
+    artifact = {
+        "map": "map2",
+        "load_factor": 2.0,
+        "seed": 104729,
+        "arm": "P1D1",
+        "provenance": {
+            "binary_path": str(tmp_path / "binary.pyd"),
+            "workload_path": str(workload),
+        },
+    }
+
+    args = correction._random_args(artifact, manifest)
+
+    assert args.map2_workload_2x == workload
+    assert args.canonical_workload is None
+
+
+def test_random_regeneration_reuses_recorded_nanning_workload_directory(
+    tmp_path: Path,
+) -> None:
+    manifest = random_runner.REVISION_MANIFEST.resolve(strict=True)
+    workload = tmp_path / "frozen-nanning" / "nanning_2x_canonical.jsonl"
+    artifact = {
+        "map": "nanning",
+        "load_factor": 2.0,
+        "seed": 104729,
+        "arm": "P0D0",
+        "provenance": {
+            "binary_path": str(tmp_path / "binary.pyd"),
+            "workload_path": str(workload),
+        },
+    }
+
+    args = correction._random_args(artifact, manifest)
+
+    assert args.nanning_task_dir == workload.parent
+    assert args.canonical_workload is None

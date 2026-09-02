@@ -399,11 +399,53 @@ def _random_args(artifact: Mapping[str, Any], manifest: Path) -> SimpleNamespace
 
     provenance = artifact.get("provenance")
     provenance = provenance if isinstance(provenance, Mapping) else {}
+    release = artifact.get("release_protocol")
+    release = release if isinstance(release, Mapping) else {}
+    release_evidence = release.get("evidence")
+    release_evidence = (
+        release_evidence if isinstance(release_evidence, Mapping) else {}
+    )
+    release_source = release_evidence.get("source_root")
+    release_source = (
+        Path(release_source) if isinstance(release_source, str) else None
+    )
     load_factor = _number(artifact.get("load_factor"))
-    canonical_workload = None
-    if load_factor not in (1.0, 2.0):
-        value = provenance.get("workload_path")
-        canonical_workload = Path(value) if isinstance(value, str) else None
+    if load_factor == 1.0:
+        release_gates = {
+            "base_release_mode": (
+                release.get("base_release_mode_before_random_jitter")
+                == "same_hca"
+            ),
+            "base_release_pass": (
+                release.get("base_same_hca_release_trace_pass") is True
+            ),
+            "evidence_pass": release_evidence.get("pass") is True,
+            "evidence_status": (
+                release_evidence.get("status")
+                == "ELIGIBLE_EXACT_HCA_RELEASE_TRACE"
+            ),
+            "source_root_recorded": release_source is not None,
+        }
+        if not all(release_gates.values()):
+            raise BacklogAreaCorrectionError(
+                "random 1x correction requires its recorded, eligible "
+                f"same-HCA release root: {release_gates}"
+            )
+        try:
+            release_source = release_source.resolve(strict=True)
+        except OSError as exc:
+            raise BacklogAreaCorrectionError(
+                "recorded same-HCA release root is unavailable"
+            ) from exc
+        if not release_source.is_dir():
+            raise BacklogAreaCorrectionError(
+                "recorded same-HCA release root is not a directory"
+            )
+    value = provenance.get("workload_path")
+    provenance_workload = Path(value) if isinstance(value, str) else None
+    canonical_workload = (
+        provenance_workload if load_factor not in (1.0, 2.0) else None
+    )
     return SimpleNamespace(
         map=artifact.get("map"),
         load_factor=load_factor,
@@ -414,12 +456,34 @@ def _random_args(artifact: Mapping[str, Any], manifest: Path) -> SimpleNamespace
         revision_manifest=manifest,
         canonical_workload=canonical_workload,
         load_manifest=random_runner.activation.DEFAULT_LOAD_MANIFEST,
-        nanning_task_dir=random_runner.factorial.g35.nanning_native.DEFAULT_TASK_DIR,
+        nanning_task_dir=(
+            provenance_workload.parent
+            if artifact.get("map") == "nanning"
+            and load_factor in (1.0, 2.0)
+            and provenance_workload is not None
+            else random_runner.factorial.g35.nanning_native.DEFAULT_TASK_DIR
+        ),
         nanning_map_profile=random_runner.factorial.g35.nanning_native.DEFAULT_MAP_PROFILE,
-        nanning_hca_root=random_runner.factorial.g35.nanning_paired.DEFAULT_HCA_ROOT,
-        map2_workload_1x=random_runner.factorial.g35.map2_native.DEFAULT_WORKLOAD_1X,
-        map2_workload_2x=random_runner.factorial.g35.map2_native.DEFAULT_WORKLOAD_2X,
-        map2_hca_case_root=None,
+        nanning_hca_root=(
+            release_source
+            if artifact.get("map") == "nanning" and load_factor == 1.0
+            else random_runner.factorial.g35.nanning_paired.DEFAULT_HCA_ROOT
+        ),
+        map2_workload_1x=(
+            provenance_workload
+            if artifact.get("map") == "map2" and load_factor == 1.0
+            else random_runner.factorial.g35.map2_native.DEFAULT_WORKLOAD_1X
+        ),
+        map2_workload_2x=(
+            provenance_workload
+            if artifact.get("map") == "map2" and load_factor == 2.0
+            else random_runner.factorial.g35.map2_native.DEFAULT_WORKLOAD_2X
+        ),
+        map2_hca_case_root=(
+            release_source
+            if artifact.get("map") == "map2" and load_factor == 1.0
+            else None
+        ),
         dry_run=True,
         force=False,
     )

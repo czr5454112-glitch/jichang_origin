@@ -1,0 +1,207 @@
+{
+  "generated_at": "2026-09-02T03:37:26.367757+00:00",
+  "hca_regression": {
+    "eligible_run_count": 1,
+    "frozen_expected": {
+      "processed_max_seconds": 357.0,
+      "processed_mean_seconds": 236.710166280783,
+      "processed_min_seconds": 188.0,
+      "raw_bag_count": 28506,
+      "segment_count": 43603,
+      "success_rate": 1.0
+    },
+    "pass": true,
+    "runs": [
+      {
+        "checks": {
+          "completion_100_percent": true,
+          "not_survivor_timing": true,
+          "processed_max_exact": true,
+          "processed_mean_exact": true,
+          "processed_min_exact": true,
+          "processed_population_exact": true,
+          "raw_bags_complete": true,
+          "raw_bags_exact": true,
+          "segments_complete": true,
+          "segments_exact": true
+        },
+        "observed": {
+          "complete_raw_bag_count": 28506,
+          "completed_segment_count": 43603,
+          "cpu_seconds": "NOT_MEASURED",
+          "fault_event_count": "0",
+          "peak_rss_bytes": "NOT_MEASURED",
+          "processed_count": 28506,
+          "processed_max_seconds": 357.0,
+          "processed_mean_seconds": 236.710166280783,
+          "processed_min_seconds": 188.0,
+          "raw_bag_count": 28506,
+          "repair_event_count": "0",
+          "route_location_checksum": "103288132",
+          "route_size_checksum": "475106",
+          "segment_count": 43603,
+          "success_rate": 1.0,
+          "survivor_only": false,
+          "unfinished_count": "0",
+          "wall_seconds": 243.78774299984798
+        },
+        "pass": true,
+        "run_id": "run_01"
+      }
+    ],
+    "status": "FENG_NATIVE_HCA_REGRESSION_PASS"
+  },
+  "identity_contract": {
+    "baseline_family": "FENG_NATIVE_HCA",
+    "coordination_protocol": "CENTRALIZED_ASTAR_RESERVATION",
+    "executor_identity": "FENG_NATIVE_JAVA_HCA_SCHEDULER",
+    "full_population_eligible": true,
+    "path_release_completion_trace_hash_verified": false,
+    "random_seed": null,
+    "release_protocol": "ORIGINAL_JAVA_TASK_RELEASE",
+    "reproduction_or_adaptation_label": "FROZEN_AGGREGATE_EXACT_REGRESSION_NOT_TRACE_EXACT",
+    "runtime": {
+      "cpu_seconds": "NOT_MEASURED",
+      "peak_rss_bytes": "NOT_MEASURED",
+      "wall_seconds": 243.78774299984798
+    },
+    "safety": {
+      "fault_events": "0",
+      "repair_events": "0",
+      "reservation_conflicts": "NOT_MEASURED",
+      "unfinished_segments": "0",
+      "wrong_terminal_completion": "NOT_MEASURED"
+    },
+    "survivor_timing_used": false,
+    "unverified_trace_fields": [
+      "per_task_release_trace",
+      "per_task_route_trace",
+      "per_task_completion_trace"
+    ]
+  },
+  "native_cie_dh": {
+    "measured": false,
+    "reason": "The 15 recovered Java sources do not implement the executable position-level DH/moving/stopped/BTI/DDI/0.2-s state required for a faithful native reconstruction. No common-executor result is substituted.",
+    "source_audit": {
+      "aggregate_sha256": "b0c7545abad1705eba9255527d39a864007bd576c9edbc9cb872a51e6acc9c25",
+      "all_required_dh_state_present": false,
+      "call_chain": "RUN.Main.run -> Tasks.generate_tasks -> ICS_PathFinding.ICS_path_finding -> Astar.research",
+      "call_chain_checks": {
+        "ICS_PathFinding_calls_Astar.research": true,
+        "RUN.Main.run_calls_ICS_path_finding": true,
+        "RUN.Main.run_calls_Tasks.generate_tasks": true,
+        "RUN.Main.run_constructs_ICS_PathFinding": true
+      },
+      "conclusion": "The recovered sources contain the centralized epoch scheduler and A* reservation call chain, but no executable DH/moving/stopped/BTI/DDI/0.2-s state set. The 200 ms GUI refresh cycle is not a position-level DH update.",
+      "executable_code_matches": {
+        "bti_state": [],
+        "ddi_state": [],
+        "dh_identifier": [],
+        "moving_state": [],
+        "point_two_second_literal": [],
+        "stopped_state": []
+      },
+      "gui_cycle_false_positive": {
+        "classification": "GUI_REFRESH_MILLISECONDS_NOT_DH_POSITION_UPDATE_STATE",
+        "consumer": "RUN.Main.run passes gui.getCycle() to Thread.sleep",
+        "declaration": "private double cycle = 200",
+        "path": "src/ICS_GUI/ICS_GUI.java"
+      },
+      "java_source_count": 15,
+      "java_sources": [
+        "src/App/Astar.java",
+        "src/App/Edge.java",
+        "src/App/ICS_PathFinding.java",
+        "src/App/Map.java",
+        "src/App/Node.java",
+        "src/App/Route.java",
+        "src/App/task.java",
+        "src/App/Tasks.java",
+        "src/App/Vertex.java",
+        "src/communication/decode1.java",
+        "src/communication/SocketClient.java",
+        "src/communication/SocketClientHandler.java",
+        "src/ICS_GUI/ICS_GUI.java",
+        "src/RUN/Main.java",
+        "src/RUN/test.java"
+      ]
+    },
+    "status": "BLOCKED_FENG_NATIVE_DH_SOURCE_NOT_RECOVERED"
+  },
+  "paper_table_5_3_reference": {
+    "source": "values transcribed in codex_cie_native_dh_targeted_ablation_repair.md",
+    "used_as_training_target": false,
+    "values": {
+      "FENG_NATIVE_CIE_DH_RECONSTRUCTION": {
+        "max_minutes": 8.62,
+        "mean_minutes": 4.43,
+        "min_minutes": 3.56
+      },
+      "FENG_NATIVE_HCA": {
+        "max_minutes": 5.98,
+        "mean_minutes": 3.96,
+        "min_minutes": 3.13
+      }
+    }
+  },
+  "provenance": {
+    "compiled_classes": {
+      "aggregate_sha256": "005f2cca4ede5f9d08668830a1d02f2b33a6d5e789ab29a2ef09fdded18c2b1f",
+      "class_count": 27,
+      "classes": [
+        "App/Astar$1.class",
+        "App/Astar.class",
+        "App/Edge.class",
+        "App/ICS_PathFinding$1.class",
+        "App/ICS_PathFinding.class",
+        "App/Map.class",
+        "App/Node.class",
+        "App/Route.class",
+        "App/task.class",
+        "App/Tasks.class",
+        "App/Vertex.class",
+        "ICS_GUI/ICS_GUI$1.class",
+        "ICS_GUI/ICS_GUI$2.class",
+        "ICS_GUI/ICS_GUI$3.class",
+        "ICS_GUI/ICS_GUI$4.class",
+        "ICS_GUI/ICS_GUI$5.class",
+        "ICS_GUI/ICS_GUI$6.class",
+        "ICS_GUI/ICS_GUI$7.class",
+        "ICS_GUI/ICS_GUI$8.class",
+        "ICS_GUI/ICS_GUI$9.class",
+        "ICS_GUI/ICS_GUI.class",
+        "LegacyIcsNoFaultWindowBenchmark$1.class",
+        "LegacyIcsNoFaultWindowBenchmark$PlannedRoute.class",
+        "LegacyIcsNoFaultWindowBenchmark$ReleaseEvent.class",
+        "LegacyIcsNoFaultWindowBenchmark$RunResult.class",
+        "LegacyIcsNoFaultWindowBenchmark$ScheduleEvent.class",
+        "LegacyIcsNoFaultWindowBenchmark.class"
+      ],
+      "path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\build\\cie_revision_java"
+    },
+    "experiment_manifest": {
+      "path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\configs\\eval\\cie_revision_manifest.yaml",
+      "sha256": "0bc8471ed4f34e046aae0b912737290716556317cdc0aec9e57ff2ada460dc17"
+    },
+    "git_branch": "codex/cie-native-dh-mechanism-evidence",
+    "git_commit": "0ca2aa9184cfc31a7a50157384b75db2b4596d41",
+    "inputdata": {
+      "path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\legacy\\jichang_origin_readonly\\inputdata.txt",
+      "sha256": "0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87"
+    },
+    "java_sources_aggregate_sha256": "b0c7545abad1705eba9255527d39a864007bd576c9edbc9cb872a51e6acc9c25",
+    "legacy_root": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\legacy\\jichang_origin_readonly",
+    "map2": {
+      "path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\legacy\\jichang_origin_readonly\\map2.txt",
+      "sha256": "55f578cb4b8fcc61f5b13963fcb8546aca91e517ea6f8ff4a7361670f1b03f8f"
+    },
+    "summary_path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\build_cie_revision\\raw_hca_runs\\feng_native_hca_full_regression\\fresh_hca_summary.json",
+    "summary_sha256": "551186d4f7a05543fee4f6d10905b72f8b5df9fcd1d37aa5fdcd1b234b365f06"
+  },
+  "schema": "czr005.cie_revision.feng_native_cie_dh_audit.v1",
+  "scope": "read_only_reproduction_audit_no_java_execution_no_dh_implementation",
+  "statuses": {
+    "hca_regression": "FENG_NATIVE_HCA_REGRESSION_PASS",
+    "native_cie_dh": "BLOCKED_FENG_NATIVE_DH_SOURCE_NOT_RECOVERED"
+  }
+}

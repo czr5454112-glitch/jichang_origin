@@ -42,14 +42,14 @@ GUI 原入口的主链为：
 $fengSources = @(Get-ChildItem 'legacy\jichang_origin_readonly\src\App\*.java' -File | ForEach-Object FullName)
 $fengSources += (Resolve-Path 'legacy\jichang_origin_readonly\src\ICS_GUI\ICS_GUI.java').Path
 $fengSources += (Resolve-Path 'benchmarks\java\LegacyIcsNoFaultWindowBenchmark.java').Path
-New-Item -ItemType Directory -Force 'build\feng_native_hca_java' | Out-Null
-& 'C:\PROGRAMING\jdk-18\bin\javac.exe' --release 8 -encoding UTF-8 -d 'build\feng_native_hca_java' @fengSources
+New-Item -ItemType Directory -Force 'build\cie_revision_java' | Out-Null
+& 'C:\PROGRAMING\jdk-18\bin\javac.exe' --release 8 -encoding UTF-8 -d 'build\cie_revision_java' @fengSources
 ```
 
 正式 1× map2 HCA 回归应复用既有 runner，并跳过其内部再次编译，以确保实际使用上面的 `--release 8` 类文件：
 
 ```powershell
-python scripts/eval/run_g4irsf24_fresh_hca.py run --profile full --repeats 1 --classes-dir build/feng_native_hca_java --output-root outputs/raw/cie_revision/feng_native_hca_map2_1x --java C:\PROGRAMING\jdk-18\bin\java.exe --skip-compile
+python scripts/eval/run_g4irsf24_fresh_hca.py run --profile full --repeats 1 --classes-dir build/cie_revision_java --output-root outputs/raw/cie_revision/feng_native_hca_map2_1x --java C:\PROGRAMING\jdk-18\bin\java.exe --skip-compile
 ```
 
 ## 完整回归结果

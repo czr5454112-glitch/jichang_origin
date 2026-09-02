@@ -370,7 +370,7 @@ def test_two_x_fixed_denominator_business_metrics_enter_factorial(
         and row["metric"] == "population_latency_mean_seconds"
     )
     assert latency["comparison_status"] == (
-        "METRIC_NOT_AVAILABLE_FULL_POPULATION_REQUIRED"
+        "FORMAL_2X_TIMING_NA_BY_PROTOCOL"
     )
     business = next(
         row

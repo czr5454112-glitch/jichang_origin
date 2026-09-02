@@ -171,8 +171,8 @@ def build_protocol_rows() -> list[ProtocolRow]:
         ProtocolRow(
             "P1",
             "common_executor_mechanism_comparison",
-            "G31_S4",
-            "G31/S4 project method",
+            "G31_S4_NEUTRAL_FIFO",
+            "G31/S4 neutral-FIFO route scorer",
             "CZR005_G31",
             "COMMON_CPP_EVENT_EXECUTOR",
             p1_release,

@@ -639,10 +639,17 @@ def _effect_status(
                 ";".join(_cell_label(cell) for cell in unavailable),
                 selected,
             )
+        is_formal_2x = all(
+            _number(row.get("scale")) == 2.0 for row in selected.values()
+        )
         status = (
-            "METRIC_NOT_AVAILABLE_FULL_POPULATION_REQUIRED"
-            if metric in TIMING_METRICS
-            else "METRIC_NOT_REPORTED"
+            "FORMAL_2X_TIMING_NA_BY_PROTOCOL"
+            if metric in TIMING_METRICS and is_formal_2x
+            else (
+                "METRIC_NOT_AVAILABLE_FULL_POPULATION_REQUIRED"
+                if metric in TIMING_METRICS
+                else "METRIC_NOT_REPORTED"
+            )
         )
         return status, "", selected
     return "COMPLETE", "", selected

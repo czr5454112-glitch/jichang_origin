@@ -593,7 +593,7 @@ def _write_report(
         "",
         "All registered arms were enumerated mechanically on both maps. No arm was selected, promoted, or removed from observed outcomes. Missing cells remain `NA`; no value is interpolated.",
         "",
-        "`FULL_MINUS_WC` was preregistered as conditional on at least 100 wc counterfactual raw-argmin changes. The separate activation census recorded zero wc opportunities, so its missing cells are an intentional dormant-mechanism stop, not failed runs.",
+        "`FULL_MINUS_WC` was pre-specified and frozen before result inspection as conditional on at least 100 wc counterfactual raw-argmin changes. The separate activation census recorded zero wc opportunities, so its missing cells are an intentional dormant-mechanism stop, not failed runs.",
         "",
         "The 2× THT columns are always `NA` under the frozen protocol. Business outcomes use the complete fixed raw-bag denominator, including incomplete bags through fixed-horizon tardiness lower bounds.",
         "",
