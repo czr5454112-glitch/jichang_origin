@@ -1,0 +1,108 @@
+schema: czr005.cie_revision_manifest.v1
+frozen_before_formal_result_read: true
+created_utc: 2026-09-02T03:09:30Z
+base_commit: 89dc12ea06913aaac63f5a129da1e264fd4657eb
+branch: codex/cie-native-dh-mechanism-evidence
+
+scientific_contract:
+  primary_priority: real_algorithm_and_experimental_performance
+  no_posthoc_weight_tuning: true
+  no_survivor_timing: true
+  no_cross_protocol_ranking: true
+  incomplete_full_population_timing: N/A
+  stop_dormant_mechanisms: true
+
+protocols:
+  P0:
+    executor: FENG_NATIVE_JAVA
+    map: map2
+    speed_mps: 2.5
+    population: 1x
+    comparison: [FENG_NATIVE_HCA, FENG_NATIVE_CIE_DH_RECONSTRUCTION]
+  P1:
+    executor: COMMON_CPP_EVENT_EXECUTOR
+    coordination: neutral_fifo
+    speed_mps: 2.5
+    maps: [map2, nanning]
+    loads: [1.0, 2.0]
+    release_protocol_by_load:
+      "1.0": same_hca
+      "2.0": canonical
+    potential_factorial:
+      P0D0: {potential: H_FF, dynamic_mask: 0}
+      P1D0: {potential: H_SA, dynamic_mask: 0}
+      P0D1: {potential: H_FF, dynamic_mask: 15}
+      P1D1: {potential: H_SA, dynamic_mask: 15}
+    cie_dh_adaptation_decomposition:
+      - CIE_DH_COMMON_EXECUTOR_FREE_FLOW
+      - CIE_DH_COMMON_EXECUTOR_SERVICE_AWARE
+  P2:
+    comparison: [FENG_NATIVE_HCA, G31_S4_NATIVE]
+    interpretation: end_to_end_system_only
+
+potential_contract:
+  H_FF: edge_length_divided_by_speed_only
+  H_SA: edge_travel_plus_non_goal_node_effective_service
+  goal_diagonal_seconds: 0.0
+  dynamic_components: [Q, I, wc, ws]
+  s4_full_mask: 15
+
+activation_scan:
+  maps: [map2, nanning]
+  loads: [1.0, 1.25, 1.5, 1.75, 2.0]
+  policy: G31_S4_NATIVE
+  speed_mps: 2.5
+  telemetry: exact_streaming_counts
+  trace_storage: disabled
+  classification:
+    NOT_ACTIVATED: opportunity_count_equals_0
+    RARELY_ACTIVATED:
+      action_change_rate_lt: 0.001
+      action_change_count_lt: 100
+    ACTIVATED_NO_CLEAR_OUTCOME_EFFECT: sufficient_actions_without_stable_business_effect
+    TOPOLOGY_DEPENDENT: opposite_or_materially_different_map_directions
+    LOAD_DEPENDENT: first_material_activation_near_capacity
+    SAFETY_OR_FAIRNESS_ROLE: loop_starvation_or_tail_only
+    COMPUTE_ONLY_ROLE: identical_physical_outcomes_lower_compute
+    REDUNDANT_WITH_OTHER_COMPONENTS: high_state_overlap_and_no_behavior_change
+    SUPPORTED_INCREMENTAL_BENEFIT: stable_paired_business_benefit
+
+targeted_ablation:
+  enter_only_after_activation: true
+  loads: [2.0]
+  maps: [map2, nanning]
+  arms:
+    - FULL_S4
+    - H_ONLY_SERVICE_AWARE
+    - FULL_MINUS_Q
+    - FULL_MINUS_I
+    - FULL_MINUS_WS
+    - H_PLUS_Q_PLUS_I
+  optional_full_minus_wc_gate: wc_counterfactual_raw_argmin_change_count_ge_100
+
+random_robustness:
+  enter_only_after_attributable_signal: true
+  paired_seeds: [104729, 130363, 155921, 181081, 205759, 232003, 257053, 283303, 308081, 333667]
+  arrival_jitter_seconds: {distribution: uniform, low: -5.0, high: 5.0}
+  service_multiplier: {distribution: lognormal, log_mean: 0.0, log_sigma: 0.05}
+  bootstrap_replicates: 10000
+  confidence_level: 0.95
+  result_seed_removal_forbidden: true
+
+service_heterogeneity_control:
+  construction: multiply_existing_non_goal_service_time
+  multiplier: 2.0
+  topology_tasks_and_release_unchanged: true
+
+representative_faults:
+  map2: [single_4, pair_2_4]
+  nanning: [single_3, pair_3_5]
+  fixed_start_non_repairing_faults_only: true
+  dynamic_recovery_claim_forbidden: true
+
+stopping_rules:
+  native_dh_source_missing: BLOCKED_FENG_NATIVE_DH_SOURCE_NOT_RECOVERED
+  dormant_component: stop_performance_expansion
+  cross_map_direction_conflict: stop_general_benefit_claim
+  complex_not_better_than_simple: stop_variant_stack
+  safety_gate_failure: exclude_from_paper_table
