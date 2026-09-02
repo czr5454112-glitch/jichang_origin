@@ -16,6 +16,8 @@ def _artifact(
     completed: int,
     on_time: int,
     binary_sha: str = "b" * 64,
+    loaded_binary_sha: str | None = None,
+    base_request_sha: str = "a" * 64,
     workload_sha: str | None = None,
 ) -> dict[str, object]:
     denominator = aggregate.targeted.REGISTERED_2X_RAW_BAG_COUNT
@@ -41,6 +43,7 @@ def _artifact(
         "ablation_contract": {
             "identity_pass": True,
             "sole_permitted_algorithmic_delta": "s4_score_component_mask",
+            "base_full_s4_request_sha256": base_request_sha,
         },
         "execution_integrity": {"pass": True},
         "full_population_timing": {
@@ -81,7 +84,13 @@ def _artifact(
             "binary_sha256": binary_sha,
             "canonical_workload_sha256": workload_sha,
         },
-        "runtime": {"wall_seconds": 10.0, "cpu_seconds": 9.0},
+        "runtime": {
+            "wall_seconds": 10.0,
+            "cpu_seconds": 9.0,
+            "native_summary": {
+                "loaded_cpp_binary_sha256": loaded_binary_sha or binary_sha
+            },
+        },
         "activation_telemetry": {
             "Q": {"counterfactual_raw_argmin_change_count": 123}
         },
@@ -161,9 +170,133 @@ def test_paired_difference_is_arm_minus_full_with_contract_checks(
     assert effect["comparison_status"] == "COMPLETE"
     assert effect["delta_arm_minus_full_s4"] == 1_000.0
     assert effect["binary_sha256_match"] is True
+    assert effect["base_full_s4_request_sha256_match"] is True
     assert effect["workload_sha256_match"] is True
     assert self_reference["comparison_status"] == "SELF_REFERENCE"
     assert self_reference["delta_arm_minus_full_s4"] == 0.0
+
+
+def test_loaded_binary_mismatch_invalidates_cell_and_blocks_pair(
+    tmp_path: Path,
+) -> None:
+    _write_artifact(
+        tmp_path,
+        _artifact(map_name="map2", arm="FULL_S4", completed=50_000, on_time=20_000),
+    )
+    _write_artifact(
+        tmp_path,
+        _artifact(
+            map_name="map2",
+            arm="FULL_MINUS_Q",
+            completed=51_000,
+            on_time=21_000,
+            loaded_binary_sha="c" * 64,
+        ),
+    )
+
+    rows = aggregate.collect_rows(tmp_path)
+    arm = next(
+        row
+        for row in rows
+        if row["map"] == "map2" and row["arm"] == "FULL_MINUS_Q"
+    )
+    effect = next(
+        row
+        for row in aggregate.paired_rows(rows)
+        if row["map"] == "map2"
+        and row["arm"] == "FULL_MINUS_Q"
+        and row["metric"] == "completed_raw_bag_count"
+    )
+
+    assert arm["cell_status"] == "INVALID_BINARY_IDENTITY"
+    assert arm["binary_identity_match"] is False
+    assert effect["comparison_status"] == "MISSING_OR_INVALID_ARM"
+    assert effect["delta_arm_minus_full_s4"] == "NA"
+
+
+def test_failed_integrity_artifact_remains_visible_but_is_not_paired(
+    tmp_path: Path,
+) -> None:
+    _write_artifact(
+        tmp_path,
+        _artifact(map_name="map2", arm="FULL_S4", completed=50_000, on_time=20_000),
+    )
+    failed = _artifact(
+        map_name="map2", arm="FULL_MINUS_Q", completed=49_000, on_time=19_000
+    )
+    failed["status"] = "FAILED_INTEGRITY"
+    failed["execution_integrity"] = {
+        "pass": False,
+        "gates": {
+            "merge_grant_active_bijection": False,
+            "reservation_conflicts_zero": True,
+        },
+    }
+    _write_artifact(tmp_path, failed)
+
+    rows = aggregate.collect_rows(tmp_path)
+    arm = next(
+        row
+        for row in rows
+        if row["map"] == "map2" and row["arm"] == "FULL_MINUS_Q"
+    )
+    effect = next(
+        row
+        for row in aggregate.paired_rows(rows)
+        if row["map"] == "map2"
+        and row["arm"] == "FULL_MINUS_Q"
+        and row["metric"] == "completed_raw_bag_count"
+    )
+
+    assert arm["cell_status"] == "FAILED_EXECUTION_INTEGRITY"
+    assert arm["completed_raw_bag_count"] == 49_000
+    assert arm["execution_integrity_failed_gates"] == "merge_grant_active_bijection"
+    assert effect["comparison_status"] == "MISSING_OR_INVALID_ARM"
+    assert effect["delta_arm_minus_full_s4"] == "NA"
+
+
+def test_base_request_mismatch_invalidates_arm_and_blocks_pair(
+    tmp_path: Path,
+) -> None:
+    _write_artifact(
+        tmp_path,
+        _artifact(
+            map_name="map2",
+            arm="FULL_S4",
+            completed=50_000,
+            on_time=20_000,
+            base_request_sha="a" * 64,
+        ),
+    )
+    _write_artifact(
+        tmp_path,
+        _artifact(
+            map_name="map2",
+            arm="FULL_MINUS_Q",
+            completed=51_000,
+            on_time=21_000,
+            base_request_sha="c" * 64,
+        ),
+    )
+
+    rows = aggregate.collect_rows(tmp_path)
+    arm = next(
+        row
+        for row in rows
+        if row["map"] == "map2" and row["arm"] == "FULL_MINUS_Q"
+    )
+    effect = next(
+        row
+        for row in aggregate.paired_rows(rows)
+        if row["map"] == "map2"
+        and row["arm"] == "FULL_MINUS_Q"
+        and row["metric"] == "completed_raw_bag_count"
+    )
+
+    assert arm["cell_status"] == "INVALID_BASE_REQUEST_MISMATCH"
+    assert effect["comparison_status"] == "INCOMPARABLE_BASE_REQUEST_MISMATCH"
+    assert effect["delta_arm_minus_full_s4"] == "NA"
+    assert effect["base_full_s4_request_sha256_match"] == "NA"
 
 
 def test_two_x_timing_remains_na_and_protocol_violation_is_rejected(
@@ -227,6 +360,8 @@ def test_outputs_use_literal_na_and_report_raw_argmin_boundary(
     assert "No arm was selected" in text
     assert "not final-action changes" in text
     assert "no value is interpolated" in text
+    assert "conditional on at least 100 wc" in text
+    assert "dormant-mechanism stop" in text
 
 
 def test_business_figure_contains_both_maps_and_missing_gaps(

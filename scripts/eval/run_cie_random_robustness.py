@@ -58,6 +58,13 @@ ARMS: Mapping[str, tuple[str, str]] = {
     "P1D1": ("sa", "full"),
 }
 REGISTERED_LOAD_FACTORS = (1.0, 1.25, 1.5, 1.75, 2.0)
+FORMAL_NONFAULT_SCENARIOS = (
+    ("map2", 1.0),
+    ("map2", 1.75),
+    ("map2", 2.0),
+    ("nanning", 1.0),
+    ("nanning", 2.0),
+)
 EXPECTED_PAIRED_SEEDS = (
     104729,
     130363,
@@ -140,6 +147,15 @@ SUMMARY_FIELDS = (
     "p0d0_mean",
     "p1d1_mean",
     "mean_delta_p1d1_minus_p0d0",
+    "relative_delta_vs_p0d0_percent",
+    "relative_delta_status",
+    "paired_cohen_dz",
+    "paired_cohen_dz_status",
+    "seed_win_count",
+    "seed_tie_count",
+    "seed_loss_count",
+    "failed_seed_count",
+    "failed_seed_rate",
     "bootstrap_ci_low",
     "bootstrap_ci_high",
     "bootstrap_replicates",
@@ -331,12 +347,52 @@ def _jitter_rows(
         touched = False
         for field in ("pass_time", "original_entry_time", "release_time", "arrival_time"):
             if field in row and row[field] is not None:
-                row[field] = _finite(row[field], field) + delta
+                shifted_value = _finite(row[field], field) + delta
+                if shifted_value < 0.0:
+                    raise RandomRobustnessError(
+                        f"arrival jitter would create a negative {field} for "
+                        f"task_id={task_id}"
+                    )
+                row[field] = shifted_value
                 touched = True
         if not touched:
             raise RandomRobustnessError("workload row has no arrival/release field")
         shifted.append(row)
-    return tuple(shifted)
+    result = tuple(shifted)
+    # One raw-bag offset must preserve all segment ordering and every
+    # within-bag release gap.  Check explicitly so a future field-specific
+    # perturbation cannot silently change segment precedence.
+    originals_by_task: dict[int, list[tuple[str, float]]] = {}
+    shifted_by_task: dict[int, list[tuple[str, float]]] = {}
+    for original, updated in zip(rows, result):
+        task_id = int(original["task_id"])
+        segment_id = str(original["segment_id"])
+        originals_by_task.setdefault(task_id, []).append(
+            (segment_id, _finite(original["pass_time"], "pass_time"))
+        )
+        shifted_by_task.setdefault(task_id, []).append(
+            (segment_id, _finite(updated["pass_time"], "pass_time"))
+        )
+        if original.get("std") != updated.get("std"):
+            raise RandomRobustnessError("arrival jitter changed a deadline")
+    for task_id in originals_by_task:
+        original_order = [
+            segment_id
+            for segment_id, _value in sorted(
+                originals_by_task[task_id], key=lambda item: (item[1], item[0])
+            )
+        ]
+        shifted_order = [
+            segment_id
+            for segment_id, _value in sorted(
+                shifted_by_task[task_id], key=lambda item: (item[1], item[0])
+            )
+        ]
+        if original_order != shifted_order:
+            raise RandomRobustnessError(
+                f"arrival jitter changed segment precedence for task_id={task_id}"
+            )
+    return result
 
 
 def _perturb_node_service(
@@ -353,6 +409,10 @@ def _perturb_node_service(
         service = _finite(row[2], "node service time")
         if service < 0.0:
             raise RandomRobustnessError("node service time must be non-negative")
+        if node_id not in multipliers:
+            raise RandomRobustnessError(
+                f"physical node lacks a service multiplier: {node_id}"
+            )
         row[2] = service * float(multipliers[node_id])
         records.append(row)
     prepared["node_records"] = records
@@ -398,7 +458,11 @@ def _factorial_args(args: argparse.Namespace, binary: Path) -> argparse.Namespac
         potential=potential,
         dynamic=dynamic,
         service_multiplier=1.0,
-        release_mode="canonical",
+        # The frozen revision manifest requires the original 1x subjects to
+        # start from the audited HCA-aligned release schedule.  The random
+        # offset is applied only after that alignment, identically for both
+        # arms.  The 2x population remains canonical by protocol.
+        release_mode="same_hca" if args.load_factor == 1.0 else "canonical",
         binary=binary,
         output=args.output,
         nanning_task_dir=args.nanning_task_dir,
@@ -406,7 +470,7 @@ def _factorial_args(args: argparse.Namespace, binary: Path) -> argparse.Namespac
         nanning_hca_root=args.nanning_hca_root,
         map2_workload_1x=args.map2_workload_1x,
         map2_workload_2x=args.map2_workload_2x,
-        map2_hca_case_root=None,
+        map2_hca_case_root=args.map2_hca_case_root,
         dry_run=args.dry_run,
         force=args.force,
     )
@@ -514,6 +578,23 @@ def prepare_randomized_cell(
     jittered_rows = _jitter_rows(rows, realization)
     randomized = _perturb_node_service(request, realization)
     randomized = _replace_bag_releases(randomized, jittered_rows)
+    release = dict(release)
+    base_release_mode = str(release.get("mode", "UNKNOWN"))
+    base_same_hca_pass = release.get("same_hca_release_trace_pass") is True
+    release.update(
+        {
+            "base_release_mode_before_random_jitter": base_release_mode,
+            "base_same_hca_release_trace_pass": base_same_hca_pass,
+            "mode": f"paired_random_jitter_from_{base_release_mode}",
+            "paired_random_jitter_applied": True,
+            # Once the frozen perturbation is applied this is no longer the
+            # literal HCA release trace and must not inherit HCA-comparison
+            # eligibility, even though the unperturbed base was audited.
+            "same_hca_release_trace_pass": False,
+            "formal_same_hca_release_input": False,
+            "formal_hca_cross_algorithm_timing_eligible": False,
+        }
+    )
     potential_key, dynamic = ARMS[args.arm]
     potential_requests, potential_artifacts = factorial._potential_pair(randomized)
     randomized = dict(potential_requests[potential_key])
@@ -540,6 +621,8 @@ def prepare_randomized_cell(
             "high": contract.arrival_high,
             "unit": "one shared offset per raw task_id across all its segments",
             "deadline_shifted": False,
+            "within_raw_bag_segment_precedence_preserved": True,
+            "negative_arrival_or_release_count": 0,
             "summary": _describe(arrivals),
             "realization_sha256": realization["arrival_realization_sha256"],
         },
@@ -547,8 +630,15 @@ def prepare_randomized_cell(
             "distribution": "lognormal",
             "log_mean": contract.service_log_mean,
             "log_sigma": contract.service_log_sigma,
-            "unit": "one multiplier per physical node_id",
-            "goal_service_still_excluded_by_goal_arrival_completion": True,
+            "unit": "one shared multiplier per physical node_id",
+            "all_physical_node_records_receive_multiplier": True,
+            "zero_base_service_remains_zero": True,
+            "per_bag_goal_service_not_executed": True,
+            "goal_exclusion_semantics": (
+                "complete_on_goal_arrival terminates each bag before service at "
+                "its own goal; H(g,g)=0; the same node remains perturbed when "
+                "it is a source or transit node for another bag"
+            ),
             "summary": _describe(services),
             "realization_sha256": realization["service_realization_sha256"],
         },
@@ -853,15 +943,28 @@ def paired_bootstrap_ci(
     return _quantile(estimates, alpha), _quantile(estimates, 1.0 - alpha)
 
 
-def aggregate(
+def _aggregate_for_scenarios(
     *,
     inputs: Sequence[Path],
     manifest_path: Path,
+    required_scenarios: Sequence[tuple[str, float]],
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     contract = load_random_contract(manifest_path)
+    normalized_scenarios = tuple(
+        (str(map_name), _load_factor(load))
+        for map_name, load in required_scenarios
+    )
+    if len(normalized_scenarios) != len(set(normalized_scenarios)):
+        raise RandomRobustnessError("required random scenarios must be unique")
     runs = _discover(inputs)
     if not runs:
         raise RandomRobustnessError("no executed random-robustness JSON was found")
+    expected_run_keys = {
+        (map_name, load, seed, arm)
+        for map_name, load in normalized_scenarios
+        for seed in contract.seeds
+        for arm in ARMS
+    }
     indexed: dict[tuple[str, float, int, str], Mapping[str, Any]] = {}
     for path, run in runs:
         map_name = str(run.get("map"))
@@ -869,16 +972,89 @@ def aggregate(
         seed = _integer(run.get("seed"), "run seed")
         arm = str(run.get("arm"))
         key = (map_name, load, seed, arm)
-        if arm not in ARMS or key in indexed:
+        if arm not in ARMS or key not in expected_run_keys or key in indexed:
             raise RandomRobustnessError(f"duplicate or unknown run identity: {key}")
         random_contract = run.get("random_contract")
         if not isinstance(random_contract, Mapping) or random_contract.get(
             "manifest_sha256"
         ) != contract.manifest_sha256:
             raise RandomRobustnessError(f"manifest hash mismatch: {path}")
+        release = run.get("release_protocol")
+        expected_base_release = "same_hca" if load == 1.0 else "canonical"
+        expected_release_mode = (
+            f"paired_random_jitter_from_{expected_base_release}"
+        )
+        if not isinstance(release, Mapping) or any(
+            (
+                release.get("base_release_mode_before_random_jitter")
+                != expected_base_release,
+                release.get("mode") != expected_release_mode,
+                release.get("paired_random_jitter_applied") is not True,
+                release.get("base_same_hca_release_trace_pass")
+                is not (load == 1.0),
+                release.get("same_hca_release_trace_pass") is not False,
+                release.get("formal_same_hca_release_input") is not False,
+                release.get("formal_hca_cross_algorithm_timing_eligible")
+                is not False,
+            )
+        ):
+            raise RandomRobustnessError(
+                f"randomized release contract mismatch: {path}"
+            )
         indexed[key] = run
 
-    scenarios = sorted({(key[0], key[1]) for key in indexed})
+    missing_run_keys = sorted(expected_run_keys - set(indexed))
+    if len(runs) != len(expected_run_keys) or missing_run_keys:
+        missing_scenarios = sorted(
+            set(normalized_scenarios)
+            - {(key[0], key[1]) for key in indexed}
+        )
+        raise RandomRobustnessError(
+            "formal random campaign requires exactly "
+            f"{len(expected_run_keys)} executed artifacts; found {len(runs)}; "
+            f"missing_run_count={len(missing_run_keys)}; "
+            f"missing_scenarios={missing_scenarios}"
+        )
+
+    global_identity_paths = (
+        ("provenance", "git_commit"),
+        ("provenance", "binary_sha256"),
+    )
+    for path in global_identity_paths:
+        values = {_get(run, *path) for run in indexed.values()}
+        if None in values or len(values) != 1:
+            raise RandomRobustnessError(
+                "formal random campaign global identity mismatch: "
+                f"{'.'.join(path)}"
+            )
+
+    scenario_identity_paths = (
+        ("provenance", "workload_sha256"),
+        ("perturbation", "base_arrival_schedule_sha256"),
+        ("perturbation", "base_node_service_profile_sha256"),
+        ("release_protocol", "base_release_mode_before_random_jitter"),
+        ("release_protocol", "mode"),
+        ("population", "raw_bag_count"),
+        ("population", "segment_count"),
+    )
+    for map_name, load in normalized_scenarios:
+        scenario_runs = [
+            run
+            for (candidate_map, candidate_load, _seed, _arm), run in indexed.items()
+            if candidate_map == map_name and candidate_load == load
+        ]
+        mismatches = []
+        for path in scenario_identity_paths:
+            values = {_get(run, *path) for run in scenario_runs}
+            if None in values or len(values) != 1:
+                mismatches.append(".".join(path))
+        if mismatches:
+            raise RandomRobustnessError(
+                f"scenario base identity mismatch for {map_name} {load}x: "
+                f"{mismatches}"
+            )
+
+    scenarios = sorted(normalized_scenarios)
     summary: list[dict[str, Any]] = []
     scenario_audit: list[dict[str, Any]] = []
     expected = set(contract.seeds)
@@ -913,6 +1089,7 @@ def aggregate(
                 ("perturbation", "randomized_arrival_schedule_sha256"),
                 ("perturbation", "randomized_node_service_profile_sha256"),
                 ("provenance", "workload_sha256"),
+                ("provenance", "git_commit"),
                 ("provenance", "binary_sha256"),
                 ("release_protocol", "mode"),
                 ("population", "raw_bag_count"),
@@ -951,6 +1128,8 @@ def aggregate(
                 "valid_seed_count": len(valid_pairs),
                 "missing_seeds": sorted(set(missing)),
                 "failed_seeds": sorted(failed),
+                "failed_seed_count": len(failed),
+                "failed_seed_rate": len(failed) / len(contract.seeds),
             }
         )
         metric_values = {
@@ -988,8 +1167,36 @@ def aggregate(
                 left_mean: float | None = statistics.fmean(left_values)
                 right_mean: float | None = statistics.fmean(right_values)
                 delta: float | None = statistics.fmean(differences)
+                if left_mean != 0.0:
+                    relative_delta: float | None = 100.0 * delta / left_mean
+                    relative_status = "AVAILABLE"
+                else:
+                    relative_delta = None
+                    relative_status = "N_M_ZERO_P0D0_MEAN"
+                difference_sd = statistics.stdev(differences)
+                if difference_sd != 0.0:
+                    cohen_dz: float | None = delta / difference_sd
+                    cohen_status = "AVAILABLE"
+                else:
+                    cohen_dz = None
+                    cohen_status = "N_M_ZERO_PAIRED_DIFFERENCE_SAMPLE_SD"
+                if metric.preferred_direction == "higher":
+                    wins = sum(value > 0.0 for value in differences)
+                    losses = sum(value < 0.0 for value in differences)
+                elif metric.preferred_direction == "lower":
+                    wins = sum(value < 0.0 for value in differences)
+                    losses = sum(value > 0.0 for value in differences)
+                else:
+                    raise RandomRobustnessError(
+                        f"unknown preferred direction: {metric.preferred_direction}"
+                    )
+                ties = sum(value == 0.0 for value in differences)
             else:
                 left_mean = right_mean = delta = low = high = None
+                relative_delta = cohen_dz = None
+                wins = ties = losses = None
+                relative_status = "N_M_INCOMPLETE_OR_METRIC_UNAVAILABLE"
+                cohen_status = "N_M_INCOMPLETE_OR_METRIC_UNAVAILABLE"
             summary.append(
                 {
                     "schema": SUMMARY_SCHEMA,
@@ -1008,6 +1215,15 @@ def aggregate(
                     "p0d0_mean": left_mean,
                     "p1d1_mean": right_mean,
                     "mean_delta_p1d1_minus_p0d0": delta,
+                    "relative_delta_vs_p0d0_percent": relative_delta,
+                    "relative_delta_status": relative_status,
+                    "paired_cohen_dz": cohen_dz,
+                    "paired_cohen_dz_status": cohen_status,
+                    "seed_win_count": wins,
+                    "seed_tie_count": ties,
+                    "seed_loss_count": losses,
+                    "failed_seed_count": len(failed),
+                    "failed_seed_rate": len(failed) / len(contract.seeds),
                     "bootstrap_ci_low": low,
                     "bootstrap_ci_high": high,
                     "bootstrap_replicates": contract.bootstrap_replicates,
@@ -1022,6 +1238,12 @@ def aggregate(
     audit = {
         "schema": SUMMARY_SCHEMA,
         "manifest_sha256": contract.manifest_sha256,
+        "formal_nonfault_scenarios": [
+            {"map": map_name, "load_factor": load}
+            for map_name, load in normalized_scenarios
+        ],
+        "expected_executed_artifact_count": len(expected_run_keys),
+        "executed_artifact_count": len(runs),
         "paired_seeds": list(contract.seeds),
         "seed_removal_forbidden": contract.seed_removal_forbidden,
         "bootstrap_replicates": contract.bootstrap_replicates,
@@ -1036,6 +1258,20 @@ def aggregate(
         },
     }
     return summary, audit
+
+
+def aggregate(
+    *,
+    inputs: Sequence[Path],
+    manifest_path: Path,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Aggregate the fixed five-scenario, 100-artifact formal campaign."""
+
+    return _aggregate_for_scenarios(
+        inputs=inputs,
+        manifest_path=manifest_path,
+        required_scenarios=FORMAL_NONFAULT_SCENARIOS,
+    )
 
 
 def _atomic_text(path: Path, value: str) -> None:
@@ -1069,32 +1305,45 @@ def _write_report(
         "# CIE paired random-robustness audit",
         "",
         f"- manifest SHA-256: `{audit['manifest_sha256']}`",
+        f"- executed artifacts: {audit['executed_artifact_count']}/"
+        f"{audit['expected_executed_artifact_count']}",
         f"- frozen paired seeds: `{audit['paired_seeds']}`",
         f"- bootstrap: {audit['bootstrap_replicates']} paired resamples, "
         f"{float(audit['confidence_level']) * 100:g}% percentile CI",
         "- contrast: `P1D1 - P0D0`; negative is better only for lower-is-better metrics",
+        "- relative delta is `100 * mean(P1D1-P0D0) / mean(P0D0)` and is N/M "
+        "when the P0D0 mean is zero",
+        "- paired Cohen dz is the paired-difference mean divided by its sample "
+        "standard deviation; zero difference SD is explicitly N/M",
+        "- win/tie/loss counts orient each seed by the metric's preferred direction; "
+        "failure rate uses all frozen seeds as its denominator",
         "- incomplete and failed seeds are never removed or replaced",
+        "- 1x cells start from the audited same-HCA release schedule, then apply "
+        "the frozen paired arrival jitter; the resulting trace is not eligible "
+        "for a direct HCA timing comparison",
+        "- intermediate and 2x cells start from their canonical complete-flight "
+        "population before the same paired jitter contract is applied",
         "- 2x THT is N/A even when every bag completes; fixed-denominator capacity, "
         "deadline, tardiness, completion-target and backlog metrics remain eligible",
         "",
         "## Scenario gates",
         "",
-        "| Map | Load | Status | Valid pairs | Missing seeds | Failed seeds |",
-        "|---|---:|---|---:|---|---|",
+        "| Map | Load | Status | Valid pairs | Missing seeds | Failed seeds | Failure rate |",
+        "|---|---:|---|---:|---|---|---:|",
     ]
     for item in audit["scenario_audit"]:
         lines.append(
             f"| {item['map']} | {item['load_factor']:.2f}x | {item['status']} | "
             f"{item['valid_seed_count']} | {item['missing_seeds'] or 'none'} | "
-            f"{item['failed_seeds'] or 'none'} |"
+            f"{item['failed_seeds'] or 'none'} | {item['failed_seed_rate']:.3f} |"
         )
     lines.extend(
         [
             "",
             "## Paired estimates",
             "",
-            "| Map | Load | Metric | Status | P0D0 mean | P1D1 mean | Delta | 95% CI |",
-            "|---|---:|---|---|---:|---:|---:|---|",
+            "| Map | Load | Metric | Status | P0D0 mean | P1D1 mean | Delta | Delta % | dz | W/T/L | 95% CI |",
+            "|---|---:|---|---|---:|---:|---:|---|---|---|---|",
         ]
     )
     for row in rows:
@@ -1103,11 +1352,29 @@ def _write_report(
             left = f"{row['p0d0_mean']:.6g}"
             right = f"{row['p1d1_mean']:.6g}"
             delta = f"{row['mean_delta_p1d1_minus_p0d0']:.6g}"
+            relative = (
+                f"{row['relative_delta_vs_p0d0_percent']:.6g}%"
+                if row["relative_delta_status"] == "AVAILABLE"
+                else f"N/M ({row['relative_delta_status']})"
+            )
+            cohen = (
+                f"{row['paired_cohen_dz']:.6g}"
+                if row["paired_cohen_dz_status"] == "AVAILABLE"
+                else f"N/M ({row['paired_cohen_dz_status']})"
+            )
+            counts = (
+                f"{row['seed_win_count']}/{row['seed_tie_count']}/"
+                f"{row['seed_loss_count']}"
+            )
         else:
             interval = left = right = delta = "N/M"
+            relative = f"N/M ({row['relative_delta_status']})"
+            cohen = f"N/M ({row['paired_cohen_dz_status']})"
+            counts = "N/M"
         lines.append(
             f"| {row['map']} | {row['load_factor']:.2f}x | {row['metric_label']} | "
-            f"{row['status']} | {left} | {right} | {delta} | {interval} |"
+            f"{row['status']} | {left} | {right} | {delta} | {relative} | "
+            f"{cohen} | {counts} | {interval} |"
         )
     faults = audit["representative_faults"]
     lines.extend(
@@ -1148,6 +1415,7 @@ def _run_parser(subparsers: Any) -> None:
     parser.add_argument("--nanning-hca-root", type=Path, default=factorial.g35.nanning_paired.DEFAULT_HCA_ROOT)
     parser.add_argument("--map2-workload-1x", type=Path, default=factorial.g35.map2_native.DEFAULT_WORKLOAD_1X)
     parser.add_argument("--map2-workload-2x", type=Path, default=factorial.g35.map2_native.DEFAULT_WORKLOAD_2X)
+    parser.add_argument("--map2-hca-case-root", type=Path)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
 

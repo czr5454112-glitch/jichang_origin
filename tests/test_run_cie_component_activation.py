@@ -150,6 +150,229 @@ def test_activation_classification_uses_frozen_dual_rare_threshold() -> None:
     )
 
 
+def _activation_artifact(
+    *,
+    map_name: str,
+    factor: float,
+    manifest_sha256: str,
+    summary: dict[str, object] | None = None,
+) -> dict[str, object]:
+    label = runner._factor_label(factor)
+    raw_count, segment_count = runner.REGISTERED_POPULATION_BY_FACTOR[label]
+    binary_sha256 = "b" * 64
+    native_summary = {
+        "loaded_cpp_binary_sha256": binary_sha256,
+        **(summary or {}),
+    }
+    return {
+        "schema": runner.SCHEMA_RUN,
+        "status": "COMPLETE",
+        "native_execution_started": True,
+        "map": map_name,
+        "nominal_load_factor": factor,
+        "population": {
+            "raw_bag_denominator": raw_count,
+            "segment_count": segment_count,
+            "whole_population": True,
+        },
+        "execution_integrity": {"pass": True},
+        "provenance": {
+            "git_commit": "a" * 40,
+            "binary_sha256": binary_sha256,
+            "revision_manifest_sha256": manifest_sha256,
+            "canonical_sha256": runner._json_sha256(
+                ["canonical", map_name, label]
+            ),
+            "request_sha256": runner._json_sha256(
+                ["request", map_name, label]
+            ),
+            "load_manifest_sha256": (
+                "c" * 64 if factor in {1.25, 1.5, 1.75} else None
+            ),
+        },
+        "runtime": {"summary": native_summary},
+    }
+
+
+def _write_activation_campaign(
+    root: Path,
+    manifest: Path,
+    *,
+    nanning_two_x_summary: dict[str, object] | None = None,
+) -> list[Path]:
+    manifest_sha256 = runner._file_sha256(manifest)
+    paths: list[Path] = []
+    for map_name in runner.MAPS:
+        for factor in runner.SCAN_FACTORS:
+            summary = (
+                nanning_two_x_summary
+                if map_name == "nanning" and factor == 2.0
+                else None
+            )
+            path = root / f"{map_name}_{factor:.2f}x.json"
+            path.write_text(
+                json.dumps(
+                    _activation_artifact(
+                        map_name=map_name,
+                        factor=factor,
+                        manifest_sha256=manifest_sha256,
+                        summary=summary,
+                    )
+                ),
+                encoding="utf-8",
+            )
+            paths.append(path)
+    return paths
+
+
+def test_j2_mutation_uses_multi_candidate_denominator_and_is_precommit(
+    tmp_path: Path,
+) -> None:
+    manifest = tmp_path / "revision.yaml"
+    manifest.write_text(
+        "action_change_rate_lt: 0.5\naction_change_count_lt: 100\n",
+        encoding="utf-8",
+    )
+    paths = _write_activation_campaign(
+        tmp_path,
+        manifest,
+        nanning_two_x_summary={
+            "merge_grant_service_opportunity_count": 584_213,
+            "merge_grant_multi_candidate_opportunity_count": 66,
+            "merge_grant_true_competition_count": 5,
+            "merge_grant_order_mutation_count": 15,
+        },
+    )
+
+    aggregate = runner.aggregate_results(
+        result_paths=paths, revision_manifest_path=manifest
+    )
+    row = next(
+        row
+        for row in aggregate["activation_rows"]
+        if row["map"] == "nanning" and row["nominal_load_factor"] == "2.00"
+    )
+
+    assert row["merge_grant_precommit_order_mutation_opportunity_count"] == 66
+    assert row["merge_grant_exact_slot_overlap_opportunity_count"] == 5
+    assert row["merge_grant_precommit_order_mutation_count"] == 15
+    assert row["merge_grant_precommit_order_mutation_rate"] == pytest.approx(15 / 66)
+    assert row["merge_grant_precommit_order_mutation_is_final_action"] is False
+    assert row["merge_grant_exact_slot_overlap_used_as_mutation_denominator"] is False
+    # With the frozen test threshold, 15/66 is rare while 15/5 would be active.
+    assert row["j2_m3_classification"] == "RARELY_ACTIVATED"
+    report = runner._report_text(aggregate)
+    assert "PRE_COMMIT_ORDER_MUTATION" in report
+    assert "not a final executed action" in report
+    assert "| nanning | 2.00 | 584213 | 66 | 5 | 15 | 0.227273 |" in report
+
+
+def test_activation_aggregate_rejects_failed_or_extra_cells(tmp_path: Path) -> None:
+    manifest = tmp_path / "revision.yaml"
+    manifest.write_text(
+        "action_change_rate_lt: 0.001\naction_change_count_lt: 100\n",
+        encoding="utf-8",
+    )
+    paths = _write_activation_campaign(tmp_path, manifest)
+    failed = json.loads(paths[0].read_text(encoding="utf-8"))
+    failed["status"] = "FAILED_INTEGRITY"
+    failed["execution_integrity"] = {"pass": False}
+    paths[0].write_text(json.dumps(failed), encoding="utf-8")
+
+    with pytest.raises(runner.ActivationError, match="failed execution integrity"):
+        runner.aggregate_results(
+            result_paths=paths, revision_manifest_path=manifest
+        )
+
+    paths = _write_activation_campaign(tmp_path, manifest)
+    extra = tmp_path / "map2_3.00x.json"
+    extra.write_text(
+        json.dumps(
+            _activation_artifact(
+                map_name="map2",
+                factor=2.0,
+                manifest_sha256=runner._file_sha256(manifest),
+            )
+            | {"nominal_load_factor": 3.0}
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(runner.ActivationError, match="unregistered"):
+        runner.aggregate_results(
+            result_paths=[*paths, extra], revision_manifest_path=manifest
+        )
+
+    with pytest.raises(runner.ActivationError, match="duplicate"):
+        runner.aggregate_results(
+            result_paths=[*paths, paths[0]], revision_manifest_path=manifest
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement", "message"),
+    (
+        ("git_commit", "d" * 40, "git identity mismatch"),
+        ("binary_sha256", "d" * 64, "binary identity mismatch"),
+        (
+            "revision_manifest_sha256",
+            "d" * 64,
+            "revision-manifest identity mismatch",
+        ),
+    ),
+)
+def test_activation_aggregate_rejects_mixed_global_identity(
+    tmp_path: Path,
+    field: str,
+    replacement: str,
+    message: str,
+) -> None:
+    manifest = tmp_path / "revision.yaml"
+    manifest.write_text(
+        "action_change_rate_lt: 0.001\naction_change_count_lt: 100\n",
+        encoding="utf-8",
+    )
+    paths = _write_activation_campaign(tmp_path, manifest)
+    changed = json.loads(paths[-1].read_text(encoding="utf-8"))
+    changed["provenance"][field] = replacement
+    if field == "binary_sha256":
+        changed["runtime"]["summary"]["loaded_cpp_binary_sha256"] = replacement
+    paths[-1].write_text(json.dumps(changed), encoding="utf-8")
+
+    with pytest.raises(runner.ActivationError, match=message):
+        runner.aggregate_results(
+            result_paths=paths, revision_manifest_path=manifest
+        )
+
+
+def test_activation_aggregate_rejects_bad_workload_identity(tmp_path: Path) -> None:
+    manifest = tmp_path / "revision.yaml"
+    manifest.write_text(
+        "action_change_rate_lt: 0.001\naction_change_count_lt: 100\n",
+        encoding="utf-8",
+    )
+    paths = _write_activation_campaign(tmp_path, manifest)
+    changed = json.loads(paths[-1].read_text(encoding="utf-8"))
+    changed["population"]["raw_bag_denominator"] -= 1
+    paths[-1].write_text(json.dumps(changed), encoding="utf-8")
+
+    with pytest.raises(runner.ActivationError, match="workload population mismatch"):
+        runner.aggregate_results(
+            result_paths=paths, revision_manifest_path=manifest
+        )
+
+    paths = _write_activation_campaign(tmp_path, manifest)
+    first = json.loads(paths[0].read_text(encoding="utf-8"))
+    changed = json.loads(paths[-1].read_text(encoding="utf-8"))
+    changed["provenance"]["canonical_sha256"] = first["provenance"][
+        "canonical_sha256"
+    ]
+    paths[-1].write_text(json.dumps(changed), encoding="utf-8")
+    with pytest.raises(runner.ActivationError, match="reused a canonical workload"):
+        runner.aggregate_results(
+            result_paths=paths, revision_manifest_path=manifest
+        )
+
+
 def test_two_x_timing_is_na_even_if_population_completes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

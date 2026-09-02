@@ -4,6 +4,7 @@ import argparse
 from copy import deepcopy
 import json
 from pathlib import Path
+import statistics
 from types import SimpleNamespace
 
 import pytest
@@ -120,6 +121,53 @@ def test_arrival_jitter_is_shared_by_raw_bag_and_deadline_is_not_shifted(
     assert shifted[0]["std"] == shifted[1]["std"] == 200.0
 
 
+def test_arrival_jitter_rejects_negative_time_and_preserves_precedence(
+    tmp_path: Path,
+) -> None:
+    contract = runner.load_random_contract(_manifest(tmp_path / "manifest.yaml"))
+    realization = runner.build_realization(
+        seed=SEEDS[0], task_ids=[10], node_ids=[0], contract=contract
+    )
+    delta = realization["arrival_by_task_id"][10]
+    precedence_rows = (
+        {"segment_id": "10:0", "task_id": 10, "pass_time": 20.0, "std": 100.0},
+        {"segment_id": "10:1", "task_id": 10, "pass_time": 25.0, "std": 100.0},
+    )
+
+    shifted = runner._jitter_rows(precedence_rows, realization)
+
+    assert shifted[1]["pass_time"] - shifted[0]["pass_time"] == pytest.approx(5.0)
+    assert shifted[0]["pass_time"] == pytest.approx(20.0 + delta)
+
+    negative = dict(realization)
+    negative["arrival_by_task_id"] = {10: -5.0}
+    with pytest.raises(runner.RandomRobustnessError, match="negative pass_time"):
+        runner._jitter_rows(
+            ({"segment_id": "10:0", "task_id": 10, "pass_time": 1.0, "std": 100.0},),
+            negative,
+        )
+
+
+def test_service_perturbation_covers_shared_nodes_including_other_bag_goals(
+    tmp_path: Path,
+) -> None:
+    contract = runner.load_random_contract(_manifest(tmp_path / "manifest.yaml"))
+    realization = runner.build_realization(
+        seed=SEEDS[0], task_ids=[1], node_ids=[0, 1, 2], contract=contract
+    )
+    request = {
+        "node_records": [[0, 1, 2.0], [1, 4, 3.0], [2, 2, 7.0]],
+    }
+
+    perturbed = runner._perturb_node_service(request, realization)
+
+    for index, base in enumerate((2.0, 3.0, 7.0)):
+        node_id = request["node_records"][index][0]
+        assert perturbed["node_records"][index][2] == pytest.approx(
+            base * realization["service_multiplier_by_node_id"][node_id]
+        )
+
+
 def _args(tmp_path: Path, manifest: Path, *, arm: str = "P0D0") -> argparse.Namespace:
     binary = tmp_path / "czr005_cpp.pyd"
     binary.write_bytes(b"random-test-binary")
@@ -140,6 +188,7 @@ def _args(tmp_path: Path, manifest: Path, *, arm: str = "P0D0") -> argparse.Name
         nanning_hca_root=tmp_path,
         map2_workload_1x=workload,
         map2_workload_2x=workload,
+        map2_hca_case_root=tmp_path / "map2_hca",
         dry_run=True,
         force=False,
     )
@@ -219,10 +268,55 @@ def test_both_arms_receive_identical_random_realization(
         "perturbation"
     ]["combined_realization_sha256"]
     assert left_request["node_records"] == right_request["node_records"]
+    assert left_request["node_records"][1][2] != 0.4
     assert left_request["bag_records"] == right_request["bag_records"]
     assert left_request["s4_score_component_mask"] == 0
     assert right_request["s4_score_component_mask"] == 15
     assert left_request["heuristic_time"] != right_request["heuristic_time"]
+    service_contract = left["perturbation"]["node_service_multiplier"]
+    assert service_contract["all_physical_node_records_receive_multiplier"] is True
+    assert service_contract["per_bag_goal_service_not_executed"] is True
+    assert "source or transit" in service_contract["goal_exclusion_semantics"]
+
+
+def test_one_x_starts_from_hca_aligned_base_but_randomized_release_is_not_hca_trace(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    args = _args(tmp_path, manifest)
+    args.load_factor = 1.0
+    prepared = list(
+        _base_prepare(Path(args.binary), Path(args.map2_workload_1x))
+    )
+    prepared[3] = {
+        "mode": "same_hca",
+        "same_hca_release_trace_pass": True,
+        "formal_same_hca_release_input": True,
+        "evidence": {"pass": True},
+    }
+    observed: dict[str, object] = {}
+
+    def fake_prepare(projected: argparse.Namespace) -> tuple[object, ...]:
+        observed["release_mode"] = projected.release_mode
+        observed["map2_hca_case_root"] = projected.map2_hca_case_root
+        return deepcopy(tuple(prepared))
+
+    monkeypatch.setattr(runner.factorial, "prepare_cell", fake_prepare)
+    contract = runner.load_random_contract(manifest)
+
+    _case, _workload, _request, release, _details = (
+        runner.prepare_randomized_cell(args, contract)
+    )
+
+    assert observed["release_mode"] == "same_hca"
+    assert observed["map2_hca_case_root"] == args.map2_hca_case_root
+    assert release["base_release_mode_before_random_jitter"] == "same_hca"
+    assert release["base_same_hca_release_trace_pass"] is True
+    assert release["mode"] == "paired_random_jitter_from_same_hca"
+    assert release["paired_random_jitter_applied"] is True
+    assert release["same_hca_release_trace_pass"] is False
+    assert release["formal_same_hca_release_input"] is False
+    assert release["formal_hca_cross_algorithm_timing_eligible"] is False
 
 
 def test_two_x_execution_forces_timing_na_and_reports_fault_blocker(
@@ -320,9 +414,18 @@ def _fake_run(manifest: Path, seed: int, arm: str, value: float) -> dict[str, ob
         },
         "provenance": {
             "workload_sha256": "workload",
+            "git_commit": "experiment-commit",
             "binary_sha256": "binary",
         },
-        "release_protocol": {"mode": "canonical"},
+        "release_protocol": {
+            "base_release_mode_before_random_jitter": "canonical",
+            "base_same_hca_release_trace_pass": False,
+            "mode": "paired_random_jitter_from_canonical",
+            "paired_random_jitter_applied": True,
+            "same_hca_release_trace_pass": False,
+            "formal_same_hca_release_input": False,
+            "formal_hca_cross_algorithm_timing_eligible": False,
+        },
         "population": {"raw_bag_count": 100, "segment_count": 120},
         "execution_integrity": {"pass": True},
         "paper_subjects": {
@@ -335,6 +438,16 @@ def _fake_run(manifest: Path, seed: int, arm: str, value: float) -> dict[str, ob
     }
 
 
+def _aggregate_one_scenario(
+    root: Path, manifest: Path
+) -> tuple[list[dict[str, object]], dict[str, object]]:
+    return runner._aggregate_for_scenarios(
+        inputs=[root],
+        manifest_path=manifest,
+        required_scenarios=(("map2", 2.0),),
+    )
+
+
 def test_aggregate_uses_all_frozen_pairs_and_deterministic_bootstrap(
     tmp_path: Path,
 ) -> None:
@@ -343,13 +456,22 @@ def test_aggregate_uses_all_frozen_pairs_and_deterministic_bootstrap(
     root.mkdir()
     for index, seed in enumerate(SEEDS):
         for arm, value in (("P0D0", float(index)), ("P1D1", float(index + 2))):
+            run = _fake_run(manifest, seed, arm, value)
+            run["paper_subjects"]["fixed_denominator_business"][
+                "completed_raw_bag_count"
+            ] = 0
             (root / f"{seed}_{arm}.json").write_text(
-                json.dumps(_fake_run(manifest, seed, arm, value)), encoding="utf-8"
+                json.dumps(run), encoding="utf-8"
             )
 
-    rows, audit = runner.aggregate(inputs=[root], manifest_path=manifest)
-    rows_again, _ = runner.aggregate(inputs=[root], manifest_path=manifest)
+    rows, audit = _aggregate_one_scenario(root, manifest)
+    rows_again, _ = _aggregate_one_scenario(root, manifest)
     on_time = next(row for row in rows if row["metric"] == "on_time_raw_bag_count")
+    missed = next(row for row in rows if row["metric"] == "missed_bag_count")
+    tied = next(row for row in rows if row["metric"] == "completion_rate")
+    zero_baseline = next(
+        row for row in rows if row["metric"] == "completed_raw_bag_count"
+    )
     timing = next(row for row in rows if row["metric"] == "population_latency_mean_seconds")
 
     assert audit["scenario_audit"][0]["valid_seed_count"] == 10
@@ -357,26 +479,158 @@ def test_aggregate_uses_all_frozen_pairs_and_deterministic_bootstrap(
     assert on_time["mean_delta_p1d1_minus_p0d0"] == pytest.approx(2.0)
     assert on_time["bootstrap_ci_low"] == pytest.approx(2.0)
     assert on_time["bootstrap_ci_high"] == pytest.approx(2.0)
+    assert on_time["relative_delta_vs_p0d0_percent"] == pytest.approx(
+        100.0 * 2.0 / 94.5
+    )
+    assert on_time["relative_delta_status"] == "AVAILABLE"
+    assert on_time["paired_cohen_dz"] is None
+    assert on_time["paired_cohen_dz_status"] == "N_M_ZERO_PAIRED_DIFFERENCE_SAMPLE_SD"
+    assert (on_time["seed_win_count"], on_time["seed_tie_count"], on_time["seed_loss_count"]) == (10, 0, 0)
+    assert (missed["seed_win_count"], missed["seed_tie_count"], missed["seed_loss_count"]) == (10, 0, 0)
+    assert (tied["seed_win_count"], tied["seed_tie_count"], tied["seed_loss_count"]) == (0, 10, 0)
+    assert on_time["failed_seed_rate"] == 0.0
+    assert zero_baseline["relative_delta_vs_p0d0_percent"] is None
+    assert zero_baseline["relative_delta_status"] == "N_M_ZERO_P0D0_MEAN"
     assert rows == rows_again
     assert timing["status"] == "N_M_METRIC_NOT_AVAILABLE_FOR_EVERY_FROZEN_SEED"
     assert timing["mean_delta_p1d1_minus_p0d0"] is None
+
+
+def test_paired_cohen_dz_and_directional_seed_counts(tmp_path: Path) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+    root.mkdir()
+    for index, seed in enumerate(SEEDS):
+        for arm, value in (("P0D0", float(index)), ("P1D1", float(2 * index))):
+            (root / f"{seed}_{arm}.json").write_text(
+                json.dumps(_fake_run(manifest, seed, arm, value)), encoding="utf-8"
+            )
+
+    rows, audit = _aggregate_one_scenario(root, manifest)
+    on_time = next(row for row in rows if row["metric"] == "on_time_raw_bag_count")
+
+    expected_differences = [float(index) for index in range(10)]
+    assert on_time["mean_delta_p1d1_minus_p0d0"] == pytest.approx(4.5)
+    assert on_time["paired_cohen_dz"] == pytest.approx(
+        statistics.fmean(expected_differences)
+        / statistics.stdev(expected_differences)
+    )
+    assert on_time["paired_cohen_dz_status"] == "AVAILABLE"
+    assert (on_time["seed_win_count"], on_time["seed_tie_count"], on_time["seed_loss_count"]) == (9, 1, 0)
+    assert audit["scenario_audit"][0]["failed_seed_rate"] == 0.0
+
+
+def test_failed_seed_rate_blocks_bootstrap_and_effects(tmp_path: Path) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+    root.mkdir()
+    for index, seed in enumerate(SEEDS):
+        for arm in runner.ARMS:
+            value = _fake_run(manifest, seed, arm, float(index))
+            if seed == SEEDS[-1] and arm == "P1D1":
+                value["status"] = "FAILED_INTEGRITY"
+                value["execution_integrity"] = {"pass": False}
+            (root / f"{seed}_{arm}.json").write_text(
+                json.dumps(value), encoding="utf-8"
+            )
+
+    rows, audit = _aggregate_one_scenario(root, manifest)
+    on_time = next(row for row in rows if row["metric"] == "on_time_raw_bag_count")
+
+    assert audit["scenario_audit"][0]["failed_seed_count"] == 1
+    assert audit["scenario_audit"][0]["failed_seed_rate"] == pytest.approx(0.1)
+    assert on_time["failed_seed_count"] == 1
+    assert on_time["failed_seed_rate"] == pytest.approx(0.1)
+    assert on_time["status"] == "INCOMPLETE_NO_BOOTSTRAP_SEED_REMOVAL_FORBIDDEN"
+    assert on_time["bootstrap_ci_low"] is None
+    assert on_time["paired_cohen_dz"] is None
+    assert on_time["seed_win_count"] is None
 
 
 def test_aggregate_refuses_mismatched_paired_realization(tmp_path: Path) -> None:
     manifest = _manifest(tmp_path / "manifest.yaml")
     root = tmp_path / "runs"
     root.mkdir()
-    left = _fake_run(manifest, SEEDS[0], "P0D0", 0.0)
-    right = _fake_run(manifest, SEEDS[0], "P1D1", 1.0)
-    right["perturbation"]["combined_realization_sha256"] = "different"
-    (root / "left.json").write_text(json.dumps(left), encoding="utf-8")
-    (root / "right.json").write_text(json.dumps(right), encoding="utf-8")
+    for seed in SEEDS:
+        for arm in runner.ARMS:
+            value = _fake_run(manifest, seed, arm, 0.0)
+            if seed == SEEDS[0] and arm == "P1D1":
+                value["perturbation"]["combined_realization_sha256"] = "different"
+            (root / f"{seed}_{arm}.json").write_text(
+                json.dumps(value), encoding="utf-8"
+            )
 
     with pytest.raises(runner.RandomRobustnessError, match="realization mismatch"):
-        runner.aggregate(inputs=[root], manifest_path=manifest)
+        _aggregate_one_scenario(root, manifest)
 
 
-def test_incomplete_seed_set_is_reported_without_bootstrap(tmp_path: Path) -> None:
+def test_aggregate_rejects_populated_two_x_timing(tmp_path: Path) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+    root.mkdir()
+    for seed in SEEDS:
+        for arm in runner.ARMS:
+            value = _fake_run(manifest, seed, arm, 0.0)
+            if seed == SEEDS[0]:
+                value["paper_subjects"]["full_population_raw_bag_timing"] = {
+                    "status": "FULL_POPULATION_RAW_BAG_TIMING",
+                    "metrics_seconds": {
+                        "paper_network_from_admission": {"mean": 1.0}
+                    },
+                }
+            (root / f"{seed}_{arm}.json").write_text(
+                json.dumps(value), encoding="utf-8"
+            )
+
+    with pytest.raises(runner.RandomRobustnessError, match="non-N/A 2x timing"):
+        _aggregate_one_scenario(root, manifest)
+
+
+def test_aggregate_rejects_randomized_release_contract_mismatch(
+    tmp_path: Path,
+) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+    root.mkdir()
+    value = _fake_run(manifest, SEEDS[0], "P0D0", 0.0)
+    value["release_protocol"]["mode"] = "canonical"
+    (root / "bad_release.json").write_text(json.dumps(value), encoding="utf-8")
+
+    with pytest.raises(
+        runner.RandomRobustnessError, match="randomized release contract mismatch"
+    ):
+        _aggregate_one_scenario(root, manifest)
+
+
+def test_unreached_time_to_x_is_nm_not_imputed(tmp_path: Path) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+    root.mkdir()
+    for index, seed in enumerate(SEEDS):
+        for arm in runner.ARMS:
+            value = _fake_run(manifest, seed, arm, float(index))
+            if seed == SEEDS[-1] and arm == "P1D1":
+                value["paper_subjects"]["fixed_denominator_business"][
+                    "completion_targets"
+                ]["time_to_95_percent"] = {
+                    "reached": False,
+                    "elapsed_from_first_arrival_seconds": None,
+                }
+            (root / f"{seed}_{arm}.json").write_text(
+                json.dumps(value), encoding="utf-8"
+            )
+
+    rows, _audit = _aggregate_one_scenario(root, manifest)
+    time_to_95 = next(
+        row for row in rows if row["metric"] == "time_to_95_percent_seconds"
+    )
+
+    assert time_to_95["status"] == "N_M_METRIC_NOT_AVAILABLE_FOR_EVERY_FROZEN_SEED"
+    assert time_to_95["p1d1_mean"] is None
+    assert time_to_95["bootstrap_ci_low"] is None
+
+
+def test_incomplete_seed_set_is_rejected_before_aggregation(tmp_path: Path) -> None:
     manifest = _manifest(tmp_path / "manifest.yaml")
     root = tmp_path / "runs"
     root.mkdir()
@@ -385,8 +639,151 @@ def test_incomplete_seed_set_is_reported_without_bootstrap(tmp_path: Path) -> No
             json.dumps(_fake_run(manifest, SEEDS[0], arm, 0.0)), encoding="utf-8"
         )
 
+    with pytest.raises(runner.RandomRobustnessError, match="executed artifacts"):
+        _aggregate_one_scenario(root, manifest)
+
+
+def _formal_campaign_run(
+    manifest: Path,
+    *,
+    map_name: str,
+    load: float,
+    seed: int,
+    arm: str,
+) -> dict[str, object]:
+    value = _fake_run(manifest, seed, arm, 0.0)
+    scenario = f"{map_name}-{load:g}"
+    base_release = "same_hca" if load == 1.0 else "canonical"
+    value["map"] = map_name
+    value["load_factor"] = load
+    value["perturbation"].update(
+        {
+            "combined_realization_sha256": f"{scenario}-paired-{seed}",
+            "base_arrival_schedule_sha256": f"{scenario}-base-arrivals",
+            "base_node_service_profile_sha256": f"{scenario}-base-services",
+            "randomized_arrival_schedule_sha256": (
+                f"{scenario}-random-arrivals-{seed}"
+            ),
+            "randomized_node_service_profile_sha256": (
+                f"{scenario}-random-services-{seed}"
+            ),
+        }
+    )
+    value["provenance"]["workload_sha256"] = f"{scenario}-workload"
+    value["release_protocol"].update(
+        {
+            "base_release_mode_before_random_jitter": base_release,
+            "base_same_hca_release_trace_pass": load == 1.0,
+            "mode": f"paired_random_jitter_from_{base_release}",
+        }
+    )
+    value["population"] = {
+        "raw_bag_count": int(100 * load),
+        "segment_count": int(120 * load),
+    }
+    # Preserve all 100 executed artifacts while avoiding expensive bootstrap
+    # work in campaign-gate tests.
+    value["status"] = "FAILED_INTEGRITY"
+    value["execution_integrity"] = {"pass": False}
+    return value
+
+
+def _write_formal_campaign(
+    root: Path,
+    manifest: Path,
+    *,
+    omit_scenario: tuple[str, float] | None = None,
+    mutate: object | None = None,
+) -> None:
+    root.mkdir()
+    for map_name, load in runner.FORMAL_NONFAULT_SCENARIOS:
+        if (map_name, load) == omit_scenario:
+            continue
+        for seed in SEEDS:
+            for arm in runner.ARMS:
+                value = _formal_campaign_run(
+                    manifest,
+                    map_name=map_name,
+                    load=load,
+                    seed=seed,
+                    arm=arm,
+                )
+                if callable(mutate):
+                    mutate(value, map_name, load, seed, arm)
+                (root / f"{map_name}_{load:g}_{seed}_{arm}.json").write_text(
+                    json.dumps(value), encoding="utf-8"
+                )
+
+
+def test_formal_aggregate_requires_and_accepts_exactly_100_executed_artifacts(
+    tmp_path: Path,
+) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+    _write_formal_campaign(root, manifest)
+
     rows, audit = runner.aggregate(inputs=[root], manifest_path=manifest)
 
-    assert audit["scenario_audit"][0]["status"].startswith("INCOMPLETE")
-    assert len(audit["scenario_audit"][0]["missing_seeds"]) == 9
-    assert all(row["bootstrap_ci_low"] is None for row in rows)
+    assert audit["executed_artifact_count"] == 100
+    assert audit["expected_executed_artifact_count"] == 100
+    assert len(audit["scenario_audit"]) == 5
+    assert rows
+
+
+def test_formal_aggregate_rejects_wholly_missing_scenario(tmp_path: Path) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+    _write_formal_campaign(root, manifest, omit_scenario=("map2", 1.75))
+
+    with pytest.raises(
+        runner.RandomRobustnessError, match="missing_scenarios.*map2"
+    ):
+        runner.aggregate(inputs=[root], manifest_path=manifest)
+
+
+def test_formal_aggregate_requires_one_git_and_binary_for_all_100_runs(
+    tmp_path: Path,
+) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+
+    def mutate(
+        value: dict[str, object],
+        map_name: str,
+        load: float,
+        seed: int,
+        arm: str,
+    ) -> None:
+        if (map_name, load, seed, arm) == ("map2", 1.0, SEEDS[0], "P0D0"):
+            value["provenance"]["git_commit"] = "different-commit"
+
+    _write_formal_campaign(root, manifest, mutate=mutate)
+
+    with pytest.raises(runner.RandomRobustnessError, match="git_commit"):
+        runner.aggregate(inputs=[root], manifest_path=manifest)
+
+
+def test_formal_aggregate_requires_scenario_base_identity_across_seeds(
+    tmp_path: Path,
+) -> None:
+    manifest = _manifest(tmp_path / "manifest.yaml")
+    root = tmp_path / "runs"
+
+    def mutate(
+        value: dict[str, object],
+        map_name: str,
+        load: float,
+        seed: int,
+        arm: str,
+    ) -> None:
+        if (map_name, load, seed, arm) == ("map2", 1.75, SEEDS[-1], "P1D1"):
+            value["perturbation"]["base_arrival_schedule_sha256"] = (
+                "different-base-arrivals"
+            )
+
+    _write_formal_campaign(root, manifest, mutate=mutate)
+
+    with pytest.raises(
+        runner.RandomRobustnessError, match="scenario base identity mismatch"
+    ):
+        runner.aggregate(inputs=[root], manifest_path=manifest)

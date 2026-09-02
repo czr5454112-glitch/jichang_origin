@@ -57,6 +57,13 @@ SCHEMA_RUN = "czr005.cie_component_activation.run.v1"
 INTERMEDIATE_FACTORS = (1.25, 1.50, 1.75)
 SCAN_FACTORS = (1.0, 1.25, 1.50, 1.75, 2.0)
 MAPS = ("map2", "nanning")
+REGISTERED_POPULATION_BY_FACTOR = {
+    "1.00": (28_506, 43_603),
+    "1.25": (35_659, 54_559),
+    "1.50": (42_932, 65_679),
+    "1.75": (49_765, 76_108),
+    "2.00": (57_012, 87_206),
+}
 SPEED_MPS = 2.5
 FIXED_END_EPOCH = 98_259.0
 MAX_EVENTS = 60_000_000
@@ -883,25 +890,181 @@ def _mechanism_projection(summary: Mapping[str, Any]) -> dict[str, int]:
     return {name: _integer(summary.get(name)) for name in names}
 
 
+def _precommit_order_mutation_projection(
+    mechanism: Mapping[str, int],
+) -> dict[str, Any]:
+    """Name and normalize the J2/M3 ordering counters at their true boundary.
+
+    ``merge_grant_order_mutation_count`` is incremented when the selected
+    winner differs from FIFO in a ready set containing at least two
+    candidates.  It is recorded before the later owner, fault, calendar,
+    capacity, exact-slot, and commit checks.  Consequently its opportunity
+    denominator is the multi-candidate count, not the narrower count of
+    candidate intervals overlapping the selected exact slot.
+    """
+
+    service = int(mechanism["merge_grant_service_opportunity_count"])
+    multi = int(mechanism["merge_grant_multi_candidate_opportunity_count"])
+    overlap = int(mechanism["merge_grant_true_competition_count"])
+    mutations = int(mechanism["merge_grant_order_mutation_count"])
+    if multi > service:
+        raise ActivationError(
+            "multi-candidate merge opportunities exceed service opportunities"
+        )
+    if overlap > multi:
+        raise ActivationError(
+            "exact-slot-overlap opportunities exceed multi-candidate opportunities"
+        )
+    if mutations > multi:
+        raise ActivationError(
+            "pre-commit order mutations exceed multi-candidate opportunities"
+        )
+    return {
+        "merge_grant_precommit_order_mutation_opportunity_count": multi,
+        "merge_grant_exact_slot_overlap_opportunity_count": overlap,
+        "merge_grant_precommit_order_mutation_count": mutations,
+        "merge_grant_precommit_order_mutation_rate": (
+            mutations / multi if multi else 0.0
+        ),
+        "merge_grant_precommit_order_mutation_is_final_action": False,
+        "merge_grant_exact_slot_overlap_used_as_mutation_denominator": False,
+        "merge_grant_precommit_order_mutation_semantics": (
+            "PRE_COMMIT_ORDER_MUTATION_VS_FIFO_AT_MULTI_CANDIDATE_SELECTION"
+        ),
+    }
+
+
+def _is_hex_identity(value: Any, lengths: tuple[int, ...] = (64,)) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) in lengths
+        and all(character in "0123456789abcdefABCDEF" for character in value)
+    )
+
+
 def aggregate_results(
     *,
     result_paths: Sequence[Path],
     revision_manifest_path: Path = DEFAULT_REVISION_MANIFEST,
 ) -> dict[str, Any]:
     thresholds = _classification_thresholds(revision_manifest_path)
+    manifest_sha256 = _file_sha256(revision_manifest_path.resolve(strict=True))
+    expected = {
+        (map_name, _factor_label(factor))
+        for map_name in MAPS
+        for factor in SCAN_FACTORS
+    }
     by_cell: dict[tuple[str, str], dict[str, Any]] = {}
     for path in result_paths:
         value = _read_json(path)
         if value.get("schema") != SCHEMA_RUN:
-            continue
+            raise ActivationError(f"aggregate input schema mismatch: {path}")
         if value.get("native_execution_started") is not True:
-            continue
+            raise ActivationError(f"aggregate input was not executed: {path}")
+        if (
+            value.get("status") != "COMPLETE"
+            or _nested(value, "execution_integrity", "pass") is not True
+        ):
+            raise ActivationError(
+                f"aggregate input failed execution integrity: {path}"
+            )
         map_name = str(value.get("map"))
-        factor = _factor_label(value.get("nominal_load_factor"))
+        try:
+            factor = _factor_label(value.get("nominal_load_factor"))
+        except (TypeError, ValueError) as exc:
+            raise ActivationError(
+                f"invalid activation result load factor: {path}"
+            ) from exc
         key = (map_name, factor)
+        if key not in expected:
+            raise ActivationError(f"unregistered activation result cell: {key}")
         if key in by_cell:
             raise ActivationError(f"duplicate activation result cell: {key}")
+
+        population = value.get("population")
+        provenance = value.get("provenance")
+        summary = _nested(value, "runtime", "summary", default={})
+        if (
+            not isinstance(population, Mapping)
+            or not isinstance(provenance, Mapping)
+            or not isinstance(summary, Mapping)
+        ):
+            raise ActivationError(f"aggregate input lacks identity payload: {path}")
+        expected_raw, expected_segments = REGISTERED_POPULATION_BY_FACTOR[factor]
+        if (
+            population.get("whole_population") is not True
+            or population.get("raw_bag_denominator") != expected_raw
+            or population.get("segment_count") != expected_segments
+        ):
+            raise ActivationError(
+                f"activation workload population mismatch for {key}: {path}"
+            )
+        canonical_sha256 = provenance.get("canonical_sha256")
+        request_sha256 = provenance.get("request_sha256")
+        binary_sha256 = provenance.get("binary_sha256")
+        loaded_binary_sha256 = summary.get("loaded_cpp_binary_sha256")
+        if not _is_hex_identity(canonical_sha256) or not _is_hex_identity(
+            request_sha256
+        ):
+            raise ActivationError(
+                f"activation workload/request identity invalid for {key}: {path}"
+            )
+        if (
+            not _is_hex_identity(binary_sha256)
+            or loaded_binary_sha256 != binary_sha256
+        ):
+            raise ActivationError(
+                f"activation binary identity mismatch for {key}: {path}"
+            )
         by_cell[key] = value
+
+    missing = sorted(expected - set(by_cell))
+    if missing:
+        raise ActivationError(
+            f"activation aggregate requires all 10 registered cells; missing={missing}"
+        )
+
+    provenance_rows = [value["provenance"] for value in by_cell.values()]
+    git_commits = {row.get("git_commit") for row in provenance_rows}
+    binary_sha256s = {row.get("binary_sha256") for row in provenance_rows}
+    manifest_sha256s = {
+        row.get("revision_manifest_sha256") for row in provenance_rows
+    }
+    if len(git_commits) != 1 or not _is_hex_identity(
+        next(iter(git_commits)), (40, 64)
+    ):
+        raise ActivationError("activation aggregate git identity mismatch")
+    if len(binary_sha256s) != 1 or not _is_hex_identity(
+        next(iter(binary_sha256s))
+    ):
+        raise ActivationError("activation aggregate binary identity mismatch")
+    if manifest_sha256s != {manifest_sha256}:
+        raise ActivationError(
+            "activation aggregate revision-manifest identity mismatch"
+        )
+
+    canonical_sha256s = {
+        row.get("canonical_sha256") for row in provenance_rows
+    }
+    request_sha256s = {row.get("request_sha256") for row in provenance_rows}
+    if len(canonical_sha256s) != len(expected):
+        raise ActivationError(
+            "activation aggregate reused a canonical workload identity"
+        )
+    if len(request_sha256s) != len(expected):
+        raise ActivationError("activation aggregate reused a request identity")
+    intermediate_manifest_sha256s = {
+        _nested(value, "provenance", "load_manifest_sha256")
+        for (map_name, factor), value in by_cell.items()
+        if factor in {"1.25", "1.50", "1.75"}
+    }
+    if (
+        len(intermediate_manifest_sha256s) != 1
+        or not _is_hex_identity(next(iter(intermediate_manifest_sha256s)))
+    ):
+        raise ActivationError(
+            "activation intermediate-load manifest identity mismatch"
+        )
 
     activation_rows: list[dict[str, Any]] = []
     change_rows: list[dict[str, Any]] = []
@@ -918,6 +1081,7 @@ def aggregate_results(
         strict = activation.get("strict_descent", {})
         if not isinstance(strict, Mapping):
             strict = {}
+        mechanism = _mechanism_projection(summary)
         base = {
             "map": map_name,
             "nominal_load_factor": factor,
@@ -953,7 +1117,8 @@ def aggregate_results(
             "strict_empty_ranking_count": _integer(
                 strict.get("empty_ranking_count")
             ),
-            **_mechanism_projection(summary),
+            **mechanism,
+            **_precommit_order_mutation_projection(mechanism),
         }
         base["strict_classification"] = classify_component(
             base["strict_filtered_candidate_count"],
@@ -961,10 +1126,13 @@ def aggregate_results(
             thresholds,
         )
         base["j2_m3_classification"] = classify_component(
-            base["merge_grant_true_competition_count"],
-            base["merge_grant_order_mutation_count"],
+            base["merge_grant_precommit_order_mutation_opportunity_count"],
+            base["merge_grant_precommit_order_mutation_count"],
             thresholds,
         )
+        base["j2_m3_precommit_order_mutation_classification"] = base[
+            "j2_m3_classification"
+        ]
         base["p2_classification"] = classify_component(
             base["bounded_local_pibt_applicability_count"],
             base["bounded_local_pibt_commit_count"],
@@ -1021,9 +1189,6 @@ def aggregate_results(
             )
         activation_rows.append(base)
 
-    expected = {(map_name, _factor_label(factor))
-                for map_name in MAPS for factor in SCAN_FACTORS}
-    missing = sorted(expected - set(by_cell))
     # Upgrade materially active components to load-dependent when neither map
     # has material activation at 1x but a later factor does.  This is a scan
     # classification, not a performance-benefit claim.
@@ -1078,7 +1243,8 @@ def _report_text(aggregate: Mapping[str, Any]) -> str:
         "Counters are same-state streaming diagnostics; no candidate trace or "
         "survivor-only timing is used.",
         "",
-        "| Map | Load | Component | Opportunities | Action changes | Rate | Classification |",
+        "| Map | Load | Component | Opportunities | Pre-feasibility "
+        "raw-argmin changes | Rate | Classification |",
         "|---|---:|---|---:|---:|---:|---|",
     ]
     for row in aggregate["counterfactual_rows"]:
@@ -1096,7 +1262,32 @@ def _report_text(aggregate: Mapping[str, Any]) -> str:
         "not itself evidence of business benefit. `LOAD_DEPENDENT` means the "
         "material threshold was first crossed above 1x.",
         "",
+        "## J2/M3 pre-commit ordering diagnostic",
+        "",
+        "The `PRE_COMMIT_ORDER_MUTATION` rate uses the count of service "
+        "opportunities with at least two ready candidates as its denominator. "
+        "`EXACT_SLOT_OVERLAP` is a separate, narrower physical-overlap "
+        "diagnostic and is never used as that denominator. The mutation is "
+        "observed before owner, queue-generation, fault-generation, calendar, "
+        "capacity, exact-slot, and commit checks; it is not a final executed "
+        "action or committed-grant change.",
+        "",
+        "| Map | Load | Service opportunities | Multi-candidate opportunities "
+        "(denominator) | EXACT_SLOT_OVERLAP (separate) | "
+        "PRE_COMMIT_ORDER_MUTATION vs FIFO | Rate | Classification |",
+        "|---|---:|---:|---:|---:|---:|---:|---|",
     ])
+    for row in aggregate["activation_rows"]:
+        lines.append(
+            f"| {row['map']} | {row['nominal_load_factor']} | "
+            f"{row['merge_grant_service_opportunity_count']} | "
+            f"{row['merge_grant_precommit_order_mutation_opportunity_count']} | "
+            f"{row['merge_grant_exact_slot_overlap_opportunity_count']} | "
+            f"{row['merge_grant_precommit_order_mutation_count']} | "
+            f"{row['merge_grant_precommit_order_mutation_rate']:.6f} | "
+            f"{row['j2_m3_precommit_order_mutation_classification']} |"
+        )
+    lines.append("")
     if aggregate["missing_cells"]:
         lines.append("Missing cells: " + ", ".join(aggregate["missing_cells"]) + ".")
         lines.append("")
