@@ -392,6 +392,10 @@ public final class FengDhBagState {
         require(status == Status.MOVING_ON_EDGE || status == Status.STOPPED_ON_EDGE,
                 "boundary service admission requires an edge state");
         require(readyTick >= tick, "boundary service cannot finish before it starts");
+        require(!hasNodeServiceStarted(),
+                "duplicate boundary service for task " + taskId + " at node " + node
+                        + "; existing_start=" + nodeServiceStartTick
+                        + "; existing_ready=" + nodeServiceReadyTick);
         previousStatus = status;
         currentNode = node;
         chosenOutgoingEdgeId = -1;

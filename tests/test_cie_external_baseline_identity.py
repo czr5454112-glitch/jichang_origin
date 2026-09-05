@@ -402,6 +402,36 @@ def _normalized_result(
     return path
 
 
+@pytest.mark.parametrize("map_name", ["map2", "nanning"])
+def test_broken_dh_port_is_rejected_but_map2_evidence_remains_reusable(
+    tmp_path: Path, map_name: str
+) -> None:
+    path = _normalized_result(
+        tmp_path=tmp_path,
+        load=1.0,
+        seed=external.SEEDS[0],
+        method="FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION",
+        value=1.0,
+        full=True,
+        map_name=map_name,
+    )
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload["normalization_contract"].update(
+        reconstruction_java_source_sha256=external.LEGACY_DH_SOURCE_SHA256,
+        compiled_java_class_sha256=external.LEGACY_DH_CLASS_SHA256,
+    )
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    if map_name == "nanning":
+        with pytest.raises(external.ExternalBaselineError, match=external.INVALIDATED_DH_STATUS):
+            external.aggregate_results([path], bootstrap_replicates=2)
+    else:
+        assert external.load_normalized_result(path)["map"] == "map2"
+        payload["normalization_contract"]["compiled_java_class_sha256"] = "0" * 64
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        with pytest.raises(external.ExternalBaselineError, match="compiled class identity"):
+            external.load_normalized_result(path)
+
+
 def test_two_x_timing_is_rejected_even_if_full_population(tmp_path: Path) -> None:
     path = _normalized_result(
         tmp_path=tmp_path,

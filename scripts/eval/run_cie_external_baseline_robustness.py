@@ -91,7 +91,7 @@ DEFAULT_WORKLOAD_ROOT = (
     ROOT / "data" / "processed" / "workloads" / "cie_external_robustness"
 )
 DEFAULT_RESULT_ROOT = ROOT / "outputs" / "runtime" / "cie_external_baseline_robustness"
-DEFAULT_DH_CLASSES_DIR = ROOT / "build" / "feng_cie_dh_java"
+DEFAULT_DH_CLASSES_DIR = ROOT / "build" / "feng_cie_dh_zero_through_fix_v1"
 EXPECTED_SOURCE_SHA256 = "0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87"
 EXPECTED_MAP_SHA256 = "55f578cb4b8fcc61f5b13963fcb8546aca91e517ea6f8ff4a7361670f1b03f8f"
 EXPECTED_NANNING_SOURCE_SHA256 = (
@@ -103,12 +103,31 @@ EXPECTED_NANNING_MAP_SHA256 = (
 EXPECTED_G31_BINARY_SHA256 = (
     "b00fd178dca5b3f201d50ddfc6446959272baa4cc45b4ee01a2f08e0c85a91f5"
 )
-EXPECTED_DH_SOURCE_SHA256 = (
+LEGACY_DH_SOURCE_SHA256 = (
     "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8"
 )
-EXPECTED_DH_CLASS_SHA256 = (
+LEGACY_DH_CLASS_SHA256 = (
     "d611967f0433dfc08f67d92c89e9b13dcb5b8ac5ace3d3abec9c098dba360286"
 )
+# Frozen after T1-T10, Z1-Z12 and full-population/OD regression.
+EXPECTED_DH_SOURCE_SHA256 = "3b47ffcefa558365e55e27508fc8904608026fd3235102eee6c305539999a208"
+EXPECTED_DH_CLASS_SHA256 = "21fc22d8cd27628e2933eb73256cafa6f2bd695628fd46988ea445aafd7a5d47"
+INVALIDATED_DH_STATUS = "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG"
+
+
+def validate_dh_version(map_name: str, source_sha256: str, class_sha256: str) -> str:
+    """Keep validated map2 evidence reusable while rejecting the broken port."""
+    if source_sha256 == LEGACY_DH_SOURCE_SHA256:
+        if class_sha256 != LEGACY_DH_CLASS_SHA256:
+            raise ExternalBaselineError("Feng DH compiled class identity is not final")
+        if map_name != "map2":
+            raise ExternalBaselineError(INVALIDATED_DH_STATUS)
+        return "LEGACY_MAP2_REUSED_AFTER_FULL_POPULATION_REGRESSION"
+    if source_sha256 != EXPECTED_DH_SOURCE_SHA256 or len(source_sha256) != 64:
+        raise ExternalBaselineError("Feng DH source is not final: unvalidated repair")
+    if class_sha256 != EXPECTED_DH_CLASS_SHA256 or len(class_sha256) != 64:
+        raise ExternalBaselineError("Feng DH compiled class identity is not final")
+    return "ZERO_THROUGH_STATE_MACHINE_REPAIRED_V1"
 EXPECTED_POPULATIONS = {
     1.0: (28_506, 43_603),
     1.75: (49_765, 76_108),
@@ -1312,16 +1331,11 @@ def _normalize_dh(
         raise ExternalBaselineError("Feng DH raw workload hash mismatch")
     if native_identity.get("map_sha256") != identity["map_sha256"]:
         raise ExternalBaselineError("Feng DH map hash mismatch")
-    if (
-        native_identity.get("reconstruction_java_source_aggregate_sha256")
-        != EXPECTED_DH_SOURCE_SHA256
-    ):
-        raise ExternalBaselineError("Feng DH reconstruction source identity is not final")
-    if (
-        native_identity.get("compiled_java_class_aggregate_sha256")
-        != EXPECTED_DH_CLASS_SHA256
-    ):
-        raise ExternalBaselineError("Feng DH compiled class identity is not final")
+    validated_version = validate_dh_version(
+        str(identity["map"]),
+        str(native_identity.get("reconstruction_java_source_aggregate_sha256", "")),
+        str(native_identity.get("compiled_java_class_aggregate_sha256", "")),
+    )
 
     summary_path = native_dir / "summary.csv"
     summaries = _read_csv_rows(summary_path)
@@ -1385,6 +1399,12 @@ def _normalize_dh(
         "native_terminal_status": native_status,
         "timing_denominator": timing_denominator,
         "reproduction_level": summary.get("reproduction_level"),
+        "validated_implementation_version": validated_version,
+        "scientific_validity": "VALIDATED_IMPLEMENTATION_PARTIAL_RECONSTRUCTION",
+        "population_latency_definition": (
+            "SUM_PER_RAW_BAG_OF_SEGMENT_COMPLETION_MINUS_FIRST_ADMISSION; "
+            "EXCLUDES_SOURCE_WAIT_AND_EBS_DWELL; NOT_HISTORICAL_SHARED_D"
+        ),
         "reconstruction_java_source_sha256": native_identity.get(
             "reconstruction_java_source_aggregate_sha256"
         ),
@@ -1647,10 +1667,11 @@ def load_normalized_result(path: Path) -> dict[str, Any]:
     if not isinstance(contract, Mapping):
         raise ExternalBaselineError(f"result lacks normalization contract: {path}")
     if value["method"] == "FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION":
-        if contract.get("reconstruction_java_source_sha256") != EXPECTED_DH_SOURCE_SHA256:
-            raise ExternalBaselineError(f"normalized DH source is not final: {path}")
-        if contract.get("compiled_java_class_sha256") != EXPECTED_DH_CLASS_SHA256:
-            raise ExternalBaselineError(f"normalized DH classes are not final: {path}")
+        validate_dh_version(
+            str(value["map"]),
+            str(contract.get("reconstruction_java_source_sha256", "")),
+            str(contract.get("compiled_java_class_sha256", "")),
+        )
     if value["method"] == "G31_S4_NATIVE_SYSTEM" and contract.get(
         "native_binary_sha256"
     ) != EXPECTED_G31_BINARY_SHA256:

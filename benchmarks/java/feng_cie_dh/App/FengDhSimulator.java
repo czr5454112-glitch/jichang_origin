@@ -321,6 +321,9 @@ public final class FengDhSimulator {
                 if (throughOccupant == bag) {
                     if (!bag.isNodeServiceReadyAt(commitTick)) {
                         nodeThroughWaiting.add(bag);
+                        // A finite, already-started service advances with this
+                        // tick even though its retained footprint is stationary.
+                        progress++;
                         continue;
                     }
                     throughServicesFinishing.add(bag);
@@ -329,6 +332,39 @@ public final class FengDhSimulator {
                 }
                 addNodeService(servicesByNode,
                         new NodeServiceProposal(bag, edge.id, edge.to));
+            }
+        }
+
+        // Resolve node service admissions before target-edge entries so a
+        // zero-time winner supplies the same simultaneous-vacate guarantee as
+        // an already-finishing positive service or a goal arrival.
+        HashSet<Integer> nodeThroughDepartures = new HashSet<Integer>();
+        for (FengDhBagState bag : throughServicesFinishing) {
+            nodeThroughDepartures.add(Integer.valueOf(bag.getCurrentNode()));
+        }
+
+        LinkedHashMap<Long, NodeServiceProposal> approvedNodeServices =
+                new LinkedHashMap<Long, NodeServiceProposal>();
+        ArrayList<NodeServiceProposal> blockedNodeServices =
+                new ArrayList<NodeServiceProposal>();
+        for (Integer nodeValue : sortedNodeIds(servicesByNode)) {
+            ArrayList<NodeServiceProposal> proposals = servicesByNode.get(nodeValue);
+            Collections.sort(proposals, nodeServiceOrder());
+            FengDhBagState occupant = nodeThroughOccupants.get(nodeValue);
+            boolean available = occupant == null || nodeThroughDepartures.contains(nodeValue);
+            int firstBlocked = 0;
+            if (available) {
+                NodeServiceProposal winner = proposals.get(0);
+                approvedNodeServices.put(Long.valueOf(winner.bag.taskId), winner);
+                if (mapThroughTicks(winner.node) == 0L) {
+                    guaranteedDepartures.add(Long.valueOf(winner.bag.taskId));
+                }
+                firstBlocked = 1;
+            }
+            for (int index = firstBlocked; index < proposals.size(); index++) {
+                NodeServiceProposal proposal = proposals.get(index);
+                proposal.blockingBag = available ? proposals.get(0).bag : occupant;
+                blockedNodeServices.add(proposal);
             }
         }
 
@@ -350,10 +386,17 @@ public final class FengDhSimulator {
                 if (bag.isNodeServiceReadyAt(commitTick)) {
                     servicesFinishing.add(bag);
                     nodeCompletions.add(bag);
+                } else if (bag.hasNodeServiceStarted()) {
+                    progress++;
                 }
                 continue;
             }
             if (!bag.isNodeServiceReadyAt(commitTick)) {
+                if (bag.hasNodeServiceStarted()) {
+                    // Count only the finite timer countdown, never repeated
+                    // route requests or an already-finished service.
+                    progress++;
+                }
                 continue;
             }
             servicesFinishing.add(bag);
@@ -393,11 +436,6 @@ public final class FengDhSimulator {
                 holdForMergeConflict(proposals.get(index), winner, commitTick, traceSampleModulo);
             }
         }
-        HashSet<Integer> nodeThroughDepartures = new HashSet<Integer>();
-        for (FengDhBagState bag : throughServicesFinishing) {
-            nodeThroughDepartures.add(Integer.valueOf(bag.getCurrentNode()));
-        }
-
         // Any accepted direct edge-transfer proposal vacates its upstream edge.
         for (EntryProposal proposal : approvedEntries.values()) {
             if (proposal.upstreamEdgeId >= 0) {
@@ -405,27 +443,6 @@ public final class FengDhSimulator {
             }
         }
 
-        LinkedHashMap<Long, NodeServiceProposal> approvedNodeServices =
-                new LinkedHashMap<Long, NodeServiceProposal>();
-        ArrayList<NodeServiceProposal> blockedNodeServices =
-                new ArrayList<NodeServiceProposal>();
-        for (Integer nodeValue : sortedNodeIds(servicesByNode)) {
-            ArrayList<NodeServiceProposal> proposals = servicesByNode.get(nodeValue);
-            Collections.sort(proposals, nodeServiceOrder());
-            FengDhBagState occupant = nodeThroughOccupants.get(nodeValue);
-            boolean available = occupant == null || nodeThroughDepartures.contains(nodeValue);
-            int firstBlocked = 0;
-            if (available) {
-                NodeServiceProposal winner = proposals.get(0);
-                approvedNodeServices.put(Long.valueOf(winner.bag.taskId), winner);
-                firstBlocked = 1;
-            }
-            for (int index = firstBlocked; index < proposals.size(); index++) {
-                NodeServiceProposal proposal = proposals.get(index);
-                proposal.blockingBag = available ? proposals.get(0).bag : occupant;
-                blockedNodeServices.add(proposal);
-            }
-        }
         // Re-plan followers after every accepted upstream departure is known.
         // This is the simultaneous-vacate rule at edge/node boundaries.
         plannedPositions.clear();
@@ -433,6 +450,45 @@ public final class FengDhSimulator {
         internalStops.clear();
         planInternalMovement(
                 guaranteedDepartures, plannedPositions, internalMoves, internalStops);
+
+        // Zero through-time completes in this commit and immediately starts
+        // the existing per-bag transfer timer.  Remove its upstream footprint
+        // before follower mutations, including a one-cell carrier moving into
+        // the exact vacated cell.  Arbitration still uses the frozen snapshot.
+        for (NodeServiceProposal proposal : approvedNodeServices.values()) {
+            if (mapThroughTicks(proposal.node) != 0L) {
+                continue;
+            }
+            FengDhBagState bag = proposal.bag;
+            bag.beginBoundaryService(
+                    commitTick,
+                    proposal.node,
+                    commitTick,
+                    "ZERO_MAP_THROUGH_TIME;basis=LEGACY_NODE_CONSTRAINT;"
+                            + "upstream_edge=" + proposal.upstreamEdgeId,
+                    shouldTrace(bag, traceSampleModulo));
+            lattice.remove(proposal.upstreamEdgeId, bag);
+            bag.beginNodeService(
+                    commitTick,
+                    proposal.node,
+                    commitTick + reconstructedTransferTicks(),
+                    "INTERMEDIATE_FIXED_TRANSFER_DELAY;reconstructed_transfer_seconds="
+                            + RECONSTRUCTED_TRANSFER_DURATION_SECONDS
+                            + ";basis=HISTORICAL_OD_LOWER_ENVELOPE;upstream_edge="
+                            + proposal.upstreamEdgeId,
+                    shouldTrace(bag, traceSampleModulo));
+            progress++;
+        }
+
+        // The same simultaneous-vacate rule also applies to goal arrivals
+        // and finishing positive through services.  Keep their state/trace
+        // commits below, but release lattice cells before follower moves.
+        for (FengDhBagState bag : edgeCompletions) {
+            lattice.remove(bag.getCurrentEdgeId(), bag);
+        }
+        for (FengDhBagState bag : throughServicesFinishing) {
+            lattice.remove(bag.getCurrentEdgeId(), bag);
+        }
 
         // Commit internal edge motion.  Snapshot-based following never reads an
         // earlier mutation in this loop, so container order cannot create motion.
@@ -481,7 +537,6 @@ public final class FengDhSimulator {
             if (removed != bag) {
                 throw new IllegalStateException("junction through occupant mismatch at " + node);
             }
-            lattice.remove(upstreamEdgeId, bag);
             bag.beginNodeService(
                     commitTick,
                     node,
@@ -496,8 +551,6 @@ public final class FengDhSimulator {
 
         // Completion and accepted transfers remove upstream occupation first.
         for (FengDhBagState bag : edgeCompletions) {
-            int edgeId = bag.getCurrentEdgeId();
-            lattice.remove(edgeId, bag);
             bag.complete(commitTick, bag.goalNode, shouldTrace(bag, traceSampleModulo));
             completedByTask.put(Long.valueOf(bag.taskId), bag);
             active.remove(Long.valueOf(bag.taskId));
@@ -543,6 +596,9 @@ public final class FengDhSimulator {
         for (NodeServiceProposal proposal : approvedNodeServices.values()) {
             FengDhBagState bag = proposal.bag;
             long throughTicks = mapThroughTicks(proposal.node);
+            if (throughTicks == 0L) {
+                continue; // Completed and released before follower commits.
+            }
             double mapThroughSeconds = lattice.nodes().get(
                     Integer.valueOf(proposal.node)).throughTimeSeconds;
             if (throughTicks > 0L) {
@@ -563,14 +619,6 @@ public final class FengDhSimulator {
                     throw new IllegalStateException(
                             "duplicate junction through occupant at " + proposal.node);
                 }
-            } else {
-                bag.beginBoundaryService(
-                        commitTick,
-                        proposal.node,
-                        commitTick,
-                        "ZERO_MAP_THROUGH_TIME;basis=LEGACY_NODE_CONSTRAINT;"
-                                + "upstream_edge=" + proposal.upstreamEdgeId,
-                        shouldTrace(bag, traceSampleModulo));
             }
             progress++;
         }
