@@ -46,6 +46,28 @@ class ReportContractTest(unittest.TestCase):
             actual = report.improvement_percent(summaries["V5_DH"][stat], summaries["G31"][stat], higher_is_better=False)
             self.assertAlmostEqual(actual, value["G31_reduction_percent"]["V5_DH"][stat], places=9)
 
+    def test_accounting_flags_limit_headline_scope_without_changing_pairs(self):
+        notes = report.load_control_notes(report.CONTROL_NOTES)
+        self.assertEqual(notes["affected_cell_count"], 43)
+        self.assertEqual(len(notes["_affected_groups"]), 5)
+        pairs = {}
+        for map_name in report.external.MAPS:
+            for load in report.external.LOAD_FACTORS:
+                for baseline in report.METHODS[1:]:
+                    value = {"map": map_name, "load_factor": load, "baseline": baseline,
+                        "reference": report.METHODS[0], "metric": "completed_raw_bag_count", "status": "COMPLETE"}
+                    pairs[report.pair_key(value)] = value
+        original = [dict(p) for p in pairs.values()]
+        selected, excluded = report.headline_pairs(pairs, "completed_raw_bag_count", notes["_affected_groups"])
+        self.assertEqual(excluded, 5)
+        self.assertEqual(sum(p["baseline"] == report.METHODS[1] for p in selected), 6)
+        hca = [p for p in selected if p["baseline"] == report.METHODS[2]]
+        self.assertEqual([(p["map"], p["load_factor"]) for p in hca], [("map2", 1.0)])
+        self.assertEqual(list(pairs.values()), original)
+
+    def test_missing_interpretation_does_not_create_a_simulation_gate(self):
+        self.assertIsNone(report.load_control_notes(Path("build/nonexistent_optional_control_notes.json")))
+
 
 if __name__ == "__main__":
     unittest.main()

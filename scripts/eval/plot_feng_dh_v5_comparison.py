@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT))
 from scripts.eval import run_cie_external_baseline_robustness as external
 
 METHODS = ("G31_S4_NATIVE_SYSTEM", "FENG_DH_BOUNDARY_CLEARANCE_V5", "FENG_NATIVE_HCA")
-LABELS = {METHODS[0]: "G31 (archived)", METHODS[1]: "V5 DH reconstruction", METHODS[2]: "HCA (archived)"}
+LABELS = {METHODS[0]: "G31 (archived)", METHODS[1]: "V5 DH reconstruction", METHODS[2]: "HCA (archived obs.)"}
 COLORS = {METHODS[0]: "#0072B2", METHODS[1]: "#D55E00", METHODS[2]: "#7F3C8D"}
 MARKERS = {METHODS[0]: "s", METHODS[1]: "o", METHODS[2]: "^"}
 SOURCE_SHA = "7deb321e34b9ebdd562eeac0c5293618df41441830789498b37ddb4bca1cccc7"
@@ -35,6 +35,7 @@ CLASS_SHA = "a0a0c35bc2e3576c83f23a60f6a3cd807f3c66ae0ea24304924b9f7fe193b869"
 STATS = ("min", "mean", "max")
 CELLS = ROOT / "outputs/tables/feng_dh_v5_cells_20260905.csv"
 OUTPUT = ROOT / "outputs/figures/feng_dh_v5_20260905"
+CONTROL_NOTES = ROOT / "outputs/runtime/cie_external_baseline_boundary_clearance_v5/control_completion_notes.json"
 
 
 def require(condition: bool, message: str) -> None:
@@ -57,6 +58,19 @@ def number(value: object) -> float | None:
 def boolean(value: object) -> bool:
     require(value in (True, False, "True", "False", "true", "false"), "invalid population-completion flag")
     return str(value).lower() == "true"
+
+
+def load_control_audit(path: Path) -> dict:
+    """Attach interpretation to unchanged observations, without adding a run gate."""
+    if not path.exists():
+        return {"status": "NOT_PROVIDED", "path": str(path.resolve()), "sha256": None}
+    value = json.loads(path.read_text(encoding="utf-8"))
+    require(value["schema"] == "czr005.feng_v5_hca_control_completion_notes.v1", "unknown control audit")
+    require(value["audited_cell_count"] == len(value["cells"]) == 60
+            and value["affected_cell_count"] == sum(int(c["residual"]) > 0 for c in value["cells"]), "control audit count differs")
+    return {"status": "ARCHIVED_OBSERVATIONS_WITH_ACCOUNTING_LIMIT", "path": str(path.resolve()), "sha256": sha(path),
+            "audited_cell_count": value["audited_cell_count"], "affected_cell_count": value["affected_cell_count"],
+            "interpretation": "Affected HCA observations are not evidence of a loss-free physical baseline or capacity superiority."}
 
 
 def load_cells(path: Path, *, allow_partial: bool = False) -> dict:
@@ -161,7 +175,8 @@ def axes_style(ax, *, count: bool) -> None:
     ax.spines[["top", "right"]].set_visible(False)
 
 
-def render(groups: list[dict], output: Path, *, preview: bool = False, synthetic_qa: bool = False) -> list[Path]:
+def render(groups: list[dict], output: Path, *, preview: bool = False, synthetic_qa: bool = False,
+           control_audit: dict | None = None) -> list[Path]:
     output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10,
         "axes.titlesize": 11, "axes.labelsize": 10, "pdf.fonttype": 42, "ps.fonttype": 42,
@@ -172,6 +187,9 @@ def render(groups: list[dict], output: Path, *, preview: bool = False, synthetic
     prefix = "SYNTHETIC QA — NOT EXPERIMENT RESULTS\n" if synthetic_qa else "PARTIAL PREVIEW — missing groups suppressed\n" if preview else ""
     footnote = "Large points: mean of 10 seed statistics. Faint points: individual seeds. Whiskers: observed seed min–max (not confidence intervals)."
     provenance = "V5 is a disclosed-assumption DH reconstruction. G31/HCA use archived controls; the historical HCA build hash is unavailable."
+    accounting_note = (f"HCA: {control_audit['affected_cell_count']}/{control_audit['audited_cell_count']} archived cells have segment-accounting anomalies; see control audit. Purple points are observed records, not clean capacity evidence."
+                       if control_audit and control_audit["status"] != "NOT_PROVIDED" else
+                       "HCA accounting qualification is not attached. Purple points are archived observations, not verified loss-free capacity evidence.")
     fig, axes = plt.subplots(2, 3, figsize=(14.4, 8.9))
     for row, map_name in enumerate(external.MAPS):
         for column, stat in enumerate(STATS):
@@ -194,11 +212,12 @@ def render(groups: list[dict], output: Path, *, preview: bool = False, synthetic
                                 ha="center", va="bottom", rotation=90, transform=ax.get_xaxis_transform())
             axes_style(ax, count=False)
             ax.set_ylabel("Seconds")
-    fig.suptitle(prefix + "Scheduled-release THT: V5 reconstructed DH and archived G31/HCA controls", fontsize=14, y=.98)
+    fig.suptitle(prefix + "Scheduled-release THT: V5 reconstructed DH and archived G31/HCA observations", fontsize=14, y=.98)
     fig.legend(handles=legend, loc="lower center", bbox_to_anchor=(.5, .092), ncol=3, frameon=False)
     fig.text(.5, .071, "Each bag: sum of segment (completion − common canonical scheduled release). Min/mean/max are bag-population statistics within each seed.", ha="center", fontsize=8.4)
     fig.text(.5, .048, footnote, ha="center", fontsize=8.4)
     fig.text(.5, .026, provenance, ha="center", fontsize=8.2, color="#555555")
+    fig.text(.5, .008, accounting_note, ha="center", fontsize=8.0, color="#604266")
     fig.subplots_adjust(left=.065, right=.985, top=.90 if not prefix else .87, bottom=.20, hspace=.38, wspace=.30)
     paths = []
     for extension in ("png", "pdf"):
@@ -224,12 +243,13 @@ def render(groups: list[dict], output: Path, *, preview: bool = False, synthetic
                             rotation=90, ha="center", va="bottom", transform=ax.get_xaxis_transform())
         axes_style(ax, count=True)
         ax.set_ylabel("Completed raw bags (TH)")
-    fig.suptitle(prefix + "Fixed-horizon TH: V5 reconstructed DH and archived G31/HCA controls", fontsize=14, y=.98)
+    fig.suptitle(prefix + "Fixed-horizon TH: V5 reconstructed DH and archived G31/HCA observations", fontsize=14, y=.98)
     all_handles = legend + [Line2D([], [], color="#777777", linestyle=":", marker="D", markerfacecolor="white", markersize=4, label="Offered raw bags")]
     fig.legend(handles=all_handles, loc="lower center", bbox_to_anchor=(.5, .125), ncol=4, frameon=False)
     fig.text(.5, .104, "TH = completed raw-bag count by absolute model epoch 98,259 s. Includes every load; unfinished bags remain in the fixed denominator.", ha="center", fontsize=8.4)
     fig.text(.5, .073, footnote, ha="center", fontsize=8.4)
     fig.text(.5, .040, provenance, ha="center", fontsize=8.2, color="#555555")
+    fig.text(.5, .012, accounting_note, ha="center", fontsize=8.0, color="#604266")
     fig.subplots_adjust(left=.075, right=.985, top=.84 if not prefix else .80, bottom=.28, wspace=.24)
     for extension in ("png", "pdf"):
         path = output / ("feng_dh_v5_fixed_horizon_th_20260905." + extension)
@@ -244,12 +264,14 @@ def main() -> int:
     parser.add_argument("--cells", type=Path, default=CELLS)
     parser.add_argument("--output-dir", type=Path, default=OUTPUT)
     parser.add_argument("--allow-partial", action="store_true", help="Preview only; never estimate groups from fewer than ten seeds")
+    parser.add_argument("--control-notes", type=Path, default=CONTROL_NOTES, help="Optional control-accounting interpretation sidecar")
     args = parser.parse_args()
     input_sha = sha(args.cells)
     indexed = load_cells(args.cells, allow_partial=args.allow_partial)
     require(sha(args.cells) == input_sha, "input table changed while being read")
     groups = summarize(indexed)
-    outputs = render(groups, args.output_dir, preview=len(indexed) < 180)
+    control_audit = load_control_audit(args.control_notes)
+    outputs = render(groups, args.output_dir, preview=len(indexed) < 180, control_audit=control_audit)
     statistics_path = args.output_dir / "feng_dh_v5_plot_statistics_20260905.json"
     statistics_path.write_text(json.dumps(groups, indent=2) + "\n", encoding="utf-8")
     manifest = {"schema": "czr005.feng_v5_scientific_figures.v1",
@@ -262,9 +284,12 @@ def main() -> int:
         "THT_gate": "ALL_TEN_SEEDS_ALL_RAW_BAGS_COMPLETE_AND_LOAD_NOT_2X; OTHERWISE_NA_NO_SUBSET",
         "TH_definition": "COMPLETED_RAW_BAG_COUNT_BY_FIXED_ABSOLUTE_EPOCH_98259",
         "provenance": "V5 reconstruction; archived G31/HCA; historical HCA runtime build hash unavailable",
+        "control_accounting_audit": control_audit,
         "statistics": {"path": str(statistics_path.resolve()), "sha256": sha(statistics_path)},
         "figures": [{"path": str(path.resolve()), "sha256": sha(path)} for path in outputs]}
     require(sha(args.cells) == input_sha, "input table changed while figures were rendered; rerun against final export")
+    if control_audit["sha256"] is not None:
+        require(sha(args.control_notes) == control_audit["sha256"], "control audit changed while figures were rendered")
     (args.output_dir / "figure_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": manifest["status"], "figures": len(outputs), "cells": len(indexed)}))
     return 0

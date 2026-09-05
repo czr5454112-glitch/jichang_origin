@@ -32,6 +32,7 @@ TABLE_ROOT = ROOT / "outputs/tables"
 EVIDENCE = ROOT / "outputs/evidence/feng_dh_boundary_clearance_v5_20260905"
 OUTPUT = ROOT / "outputs/reports/feng_dh_v5_full_campaign_20260905.md"
 HISTORICAL = ROOT / "outputs/runtime/feng_dh_v5_shared_D_20260905/comparison_and_audit.json"
+CONTROL_NOTES = ROOT / "outputs/runtime/cie_external_baseline_boundary_clearance_v5/control_completion_notes.json"
 
 
 def require(condition: bool, message: str) -> None:
@@ -78,6 +79,33 @@ def pair_key(row: dict) -> tuple:
     return row["map"], float(row["load_factor"]), row["baseline"], row["reference"], row["metric"]
 
 
+def load_control_notes(path: Path) -> dict | None:
+    """Optional interpretation sidecar; it never changes metrics or runtime gates."""
+    if not path.exists():
+        return None
+    value = read_json(path)
+    require(value["schema"] == "czr005.feng_v5_hca_control_completion_notes.v1", "unknown control-accounting notes")
+    cells = value["cells"]
+    coords = {(c["map"], float(c["load_factor"]), int(c["seed"])) for c in cells}
+    expected = {(m, l, s) for m in external.MAPS for l in external.LOAD_FACTORS for s in external.SEEDS}
+    require(len(cells) == value["audited_cell_count"] == 60 and coords == expected, "control note coverage mismatch")
+    for cell in cells:
+        require(int(cell["residual"]) == int(cell["generated_count"]) - int(cell["completed_count"])
+                - int(cell["active_route_count"]) - int(cell["unfinished_count"]), "control residual arithmetic differs")
+    affected = [c for c in cells if int(c["residual"]) > 0]
+    require(len(affected) == value["affected_cell_count"], "control affected count differs")
+    value["_affected_groups"] = {(c["map"], float(c["load_factor"])) for c in affected}
+    return value
+
+
+def headline_pairs(pairs: dict, metric: str, affected_groups: set | None) -> tuple[list, int]:
+    eligible = [p for p in pairs.values() if p["reference"] == METHODS[0] and p["baseline"] in METHODS[1:]
+                and p["metric"] == metric and p["status"] == "COMPLETE"]
+    selected = [p for p in eligible if p["baseline"] != METHODS[2]
+                or (affected_groups is not None and (p["map"], float(p["load_factor"])) not in affected_groups)]
+    return selected, len(eligible) - len(selected)
+
+
 def completion_group(rows: list[dict], *, load: float) -> dict:
     require(len(rows) == 10 and {int(r["seed"]) for r in rows} == set(external.SEEDS), "report requires all ten frozen seeds")
     complete = sum(boolean(r["full_population_complete"]) for r in rows)
@@ -120,6 +148,10 @@ def load_final(args: argparse.Namespace) -> tuple:
         "paired_json": args.table_root / "feng_dh_v5_paired_20260905.json",
         "manifest": args.evidence_root / "campaign_manifest.json",
         "verification": args.evidence_root / "archive_verification.json", "historical": args.historical}
+    control_notes_path = getattr(args, "control_notes", CONTROL_NOTES)
+    if control_notes_path.exists():
+        load_control_notes(control_notes_path)
+        paths["control_accounting_notes"] = control_notes_path
     hashes = {name: sha(path) for name, path in paths.items()}
     manifest, verification = read_json(paths["manifest"]), read_json(paths["verification"])
     validate_final_manifest(manifest, verification, paths["manifest"])
@@ -229,6 +261,12 @@ def comparison_cells(pair: dict, *, metric: str) -> list[str]:
 
 def render_report(args: argparse.Namespace, rows: list, pairs: dict, manifest: dict, verification: dict, historical: dict) -> str:
     output = args.output
+    control_notes_path = getattr(args, "control_notes", CONTROL_NOTES)
+    notes = load_control_notes(control_notes_path)
+    affected_groups = None if notes is None else notes["_affected_groups"]
+
+    def hca_mark(map_name: str, load: float, method: str) -> str:
+        return "†" if method == METHODS[2] and (affected_groups is None or (map_name, load) in affected_groups) else ""
     v5_rows = [r for r in rows if r["method"] == METHODS[1]]
     terminal = Counter(r["native_terminal_status"] for r in v5_rows)
     full_counts = {method: sum(boolean(r["full_population_complete"]) for r in rows if r["method"] == method) for method in METHODS}
@@ -237,20 +275,38 @@ def render_report(args: argparse.Namespace, rows: list, pairs: dict, manifest: d
     outcome_text = []
     for metric, label, better in (("tht_scheduled_release_mean_seconds", "平均 THT", -1),
                                   ("completed_raw_bag_count", "TH 完成量", 1)):
-        eligible_pairs = [p for p in pairs.values() if p["reference"] == METHODS[0] and p["baseline"] in METHODS[1:]
-                          and p["metric"] == metric and p["status"] == "COMPLETE"]
+        eligible_pairs, excluded = headline_pairs(pairs, metric, affected_groups)
         deltas = [better * number(p["mean_delta_reference_minus_baseline"]) for p in eligible_pairs]
         good, tied, bad = sum(v > 1e-12 for v in deltas), sum(abs(v) <= 1e-12 for v in deltas), sum(v < -1e-12 for v in deltas)
-        outcome_text.append(f"{label}有 {len(deltas)} 个具备十种子资格的地图/负载/对照条件，G31 的种子均值改善 {good}、持平 {tied}、劣化 {bad} 个。")
+        outcome_text.append(f"{label}在排除 {excluded} 个 HCA 账目异常或附注缺失条件后，有 {len(deltas)} 个具备十种子资格的地图/负载/对照条件，G31 的观测种子均值方向更优 {good}、持平 {tied}、更差 {bad} 个。")
     text = ["# V5 DH 两地图、三负载、十种子完整实验报告", "",
-        f"**180/180 个方法格已具备合格终态并通过归档核验：60 格 V5 DH 新执行，120 格 G31/HCA 档案控制复用。** 方法格完成指运行与证据交付完整，不等于所有行李均完成；60 个 V5 格中，全人口完成 {full_counts[METHODS[1]]} 格，未全完 {60-full_counts[METHODS[1]]} 格。",
+        f"**180/180 个方法格具有终态档案并通过字节与指标归档核验：60 格 V5 DH 新执行，120 格 G31/HCA 档案观测复用。** 方法格完成指运行记录与证据交付完整，不等于执行语义正确，也不等于所有行李均完成；60 个 V5 格中，全人口完成 {full_counts[METHODS[1]]} 格，未全完 {60-full_counts[METHODS[1]]} 格。",
         f"V5 原生终态计数：{'；'.join(f'{k} {v}' for k, v in sorted(terminal.items()))}。控制中 G31 全人口完成 {full_counts[METHODS[0]]}/60 格，HCA 全人口完成 {full_counts[METHODS[2]]}/60 格。未完成袋、失败尾部和不利条件均保留。", "",
-        " ".join(outcome_text) + " 这些是条件级点估计的方向计数，不是显著性计数，也不把原始 shared-D 结果纳入。对应差值区间和逐种子胜/平/负全部列在下表。", "",
+        " ".join(outcome_text) + " 这些是条件级点估计的方向计数，不是显著性或容量优势计数，也不把原始 shared-D 结果纳入。G31 对 V5 的统计未变；受影响 HCA 原观测、差值区间和逐种子胜/平/负仍在下表保留。", "",
         f"本报告的全部数值从最终逐格表、配对统计表及证据清单派生，脚本再次核对分母、配对输入、种子、均值及胜/平/负；压缩归档验证通过 {verification['checked_unique_files']:,} 份唯一文件。{evidence_link}；{protocol_link}。", "",
         "**实验身份与口径。** 地图为 map2 和真实南宁图，负载为 1×、1.75×、2×，每种方法使用相同的十个固定工作负载种子：" + "、".join(map(str, external.SEEDS)) + "。",
         "各负载每种子的原始袋数依次为 " + "、".join(f"{external.EXPECTED_POPULATIONS[l][0]:,}" for l in external.LOAD_FACTORS) + "；EBS 段数依各格抖动后的 raw 实际展开，未固定成未抖动段数。共同绝对终止 epoch 为 98,259 秒；TH 是到该时点的完成原始袋数，完成率使用所有原始袋为分母，不是每小时容量。", "",
         "正式 THT 定义为每个原始袋所有业务段的 Σ（段完成时刻 − 共同 canonical scheduled release），先在每个种子的完整袋人口上求 min/mean/max，再对十种子统计量取均值。它区别于各方法原生起点：V5 first-admission；HCA/G31 processed_attempt（G31 对应 admitted_time）。这些 native 时间族尚未被证明代表同一物理入网事件；本报告的正式比较使用共同 canonical D，也不混用原始历史工作簿 D。HCA 实际整数 release 与 canonical D 可以存在不足 1 秒的差，偏移另存于逐格表，不能称三个执行器的实际释放 tick 完全相同。2× 的所有正式 THT 一律 N/A，即使全完；其他负载只要某方法组有一个种子人口未全完，该组 THT 也为 N/A。没有删袋、删种子、共同幸存者或可用子集均值。", "",
         "**随机矩阵主结果。** TH 方括号为十种子的最小—最大完成量；完成率为十种子的均值。THT 三列单位均为秒，数值是对应种子级统计量的均值，并非将十次运行拼成一个袋分布。"]
+    if notes is None:
+        text += ["", "**HCA 解释资格附注未提供。** HCA 观测与 N/A 继续保留，暂不纳入开头的优劣方向计数；没有因此要求新运行或修改已有统计。归档字节 PASS 不能作为执行语义正确的证明。"]
+    else:
+        affected_count, audited_count = notes["affected_cell_count"], notes["audited_cell_count"]
+        case_seeds = "、".join(str(c["seed"]) for c in notes["detailed_cases"])
+        nanning_1x_difference = statistics.fmean(number(r["TH_completed_raw_bags"]) for r in rows
+            if r["map"] == "nanning" and float(r["load_factor"]) == 1 and r["method"] == METHODS[0]) - statistics.fmean(
+            number(r["TH_completed_raw_bags"]) for r in rows
+            if r["map"] == "nanning" and float(r["load_factor"]) == 1 and r["method"] == METHODS[2])
+        group_parts = []
+        for map_name in external.MAPS:
+            for load in external.LOAD_FACTORS:
+                group_cells = [c for c in notes["cells"] if c["map"] == map_name and float(c["load_factor"]) == load]
+                positive = [int(c["residual"]) for c in group_cells if int(c["residual"]) > 0]
+                if positive:
+                    group_parts.append(f"{map_name} {load:g}×：{len(positive)}/10 格，每格正残差 {min(positive)}–{max(positive)} 段")
+        text += ["", f"**历史 HCA 执行账目异常。** {audited_count} 格中 {affected_count} 格的 `generated−completed−active_routes−unfinished` 为正；这是段级账目残差，不直接等同于缺失原始袋数。" + "；".join(group_parts) + "。",
+            f"南宁 1× 的 {len(notes['detailed_cases'])} 个细查种子（{case_seeds}）均记录同一原始袋的两段已释放、两次成功规划，却只有一次 raw-ID completion，终态 active/unfinished 都为 0；不能仅用普通时域排队解释。其 G31−HCA 平均完成量差为 {nanning_1x_difference:.1f} 袋，这不是无丢失物理基线的吞吐容量优势证据。可读源码按 raw task_id 保存活动路径，EBS 双段同键覆盖与日志吻合，但旧运行 class 身份未恢复，覆盖机制是高置信静态推断，具体完成段归属仍有歧义。其余 {affected_count-len(notes['detailed_cases'])} 格仅确认终态账目异常，未逐袋证明同一根因。",
+            f"† 标记含异常格的 HCA 方法/负载组：仅保留档案观测及原 N/A/配对值，不作干净算法容量优越性证据，且从开头的条件级方向计数排除。其余 {audited_count-affected_count} 格本检查未发现正残差，不能由此泛化为全部 HCA 无效，也不能反推执行语义已获完整证明。" + link(output, control_notes_path, "控制完成账目复核与具体证据") + "。"]
     for map_name in external.MAPS:
         text += ["", f"**{'Map2' if map_name == 'map2' else '南宁'}**", "",
             "| 负载 | 方法 | TH 均值 [种子范围] | 完成率均值 | 全完种子 | THT min | THT mean | THT max |",
@@ -259,7 +315,7 @@ def render_report(args: argparse.Namespace, rows: list, pairs: dict, manifest: d
             for method in METHODS:
                 group = completion_group([r for r in rows if r["map"] == map_name and float(r["load_factor"]) == load and r["method"] == method], load=load)
                 timing = [fmt(group["THT"][s]) if group["THT"][s] is not None else f"N/A（{group['THT_status']}）" for s in STATS]
-                text.append("| " + " | ".join([f"{load:g}×", NAMES[method],
+                text.append("| " + " | ".join([f"{load:g}×", NAMES[method] + hca_mark(map_name, load, method),
                     f"{fmt(group['TH_mean'],1)} [{fmt(group['TH_min'],0)}–{fmt(group['TH_max'],0)}]",
                     f"{100*group['completion_rate_mean']:.4f}%", f"{group['complete_seeds']}/10", *timing]) + " |")
     text += ["", "**G31 对两个对照的十种子配对比较。** 正的改善率表示 G31 更优：THT 取（对照均值−G31 均值）/对照均值，TH 取（G31 均值−对照均值）/对照均值。负值明确表示劣化，零值为持平；相对百分比是两组种子均值的比，不是逐种子百分比的均值。", "",
@@ -273,7 +329,8 @@ def render_report(args: argparse.Namespace, rows: list, pairs: dict, manifest: d
             for baseline in METHODS[1:]:
                 for metric, label in metrics:
                     pair = pairs[(map_name, load, baseline, METHODS[0], metric)]
-                    text.append("| " + " | ".join([f"{load:g}×", SHORT[baseline], label, *comparison_cells(pair, metric=metric)]) + " |")
+                    text.append("| " + " | ".join([f"{load:g}×", SHORT[baseline] + hca_mark(map_name, load, baseline), label, *comparison_cells(pair, metric=metric)]) + " |")
+        text += ["", "表注：† HCA 行仅描述有账目异常的档案记录；保留百分比、绝对差和区间不表示认可其容量解释，正值不得被改写成无丢失 HCA 物理系统的算法容量优势。"]
     text += ["", "完整逐格结果还保留准时率、未完成数、积压、迟到及入网后诊断时间：" +
         link(output, args.table_root / "feng_dh_v5_cells_20260905.csv", "逐格表") + "；" +
         link(output, args.table_root / "feng_dh_v5_paired_20260905.csv", "全部配对统计") + "。", "",
@@ -321,6 +378,8 @@ def main() -> int:
     parser.add_argument("--table-root", type=Path, default=TABLE_ROOT)
     parser.add_argument("--evidence-root", type=Path, default=EVIDENCE)
     parser.add_argument("--historical", type=Path, default=HISTORICAL)
+    parser.add_argument("--control-notes", type=Path, default=CONTROL_NOTES,
+                        help="Optional read-only accounting interpretation; never requires a new simulation")
     parser.add_argument("--output", type=Path, default=OUTPUT)
     args = parser.parse_args()
     rows, pairs, manifest, verification, historical, paths, hashes = load_final(args)

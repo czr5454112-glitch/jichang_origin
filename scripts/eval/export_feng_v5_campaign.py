@@ -40,6 +40,11 @@ require = population.require
 sha = population.sha
 GENERATOR_SHA = sha(Path(__file__))
 POPULATION_GENERATOR_SHA = sha(Path(population.__file__))
+CONTROL_NOTES_NAME = "control_completion_notes"
+CONTROL_QUALIFICATION_DIR = "control_scientific_qualification"
+HCA_INVALIDATED = "INVALIDATED_HCA_SEGMENT_ACCOUNTING_DEFICIT_FOR_PHYSICAL_PERFORMANCE_COMPARISON"
+HCA_NOT_DETECTED = "NO_POSITIVE_TERMINAL_ACCOUNTING_RESIDUAL_DETECTED_NOT_FULL_VALIDATION"
+HCA_COUNTERS = ("generated_count", "planned_count", "completed_count", "active_route_count", "unfinished_count")
 
 
 def read_json(path: Path) -> dict:
@@ -335,6 +340,127 @@ def paired_aggregate(rows: list[dict], replicates: int) -> dict:
         "partial_seed_estimates_suppressed": True, "rows": result}
 
 
+def validate_control_completion_notes(notes: dict) -> dict:
+    """Validate the separate observation sidecar; do not reinterpret old metrics."""
+    require(notes["schema"] == "czr005.feng_v5_hca_control_completion_notes.v1", "unexpected HCA notes schema")
+    cells = notes["cells"]
+    expected = {(m, l, s) for m in external.MAPS for l in external.LOAD_FACTORS for s in external.SEEDS}
+    coordinates = {(c["map"], float(c["load_factor"]), int(c["seed"])) for c in cells}
+    require(len(cells) == notes["audited_cell_count"] == 60 and coordinates == expected, "HCA notes must cover exact 60 coordinates")
+    for cell in cells:
+        require(all(isinstance(cell[k], int) and not isinstance(cell[k], bool) and cell[k] >= 0 for k in HCA_COUNTERS + ("residual",)),
+                "HCA notes counters must be nonnegative integers")
+        residual = int(cell["generated_count"]) - int(cell["completed_count"]) - int(cell["active_route_count"]) - int(cell["unfinished_count"])
+        require(residual == int(cell["residual"]) and residual >= 0, "HCA notes residual arithmetic mismatch")
+        require(float(cell["last_epoch"]) == external.FIXED_HORIZON_SECONDS, "HCA notes horizon mismatch")
+    require(sum(int(c["residual"]) > 0 for c in cells) == notes["affected_cell_count"] == 43, "HCA affected count must be 43")
+    require(sum(int(c["residual"]) == 0 for c in cells) == notes["zero_residual_cell_count"] == 17, "HCA zero-residual count must be 17")
+    return notes
+
+
+def hca_summary_residual(summary: dict, note: dict) -> int:
+    for name in HCA_COUNTERS:
+        require(int(summary[name]) == int(note[name]), f"HCA summary/notes counter differs: {name}")
+    require(float(summary["last_epoch"]) == float(note["last_epoch"]) == external.FIXED_HORIZON_SECONDS,
+            "HCA summary/notes epoch differs")
+    residual = int(summary["generated_count"]) - int(summary["completed_count"]) - int(summary["active_route_count"]) - int(summary["unfinished_count"])
+    require(residual == int(note["residual"]), "HCA native summary residual differs from notes")
+    return residual
+
+
+def scientific_interpretation(result_root: Path, evidence_root: Path, *, archive: bool) -> dict:
+    """Archive optional scientific qualification independently of all numeric outputs."""
+    json_path, md_path = (result_root / (CONTROL_NOTES_NAME + suffix) for suffix in (".json", ".md"))
+    common = {"schema": "czr005.feng_v5_scientific_interpretation.v1",
+        "identity_reuse_scope": "120_CONTROLS_IDENTITY_REUSABLE_NOT_120_SCIENTIFICALLY_VALID_CONTROLS",
+        "qualification_separate_from_normalization_and_archive_pass": True,
+        "observed_metrics_normalization_and_paired_algorithm_unchanged": True,
+        "verifier_scope": "SIDECAR_HASH_AND_NATIVE_SUMMARY_RESIDUAL_RECOMPUTATION_NOT_HCA_EXECUTION_VALIDATION"}
+    if not json_path.exists() and not md_path.exists():
+        return {**common, "status": "NOT_ASSESSED_NO_CONTROL_COMPLETION_NOTES", "files": [], "cells": []}
+    require(json_path.is_file() and md_path.is_file(), "HCA scientific notes require both JSON and Markdown")
+    notes = validate_control_completion_notes(read_json(json_path))
+    records, cells = [], []
+    notes_refs = {}
+    for path in (json_path, md_path):
+        relative = f"{CONTROL_QUALIFICATION_DIR}/{path.name}"
+        notes_refs[path.suffix.lstrip(".")] = {"archive_relative_path": relative, "sha256": sha(path)}
+        if archive:
+            records.append(archive_file(path, evidence_root / relative))
+    for note in notes["cells"]:
+        map_name, load, seed = note["map"], float(note["load_factor"]), int(note["seed"])
+        # The sidecar cannot nominate arbitrary files: it names the existing run_01 summary.
+        source = external.cell_dir(external.DEFAULT_RESULT_ROOT, load, seed, map_name) / "hca_native/run_01/summary.csv"
+        require((ROOT / note["evidence"]["path"]).resolve() == source.resolve(), "unexpected HCA summary provenance path")
+        require(sha(source) == note["evidence"]["sha256"], "HCA summary source SHA differs from notes")
+        native_rows = population.rows(source)
+        require(len(native_rows) == 1, "HCA native summary must have one row")
+        residual = hca_summary_residual(native_rows[0], note)
+        target = external.cell_dir(evidence_root, load, seed, map_name) / "hca/run_01/summary.csv"
+        if archive:
+            records.append(archive_file(source, target))
+        cells.append({"map": map_name, "load_factor": load, "seed": seed, "method": "FENG_NATIVE_HCA",
+            "residual": residual, "residual_unit": "NATIVE_SEGMENT_ACCOUNTING_NOT_RAW_BAG_COUNT",
+            "qualification": HCA_INVALIDATED if residual > 0 else HCA_NOT_DETECTED,
+            "summary_archive_relative_path": target.relative_to(evidence_root).as_posix(),
+            "summary_sha256": note["evidence"]["sha256"]})
+    return {**common, "status": "HCA_CONTROL_ACCOUNTING_DEFICITS_DISCLOSED",
+        "hca_audited_cells": 60, "hca_invalidated_for_no_loss_physical_comparison": 43,
+        "hca_no_positive_residual_detected_not_fully_validated": 17,
+        "positive_residual_rule": HCA_INVALIDATED, "zero_residual_rule": HCA_NOT_DETECTED,
+        "scientific_use_limit": "Retain all observations, but do not use the 43 affected HCA cells as no-loss physical performance/capacity evidence. The other 17 only lack this detected residual; neither this check nor identity reuse proves full HCA correctness.",
+        "notes": notes_refs, "cells": cells, "files": records}
+
+
+def verify_scientific_interpretation(root: Path, qualification: dict | None) -> dict:
+    """Recompute only the disclosed residual, using portable HCA summaries."""
+    if qualification is None:
+        return {"status": "NOT_ASSESSED_LEGACY_MANIFEST_NO_SCIENTIFIC_QUALIFICATION"}
+    require(qualification["schema"] == "czr005.feng_v5_scientific_interpretation.v1", "unknown scientific qualification schema")
+    require(qualification["qualification_separate_from_normalization_and_archive_pass"] is True
+            and qualification["observed_metrics_normalization_and_paired_algorithm_unchanged"] is True,
+            "scientific qualification must remain separate from numeric records")
+    if qualification["status"] == "NOT_ASSESSED_NO_CONTROL_COMPLETION_NOTES":
+        require(not qualification["files"] and not qualification["cells"], "unassessed qualification contains assessed records")
+        return {"status": qualification["status"]}
+    require(qualification["status"] == "HCA_CONTROL_ACCOUNTING_DEFICITS_DISCLOSED", "unknown scientific qualification status")
+    for suffix in ("json", "md"):
+        record = qualification["notes"][suffix]
+        expected_relative = f"{CONTROL_QUALIFICATION_DIR}/{CONTROL_NOTES_NAME}.{suffix}"
+        require(record["archive_relative_path"] == expected_relative, "unexpected portable notes path")
+        require(sha(root / expected_relative) == record["sha256"], "portable scientific notes SHA mismatch")
+    notes = validate_control_completion_notes(read_json(root / qualification["notes"]["json"]["archive_relative_path"]))
+    indexed = {(c["map"], float(c["load_factor"]), int(c["seed"])): c for c in qualification["cells"]}
+    expected = {(c["map"], float(c["load_factor"]), int(c["seed"])) for c in notes["cells"]}
+    require(len(qualification["cells"]) == len(indexed) == 60 and set(indexed) == expected, "scientific qualification coordinate mismatch")
+    affected = 0
+    for note in notes["cells"]:
+        key = note["map"], float(note["load_factor"]), int(note["seed"])
+        record = indexed[key]
+        folder = external.cell_dir(root, key[1], key[2], key[0]) / "hca"
+        summary_path = folder / "run_01/summary.csv"
+        require(record["method"] == "FENG_NATIVE_HCA" and record["summary_archive_relative_path"] == summary_path.relative_to(root).as_posix(),
+                "portable HCA scientific summary identity differs")
+        require(sha(summary_path) == record["summary_sha256"] == note["evidence"]["sha256"], "portable HCA summary SHA mismatch")
+        summary_rows = population.rows(summary_path)
+        require(len(summary_rows) == 1, "portable HCA summary row count differs")
+        residual = hca_summary_residual(summary_rows[0], note)
+        # Cross-check the summary copy already used by the archived native normalizer.
+        native = read_json(folder / "fresh_hca_summary.json")
+        runs = [r for r in native["runs"] if r["run_id"] == "run_01"]
+        require(len(runs) == 1, "portable HCA campaign run identity differs")
+        require(hca_summary_residual(runs[0]["benchmark_summary"], note) == residual, "HCA campaign/CSV residual mismatch")
+        require(record["residual"] == residual and record["qualification"] == (HCA_INVALIDATED if residual > 0 else HCA_NOT_DETECTED),
+                "scientific qualification differs from recomputed residual")
+        affected += residual > 0
+    require(affected == qualification["hca_invalidated_for_no_loss_physical_comparison"] == 43
+            and qualification["hca_audited_cells"] == 60
+            and qualification["hca_no_positive_residual_detected_not_fully_validated"] == 17, "scientific qualification total differs")
+    return {"status": "DISCLOSURE_AND_RESIDUAL_RECOMPUTATION_PASS_NOT_EXECUTION_VALIDATION", "hca_summaries_recomputed": 60,
+        "hca_invalidated_for_no_loss_physical_comparison": 43, "hca_no_positive_residual_detected_not_fully_validated": 17,
+        "changes_any_observed_metric": False, "proves_hca_execution_correctness": False}
+
+
 def archive_campaign_support(result_root: Path, evidence_root: Path, *, all_dh_finished: bool) -> dict:
     """Freeze small static support now, and dynamic orchestration only at the end."""
     records, pending = [], []
@@ -352,7 +478,7 @@ def archive_campaign_support(result_root: Path, evidence_root: Path, *, all_dh_f
     protocol = ROOT / "docs/baselines/feng_dh_v5_acceptance_and_campaign_protocol_20260905.md"
     records.append(archive_file(protocol, evidence_root / "support" / protocol.name))
     for source in sorted(result_root.glob("*.json")):
-        if source.name.endswith("_reused_controls.json"):
+        if source.name.endswith("_reused_controls.json") or source.name == CONTROL_NOTES_NAME + ".json":
             continue
         dynamic = source.name.endswith("_execution_status.json") or source.name == "root_orchestration.json"
         if dynamic and not all_dh_finished:
@@ -465,6 +591,7 @@ def export_campaign(result_root: Path, evidence_root: Path, table_root: Path, *,
     external._atomic_json(table_root / "feng_dh_v5_paired_20260905.json", aggregate)
     support = archive_campaign_support(result_root, evidence_root,
         all_dh_finished=sum(r["method"] == METHOD for r in rows) == 60) if archive else {"files": []}
+    interpretation = scientific_interpretation(result_root, evidence_root, archive=archive)
     manifest = {"schema": "czr005.feng_v5_portable_campaign.v1", "status": "FAIL" if failures else aggregate["status"],
         "expected_cells": 180, "observed_cells": len(rows), "expected_new_dh_cells": 60,
         "new_dh_cells": sum(r["method"] == METHOD for r in rows), "reused_control_cells": sum(r["method"] != METHOD for r in rows),
@@ -474,22 +601,23 @@ def export_campaign(result_root: Path, evidence_root: Path, table_root: Path, *,
         "qualified_control_reuse_count": len(reuse_records),
         "support_files": support["files"], "pending_dynamic_support": support.get("pending_dynamic_records", []),
         "support_index_sha256": sha(evidence_root / "support/support_manifest.json") if archive else None,
+        "scientific_interpretation": interpretation,
         "evidence_limits": ["V5 trace=0 cannot independently prove per-tick collision/FIFO or no repeated zero-service starts.",
             "HCA historical controls lack run-time source/class hash; copied current classes do not fill this gap.",
             "G31 control JSON archives aggregate values and original integrity gates, not an absent per-bag payload.",
             "All randomized campaign methods share canonical D; these are not the original historical shared-D workload.",
             "Wall times were collected at different dates/concurrency; they are not a controlled speed benchmark."]}
     external._atomic_json(evidence_root / "campaign_manifest.json", manifest)
-    write_readme(evidence_root)
+    write_readme(evidence_root, interpretation)
     return manifest
 
 
-def write_readme(root: Path) -> None:
+def write_readme(root: Path, interpretation: dict | None = None) -> None:
     text = """# V5 campaign evidence
 
 This is the separate, user-adopted boundary-clearance V5 reconstruction. Its source identity is 7deb321e34b9ebdd562eeac0c5293618df41441830789498b37ddb4bca1cccc7 and its formal JDK18 class identity is a0a0c35bc2e3576c83f23a60f6a3cd807f3c66ae0ea24304924b9f7fe193b869. It is not a source-exact reproduction. Prior campaigns and audit opinions are preserved.
 
-`campaign_manifest.json` lists actual, missing, and failed cells. COMPLETE means 60 new V5 plus 120 qualified historical controls were audited; it does not mean every baggage population completed. Clean DEADLOCK/HORIZON_REACHED outcomes retain every unfinished bag. The 2x timing prohibition remains even if a method completes.
+`campaign_manifest.json` lists actual, missing, and failed cells. COMPLETE means 60 new V5 plus 120 historical controls passed the recorded identity/data checks; it does not mean all 120 controls are scientifically valid or every baggage population completed. Clean DEADLOCK/HORIZON_REACHED outcomes retain every unfinished bag. The 2x timing prohibition remains even if a method completes.
 
 Primary THT min/mean/max (and diagnostic P95/P99) is the per-raw-bag sum of segment completion minus the shared canonical scheduled release. Native admission-based THT is secondary. HCA actual integer release_epoch is explicitly distinct from canonical D. TH is the number of completed raw bags by fixed absolute epoch 98259; completion/on-time rates, unfinished counts and backlog are separate columns. The optional per-hour normalization divides by 98259 seconds measured from model time zero, not by the active operating window or wall time; it is not an estimate of conveyor capacity. Source backlog ends only when all segments are admitted and therefore includes the EBS schedule gap.
 
@@ -513,6 +641,13 @@ python scripts/eval/export_feng_v5_campaign.py --archive
 
 Final publication should use `--archive --require-complete`; unfinished processes are never read as completed cells. Native CSV trace=0 exports do not prove per-tick collision freedom or reveal actual edge queues. Separate Java fixtures/OD checks support implementation semantics. V5 body-clearance interpretation and its 2,000/h same-incoming bottleneck remain disclosed assumptions; the user selected this candidate after seeing its original map2 results.
 """
+    if interpretation and interpretation["status"] == "HCA_CONTROL_ACCOUNTING_DEFICITS_DISCLOSED":
+        notice = """**HCA scientific qualification:** 43 of 60 historical HCA cells have a positive `generated - completed - active_routes - unfinished` segment-accounting residual. These 43 are invalidated as evidence for no-loss physical performance/capacity comparisons. The other 17 only lack this detected residual; this does not prove full correctness. All observed numbers remain unchanged. Identity/archive/normalization PASS is not HCA execution validation. See the [notes](control_scientific_qualification/control_completion_notes.md) and [60-cell evidence](control_scientific_qualification/control_completion_notes.json); `campaign_manifest.json.scientific_interpretation` records this separately.
+
+"""
+    else:
+        notice = "**Scientific qualification is not assessed by the optional HCA completion sidecar in this bundle.** Identity, normalization and archive PASS alone do not establish HCA execution correctness.\n\n"
+    text = text.replace("# V5 campaign evidence\n\n", "# V5 campaign evidence\n\n" + notice, 1)
     (root / "README.md").write_text(text, encoding="utf-8")
 
 
@@ -521,7 +656,8 @@ def verify_archive(root: Path) -> dict:
     if manifest.get("support_index_sha256"):
         require(sha(root / "support/support_manifest.json") == manifest["support_index_sha256"], "support index bytes drift")
     checked = {}
-    for cell in manifest["cells"] + [{"files": manifest.get("control_reuse_files", [])}, {"files": manifest.get("support_files", [])}]:
+    for cell in manifest["cells"] + [{"files": manifest.get("control_reuse_files", [])}, {"files": manifest.get("support_files", [])},
+                                    {"files": manifest.get("scientific_interpretation", {}).get("files", [])}]:
         for record in cell["files"]:
             portable = str(record["archive_path"]).replace("\\", "/").split("/" + root.name + "/", 1)
             require(len(portable) == 2, "archive record is outside portable root")
@@ -646,10 +782,13 @@ def verify_archive(root: Path) -> dict:
                         population.close(native["full_population_timing"]["distributions"][family][f"{suffix}_seconds"],
                             cell["exported_metrics"][f"{prefix}_{suffix}_seconds"], "portable G31 aggregate THT")
             aggregate_only += 1
+    scientific_check = verify_scientific_interpretation(root, manifest.get("scientific_interpretation"))
     return {"status": "PASS", "checked_unique_files": len(checked), "observed_cells": manifest["observed_cells"],
             "campaign_status": manifest["status"], "original_absolute_paths_required": False,
             "cells_with_portable_lifecycle_recomputed": recomputed, "G31_cells_with_aggregate_only_evidence": aggregate_only,
             "preflight_independent_bags_verified": preflight_count,
+            "scientific_interpretation": scientific_check,
+            "pass_proves_hca_execution_correctness": False,
             "campaign_manifest_sha256": sha(root / "campaign_manifest.json"), "verifier_sha256": GENERATOR_SHA}
 
 

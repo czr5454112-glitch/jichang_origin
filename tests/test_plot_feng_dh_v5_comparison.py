@@ -82,6 +82,14 @@ class PlotContractTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate"):
             self.parse(rows + [rows[0]])
 
+    def test_control_accounting_annotation_keeps_observation_statistics(self):
+        indexed = self.parse(synthetic_rows())
+        before = plot.summarize(indexed)
+        audit = plot.load_control_audit(plot.CONTROL_NOTES)
+        self.assertEqual((audit["affected_cell_count"], audit["audited_cell_count"]), (43, 60))
+        self.assertEqual(audit["sha256"], plot.sha(plot.CONTROL_NOTES))
+        self.assertEqual(before, plot.summarize(indexed))
+
 
 if __name__ == "__main__":
     unittest.main()
