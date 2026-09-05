@@ -286,7 +286,7 @@ def render_report(args: argparse.Namespace, rows: list, pairs: dict, manifest: d
         f"本报告的全部数值从最终逐格表、配对统计表及证据清单派生，脚本再次核对分母、配对输入、种子、均值及胜/平/负；压缩归档验证通过 {verification['checked_unique_files']:,} 份唯一文件。{evidence_link}；{protocol_link}。", "",
         "**实验身份与口径。** 地图为 map2 和真实南宁图，负载为 1×、1.75×、2×，每种方法使用相同的十个固定工作负载种子：" + "、".join(map(str, external.SEEDS)) + "。",
         "各负载每种子的原始袋数依次为 " + "、".join(f"{external.EXPECTED_POPULATIONS[l][0]:,}" for l in external.LOAD_FACTORS) + "；EBS 段数依各格抖动后的 raw 实际展开，未固定成未抖动段数。共同绝对终止 epoch 为 98,259 秒；TH 是到该时点的完成原始袋数，完成率使用所有原始袋为分母，不是每小时容量。", "",
-        "正式 THT 定义为每个原始袋所有业务段的 Σ（段完成时刻 − 共同 canonical scheduled release），先在每个种子的完整袋人口上求 min/mean/max，再对十种子统计量取均值。它区别于各方法原生起点：V5 first-admission；HCA/G31 processed_attempt（G31 对应 admitted_time）。这些 native 时间族尚未被证明代表同一物理入网事件；本报告的正式比较使用共同 canonical D，也不混用原始历史工作簿 D。HCA 实际整数 release 与 canonical D 可以存在不足 1 秒的差，偏移另存于逐格表，不能称三个执行器的实际释放 tick 完全相同。2× 的所有正式 THT 一律 N/A，即使全完；其他负载只要某方法组有一个种子人口未全完，该组 THT 也为 N/A。没有删袋、删种子、共同幸存者或可用子集均值。", "",
+        "正式 THT 定义为每个原始袋所有业务段的 Σ（段完成时刻 − 共同 canonical scheduled release），先在每个种子的完整袋人口上求 min/mean/max，再对十种子统计量取均值。它区别于各方法原生起点：V5 first-admission；HCA/G31 processed_attempt（G31 对应 admitted_time）。这些 native 时间族尚未被证明代表同一物理入网事件；本报告的正式比较使用共同 canonical D，也不混用原始历史工作簿 D。HCA 日志中的实际 release_epoch 与 canonical D 的差异包含整数时钟量化及源端释放/排队延迟，可能远超 1 秒；正式 THT 仍统一从 canonical D 起算，不能称三个执行器的实际释放 tick 完全相同。2× 的所有正式 THT 一律 N/A，即使全完；其他负载只要某方法组有一个种子人口未全完，该组 THT 也为 N/A。没有删袋、删种子、共同幸存者或可用子集均值。", "",
         "**随机矩阵主结果。** TH 方括号为十种子的最小—最大完成量；完成率为十种子的均值。THT 三列单位均为秒，数值是对应种子级统计量的均值，并非将十次运行拼成一个袋分布。"]
     if notes is None:
         text += ["", "**HCA 解释资格附注未提供。** HCA 观测与 N/A 继续保留，暂不纳入开头的优劣方向计数；没有因此要求新运行或修改已有统计。归档字节 PASS 不能作为执行语义正确的证明。"]

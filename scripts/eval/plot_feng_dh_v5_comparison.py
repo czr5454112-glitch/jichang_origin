@@ -168,7 +168,8 @@ def draw_group(ax, x: float, method: str, statistic: dict) -> None:
 def axes_style(ax, *, count: bool) -> None:
     ax.set_xticks(range(3), ["1×", "1.75×", "2×"])
     ax.set_xlim(-.48, 2.48)
-    ax.set_ylim(bottom=0)
+    upper = ax.get_ylim()[1]
+    ax.set_ylim(0, upper * 1.04 if upper > 0 else 1)
     ax.set_xlabel("Workload load factor")
     ax.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}" if count else "{x:,.0f}"))
     ax.grid(axis="y", color="#dddddd", linewidth=.65, zorder=0)
