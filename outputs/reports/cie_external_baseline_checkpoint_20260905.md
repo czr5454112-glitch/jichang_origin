@@ -52,6 +52,12 @@ available aggregate is in
 `outputs/reports/cie_external_baseline_robustness.md` and is explicitly marked
 `INCOMPLETE (161/180)`.
 
+The matched seed-104729 execution-cost diagnostic is recorded separately in
+`outputs/reports/feng_cie_dh_nanning_runtime_amplification.md`: Nanning executes
+834.18x as many route decisions and 631.43x as many holds as map2, while its
+measured simulator wall time is 582.73x longer. These counters explain the
+long campaign but are not used to claim routing-quality superiority.
+
 ## Shutdown boundary
 
 At the checkpoint, twelve non-checkpointable Java cells were running:
