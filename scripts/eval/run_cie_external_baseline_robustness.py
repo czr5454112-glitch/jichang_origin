@@ -91,7 +91,7 @@ DEFAULT_WORKLOAD_ROOT = (
     ROOT / "data" / "processed" / "workloads" / "cie_external_robustness"
 )
 DEFAULT_RESULT_ROOT = ROOT / "outputs" / "runtime" / "cie_external_baseline_robustness"
-DEFAULT_DH_CLASSES_DIR = ROOT / "build" / "feng_cie_dh_zero_through_fix_v1"
+DEFAULT_DH_CLASSES_DIR = ROOT / "build" / "feng_cie_dh_zero_through_optimized_v1"
 EXPECTED_SOURCE_SHA256 = "0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87"
 EXPECTED_MAP_SHA256 = "55f578cb4b8fcc61f5b13963fcb8546aca91e517ea6f8ff4a7361670f1b03f8f"
 EXPECTED_NANNING_SOURCE_SHA256 = (
@@ -109,9 +109,9 @@ LEGACY_DH_SOURCE_SHA256 = (
 LEGACY_DH_CLASS_SHA256 = (
     "d611967f0433dfc08f67d92c89e9b13dcb5b8ac5ace3d3abec9c098dba360286"
 )
-# Frozen after T1-T10, Z1-Z12 and full-population/OD regression.
-EXPECTED_DH_SOURCE_SHA256 = "3b47ffcefa558365e55e27508fc8904608026fd3235102eee6c305539999a208"
-EXPECTED_DH_CLASS_SHA256 = "21fc22d8cd27628e2933eb73256cafa6f2bd695628fd46988ea445aafd7a5d47"
+# Frozen equivalent optimization; correctness revision 3b47ffce remains separately archived.
+EXPECTED_DH_SOURCE_SHA256 = "809d069832da3fec5a2aa6302a99a9ede24fcd5a1fb28c4a53c3cc3c139ff86f"
+EXPECTED_DH_CLASS_SHA256 = "ad828f533bc34abb3527d92f0f476e69412fc14c0024cbf2694bf0f82b382fd0"
 INVALIDATED_DH_STATUS = "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG"
 
 

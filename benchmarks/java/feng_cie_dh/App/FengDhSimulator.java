@@ -406,8 +406,9 @@ public final class FengDhSimulator {
                 holdNodeNoPath(bag, commitTick, traceSampleModulo);
                 continue;
             }
-            bag.selectEdge(tick, decision.selectedEdgeId, decision.traceDetail(),
-                    shouldTrace(bag, traceSampleModulo));
+            boolean recordTrace = shouldTrace(bag, traceSampleModulo);
+            bag.selectEdge(tick, decision.selectedEdgeId,
+                    recordTrace ? decision.traceDetail() : "", recordTrace);
             addEntry(entriesByEdge,
                     new EntryProposal(
                             bag, -1, bag.getCurrentNode(), decision));
@@ -565,6 +566,7 @@ public final class FengDhSimulator {
         for (EntryProposal proposal : approvedEntries.values()) {
             FengDhBagState bag = proposal.bag;
             int targetEdgeId = proposal.decision.selectedEdgeId;
+            boolean recordTrace = shouldTrace(bag, traceSampleModulo);
             if (proposal.upstreamEdgeId >= 0) {
                 lattice.remove(proposal.upstreamEdgeId, bag);
                 lattice.enter(targetEdgeId, bag);
@@ -572,8 +574,8 @@ public final class FengDhSimulator {
                         commitTick,
                         proposal.downstreamNode,
                         targetEdgeId,
-                        proposal.decision.traceDetail(),
-                        shouldTrace(bag, traceSampleModulo));
+                        recordTrace ? proposal.decision.traceDetail() : "",
+                        recordTrace);
             } else {
                 lattice.enter(targetEdgeId, bag);
                 boolean firstAdmission = bag.getFirstAdmissionTick() < 0L;
@@ -581,8 +583,8 @@ public final class FengDhSimulator {
                         commitTick,
                         targetEdgeId,
                         firstAdmission,
-                        proposal.decision.traceDetail(),
-                        shouldTrace(bag, traceSampleModulo));
+                        recordTrace ? proposal.decision.traceDetail() : "",
+                        recordTrace);
                 if (firstAdmission) {
                     enteredSegments++;
                 }

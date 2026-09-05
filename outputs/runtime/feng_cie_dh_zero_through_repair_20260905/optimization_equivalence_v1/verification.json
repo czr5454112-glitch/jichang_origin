@@ -1,0 +1,309 @@
+{
+  "schema": "czr005.feng_dh_optimization_equivalence.v1",
+  "status": "PASS",
+  "production_builds": {
+    "unoptimized": {
+      "class_aggregate_sha256": "21fc22d8cd27628e2933eb73256cafa6f2bd695628fd46988ea445aafd7a5d47",
+      "class_count": 33,
+      "command": [
+        "javac",
+        "--release",
+        "8",
+        "-Xlint:all",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_fix_v1",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhBagState.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhBenchmark.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhEdgeLattice.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhPolicy.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhSimulator.java"
+      ],
+      "schema": "czr005.feng_paper_env_cie_dh.compile.v1",
+      "source_aggregate_sha256": "3b47ffcefa558365e55e27508fc8904608026fd3235102eee6c305539999a208"
+    },
+    "optimized": {
+      "class_aggregate_sha256": "ad828f533bc34abb3527d92f0f476e69412fc14c0024cbf2694bf0f82b382fd0",
+      "class_count": 33,
+      "command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\javac.exe",
+        "--release",
+        "8",
+        "-Xlint:all",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_optimized_v1",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhBagState.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhBenchmark.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhEdgeLattice.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhPolicy.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhSimulator.java"
+      ],
+      "schema": "czr005.feng_paper_env_cie_dh.compile.v1",
+      "source_aggregate_sha256": "809d069832da3fec5a2aa6302a99a9ede24fcd5a1fb28c4a53c3cc3c139ff86f"
+    }
+  },
+  "commands": [
+    [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.exe",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_optimization_tests_v1;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_fix_v1",
+      "App.FengDhOptimizationRegression"
+    ],
+    [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.exe",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_fix_v1",
+      "App.FengDhBenchmark",
+      "microtests",
+      "--json-out",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_T1_T10.jsonl"
+    ],
+    [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.exe",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_optimization_tests_v1;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_fix_v1",
+      "App.ZeroThroughAudit",
+      "--gate",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\nanning_legacy.txt"
+    ],
+    [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.exe",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_optimization_tests_v1;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_optimized_v1",
+      "App.FengDhOptimizationRegression"
+    ],
+    [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.exe",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_optimized_v1",
+      "App.FengDhBenchmark",
+      "microtests",
+      "--json-out",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_T1_T10.jsonl"
+    ],
+    [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.exe",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_optimization_tests_v1;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_optimized_v1",
+      "App.ZeroThroughAudit",
+      "--gate",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\nanning_legacy.txt"
+    ],
+    [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.exe",
+      "-Djava.awt.headless=true",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_fix_v1",
+      "App.FengDhBenchmark",
+      "run",
+      "--map",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\nanning_legacy.txt",
+      "--input",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\workloads\\cie_external_robustness\\nanning_1p00x\\seed_104729\\inputdata.txt",
+      "--output",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\unoptimized",
+      "--alpha",
+      "0.4",
+      "--beta",
+      "0.8",
+      "--limit",
+      "128",
+      "--seed",
+      "104729",
+      "--horizon-seconds",
+      "98259",
+      "--trace-sample-modulo",
+      "1",
+      "--storage-in-goal",
+      "53",
+      "--storage-out-start",
+      "53"
+    ],
+    [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.exe",
+      "-Djava.awt.headless=true",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_cie_dh_zero_through_optimized_v1",
+      "App.FengDhBenchmark",
+      "run",
+      "--map",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\nanning_legacy.txt",
+      "--input",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\workloads\\cie_external_robustness\\nanning_1p00x\\seed_104729\\inputdata.txt",
+      "--output",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\optimized",
+      "--alpha",
+      "0.4",
+      "--beta",
+      "0.8",
+      "--limit",
+      "128",
+      "--seed",
+      "104729",
+      "--horizon-seconds",
+      "98259",
+      "--trace-sample-modulo",
+      "1",
+      "--storage-in-goal",
+      "53",
+      "--storage-out-start",
+      "53"
+    ]
+  ],
+  "map_sha256": "daf51cf339862872ec1e6ce86fbdffccd326d83ebd80ebef0e926917c61ac0df",
+  "input_sha256": "d2916b99efdf8329c08971af2120009e880fe43404bcd59b13370cd81ca8d3c3",
+  "checks": {
+    "cache_regression.jsonl": {
+      "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_cache_regression.jsonl",
+      "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_cache_regression.jsonl",
+      "sha256": "6029f0c9181391980beb7ad80abe28983d064517d900d3d0c9e9e4da7020ded8",
+      "byte_identical": true,
+      "size_bytes": 175
+    },
+    "T1_T10.jsonl": {
+      "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_T1_T10.jsonl",
+      "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_T1_T10.jsonl",
+      "sha256": "e514d30b1b0827595124bae27fe8d719b335c566dd3531d8791f78742cb8161d",
+      "byte_identical": true,
+      "size_bytes": 28848
+    },
+    "zero_through.jsonl": {
+      "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through.jsonl",
+      "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through.jsonl",
+      "sha256": "e52e9ce7139a2841d81138e5271cd5fe9a0709ce78a2b266a54d3fe8c95c99fc",
+      "byte_identical": true,
+      "size_bytes": 827
+    },
+    "zero_through_traces": [
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z10_zero_goal.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z10_zero_goal.tsv",
+        "sha256": "000ab92bdddcef877998c9fda0bcabcff9b2b2f6feb9aaacabb4324c672e7b67",
+        "byte_identical": true,
+        "size_bytes": 579
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z11_real_nanning_130_57_58.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z11_real_nanning_130_57_58.tsv",
+        "sha256": "7e98b551927978d83315b5b7be9c69028ab8f82a725893ecc101ead128c922f9",
+        "byte_identical": true,
+        "size_bytes": 6644
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z12_same_commit_source_entry.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z12_same_commit_source_entry.tsv",
+        "sha256": "e5e6dd9985afa612e8230e82528ffeec59e553d6f3f62e3e7c777773adf16323",
+        "byte_identical": true,
+        "size_bytes": 2148
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z1_zero_intermediate.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z1_zero_intermediate.tsv",
+        "sha256": "890b663d91be8f6348c2df87c8e314466fdf2cb01bba88d0b0ad03a9e722dae6",
+        "byte_identical": true,
+        "size_bytes": 1243
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z2_positive_control.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z2_positive_control.tsv",
+        "sha256": "08467c72cd870317b3d1735c5f077d1c26e0c86194f742801ccd25919cc6277d",
+        "byte_identical": true,
+        "size_bytes": 1836
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z3_following.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z3_following.tsv",
+        "sha256": "317db8136bed0ff3031740806fba49f8c59190cad88287a8eb569b50894122b3",
+        "byte_identical": true,
+        "size_bytes": 1636
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z4_one_cell_footprint.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z4_one_cell_footprint.tsv",
+        "sha256": "8468bc3ad9a656b604242a86604ddfb942193dc4e4c16205a26ec6cc4f5f9688",
+        "byte_identical": true,
+        "size_bytes": 1619
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z5_simultaneous_competition.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z5_simultaneous_competition.tsv",
+        "sha256": "f7c56d431099c891d6e28c2a56f6836a6e8ebaee98b38ccfdc2244d1dc607a5f",
+        "byte_identical": true,
+        "size_bytes": 1976
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z6_downstream_blocked_then_release.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z6_downstream_blocked_then_release.tsv",
+        "sha256": "660c2196d3272118688379eb2f2f9446c40d69c237fc68611e88153c3f28fa53",
+        "byte_identical": true,
+        "size_bytes": 8997
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z7_finite_service_not_deadlock.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z7_finite_service_not_deadlock.tsv",
+        "sha256": "a1137c9a8571467900f34527658d0190224b2b792fd1620dc1704b5f255c0135",
+        "byte_identical": true,
+        "size_bytes": 12517
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\unoptimized_zero_through\\Z8_no_path_deadlock.tsv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\optimized_zero_through\\Z8_no_path_deadlock.tsv",
+        "sha256": "ed328bd0583192b76d7dd4b176eba16b7bdcc0b14438f1a08d9e7557a8165cdf",
+        "byte_identical": true,
+        "size_bytes": 495
+      }
+    ],
+    "nanning_native_files": [
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\unoptimized\\bags.csv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\optimized\\bags.csv",
+        "sha256": "372315dcd8edcc1e4555214d702c92fb2fe0bad01f6e337df410c42a1d7793fc",
+        "byte_identical": true,
+        "size_bytes": 14815
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\unoptimized\\segments.csv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\optimized\\segments.csv",
+        "sha256": "1e57a53cddd35f9108b9ee5530281f59fc8238bca309d482cefb3bd1b8097c1b",
+        "byte_identical": true,
+        "size_bytes": 36641
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\unoptimized\\trace.csv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\optimized\\trace.csv",
+        "sha256": "16e6c4a27f4e0983836b5581010ea03891c6e6b8ff9f7dfc5412b4c65c15b271",
+        "byte_identical": true,
+        "size_bytes": 19914376
+      },
+      {
+        "unoptimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\unoptimized\\event_summary.csv",
+        "optimized": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_cie_dh_zero_through_repair_20260905\\optimization_equivalence_v1\\nanning_128_trace1\\optimized\\event_summary.csv",
+        "sha256": "4a0182b5780ad33674ce85a887bf33f1d69c7ca3f81527234bd179b83c2d9f36",
+        "byte_identical": true,
+        "size_bytes": 323
+      }
+    ]
+  },
+  "summary_differences_allowed_wall_only": {
+    "wall_seconds": [
+      "3.311938500",
+      "3.967409300"
+    ]
+  },
+  "representative_congestion": {
+    "raw_bag_count": "128",
+    "segment_count": "256",
+    "route_decisions": "5627",
+    "tied_route_decisions": "32",
+    "hold_count": "42326",
+    "stopped_ticks": "40210",
+    "junction_through_busy_holds": "838",
+    "following_footprint_holds": "11426"
+  },
+  "repeated_snapshot_node_goal_requests": 1390
+}

@@ -95,9 +95,16 @@ public final class FengDhEdgeLattice {
 
     public static final class Snapshot {
         private final Map<Integer, List<OccupantSnapshot>> byEdge;
+        private final int[] movingByEdge;
+        private final int[] stoppedByEdge;
 
-        Snapshot(Map<Integer, List<OccupantSnapshot>> byEdge) {
+        Snapshot(
+                Map<Integer, List<OccupantSnapshot>> byEdge,
+                int[] movingByEdge,
+                int[] stoppedByEdge) {
             this.byEdge = byEdge;
+            this.movingByEdge = movingByEdge;
+            this.stoppedByEdge = stoppedByEdge;
         }
 
         public List<OccupantSnapshot> occupants(int edgeId) {
@@ -106,23 +113,11 @@ public final class FengDhEdgeLattice {
         }
 
         public int movingCount(int edgeId) {
-            int count = 0;
-            for (OccupantSnapshot occupant : occupants(edgeId)) {
-                if (occupant.status == FengDhBagState.Status.MOVING_ON_EDGE) {
-                    count++;
-                }
-            }
-            return count;
+            return edgeId >= 0 && edgeId < movingByEdge.length ? movingByEdge[edgeId] : 0;
         }
 
         public int stoppedCount(int edgeId) {
-            int count = 0;
-            for (OccupantSnapshot occupant : occupants(edgeId)) {
-                if (occupant.status == FengDhBagState.Status.STOPPED_ON_EDGE) {
-                    count++;
-                }
-            }
-            return count;
+            return edgeId >= 0 && edgeId < stoppedByEdge.length ? stoppedByEdge[edgeId] : 0;
         }
     }
 
@@ -354,18 +349,26 @@ public final class FengDhEdgeLattice {
     public Snapshot snapshot() {
         HashMap<Integer, List<OccupantSnapshot>> result =
                 new HashMap<Integer, List<OccupantSnapshot>>();
+        int[] movingByEdge = new int[edges.size()];
+        int[] stoppedByEdge = new int[edges.size()];
         for (EdgeData edge : edges) {
             ArrayList<OccupantSnapshot> values = new ArrayList<OccupantSnapshot>();
             for (Map.Entry<Integer, FengDhBagState> entry
                     : occupancy.get(Integer.valueOf(edge.id)).entrySet()) {
+                FengDhBagState.Status status = entry.getValue().getStatus();
                 values.add(new OccupantSnapshot(
                         entry.getValue().taskId,
                         entry.getKey().intValue(),
-                        entry.getValue().getStatus()));
+                        status));
+                if (status == FengDhBagState.Status.MOVING_ON_EDGE) {
+                    movingByEdge[edge.id]++;
+                } else if (status == FengDhBagState.Status.STOPPED_ON_EDGE) {
+                    stoppedByEdge[edge.id]++;
+                }
             }
             result.put(Integer.valueOf(edge.id), Collections.unmodifiableList(values));
         }
-        return new Snapshot(Collections.unmodifiableMap(result));
+        return new Snapshot(Collections.unmodifiableMap(result), movingByEdge, stoppedByEdge);
     }
 
     public List<FengDhBagState> occupantsDownstreamFirst(int edgeId) {

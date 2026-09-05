@@ -117,7 +117,7 @@ def audit(version: str, source_dir: Path) -> None:
     sources = sorted(source_dir.glob("*.java"))
     source_sha = aggregate(sources, source_dir.parent)
     if version == "old": assert source_sha == OLD_SHA, source_sha
-    classes = ROOT / f"build/feng_zero_through_audit_{version}"
+    classes = ROOT / f"build/feng_zero_through_audit_{OUT.name}_{version}"
     classes.mkdir(parents=True, exist_ok=True)
     subprocess.run([shutil.which("javac") or "javac", "--release", "8", "-encoding", "UTF-8", "-d", str(classes),
                     *map(str, sources), str(HARNESS)], check=True, cwd=ROOT)
@@ -154,7 +154,7 @@ def audit(version: str, source_dir: Path) -> None:
 def regression() -> None:
     baseline = ROOT / "outputs/runtime/feng_cie_dh_reconstruction/primary"
     destination = OUT / "map2_full_population_repaired"
-    classes = ROOT / "build/feng_zero_through_regression"
+    classes = ROOT / f"build/feng_zero_through_{OUT.name}"
     command = [sys.executable, str(ROOT / "scripts/eval/run_feng_paper_env_cie_dh.py"), "run",
                "--classes-dir", str(classes), "--output-dir", str(destination)]
     subprocess.run(command, cwd=ROOT, check=True)
@@ -226,19 +226,58 @@ def summarize() -> None:
     print(json.dumps({"pass": True, "repaired": len(rows), "unchanged": unaffected}))
 
 
+def compare_reference(reference: Path) -> None:
+    """Require all sampled service traces and the complete map2 population to match."""
+    comparisons = {}
+    names = [f"repaired_{name}_single_bag.jsonl" for name in
+             ("map2", "nanning", "nanning_topology_witness")]
+    names += [f"map2_full_population_repaired/{name}" for name in
+              ("bags.csv", "segments.csv", "event_summary.csv", "trace.csv")]
+    for name in names:
+        before, after = reference / name, OUT / name
+        comparisons[name] = {"reference_sha256": sha(before), "current_sha256": sha(after),
+                             "byte_identical": before.read_bytes() == after.read_bytes()}
+    native = "map2_full_population_repaired"
+    with (reference / native / "summary.csv").open(encoding="utf-8", newline="") as h:
+        before_summary = next(csv.DictReader(h))
+    with (OUT / native / "summary.csv").open(encoding="utf-8", newline="") as h:
+        after_summary = next(csv.DictReader(h))
+    differences = {k: {"reference": before_summary.get(k), "current": after_summary.get(k)}
+                   for k in before_summary.keys() | after_summary.keys()
+                   if before_summary.get(k) != after_summary.get(k)}
+    reference_identity = json.loads((reference / native / "runner_status.json").read_text())["identity"]
+    current_identity = json.loads((OUT / native / "runner_status.json").read_text())["identity"]
+    report = {"schema": "czr005.feng_correctness_to_optimized_equivalence.v1",
+              "reference_directory": reference.relative_to(ROOT).as_posix(),
+              "reference_source_sha256": reference_identity["reconstruction_java_source_aggregate_sha256"],
+              "current_source_sha256": current_identity["reconstruction_java_source_aggregate_sha256"],
+              "reference_class_sha256": reference_identity["compiled_java_class_aggregate_sha256"],
+              "current_class_sha256": current_identity["compiled_java_class_aggregate_sha256"],
+              "file_comparisons": comparisons, "summary_differences": differences,
+              "allowed_summary_difference_fields": ["wall_seconds"],
+              "pass": all(v["byte_identical"] for v in comparisons.values()) and set(differences) <= {"wall_seconds"}}
+    write_json(OUT / "correctness_to_optimized_equivalence.json", report)
+    print(json.dumps(report, indent=2))
+    assert report["pass"], "optimization changed service traces or population behavior"
+
+
 def main() -> None:
     global OUT
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["prepare", "prepare-old", "audit", "regression", "summarize"])
+    parser.add_argument("action", choices=["prepare", "prepare-old", "audit", "regression", "summarize", "compare-reference"])
     parser.add_argument("--version", default="repaired")
     parser.add_argument("--source-dir", type=Path, default=CORE)
     parser.add_argument("--output-dir", type=Path, default=OUT)
+    parser.add_argument("--reference-dir", type=Path)
     args = parser.parse_args()
     OUT = args.output_dir.resolve()
     if args.action == "prepare": prepare()
     elif args.action == "prepare-old": prepare_old()
     elif args.action == "audit": audit(args.version, args.source_dir.resolve())
     elif args.action == "summarize": summarize()
+    elif args.action == "compare-reference":
+        if args.reference_dir is None: parser.error("compare-reference requires --reference-dir")
+        compare_reference(args.reference_dir.resolve())
     else: regression()
 
 

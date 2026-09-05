@@ -98,3 +98,13 @@ tests/test_g4irsf16_*.py text eol=lf
 # CIE E2 physical-equivalence traces are compressed binary evidence.
 outputs/runtime/cie_revision/e2_equivalence/*.zst -text
 cpp/**/g4irsf16_*.hpp text eol=lf
+
+# The DH executable identities bind the Windows source bytes. Audit TSVs have
+# intentional empty final columns; retain measured bytes and their SHA hashes.
+benchmarks/java/feng_cie_dh/App/*.java text eol=crlf
+outputs/runtime/feng_cie_dh_zero_through_repair_v1/** -text -whitespace
+outputs/runtime/feng_cie_dh_zero_through_repair_20260905/** -text -whitespace
+outputs/evidence/feng_cie_dh_repair_20260905/** -text -whitespace
+outputs/runtime/feng_cie_dh_zero_through_repair_v1/**/*.tsv -text -whitespace
+outputs/runtime/feng_cie_dh_zero_through_repair_20260905/**/*.tsv -text -whitespace
+outputs/runtime/feng_cie_dh_zero_through_repair_20260905/**/*.gz -text

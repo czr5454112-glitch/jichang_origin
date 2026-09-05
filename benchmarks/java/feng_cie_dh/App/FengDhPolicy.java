@@ -76,6 +76,9 @@ public final class FengDhPolicy {
     private final double alphaMoveSeconds;
     private final double betaStopSeconds;
     private final HashMap<Long, Path> shortestPathCache;
+    private final HashMap<Long, List<Path>> candidatePathCache;
+    private final HashMap<Long, Decision> snapshotDecisionCache;
+    private FengDhEdgeLattice.Snapshot cachedSnapshot;
     private long decisions;
     private long unreachableDecisions;
     private long tiedDecisions;
@@ -97,6 +100,8 @@ public final class FengDhPolicy {
         this.alphaMoveSeconds = alphaMoveSeconds;
         this.betaStopSeconds = betaStopSeconds;
         this.shortestPathCache = new HashMap<Long, Path>();
+        this.candidatePathCache = new HashMap<Long, List<Path>>();
+        this.snapshotDecisionCache = new HashMap<Long, Decision>();
     }
 
     public double getAlphaMoveSeconds() {
@@ -127,22 +132,24 @@ public final class FengDhPolicy {
         if (currentNode == goalNode) {
             return null;
         }
-        ArrayList<Decision> candidates = new ArrayList<Decision>();
-        for (FengDhEdgeLattice.EdgeData first : lattice.outgoing(currentNode)) {
-            Path suffix = shortestPath(first.to, goalNode);
-            if (suffix == null) {
-                continue;
+        // Scores depend only on this immutable tick-start snapshot and the OD.
+        // Keep logical request/tie/unreachable counters on every cache hit.
+        if (snapshot != cachedSnapshot) {
+            snapshotDecisionCache.clear();
+            cachedSnapshot = snapshot;
+        }
+        Long key = Long.valueOf(pairKey(currentNode, goalNode));
+        if (snapshotDecisionCache.containsKey(key)) {
+            Decision cached = snapshotDecisionCache.get(key);
+            if (cached == null) {
+                unreachableDecisions++;
+            } else if (cached.equalScoreCandidateCount > 1) {
+                tiedDecisions++;
             }
-            ArrayList<Integer> nodes = new ArrayList<Integer>();
-            nodes.add(Integer.valueOf(currentNode));
-            nodes.addAll(suffix.nodeIds);
-            ArrayList<Integer> edges = new ArrayList<Integer>();
-            edges.add(Integer.valueOf(first.id));
-            edges.addAll(suffix.edgeIds);
-            Path continuation = new Path(
-                    nodes,
-                    edges,
-                    first.freeFlowSeconds() + suffix.freeFlowSeconds);
+            return cached;
+        }
+        ArrayList<Decision> candidates = new ArrayList<Decision>();
+        for (Path continuation : candidatePaths(currentNode, goalNode)) {
             int moving = 0;
             int stopped = 0;
             for (Integer edgeId : continuation.edgeIds) {
@@ -152,10 +159,12 @@ public final class FengDhPolicy {
             double eta = continuation.freeFlowSeconds
                     + alphaMoveSeconds * moving
                     + betaStopSeconds * stopped;
-            candidates.add(new Decision(first.id, continuation, moving, stopped, eta, 1));
+            candidates.add(new Decision(continuation.edgeIds.get(0).intValue(),
+                    continuation, moving, stopped, eta, 1));
         }
         if (candidates.isEmpty()) {
             unreachableDecisions++;
+            snapshotDecisionCache.put(key, null);
             return null;
         }
         Collections.sort(candidates, new Comparator<Decision>() {
@@ -183,13 +192,42 @@ public final class FengDhPolicy {
         if (equal > 1) {
             tiedDecisions++;
         }
-        return new Decision(
+        Decision selected = new Decision(
                 best.selectedEdgeId,
                 best.continuation,
                 best.movingBags,
                 best.stoppedBags,
                 best.etaSeconds,
                 equal);
+        snapshotDecisionCache.put(key, selected);
+        return selected;
+    }
+
+    /** Static topology paths keep the original outgoing-edge iteration order. */
+    private List<Path> candidatePaths(int currentNode, int goalNode) {
+        Long key = Long.valueOf(pairKey(currentNode, goalNode));
+        List<Path> cached = candidatePathCache.get(key);
+        if (cached != null) {
+            return cached;
+        }
+        ArrayList<Path> paths = new ArrayList<Path>();
+        for (FengDhEdgeLattice.EdgeData first : lattice.outgoing(currentNode)) {
+            Path suffix = shortestPath(first.to, goalNode);
+            if (suffix == null) {
+                continue;
+            }
+            ArrayList<Integer> nodes = new ArrayList<Integer>();
+            nodes.add(Integer.valueOf(currentNode));
+            nodes.addAll(suffix.nodeIds);
+            ArrayList<Integer> edges = new ArrayList<Integer>();
+            edges.add(Integer.valueOf(first.id));
+            edges.addAll(suffix.edgeIds);
+            paths.add(new Path(nodes, edges,
+                    first.freeFlowSeconds() + suffix.freeFlowSeconds));
+        }
+        List<Path> frozen = Collections.unmodifiableList(paths);
+        candidatePathCache.put(key, frozen);
+        return frozen;
     }
 
     /** Free-flow shortest continuation with lexicographic full-node tie breaking. */

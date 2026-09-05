@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from scripts.eval import run_cie_external_baseline_robustness as external
 
-RESULT_ROOT = ROOT / "outputs/runtime/cie_external_baseline_zero_through_v1"
+RESULT_ROOT = ROOT / "outputs/runtime/cie_external_baseline_zero_through_optimized_v1"
 AUDIT_ROOT = ROOT / "outputs/runtime/feng_cie_dh_zero_through_repair_20260905"
 BINARY = ROOT / "build/nanning_ablation_gate_f_pybind/python/Release/czr005_cpp.cp311-win_amd64.pyd"
 METHOD = "FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION"
@@ -53,7 +53,7 @@ def reuse(result_root: Path) -> None:
 def smoke(result_root: Path) -> None:
     identity = external.cell_dir(external.DEFAULT_WORKLOAD_ROOT, 1.0, external.SEEDS[0], "nanning")
     external.audit_cell(identity / "identity.json")
-    output = AUDIT_ROOT / "smoke_nanning_128"
+    output = AUDIT_ROOT / f"smoke_nanning_128_{external.DEFAULT_DH_CLASSES_DIR.name}"
     if (output / "runner_status.json").exists():
         raise ValueError("smoke evidence already exists; inspect it before selecting a new directory")
     command = [sys.executable, str(ROOT / "scripts/eval/run_feng_paper_env_cie_dh.py"), "run",
