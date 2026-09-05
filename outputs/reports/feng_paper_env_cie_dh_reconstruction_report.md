@@ -19,8 +19,8 @@ separate evidence layers throughout this report:
 Interim campaign note (2026-09-05): the executable code and all results
 available before a possible host shutdown are frozen in
 `outputs/reports/cie_external_baseline_checkpoint_20260905.md`. The external
-robustness matrix is explicitly incomplete at `164/180` normalized cells;
-Nanning CIE-DH contributes `14/30` cells and no final cross-map claim is made.
+robustness matrix is explicitly incomplete at `166/180` normalized cells;
+Nanning CIE-DH contributes `16/30` cells and no final cross-map claim is made.
 
 ## Direct answers to the required questions
 
@@ -85,12 +85,12 @@ Nanning CIE-DH contributes `14/30` cells and no final cross-map claim is made.
 
 10. **Do external paired seeds support G31 against reconstructed DH?** The
     answer remains not identified for the full cross-map matrix. At the
-    2026-09-05 shutdown checkpoint, `164/180` normalized cells exist: map2 is
+    2026-09-05 shutdown checkpoint, `166/180` normalized cells exist: map2 is
     complete and mixed at 1x (G31 mean is lower, but its P95/P99/max are
-    higher), whereas the Nanning DH port has only `14/30` cells. Its seven 1x
+    higher), whereas the Nanning DH port has only `16/30` cells. Its seven 1x
     cells complete 44.530% on average and its four 1.75x cells complete
-    44.308% on average. Its first three 2x cells complete 42.938% and deliver
-    28.280% on time on average; formal 2x timing is N/A by protocol. Every
+    44.308% on average. Its first five 2x cells complete 42.938% and deliver
+    28.275% on time on average; formal 2x timing is N/A by protocol. Every
     Nanning DH cell remains full-population incomplete. These are interim
     diagnostics, not a final external ranking.
 

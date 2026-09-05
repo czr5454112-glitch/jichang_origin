@@ -1,11 +1,11 @@
 # CIE external-baseline shutdown checkpoint — 2026-09-05
 
-Checkpoint time: `2026-09-05T09:05:34+08:00`.
+Checkpoint time: `2026-09-05T09:35:26.2664227+08:00`.
 
 Status: **INTERIM / INCOMPLETE**. The external-robustness campaign contains
-`164/180` validated normalized cells. All `90/90` map2 cells and all `60/60`
+`166/180` validated normalized cells. All `90/90` map2 cells and all `60/60`
 Nanning HCA/G31 cells are complete. The long-running Nanning CIE-DH port has
-`14/30` complete cells: `7/10` at 1x, `4/10` at 1.75x, and `3/10` at 2x.
+`16/30` complete cells: `7/10` at 1x, `4/10` at 1.75x, and `5/10` at 2x.
 This checkpoint is for review and shutdown recovery; it is not a final
 cross-map performance claim.
 
@@ -15,10 +15,10 @@ cross-map performance claim.
 |---|---:|---:|---:|---:|---:|---|
 | Nanning 1x | 7/10 | 12,693.714 / 28,506 | 44.52997% | 12,327.143 | 43.24403% | N/A: every cell is full-population incomplete |
 | Nanning 1.75x | 4/10 | 22,050.000 / 49,765 | 44.30825% | 14,126.750 | 28.38692% | N/A: every cell is full-population incomplete |
-| Nanning 2x | 3/10 | 24,480.000 / 57,012 | 42.93833% | 16,123.000 | 28.28001% | N/A by the frozen 2x protocol |
+| Nanning 2x | 5/10 | 24,479.600 / 57,012 | 42.93763% | 16,120.000 | 28.27475% | N/A by the frozen 2x protocol |
 
 The completed-cell ranges are narrow: Nanning 1x completes 12,690–12,701
-bags, Nanning 1.75x completes 22,047–22,052, and the first three Nanning 2x
+bags, Nanning 1.75x completes 22,047–22,052, and the first five Nanning 2x
 cells complete 24,473–24,484. This is an early, internally
 consistent signal that the unchanged map2 partial state machine is not viable
 on Nanning under the frozen port. It must not be back-attributed to Feng's
@@ -45,15 +45,15 @@ and maximum 326.0 s versus 517.2 s.
 - Nanning 1x: `104729`, `130363`, `155921`, `205759`, `232003`, `283303`,
   `308081`.
 - Nanning 1.75x: `104729`, `181081`, `257053`, `308081`.
-- Nanning 2x: `155921`, `257053`, `308081`.
+- Nanning 2x: `104729`, `155921`, `205759`, `257053`, `308081`.
 
 The compact per-cell values and result hashes are in
 `outputs/tables/cie_external_baseline_checkpoint_20260905.csv`. The complete
 available aggregate is in
 `outputs/reports/cie_external_baseline_robustness.md` and is explicitly marked
-`INCOMPLETE (164/180)`. A compact immutable cell/hash checkpoint is in
-`outputs/runtime/cie_external_baseline_robustness/checkpoints/nanning_dh_14_of_30_20260905T0905.json`
-(SHA-256 `655d7cbbd80fd90cac1d8d43bf77b7bc642229da1e44f1189f1e911e804b7533`);
+`INCOMPLETE (166/180)`. A compact immutable cell/hash checkpoint is in
+`outputs/runtime/cie_external_baseline_robustness/checkpoints/nanning_dh_16_of_30_20260905T0935.json`
+(SHA-256 `b5d22137e280de3d0621e8d62cdbd181dd74e15f83c13dbfb77bb967765d1e3a`);
 it excludes all active and partial files.
 
 The matched seed-104729 execution-cost diagnostic is recorded separately in
@@ -68,17 +68,16 @@ At the checkpoint, twelve non-checkpointable Java cells were running:
 
 - Nanning 1x: `181081`, `257053`, `333667`;
 - Nanning 1.75x: `130363`, `205759`, `283303`, `333667`;
-- Nanning 2x: `104729`, `181081`, `205759`, `283303`, `333667`.
+- Nanning 2x: `130363`, `181081`, `232003`, `283303`, `333667`.
 
-Four coordinates had not started:
+Two coordinates had not started:
 
-- Nanning 1.75x: `155921`, `232003`;
-- Nanning 2x: `130363`, `232003`.
+- Nanning 1.75x: `155921`, `232003`.
 
 An operating-system shutdown invalidates only the twelve in-flight cells; the
-fourteen completed cells above remain valid. Resume must retain those fourteen,
+sixteen completed cells above remain valid. Resume must retain those sixteen,
 force-rerun any interrupted `running/null` coordinate from the beginning, and
-then run the four untouched coordinates. Partial native output must never be
+then run the two untouched coordinates. Partial native output must never be
 normalized or counted.
 
 ## Frozen executable identity
