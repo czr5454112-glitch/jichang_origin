@@ -1,0 +1,224 @@
+schema: czr005.feng_paper_env_cie_dh_reconstruction.v1
+frozen_from_git_commit: 4aeeda64cb7e9122c8d6e9e03705b03bafa62d8e
+
+identity:
+  historical_measurement:
+    method: FENG_PAPER_CIE_DH_HISTORICAL_MEASURED
+    status: PRIMARY_REFERENCE_NOT_EXECUTABLE
+    source: original Table 5.3 workbook DH sheet
+  exact_source_reproduction:
+    method: FENG_SOURCE_EXACT_CIE_DH
+    source_recovered: false
+    status: SOURCE_NOT_RECOVERED
+    may_stop_exact_source_track: true
+  paper_environment_reconstruction:
+    method: FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION
+    required: true
+    missing_source_is_not_a_stop_condition: true
+    completion_requires_executable_baseline: true
+    target_level: SEMANTICALLY_PARTIAL_RECONSTRUCTION
+  common_executor_adaptation:
+    method: CIE_DH_COMMON_EXECUTOR_ADAPTED
+    primary_baseline_eligible: false
+    purpose: route-policy isolation under a shared executor
+
+paper_environment:
+  executor: FENG_JAVA_POSITION_LEVEL_RECONSTRUCTION
+  implementation_language: Java
+  benchmark_main_class: App.FengDhBenchmark
+  benchmark_sources: benchmarks/java/feng_cie_dh/App
+  legacy_mirror: legacy/jichang_origin_readonly
+  legacy_mirror_mutation_allowed: false
+  map:
+    path: legacy/jichang_origin_readonly/map2.txt
+    sha256: 55f578cb4b8fcc61f5b13963fcb8546aca91e517ea6f8ff4a7361670f1b03f8f
+    vertex_count: 54
+    agv_length_m: 1.0
+    safe_length_m: 0.0
+  workload:
+    path: legacy/jichang_origin_readonly/inputdata.txt
+    sha256: 0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87
+    raw_bag_population: 28506
+    expanded_segment_population: 43603
+    storage_in_goal: 47
+    storage_out_start: 52
+    early_bag_threshold_seconds: 4800.0
+    storage_lead_seconds: 2700.0
+    table53_schedule_path: data/processed/feng_table53_segment_schedule.csv
+    table53_schedule_sha256: a3db0d3f495870437414af0b46a0a140f7cafe8111b40222ca59fcd78e7d4d86
+    table53_schedule_rows: 43603
+    table53_schedule_source: recovered workbook shared D column
+  recovered_java_source_aggregate_sha256: b0c7545abad1705eba9255527d39a864007bd576c9edbc9cb872a51e6acc9c25
+
+mechanics:
+  tick_seconds: 0.2
+  speed_mps: 2.5
+  movement_per_tick_m: 0.5
+  reconstructed_transfer_stage_seconds: 2.0
+  reconstructed_transfer_stage_status: FROZEN_HISTORICAL_OD_LOWER_ENVELOPE_INFERENCE_NOT_PAPER_EXPLICIT
+  transfer_stage_scope: >-
+    source fixed 2.0 s per-bag nonexclusive induction; at each non-goal
+    intermediate node, map throughTime is a locally exclusive junction stage
+    that retains the upstream edge footprint, followed by a per-bag
+    nonexclusive fixed 2.0 s timer after the upstream footprint is released;
+    timer completion enters the physical outgoing-edge FIFO; goal service is zero
+  source_induction:
+    duration_seconds: 2.0
+    capacity_semantics: per_bag_nonexclusive_timer_then_physical_outgoing_entry_fifo
+    evidence: historical_25_one_bag_OD_lower_envelopes_only
+  intermediate_handoff:
+    map_through_time_seconds_on_map2: 1.0
+    map_through_capacity_semantics: graph_node_local_exclusive
+    map_through_occupancy_semantics: retain_upstream_edge_footprint_as_STOPPED
+    post_through_transfer_seconds: 2.0
+    post_through_transfer_capacity_semantics: per_bag_nonexclusive_overlapping_timer
+    post_through_occupancy_semantics: upstream_edge_footprint_released
+    post_timer_admission_semantics: physical_outgoing_edge_entry_FIFO
+  goal_service_seconds: 0.0
+  evidence_limits:
+    demo3d_transferduration: NOT_ACCEPTED_AS_VALIDATION_EVIDENCE
+    unavailable_DH_source_state_machine: NOT_RECOVERED
+  footprint_definition: ceil((agv_length_m + safe_length_m) / movement_per_tick_m)
+  update: snapshot_plan_conflict_resolution_simultaneous_commit
+  state_space:
+    - NOT_RELEASED
+    - AT_LOADING_OR_JUNCTION
+    - MOVING_ON_EDGE
+    - STOPPED_ON_EDGE
+    - COMPLETED
+  merge_tie_break:
+    - arrival_tick_at_node
+    - task_release_tick
+    - task_id
+    - upstream_edge_id
+
+routing:
+  free_flow_cost: edge_length / speed_mps
+  occupancy_source: tick-start physical positions on the candidate continuation path
+  score: free_flow_time + alpha_seconds * moving_count + beta_seconds * stopped_count
+  hold: selected edge entry blocked by a physically stopped bag
+  coefficients:
+    disclosure_status: COEFFICIENTS_UNDISCLOSED_SENSITIVITY_REPORTED
+    physical_anchor: (agv_length_m + safe_length_m) / speed_mps
+    primary:
+      alpha_scale: 1.0
+      beta_over_alpha: 2.0
+    sensitivity:
+      alpha_scales: [0.5, 1.0, 2.0]
+      beta_over_alpha: [1.5, 2.0, 3.0]
+    frozen_before_formal_run: true
+    paper_table_used_as_tuning_target: false
+
+runner:
+  path: scripts/eval/run_feng_paper_env_cie_dh.py
+  java_release: 8
+  classes_dir: build/feng_cie_dh_java
+  output_root: outputs/runtime/feng_cie_dh_reconstruction
+  commands:
+    compile: compile
+    microtests: microtests
+    single_run: run
+    sensitivity: sensitivity
+    aggregate: aggregate
+  workload_scale: 1.0
+  seed: 0
+  max_raw_bags: 0
+  horizon_seconds: 0.0
+  trace_sample_modulo: 0
+
+table_5_3:
+  historical_reference_seconds:
+    FENG_PAPER_CIE_DH_HISTORICAL_MEASURED:
+      {min: 213.3, mean: 265.592131, p95: 336.9, p99: 384.595, max: 517.2}
+  historical_reference_minutes:
+    FENG_PAPER_CIE_DH_HISTORICAL_MEASURED: {min: 3.56, mean: 4.43, max: 8.62}
+    FENG_NATIVE_HCA: {min: 3.13, mean: 3.96, max: 5.98}
+  executable_reconstruction_seconds:
+    method: FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION
+    reproduction_level: SEMANTICALLY_PARTIAL_RECONSTRUCTION
+    table53_seconds: {min: 206.4, mean: 238.702287238, p95: 285.2, p99: 300.8, max: 326.0}
+  observation_unit: raw_bag
+  historical_regression_denominator: full_28506_raw_bag_population
+  start_timestamp: frozen_shared_schedule_D
+  end_timestamp: segment_completion_E
+  two_segment_aggregation: sum_each_segment_completion_E_minus_shared_schedule_D
+  ebs_scheduled_storage_wait_included: false
+  source_wait_after_shared_schedule_D_included: true
+  first_edge_admission_timestamp_used: false
+  completion_population: all_28506_raw_bags
+  identity_status: RECOVERED_EXACTLY_FROM_ORIGINAL_TABLE53_WORKBOOK_FORMULAS
+  note: >-
+    The original workbook computes each raw bag as the sum of segment E-D.
+    The D schedule is byte-frozen and shared by the HCA and DH sheets; planned
+    EBS storage gaps are therefore excluded, while any wait after D remains in
+    the measured segment interval. First-admission timing is diagnostic only.
+
+full_population_validation:
+  method: FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION
+  raw_bags: {completed: 28506, total: 28506}
+  segments: {completed: 43603, total: 43603}
+  event_counts:
+    stopped_ticks: 1872897
+    holds: 2282929
+    junction_through_busy_holds: 49194
+    following_footprint_holds: 361338
+    entry_stopped_holds: 243122
+    entry_moving_holds: 112599
+    outgoing_entry_FIFO_holds: 54311
+  segment_source_wait_mean_seconds: 2.089076440
+  interpretation: >-
+    Executable semantic extrapolation under the frozen reconstruction. It is
+    not the historical measurement and does not validate unavailable DH source.
+
+semantic_diagnostics:
+  fully_nonexclusive_intermediate:
+    status: REJECTED_CONGESTION_ERASURE
+    table53_seconds: {min: 206.4, mean: 232.810952, p95: 271.0, p99: 271.2, max: 273.6}
+  whole_3s_node_exclusive:
+    status: REJECTED_UNSUPPORTED_CAPACITY_COLLAPSE
+    table53_seconds: {min: 206.4, mean: 1057.2419, p95: 4363.15, p99: 6177.7, max: 8767.2}
+    holds: 117181154
+  whole_boundary_retained:
+    status: REJECTED_AFTER_1000_BAG_PREFIX
+    population: 1000
+    full_population_run_completed: false
+    table53_seconds: {min: 209.6, mean: 350.8922, p95: 551.01, p99: 674.458, max: 742.8}
+  source_minimal_executable_extrapolation:
+    status: DIAGNOSTIC_NOT_HISTORICAL_MEASUREMENT
+    table53_seconds: {min: 188.2, mean: 210.104876, p95: 246.4, p99: 249.6, max: 260.0}
+
+hca_immutability_gate:
+  method: FENG_NATIVE_HCA
+  artifact: outputs/runtime/feng_cie_dh_reconstruction/hca_regression.json
+  fresh_rerun_raw_artifact: outputs/raw/feng_paper_env_hca_rerun/fresh_hca_summary.json
+  status: FENG_NATIVE_HCA_REGRESSION_PASS
+  stable_aggregate_projection_sha256: 165cc039f274412d886665616e854dfda3897adf21fa583120e6751344bf5189
+  segment_count: 43603
+  raw_bag_count: 28506
+  processed_attempt_seconds:
+    min: 188.0
+    mean: 236.710166280783
+    max: 357.0
+
+independence_gate:
+  prohibited_executable_dependencies:
+    - czr005_cpp
+    - g4irsf31_map_adapter
+    - H_SA
+    - scheduled_incoming
+    - service_calendar
+    - J2
+    - M3
+    - R3
+    - E2
+    - P2
+    - surviving_graph
+  prohibited_legacy_mutation: true
+  python_role: compile_run_and_aggregate_only
+
+reporting_contract:
+  no_survivor_timing: true
+  incomplete_population_timing_status: NOT_APPLICABLE
+  report_all_sensitivity_cells: true
+  no_post_result_coefficient_selection: true
+  no_common_executor_substitution: true

@@ -2,7 +2,7 @@
   "ablation_contract": {
     "arm": "FULL_MINUS_Q",
     "base_algorithm": "G31_S4_NATIVE",
-    "base_full_s4_request_sha256": "eedd8676fbb42d3fe9790f0e638fe7127510e01b08ecc2a1d4c7dea767138d13",
+    "base_full_s4_request_sha256": "071c7270af404df8c75edb6da2b12dc7ca42547db09851098e8be3b12488c1aa",
     "changed_request_fields_from_full_s4": [
       "s4_score_component_mask"
     ],
@@ -37,7 +37,7 @@
     "s4_score_component_mask": 14,
     "scale": 2,
     "segment_count": 87206,
-    "selected_request_sha256": "28fd0d3c6cf227bc84faea9fa87ea646e416706db5609fca545257e89e9174e1",
+    "selected_request_sha256": "88981305c62653070550cb38274c86fbb55bdbbca21a70b8a8364493bb4249a7",
     "sole_permitted_algorithmic_delta": "s4_score_component_mask",
     "static_potential": "H_SA",
     "strict_local_descent": true
@@ -122,7 +122,7 @@
       "fixed_horizon_echo": true,
       "loaded_expected_binary": true,
       "m3_echo": true,
-      "merge_grant_active_bijection": false,
+      "merge_grant_active_bijection": true,
       "merge_grant_conservation": true,
       "registered_2x_population": true,
       "reservation_conflicts_zero": true,
@@ -139,7 +139,7 @@
       "ebs_lifecycle_conservation",
       "p2_atomic_commit_rollback_conservation"
     ],
-    "pass": false
+    "pass": true
   },
   "fixed_denominator_business": {
     "capacity": {
@@ -150,9 +150,11 @@
     "detailed": {
       "backlog": {
         "raw_bag_network_after_all_segments_admitted": {
+          "area_includes_residual_to_observation_end": true,
           "arrival_count": 57012,
           "arrival_rate_per_second": 0.8717777155114264,
-          "backlog_area_seconds": 693509386.1957432,
+          "backlog_area_method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
+          "backlog_area_seconds": 693519861.614743,
           "backlog_at_last_arrival": 11305,
           "backlog_slope_fraction_of_arrival_rate": 0.1676688267612277,
           "backlog_slope_per_second": 0.1461699467563842,
@@ -160,11 +162,18 @@
           "departure_rate_during_arrivals_per_second": 0.6989115281498766,
           "drain_time_seconds": 15440.113000000143,
           "end_backlog": 1087,
-          "peak_backlog": 14628
+          "last_arrival_time_seconds": 82809.25,
+          "last_departure_time_seconds": 98249.36300000014,
+          "last_event_time_seconds": 98249.36300000014,
+          "observation_end_seconds": 98259.0,
+          "peak_backlog": 14628,
+          "tail_extension_area_seconds": 10475.418999844478
         },
         "raw_bag_source_until_all_segments_admitted": {
+          "area_includes_residual_to_observation_end": true,
           "arrival_count": 57012,
           "arrival_rate_per_second": 0.769020340997767,
+          "backlog_area_method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
           "backlog_area_seconds": 131856789.62147595,
           "backlog_at_last_arrival": 88,
           "backlog_slope_fraction_of_arrival_rate": -0.029109726648905983,
@@ -173,12 +182,19 @@
           "departure_rate_during_arrivals_per_second": 0.7678333314206989,
           "drain_time_seconds": 405.52417999999307,
           "end_backlog": 0,
-          "peak_backlog": 4224
+          "last_arrival_time_seconds": 82403.72582,
+          "last_departure_time_seconds": 82809.25,
+          "last_event_time_seconds": 82809.25,
+          "observation_end_seconds": 98259.0,
+          "peak_backlog": 4224,
+          "tail_extension_area_seconds": 0.0
         },
         "raw_bag_total": {
+          "area_includes_residual_to_observation_end": true,
           "arrival_count": 57012,
           "arrival_rate_per_second": 0.769020340997767,
-          "backlog_area_seconds": 825366175.8172289,
+          "backlog_area_method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
+          "backlog_area_seconds": 825376651.2362287,
           "backlog_at_last_arrival": 11580,
           "backlog_slope_fraction_of_arrival_rate": 0.17325947695425456,
           "backlog_slope_per_second": 0.1332400620484556,
@@ -186,12 +202,19 @@
           "departure_rate_during_arrivals_per_second": 0.6128206716517671,
           "drain_time_seconds": 15845.637180000136,
           "end_backlog": 1087,
-          "peak_backlog": 15835
+          "last_arrival_time_seconds": 82403.72582,
+          "last_departure_time_seconds": 98249.36300000014,
+          "last_event_time_seconds": 98249.36300000014,
+          "observation_end_seconds": 98259.0,
+          "peak_backlog": 15835,
+          "tail_extension_area_seconds": 10475.418999844478
         },
         "segment_network": {
+          "area_includes_residual_to_observation_end": true,
           "arrival_count": 87206,
           "arrival_rate_per_second": 1.1699001451604618,
-          "backlog_area_seconds": 881926035.7426332,
+          "backlog_area_method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
+          "backlog_area_seconds": 881936520.7986331,
           "backlog_at_last_arrival": 13730,
           "backlog_slope_fraction_of_arrival_rate": 0.15300537029017736,
           "backlog_slope_per_second": 0.1790010049128087,
@@ -199,11 +222,18 @@
           "departure_rate_during_arrivals_per_second": 0.985707211267689,
           "drain_time_seconds": 15440.113000000143,
           "end_backlog": 1088,
-          "peak_backlog": 18225
+          "last_arrival_time_seconds": 82809.25,
+          "last_departure_time_seconds": 98249.36300000014,
+          "last_event_time_seconds": 98249.36300000014,
+          "observation_end_seconds": 98259.0,
+          "peak_backlog": 18225,
+          "tail_extension_area_seconds": 10485.055999844335
         },
         "segment_source": {
+          "area_includes_residual_to_observation_end": true,
           "arrival_count": 87206,
           "arrival_rate_per_second": 1.170045338552609,
+          "backlog_area_method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
           "backlog_area_seconds": 5080221.728780002,
           "backlog_at_last_arrival": 37,
           "backlog_slope_fraction_of_arrival_rate": 0.00010987392618401335,
@@ -212,8 +242,19 @@
           "departure_rate_during_arrivals_per_second": 1.169548908518822,
           "drain_time_seconds": 9.25,
           "end_backlog": 0,
-          "peak_backlog": 1201
+          "last_arrival_time_seconds": 82800.0,
+          "last_departure_time_seconds": 82809.25,
+          "last_event_time_seconds": 82809.25,
+          "observation_end_seconds": 98259.0,
+          "peak_backlog": 1201,
+          "tail_extension_area_seconds": 0.0
         }
+      },
+      "backlog_area_contract": {
+        "legacy_incomplete_last_event_area_is_not_reportable_without_exact_correction": true,
+        "method": "EVENT_STEP_INTEGRAL_THROUGH_OBSERVATION_END_V2",
+        "observation_end_seconds": 98259.0,
+        "tail_backlog_integrated_to_observation_end": true
       },
       "completed_raw_bag_count": 55925,
       "completion_rate": 0.9809338384901424,
@@ -307,21 +348,21 @@
     "whole_population": true
   },
   "provenance": {
-    "binary_path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\build_cie_revision\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
-    "binary_sha256": "085a87615d5cd9a38fa3c7e5a26249ea99593d1a9277d064dd5a309a03452aca",
+    "binary_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\nanning_ablation_gate_f_pybind\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+    "binary_sha256": "b00fd178dca5b3f201d50ddfc6446959272baa4cc45b4ee01a2f08e0c85a91f5",
     "canonical_workload_path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\build_cie_revision\\workloads\\g4irsf31_nanning\\nanning_2x_canonical.jsonl",
     "canonical_workload_sha256": "55538837011a1ed31eb272cc170fdc9fefb3b40ec14e2ae0574877a8c465a115",
     "executor_identity": "COMMON_CPP_EVENT_EXECUTOR_G31_NATIVE",
-    "git_branch": "codex/cie-native-dh-mechanism-evidence",
-    "git_commit": "00fc8aa7eb05d7a8dcececa3dc361961c50c8f8d",
+    "git_branch": "codex/feng-paper-env-cie-dh-reconstruction",
+    "git_commit": "4aeeda64cb7e9122c8d6e9e03705b03bafa62d8e",
     "random_seed": null,
     "release_protocol": "canonical_complete_flight_population",
-    "revision_manifest_path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\configs\\eval\\cie_revision_manifest.yaml",
-    "revision_manifest_sha256": "0bc8471ed4f34e046aae0b912737290716556317cdc0aec9e57ff2ada460dc17",
+    "revision_manifest_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\configs\\eval\\cie_revision_manifest.yaml",
+    "revision_manifest_sha256": "029ebdb9384530081adcfbf5f7e1f52ea6af7a5d94dc80431b16d109c98fed3e",
     "survivor_timing_used": false
   },
   "runtime": {
-    "cpu_seconds": 970.015625,
+    "cpu_seconds": 1290.796875,
     "decision_count": 1175917,
     "event_count": 15035166,
     "mechanism_activation_j2_p2_e2": {
@@ -450,9 +491,9 @@
       "deadlock_count": 1412,
       "deadlock_escape_activation_count": 1412,
       "decision_count": 1175917,
-      "decision_latency_us_p50": 34.2,
-      "decision_latency_us_p95": 423.3,
-      "decision_latency_us_p99": 730.9,
+      "decision_latency_us_p50": 36.3,
+      "decision_latency_us_p95": 547.2,
+      "decision_latency_us_p99": 953.6,
       "decision_trace_seen_count": 1343416,
       "decision_trace_shard_seen_count": 1343416,
       "decision_trace_stored_count": 0,
@@ -473,7 +514,7 @@
       "event_seq_audit_dropped_count": 0,
       "event_seq_audit_stored_count": 0,
       "event_seq_audit_total_count": 0,
-      "event_throughput_per_second": 15243.219957712068,
+      "event_throughput_per_second": 11552.513804835336,
       "event_trace_limit": 0,
       "event_trace_limit_inherited": false,
       "event_trace_truncated": true,
@@ -543,8 +584,8 @@
       "junction_same_timestamp_batch_count": 0,
       "junction_service_complete_event_count": 1176940,
       "legacy_pibt_lite_enabled": false,
-      "loaded_cpp_binary_path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\build_cie_revision\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
-      "loaded_cpp_binary_sha256": "085a87615d5cd9a38fa3c7e5a26249ea99593d1a9277d064dd5a309a03452aca",
+      "loaded_cpp_binary_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\nanning_ablation_gate_f_pybind\\python\\Release\\czr005_cpp.cp311-win_amd64.pyd",
+      "loaded_cpp_binary_sha256": "b00fd178dca5b3f201d50ddfc6446959272baa4cc45b4ee01a2f08e0c85a91f5",
       "local_fault_policy_action_count": 0,
       "local_fault_policy_hold_count": 0,
       "local_fault_policy_reroute_count": 0,
@@ -567,7 +608,7 @@
       "max_source_arbitration_batch_size": 470,
       "max_source_queue_delay": 5494.739899999997,
       "max_source_queue_length": 1033,
-      "merge_grant_active_bijection_holds": false,
+      "merge_grant_active_bijection_holds": true,
       "merge_grant_active_grant_rejection_count": 0,
       "merge_grant_active_state_integrity_pass": false,
       "merge_grant_candidate_total_count": 588066,
@@ -690,7 +731,7 @@
       "runtime_full_cie_astar_calls": 0,
       "runtime_loop_owner": "cpp_event_scheduler",
       "runtime_name": "event_driven_local_decision_runtime",
-      "runtime_seconds": 986.3510493,
+      "runtime_seconds": 1301.4627166,
       "s4_direct_neighbor_merge_calendar_visibility_claim_boundary": "direct_outgoing_neighbor_calendar_scalar;existing_calendar_wait_weight;J2_authority_unchanged;O_outdegree;no_full_route;no_learning",
       "s4_direct_neighbor_merge_calendar_visibility_enabled": true,
       "s4_direct_neighbor_merge_calendar_visibility_learning_active": false,
@@ -752,14 +793,14 @@
       "unresolved_deadlock_count": 0
     },
     "peak_rss_bytes": "NOT_MEASURED",
-    "wall_seconds": 991.9546065998729
+    "wall_seconds": 1308.3041139999405
   },
   "scale": 2,
   "schema": "czr005.cie_targeted_ablation.run.v1",
   "selection_protocol": {
     "activation_evidence_interpreted_by_runner": false,
-    "activation_evidence_path": "C:\\PROGRAMING\\czr005\\.cie_native_dh_worktree\\outputs\\tables\\cie_component_activation.csv",
-    "activation_evidence_sha256": "655f4428c7fc8f7b5edb91cdc64fbb73bbf9decd4b62562e50b319292f6af7af",
+    "activation_evidence_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\tables\\cie_component_activation.csv",
+    "activation_evidence_sha256": "09d9450b9ad357fed11d660dc59731ace8294dcf7edacf16f7ddaf01fb0d6d29",
     "activation_gate": "REQUIRED_BEFORE_INVOCATION",
     "arm_selected_from_outcomes_by_runner": false,
     "preregistered_arm_catalog": {
@@ -772,5 +813,5 @@
       "H_PLUS_Q_PLUS_I": 3
     }
   },
-  "status": "FAILED_INTEGRITY"
+  "status": "COMPLETE"
 }

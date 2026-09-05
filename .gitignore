@@ -31,3 +31,43 @@ artifacts/models/*
 !artifacts/models/g4irsf17_*.json
 !artifacts/models/g4irsf18_*.json
 artifacts/tasks/g4irsf2_high_flow_tasks.jsonl
+
+# Reproducible generated workloads and native raw evidence for the Feng-env
+# reconstruction campaign.  The committed runners, compact tables, reports,
+# identities, and deterministic sampled trace are the review surface.
+data/processed/workloads/cie_external_robustness/
+data/processed/workloads/cie_critical_load_curve/
+outputs/raw/
+artifacts/tasks/cie_component_activation/map2_1.25x_*
+artifacts/tasks/cie_component_activation/map2_1.50x_*
+artifacts/tasks/cie_component_activation/map2_1.75x_*
+artifacts/tasks/cie_component_activation/nanning_1.25x_*
+artifacts/tasks/cie_component_activation/nanning_1.50x_*
+artifacts/tasks/cie_component_activation/nanning_1.75x_*
+artifacts/tasks/g4irsf31_nanning/nanning_*_canonical.jsonl
+artifacts/tasks/g4irsf31_nanning/nanning_*_raw.txt
+
+outputs/runtime/feng_cie_dh_reconstruction/**/bags.csv
+outputs/runtime/feng_cie_dh_reconstruction/**/segments.csv
+outputs/runtime/feng_cie_dh_reconstruction/**/stdout.txt
+outputs/runtime/feng_cie_dh_reconstruction/**/stderr.txt
+outputs/runtime/feng_cie_dh_reconstruction/primary/trace.csv
+outputs/runtime/feng_cie_dh_reconstruction/sensitivity/*/
+outputs/runtime/feng_cie_dh_reconstruction/sensitivity_aggregate.json
+outputs/runtime/feng_cie_dh_reconstruction/scaling/
+outputs/runtime/feng_cie_dh_reconstruction/node_service_validation/
+outputs/runtime/feng_common_executor_bridge/
+outputs/runtime/cie_critical_load_curve/
+outputs/runtime/cie_external_baseline_robustness/
+outputs/runtime/cie_revision/nanning_2x_tail_audit/details/
+outputs/runtime/cie_revision/random_robustness/**/*_P1D0.json
+outputs/runtime/cie_revision/random_robustness/**/*_P0D1.json
+outputs/runtime/cie_revision/random_factorial_missing_commands.cmd
+outputs/runtime/cie_revision/random_factorial_missing_plan.json
+outputs/reports/cie_external_baseline_robustness_smoke.md
+outputs/tables/cie_external_baseline_robustness_smoke.csv
+
+# Local test and workbook-audit scratch directories.
+.tmp_pytest*/
+.tmp_feng_workbook_audit/
+tmp/

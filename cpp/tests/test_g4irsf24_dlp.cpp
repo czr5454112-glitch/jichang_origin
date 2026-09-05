@@ -124,6 +124,7 @@ EventDrivenJunctionResult run_j2() {
   config.event_semantics = "E4";
   config.pibt_mode = "P2";
   config.merge_grant_timing_mode = "jit_fair_aging_deadline";
+  config.merge_grant_rule = "M3";
   config.g4irsf24_dlp = dlp_config("ewma", 0.0, 0.0);
   config.g4irsf24_dlp.edge_residuals.clear();
   config.g4irsf24_dlp.insert_edge(0, 4, 1.0, 8);

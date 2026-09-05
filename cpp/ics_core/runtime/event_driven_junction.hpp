@@ -3579,6 +3579,15 @@ class EventDrivenJunctionRuntime {
     }
     require_checkpoint_safe_boundary();
     active_backlog_at_runtime_stop_ = active_bag_count_;
+    // The controller record, move-only bag capability, in-transit owner and
+    // exact destination lease all describe the last executable event
+    // boundary.  Validate that boundary before finalize_incomplete() changes
+    // every unfinished bag to the reporting-only kFailed terminal state.
+    // Mixing the pre-finalization grant state with post-finalization bag
+    // status makes a valid capability look orphaned whenever a fixed horizon
+    // cuts through an edge traversal.
+    result_.summary.merge_grant_active_bijection_holds =
+        merge_grant_active_bijection_holds_at_runtime_stop();
     finalize_incomplete();
     build_bag_results();
     build_junction_results();
@@ -4580,9 +4589,10 @@ class EventDrivenJunctionRuntime {
   }
 
   DestinationMergeGrantRule effective_merge_grant_rule() const {
-    return destination_merge_grant_rule_for_timing(
-        canonical_merge_grant_timing_mode(),
-        canonical_merge_grant_rule());
+    // Timing owns eligibility and wakeup semantics; the configured rule owns
+    // ready-set priority.  Keeping those axes independent makes J2/M1 and
+    // J2/M3 identifiable without adding a policy layer or a new mode.
+    return canonical_merge_grant_rule();
   }
 
   DestinationMergeGrantRule canonical_merge_grant_rule() const {
@@ -17653,6 +17663,69 @@ class EventDrivenJunctionRuntime {
     --active_bag_count_;
   }
 
+  [[nodiscard]] bool
+  merge_grant_active_bijection_holds_at_runtime_stop() const {
+    if (!uses_destination_merge_grants()) {
+      return true;
+    }
+    if (g4irsf14_state_ == nullptr) {
+      return false;
+    }
+
+    bool holds = true;
+    std::size_t active_record_count = 0;
+    for (const auto& entry : destination_merge_controllers_) {
+      const auto& controller = entry.second;
+      active_record_count += controller.active_.size();
+      for (const auto& active : controller.active_) {
+        const auto bag = bags_.find(active.owner_runtime_bag_id);
+        const auto merge =
+            g4irsf14_state_->destination_merge_bags.find(
+                active.owner_runtime_bag_id);
+        const bool capability_matches =
+            merge != g4irsf14_state_->destination_merge_bags.end() &&
+            merge->second.capability.has_value() &&
+            merge->second.capability->grant_id() == active.grant_id &&
+            controller.validates_active_capability(
+                *merge->second.capability);
+        const auto destination = junctions_.find(entry.first);
+        holds = holds && bag != bags_.end() &&
+                bag->second.status == BagStatus::kInTransit &&
+                bag->second.transit_from == active.edge.from_node &&
+                bag->second.transit_to == active.edge.to_node &&
+                bag->second.transit_merge_grant.required &&
+                bag->second.transit_merge_grant.grant_id ==
+                    active.grant_id &&
+                bag->second.transit_merge_grant.request_id ==
+                    active.request_id &&
+                bag->second.transit_merge_grant.lineage == active.lineage &&
+                bag->second.transit_merge_grant.edge == active.edge &&
+                capability_matches && destination != junctions_.end() &&
+                destination->second.service_calendar.contains_exact(
+                    active.owner_runtime_bag_id,
+                    active.slot_start,
+                    active.slot_end);
+      }
+    }
+
+    std::size_t stored_capability_count = 0;
+    for (const auto& entry :
+         g4irsf14_state_->destination_merge_bags) {
+      if (!entry.second.capability.has_value()) {
+        continue;
+      }
+      ++stored_capability_count;
+      const auto& capability = *entry.second.capability;
+      const auto controller = destination_merge_controllers_.find(
+          capability.destination_node());
+      holds = holds &&
+              capability.owner_runtime_bag_id() == entry.first &&
+              controller != destination_merge_controllers_.end() &&
+              controller->second.validates_active_capability(capability);
+    }
+    return holds && active_record_count == stored_capability_count;
+  }
+
   void finalize_incomplete() {
     for (auto& entry : bags_) {
       auto& bag = entry.second;
@@ -17948,90 +18021,6 @@ class EventDrivenJunctionRuntime {
       }
       result_.merge_grant_lifecycle.reserve(
           lifecycle_rows);
-      std::size_t active_record_count = 0;
-      for (const auto& entry :
-           destination_merge_controllers_) {
-        const auto& controller = entry.second;
-        active_record_count += controller.active_.size();
-        for (const auto& active : controller.active_) {
-          const auto bag = bags_.find(
-              active.owner_runtime_bag_id);
-          const auto merge =
-              g4irsf14_state_
-                  ->destination_merge_bags.find(
-                      active.owner_runtime_bag_id);
-          const bool capability_matches =
-              merge !=
-                      g4irsf14_state_
-                          ->destination_merge_bags.end() &&
-              merge->second.capability.has_value() &&
-              merge->second.capability->grant_id() ==
-                  active.grant_id &&
-              controller.validates_active_capability(
-                  *merge->second.capability);
-          const auto destination =
-              junctions_.find(entry.first);
-          result_.summary
-              .merge_grant_active_bijection_holds =
-              result_.summary
-                      .merge_grant_active_bijection_holds &&
-              bag != bags_.end() &&
-              bag->second.status == BagStatus::kInTransit &&
-              bag->second.transit_from ==
-                  active.edge.from_node &&
-              bag->second.transit_to ==
-                  active.edge.to_node &&
-              bag->second.transit_merge_grant.required &&
-              bag->second
-                      .transit_merge_grant.grant_id ==
-                  active.grant_id &&
-              bag->second
-                      .transit_merge_grant.request_id ==
-                  active.request_id &&
-              bag->second
-                      .transit_merge_grant.lineage ==
-                  active.lineage &&
-              bag->second
-                      .transit_merge_grant.edge ==
-                  active.edge &&
-              capability_matches &&
-              destination != junctions_.end() &&
-              destination->second
-                  .service_calendar.contains_exact(
-                      active.owner_runtime_bag_id,
-                      active.slot_start,
-                      active.slot_end);
-        }
-      }
-      std::size_t stored_capability_count = 0;
-      for (const auto& entry :
-           g4irsf14_state_->destination_merge_bags) {
-        if (!entry.second.capability.has_value()) {
-          continue;
-        }
-        ++stored_capability_count;
-        const auto& capability =
-            *entry.second.capability;
-        const auto controller =
-            destination_merge_controllers_.find(
-                capability.destination_node());
-        result_.summary
-            .merge_grant_active_bijection_holds =
-            result_.summary
-                    .merge_grant_active_bijection_holds &&
-            capability.owner_runtime_bag_id() ==
-                entry.first &&
-            controller !=
-                destination_merge_controllers_.end() &&
-            controller->second
-                .validates_active_capability(capability);
-      }
-      result_.summary
-          .merge_grant_active_bijection_holds =
-          result_.summary
-                  .merge_grant_active_bijection_holds &&
-          active_record_count ==
-              stored_capability_count;
       for (const auto& entry :
            destination_merge_controllers_) {
         const auto& controller = entry.second;

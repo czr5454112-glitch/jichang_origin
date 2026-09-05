@@ -89,10 +89,12 @@ EventDrivenJunctionConfig e4_config() {
   return config;
 }
 
-EventDrivenJunctionResult run_with_timing(
-    const std::string& timing_mode) {
+EventDrivenJunctionResult run_with_merge_contract(
+    const std::string& timing_mode,
+    const std::string& priority_rule) {
   auto config = e4_config();
   config.merge_grant_timing_mode = timing_mode;
+  config.merge_grant_rule = priority_rule;
   return EventDrivenJunctionRuntime(
              busy_destination_graph(), std::move(config))
       .run(busy_destination_requests());
@@ -107,6 +109,7 @@ EventDrivenJunctionResult run_default_eager() {
 EventDrivenJunctionResult run_jit_with_pending_fault() {
   auto config = e4_config();
   config.merge_grant_timing_mode = "jit_fifo";
+  config.merge_grant_rule = "M1";
   return EventDrivenJunctionRuntime(
              busy_destination_graph(), std::move(config))
       .run(
@@ -154,6 +157,7 @@ EventDrivenJunctionResult run_with_policy(
     G4IRSF18MergeLinearPolicyConfig policy) {
   auto config = e4_config();
   config.merge_grant_timing_mode = "jit_fair_aging_deadline";
+  config.merge_grant_rule = "M3";
   config.starvation_threshold = 120.0;
   config.g4irsf18_merge_policy = std::move(policy);
   return EventDrivenJunctionRuntime(
@@ -203,7 +207,7 @@ first_opportunity_rows(const EventDrivenJunctionResult& result) {
 }
 
 void test_jit_fifo_retains_loser(Checks& checks) {
-  const auto result = run_with_timing("jit_fifo");
+  const auto result = run_with_merge_contract("jit_fifo", "M1");
   require_safe_complete(checks, result, "J1");
   checks.require(result.summary.merge_grant_timing_mode == "jit_fifo",
                  "J1 must report its canonical timing mode");
@@ -245,7 +249,8 @@ void test_jit_fifo_retains_loser(Checks& checks) {
 }
 
 void test_jit_deadline_aging_mutates_real_choice(Checks& checks) {
-  const auto result = run_with_timing("jit_fair_aging_deadline");
+  const auto result = run_with_merge_contract(
+      "jit_fair_aging_deadline", "M3");
   require_safe_complete(checks, result, "J2");
   const auto first = first_opportunity_rows(result);
   checks.require(first.size() == 2 &&
@@ -264,6 +269,76 @@ void test_jit_deadline_aging_mutates_real_choice(Checks& checks) {
                        (*chosen)->upstream_node == 1,
                    "J2 must choose the later but urgent upstream request");
   }
+}
+
+void test_j2_timing_and_priority_rule_are_independent(Checks& checks) {
+  const auto fifo = run_with_merge_contract(
+      "jit_fair_aging_deadline", "M1");
+  const auto deadline = run_with_merge_contract(
+      "jit_fair_aging_deadline", "M3");
+  require_safe_complete(checks, fifo, "J2/M1");
+  require_safe_complete(checks, deadline, "J2/M3");
+
+  const auto fifo_first = first_opportunity_rows(fifo);
+  const auto deadline_first = first_opportunity_rows(deadline);
+  checks.require(
+      fifo.summary.merge_grant_timing_mode ==
+              "jit_fair_aging_deadline" &&
+          deadline.summary.merge_grant_timing_mode ==
+              "jit_fair_aging_deadline" &&
+          fifo_first.size() == 2 && deadline_first.size() == 2,
+      "J2 must expose the same two-candidate service opportunity under M1 and M3");
+  if (fifo_first.size() == 2 && deadline_first.size() == 2) {
+    const auto candidate_ids = [](const auto& rows) {
+      std::vector<std::uint64_t> ids;
+      ids.reserve(rows.size());
+      for (const auto* row : rows) {
+        ids.push_back(row->candidate_request_id);
+      }
+      std::sort(ids.begin(), ids.end());
+      return ids;
+    };
+    const auto fifo_winner = std::find_if(
+        fifo_first.begin(), fifo_first.end(), [](const auto* row) {
+          return row->chosen_winner;
+        });
+    const auto deadline_winner = std::find_if(
+        deadline_first.begin(), deadline_first.end(), [](const auto* row) {
+          return row->chosen_winner;
+        });
+    checks.require(
+        fifo_first.front()->event_time ==
+                deadline_first.front()->event_time &&
+            fifo_first.front()->candidate_count ==
+                deadline_first.front()->candidate_count &&
+            fifo_first.front()->controller_generation ==
+                deadline_first.front()->controller_generation &&
+            candidate_ids(fifo_first) == candidate_ids(deadline_first),
+        "changing M1 to M3 must not change J2 eligibility, ready-set identity, or wakeup timing");
+    checks.require(
+        fifo_winner != fifo_first.end() &&
+            deadline_winner != deadline_first.end() &&
+            (*fifo_winner)->upstream_node == 0 &&
+            (*deadline_winner)->upstream_node == 1 &&
+            (*fifo_winner)->candidate_request_id !=
+                (*deadline_winner)->candidate_request_id,
+        "the independent priority axis must let M1 keep FIFO while M3 selects the urgent peer");
+  }
+
+  const auto first_commit_time = [](const auto& result) {
+    const auto committed = std::find_if(
+        result.merge_grant_lifecycle.begin(),
+        result.merge_grant_lifecycle.end(), [](const auto& row) {
+          return row.state == czr005::ics::MergeGrantState::kCommitted;
+        });
+    return committed == result.merge_grant_lifecycle.end()
+               ? -1.0
+               : committed->time;
+  };
+  checks.require(
+      first_commit_time(fifo) >= 0.0 &&
+          first_commit_time(fifo) == first_commit_time(deadline),
+      "M1/M3 must change only the J2 winner, not the first grant lifecycle time");
 }
 
 void test_pending_fault_revalidates_generation(Checks& checks) {
@@ -290,7 +365,7 @@ void test_pending_fault_revalidates_generation(Checks& checks) {
 
 void test_default_eager_compatibility(Checks& checks) {
   const auto implicit = run_default_eager();
-  const auto explicit_mode = run_with_timing("eager");
+  const auto explicit_mode = run_with_merge_contract("eager", "M1");
   require_safe_complete(checks, implicit, "implicit eager");
   require_safe_complete(checks, explicit_mode, "explicit eager");
   checks.require(implicit.summary.merge_grant_timing_mode == "eager" &&
@@ -325,6 +400,62 @@ void test_default_eager_compatibility(Checks& checks) {
           "implicit and explicit eager bag results must match exactly");
     }
   }
+}
+
+void test_fixed_horizon_checks_live_merge_boundary_before_reporting_failure(
+    Checks& checks) {
+  auto config = e4_config();
+  // The grant commits after node 0 service at t=0.1 and its EDGE_EXIT is at
+  // t=1.1.  Cutting at t=0.5 therefore leaves one exact, legitimate
+  // controller/capability/in-transit/calendar tuple at the last executable
+  // boundary.
+  config.max_simulation_time = 0.5;
+  const EventRuntimeBagRequest request{
+      "fixed-horizon-inflight-grant",
+      91,
+      0.0,
+      100.0,
+      0,
+      3,
+      "fixed-horizon-boundary-regression"};
+  const auto result = EventDrivenJunctionRuntime(
+                          busy_destination_graph(), std::move(config))
+                          .run({request});
+
+  checks.require(
+      result.summary.time_limit_reached &&
+          !result.summary.event_limit_reached &&
+          result.summary.requested_count == 1 &&
+          result.summary.completed_count == 0 &&
+          result.summary.failed_count == 1 &&
+          result.summary.final_active_bag_count == 0,
+      "fixed-horizon reporting must retain the terminal bag partition");
+  checks.require(
+      result.bags.size() == 1 && !result.bags.front().completed &&
+          result.bags.front().failure_reason == "time_limit_reached",
+      "the cut in-flight bag must remain an honest fixed-horizon failure");
+  checks.require(
+      result.summary.merge_grant_committed_count == 1 &&
+          result.summary.merge_grant_consumed_count == 0 &&
+          result.summary.merge_grant_final_active_unconsumed == 1 &&
+          result.summary.merge_grant_conservation_holds,
+      "the report must preserve, rather than consume or revoke, the live "
+      "capability at the fixed horizon");
+  checks.require(
+      result.summary.merge_grant_active_bijection_holds,
+      "the active-grant bijection must be checked at the runtime-stop "
+      "boundary before incomplete bags become reporting failures");
+  const auto committed = std::find_if(
+      result.merge_grant_lifecycle.begin(),
+      result.merge_grant_lifecycle.end(),
+      [](const auto& row) {
+        return row.state == czr005::ics::MergeGrantState::kCommitted;
+      });
+  checks.require(
+      committed != result.merge_grant_lifecycle.end() &&
+          committed->runtime_bag_id == result.bags.front().runtime_bag_id &&
+          committed->edge.from_node == 0 && committed->edge.to_node == 2,
+      "the audit trace must identify the exact first cut grant owner/edge");
 }
 
 void test_learned_policy_research_closed_loop_and_feature_parity(
@@ -521,8 +652,11 @@ int main() {
   Checks checks;
   test_jit_fifo_retains_loser(checks);
   test_jit_deadline_aging_mutates_real_choice(checks);
+  test_j2_timing_and_priority_rule_are_independent(checks);
   test_pending_fault_revalidates_generation(checks);
   test_default_eager_compatibility(checks);
+  test_fixed_horizon_checks_live_merge_boundary_before_reporting_failure(
+      checks);
   test_learned_policy_research_closed_loop_and_feature_parity(checks);
   test_learned_policy_fail_closed_gates(checks);
   test_feature_batch_marks_ood_and_invalid(checks);

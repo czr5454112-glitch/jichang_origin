@@ -287,7 +287,13 @@ def _manifest_reference(value: str, manifest_path: Path) -> Path:
     if path.is_absolute():
         return path
     rooted = ROOT / path
-    return rooted if rooted.exists() else manifest_path.parent / path
+    if rooted.exists():
+        return rooted
+    # Generated workload bundles are sometimes relocated under a build/evidence
+    # directory while their manifest retains the original repository-relative
+    # display path.  The canonical/raw files remain siblings of the manifest.
+    sibling = manifest_path.parent / path.name
+    return sibling if sibling.exists() else manifest_path.parent / path
 
 
 def load_workload(scale: int, task_dir: Path = DEFAULT_TASK_DIR) -> Workload:
