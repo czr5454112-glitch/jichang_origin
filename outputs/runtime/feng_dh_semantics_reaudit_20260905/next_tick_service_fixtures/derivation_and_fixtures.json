@@ -1,0 +1,176 @@
+{
+  "schema": "feng.dh.next_tick_service_derivation.v1",
+  "method": "FENG_DH_NEXT_TICK_SERVICE_V4",
+  "parent_files": {
+    "App/FengDhBagState.java": "05c62886be3da92d07c896bf8917df6ba6de9ebced3b1b849d2004975db2929b",
+    "App/FengDhBenchmark.java": "f167f260c6177ce116de2a8feedc7f1f5bd67ccf6d5d88b2820c7bbf2e533d31",
+    "App/FengDhEdgeLattice.java": "a6659d82f101984e60a3e1236c4054ccd4e815025f9d82f5c5647bb4944c3aa7",
+    "App/FengDhPolicy.java": "fb839478ab62893949f8a745aab3ff9923425181513b1c4f68d66a1a7ea83fe6",
+    "App/FengDhSimulator.java": "599d5ba91912a48368340d1e51ba4a9b56b4a8835e9cb9cb363ff9a3bb4fbbd7"
+  },
+  "target_files": {
+    "App/FengDhBagState.java": "05c62886be3da92d07c896bf8917df6ba6de9ebced3b1b849d2004975db2929b",
+    "App/FengDhBenchmark.java": "eb9bf21fa04d9fe187262c6570238a67f03a64705ffb9f59d1aa9580927e9f36",
+    "App/FengDhEdgeLattice.java": "a6659d82f101984e60a3e1236c4054ccd4e815025f9d82f5c5647bb4944c3aa7",
+    "App/FengDhPolicy.java": "fb839478ab62893949f8a745aab3ff9923425181513b1c4f68d66a1a7ea83fe6",
+    "App/FengDhSimulator.java": "5cce3ef98514bd4d1a47ffae53569ed91bd3ba66d8e87daa040f7db4e5434f80"
+  },
+  "parent_source_aggregate_sha256": "809d069832da3fec5a2aa6302a99a9ede24fcd5a1fb28c4a53c3cc3c139ff86f",
+  "source_aggregate_sha256": "c59fd6ccae5a8d405e18fd72bf29a2979e1f3d1278e8b5fa526d0b233176e419",
+  "changed_files": [
+    "App/FengDhBenchmark.java",
+    "App/FengDhSimulator.java"
+  ],
+  "semantic_change": "node-through availability reads current occupant only",
+  "verification": [
+    {
+      "name": "feng_cie_dh",
+      "checks": [
+        {
+          "case_id": "NS1_two_incoming_ports",
+          "pass": true,
+          "next_tick_service_reuse": false,
+          "all_complete": true,
+          "service_start_ticks": [
+            1,
+            6
+          ]
+        },
+        {
+          "case_id": "NS2_same_incoming_port",
+          "pass": true,
+          "next_tick_service_reuse": false,
+          "all_complete": true,
+          "service_start_ticks": [
+            1,
+            8
+          ]
+        },
+        {
+          "case_id": "NS3_zero_single",
+          "pass": true,
+          "next_tick_service_reuse": false,
+          "all_complete": true,
+          "completion_tick": 28
+        },
+        {
+          "case_id": "NS4_positive_single",
+          "pass": true,
+          "next_tick_service_reuse": false,
+          "all_complete": true,
+          "completion_tick": 33
+        }
+      ],
+      "compile_command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+        "--release",
+        "8",
+        "-Xlint:all",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_next_tick_service_probe\\feng_cie_dh\\classes",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhBagState.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhBenchmark.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhEdgeLattice.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhPolicy.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhSimulator.java"
+      ],
+      "command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\java.EXE",
+        "-cp",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_next_tick_service_probe\\feng_cie_dh\\classes;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_next_tick_service_probe\\feng_cie_dh\\audit",
+        "App.NextTickServiceAudit",
+        "same",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_dh_semantics_reaudit_20260905\\next_tick_service_fixtures\\feng_cie_dh"
+      ],
+      "class_aggregate_sha256": "ad828f533bc34abb3527d92f0f476e69412fc14c0024cbf2694bf0f82b382fd0",
+      "test_source": {
+        "NextTickServiceAudit.java": "e011f6ef7e19993b47b1209f053807072740fa4b24c5fb29048ca1b8ab56f852"
+      },
+      "outputs": {
+        "NS1_two_incoming_ports.tsv": "8b2ff8d3d3a3babc3f2d3b3d3d2c5514e7fa226392bbfb858165f1b50adcbc83",
+        "NS2_same_incoming_port.tsv": "e757cfab41fa6b5b8a58e3e27506337b6d0ba0599b81125908365678de3fce3b",
+        "NS3_zero_single.tsv": "f681a95a1ade8d006d17cfc775638c42322cd6cb7a004169435e48a142334b15",
+        "NS4_positive_single.tsv": "8a7ff11ac7d3f154eac89620315bba89a48d6296e72b0df3e25cf874e137ff32",
+        "results.jsonl": "c3df666f85612e39a9d07ff26227a47bb75101309d2b79febc7c0f0d51e514e0",
+        "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "feng_cie_dh_next_tick_service_v4",
+      "checks": [
+        {
+          "case_id": "NS1_two_incoming_ports",
+          "pass": true,
+          "next_tick_service_reuse": true,
+          "all_complete": true,
+          "service_start_ticks": [
+            1,
+            7
+          ]
+        },
+        {
+          "case_id": "NS2_same_incoming_port",
+          "pass": true,
+          "next_tick_service_reuse": true,
+          "all_complete": true,
+          "service_start_ticks": [
+            1,
+            8
+          ]
+        },
+        {
+          "case_id": "NS3_zero_single",
+          "pass": true,
+          "next_tick_service_reuse": true,
+          "all_complete": true,
+          "completion_tick": 28
+        },
+        {
+          "case_id": "NS4_positive_single",
+          "pass": true,
+          "next_tick_service_reuse": true,
+          "all_complete": true,
+          "completion_tick": 33
+        }
+      ],
+      "compile_command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+        "--release",
+        "8",
+        "-Xlint:all",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_next_tick_service_probe\\feng_cie_dh_next_tick_service_v4\\classes",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_next_tick_service_v4\\App\\FengDhBagState.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_next_tick_service_v4\\App\\FengDhBenchmark.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_next_tick_service_v4\\App\\FengDhEdgeLattice.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_next_tick_service_v4\\App\\FengDhPolicy.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_next_tick_service_v4\\App\\FengDhSimulator.java"
+      ],
+      "command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\java.EXE",
+        "-cp",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_next_tick_service_probe\\feng_cie_dh_next_tick_service_v4\\classes;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_next_tick_service_probe\\feng_cie_dh_next_tick_service_v4\\audit",
+        "App.NextTickServiceAudit",
+        "next",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_dh_semantics_reaudit_20260905\\next_tick_service_fixtures\\feng_cie_dh_next_tick_service_v4"
+      ],
+      "class_aggregate_sha256": "853560a300ac24d341368ee3fce9fbcd7808c7bbb3f044955ecce91b68cd8f87",
+      "test_source": {
+        "NextTickServiceAudit.java": "e011f6ef7e19993b47b1209f053807072740fa4b24c5fb29048ca1b8ab56f852"
+      },
+      "outputs": {
+        "NS1_two_incoming_ports.tsv": "88aa2fe676faf44c8279184412f0365c6f13956014940e00cca364ea3319c8d6",
+        "NS2_same_incoming_port.tsv": "e757cfab41fa6b5b8a58e3e27506337b6d0ba0599b81125908365678de3fce3b",
+        "NS3_zero_single.tsv": "f681a95a1ade8d006d17cfc775638c42322cd6cb7a004169435e48a142334b15",
+        "NS4_positive_single.tsv": "8a7ff11ac7d3f154eac89620315bba89a48d6296e72b0df3e25cf874e137ff32",
+        "results.jsonl": "1ee88b0031e5f46f8fa885e350c97168c4b5e971110b4406c89ce802874fb7c0",
+        "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "formal_experiments_started": 0
+}

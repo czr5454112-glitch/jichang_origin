@@ -1,0 +1,43 @@
+task_id	tick	event	node	edge	position	detail
+2	0	RELEASE	0	-1	-1	release_seconds=0.0
+2	0	NODE_SERVICE_START	0	-1	-1	arrival_tick=0;ready_tick=1;fixture_ready_source
+2	0	SELECT	0	2	-1	free_flow_seconds=2.2;moving=0;stopped=0;eta_seconds=2.2;equal_score_candidates=1;nodes=0>2>3
+2	1	NODE_SERVICE_FINISH	0	-1	-1	
+2	1	ENTER_EDGE	0	2	0	free_flow_seconds=2.2;moving=0;stopped=0;eta_seconds=2.2;equal_score_candidates=1;nodes=0>2>3
+2	2	MOVE	0	2	1	
+2	3	MOVE	0	2	2	
+2	4	MOVE	0	2	3	
+2	5	MOVE	0	2	4	
+2	6	MOVE	0	2	5	
+2	7	MOVE	0	2	6	
+2	8	NODE_SERVICE_START	2	2	6	arrival_tick=7;ready_tick=8;ZERO_MAP_THROUGH_TIME;basis=LEGACY_NODE_CONSTRAINT;upstream_edge=2
+2	8	NODE_SERVICE_FINISH	2	2	6	
+2	8	NODE_SERVICE_START	2	-1	-1	arrival_tick=7;ready_tick=18;INTERMEDIATE_FIXED_TRANSFER_DELAY;reconstructed_transfer_seconds=2.0;basis=HISTORICAL_OD_LOWER_ENVELOPE;upstream_edge=2
+2	17	SELECT	2	3	-1	free_flow_seconds=0.8;moving=0;stopped=0;eta_seconds=0.8;equal_score_candidates=1;nodes=2>3
+2	18	NODE_SERVICE_FINISH	2	-1	-1	
+2	18	ENTER_EDGE	2	3	0	free_flow_seconds=0.8;moving=0;stopped=0;eta_seconds=0.8;equal_score_candidates=1;nodes=2>3
+2	19	MOVE	2	3	1	
+2	20	MOVE	2	3	2	
+2	21	MOVE	2	3	3	
+2	22	COMPLETE	3	-1	-1	
+4	0	RELEASE	1	-1	-1	release_seconds=0.0
+4	0	ENTER_EDGE	1	1	0	seed
+4	0	MOVE	1	1	1	
+4	0	HOLD	1	-1	1	reason=seed_stopped;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=1
+4	1	MOVE	1	1	2	
+4	2	MOVE	1	1	3	
+4	3	NODE_SERVICE_START	3	1	3	arrival_tick=2;ready_tick=8;MAP_JUNCTION_THROUGH_EXCLUSIVE;map_through_seconds=1.0;basis=LEGACY_NODE_CONSTRAINT;upstream_edge=1
+4	3	HOLD	3	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=4
+4	4	HOLD	3	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=5
+4	5	HOLD	3	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=6
+4	6	HOLD	3	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=7
+4	7	HOLD	3	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=8
+4	8	NODE_SERVICE_FINISH	3	1	3	
+4	8	NODE_SERVICE_START	3	-1	-1	arrival_tick=2;ready_tick=18;INTERMEDIATE_FIXED_TRANSFER_DELAY;reconstructed_transfer_seconds=2.0;basis=HISTORICAL_OD_LOWER_ENVELOPE;upstream_edge=1
+4	17	SELECT	3	4	-1	free_flow_seconds=0.8;moving=0;stopped=0;eta_seconds=0.8;equal_score_candidates=1;nodes=3>4
+4	18	NODE_SERVICE_FINISH	3	-1	-1	
+4	18	ENTER_EDGE	3	4	0	free_flow_seconds=0.8;moving=0;stopped=0;eta_seconds=0.8;equal_score_candidates=1;nodes=3>4
+4	19	MOVE	3	4	1	
+4	20	MOVE	3	4	2	
+4	21	MOVE	3	4	3	
+4	22	COMPLETE	4	-1	-1	

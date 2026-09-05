@@ -1,0 +1,328 @@
+{
+  "schema": "feng.dh.post_movement_scoring_derivation.v1",
+  "method": "FENG_DH_POST_MOVEMENT_SCORING_V6",
+  "parent_files": {
+    "App/FengDhBagState.java": "05c62886be3da92d07c896bf8917df6ba6de9ebced3b1b849d2004975db2929b",
+    "App/FengDhBenchmark.java": "f167f260c6177ce116de2a8feedc7f1f5bd67ccf6d5d88b2820c7bbf2e533d31",
+    "App/FengDhEdgeLattice.java": "a6659d82f101984e60a3e1236c4054ccd4e815025f9d82f5c5647bb4944c3aa7",
+    "App/FengDhPolicy.java": "fb839478ab62893949f8a745aab3ff9923425181513b1c4f68d66a1a7ea83fe6",
+    "App/FengDhSimulator.java": "599d5ba91912a48368340d1e51ba4a9b56b4a8835e9cb9cb363ff9a3bb4fbbd7"
+  },
+  "target_files": {
+    "App/FengDhBagState.java": "05c62886be3da92d07c896bf8917df6ba6de9ebced3b1b849d2004975db2929b",
+    "App/FengDhBenchmark.java": "bf317f7166e5cd26df9e9ce35d87a8f89babb65dd2eccafe3cab53af2b5591d3",
+    "App/FengDhEdgeLattice.java": "675b621918db4a96aac115d5c38b935b484006e62ba94ea8501489766d5d2a79",
+    "App/FengDhPolicy.java": "fb839478ab62893949f8a745aab3ff9923425181513b1c4f68d66a1a7ea83fe6",
+    "App/FengDhSimulator.java": "50cb6a39452c7023a6384483ba1038c54a4bd1658adc9e3e9924273e689ef5d9"
+  },
+  "parent_source_aggregate_sha256": "809d069832da3fec5a2aa6302a99a9ede24fcd5a1fb28c4a53c3cc3c139ff86f",
+  "source_aggregate_sha256": "a5b73a08b7058a0e1a3b82cfa6b4f7f7ad832b5e37e90076af2e1036f4250b3a",
+  "verification": [
+    {
+      "name": "feng_cie_dh",
+      "compile_command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+        "--release",
+        "8",
+        "-Xlint:all",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_post_movement_scoring_probe\\feng_cie_dh\\classes",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhBagState.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhBenchmark.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhEdgeLattice.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhPolicy.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh\\App\\FengDhSimulator.java"
+      ],
+      "command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\java.EXE",
+        "-cp",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_post_movement_scoring_probe\\feng_cie_dh\\classes;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_post_movement_scoring_probe\\feng_cie_dh\\audit",
+        "App.PostMovementScoringAudit",
+        "parent",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_dh_semantics_reaudit_20260905\\post_movement_scoring_fixtures\\feng_cie_dh"
+      ],
+      "checks": [
+        {
+          "case_id": "PS1_newly_stopped",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "first_decision_tick": 0,
+          "first_commit_tick": 1,
+          "parent_selected_edge": 0,
+          "post_selected_edge": 2,
+          "actual_selected_edge": 0,
+          "tick_start_candidate_A_eta": 2.8,
+          "post_movement_candidate_A_eta": 3.2,
+          "candidate_B_eta": 3.0
+        },
+        {
+          "case_id": "PS2_newly_moving",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "first_decision_tick": 0,
+          "first_commit_tick": 1,
+          "parent_selected_edge": 2,
+          "post_selected_edge": 0,
+          "actual_selected_edge": 2,
+          "tick_start_candidate_A_eta": 2.4000000000000004,
+          "post_movement_candidate_A_eta": 2.0,
+          "candidate_B_eta": 2.2
+        },
+        {
+          "case_id": "PS3_goal_departure",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "first_decision_tick": 0,
+          "first_commit_tick": 1,
+          "parent_selected_edge": 2,
+          "post_selected_edge": 0,
+          "actual_selected_edge": 2,
+          "tick_start_candidate_A_eta": 2.0,
+          "post_movement_candidate_A_eta": 1.6,
+          "candidate_B_eta": 1.8
+        },
+        {
+          "case_id": "PS4_zero_departure",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "first_decision_tick": 0,
+          "first_commit_tick": 1,
+          "parent_selected_edge": 2,
+          "post_selected_edge": 0,
+          "actual_selected_edge": 2,
+          "tick_start_candidate_A_eta": 2.0,
+          "post_movement_candidate_A_eta": 1.6,
+          "candidate_B_eta": 1.8
+        },
+        {
+          "case_id": "PS5_positive_departure",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "first_decision_tick": 5,
+          "first_commit_tick": 6,
+          "parent_selected_edge": 2,
+          "post_selected_edge": 0,
+          "actual_selected_edge": 2,
+          "tick_start_candidate_A_eta": 2.4000000000000004,
+          "post_movement_candidate_A_eta": 1.6,
+          "candidate_B_eta": 1.8
+        },
+        {
+          "case_id": "PS6_new_entries_excluded",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "first_selected_edges": [
+            0,
+            0
+          ],
+          "selected_eta": 1.6
+        },
+        {
+          "case_id": "PS7_original_entry_gate",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "query_admission_tick": 2,
+          "first_selected_eta": 1.6
+        },
+        {
+          "case_id": "PS8_zero_single",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "completion_tick": 28
+        },
+        {
+          "case_id": "PS9_positive_single",
+          "pass": true,
+          "post_movement_scoring": false,
+          "all_complete": true,
+          "completion_tick": 33
+        }
+      ],
+      "class_aggregate_sha256": "ad828f533bc34abb3527d92f0f476e69412fc14c0024cbf2694bf0f82b382fd0",
+      "test_source": {
+        "PostMovementScoringAudit.java": "a20d96a8805d851a8568602559da7fa73cec626f26f7311caffbc94d8a680c79"
+      },
+      "outputs": {
+        "PS1_newly_stopped.tsv": "f8ff7638a771cb05e136e8f8454107f554e56ba5d7abe3e642875beb7b3680dd",
+        "PS2_newly_moving.tsv": "64c5331fe1a804b811a63f937a10f442bf62aeb4bb741f2fad30a68b35c99639",
+        "PS3_goal_departure.tsv": "0183f861403d4d0d1e89bf5d826f6699fe3674146f8eb357af3217bafbee6385",
+        "PS4_zero_departure.tsv": "810219c8611b17bee151b775cc35af914d0da8ca964e111c372b3c6771bd843d",
+        "PS5_positive_departure.tsv": "fb7df80517b870daa8b9fe6935946491b5f0a762408e0b4e1b3aef4223fd7682",
+        "PS6_new_entries_excluded.tsv": "29d67b70991d6133f99db383e538902084bd5ebbf770a5ba811b9c390e28f03f",
+        "PS7_original_entry_gate.tsv": "17cf784a580a479a9fff788a994fdbf1c9e26a4bd8a90d722af5a626ed09b698",
+        "PS8_zero_single.tsv": "f681a95a1ade8d006d17cfc775638c42322cd6cb7a004169435e48a142334b15",
+        "PS9_positive_single.tsv": "8a7ff11ac7d3f154eac89620315bba89a48d6296e72b0df3e25cf874e137ff32",
+        "results.jsonl": "e2d9077f0bbaf465d72f0b77577be3bbd4339f3218e564a020bd06f4cac6f134",
+        "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "feng_cie_dh_post_movement_scoring_v6",
+      "compile_command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+        "--release",
+        "8",
+        "-Xlint:all",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_post_movement_scoring_probe\\feng_cie_dh_post_movement_scoring_v6\\classes",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_post_movement_scoring_v6\\App\\FengDhBagState.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_post_movement_scoring_v6\\App\\FengDhBenchmark.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_post_movement_scoring_v6\\App\\FengDhEdgeLattice.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_post_movement_scoring_v6\\App\\FengDhPolicy.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_post_movement_scoring_v6\\App\\FengDhSimulator.java"
+      ],
+      "command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\java.EXE",
+        "-cp",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_post_movement_scoring_probe\\feng_cie_dh_post_movement_scoring_v6\\classes;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_post_movement_scoring_probe\\feng_cie_dh_post_movement_scoring_v6\\audit",
+        "App.PostMovementScoringAudit",
+        "post",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_dh_semantics_reaudit_20260905\\post_movement_scoring_fixtures\\feng_cie_dh_post_movement_scoring_v6"
+      ],
+      "checks": [
+        {
+          "case_id": "PS1_newly_stopped",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "first_decision_tick": 0,
+          "first_commit_tick": 1,
+          "parent_selected_edge": 0,
+          "post_selected_edge": 2,
+          "actual_selected_edge": 2,
+          "tick_start_candidate_A_eta": 2.8,
+          "post_movement_candidate_A_eta": 3.2,
+          "candidate_B_eta": 3.0
+        },
+        {
+          "case_id": "PS2_newly_moving",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "first_decision_tick": 0,
+          "first_commit_tick": 1,
+          "parent_selected_edge": 2,
+          "post_selected_edge": 0,
+          "actual_selected_edge": 0,
+          "tick_start_candidate_A_eta": 2.4000000000000004,
+          "post_movement_candidate_A_eta": 2.0,
+          "candidate_B_eta": 2.2
+        },
+        {
+          "case_id": "PS3_goal_departure",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "first_decision_tick": 0,
+          "first_commit_tick": 1,
+          "parent_selected_edge": 2,
+          "post_selected_edge": 0,
+          "actual_selected_edge": 0,
+          "tick_start_candidate_A_eta": 2.0,
+          "post_movement_candidate_A_eta": 1.6,
+          "candidate_B_eta": 1.8
+        },
+        {
+          "case_id": "PS4_zero_departure",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "first_decision_tick": 0,
+          "first_commit_tick": 1,
+          "parent_selected_edge": 2,
+          "post_selected_edge": 0,
+          "actual_selected_edge": 0,
+          "tick_start_candidate_A_eta": 2.0,
+          "post_movement_candidate_A_eta": 1.6,
+          "candidate_B_eta": 1.8
+        },
+        {
+          "case_id": "PS5_positive_departure",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "first_decision_tick": 5,
+          "first_commit_tick": 6,
+          "parent_selected_edge": 2,
+          "post_selected_edge": 0,
+          "actual_selected_edge": 0,
+          "tick_start_candidate_A_eta": 2.4000000000000004,
+          "post_movement_candidate_A_eta": 1.6,
+          "candidate_B_eta": 1.8
+        },
+        {
+          "case_id": "PS6_new_entries_excluded",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "first_selected_edges": [
+            0,
+            0
+          ],
+          "selected_eta": 1.6
+        },
+        {
+          "case_id": "PS7_original_entry_gate",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "query_admission_tick": 2,
+          "first_selected_eta": 1.2000000000000002
+        },
+        {
+          "case_id": "PS8_zero_single",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "completion_tick": 28
+        },
+        {
+          "case_id": "PS9_positive_single",
+          "pass": true,
+          "post_movement_scoring": true,
+          "all_complete": true,
+          "completion_tick": 33
+        },
+        {
+          "case_id": "PS10_frozen_projection",
+          "pass": true,
+          "physical_state_untouched": true,
+          "mutable_inputs_detached": true,
+          "incomplete_plan_rejected": true
+        }
+      ],
+      "class_aggregate_sha256": "898b04675cbeb69a545e1b5bd8e6f2d11ea45a08c7c771d692d5717f9c5934e6",
+      "test_source": {
+        "PostMovementScoringAudit.java": "a20d96a8805d851a8568602559da7fa73cec626f26f7311caffbc94d8a680c79",
+        "PostMovementSnapshotAudit.java": "6a68d2e003ae1ed11d6a30ba0331192a256e30263816df409417ae80a21f6478"
+      },
+      "outputs": {
+        "frozen_projection.jsonl": "f3e8d289ff6485fc3e78fa0dd443a1e62afea2e946d1df03a7b5a5b2a96bf06e",
+        "PS1_newly_stopped.tsv": "69aef4d5ae5130a1b1b8b9112246bd65f2c886840646d1cfe7f75ee904f847f3",
+        "PS2_newly_moving.tsv": "91db423b222b6e5b03c185850b65fa439a31d8f3c732f2baa9d755e0b2bd1a1b",
+        "PS3_goal_departure.tsv": "70ceaefc00cd54f3a55629165cecfcb5ca6ff8802ce3be844f177ffca6cb1bce",
+        "PS4_zero_departure.tsv": "93c06910dcc1956f4c7ce6037482b10eebc8c7932d65421129b5780d194a013a",
+        "PS5_positive_departure.tsv": "0f655d3579b41b4fa237e21938f448102f7f0cc5cea2112565361f9102165bc0",
+        "PS6_new_entries_excluded.tsv": "29d67b70991d6133f99db383e538902084bd5ebbf770a5ba811b9c390e28f03f",
+        "PS7_original_entry_gate.tsv": "99494c6ffc9a9e0635986eb87f6c3b2f102a85e356c83d1306484ebeb428e85d",
+        "PS8_zero_single.tsv": "f681a95a1ade8d006d17cfc775638c42322cd6cb7a004169435e48a142334b15",
+        "PS9_positive_single.tsv": "8a7ff11ac7d3f154eac89620315bba89a48d6296e72b0df3e25cf874e137ff32",
+        "results.jsonl": "b0ed9242addc4a6ff5204c1b3737c8b40f6fe465419430e569a4129e2f525145",
+        "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "formal_experiments_started": 0
+}

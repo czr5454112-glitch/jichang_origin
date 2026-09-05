@@ -1,0 +1,105 @@
+{
+  "schema": "czr005.feng_outlet_gate_snapshot_fixture.v1",
+  "method": "FENG_DH_OUTLET_GATE_V3_SNAPSHOT",
+  "source_aggregate_sha256": "c966079ed11c20328f21e2c601ea30bc8279387668fb9a8819b6955a6a7167fa",
+  "compiled_java_class_aggregate_sha256": "bbc0f4bd4dba64c144519a111623811dfab2ccfcb365754e6755a99ddf0ab785",
+  "source_eol": "CRLF",
+  "source_file_count": 5,
+  "reference_method": "FENG_DH_OUTLET_GATE_V3",
+  "reference_source_aggregate_sha256": "8c70cf8443f1f89b9cee3f65773d5fe0520b8048ec941f9df7a8e66c89164fc2",
+  "reference_class_aggregate_sha256": "3815201b2b413ce228975ff8bf5e2e7622d2037a8df3d7a253d575af3921b3aa",
+  "checks": [
+    {
+      "command": [
+        "C:/PROGRAMING/jdk-18/bin/java.exe",
+        "-cp",
+        "build/feng_cie_dh_outlet_gate_v3_snapshot;build/feng_cie_dh_outlet_gate_v3_snapshot_audit",
+        "App.OutletGateSnapshotAudit",
+        "frozen"
+      ],
+      "exit_code": 0,
+      "observations": [
+        {
+          "case": "zero_chain_node_order",
+          "downstream_first": false,
+          "frozen": true,
+          "upstream_released": true,
+          "pass": true
+        },
+        {
+          "case": "zero_chain_node_order",
+          "downstream_first": true,
+          "frozen": true,
+          "upstream_released": true,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "command": [
+        "C:/PROGRAMING/jdk-18/bin/java.exe",
+        "-cp",
+        "build/feng_dh_outlet_gate_v3;build/feng_cie_dh_outlet_gate_v3_snapshot_audit",
+        "App.OutletGateSnapshotAudit",
+        "live"
+      ],
+      "exit_code": 0,
+      "observations": [
+        {
+          "case": "zero_chain_node_order",
+          "downstream_first": false,
+          "frozen": false,
+          "upstream_released": true,
+          "pass": true
+        },
+        {
+          "case": "zero_chain_node_order",
+          "downstream_first": true,
+          "frozen": false,
+          "upstream_released": false,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "command": [
+        "C:/PROGRAMING/jdk-18/bin/java.exe",
+        "-cp",
+        "build/feng_cie_dh_outlet_gate_v3_snapshot;build/feng_cie_dh_outlet_gate_v3_snapshot_audit",
+        "App.OutletGateAudit",
+        "gated"
+      ],
+      "exit_code": 0,
+      "observations": [
+        {
+          "case": "blocked_0.0",
+          "gated": true,
+          "all_complete": true,
+          "completion_tick": 67
+        },
+        {
+          "case": "blocked_1.0",
+          "gated": true,
+          "all_complete": true,
+          "completion_tick": 67
+        },
+        {
+          "case": "open_ports_overlap",
+          "transfer_ready_ticks": [
+            16,
+            21
+          ],
+          "pass": true
+        },
+        {
+          "case": "finite_service",
+          "completion_tick": 128,
+          "pass": true
+        }
+      ]
+    }
+  ],
+  "full_population_run": false,
+  "nanning_run": false,
+  "result": "PASS: frozen snapshot removes the demonstrated node-ID-order leak, while original V3 intentionally exposes it in the control contrast. Existing positive/zero gate, overlapping timer and finite-service fixtures pass."
+}

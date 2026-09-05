@@ -1,5 +1,13 @@
 # Feng paper-environment CIE-DH reconstruction specification
 
+> Reopened fidelity review, 2026-09-05: this document preserves the original
+> control contract and its historical acceptance decision. The later user
+> request re-examines its physical assumptions; see the
+> [primary-source re-audit](feng_dh_primary_semantics_reaudit_20260905.md),
+> [executor review](feng_dh_executor_semantics_reaudit_20260905.md), and
+> [updated map2 acceptance policy](feng_dh_map2_acceptance_update_20260905.md).
+> New diagnostic variants do not replace this executable identity automatically.
+
 ## Scientific identity and evidence layers
 
 The historical primary reference and the executable reconstruction are two

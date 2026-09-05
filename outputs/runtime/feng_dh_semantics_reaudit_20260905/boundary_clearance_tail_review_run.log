@@ -1,0 +1,193 @@
+{
+  "schema": "feng.dh.boundary_clearance_tail_review.v1",
+  "segments": 43603,
+  "bags": 28506,
+  "inputs": {
+    "outputs/runtime/feng_dh_historical_signatures_20260905/paired_segments.csv.gz": "e38d5db5d25ec2baa16a3b2da3f2d5e1b0f5381c78d52d4571d0878223c42054",
+    "outputs/runtime/feng_dh_semantics_reaudit_20260905/boundary_clearance_v5/segments.csv.gz": "458e2f40ed1cb1556dc70308abe2be36eea6af658c097ab7d8791fd060e0ae14",
+    "outputs/runtime/feng_dh_semantics_reaudit_20260905/boundary_clearance_v5/bags.csv.gz": "e2b51a55316c814685438e0cb25f650e350c63f22edc141b19df5fb13c44c392",
+    "outputs/runtime/feng_dh_semantics_reaudit_20260905/boundary_clearance_v5/run_identity.json": "80f8d34d58769c2085a96c6e24df6d59ff757a72d177fb8f1c4525eaa030d082",
+    "outputs/runtime/feng_dh_historical_signatures_20260905/od_minimum_timing_signatures.csv": "7887da1870c2585042c443cb8914638dbf3a82fdf256f6a5045867ff99a09075"
+  },
+  "bag_metrics": {
+    "historical": {
+      "count": 28506,
+      "min": 213.3,
+      "mean": 265.5921314810917,
+      "median": 258.7,
+      "p95": 336.9,
+      "p99": 384.5950000000001,
+      "max": 517.2
+    },
+    "control": {
+      "count": 28506,
+      "min": 206.4,
+      "mean": 238.70228723777447,
+      "median": 226.4,
+      "p95": 285.20000000000005,
+      "p99": 300.79999999999995,
+      "max": 326.0
+    },
+    "v5": {
+      "count": 28506,
+      "min": 206.39999999999418,
+      "mean": 288.82647162000984,
+      "median": 249.40000000000146,
+      "p95": 620.0,
+      "p99": 753.2000000000007,
+      "max": 819.0
+    },
+    "historical_delta": {
+      "count": 28506,
+      "min": -248.80000000000143,
+      "mean": 23.23434013891819,
+      "median": -1.3000000000014609,
+      "p95": 326.675000000002,
+      "p99": 483.4949999999988,
+      "max": 544.6999999999971
+    },
+    "control_delta": {
+      "count": 28506,
+      "min": -39.399999999998556,
+      "mean": 50.12418438223539,
+      "median": 10.80000000000146,
+      "p95": 357.8999999999989,
+      "p99": 506.38999999999817,
+      "max": 547.7999999999993
+    },
+    "source_wait_delta": {
+      "count": 28506,
+      "min": 0.0,
+      "mean": 1.2526205009471667,
+      "median": 0.0,
+      "p95": 8.00000000000109,
+      "p99": 20.0,
+      "max": 41.19999999999927
+    },
+    "after_admission_delta": {
+      "count": 28506,
+      "min": -39.399999999998556,
+      "mean": 48.87156388128821,
+      "median": 9.200000000002902,
+      "p95": 354.1500000000007,
+      "p99": 505.4000000000014,
+      "max": 547.7999999999993
+    },
+    "source_wait": {
+      "count": 28506,
+      "min": 2.0,
+      "mean": 4.448088121798917,
+      "median": 4.0,
+      "p95": 12.60000000000582,
+      "p99": 25.80000000000291,
+      "max": 54.0
+    }
+  },
+  "control_delta_decomposition": {
+    "source_wait_fraction": 0.024990341815738556,
+    "after_admission_fraction": 0.9750096581842611
+  },
+  "v5_top5_percent_bags": {
+    "threshold_seconds": 620.0,
+    "count": 1427,
+    "fraction_of_total_v5_minus_control": 0.4600881834215162,
+    "fraction_of_positive_v5_minus_historical": 0.5525133102000938,
+    "source_wait_delta_seconds_per_bag": 0.8350385423966403,
+    "after_admission_delta_seconds_per_bag": 459.8463910301332
+  },
+  "bag_count_v5_above_historical_p95": 3791,
+  "bag_count_v5_above_historical_p99": 2781,
+  "bag_count_v5_above_historical_max": 2046,
+  "bag_count_v5_slower_than_historical": 11959,
+  "bag_count_v5_faster_than_historical": 16452,
+  "bag_historical_mean_in_top5_v5": 280.2760336370007,
+  "bag_control_mean_in_top5_v5": 247.89908899789768,
+  "bag_v5_mean_in_top5_v5": 708.5805185704276,
+  "top5_v5_bag_first_release_hour_counts": {
+    "6": 1399,
+    "7": 28
+  },
+  "top5_v5_bag_first_segments_with_isolated_route_24_to_27": 1427,
+  "v5_below_isolated_policy_route_segment_count": 716,
+  "caveat": "Distance-shortest isolated policy time is not a global physical lower bound. Source wait and post-admission time are exact; network concurrency is reconstructed from interval overlap, not node-specific queue length.",
+  "correlations": {
+    "v5_and_historical_segment_duration": 0.5272594423528598,
+    "v5_control_delta_and_historical_control_delta": 0.09507745590342292,
+    "v5_source_wait_and_post_admission_time": 0.029947067512280826
+  },
+  "network_active_twice_control_episodes": [
+    {
+      "begin_seconds": 23400,
+      "end_seconds": 24600,
+      "duration_seconds": 1200,
+      "v5_mean_admitted_active_segments": 474.81549999999993,
+      "control_mean_admitted_active_segments": 203.825666666667,
+      "v5_mean_source_pending_segments": 2.4266666666666667
+    },
+    {
+      "begin_seconds": 24900,
+      "end_seconds": 25500,
+      "duration_seconds": 600,
+      "v5_mean_admitted_active_segments": 462.86400000000026,
+      "control_mean_admitted_active_segments": 217.89033333333396,
+      "v5_mean_source_pending_segments": 2.5166666666666666
+    }
+  ],
+  "top_6_ods_by_positive_historical_excess": [
+    {
+      "start": 53,
+      "goal": 47,
+      "count": 3777,
+      "v5_seconds_mean": 114.7478422028075,
+      "historical_dh_seconds_mean": 71.5825258141382,
+      "v5_minus_control_mean": 51.76139793486998,
+      "positive_v5_minus_historical_seconds": 181837.50000000012
+    },
+    {
+      "start": 3,
+      "goal": 47,
+      "count": 2332,
+      "v5_seconds_mean": 122.06097770154362,
+      "historical_dh_seconds_mean": 91.49232418524872,
+      "v5_minus_control_mean": 49.94931389365341,
+      "positive_v5_minus_historical_seconds": 95997.09999999989
+    },
+    {
+      "start": 5,
+      "goal": 47,
+      "count": 2274,
+      "v5_seconds_mean": 117.64344766930517,
+      "historical_dh_seconds_mean": 89.99221635883904,
+      "v5_minus_control_mean": 51.41829375549688,
+      "positive_v5_minus_historical_seconds": 93221.79999999996
+    },
+    {
+      "start": 4,
+      "goal": 47,
+      "count": 2234,
+      "v5_seconds_mean": 116.87439570277512,
+      "historical_dh_seconds_mean": 86.60850492390333,
+      "v5_minus_control_mean": 50.06060877350028,
+      "positive_v5_minus_historical_seconds": 90500.19999999991
+    },
+    {
+      "start": 0,
+      "goal": 47,
+      "count": 1519,
+      "v5_seconds_mean": 136.602896642528,
+      "historical_dh_seconds_mean": 94.97346938775512,
+      "v5_minus_control_mean": 67.05464121132329,
+      "positive_v5_minus_historical_seconds": 80560.30000000005
+    },
+    {
+      "start": 52,
+      "goal": 49,
+      "count": 6996,
+      "v5_seconds_mean": 172.12867352773011,
+      "historical_dh_seconds_mean": 162.7412092624357,
+      "v5_minus_control_mean": 12.070697541452251,
+      "positive_v5_minus_historical_seconds": 75295.39999999997
+    }
+  ],
+  "accounting_remainder_min_seconds": 4.79999999999416
+}

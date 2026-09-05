@@ -1,0 +1,160 @@
+[
+  {
+    "script_id": "6212d718-d7e2-4c1e-b6a9-944f61996544",
+    "script_name": "BaggageHandling.3",
+    "embedded_member": "ToteSystems/FlowControlCS.cs",
+    "bytes": 26331,
+    "sha256": "c3c3c41becfa784ba912ec66b5d9b72e72cd48bfdc8a6fda6b90f3ac5edfa3a4",
+    "excerpts": [
+      {
+        "start_line": 437,
+        "end_line": 466,
+        "text": "        static IEnumerable ConveyTo(Visual load, Visual target) {\n            load.PushRoutingTarget(target);\n            if (!TargetIsReachable(load, target)) {\n                throw new Exception(\"Target cannot be reached: load=\" + load.Name + \" target=\" + target.FullName);\n            }\n            ReleaseLoad(load);\n            yield return WaitForLoadToArrive(load, target, SetDispatchOutFalse);\n        }\n\n        static bool TargetIsReachable(Visual load, Visual target) {\n            if (load == null || target == null) {\n                return false;\n            }\n\n            var conv = load.CurrentStation.Visual;\n\n            if (conv != null && conv.Parent != null && (conv.Parent is ConveyorVisual || conv.Parent.HasCustomProperty(\"IsMotorOn\"))) {\n                conv = conv.Parent;\n            }\n\n            if (target.Parent == conv || target == conv) return true;\n\n            if (target.HasCustomProperty(\"IsStation\")) {\n                target = target.Parent as Visual;\n            }\n\n            var routing = new ConnectedRoutingDijkstra(conv, target);\n            return routing.FirstTransfer != null;\n        }\n"
+      },
+      {
+        "start_line": 501,
+        "end_line": 519,
+        "text": "        public static void SetDispatchOut(Visual load, bool enabled) {\n            if (enabled) {\n                load.RemoveCustomProperty(\"DispatchOutEnabled\");\n            } else {\n                load.AddCustomProperty(\"DispatchOutEnabled\", false, \"\");\n            }\n        }\n\n        static void ReleaseLoad(Visual load) {\n            var station = load.CurrentStation.Visual;\n\n            var _load = load as PhysicsObject;\n            SetKinematic(_load, false);\n\n            if (station != null && station.TransferStateEnabled) {\n                SetDispatchOut(load, true);\n                Transfer.Dispatch(station);\n            }\n        }"
+      }
+    ]
+  },
+  {
+    "script_id": "6212d718-d7e2-4c1e-b6a9-944f61996544",
+    "script_name": "BaggageHandling.3",
+    "embedded_member": "ToteSystems/IntersectionControllerCS.cs",
+    "bytes": 49487,
+    "sha256": "9f04fe12b6b9d1c4bc9995068aa9fd5dba3429ff60c25e64bbed306b97bfadd0",
+    "excerpts": [
+      {
+        "start_line": 103,
+        "end_line": 110,
+        "text": "        [Auto] SimplePropertyValue      <TimeProperty>          TransferTime;\n        [Category(\"Control\"), DefaultValue(true), Description(\"While false loads will be suspended from transferring to divert targets\")]\n        [Auto] SimplePropertyValue      <bool>          Enabled;\n\n        [Category(\"Configuration\"), Description(\"When true, makes the Leader Sensor visible\")]\n        [Auto] CustomPropertyValue<bool> ShowLeaderSensor;\n        [Category(\"Configuration\"), DefaultValue(true), Description(\"When true and app is in LinearPhysics mode, make this component innactive\")]\n        [Auto] SimplePropertyValue<bool> DisableForLinPhys;"
+      },
+      {
+        "start_line": 159,
+        "end_line": 169,
+        "text": "        [Auto] void OnDisableForLinPhysUpdated( BoxVisual sender, bool value, bool oldValue ) {\n            if (document.Scene.PhysicsEnabled) { return; }\n            if ( !document.Scene.SimulationLinearPhysics) { return; }\n            \n            if (value) {\n                sender.BodyType = PhysicsBodyType.VisualOnly;\n            } else {\n                sender.BodyType = PhysicsBodyType.Sensor;\n            }\n        }        \n        "
+      },
+      {
+        "start_line": 980,
+        "end_line": 1006,
+        "text": "                    yield return Wait.ForSeconds(0.01);\n                }\n                \n                _px.Add(load);\n                conv.SimulateLoad(load);\n                yield break;\n            }\n            \n            var tTime = this.TransferTime.Value;\n            var _from  = BoxVisual.TransformFromWorld( load.WorldLocation );\n            \n            var delta  = Vector3.Subtract( to, _from );\n            var dist  = delta.Length();\n            var speed = dist/tTime;\n            \n            var transferNormal = Vector3.Normalize( delta );\n            load.Velocity = Vector3.Multiply( transferNormal , (float)speed );\n            load.Kinematic = true;\n            to = BoxVisual.TransformToWorld( to );\n            load.MoveTo( to, speed );\n            yield return load.WaitForMove();\n            yield return Wait.ForSeconds(0);\n            load.Kinematic = false;\n            conv.SimulateLoad(load);\n\n            _px.Add(load);\n        } "
+      },
+      {
+        "start_line": 1164,
+        "end_line": 1172,
+        "text": "        }\n        \n        ConnectorPair FindDefaultDeliveryConnector( ConveyorVisual conv, Visual target ) {\n            if (target == null) return null;\n            \n            var routing = new ConnectedRoutingDijkstra( conv, target );\n            \n            return routing.FirstTransfer;\n        }"
+      }
+    ]
+  },
+  {
+    "script_id": "6212d718-d7e2-4c1e-b6a9-944f61996544",
+    "script_name": "BaggageHandling.3",
+    "embedded_member": "Utils.cs",
+    "bytes": 6294,
+    "sha256": "798a4de37e1a4b4fff694dd104e26eed2570f781d8b4e6aa4ea86db7bd889556",
+    "excerpts": [
+      {
+        "start_line": 34,
+        "end_line": 56,
+        "text": "        public static Visual GetTarget( Visual load ) {\n            var target = load.CurrentRoutingTarget;\n            if (target == null) { return null; }\n            target = load.HasCustomProperty(\"_CurrentRoutingTarget\")\n                ? load.GetCustomPropertyValue<VisualReference>(\"_CurrentRoutingTarget\").Visual\n                : target;\n            load.RemoveCustomProperty(\"_CurrentRoutingTarget\");\n            return (target.Parent is ConveyorVisual) ? target.Parent : target;\n        }\n\n        public static bool IsTargetInRoute( Visual _from, Visual target, Visual match ) {\n            if (target == null) { return false; }\n            if (ReferenceEquals(_from, target)) {\n                return ReferenceEquals(target, match);\n            }\n\n            var routing = new ConnectedRoutingDijkstra( _from, target );\n            var route   = routing.Route;\n\n            if (route == null || route.Count == 0) {\n                throw new Exception(\"Target cannot be reached: from=\" + _from.Name + \" target=\" + target.FullName);\n            }\n"
+      }
+    ]
+  },
+  {
+    "script_id": "96cf3c72-bf3d-4282-9bfb-5250a3e35c23",
+    "script_name": "SensorScript.2",
+    "embedded_member": "NativeSource",
+    "bytes": 4846,
+    "sha256": "cb4353608ebc32e2481ea36f8659367495a1b927556385fca29007225d04b65e",
+    "excerpts": [
+      {
+        "start_line": 48,
+        "end_line": 69,
+        "text": "    void OnBlocked(Visual sender, Visual load)\n    {\n        var rfid_strip = load.GetCustomPropertyValue(\"rfid_strip\");\n        String message = rfid_strip == null ? \"-1\" : rfid_strip.ToString();\n\n        string temp_strip = \"caltco\" + initial_code.ToString();\n        initial_code++;\n        if (message == \"-1\")\n        {\n            message = temp_strip;\n            load.SetCustomPropertyValue(\"rfid_strip\", temp_strip);\n        }\n\n        List<Visual> children = load.ChildrenAsList();\n        foreach (Visual ch in children)\n        {\n            message += \",\";\n            message += ch.GetCustomPropertyValue(\"btm\") == null ? \"-1\" : ch.GetCustomPropertyValue(\"btm\").ToString();\n        }\n        SendMessage(message);\n\n    }"
+      },
+      {
+        "start_line": 152,
+        "end_line": 164,
+        "text": "    private void UpdateTable(string message)\n    {        \n        string[] infos = message.Split(',');\n        if(infos.Length < 2) return;\n        Object[] obj = new Object[2];\n        obj[0] = infos[0];\n        obj[1] = Int32.Parse(infos[1]);\n\n        table.Value.DataTable.BeginLoadData();\n        table.Value.DataTable.LoadDataRow(obj, LoadOption.OverwriteChanges);\n        table.Value.DataTable.EndLoadData();\n    }\n}"
+      }
+    ]
+  },
+  {
+    "script_id": "a3cd5def-e41a-4349-b09c-637f5f9217b7",
+    "script_name": "FlowControlComponent",
+    "embedded_member": "Source",
+    "bytes": 1981,
+    "sha256": "628e21a056c2a1d19d7277a0de189ca4d1685fee9b1686ed7d33d86115f60c3f",
+    "excerpts": [
+      {
+        "start_line": 5,
+        "end_line": 17,
+        "text": "[Optimize(false)]\nfunction Box1_OnInitialize( sender : Demo3D.Visuals.BoxVisual )\n{\n\tRun(FlowControlMainProcedure, sender);\n}\n\n[Optimize(false)]\nfunction FlowControlMainProcedure( sender : Visual )\n{\n\tif (sender.MainProcedureEnabled) {\n\t\tsender.MainProcedure.Execute( sender );\n\t}\n}"
+      }
+    ]
+  },
+  {
+    "script_id": "ac219aaf-1b33-4aa8-baad-522eadecb3fb",
+    "script_name": "SensorScript.1",
+    "embedded_member": "NativeSource",
+    "bytes": 2609,
+    "sha256": "6587fcdc764a24ce5071dd3a83eea7841a1867288fd7b7f322d89364b9416c1f",
+    "excerpts": [
+      {
+        "start_line": 54,
+        "end_line": 59,
+        "text": "    [Auto]\n    void OnBlocked(Visual sender, Visual load)\n    {\n        var rfid_strip = load.GetCustomPropertyValue(\"rfid_strip\");\n        SendMessage(rfid_strip == null ? \"-1\" : rfid_strip.ToString());\n    }"
+      }
+    ]
+  },
+  {
+    "script_id": "add0856e-eb21-4f1b-8f97-13f6f0b58d91",
+    "script_name": "IntersectionController",
+    "embedded_member": "NativeSource",
+    "bytes": 50469,
+    "sha256": "afd78a86f2e0d6e6bbb84a2b062ddccb1314a83075999cd2ba94fd89b6ece4c2",
+    "excerpts": [
+      {
+        "start_line": 169,
+        "end_line": 178,
+        "text": "        [Auto] void OnDisableForLinPhysUpdated(BoxVisual sender, bool value, bool oldValue) {\n            if (document.Scene.PhysicsEnabled) { return; }\n            if ( !document.Scene.SimulationLinearPhysics) { return; }\n            \n            if (value) {\n                sender.BodyType = PhysicsBodyType.VisualOnly;\n            } else {\n                sender.BodyType = PhysicsBodyType.Sensor;\n            }\n        }        "
+      },
+      {
+        "start_line": 893,
+        "end_line": 915,
+        "text": "        void StopInfeed( FeedClass infeed ){\n            var controller = infeed.Controller;\n            if ( infeed.Conv == BoxVisual.Parent ){\n                controller = _PrevController;\n            }\n            if ( controller != null ){\n                controller.SetCustomPropertyValue( \"ReleaseEnabled\", false );\n                var infeedConv = controller.Parent as ConveyorVisual;\n                infeedConv.IsMotorOn = false;\n            }    \n        }\n        \n        void ReleaseInfeed( FeedClass infeed ){\n            var controller = infeed.Controller;\n            if ( infeed.Conv == BoxVisual.Parent ){\n                controller = _PrevController;\n            }\n            if ( controller != null ){\n                controller.SetCustomPropertyValue( \"ReleaseEnabled\", true );\n                var infeedConv = controller.Parent as ConveyorVisual;\n                infeedConv.IsMotorOn = true;\n            } \n        }"
+      },
+      {
+        "start_line": 928,
+        "end_line": 938,
+        "text": "        IEnumerable WaitToAccept( FeedClass target )\n        {    \n            var inductor = IsInductor( target.Con );\n            var isMotorOn = target.Conv.IsMotorOn;\n            while ( inductor || !isMotorOn || !Enabled.Value || target.IsBusy ){\n                yield return Wait.ForAny(target.Conv.OnAfterPropertyUpdated, BoxVisual.OnAfterPropertyUpdated);\n                inductor  = IsInductor( target.Con );\n                isMotorOn = target.Conv.IsMotorOn;\n            }\n        }\n        "
+      },
+      {
+        "start_line": 962,
+        "end_line": 981,
+        "text": "            yield return SimulateOntoConveyor( infeed, load );\n            CallScriptRef( \"OnReceived\" );\n            \n            var targetConv = target.Conv;\n            \n            CallScriptRef( \"OnDivert\" );\n            \n            if ( !targetConv.IsMotorOn || IsInductor( target.Con ) || !Enabled.Value || target.IsBusy ){\n                if ( TargetBlockedMode.Value.Value == \"Dieback\" ){\n                    load.Kinematic = true;\n                    yield return WaitToAccept( target );\n                    load.Kinematic = false;\n                }\n                else {\n                    CallScriptRef( \"OnBypass\" );\n                    yield break; // bypass\n                }\n            }\n            \n            target.IsBusy = true;"
+      },
+      {
+        "start_line": 1004,
+        "end_line": 1019,
+        "text": "            \n            var _from = sender.TransformFromWorld( load.WorldLocation );\n            var to    = new Vector3(loadOffsetX,loadOffsetY,loadOffsetZ);\n            var dist  = (to - _from).Length();\n            var speed = dist/tTime;\n            load.Kinematic = true;\n            to = BoxVisual.TransformToWorld( to );\n            load.MoveTo( to, speed );\n            yield return load.WaitForMove();\n            load.Kinematic = false;\n            load.Unstick();\n            target.IsBusy = false;\n            sender.PropertiesUpdated(\"Enabled\");\n            CallScriptRef( \"OnDiverted\" );\n\n        }"
+      },
+      {
+        "start_line": 1062,
+        "end_line": 1069,
+        "text": "        IEnumerable SimulateOntoConveyor( FeedClass infeed, PhysicsObject load )\n        {\n            ReleaseInfeed( infeed );\n            var to = GetInboundLocation( infeed, load );\n            var conv   = BoxVisual.Parent as ConveyorVisual;\n            if ( to == Vector3.Empty ){  \n                load.Kinematic = false;\n                "
+      },
+      {
+        "start_line": 1085,
+        "end_line": 1104,
+        "text": "            var tTime = this.TransferTime.Value;\n            var _from  = BoxVisual.TransformFromWorld( load.WorldLocation );\n            \n            var delta  = Vector3.Subtract( to, _from );\n            var dist  = delta.Length();\n            var speed = dist/tTime;\n            \n            var transferNormal = Vector3.Normalize( delta );\n            load.Velocity = Vector3.Multiply( transferNormal , (float)speed );\n            load.Kinematic = true;\n            to = BoxVisual.TransformToWorld( to );\n            load.MoveTo( to, speed );\n            yield return load.WaitForMove();\n            yield return Wait.ForSeconds(0);\n            load.Kinematic = false;\n            conv.SimulateLoad(load);\n\n            _px.Add(load);\n        } \n"
+      },
+      {
+        "start_line": 1293,
+        "end_line": 1300,
+        "text": "        ConnectorPair FindDefaultDeliveryConnector( ConveyorVisual conv, Visual target )\n        {\n            if (target == null) return null;\n            \n            var routing = new ConnectedRoutingDijkstra( conv, target );\n            \n            return routing.FirstTransfer;\n        }"
+      }
+    ]
+  }
+]

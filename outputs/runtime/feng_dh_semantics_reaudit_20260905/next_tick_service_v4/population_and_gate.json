@@ -1,0 +1,46 @@
+{
+  "schema": "feng.dh.map2_reaudit.v1",
+  "checks": {
+    "exact_bag_population": true,
+    "exact_segment_population": true,
+    "all_raw_complete": true,
+    "all_segments_complete": true,
+    "segment_multiplicity": true,
+    "shared_D_and_leg_THT_exact": true,
+    "bag_THT_equals_sum_E_minus_D": true
+  },
+  "completed_raw_bags": 28506,
+  "completed_segments": 43603,
+  "THT_seconds_shared_D": {
+    "min": 206.39999999999418,
+    "mean": 238.72304076334956,
+    "p95": 285.2000000000007,
+    "p99": 302.40000000000146,
+    "max": 342.2000000000007
+  },
+  "historical_reference_seconds": {
+    "min": 213.3,
+    "mean": 265.592131481,
+    "p95": 336.9,
+    "p99": 384.595,
+    "max": 517.2
+  },
+  "relative_error": {
+    "min": -0.03234880450073052,
+    "mean": -0.10116674228194378,
+    "p95": -0.15345799940634985,
+    "p99": -0.2137183270713311,
+    "max": -0.3383604021655052
+  },
+  "tolerances": {
+    "min": 0.05,
+    "mean": 0.05,
+    "p95": 0.1,
+    "p99": 0.1,
+    "max": 0.1
+  },
+  "numerical_gate_pass": false,
+  "numerical_gate_role": "diagnostic_only_after_user_softened_acceptance",
+  "extension_authorized_by_this_runner": false,
+  "note": "User accepts close or moderately slower results; thresholds are diagnostic. Advancement requires combined semantic, fixture, and historical-signature review."
+}

@@ -1,0 +1,19 @@
+task_id	tick	event	node	edge	position	detail
+2	0	RELEASE	0	-1	-1	release_seconds=0.0
+2	0	NODE_SERVICE_START	0	-1	-1	arrival_tick=0;ready_tick=1;fixture_ready_source
+2	0	SELECT	0	0	-1	free_flow_seconds=0.8;moving=1;stopped=0;eta_seconds=1.2000000000000002;equal_score_candidates=1;nodes=0>1
+2	1	HOLD	0	0	-1	reason=ENTRY_STOPPED_OCCUPANT;entry_occupant=4;entry_occupant_state=STOPPED_ON_EDGE;retry_tick=2
+2	1	NODE_SERVICE_FINISH	0	-1	-1	
+2	1	SELECT	0	0	-1	free_flow_seconds=0.8;moving=1;stopped=0;eta_seconds=1.2000000000000002;equal_score_candidates=1;nodes=0>1
+2	2	ENTER_EDGE	0	0	0	free_flow_seconds=0.8;moving=1;stopped=0;eta_seconds=1.2000000000000002;equal_score_candidates=1;nodes=0>1
+2	3	MOVE	0	0	1	
+2	4	MOVE	0	0	2	
+2	5	MOVE	0	0	3	
+2	6	COMPLETE	1	-1	-1	
+4	0	RELEASE	0	-1	-1	release_seconds=0.0
+4	0	ENTER_EDGE	0	0	0	seed
+4	0	HOLD	0	-1	0	reason=seed_stopped;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=1
+4	1	MOVE	0	0	1	
+4	2	MOVE	0	0	2	
+4	3	MOVE	0	0	3	
+4	4	COMPLETE	1	-1	-1	

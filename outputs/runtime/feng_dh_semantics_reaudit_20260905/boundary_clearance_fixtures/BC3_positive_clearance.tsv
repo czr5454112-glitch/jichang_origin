@@ -1,0 +1,22 @@
+task_id	tick	event	node	edge	position	detail
+2	0	RELEASE	0	-1	-1	release_seconds=0.0
+2	0	ENTER_EDGE	0	0	0	seed
+2	0	MOVE	0	0	3	
+2	1	NODE_SERVICE_START	1	0	3	arrival_tick=0;ready_tick=6;MAP_JUNCTION_THROUGH_EXCLUSIVE;map_through_seconds=1.0;basis=LEGACY_NODE_CONSTRAINT;upstream_edge=0
+2	1	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=2
+2	2	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=3
+2	3	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=4
+2	4	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=5
+2	5	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=6
+2	6	NODE_SERVICE_FINISH	1	0	3	
+2	6	NODE_SERVICE_START	1	0	3	arrival_tick=0;ready_tick=16;clearance_ready_tick=8;INTERMEDIATE_FIXED_TRANSFER_DELAY;reconstructed_transfer_seconds=2.0;basis=HISTORICAL_OD_LOWER_ENVELOPE;upstream_edge=0
+2	6	HOLD	1	-1	3	reason=BOUNDARY_BODY_CLEARANCE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=7
+2	7	HOLD	1	-1	3	reason=BOUNDARY_BODY_CLEARANCE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=8
+2	8	BOUNDARY_CLEARANCE_FINISH	1	-1	-1	transfer_ready_tick_unchanged=16
+2	15	SELECT	1	1	-1	free_flow_seconds=0.8;moving=0;stopped=0;eta_seconds=0.8;equal_score_candidates=1;nodes=1>2
+2	16	NODE_SERVICE_FINISH	1	-1	-1	
+2	16	ENTER_EDGE	1	1	0	free_flow_seconds=0.8;moving=0;stopped=0;eta_seconds=0.8;equal_score_candidates=1;nodes=1>2
+2	17	MOVE	1	1	1	
+2	18	MOVE	1	1	2	
+2	19	MOVE	1	1	3	
+2	20	COMPLETE	2	-1	-1	

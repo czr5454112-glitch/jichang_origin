@@ -1,0 +1,128 @@
+{
+  "schema": "feng.dh.boundary_clearance_derivation.v1",
+  "method": "FENG_DH_BOUNDARY_CLEARANCE_V5",
+  "parent_files": {
+    "App/FengDhBagState.java": "05c62886be3da92d07c896bf8917df6ba6de9ebced3b1b849d2004975db2929b",
+    "App/FengDhBenchmark.java": "f167f260c6177ce116de2a8feedc7f1f5bd67ccf6d5d88b2820c7bbf2e533d31",
+    "App/FengDhEdgeLattice.java": "a6659d82f101984e60a3e1236c4054ccd4e815025f9d82f5c5647bb4944c3aa7",
+    "App/FengDhPolicy.java": "fb839478ab62893949f8a745aab3ff9923425181513b1c4f68d66a1a7ea83fe6",
+    "App/FengDhSimulator.java": "599d5ba91912a48368340d1e51ba4a9b56b4a8835e9cb9cb363ff9a3bb4fbbd7"
+  },
+  "target_files": {
+    "App/FengDhBagState.java": "7f8e9043087709f9a01390fe20ba24671df43a38cec81eef0e965b5fcda0d45b",
+    "App/FengDhBenchmark.java": "052176456427fe90a8d536448fca082d3ae65cfef086a419fa837a68a51a03d9",
+    "App/FengDhEdgeLattice.java": "a6659d82f101984e60a3e1236c4054ccd4e815025f9d82f5c5647bb4944c3aa7",
+    "App/FengDhPolicy.java": "fb839478ab62893949f8a745aab3ff9923425181513b1c4f68d66a1a7ea83fe6",
+    "App/FengDhSimulator.java": "43e4dac5f7f79f03e1a630c1e4f327169d568a7433d92edf0a05083810b18d93"
+  },
+  "parent_source_aggregate_sha256": "809d069832da3fec5a2aa6302a99a9ede24fcd5a1fb28c4a53c3cc3c139ff86f",
+  "source_aggregate_sha256": "7deb321e34b9ebdd562eeac0c5293618df41441830789498b37ddb4bca1cccc7",
+  "verification": {
+    "compile_command": [
+      "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+      "--release",
+      "8",
+      "-Xlint:all",
+      "-encoding",
+      "UTF-8",
+      "-d",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_boundary_clearance_v5",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_boundary_clearance_v5\\App\\FengDhBagState.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_boundary_clearance_v5\\App\\FengDhBenchmark.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_boundary_clearance_v5\\App\\FengDhEdgeLattice.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_boundary_clearance_v5\\App\\FengDhPolicy.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\feng_cie_dh_boundary_clearance_v5\\App\\FengDhSimulator.java"
+    ],
+    "command": [
+      "C:\\PROGRAMING\\jdk-18\\bin\\java.EXE",
+      "-cp",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_boundary_clearance_v5;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\feng_dh_boundary_clearance_v5_audit",
+      "App.BoundaryClearanceAudit",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\feng_dh_semantics_reaudit_20260905\\boundary_clearance_fixtures"
+    ],
+    "checks": [
+      {
+        "case_id": "BC1_zero_single",
+        "pass": true,
+        "all_complete": true,
+        "completion_tick": 28
+      },
+      {
+        "case_id": "BC2_positive_single",
+        "pass": true,
+        "all_complete": true,
+        "completion_tick": 33
+      },
+      {
+        "case_id": "BC3_positive_clearance",
+        "pass": true,
+        "all_complete": true,
+        "clearance_ready_tick": 8,
+        "transfer_ready_tick": 16
+      },
+      {
+        "case_id": "BC4_zero_one_shot_clearance",
+        "pass": true,
+        "all_complete": true,
+        "clearance_ready_tick": 3,
+        "transfer_ready_tick": 11
+      },
+      {
+        "case_id": "BC5_map_derived_clearance",
+        "pass": true,
+        "all_complete": true,
+        "clearance_ready_tick": 9,
+        "transfer_ready_tick": 16
+      },
+      {
+        "case_id": "BC6_same_incoming_port",
+        "pass": true,
+        "all_complete": true,
+        "service_start_ticks": [
+          1,
+          10
+        ]
+      },
+      {
+        "case_id": "BC7_two_incoming_ports",
+        "pass": true,
+        "all_complete": true,
+        "service_start_ticks": [
+          1,
+          6
+        ]
+      },
+      {
+        "case_id": "BC8_finite_countdowns",
+        "pass": true,
+        "all_complete": true,
+        "completion_tick": 128
+      },
+      {
+        "case_id": "BC9_blocked_outlet_scope",
+        "pass": true,
+        "all_complete": true,
+        "upstream_clear_tick": 3,
+        "unchanged_transfer_ready_tick": 11
+      }
+    ],
+    "class_aggregate_sha256": "0859243f372689bc6167b328f65b743e145eb323e375f0aaee56be4aeb60079e",
+    "test_source": {
+      "BoundaryClearanceAudit.java": "674e50ba5b1127e39d9777483fd3254cfe98d915795811c0ccf0793dfc4c3da1"
+    },
+    "outputs": {
+      "BC1_zero_single.tsv": "6e82b0464389509f79465b1ea502413d76bfda8bc9217f7fd2b8fd258907b615",
+      "BC2_positive_single.tsv": "93b94d73235162a4e563720ac20f4ffeb40d1aa479752def48989026300cb9a6",
+      "BC3_positive_clearance.tsv": "429d5e0a0f2e3cf48e4741d364d8f7e9d7d1fbabfab9283f20130509589cca96",
+      "BC4_zero_one_shot_clearance.tsv": "d1bddce3cb6f6326720eb2cf27fc52a7a18f7ecce15193e08a54fd7145ad5a19",
+      "BC5_map_derived_clearance.tsv": "8da20e25b0a4f5594419cf12890d036cee0f808dd2ee9ef7f373b322feebccdb",
+      "BC6_same_incoming_port.tsv": "46ece5440230a1a15bcc1aa022ef4de42404e8e53c3579d4eeab256b19595888",
+      "BC7_two_incoming_ports.tsv": "958d2ad0616e887b608f6e5540be4ff47762bc86514916ea36a7e70a45bc22ff",
+      "BC8_finite_countdowns.tsv": "3937f879d0adb1fadffffa3c142a529bb27244c419cdaa05980743925f10bc1d",
+      "BC9_blocked_outlet_scope.tsv": "c2901805efd0623eca453908d8c690883471c0621f90029228f0a1820904c93d",
+      "results.jsonl": "59b30045f885430d42b17c085140a96a04f07bd824e5644fe580f883088e78ee",
+      "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "formal_experiments_started": 0
+}
