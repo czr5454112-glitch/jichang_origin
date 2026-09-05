@@ -111,10 +111,15 @@ benchmarks/java/feng_cie_dh_post_movement_scoring_v6/App/*.java text eol=crlf
 benchmarks/java/feng_cie_dh_overlap_id_order/App/*.java text eol=crlf
 benchmarks/java/feng_cie_dh_retained_boundary_v2_id_order/App/*.java text eol=crlf
 scripts/eval/*feng_dh*.py text eol=lf
+scripts/eval/*feng_v5*.py text eol=lf
+# This already-frozen auditor is recorded by its physical CRLF byte hash.
+scripts/eval/audit_feng_v5_population.py -text whitespace=cr-at-eol
 scripts/eval/extract_feng_demo3d_semantics_evidence.py text eol=lf
 outputs/runtime/feng_dh_semantics_reaudit_20260905/** -text -whitespace
 outputs/runtime/feng_dh_historical_signatures_20260905/** -text -whitespace
 outputs/runtime/feng_dh_v5_shared_D_20260905/** -text -whitespace
+outputs/runtime/cie_external_baseline_boundary_clearance_v5/** -text -whitespace
+outputs/evidence/feng_dh_boundary_clearance_v5_20260905/** -text -whitespace
 tests/java/App/OutletGateAudit.java text eol=lf
 tests/java/App/OutletGateSnapshotAudit.java text eol=lf
 tests/java/App/IdOrderProbeAudit.java text eol=lf
@@ -123,9 +128,17 @@ tests/java/App/RetainedBoundaryAudit.java text eol=lf
 tests/java/App/BoundaryClearanceAudit.java text eol=lf
 tests/java/App/PostMovementScoringAudit.java text eol=lf
 tests/java/App/PostMovementSnapshotAudit.java text eol=lf
+tests/java/App/V5ClearanceDomainAudit.java text eol=lf
+tests/test_feng_dh_v5_campaign.py text eol=lf
+tests/test_plot_feng_dh_v5_comparison.py text eol=lf
+tests/test_report_feng_dh_v5_campaign.py text eol=lf
+outputs/figures/feng_dh_v5_20260905/** -text -whitespace
+docs/baselines/feng_cie_published_version_lookup_20260905.md text eol=lf
 docs/baselines/feng_dh_*.md text eol=lf
 outputs/reports/feng_dh_*.md text eol=lf
+outputs/reports/feng_v5_*.md text eol=lf
 outputs/tables/feng_dh_*.csv -text -whitespace
+outputs/tables/feng_v5_* -text -whitespace
 outputs/runtime/feng_cie_dh_zero_through_repair_v1/** -text -whitespace
 outputs/runtime/feng_cie_dh_zero_through_repair_20260905/** -text -whitespace
 outputs/evidence/feng_cie_dh_repair_20260905/** -text -whitespace
