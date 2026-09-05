@@ -135,8 +135,8 @@ Feng's reported CIE-DH level.
 
 The deterministic map2 critical curve now passes the final Java source/class
 identity (`99bf...14d8`/`d611...0286`) and is accepted with the mixed result
-above. The 2026-09-05 shutdown checkpoint contains `161/180` normalized cells:
-all map2 and Nanning HCA/G31 cells, plus `11/30` Nanning CIE-DH-port cells. Its
+above. The 2026-09-05 shutdown checkpoint contains `164/180` normalized cells:
+all map2 and Nanning HCA/G31 cells, plus `14/30` Nanning CIE-DH-port cells. Its
 gate remains 180/180 strict normalized cells
 (2 maps × 3 loads × 10 seeds × 3 methods): 60 byte/SHA-matched map2 HCA/G31
 cells may be strictly reused and renormalized, 60 final-identity DH cells are

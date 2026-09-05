@@ -1,6 +1,6 @@
 # CIE external-baseline robustness report
 
-Status: `INCOMPLETE` (161/180 normalized results).
+Status: `INCOMPLETE` (164/180 normalized results).
 
 All cells use the exact per-seed workload identity and a 98259-second fixed observation horizon. Population latency is reported only for a complete full population; formal 2x timing is always N/A. Null means the metric was not derivable from native evidence.
 
@@ -160,6 +160,7 @@ Execution accounting is based on validated normalized cells and the latest succe
 | nanning | 2 | 130363 | FENG_NATIVE_HCA | 39047 | no | 19470 | N/A |
 | nanning | 2 | 130363 | G31_S4_NATIVE_SYSTEM | 57012.0 | yes | 20952.0 | N/A |
 | nanning | 2 | 155921 | FENG_NATIVE_HCA | 39088 | no | 19449 | N/A |
+| nanning | 2 | 155921 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | 24484 | no | 16126 | N/A |
 | nanning | 2 | 155921 | G31_S4_NATIVE_SYSTEM | 57012.0 | yes | 20980.0 | N/A |
 | nanning | 2 | 181081 | FENG_NATIVE_HCA | 39026 | no | 19364 | N/A |
 | nanning | 2 | 181081 | G31_S4_NATIVE_SYSTEM | 57012.0 | yes | 20976.0 | N/A |
@@ -168,10 +169,12 @@ Execution accounting is based on validated normalized cells and the latest succe
 | nanning | 2 | 232003 | FENG_NATIVE_HCA | 39024 | no | 19400 | N/A |
 | nanning | 2 | 232003 | G31_S4_NATIVE_SYSTEM | 57012.0 | yes | 20997.0 | N/A |
 | nanning | 2 | 257053 | FENG_NATIVE_HCA | 39091 | no | 19443 | N/A |
+| nanning | 2 | 257053 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | 24473 | no | 16120 | N/A |
 | nanning | 2 | 257053 | G31_S4_NATIVE_SYSTEM | 57012.0 | yes | 21014.0 | N/A |
 | nanning | 2 | 283303 | FENG_NATIVE_HCA | 38969 | no | 19355 | N/A |
 | nanning | 2 | 283303 | G31_S4_NATIVE_SYSTEM | 57012.0 | yes | 21006.0 | N/A |
 | nanning | 2 | 308081 | FENG_NATIVE_HCA | 39033 | no | 19464 | N/A |
+| nanning | 2 | 308081 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | 24483 | no | 16123 | N/A |
 | nanning | 2 | 308081 | G31_S4_NATIVE_SYSTEM | 57012.0 | yes | 21013.0 | N/A |
 | nanning | 2 | 333667 | FENG_NATIVE_HCA | 39032 | no | 19433 | N/A |
 | nanning | 2 | 333667 | G31_S4_NATIVE_SYSTEM | 57012.0 | yes | 20956.0 | N/A |
@@ -371,3 +374,17 @@ Execution accounting is based on validated normalized cells and the latest succe
 | nanning | 2 | FENG_NATIVE_HCA | tardiness_p99_seconds | 10 | COMPLETE | 10/0/0 |
 | nanning | 2 | FENG_NATIVE_HCA | tardiness_sum_seconds | 10 | COMPLETE | 10/0/0 |
 | nanning | 2 | FENG_NATIVE_HCA | total_backlog_area_seconds | 10 | COMPLETE | 10/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | completed_raw_bag_count | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | completion_rate | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | missed_bag_count | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | missed_bag_rate | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | network_backlog_area_seconds | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | on_time_rate | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | on_time_raw_bag_count | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | source_backlog_area_seconds | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | tardiness_max_seconds | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | tardiness_mean_seconds | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | tardiness_p95_seconds | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | tardiness_p99_seconds | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | tardiness_sum_seconds | 3 | INCOMPLETE | 3/0/0 |
+| nanning | 2 | FENG_PAPER_ENV_CIE_DH_NANNING_PORTED | total_backlog_area_seconds | 3 | INCOMPLETE | 3/0/0 |
