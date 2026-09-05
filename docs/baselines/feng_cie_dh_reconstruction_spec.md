@@ -60,8 +60,11 @@ At each non-goal intermediate map2 node:
 
 1. The map-defined `throughTime=1.0 s` is a graph-node-local exclusive junction
    stage.
-2. During that one-second stage, the bag retains its upstream edge footprint
-   and is physically `STOPPED`; a competing bag records a junction-busy hold.
+2. During that one-second stage, the bag retains its upstream edge footprint;
+   subsequent waiting commits set `STOPPED`, and a competing bag records a
+   junction-busy hold. The service-start commit retains the preceding edge
+   state label. This one-tick labeling convention is retained for exact map2
+   regression and is a reconstruction detail, not recovered paper semantics.
 3. When the one-second stage completes, the bag leaves the upstream edge and
    starts a fixed `2.0 s` per-bag transfer timer. These timers overlap and add
    no independent node-wide capacity.
@@ -91,7 +94,8 @@ ETA = free_flow_seconds
 
 The junction timer is not an additional scorer. Physical bags in the
 one-second through stage retain their upstream edge footprint and are counted
-as stopped there; bags in the subsequent two-second transfer timer have left
+using the snapshot state (including the service-start convention above);
+bags in the subsequent two-second transfer timer have left
 the edge and are not counted as edge occupancy. Same-tick proposals are built
 from one snapshot and committed together only when final footprints remain
 disjoint. A stopped predecessor never exposes its cells.
@@ -169,3 +173,29 @@ population and the scheduled-D observation contract. In incomplete or
 fixed-horizon-ineligible runs, survivor timing is `N/A`; completion and backlog
 retain the full denominator. Historical measured rows and executable
 extrapolations must remain separately named in every table and narrative.
+
+## Zero-through repair and equivalent optimization (2026-09-05)
+
+On a zero-through intermediate node, the approved local FIFO winner completes
+the zero service once in the current commit, releases its upstream footprint,
+and starts the same fixed two-second per-bag transfer timer. Its edge identity
+and position become `-1`; it is not a node-through occupant. Guaranteed
+vacancies participate in both follower motion and source-entry arbitration
+before any mutation. Goal and positive-service departures release lattice
+cells before follower commits while preserving their existing state/trace
+ordering. No map field, OD, coefficient, or transfer duration changes.
+
+Repeated boundary-service admission is an explicit error. Actual moves,
+completions and an already-started finite service countdown count as progress;
+repeated route requests after a timer expires do not prevent deadlock detection.
+T1-T10, Z1-Z12, all 521 formal-workload ODs plus the topology witness, and the
+full original map2 population have executable regression evidence.
+
+Static candidate paths and moving/stopped edge counts are cached; selected
+scores may be reused only for the same immutable snapshot and node/goal pair.
+Each logical request still increments the original decision/tie/unreachable
+counters. There is no cross-tick congestion reuse or event-driven replacement.
+Full-population Nanning 1x output and congested trace output are byte-identical
+before/after optimization. See the
+[repair comparison](../../outputs/reports/feng_cie_dh_repair_comparison_20260905.md)
+for frozen source/class identities, matrix status and separate timing protocols.

@@ -1,5 +1,14 @@
 # Feng paper-environment CIE-DH reconstruction report
 
+Scientific-validity correction (2026-09-05): this report preserves the
+pre-repair map2 source identity and historical results. All old Nanning Java
+DH cells are `INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG`; their completion
+and runtime observations are excluded from formal comparison. This program's
+cross-map execution correctness failed. The 10 legacy tests did not cover
+zero-through intermediate nodes. Corrected execution and its regression
+evidence must be reported separately; map2 evidence is not automatically
+invalidated by this branch-specific bug.
+
 ## Outcome
 
 The executable diagnostic is complete, but its scientific identity is
@@ -16,11 +25,12 @@ separate evidence layers throughout this report:
 - `FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION`: independent Java executable;
   semantic extrapolation in the Feng environment.
 
-Interim campaign note (2026-09-05): the executable code and all results
-available before a possible host shutdown are frozen in
-`outputs/reports/cie_external_baseline_checkpoint_20260905.md`. The external
-robustness matrix is explicitly incomplete at `166/180` normalized cells;
-Nanning CIE-DH contributes `16/30` cells and no final cross-map claim is made.
+The superseded 2026-09-05 checkpoint records 166 execution cells, including
+16 Nanning DH cells now scientifically invalidated. It remains audit history
+in `cie_external_baseline_checkpoint_20260905.md`. The corrected executable,
+full-population byte regressions, separately versioned matrix, and current
+comparison are documented in
+[the repair report](feng_cie_dh_repair_comparison_20260905.md).
 
 ## Direct answers to the required questions
 
@@ -84,15 +94,13 @@ Nanning CIE-DH contributes `16/30` cells and no final cross-map claim is made.
    selecting the fastest cell.
 
 10. **Do external paired seeds support G31 against reconstructed DH?** The
-    answer remains not identified for the full cross-map matrix. At the
-    2026-09-05 shutdown checkpoint, `166/180` normalized cells exist: map2 is
-    complete and mixed at 1x (G31 mean is lower, but its P95/P99/max are
-    higher), whereas the Nanning DH port has only `16/30` cells. Its seven 1x
-    cells complete 44.530% on average and its four 1.75x cells complete
-    44.308% on average. Its first five 2x cells complete 42.938% and deliver
-    28.275% on time on average; formal 2x timing is N/A by protocol. Every
-    Nanning DH cell remains full-population incomplete. These are interim
-    diagnostics, not a final external ranking.
+    current answer is provided by the named map/load/metric comparisons and
+    matrix status in [the repair report](feng_cie_dh_repair_comparison_20260905.md).
+    The valid map2 1x result remains mixed (G31 mean is lower, but its
+    P95/P99/max are higher), with exact full-population regression supporting
+    reuse after repair. Old Nanning DH observations cannot establish normal
+    congestion or G31's advantage and are excluded. New Nanning cells retain
+    their entire population; formal 2x timing remains N/A even if complete.
 
 11. **What role remains for common-executor CIE-DH?** It remains a secondary
     route-policy isolation diagnostic. Neither executable variant can replace
@@ -169,7 +177,7 @@ The workbook's exact corresponding values are `3.555 / 4.426535524685 /
 8.62 min`; the executable values are `3.44 / 3.978371454 /
 5.433333333 min`.
 
-## Final executable identity
+## Pre-repair executable identity (retained for provenance)
 
 - Java source aggregate SHA-256: `99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8`.
 - Compiled class aggregate SHA-256: `d611967f0433dfc08f67d92c89e9b13dcb5b8ac5ace3d3abec9c098dba360286`.
@@ -238,4 +246,6 @@ fit to Table 5.3.
 | final-branch coefficient envelope | `PASS_9_OF_9_COMPLETE` | every cell rerun under source `99bf...14d8`; no result-selected cell |
 | paper use | `CONDITIONAL` | secondary executable diagnostic only; the historical measured row remains the primary CIE-DH performance reference |
 
-OVERALL_DETERMINATION: READY_WITH_CONDITIONAL_DH_RECONSTRUCTION
+PRE_REPAIR_MAP2_DETERMINATION: READY_WITH_CONDITIONAL_DH_RECONSTRUCTION
+
+PRE_REPAIR_CROSS_MAP_DETERMINATION: INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG

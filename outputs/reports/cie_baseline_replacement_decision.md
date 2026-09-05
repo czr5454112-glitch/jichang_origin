@@ -135,18 +135,21 @@ Feng's reported CIE-DH level.
 
 The deterministic map2 critical curve now passes the final Java source/class
 identity (`99bf...14d8`/`d611...0286`) and is accepted with the mixed result
-above. The 2026-09-05 shutdown checkpoint contains `166/180` normalized cells:
-all map2 and Nanning HCA/G31 cells, plus `16/30` Nanning CIE-DH-port cells. Its
-gate remains 180/180 strict normalized cells
-(2 maps × 3 loads × 10 seeds × 3 methods): 60 byte/SHA-matched map2 HCA/G31
-cells may be strictly reused and renormalized, 60 final-identity DH cells are
-rerun, and all 90 Nanning native cells are newly executed. Until
-`cie_external_baseline_robustness.md` and its CSV pass the final Java identity,
-workload, denominator, per-cell 10/10 seeds and 180/180 matrix gates, no
-randomized external G31-versus-reconstructed-DH ranking is promoted. The
-interim report and exact shutdown boundary are recorded in
-`cie_external_baseline_checkpoint_20260905.md`; earlier smoke and
-superseded-source rows are audit history only.
+above. The superseded 2026-09-05 checkpoint contains `166/180` execution
+records, including 16 Nanning DH cells now marked
+`INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG`; none of those 16 may enter a
+formal comparison. Full-population byte parity after the zero-through repair
+and equivalent optimization permits reuse of all 90 map2 cells; the 60
+Nanning HCA/G31 cells also retain their valid identities. Only the 30 Nanning
+DH cells require the corrected executable. Their separate version directory
+uses source `809d...f86f` and classes `ad828...2fd0`.
+
+The authoritative repaired matrix status and named, protocol-specific G31
+advantages are in [the repair comparison](feng_cie_dh_repair_comparison_20260905.md)
+and its per-cell/paired tables. Completion requires all 180 valid coordinates
+(2 maps × 3 loads × 10 seeds × 3 methods); invalid old cells and incomplete
+process files cannot fill a coordinate. The old stopped boundary remains in
+`cie_external_baseline_checkpoint_20260905.md` as audit history.
 
 FINAL_BASELINE_DECISION: HISTORICAL_ANCHOR_WITH_SECONDARY_EXECUTABLE_DIAGNOSTICS
 

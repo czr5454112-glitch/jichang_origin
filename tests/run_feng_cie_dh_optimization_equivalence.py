@@ -2,14 +2,18 @@
 
 Run from the repository with --output pointing to a new evidence directory.
 Both production builds and tests/java/App harnesses must already be compiled.
+Use --archive-only --output EXISTING_DIRECTORY to package passed raw evidence
+without compiling or executing either simulator.
 """
 from __future__ import annotations
 
 import argparse
 import csv
+import gzip
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -36,15 +40,74 @@ def run(command: list[str], output: Path) -> None:
     assert result.returncode == 0, (command, result.returncode, result.stderr)
 
 
+def archive_shared_native(output: Path, verification: dict) -> dict:
+    """Archive one copy only after both raw files match the recorded comparison."""
+    if verification.get("status") != "PASS":
+        raise ValueError("only passed equivalence evidence can be archived")
+    recorded = {Path(row["unoptimized"]).name: row
+                for row in verification["checks"]["nanning_native_files"]}
+    directory = output / "nanning_128_trace1"
+    archives = []
+    for name in ("trace.csv", "bags.csv", "segments.csv"):
+        comparison = same(directory / "unoptimized" / name, directory / "optimized" / name)
+        if not recorded[name].get("byte_identical") or any(
+                comparison[field] != recorded[name][field] for field in ("sha256", "size_bytes")):
+            raise ValueError(f"raw evidence changed after the passed comparison: {name}")
+        destination = directory / f"shared_{name}.gz"
+        if not destination.exists():
+            with (directory / "unoptimized" / name).open("rb") as source, destination.open("xb") as target:
+                # Empty filename and zero mtime remove path/time-dependent headers.
+                with gzip.GzipFile(filename="", mode="wb", fileobj=target,
+                                   compresslevel=9, mtime=0) as compressed:
+                    shutil.copyfileobj(source, compressed)
+        digest = hashlib.sha256()
+        restored_bytes = 0
+        with gzip.open(destination, "rb") as restored:
+            while chunk := restored.read(1024 * 1024):
+                digest.update(chunk)
+                restored_bytes += len(chunk)
+        if digest.hexdigest() != comparison["sha256"] or restored_bytes != comparison["size_bytes"]:
+            raise ValueError(f"archive differs from matched raw evidence: {destination}")
+        archives.append({"native_filename": name, "both_variants_byte_identical": True,
+                         "uncompressed_sha256": comparison["sha256"],
+                         "uncompressed_size_bytes": comparison["size_bytes"],
+                         "archive_path": destination.name,
+                         "archive_sha256": sha(destination),
+                         "archive_size_bytes": destination.stat().st_size,
+                         "lossless_round_trip_verified": True})
+    manifest = {"schema": "czr005.feng_dh_shared_optimization_trace_archive.v1",
+                "status": "PASS", "population": verification["representative_congestion"],
+                "archive_path_base": "this manifest directory",
+                "gzip_contract": {"filename": "", "mtime": 0, "compresslevel": 9},
+                "source_production_builds": verification["production_builds"], "files": archives}
+    manifest_path = directory / "shared_archive_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    return {"manifest_path": "nanning_128_trace1/shared_archive_manifest.json",
+            "manifest_sha256": sha(manifest_path), "file_count": len(archives),
+            "total_uncompressed_size_bytes": sum(row["uncompressed_size_bytes"] for row in archives),
+            "total_archive_size_bytes": sum(row["archive_size_bytes"] for row in archives)}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--java", required=True)
-    parser.add_argument("--unoptimized-classes", type=Path, required=True)
-    parser.add_argument("--optimized-classes", type=Path, required=True)
-    parser.add_argument("--test-classes", type=Path, required=True)
+    parser.add_argument("--java")
+    parser.add_argument("--unoptimized-classes", type=Path)
+    parser.add_argument("--optimized-classes", type=Path)
+    parser.add_argument("--test-classes", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--archive-only", action="store_true")
     args = parser.parse_args()
     output = args.output.resolve()
+    if args.archive_only:
+        verification_path = output / "verification.json"
+        verification = json.loads(verification_path.read_text(encoding="utf-8"))
+        verification["shared_native_archive"] = archive_shared_native(output, verification)
+        verification_path.write_text(json.dumps(verification, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps({"status": "PASS", "simulations_run": 0,
+                          "shared_native_archive": verification["shared_native_archive"]}))
+        return
+    if not all((args.java, args.unoptimized_classes, args.optimized_classes, args.test_classes)):
+        parser.error("simulation mode requires --java, both production builds and --test-classes")
     output.mkdir(parents=True, exist_ok=False)
     builds = {"unoptimized": args.unoptimized_classes.resolve(),
               "optimized": args.optimized_classes.resolve()}
@@ -125,6 +188,7 @@ def main() -> None:
                   "raw_bag_count", "segment_count", "route_decisions", "tied_route_decisions",
                   "hold_count", "stopped_ticks", "junction_through_busy_holds", "following_footprint_holds")},
               "repeated_snapshot_node_goal_requests": repeated}
+    result["shared_native_archive"] = archive_shared_native(output, result)
     (output / "verification.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": "PASS", "representative_congestion": result["representative_congestion"],
                       "repeated_snapshot_node_goal_requests": repeated,

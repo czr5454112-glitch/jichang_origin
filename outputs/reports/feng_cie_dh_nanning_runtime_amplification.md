@@ -1,7 +1,10 @@
 # Feng-environment CIE-DH Nanning runtime amplification
 
-Status: `VALIDATED_DIAGNOSTIC`, not an algorithm-quality metric and not a
-claim about Feng's unavailable original CIE-DH implementation.
+Scientific validity: `INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG`.
+The original counters, timings, hashes and execution outcomes below are
+preserved as observations of a defective program. The earlier
+`VALIDATED_DIAGNOSTIC` performance interpretation is withdrawn. This is not
+valid evidence of normal congestion scaling or of Feng's original CIE-DH.
 
 ## Matched observation
 
@@ -28,24 +31,27 @@ increase in route-decision-loop executions. The distinction matters because
 wall time also depends on JVM and host scheduling, while decision counts are
 native state-machine work counters.
 
-## Mechanistic interpretation
+## Corrected interpretation (2026-09-05)
 
-The partial Java reconstruction advances through synchronous
-snapshot–plan–resolve–commit ticks. Under map2 1x it completes all bags and
-the active population drains. Under the Nanning port, unresolved congestion
-keeps a much larger active population resident until the fixed horizon. The
-runner repeatedly rebuilds occupancy snapshots and evaluates local route or
-hold decisions for those active states. The 31.99x peak-active increase,
-together with prolonged residence, produces billions of decision and hold
-operations.
+The old zero-through intermediate-node branch starts an instantaneous service
+but fails to release the upstream edge and enter the subsequent transfer
+timer. It can repeat that start every tick and count it as progress. Nanning
+has 22 zero-through nodes with both incoming and outgoing edges; map2's 13
+zero-through nodes are endpoints. The old Nanning completion, moving/stopped
+counts, route decisions and runtime are consequently contaminated.
 
-This evidence supports an engineering diagnosis of pathological computational
-scaling for the unchanged partial state machine on Nanning. It does **not**
-establish that Feng's original CIE-DH had this runtime, because its source and
-full node-handoff semantics were not recovered. It also must not be used as a
-replacement performance objective: the paper comparison remains completion,
-on-time count, full-population latency when eligible, tail latency, tardiness,
-backlog, fairness, and recovery under the frozen business protocol.
+`834.18x` remains the arithmetic ratio of this Java reconstruction's Nanning
+route-decision count to its map2 count; `582.73x` is the corresponding
+simulator wall-time ratio. Neither ratio is a G31-over-CIE-DH speedup. The
+earlier attribution to normal congestion or scalable routing behavior is
+withdrawn. A matched full-population pre/post comparison would be needed to
+quantify how much of the approximately 44% completion and runtime difference
+the bug explains; the old counters alone cannot establish that it explains
+all differences.
+
+The machine-readable exclusion and unchanged-file hashes are recorded in
+`outputs/runtime/cie_external_baseline_robustness/scientific_validity_20260905.json`.
+Corrected execution must use a separate output/version directory.
 
 ## Evidence identity
 

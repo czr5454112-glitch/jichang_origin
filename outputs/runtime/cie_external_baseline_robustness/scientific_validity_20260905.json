@@ -1,0 +1,1578 @@
+{
+  "schema": "czr005.cie_external_baseline_scientific_validity.v1",
+  "created_at": "2026-09-05T07:32:05.777622+00:00",
+  "audit_basis": "Feng_CIE_DH_baseline_audit_and_repair_20260905.md; source-matched zero-through intermediate-node defect",
+  "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+  "scope": "All pre-repair Nanning independent Java DH cells with the identified source, including superseded 14/30 and 16/30 checkpoints; no G31/HCA or map2 cell is invalidated here.",
+  "execution_status_is_not_scientific_validity": true,
+  "native_or_normalized_files_modified": false,
+  "old_campaign_restart_allowed": false,
+  "corrected_results_directory": "outputs/runtime/feng_cie_dh_zero_through_repair_20260905",
+  "controlled_stop_commit": "05f3edc6b14791dd87f79c143d1bd4084b24954b",
+  "recorded_stop_process_audit": "2026-09-05T10:08:23+08:00; zero matching campaign processes",
+  "current_process_audit": "outputs/runtime/feng_cie_dh_zero_through_repair_20260905/process_audit.json",
+  "native_status_counts_preserved": {
+    "complete": 16,
+    "failed": 12,
+    "running": 2
+  },
+  "normalized_cells_preserved_but_excluded": 16,
+  "interrupted_cells_not_normalizable": 14,
+  "never_started_coordinates_at_final_stop": 0,
+  "retained_versioned_map2_native_cells": 90,
+  "unaffected_nanning_hca_g31_native_cells": 60,
+  "map2_reuse_condition": "Corrected-source full 28506-bag/43603-segment per-bag regression; no mechanical rerun solely because source SHA changes.",
+  "old_aggregate_csv": {
+    "path": "outputs/tables/cie_external_baseline_robustness.csv",
+    "sha256": "02342dcc544070a1a5c8d3cc8bdffbd0ece7a4b1c201e7f3b143f2bf3920969c",
+    "size_bytes": 50223
+  },
+  "filtered_formal_aggregate_csv": {
+    "path": "outputs/tables/cie_external_baseline_robustness_valid_20260905.csv",
+    "sha256": "e945abdcfb42848b4e3b5eb783f6658cff4afb1a13e6970b1492ff5afa54adf2",
+    "size_bytes": 36750
+  },
+  "old_aggregate_rows": 252,
+  "retained_aggregate_rows": 189,
+  "excluded_aggregate_rows": 63,
+  "immutable_checkpoint": {
+    "path": "outputs/runtime/cie_external_baseline_robustness/checkpoints/nanning_dh_16_of_30_20260905T0935.json",
+    "sha256": "b5d22137e280de3d0621e8d62cdbd181dd74e15f83c13dbfb77bb967765d1e3a",
+    "size_bytes": 4208
+  },
+  "arithmetic_ratios_observation_only": {
+    "route_decisions_nanning_over_map2": 834.18,
+    "simulator_wall_seconds_nanning_over_map2": 582.73,
+    "g31_speedup": false,
+    "normal_congestion_scaling_interpretation": "WITHDRAWN",
+    "fraction_of_completion_or_runtime_deficit_caused_by_bug": "NOT_QUANTIFIED"
+  },
+  "cells": [
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 104729,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43602,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "01d413029554d367c4a80cd057392c358bbcfcba9e83afaf32238cd1b8834f47",
+        "size_bytes": 4073
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/feng_env_dh/bags.csv",
+          "sha256": "ecd964ccbd31dd3c8414e28547ab857fc68c05ac06d1d6b6a6e20510bb2808b7",
+          "size_bytes": 2786629
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/feng_env_dh/event_summary.csv",
+          "sha256": "fca77c667b4f6070aba551d0a08aa1ab51df53a3be340084cc444390f0e696f9",
+          "size_bytes": 368
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/feng_env_dh/runner_status.json",
+          "sha256": "89632d1716f3d03cd4b4b50d61d0eb3e283a9df25bdc1ad71bf5477934441755",
+          "size_bytes": 3166
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/feng_env_dh/segments.csv",
+          "sha256": "2af5490a1fb8ba9168c898e8f13e06b28eee828aa7e818f2eda45939eda6b72e",
+          "size_bytes": 6664138
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/feng_env_dh/stdout.txt",
+          "sha256": "13c4baa953829b41b814f92aad3af9b00993b4f5d8b947f7c38dbd20aef2d563",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/feng_env_dh/summary.csv",
+          "sha256": "20936d244e8070ecf99391c817d8b70539bc35564807d1fdbde1995b71287658",
+          "size_bytes": 4567
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_104729/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 12696
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 130363,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43602,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "2880cb2faf1abf931c27660d23fdc955b29d0d2711c567983e93ffcaac07dc67",
+        "size_bytes": 4072
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/feng_env_dh/bags.csv",
+          "sha256": "44ef33e6dd826e637cc81869c18cdcb978e93887a02ed81956158968dea98e3a",
+          "size_bytes": 2786882
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/feng_env_dh/event_summary.csv",
+          "sha256": "93f0046a0853c55298e8de2a0abc7dd34ec3eaf45d25a7129f2b26bf2549d3d1",
+          "size_bytes": 368
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/feng_env_dh/runner_status.json",
+          "sha256": "9beb94e735918d302921424e1b785b52db1eb36d087a81e6b0f75461b047c840",
+          "size_bytes": 3165
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/feng_env_dh/segments.csv",
+          "sha256": "79969836006ff86c02b76be297fdfe29d922eb78bbef5d124fb82b843a17e75f",
+          "size_bytes": 6663968
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/feng_env_dh/stdout.txt",
+          "sha256": "5e0a098b58d89724ae5deafd5bebceaac4d7637dedc75ed9f2061c2059640889",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/feng_env_dh/summary.csv",
+          "sha256": "c3c89e81245130bf15830bbe57a2670a8a2385b248cd7493a3504faf3b42ed59",
+          "size_bytes": 4567
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_130363/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 12701
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 155921,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43599,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "53e2c1ea086a062ba66b3ebcefea27137734a7ab1f6a2dbe936629bc659a6129",
+        "size_bytes": 4072
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/feng_env_dh/bags.csv",
+          "sha256": "c40e569ecb7d29fe1187291a9c664a217a4e6c3affe37d6eea64ed8a20827623",
+          "size_bytes": 2786505
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/feng_env_dh/event_summary.csv",
+          "sha256": "0ba591cf36415ee26ba252a8794c8b47bc9fdba39276b1ee333962542c0433c7",
+          "size_bytes": 368
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/feng_env_dh/runner_status.json",
+          "sha256": "5df2446e677e47a3010ab22c3a85ed898e9c39393c8fa682e65befada1e88805",
+          "size_bytes": 3166
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/feng_env_dh/segments.csv",
+          "sha256": "278e8b4968954be22146e28750b4a878f75484d3c57c08b01091f2d3cde36e58",
+          "size_bytes": 6663630
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/feng_env_dh/stdout.txt",
+          "sha256": "602e0241f1d5eb373c60d05093bc4e0a0a9682b9891dfcaf9d5156f84a0d57af",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/feng_env_dh/summary.csv",
+          "sha256": "c58a900e80a8e22140d39f94f5eb7f7fd3920a74c227a567e9cef600dbf52e40",
+          "size_bytes": 4567
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_155921/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 12692
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 181081,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_181081",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43602,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_181081/feng_env_dh/runner_status.json",
+          "sha256": "9a7fc0e46ee32992a9bba42d8dae1cf4768af1377c76817eab3ec8c11ddacb49",
+          "size_bytes": 3173
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_181081/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_181081/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 205759,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43603,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "b10738b8d364c9bd9ada91b96d7b107a9ea8e520f42032913e665148f438e437",
+        "size_bytes": 4071
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/feng_env_dh/bags.csv",
+          "sha256": "3aa57cef358156395985d2cb4df51eb8a35de9f5959bdd0227d037721846ae80",
+          "size_bytes": 2786512
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/feng_env_dh/event_summary.csv",
+          "sha256": "a066727616d8f8e8fe5c0536e189878a36be6cfe11f5b1995b5cd4a83c3e0a57",
+          "size_bytes": 368
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/feng_env_dh/runner_status.json",
+          "sha256": "2254ec9402085ddc211cb4a40c9958c65b2a60baa2c90d2cf83ed9ad5eb2080f",
+          "size_bytes": 3166
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/feng_env_dh/segments.csv",
+          "sha256": "719ecf1fd6faa9906e60d6bca92924c6145fb888d1b9795f921f8789f37d83b4",
+          "size_bytes": 6664304
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/feng_env_dh/stdout.txt",
+          "sha256": "72b287107c99eb06d9e5e848586e5cffb1a9b7f76ff405be93ab22c62b62aa22",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/feng_env_dh/summary.csv",
+          "sha256": "6ee3a678b5cf41b6f131d176a758455edd116ebfc416c73db4b07b4fc78068bd",
+          "size_bytes": 4567
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_205759/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 12693
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 232003,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43599,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "efe117ccaeefba692d6e514e67db870ec47b10e8fc5df3f5cf6f69e4e775cf0e",
+        "size_bytes": 4069
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/feng_env_dh/bags.csv",
+          "sha256": "5727be0fe2f00b4d864aaa8c7a38531ed426fff8a252a2e09c719054625833a6",
+          "size_bytes": 2786546
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/feng_env_dh/event_summary.csv",
+          "sha256": "d0fbe07f251deb461ab836d55a5f00082d74d15feb910c4ae96efc51cbfc2ae1",
+          "size_bytes": 368
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/feng_env_dh/runner_status.json",
+          "sha256": "ee03e75c759a270d34be2ffe294d51d8989a27e075d5eae90552697702996e6d",
+          "size_bytes": 3166
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/feng_env_dh/segments.csv",
+          "sha256": "546748aff3287f2776a8ac347b61faf93aa254f61714233332d32a79f7ec4c21",
+          "size_bytes": 6663583
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/feng_env_dh/stdout.txt",
+          "sha256": "c5e102ed0fa28859a2773829d224be9dfc6ee0c1f4598ba73525e8291bf89c27",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/feng_env_dh/summary.csv",
+          "sha256": "d87b3c79570b2c4ca58e285b87e276761f4460a070e3371d9dada5e057c23fd7",
+          "size_bytes": 4567
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_232003/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 12693
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 257053,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_257053",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43604,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_257053/feng_env_dh/runner_status.json",
+          "sha256": "2d214e8a0dd731a7ffaec9d0b8f4644e3ccb8182cf66fa5202ba317daaa06beb",
+          "size_bytes": 3173
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_257053/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_257053/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 283303,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43602,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "4de8e5036b376852bc6148ed3637f499cab3e80b28f80bca120c6d2ce548d413",
+        "size_bytes": 4071
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/feng_env_dh/bags.csv",
+          "sha256": "f0485bd7ea9b1dccf98abd9f5dd27bda93c34a390c6e7227e43556695c50a163",
+          "size_bytes": 2786393
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/feng_env_dh/event_summary.csv",
+          "sha256": "36efecb6f89d564d3ecee39bb5ebe831aaa7dd42232c4c6134bded5d3ca98fd5",
+          "size_bytes": 368
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/feng_env_dh/runner_status.json",
+          "sha256": "d89e5e5d588799eba97458c5f8d9227cb0a39ad7fd30ed8d46720a37fe38e7f2",
+          "size_bytes": 3166
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/feng_env_dh/segments.csv",
+          "sha256": "e42f189dc7d75cbdd91e2cad777ff8f71283291bd2f447d4de124437af6f8a35",
+          "size_bytes": 6664161
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/feng_env_dh/stdout.txt",
+          "sha256": "19fb6b2db9f808715362d91894abac7155ce3f0f1ab7a29617a1007d79e2da98",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/feng_env_dh/summary.csv",
+          "sha256": "2a538bbe3afa7c68db58f9666c36349bfe79643f9f75a780bb178c3f422656dc",
+          "size_bytes": 4567
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_283303/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 12690
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 308081,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43600,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "562c716dfed5fe846b19af05485135041b8687d4f3bc867d6d0bc69043594bda",
+        "size_bytes": 4071
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/feng_env_dh/bags.csv",
+          "sha256": "f13cd573992dd89b818c2c0212e02fca082aaabc6e3da21b7e201aab9bf6a59d",
+          "size_bytes": 2786466
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/feng_env_dh/event_summary.csv",
+          "sha256": "8929dff8e6665c854b151317271b9015acd86ee1ddc6dcaf829d1669158ba873",
+          "size_bytes": 368
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/feng_env_dh/runner_status.json",
+          "sha256": "8d5cc9eafc7e068c1aff5a9b816eba7066cdac6d25ddd5e5b5e8e15d29117c79",
+          "size_bytes": 3165
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/feng_env_dh/segments.csv",
+          "sha256": "6cec3604a740bba258d0a738544d1459c9dbd989e97a64e883ac3b0c79eda71a",
+          "size_bytes": 6663874
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/feng_env_dh/stdout.txt",
+          "sha256": "7b69f13350ce90694746de048d81cfafe535673bd62be859a03db913b3ec6edf",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/feng_env_dh/summary.csv",
+          "sha256": "cc9b48446a6703e888153d39801a84ed83091e824985f7902213339d5aa6dbea",
+          "size_bytes": 4567
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_308081/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 12691
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.0,
+      "seed": 333667,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_333667",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 28506,
+      "segment_count": 43601,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_333667/feng_env_dh/runner_status.json",
+          "sha256": "1f8c64ca5bdadf2dc60bdd93bc928f16b13951aaccfb18f43a526e72bfbf63dd",
+          "size_bytes": 3173
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_333667/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p00x/seed_333667/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 104729,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76108,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "9e7f5d769754f1e6395e6afc76973bea874a9259765a2b839084abe06395545a",
+        "size_bytes": 4077
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/feng_env_dh/bags.csv",
+          "sha256": "accfab8da719bd9ec0082b9dcbb4c698aec6af436e74fa6b0a530d95616591c6",
+          "size_bytes": 4922582
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/feng_env_dh/event_summary.csv",
+          "sha256": "f8839fc001fdd5925f8acee8ded6458546ca798459574dcc2008f64f8c8f463f",
+          "size_bytes": 372
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/feng_env_dh/runner_status.json",
+          "sha256": "ae2595cdf1c6b97c79857ab2feb63d016e51f29abce245371e452360b8487231",
+          "size_bytes": 3166
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/feng_env_dh/segments.csv",
+          "sha256": "691fb1d2b2f5bf71340804f6ec7c291e096f01852017ba5dd92438be5eaf9d36",
+          "size_bytes": 11771020
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/feng_env_dh/stdout.txt",
+          "sha256": "20279033d4708d26041e704c6f45e7e20c49345be4f9be6c5a3b39ec794d5da8",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/feng_env_dh/summary.csv",
+          "sha256": "70e3ec3baa0812280fda7d314d84804fcfdf1af3973330e12a35924c94863a2a",
+          "size_bytes": 4571
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_104729/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 22052
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 130363,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_130363",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76103,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_130363/feng_env_dh/runner_status.json",
+          "sha256": "e874697e2cdd7599c41a655702bce099479f24d8940a6dc85925e9e4b0e562b1",
+          "size_bytes": 3173
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_130363/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_130363/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 155921,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_155921",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76105,
+      "original_runner_status": "running",
+      "original_returncode": null,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_155921/feng_env_dh/runner_status.json",
+          "sha256": "9451ac8829084df8317d8c60a24b587b230993608a54d80c14f585e2fb75c541",
+          "size_bytes": 3053
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 181081,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76109,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "61b9c03e82ebde5e1f4fb688b03544d457509d9d7c22dee9e0f6eda860866fe3",
+        "size_bytes": 4078
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/feng_env_dh/bags.csv",
+          "sha256": "192ac51eee37d9c7d7795d077a16dd872b84c9df281d02cd7954dd23c6ca8571",
+          "size_bytes": 4922594
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/feng_env_dh/event_summary.csv",
+          "sha256": "7ee081cc9531c25bb9018690c5609ede87f3c058e59fb79d65f18b6f12a3becb",
+          "size_bytes": 372
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/feng_env_dh/runner_status.json",
+          "sha256": "e9d159566e31e3f03ba8a5e4562bb6bec23c178c5b33df6577e5184dddf798a0",
+          "size_bytes": 3167
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/feng_env_dh/segments.csv",
+          "sha256": "cdd7920b42577ab754edc6b3edb6839b0fa70702f9eec74fda75c99e01758573",
+          "size_bytes": 11771274
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/feng_env_dh/stdout.txt",
+          "sha256": "910b5b7c3ea0853eb1cfb41b5e9a7cac513a67689f30509d94bc594c41c66b36",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/feng_env_dh/summary.csv",
+          "sha256": "6f84086a4e2e7fdbff2f8f4b28daa2504370472badf39cb1baa6d6a3139a73fd",
+          "size_bytes": 4571
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_181081/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 22049
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 205759,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_205759",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76110,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_205759/feng_env_dh/runner_status.json",
+          "sha256": "9eb6f15e6eb828438d1068edc5a217eaf4da9b698b4d358912245447b18ee921",
+          "size_bytes": 3174
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_205759/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_205759/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 232003,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_232003",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76108,
+      "original_runner_status": "running",
+      "original_returncode": null,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_232003/feng_env_dh/runner_status.json",
+          "sha256": "3e941321231b17a476ecf48c34e6451d71d8a1e90545baa7708229b7ce5248ec",
+          "size_bytes": 3053
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 257053,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76112,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "f5c707102cf879e533a4a0f6951868857058f76294991ad5ee1b85538ac62eea",
+        "size_bytes": 4074
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/feng_env_dh/bags.csv",
+          "sha256": "c2aa731457ab84798695fe5eda2cf35d02766ae01ed9c448aad1c2d9e4a1193e",
+          "size_bytes": 4922600
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/feng_env_dh/event_summary.csv",
+          "sha256": "c580934acee87a25eaf0aa6b0934b63a3431e87f493ab8418cb2e0beb726fe64",
+          "size_bytes": 372
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/feng_env_dh/runner_status.json",
+          "sha256": "4cd982974df72b04557d62b4b224b2e0f48705955d8bbdf0ac0fc847268c9e96",
+          "size_bytes": 3166
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/feng_env_dh/segments.csv",
+          "sha256": "e6fd065f5cc408fde1c169cc9a5dce34f4a17bc437b85bcaf1fa32268023428b",
+          "size_bytes": 11771587
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/feng_env_dh/stdout.txt",
+          "sha256": "e1c258b60c7ea10be66170fc31f64fdb970fc9236bb729470178c1ff306aeefb",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/feng_env_dh/summary.csv",
+          "sha256": "ded70c240826576d178b96d96d64e65b2db0365c4bcd8d7710aab9a31359d914",
+          "size_bytes": 4571
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_257053/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 22052
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 283303,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_283303",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76109,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_283303/feng_env_dh/runner_status.json",
+          "sha256": "d0bc441a2e239e1cadcdf0ca5483643832ebab3ba05989a99cc0d407d501c419",
+          "size_bytes": 3174
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_283303/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_283303/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 308081,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76104,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "abc43f5e8e1e0bf3c52150d1cbeb916ba2fe12f52523472dd234b9de34b6a2e1",
+        "size_bytes": 4074
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/feng_env_dh/bags.csv",
+          "sha256": "76d069ae7ea5d7d95e242f8d4bc5f1e1c05a1c4c0496b9a69bb44508e11c02b2",
+          "size_bytes": 4922422
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/feng_env_dh/event_summary.csv",
+          "sha256": "1316c728aefae47d44e47f0dea78bb801f06f5510ed1ebafe72bc8480bb48083",
+          "size_bytes": 372
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/feng_env_dh/runner_status.json",
+          "sha256": "a5ff9135a83f4c77c140c4402734221376eb9ef5479a0eef8e4b24d9794bdf17",
+          "size_bytes": 3166
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/feng_env_dh/segments.csv",
+          "sha256": "f86c58d62b99ed338a568806bb8d67be9a88f05f82f63ed8e55e595eb12fddea",
+          "size_bytes": 11770219
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/feng_env_dh/stdout.txt",
+          "sha256": "ee87169dc4fea8593d17ace6099e2c08ae87b2de1a8d484ec0ed184115a1f226",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/feng_env_dh/summary.csv",
+          "sha256": "0de590fdd53f07ac1fea461fb0a18a848569b33077f23864d933b02c9154a5e6",
+          "size_bytes": 4571
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_308081/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 22047
+    },
+    {
+      "map": "nanning",
+      "load_factor": 1.75,
+      "seed": 333667,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_333667",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 49765,
+      "segment_count": 76107,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_333667/feng_env_dh/runner_status.json",
+          "sha256": "dbbe0b2f630e327f24fb468cae9f45730a56e54b866c43092f88e5b1cf0aa702",
+          "size_bytes": 3174
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_333667/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_1p75x/seed_333667/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 104729,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87205,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "c6b5c4c04ebedaa29c5923037c57f0f1f9489ebe333bb8de60ce6a7055d2edb4",
+        "size_bytes": 4067
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/feng_env_dh/bags.csv",
+          "sha256": "34a065e0241e0add73693f2e26c4075c8cbf1f01ba52c75f4119105a4deafac9",
+          "size_bytes": 5609443
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/feng_env_dh/event_summary.csv",
+          "sha256": "520c6d4a713f0f78ad8913ce0ccd116527139ad1e73656e76714e9104436c061",
+          "size_bytes": 375
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/feng_env_dh/runner_status.json",
+          "sha256": "8306219b3cd601ba629a656c6cae540a24738cac25bd71c6cad17e98fe636983",
+          "size_bytes": 3167
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/feng_env_dh/segments.csv",
+          "sha256": "ef4b4f7ad0c32e9ff163ec6c33830261c33a7d163b463de1c43e5716f54bd5a8",
+          "size_bytes": 13535572
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/feng_env_dh/stdout.txt",
+          "sha256": "359efa0cbbb46bbdce2d1f194c4eb5bed8d24dd3fc10cbf6d53c41c1f4c749a4",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/feng_env_dh/summary.csv",
+          "sha256": "f5460199c17375f2dc86e45aebcfef1daa3eb3ba7916491f2cac0e415d11b0fc",
+          "size_bytes": 4576
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_104729/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 24479
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 130363,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_130363",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87203,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_130363/feng_env_dh/runner_status.json",
+          "sha256": "ddcae2eb2ac960bc859443da4f9e29fbb837ee09f50cea1aa590d4170305b036",
+          "size_bytes": 3174
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_130363/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_130363/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 155921,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87199,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "42a269154120baa87af99e2c6d9d8bd2a249900017e26345334e9e1c06a5d2d9",
+        "size_bytes": 4069
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/feng_env_dh/bags.csv",
+          "sha256": "69e5a92916fbed83cbd8a6db824c18e8f1cbc84d6ab82bf669aa968ac4c9eb5a",
+          "size_bytes": 5609639
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/feng_env_dh/event_summary.csv",
+          "sha256": "632d7d6c9f4594f03c249967e8b7d62ed17b2680ab4cc88a29d8de58a2aa3aa6",
+          "size_bytes": 375
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/feng_env_dh/runner_status.json",
+          "sha256": "f10066e80fbbf591cd5e6c5c1979c60308ddb908a86dd6ff4d38ba5cb6818825",
+          "size_bytes": 3167
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/feng_env_dh/segments.csv",
+          "sha256": "957cb1025593eeb2c8b6a3f6d0c64d2b140a08bf92c1cb0b19a00fcfbda021b5",
+          "size_bytes": 13534560
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/feng_env_dh/stdout.txt",
+          "sha256": "3417022c30029631cd270796a203e12c707f8a699ccddf1aacefe72b34d5b5d9",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/feng_env_dh/summary.csv",
+          "sha256": "d91fa15d8fcf8be8f9a9388bcd57c26cccf5eefba53d8d99ec2dcf2d28602cd2",
+          "size_bytes": 4576
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_155921/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 24484
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 181081,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_181081",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87206,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_181081/feng_env_dh/runner_status.json",
+          "sha256": "a089426082fa7a2b87861cd372cc0a1eb98684eda1db1a325d7b15199e708b35",
+          "size_bytes": 3174
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_181081/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_181081/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 205759,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87206,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "bbf47a8ea2d68a0535787f08b5cc1531a2b9bb28fd63f9f2de343cdee8d89115",
+        "size_bytes": 4069
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/feng_env_dh/bags.csv",
+          "sha256": "547cdbedcc581c0d496d12d681be511efaf70fc0679dba08a2aa35cb59834111",
+          "size_bytes": 5609458
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/feng_env_dh/event_summary.csv",
+          "sha256": "913f1464ea9d7a1f29e3b08ba45e9403a51525c937509a2704941c76f802316d",
+          "size_bytes": 375
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/feng_env_dh/runner_status.json",
+          "sha256": "5b43c089ba08eb28b0351e213acaf602634c81f40407cc430c15bb76d12e612f",
+          "size_bytes": 3167
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/feng_env_dh/segments.csv",
+          "sha256": "fe98645984547374fbbf07dc5065c9a1a43273e643109e4e7c6f362b0b73dc85",
+          "size_bytes": 13535746
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/feng_env_dh/stdout.txt",
+          "sha256": "0960e91e19ff5a30ef0182da4bc0427136f336ecaef51ae9d00b5358e60f0436",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/feng_env_dh/summary.csv",
+          "sha256": "87244d3518afd4ab78e4e41686ffe3d22e4766e2aef9cd8e728865472d08e9d8",
+          "size_bytes": 4576
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_205759/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 24479
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 232003,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_232003",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87200,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_232003/feng_env_dh/runner_status.json",
+          "sha256": "8f05720195d6f69ba832f6ec8023136bdbfeaee2673922a0300e7fe4fe6f58be",
+          "size_bytes": 3174
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_232003/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_232003/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 257053,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87203,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "405342d880da149e1c4ea9d5eea39f1d86487b5dd65a5fd31a775cb3924fb96a",
+        "size_bytes": 4066
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/feng_env_dh/bags.csv",
+          "sha256": "0baf55611195d8b2290a57c976cf8902b41be2d5f7fa19e99a081c8fd1d1ecc5",
+          "size_bytes": 5609191
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/feng_env_dh/event_summary.csv",
+          "sha256": "a14f8a2fd571d05f3146db287a3df2c16aee7615b64bb75461a679991da56ebc",
+          "size_bytes": 375
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/feng_env_dh/runner_status.json",
+          "sha256": "58ffdc703ec6228c83441fbc209400f4a88d1e5b355ed90b2efc7dd806a93e2f",
+          "size_bytes": 3167
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/feng_env_dh/segments.csv",
+          "sha256": "33c3bba0943658aed43953e2864bf6e50e3ae2a5d7cc9ff018fc5def73379882",
+          "size_bytes": 13535178
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/feng_env_dh/stdout.txt",
+          "sha256": "da0f561c0b0fb80ac841abc2f10198771831e1f961921df9854f0bec2bced5f1",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/feng_env_dh/summary.csv",
+          "sha256": "84e2b9296b3fa7a8f8cea97798300c29fd89a281ff88134338251eefe14aeaf4",
+          "size_bytes": 4576
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_257053/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 24473
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 283303,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_283303",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87204,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_283303/feng_env_dh/runner_status.json",
+          "sha256": "d73c98b63bd6dc8a707f4cb03dd6f12f13072bd3afa68f02191ba51cb8eee9d1",
+          "size_bytes": 3174
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_283303/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_283303/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 308081,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87202,
+      "original_runner_status": "complete",
+      "original_returncode": 0,
+      "original_normalized_status": "COMPLETE",
+      "original_native_simulation_status": "HORIZON_REACHED",
+      "execution_disposition": "TERMINAL_FILES_PRESERVED",
+      "normalized_evidence": {
+        "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/FENG_PAPER_ENV_CIE_DH_RECONSTRUCTION.json",
+        "sha256": "410ee67cf0373e712e092a668765495efe7afb81ce47660af77f7fdfef310d77",
+        "size_bytes": 4069
+      },
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/feng_env_dh/bags.csv",
+          "sha256": "e28810f015d8c9d243f92b895091d4ed2e9b70a0239ce3c3952a4515c45ac7e4",
+          "size_bytes": 5609619
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/feng_env_dh/event_summary.csv",
+          "sha256": "2acde71f18b5fc8126ca5bb4088a5538e9b4e6632c864de513fad84c9c2135a6",
+          "size_bytes": 375
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/feng_env_dh/runner_status.json",
+          "sha256": "836f835cc05260c40a344fd5e2c244bcadc784fddef5e5da45eb911491eaf39b",
+          "size_bytes": 3167
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/feng_env_dh/segments.csv",
+          "sha256": "418a7cf7631e169df4252d07fa22f5b35cf5caa4fcfbf018421e3041e65cad84",
+          "size_bytes": 13535036
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/feng_env_dh/stdout.txt",
+          "sha256": "2f2ce16d55fa59167ff2bf81ac57cb3bb54c63c94c84abf356d0fb2c279ba999",
+          "size_bytes": 247
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/feng_env_dh/summary.csv",
+          "sha256": "54886b4380d6374ee35f825d624fba473e41b4be72734ee615908ebeac94045a",
+          "size_bytes": 4576
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_308081/feng_env_dh/trace.csv",
+          "sha256": "ec5ba56793fa0b66e4d9d631e3dcaa1842753e93c9c24783455c0d416cb169d6",
+          "size_bytes": 89
+        }
+      ],
+      "matches_immutable_16_cell_checkpoint": true,
+      "completed_raw_bags_observation_only": 24483
+    },
+    {
+      "map": "nanning",
+      "load_factor": 2.0,
+      "seed": 333667,
+      "directory": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_333667",
+      "scientific_validity": "INVALIDATED_ZERO_THROUGH_STATE_MACHINE_BUG",
+      "formal_comparison_eligible": false,
+      "corrected_matrix_reusable": false,
+      "source_sha256": "99bf695a787accce5780996d06bbc8eb816992169ef8b731e8116a49c10f14d8",
+      "raw_bag_count": 57012,
+      "segment_count": 87207,
+      "original_runner_status": "failed",
+      "original_returncode": 4294967295,
+      "original_normalized_status": null,
+      "original_native_simulation_status": null,
+      "execution_disposition": "INTERRUPTED_PARTIAL_FILES_PRESERVED",
+      "normalized_evidence": null,
+      "native_files": [
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_333667/feng_env_dh/runner_status.json",
+          "sha256": "fbc553c0fd2b18be6504f21df3a64659c1b8902892064468b124dcdc927a4b83",
+          "size_bytes": 3175
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_333667/feng_env_dh/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        {
+          "path": "outputs/runtime/cie_external_baseline_robustness/nanning_2p00x/seed_333667/feng_env_dh/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    }
+  ]
+}
