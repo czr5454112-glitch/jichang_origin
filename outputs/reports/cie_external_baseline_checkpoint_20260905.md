@@ -74,11 +74,26 @@ Two coordinates had not started:
 
 - Nanning 1.75x: `155921`, `232003`.
 
-An operating-system shutdown invalidates only the twelve in-flight cells; the
-sixteen completed cells above remain valid. Resume must retain those sixteen,
-force-rerun any interrupted `running/null` coordinate from the beginning, and
-then run the two untouched coordinates. Partial native output must never be
-normalized or counted.
+At the checkpoint, an operating-system shutdown would have invalidated only
+the twelve in-flight cells; the sixteen completed cells above remain valid.
+
+### Controlled stop after the checkpoint
+
+At the user's request, the campaign was stopped between `10:04` and `10:08`
+China Standard Time. The twelve active Java processes were terminated. Before
+their two surviving shard parents were stopped, they automatically launched
+the two previously untouched Nanning 1.75x cells (`155921`, `232003`); those
+new processes and all campaign Python/PowerShell runners were then terminated.
+A command-line process audit at `2026-09-05T10:08:23+08:00` found zero matching
+`FengDhBenchmark`, per-cell Python, or campaign runner processes.
+
+The final stopped boundary is therefore `16` valid complete cells and `14`
+interrupted cells requiring a full rerun. The earlier twelve have native
+`failed`/return-code `-1` status; the two briefly launched 1.75x cells retain
+stale `running` status but have no live process and no normalized result. On
+resume, retain the sixteen complete coordinates and force-rerun all fourteen
+others from the beginning. Partial native output must never be normalized or
+counted.
 
 ## Frozen executable identity
 
