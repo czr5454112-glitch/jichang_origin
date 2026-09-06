@@ -1,0 +1,67 @@
+{
+  "schema": "czr005.hca_release_delay_archive_equivalence.v1",
+  "status": "PASS",
+  "scope": {
+    "map": "nanning",
+    "load_factor": 1.0,
+    "seed": 155921,
+    "single_cell_only": true,
+    "run_role": "REPAIRED_NATIVE_CONTROL_PREFLIGHT_BEFORE_FAST_CLEANUP_CAMPAIGN",
+    "not_a_sixty_cell_or_ten_seed_conclusion": true
+  },
+  "scientific_payload_equal_across_original_native_current_native_and_archive": true,
+  "scientific_payload_sha256": "e9d254458400463a567d8ff3f693ce0bd9759d309bf520bfb5edd2faf899a3c3",
+  "compared_scientific_top_level_fields": [
+    "common_completed_cohort_diagnostic",
+    "highest_THT_bags",
+    "identity",
+    "inferences_and_limits",
+    "native_control_fields_equal",
+    "native_new_segment_to_raw_reconstruction",
+    "native_summaries",
+    "new_mean_release_minus_D_fraction",
+    "newly_resolved_raw_bags",
+    "observations",
+    "old_formal_timing_status",
+    "old_native_event_reconstruction",
+    "old_scheduled_mean_formally_exported",
+    "schema",
+    "scope",
+    "segment_comparison",
+    "source_release_rule_replay",
+    "status",
+    "timing_decomposition_seconds"
+  ],
+  "common_cohort_sha256": "142ba3fee97180899141c5451e7e9396cf1929dbdf12482580fb2295838fcd19",
+  "evidence_changed_only_diagnostic_script": [
+    "scripts/eval/diagnose_hca_segment_identity_release_delay.py"
+  ],
+  "diagnostic_script_sha256": "6b9187c604b1467b6a6051e61b3315fd34a5e6134e81d773e9f8b8bc52bf4e76",
+  "inputs": {
+    "before": {
+      "path": "build\\hca_release_delay_portable_check\\native_diagnostic_before_archive_mode.json",
+      "sha256": "ddb07485660efa139fb5a96d7e6b91ce0700181c7c7fa4dd536298125c9de939"
+    },
+    "current_native": {
+      "path": "build\\hca_release_delay_portable_check\\current_native_diagnostic.json",
+      "sha256": "c94f386c5f96b4c1248354bcbfcd9b504762edc75f2d0d00fd7ef4271a4bfa4f"
+    },
+    "from_archive": {
+      "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\hca_segment_identity_20260906\\diagnostics\\nanning_1p00x_seed_155921_release_delay.json",
+      "sha256": "5bdc4eb5b9c6dd1076296c9e228dce16aff9083c8423e25fca5769905e0a8105"
+    }
+  },
+  "metadata_excluded": [
+    "evidence",
+    "archive_read_provenance"
+  ],
+  "no_simulation_run": true,
+  "original_native_files_not_modified": true,
+  "original_native_and_workload_path_reads_forbidden_during_archive_verification": true,
+  "blocked_original_scope": [
+    "new slow-preflight native directory",
+    "old HCA native directory",
+    "original workload directory",
+    "original map file"
+  ]
+}

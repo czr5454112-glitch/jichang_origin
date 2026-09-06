@@ -1,0 +1,31 @@
+{
+  "schema": "czr005.hca_segment_cleanup_revision_validation.v1",
+  "status": "PASS",
+  "old_runner_sha256": "77105ac1695576011118e8fc2d3d450e26149cc5a165728fae7962bb4fd46230",
+  "new_runner_sha256": "9241cf23d4d7e3cc699fde4f812f6569cee9ff239c9e4f4393fbe4b43b61c525",
+  "only_changed_production_function": "cleanup_epoch_scratch",
+  "non_cleanup_module_AST_identical": true,
+  "tests": {
+    "command": "C:/PROGRAMING/python3.11.9/python.exe -m unittest tests.test_hca_segment_identity_runner tests.test_hca_segment_identity_cleanup -v",
+    "passed": 21,
+    "wall_seconds": 1.015,
+    "files": {
+      "tests/test_hca_segment_identity_runner.py": "ee292f64f835455242acbd97ca9a8f872ea4f6173efb79ee2f111e98a70062f4",
+      "tests/test_hca_segment_identity_cleanup.py": "7f4ca6e5a37710b4f2fbbb493f7cbaa32ab3bca66d9c9d4f7601f4d035d54e61"
+    }
+  },
+  "small_fixture_old_new_comparison": "Native and derived original bytes, all gzip bytes, archive manifest bytes and cleanup accounting fields identical; target path and finish timestamp intentionally differ.",
+  "safety": "Archive verification precedes metadata scan and unlink; resolved non-reparse parent retained; every child checked regular/non-reparse and same lexical parent before any unlink; run_cell lock unchanged.",
+  "readonly_existing_100_file_benchmark": {
+    "observed_at": "2026-09-06T01:25:38.751829+00:00",
+    "sample_count": 100,
+    "files_modified": 0,
+    "current_checks_seconds": 0.8207980999723077,
+    "scandir_enumeration_seconds": 0.0018529999069869518,
+    "scandir_cached_checks_seconds": 0.0010725001338869333,
+    "same_total_size_bytes": 1247,
+    "current_over_cached_including_enumeration_ratio": 280.56677098084214,
+    "scope": "Metadata check only during four active cleanup workers; not a full-population timing, archive or unlink benchmark."
+  },
+  "campaign_policy": "Old five preflight runs retained as a separate runner comparison; full sixty formal cells rerun in the fast-cleanup root with identical frozen Java, inputs and numeric code. No outcome-based selection."
+}
