@@ -1,0 +1,392 @@
+{
+  "schema": "czr005.hca_segment_identity_microtests.v1",
+  "status": "PASS",
+  "method": "HCA_SEGMENT_IDENTITY_V1",
+  "checks": [
+    {
+      "name": "overlapping_EBS_no_overwrite_no_new_precedence",
+      "pass": true,
+      "old_generated_completed_active_unplanned": [
+        2,
+        1,
+        0,
+        0
+      ],
+      "new_completed": 2,
+      "new_terminal": {
+        "storage_in": {
+          "execution_id": "7",
+          "raw_task_id": "7",
+          "leg": "storage_in",
+          "start": "0",
+          "goal": "1",
+          "scheduled_release_seconds": "0.0",
+          "release_epoch": "1.0",
+          "planned_epoch": "1.0",
+          "planned_finish_epoch": "21.0",
+          "completion_epoch": "21.0",
+          "terminal_state": "COMPLETED",
+          "active_route_member": "false",
+          "unplanned_member": "false",
+          "source_pending_member": "false"
+        },
+        "storage_out": {
+          "execution_id": "8",
+          "raw_task_id": "7",
+          "leg": "storage_out",
+          "start": "2",
+          "goal": "3",
+          "scheduled_release_seconds": "1.0",
+          "release_epoch": "1.0",
+          "planned_epoch": "1.0",
+          "planned_finish_epoch": "3.0",
+          "completion_epoch": "3.0",
+          "terminal_state": "COMPLETED",
+          "active_route_member": "false",
+          "unplanned_member": "false",
+          "source_pending_member": "false"
+        }
+      }
+    },
+    {
+      "name": "ordinary_direct_control_exact_equivalence_including_fractional_release",
+      "pass": true,
+      "identical_files": {
+        "release.csv": "8cb83aa8a9f34f787a8f6521ff457f38c7ede02e9511b81934b9a3c0e10d8def",
+        "routes.csv": "f0cb95755d7d4086a59522f6b019d10d143c2b2b65b0eac824ca4976c46f0d69",
+        "output.txt": "07b6769ed24685fd2b547b6c55216205d72700e3b57c4f1b06c8e05440551d77",
+        "outputstarttime.txt": "4d4d5b84f1423c1dd1706e2bbc5a697ea7477a328ce2c610d41a210d0b281a06"
+      }
+    },
+    {
+      "name": "sparse_raw_IDs_first_leg_preserved_second_leg_collision_free",
+      "pass": true,
+      "execution_ids": [
+        7,
+        23,
+        123,
+        124,
+        125
+      ]
+    },
+    {
+      "name": "actual_Task_and_Pallet_objects_receive_unique_execution_ID",
+      "pass": true,
+      "audit": {
+        "status": "PASS",
+        "task_object_count": 5,
+        "execution_ids": [
+          7,
+          23,
+          123,
+          124,
+          125
+        ],
+        "task_and_pallet_identity_equal": true
+      }
+    },
+    {
+      "name": "incomplete_terminal_states_cover_source_pending_active_unplanned",
+      "pass": true
+    },
+    {
+      "name": "ambiguous_raw_ID_and_integer_overflow_fail_before_execution",
+      "pass": true
+    }
+  ],
+  "check_count": 6,
+  "production_identity": {
+    "command": [
+      "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+      "-encoding",
+      "UTF-8",
+      "-d",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_segment_identity_preflight",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Astar.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Edge.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\ICS_PathFinding.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Map.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Node.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Route.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\task.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Tasks.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Vertex.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\ICS_GUI\\ICS_GUI.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\HcaSegmentIdentityBenchmark.java"
+    ],
+    "stderr": "ע: C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\ICS_GUI\\ICS_GUI.javaʹ�û򸲸����ѹ�ʱ�� API��\nע: �й���ϸ��Ϣ, ��ʹ�� -Xlint:deprecation ���±��롣\n",
+    "source_files": {
+      "legacy/jichang_origin_readonly/src/App/Astar.java": "1b46069ca968ecc3043a1f05091de65f95ca6ced65169ba23e82821cf4b63921",
+      "legacy/jichang_origin_readonly/src/App/Edge.java": "45fc16634244acfd5d3303a8689bb7ed410b4835b5e08a3758b8c50606a94cce",
+      "legacy/jichang_origin_readonly/src/App/ICS_PathFinding.java": "a367fd8e79aba7b3d23b71fc9b4d01f76dd67f291f008401d676ffcbcf53d52a",
+      "legacy/jichang_origin_readonly/src/App/Map.java": "3e2af71a17d204fdc6639feb2fa8efd252881d6b18b0b15f5248ba68e0d6ece6",
+      "legacy/jichang_origin_readonly/src/App/Node.java": "0dc21b5e6b9f8f1e9fc3c38f992da1b77612708cb3012527fae87bd99417ed62",
+      "legacy/jichang_origin_readonly/src/App/Route.java": "841f1fd2d207a11279092be33ada5993d2a7407b17bfe009546c822389dafc5f",
+      "legacy/jichang_origin_readonly/src/App/task.java": "f34ce46a39d13a64cea07d2e71b121f67c3312d31913e3d267f24f1912f16ed5",
+      "legacy/jichang_origin_readonly/src/App/Tasks.java": "dd4505e495fd3c0fa737923dca83c9d404fc3b1e3a7ce979e7dd384a57d0948b",
+      "legacy/jichang_origin_readonly/src/App/Vertex.java": "59390474713fe984614673d3f7b2849071f9c6a55d9935725f6c3ede26415eea",
+      "legacy/jichang_origin_readonly/src/ICS_GUI/ICS_GUI.java": "3a893424e4fbd5e2c9071a227fd9ed6867d7176f4dd00d44ccdc541fb697470b",
+      "benchmarks/java/HcaSegmentIdentityBenchmark.java": "9aaa3d56a0f6cb48255730714796a6fb7f48a501bb2b456c4644a98afbe4beaf"
+    },
+    "source_aggregate_sha256": "ff1e76623216c55a6d07b1a867f45e27336b10b66ab11db4fb02d59d93d43d45",
+    "class_files": {
+      "App/Astar$1.class": "613a21b39b4921e1bb60ce5c7caa2123d5f540bf3e342cd61dc0a08547605d7f",
+      "App/Astar.class": "a0a643e3dd0b16fc58d619d16179b4734e8bba490d8aa9a8d96dcfd59f023606",
+      "App/Edge.class": "0571d2d1a9f50165d739e7b46268ba7e041d6ec424d83300584d11fefa144db5",
+      "App/ICS_PathFinding$1.class": "f732269247b71fd2f246f77edd93b007ba13115eb080f7f7c1cee3669be7e469",
+      "App/ICS_PathFinding.class": "fe0cc9cd8a6a1b042394c4c52fc35cb16d0f76ce029199c4b87458493eb8aa1f",
+      "App/Map.class": "2680c349dce42d2ec5cf2a2ea3ee50047911f3732e00486a388811caad53489e",
+      "App/Node.class": "146f6f114fc04faad7d0049aa7f50db61db4c4fdbd0382a756389c433683f8bd",
+      "App/Route.class": "dd88101b58849f87aee5a327617851ef626d7b423aa49bbaa4b2eed448448013",
+      "App/task.class": "b9b76b1d569a4ea29b1cb735cba83c43ed251293585eabec1556d1fe4fc9c080",
+      "App/Tasks.class": "1b158d198e8ec630bc9c9b1f0551b27b10c666fe764b5f42c7b7d11353ca5e3d",
+      "App/Vertex.class": "1945e31622484c6200fde42a98507411f5823970746e2b1392a9f65507310154",
+      "HcaSegmentIdentityBenchmark$1.class": "af51793385b10a81ebd30df40091c075c21b31ff686c2e42053a367f7cf21680",
+      "HcaSegmentIdentityBenchmark$PlannedRoute.class": "2a9ff2f787d4f9be181fd414f64f66f2609bec964806fa5507f64d3ce7e49ad5",
+      "HcaSegmentIdentityBenchmark$ReleaseEvent.class": "fdcd3419b9ecfe2043f30eedb7d4b5b181e8e8a85f69d43e87cc60f7b1f47a95",
+      "HcaSegmentIdentityBenchmark$RunResult.class": "e98fb05880e0ba75eae19f445400669e90f6759190d65cb954c933c42485f0ad",
+      "HcaSegmentIdentityBenchmark$ScheduleEvent.class": "8aa42b59ebb5c26ce3521b8a7449a0d2c2720b3a4eb82caa8beaaaa67881e4cb",
+      "HcaSegmentIdentityBenchmark$SegmentIdentity.class": "e73596d0d47d3bc45205cac079d7d6d0132d197f299a79f8bc07134bf25134d4",
+      "HcaSegmentIdentityBenchmark.class": "e064c81fa6b374b9823231066a18421e905fc56aecac28530624ad630b5cce5b",
+      "ICS_GUI/ICS_GUI$1.class": "34662d98e11b713a6e4726129e9f3a9173dbcbbaa3692c90f1a030a8cbad257b",
+      "ICS_GUI/ICS_GUI$2.class": "0f5a1f54c1408521de300165f0187a38b606b7996e5bbe672f706be553631c0a",
+      "ICS_GUI/ICS_GUI$3.class": "5065c19be60a92c7bdd1b8e89034b103598ba964096add7d8b1055fdf7f35c6a",
+      "ICS_GUI/ICS_GUI$4.class": "9dcd7dc34645893628ce8dce99aac759f8bc6261cf7e0d1a65382d2d0ffe61dd",
+      "ICS_GUI/ICS_GUI$5.class": "2de738f85bab133a67805f08e6e3240402e056c2356e0aaa2d2bb149d977cee7",
+      "ICS_GUI/ICS_GUI$6.class": "60e07e98dacd72c6e1684fd204f6df918398837412b9167c785717ee73a7d14e",
+      "ICS_GUI/ICS_GUI$7.class": "c5ecd240e995aaf3df2444f19d2421acd496275151795006d97b553b53b78231",
+      "ICS_GUI/ICS_GUI$8.class": "ce31803972a96315e20b292281d67fe74c143fac19c56558761585cb1aae2a01",
+      "ICS_GUI/ICS_GUI$9.class": "248c25b215068a27fc0fa4664bd37efc7718944414a65bd7c20e81f01d817b36",
+      "ICS_GUI/ICS_GUI.class": "5aba3da485fa56bc835d542f5e69316b2fc5a13e53d6c78840ceffe94cd71e04"
+    },
+    "class_aggregate_sha256": "ee84b1a88485485ddebbcebf756720e715a479c690fdb731f911205fbde51075",
+    "java_version": "openjdk version \"18\" 2022-03-22\nOpenJDK Runtime Environment (build 18+36-2087)\nOpenJDK 64-Bit Server VM (build 18+36-2087, mixed mode, sharing)\n",
+    "javac_version": "javac 18\n"
+  },
+  "old_control_identity": {
+    "command": [
+      "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+      "-encoding",
+      "UTF-8",
+      "-d",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_segment_identity_preflight_old_control",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Astar.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Edge.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\ICS_PathFinding.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Map.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Node.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Route.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\task.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Tasks.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Vertex.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\ICS_GUI\\ICS_GUI.java",
+      "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\LegacyIcsNoFaultWindowBenchmark.java"
+    ],
+    "stderr": "ע: C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\ICS_GUI\\ICS_GUI.javaʹ�û򸲸����ѹ�ʱ�� API��\nע: �й���ϸ��Ϣ, ��ʹ�� -Xlint:deprecation ���±��롣\n",
+    "source_files": {
+      "legacy/jichang_origin_readonly/src/App/Astar.java": "1b46069ca968ecc3043a1f05091de65f95ca6ced65169ba23e82821cf4b63921",
+      "legacy/jichang_origin_readonly/src/App/Edge.java": "45fc16634244acfd5d3303a8689bb7ed410b4835b5e08a3758b8c50606a94cce",
+      "legacy/jichang_origin_readonly/src/App/ICS_PathFinding.java": "a367fd8e79aba7b3d23b71fc9b4d01f76dd67f291f008401d676ffcbcf53d52a",
+      "legacy/jichang_origin_readonly/src/App/Map.java": "3e2af71a17d204fdc6639feb2fa8efd252881d6b18b0b15f5248ba68e0d6ece6",
+      "legacy/jichang_origin_readonly/src/App/Node.java": "0dc21b5e6b9f8f1e9fc3c38f992da1b77612708cb3012527fae87bd99417ed62",
+      "legacy/jichang_origin_readonly/src/App/Route.java": "841f1fd2d207a11279092be33ada5993d2a7407b17bfe009546c822389dafc5f",
+      "legacy/jichang_origin_readonly/src/App/task.java": "f34ce46a39d13a64cea07d2e71b121f67c3312d31913e3d267f24f1912f16ed5",
+      "legacy/jichang_origin_readonly/src/App/Tasks.java": "dd4505e495fd3c0fa737923dca83c9d404fc3b1e3a7ce979e7dd384a57d0948b",
+      "legacy/jichang_origin_readonly/src/App/Vertex.java": "59390474713fe984614673d3f7b2849071f9c6a55d9935725f6c3ede26415eea",
+      "legacy/jichang_origin_readonly/src/ICS_GUI/ICS_GUI.java": "3a893424e4fbd5e2c9071a227fd9ed6867d7176f4dd00d44ccdc541fb697470b",
+      "benchmarks/java/LegacyIcsNoFaultWindowBenchmark.java": "28beeb2cd62f931bb2d911465cea3b5f7728effea8e06da32cd7f1ac62303a10"
+    },
+    "source_aggregate_sha256": "fe99cbcf9c38feaa9ff9c415f2abc117c9eb66bdbe894caeed8008deea218419",
+    "class_files": {
+      "App/Astar$1.class": "613a21b39b4921e1bb60ce5c7caa2123d5f540bf3e342cd61dc0a08547605d7f",
+      "App/Astar.class": "a0a643e3dd0b16fc58d619d16179b4734e8bba490d8aa9a8d96dcfd59f023606",
+      "App/Edge.class": "0571d2d1a9f50165d739e7b46268ba7e041d6ec424d83300584d11fefa144db5",
+      "App/ICS_PathFinding$1.class": "f732269247b71fd2f246f77edd93b007ba13115eb080f7f7c1cee3669be7e469",
+      "App/ICS_PathFinding.class": "fe0cc9cd8a6a1b042394c4c52fc35cb16d0f76ce029199c4b87458493eb8aa1f",
+      "App/Map.class": "2680c349dce42d2ec5cf2a2ea3ee50047911f3732e00486a388811caad53489e",
+      "App/Node.class": "146f6f114fc04faad7d0049aa7f50db61db4c4fdbd0382a756389c433683f8bd",
+      "App/Route.class": "dd88101b58849f87aee5a327617851ef626d7b423aa49bbaa4b2eed448448013",
+      "App/task.class": "b9b76b1d569a4ea29b1cb735cba83c43ed251293585eabec1556d1fe4fc9c080",
+      "App/Tasks.class": "1b158d198e8ec630bc9c9b1f0551b27b10c666fe764b5f42c7b7d11353ca5e3d",
+      "App/Vertex.class": "1945e31622484c6200fde42a98507411f5823970746e2b1392a9f65507310154",
+      "ICS_GUI/ICS_GUI$1.class": "34662d98e11b713a6e4726129e9f3a9173dbcbbaa3692c90f1a030a8cbad257b",
+      "ICS_GUI/ICS_GUI$2.class": "0f5a1f54c1408521de300165f0187a38b606b7996e5bbe672f706be553631c0a",
+      "ICS_GUI/ICS_GUI$3.class": "5065c19be60a92c7bdd1b8e89034b103598ba964096add7d8b1055fdf7f35c6a",
+      "ICS_GUI/ICS_GUI$4.class": "9dcd7dc34645893628ce8dce99aac759f8bc6261cf7e0d1a65382d2d0ffe61dd",
+      "ICS_GUI/ICS_GUI$5.class": "2de738f85bab133a67805f08e6e3240402e056c2356e0aaa2d2bb149d977cee7",
+      "ICS_GUI/ICS_GUI$6.class": "60e07e98dacd72c6e1684fd204f6df918398837412b9167c785717ee73a7d14e",
+      "ICS_GUI/ICS_GUI$7.class": "c5ecd240e995aaf3df2444f19d2421acd496275151795006d97b553b53b78231",
+      "ICS_GUI/ICS_GUI$8.class": "ce31803972a96315e20b292281d67fe74c143fac19c56558761585cb1aae2a01",
+      "ICS_GUI/ICS_GUI$9.class": "248c25b215068a27fc0fa4664bd37efc7718944414a65bd7c20e81f01d817b36",
+      "ICS_GUI/ICS_GUI.class": "5aba3da485fa56bc835d542f5e69316b2fc5a13e53d6c78840ceffe94cd71e04",
+      "LegacyIcsNoFaultWindowBenchmark$1.class": "8d2bd6e78816a25fe4154ba4ddf7e729aeb242f6c00bf2964d2f0cd73f6bd420",
+      "LegacyIcsNoFaultWindowBenchmark$PlannedRoute.class": "2faf099bdccecbbc12486b88e2fbd30d321e6310eca1938c83694523c21fae21",
+      "LegacyIcsNoFaultWindowBenchmark$ReleaseEvent.class": "bc6767b3c55ab252c640b542a447a2d11decb6ab4c70de7a13d3c92e5fbce7fb",
+      "LegacyIcsNoFaultWindowBenchmark$RunResult.class": "aff03bc87e8cedaaf7b74701a2fa169acfbdc632c175727081676753c9376235",
+      "LegacyIcsNoFaultWindowBenchmark$ScheduleEvent.class": "6ae8316832bd4d419f9ac9cccb6a1b1bfc263987ce09a4af7a8c8b3849ee0023",
+      "LegacyIcsNoFaultWindowBenchmark.class": "c78b566a6ae4ccf54c4de1dae58a185be19394a5b6a4e9b8a6359ecc31838545"
+    },
+    "class_aggregate_sha256": "005f2cca4ede5f9d08668830a1d02f2b33a6d5e789ab29a2ef09fdded18c2b1f",
+    "java_version": "openjdk version \"18\" 2022-03-22\nOpenJDK Runtime Environment (build 18+36-2087)\nOpenJDK 64-Bit Server VM (build 18+36-2087, mixed mode, sharing)\n",
+    "javac_version": "javac 18\n"
+  },
+  "source_aggregate_sha256": "ff1e76623216c55a6d07b1a867f45e27336b10b66ab11db4fb02d59d93d43d45",
+  "class_aggregate_sha256": "ee84b1a88485485ddebbcebf756720e715a479c690fdb731f911205fbde51075",
+  "wrapper_sha256": "9aaa3d56a0f6cb48255730714796a6fb7f48a501bb2b456c4644a98afbe4beaf",
+  "java_audit_source_sha256": "e270076ff04b264d1d3bfa2c9849390fac15be5f353fc8a87c3e57addcbbf77e",
+  "test_driver_sha256": "df4bf8ed153634e14217d6afadf63973cabae2b1823f39542a619551f364d6bb",
+  "native_evidence": [
+    {
+      "name": "overlap_old",
+      "expected_rejection": null,
+      "files": {
+        "microtest_native/overlap_old/epoch_files.json.gz": "09f46708d55c3dde263e521eeac5b2e0656088016eaa02a46a34053398af6fc2",
+        "microtest_native/overlap_old/input.txt": "9d7975fea11372dfa20a94483d816b957af81a87c27f15093bb5512ff1feba1f",
+        "microtest_native/overlap_old/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/overlap_old/output.txt": "61532a8be50ee11a5391a10d800996847bf56bdfa2f4367f799a0a3a3b2801a2",
+        "microtest_native/overlap_old/outputstarttime.txt": "3fa22848f72ddb05e9a4ae85ae3d977bec697ab7e61365440f2ce2513b720092",
+        "microtest_native/overlap_old/release.csv": "2d3c2f0abb267619780865a4f2ce151348509294fda93d5be9cb78e33aacc883",
+        "microtest_native/overlap_old/routes.csv": "66a74a76da42a4e806db3496280ebc1a30e312d3d24f921b5d500099186c01f0",
+        "microtest_native/overlap_old/run_status.json": "d47d492e4f9be48589aee0d1cdcaad0da516359f5d47104f2608119c3bb39716",
+        "microtest_native/overlap_old/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "microtest_native/overlap_old/stdout.txt": "f3c6ed3dc7c2d56e600cec6ac2ab67fae12bf51d1e139567ba421cd3012fb09b",
+        "microtest_native/overlap_old/summary.csv": "768d526a7cd161c09af5adfe6caa5836e0de33be9605ac7edc064f1e691c2882"
+      }
+    },
+    {
+      "name": "overlap_repaired",
+      "expected_rejection": null,
+      "files": {
+        "microtest_native/overlap_repaired/epoch_files.json.gz": "d3667d8bfbf4a81b38bfa011ece1831179eb7fae4a6ba4eacfc046aa56ab0794",
+        "microtest_native/overlap_repaired/execution_terminal.csv": "3f99baa6eb62ef5727b7bd38d950409cf59784fcea35056aaa64a63f12766523",
+        "microtest_native/overlap_repaired/input.txt": "9d7975fea11372dfa20a94483d816b957af81a87c27f15093bb5512ff1feba1f",
+        "microtest_native/overlap_repaired/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/overlap_repaired/output.txt": "9e5b94a02e4fa11263fd8b71a8ab2cebe138298cef0b1ca635ad485ad4dc03a1",
+        "microtest_native/overlap_repaired/outputstarttime.txt": "87ff363958f781fcecf06c0206d52ca472edaf01c46554c2d1aa752e40b90a6a",
+        "microtest_native/overlap_repaired/release.csv": "a8993a3a2ea8a52c539accf2f6f5a2e237c4a3ed22e10aed6a201eae18d9d818",
+        "microtest_native/overlap_repaired/routes.csv": "3593cf22fcdefe00fb085f57ff274c74291f576bf5654c59129a8c958e574482",
+        "microtest_native/overlap_repaired/run_status.json": "db114011a49bcfc412bbfafd1c3e0ddde32d8b2c81ed23745750a07102d36b28",
+        "microtest_native/overlap_repaired/segment_execution_identity.csv": "8b704c3528dbca44182bff9de81403287a4b002224a291daba605a232947baae",
+        "microtest_native/overlap_repaired/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "microtest_native/overlap_repaired/stdout.txt": "e67c6ce255cc5f0eb89e6d1830ec38c07d9278668108d77113dbc399f812fa80",
+        "microtest_native/overlap_repaired/summary.csv": "3bc39f6f49fb499e63304220443ca8ebdf8b400ab6cbe311ca619200738bad57"
+      }
+    },
+    {
+      "name": "direct_old",
+      "expected_rejection": null,
+      "files": {
+        "microtest_native/direct_old/epoch_files.json.gz": "34c6edd0efeb79502b5c1f4eb39e716549acde35bac720914e3801902e19a0af",
+        "microtest_native/direct_old/input.txt": "d085ea4d0ec31fd4d37ce622d97af2132c023cb6480a689cd242254da597e4a8",
+        "microtest_native/direct_old/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/direct_old/output.txt": "07b6769ed24685fd2b547b6c55216205d72700e3b57c4f1b06c8e05440551d77",
+        "microtest_native/direct_old/outputstarttime.txt": "4d4d5b84f1423c1dd1706e2bbc5a697ea7477a328ce2c610d41a210d0b281a06",
+        "microtest_native/direct_old/release.csv": "8cb83aa8a9f34f787a8f6521ff457f38c7ede02e9511b81934b9a3c0e10d8def",
+        "microtest_native/direct_old/routes.csv": "f0cb95755d7d4086a59522f6b019d10d143c2b2b65b0eac824ca4976c46f0d69",
+        "microtest_native/direct_old/run_status.json": "77d2981859401eaa8394348bf99a8e08fe27759d349ef070baeaa07623a70347",
+        "microtest_native/direct_old/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "microtest_native/direct_old/stdout.txt": "b928378eae91fa67ebb1e612d68764393ae12f0dffdd5f372c2c8a81754347e5",
+        "microtest_native/direct_old/summary.csv": "67ecff1912732c570ccc09fa1aed05866c8cb102ad331df85464f2527cf3c34b"
+      }
+    },
+    {
+      "name": "direct_repaired",
+      "expected_rejection": null,
+      "files": {
+        "microtest_native/direct_repaired/epoch_files.json.gz": "34c6edd0efeb79502b5c1f4eb39e716549acde35bac720914e3801902e19a0af",
+        "microtest_native/direct_repaired/execution_terminal.csv": "c5938af7299762e7f51da4702ea1786544a3b3a1e37e774d2392cc759cf185af",
+        "microtest_native/direct_repaired/input.txt": "d085ea4d0ec31fd4d37ce622d97af2132c023cb6480a689cd242254da597e4a8",
+        "microtest_native/direct_repaired/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/direct_repaired/output.txt": "07b6769ed24685fd2b547b6c55216205d72700e3b57c4f1b06c8e05440551d77",
+        "microtest_native/direct_repaired/outputstarttime.txt": "4d4d5b84f1423c1dd1706e2bbc5a697ea7477a328ce2c610d41a210d0b281a06",
+        "microtest_native/direct_repaired/release.csv": "8cb83aa8a9f34f787a8f6521ff457f38c7ede02e9511b81934b9a3c0e10d8def",
+        "microtest_native/direct_repaired/routes.csv": "f0cb95755d7d4086a59522f6b019d10d143c2b2b65b0eac824ca4976c46f0d69",
+        "microtest_native/direct_repaired/run_status.json": "5ba5f775405edb8311e598e0134e3f9981d39929a8669d22d505b331448da221",
+        "microtest_native/direct_repaired/segment_execution_identity.csv": "b7d7b03fae4ba3a0d63d8997d59c80a23c79413811fb47bb191c66b4c8044aa6",
+        "microtest_native/direct_repaired/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "microtest_native/direct_repaired/stdout.txt": "dd781b4b25f17eeeb54636759f7161641f538292975e90bbb96305104bef4d04",
+        "microtest_native/direct_repaired/summary.csv": "12b0daa3f3d83e7ca68a7dbaa6d305cda65a5af4c96a3056e866432c5ff71623"
+      }
+    },
+    {
+      "name": "sparse_ids",
+      "expected_rejection": null,
+      "files": {
+        "microtest_native/sparse_ids/epoch_files.json.gz": "0fed5ede68d2c53f5e0e121dc6a028f3544315952507642196e03716a82f3419",
+        "microtest_native/sparse_ids/execution_terminal.csv": "046e490616b31a16ee4cb1b002bf132f7319884ea68b4aa4dc817d4c5aa1aabf",
+        "microtest_native/sparse_ids/input.txt": "328257f83f640498fceb6a920654199c7a8de15b78a659bfd123b53809b3cf4c",
+        "microtest_native/sparse_ids/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/sparse_ids/output.txt": "afcadf56003482761f3c98622c32e4f9b8199618e7b1a1929973fefc166aff5f",
+        "microtest_native/sparse_ids/outputstarttime.txt": "affe8efb48bd90d30eceb34f460e8a2c818fd896f4f0bd8ed1d485bc5d7147c0",
+        "microtest_native/sparse_ids/release.csv": "fbafea106b1d0d795ab6e60b8945c2c50f62f3c363c683586dfe8f1c8a80336a",
+        "microtest_native/sparse_ids/routes.csv": "fedc74b90086d272cd6eeae2c69d1f2ed910c66f54a857876d45382ccfbab6aa",
+        "microtest_native/sparse_ids/run_status.json": "9147e9886c48126e91f89e1a3a02dac8a1cffe88f029399c5f06093b3680051c",
+        "microtest_native/sparse_ids/segment_execution_identity.csv": "a84d67b40535110c1c8e0ab6fa89335fc7102e5a79df55c5416a05cd105359a0",
+        "microtest_native/sparse_ids/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "microtest_native/sparse_ids/stdout.txt": "3696ca1d5abc30c3a3dfe6abc5cf28a38f6aa0f748e7e796eb91b924bd5e5efc",
+        "microtest_native/sparse_ids/summary.csv": "00a6524b3e08a8b1e873c3bcc571fbe0ec720bfbccbd7e41fe4864f578b1a8aa"
+      }
+    },
+    {
+      "name": "active_and_not_released",
+      "expected_rejection": null,
+      "files": {
+        "microtest_native/active_and_not_released/epoch_files.json.gz": "22ea1c3feb25b1cd052f078d7e04c27e24bd5b550836a11ddddb60123fbc20b6",
+        "microtest_native/active_and_not_released/execution_terminal.csv": "740acad3af0840cf1ad972c79a3ab7197201fdd18283981d5b9b97b74d32eec0",
+        "microtest_native/active_and_not_released/input.txt": "22554e95e0b130d33a6f4c85c51299174f65f0cbc8789e3ba7675b513163ad2e",
+        "microtest_native/active_and_not_released/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/active_and_not_released/outputstarttime.txt": "8d92e4033988b4493717ba8df2ea07126b0c34a654572713eda38ce1adbf56a1",
+        "microtest_native/active_and_not_released/release.csv": "5d264491806046775942fa90ab497ecef96ae08e3dadc75c8a414344299829c2",
+        "microtest_native/active_and_not_released/routes.csv": "5ed62164cd36f21253051fa8bc21d1b757bc6710761990b789ae5a1cd00872bc",
+        "microtest_native/active_and_not_released/run_status.json": "21fcb373d103a5e41bef4e616937aa03e1d12098269b72a99da691b91500367e",
+        "microtest_native/active_and_not_released/segment_execution_identity.csv": "de11b28b6a3994ce45b9e76953101ff80564ee12ffdbae102ea196df5c9da5e3",
+        "microtest_native/active_and_not_released/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "microtest_native/active_and_not_released/stdout.txt": "709422c2da1c353ac3df3db1bb0119ee2bdbd462d239210887c16802138c9514",
+        "microtest_native/active_and_not_released/summary.csv": "ef8ea5c86625655bcc8d7249ca2b1103d88c9fbc85a43bdb9ca25ebc2fb45ce4"
+      }
+    },
+    {
+      "name": "unplanned_unreachable",
+      "expected_rejection": null,
+      "files": {
+        "microtest_native/unplanned_unreachable/epoch_files.json.gz": "b37e0f6ece788dd61e22134d8687d5f3a0a3b9d8506c2fc6ac084c7ebca70a4c",
+        "microtest_native/unplanned_unreachable/execution_terminal.csv": "888a6c0ec8931604f92e541100cf1827083944b8d7e09413f310300a0cbe30b0",
+        "microtest_native/unplanned_unreachable/input.txt": "22554e95e0b130d33a6f4c85c51299174f65f0cbc8789e3ba7675b513163ad2e",
+        "microtest_native/unplanned_unreachable/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/unplanned_unreachable/release.csv": "c6f0915c5f5a43667f3900d5ae0c90b160a64f49e922e3ab4a4ff3691bc61eb8",
+        "microtest_native/unplanned_unreachable/routes.csv": "9b605d0b0c49b86ab01ab404ff67de7fe9ab81a23663ae3d8009e379fb4df7f7",
+        "microtest_native/unplanned_unreachable/run_status.json": "73c553fe41979412ad3f11dbac4720cd71f5d3bbec2f04c126b708e6cc985eb2",
+        "microtest_native/unplanned_unreachable/segment_execution_identity.csv": "b5382bad8ced41321af41add26bd7d75086f96018c100a631468e09f3bef88e3",
+        "microtest_native/unplanned_unreachable/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "microtest_native/unplanned_unreachable/stdout.txt": "afd99ebfd39d8084c498f7a35449987606c451e78c36b9e6541e30300fb30a66",
+        "microtest_native/unplanned_unreachable/summary.csv": "72f563caf8676e4a84ed15b8f797168ff7632c544f156f5f23b7df8f70fa62e1"
+      }
+    },
+    {
+      "name": "reject_duplicate_raw",
+      "expected_rejection": "duplicate raw task identity",
+      "files": {
+        "microtest_native/reject_duplicate_raw/epoch_files.json.gz": "c48af1e2b469cf8c869097540babee7b3e9810571595fb4a312b69e12a372a8a",
+        "microtest_native/reject_duplicate_raw/input.txt": "e7eb4f66f316a5ac9fa7724c6d0843cadcd5a4f0b6e9fc51899127c096de1391",
+        "microtest_native/reject_duplicate_raw/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/reject_duplicate_raw/run_status.json": "6d821e7d1061bbbb306e18a6a1f884f7b995a7c76183c2cd8c2be823448298f7",
+        "microtest_native/reject_duplicate_raw/stderr.txt": "358549a4f66702a924d35140856b2eba2fecdb12ee8b78c1866ba77080bafd41",
+        "microtest_native/reject_duplicate_raw/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "reject_execution_ID_overflow",
+      "expected_rejection": "insufficient integer execution IDs",
+      "files": {
+        "microtest_native/reject_execution_ID_overflow/epoch_files.json.gz": "c48af1e2b469cf8c869097540babee7b3e9810571595fb4a312b69e12a372a8a",
+        "microtest_native/reject_execution_ID_overflow/input.txt": "4661db8a83bf4f990f5be9a0635f8794926faf13b180af7f786ff7a1a545be8b",
+        "microtest_native/reject_execution_ID_overflow/map.txt": "e5ab23dafbd59aa5bdf8410e19bc03fca03b73be83536e16b54dd724ce48daa2",
+        "microtest_native/reject_execution_ID_overflow/run_status.json": "c8b0d3af3c2da0db83bb4099b18b4a0a7a0533c91e33eca27c161b2cf9170b3e",
+        "microtest_native/reject_execution_ID_overflow/stderr.txt": "8f9524ca7f98b1ac526e0035da8be2b2e32833e847bd1ba733e7929a225de023",
+        "microtest_native/reject_execution_ID_overflow/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "formal_population_simulations_executed": 0,
+  "scope": "Bounded fixtures prove these contracts; no claim that added IDs preserve EBS HashMap traversal or counterfactual trajectories."
+}

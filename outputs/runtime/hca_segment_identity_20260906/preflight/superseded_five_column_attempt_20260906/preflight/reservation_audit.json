@@ -1,0 +1,61 @@
+{
+  "audit_classes": [
+    {
+      "path": "HcaSegmentReservationAudit.class",
+      "sha256": "e0fde1e8153d6ee17e840b4d7ea2acdcd107f6c52fbed8fa51756b96edc172f5",
+      "size_bytes": 5633
+    }
+  ],
+  "audit_generator_sha256": "bbf13d9051c1863f1b5ec7cd0f47d85bbdc64285c989df5afb10baee48c227c5",
+  "audit_source": {
+    "path": "tests/java/HcaSegmentReservationAudit.java",
+    "sha256": "b0ab5c1994c33d1300f82da59385ede691e796ec3ac5036b7b6569dbbad12d67"
+  },
+  "command": [
+    "C:/PROGRAMING/jdk-18/bin/java.exe",
+    "-Djava.awt.headless=true",
+    "-cp",
+    "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_segment_identity_v1;C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_segment_identity_reservation_audit",
+    "HcaSegmentReservationAudit",
+    "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\runtime\\hca_segment_identity_20260906\\preflight\\microtest_native\\overlap_repaired\\input.txt"
+  ],
+  "compile_command": [
+    "C:/PROGRAMING/jdk-18/bin/javac.exe",
+    "-encoding",
+    "UTF-8",
+    "-cp",
+    "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_segment_identity_v1",
+    "-d",
+    "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_segment_identity_reservation_audit",
+    "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\tests\\java\\HcaSegmentReservationAudit.java"
+  ],
+  "fixture": {
+    "path": "outputs/runtime/hca_segment_identity_20260906/preflight/microtest_native/overlap_repaired/input.txt",
+    "sha256": "9d7975fea11372dfa20a94483d816b957af81a87c27f15093bb5512ff1feba1f"
+  },
+  "limitations": "Synthetic overlapping intervals test storage isolation only. No route feasibility or physical collision-free guarantee follows. Supplemental evidence does not replace or alter the original six-case microtest gate.",
+  "method": "HCA_SEGMENT_IDENTITY_V1",
+  "observed": {
+    "collision_feasibility_tested": false,
+    "foreign_id_lookup_null": true,
+    "live_execution_ids": [
+      7,
+      8
+    ],
+    "same_id_negative_control_replaces_prior_reservation": true,
+    "shared_nodes": [
+      17,
+      18
+    ],
+    "status": "PASS",
+    "two_reservations_coexist": true,
+    "unmodified_other_execution_object_and_interval": true,
+    "update_isolated_by_execution_id": true
+  },
+  "production_build_identity_sha256": "8a973b29add3f37fab8f81f83b5923ee3516c9dcfe333c69119d1dad88b8279b",
+  "production_class_sha256": "984cd0552102966ca3728981309e730c0639708e0c436f23bba565bf130d5196",
+  "production_source_sha256": "62d5b1264c7362985edbd94862ee264c04397377bceeb38dcc5ccc3805320e52",
+  "schema": "czr005.hca_segment_reservation_audit.v1",
+  "scope": "Actual frozen update_constrain/Contains methods: two execution IDs at two shared nodes coexist; updating one preserves the other object and interval; same-ID control overwrites.",
+  "status": "PASS"
+}
