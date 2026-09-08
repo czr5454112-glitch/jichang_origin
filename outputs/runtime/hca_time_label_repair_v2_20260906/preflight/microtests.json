@@ -1,0 +1,847 @@
+{
+  "schema": "czr005.hca_time_label_repair_v2.microtests.v1",
+  "status": "PASS",
+  "variant": "HCA_TIME_LABEL_REPAIR_V2",
+  "production_code_change": [
+    "n.t1=t1;",
+    "n.t2=t2;"
+  ],
+  "java_checks_per_variant": 7,
+  "java_checks_total": 14,
+  "cross_variant_checks": [
+    "unchanged map2 path and t1/t2",
+    "rejected candidate unchanged"
+  ],
+  "source_scope_checks": [
+    "only two assignments differ after newline normalization",
+    "original and frozen wrapper bytes unchanged",
+    "variant bytes unchanged during tests"
+  ],
+  "full_simulation_executed": false,
+  "interpretation": "Original mode PASS means expected defects reproduced; original five-node/Nanning formula_valid remain false. Repaired mode requires valid recurrences and reservation behavior.",
+  "driver_sha256": "5f4e1fd603af565a3b6d6eba62e2e11d064003a9735d92f26724f3843cb84a5a",
+  "test_source_sha256": "beb9cd5d9ba1f89dd35551e3bfa12e7cafb3c63742f77065916ccef4081ea6ce",
+  "sources": {
+    "algorithm": "SHA256(sorted relative path + NUL + file SHA256 + newline)",
+    "manifest_sha256": "b4eb0337f53cc875ba6202691ea754167be0b9e5cca969cb789db7bbd907c823",
+    "files": [
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/Astar.java",
+        "sha256": "389ea90cde555aecf9150249c989e969b2dd8dbb255267c45193a6e6566b79b7",
+        "size_bytes": 4663
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/Edge.java",
+        "sha256": "45fc16634244acfd5d3303a8689bb7ed410b4835b5e08a3758b8c50606a94cce",
+        "size_bytes": 648
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/ICS_PathFinding.java",
+        "sha256": "a367fd8e79aba7b3d23b71fc9b4d01f76dd67f291f008401d676ffcbcf53d52a",
+        "size_bytes": 17669
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/Map.java",
+        "sha256": "3e2af71a17d204fdc6639feb2fa8efd252881d6b18b0b15f5248ba68e0d6ece6",
+        "size_bytes": 4281
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/Node.java",
+        "sha256": "0dc21b5e6b9f8f1e9fc3c38f992da1b77612708cb3012527fae87bd99417ed62",
+        "size_bytes": 899
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/Route.java",
+        "sha256": "841f1fd2d207a11279092be33ada5993d2a7407b17bfe009546c822389dafc5f",
+        "size_bytes": 1362
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/task.java",
+        "sha256": "f34ce46a39d13a64cea07d2e71b121f67c3312d31913e3d267f24f1912f16ed5",
+        "size_bytes": 1444
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/Tasks.java",
+        "sha256": "dd4505e495fd3c0fa737923dca83c9d404fc3b1e3a7ce979e7dd384a57d0948b",
+        "size_bytes": 7928
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/App/Vertex.java",
+        "sha256": "59390474713fe984614673d3f7b2849071f9c6a55d9935725f6c3ede26415eea",
+        "size_bytes": 1189
+      },
+      {
+        "path": "benchmarks/java/hca_time_label_repair_v2/ICS_GUI/ICS_GUI.java",
+        "sha256": "3a893424e4fbd5e2c9071a227fd9ed6867d7176f4dd00d44ccdc541fb697470b",
+        "size_bytes": 25803
+      }
+    ]
+  },
+  "original_and_wrapper": {
+    "algorithm": "SHA256(sorted relative path + NUL + file SHA256 + newline)",
+    "manifest_sha256": "74c1a899b879b0523d039e9fa650ef3c860557c7fc96e80ff3a8978ae3faf92c",
+    "files": [
+      {
+        "path": "benchmarks/java/HcaSegmentIdentityBenchmark.java",
+        "sha256": "3333729ba81c2e74ac98519e52b161a4b1fbbe37148e9f7c661690fcf28dfbbd",
+        "size_bytes": 34658
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/Astar.java",
+        "sha256": "1b46069ca968ecc3043a1f05091de65f95ca6ced65169ba23e82821cf4b63921",
+        "size_bytes": 4770
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/Edge.java",
+        "sha256": "45fc16634244acfd5d3303a8689bb7ed410b4835b5e08a3758b8c50606a94cce",
+        "size_bytes": 648
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/ICS_PathFinding.java",
+        "sha256": "a367fd8e79aba7b3d23b71fc9b4d01f76dd67f291f008401d676ffcbcf53d52a",
+        "size_bytes": 17669
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/Map.java",
+        "sha256": "3e2af71a17d204fdc6639feb2fa8efd252881d6b18b0b15f5248ba68e0d6ece6",
+        "size_bytes": 4281
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/Node.java",
+        "sha256": "0dc21b5e6b9f8f1e9fc3c38f992da1b77612708cb3012527fae87bd99417ed62",
+        "size_bytes": 899
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/Route.java",
+        "sha256": "841f1fd2d207a11279092be33ada5993d2a7407b17bfe009546c822389dafc5f",
+        "size_bytes": 1362
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/task.java",
+        "sha256": "f34ce46a39d13a64cea07d2e71b121f67c3312d31913e3d267f24f1912f16ed5",
+        "size_bytes": 1444
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/Tasks.java",
+        "sha256": "dd4505e495fd3c0fa737923dca83c9d404fc3b1e3a7ce979e7dd384a57d0948b",
+        "size_bytes": 7928
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/App/Vertex.java",
+        "sha256": "59390474713fe984614673d3f7b2849071f9c6a55d9935725f6c3ede26415eea",
+        "size_bytes": 1189
+      },
+      {
+        "path": "legacy/jichang_origin_readonly/src/ICS_GUI/ICS_GUI.java",
+        "sha256": "3a893424e4fbd5e2c9071a227fd9ed6867d7176f4dd00d44ccdc541fb697470b",
+        "size_bytes": 25803
+      }
+    ]
+  },
+  "maps": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\map2.txt",
+      "sha256": "55f578cb4b8fcc61f5b13963fcb8546aca91e517ea6f8ff4a7361670f1b03f8f"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\nanning_legacy.txt",
+      "sha256": "daf51cf339862872ec1e6ce86fbdffccd326d83ebd80ebef0e926917c61ac0df"
+    }
+  ],
+  "runs": {
+    "original": {
+      "compile_command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_time_label_repair_v2_microtests\\original",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Astar.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Edge.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\ICS_PathFinding.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Map.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Node.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Route.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\task.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Tasks.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\App\\Vertex.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\src\\ICS_GUI\\ICS_GUI.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\tests\\java\\hca_time_label_repair_v2\\HcaTimeLabelAudit.java"
+      ],
+      "command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\java.EXE",
+        "-Djava.awt.headless=true",
+        "-cp",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_time_label_repair_v2_microtests\\original",
+        "App.HcaTimeLabelAudit",
+        "original",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\map2.txt",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\nanning_legacy.txt"
+      ],
+      "records": [
+        {
+          "case": "five_node",
+          "status": "PASS",
+          "formula_valid": false,
+          "mismatch_count": 1,
+          "path": [
+            {
+              "node": 0,
+              "t1": 0.0,
+              "t2": 0.0
+            },
+            {
+              "node": 2,
+              "t1": 2.0,
+              "t2": 2.0
+            },
+            {
+              "node": 3,
+              "t1": 11.0,
+              "t2": 11.0
+            },
+            {
+              "node": 4,
+              "t1": 12.0,
+              "t2": 12.0
+            }
+          ]
+        },
+        {
+          "case": "nanning_24_to_53",
+          "status": "PASS",
+          "formula_valid": false,
+          "mismatch_count": 3,
+          "path": [
+            {
+              "node": 24,
+              "t1": 8866.0,
+              "t2": 8867.0
+            },
+            {
+              "node": 25,
+              "t1": 8889.852,
+              "t2": 8891.852
+            },
+            {
+              "node": 34,
+              "t1": 8919.300000000001,
+              "t2": 8921.300000000001
+            },
+            {
+              "node": 55,
+              "t1": 8927.960000000001,
+              "t2": 8927.960000000001
+            },
+            {
+              "node": 35,
+              "t1": 8935.092,
+              "t2": 8937.092
+            },
+            {
+              "node": 36,
+              "t1": 8937.892,
+              "t2": 8939.892
+            },
+            {
+              "node": 37,
+              "t1": 8947.492,
+              "t2": 8949.492
+            },
+            {
+              "node": 46,
+              "t1": 8953.776,
+              "t2": 8954.776
+            },
+            {
+              "node": 39,
+              "t1": 8967.332,
+              "t2": 8969.332
+            },
+            {
+              "node": 48,
+              "t1": 8972.536,
+              "t2": 8973.536
+            },
+            {
+              "node": 40,
+              "t1": 8978.9,
+              "t2": 8980.9
+            },
+            {
+              "node": 28,
+              "t1": 8987.196,
+              "t2": 8989.196
+            },
+            {
+              "node": 29,
+              "t1": 8991.196,
+              "t2": 8993.196
+            },
+            {
+              "node": 112,
+              "t1": 9016.676,
+              "t2": 9018.176
+            },
+            {
+              "node": 53,
+              "t1": 9073.975999999999,
+              "t2": 9073.975999999999
+            }
+          ]
+        },
+        {
+          "case": "map2_5_to_47_control",
+          "status": "PASS",
+          "formula_valid": true,
+          "mismatch_count": 0,
+          "path": [
+            {
+              "node": 5,
+              "t1": 12471.0,
+              "t2": 12471.0
+            },
+            {
+              "node": 19,
+              "t1": 12472.6,
+              "t2": 12473.6
+            },
+            {
+              "node": 18,
+              "t1": 12476.4,
+              "t2": 12477.4
+            },
+            {
+              "node": 22,
+              "t1": 12485.8,
+              "t2": 12486.8
+            },
+            {
+              "node": 24,
+              "t1": 12497.199999999999,
+              "t2": 12498.199999999999
+            },
+            {
+              "node": 27,
+              "t1": 12499.8,
+              "t2": 12500.8
+            },
+            {
+              "node": 28,
+              "t1": 12511.599999999999,
+              "t2": 12512.599999999999
+            },
+            {
+              "node": 47,
+              "t1": 12516.599999999999,
+              "t2": 12516.599999999999
+            }
+          ]
+        },
+        {
+          "case": "native_reservations",
+          "status": "PASS",
+          "reservation": [
+            100.0,
+            11.0,
+            12.0
+          ],
+          "conflicting_request_blocked": false,
+          "old_window_request_allowed": false
+        },
+        {
+          "case": "rejected_earlier_candidate",
+          "status": "PASS",
+          "formula_valid": true,
+          "mismatch_count": 0,
+          "path": [
+            {
+              "node": 0,
+              "t1": 0.0,
+              "t2": 0.0
+            },
+            {
+              "node": 1,
+              "t1": 1.0,
+              "t2": 1.0
+            },
+            {
+              "node": 3,
+              "t1": 11.0,
+              "t2": 12.0
+            },
+            {
+              "node": 4,
+              "t1": 13.0,
+              "t2": 13.0
+            }
+          ]
+        },
+        {
+          "status": "PASS",
+          "mode": "original",
+          "asserted_checks": 7,
+          "full_simulation_executed": false
+        }
+      ],
+      "core_classes": {
+        "algorithm": "SHA256(sorted relative path + NUL + file SHA256 + newline)",
+        "manifest_sha256": "2da64c926acf64b24ebfbd38162d91ba116d0244c7f32ac7ace9f4f1b5fbe9f7",
+        "files": [
+          {
+            "path": "App/Astar$1.class",
+            "sha256": "613a21b39b4921e1bb60ce5c7caa2123d5f540bf3e342cd61dc0a08547605d7f",
+            "size_bytes": 681
+          },
+          {
+            "path": "App/Astar.class",
+            "sha256": "a0a643e3dd0b16fc58d619d16179b4734e8bba490d8aa9a8d96dcfd59f023606",
+            "size_bytes": 3968
+          },
+          {
+            "path": "App/Edge.class",
+            "sha256": "0571d2d1a9f50165d739e7b46268ba7e041d6ec424d83300584d11fefa144db5",
+            "size_bytes": 922
+          },
+          {
+            "path": "App/ICS_PathFinding$1.class",
+            "sha256": "f732269247b71fd2f246f77edd93b007ba13115eb080f7f7c1cee3669be7e469",
+            "size_bytes": 830
+          },
+          {
+            "path": "App/ICS_PathFinding.class",
+            "sha256": "fe0cc9cd8a6a1b042394c4c52fc35cb16d0f76ce029199c4b87458493eb8aa1f",
+            "size_bytes": 13366
+          },
+          {
+            "path": "App/Map.class",
+            "sha256": "2680c349dce42d2ec5cf2a2ea3ee50047911f3732e00486a388811caad53489e",
+            "size_bytes": 4915
+          },
+          {
+            "path": "App/Node.class",
+            "sha256": "146f6f114fc04faad7d0049aa7f50db61db4c4fdbd0382a756389c433683f8bd",
+            "size_bytes": 1142
+          },
+          {
+            "path": "App/Route.class",
+            "sha256": "dd88101b58849f87aee5a327617851ef626d7b423aa49bbaa4b2eed448448013",
+            "size_bytes": 2439
+          },
+          {
+            "path": "App/task.class",
+            "sha256": "b9b76b1d569a4ea29b1cb735cba83c43ed251293585eabec1556d1fe4fc9c080",
+            "size_bytes": 1446
+          },
+          {
+            "path": "App/Tasks.class",
+            "sha256": "1b158d198e8ec630bc9c9b1f0551b27b10c666fe764b5f42c7b7d11353ca5e3d",
+            "size_bytes": 7263
+          },
+          {
+            "path": "App/Vertex.class",
+            "sha256": "1945e31622484c6200fde42a98507411f5823970746e2b1392a9f65507310154",
+            "size_bytes": 1514
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$1.class",
+            "sha256": "34662d98e11b713a6e4726129e9f3a9173dbcbbaa3692c90f1a030a8cbad257b",
+            "size_bytes": 1264
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$2.class",
+            "sha256": "0f5a1f54c1408521de300165f0187a38b606b7996e5bbe672f706be553631c0a",
+            "size_bytes": 1434
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$3.class",
+            "sha256": "5065c19be60a92c7bdd1b8e89034b103598ba964096add7d8b1055fdf7f35c6a",
+            "size_bytes": 1395
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$4.class",
+            "sha256": "9dcd7dc34645893628ce8dce99aac759f8bc6261cf7e0d1a65382d2d0ffe61dd",
+            "size_bytes": 1392
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$5.class",
+            "sha256": "2de738f85bab133a67805f08e6e3240402e056c2356e0aaa2d2bb149d977cee7",
+            "size_bytes": 1126
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$6.class",
+            "sha256": "60e07e98dacd72c6e1684fd204f6df918398837412b9167c785717ee73a7d14e",
+            "size_bytes": 1127
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$7.class",
+            "sha256": "c5ecd240e995aaf3df2444f19d2421acd496275151795006d97b553b53b78231",
+            "size_bytes": 1159
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$8.class",
+            "sha256": "ce31803972a96315e20b292281d67fe74c143fac19c56558761585cb1aae2a01",
+            "size_bytes": 790
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$9.class",
+            "sha256": "248c25b215068a27fc0fa4664bd37efc7718944414a65bd7c20e81f01d817b36",
+            "size_bytes": 4753
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI.class",
+            "sha256": "5aba3da485fa56bc835d542f5e69316b2fc5a13e53d6c78840ceffe94cd71e04",
+            "size_bytes": 13148
+          }
+        ]
+      }
+    },
+    "repaired": {
+      "compile_command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\javac.EXE",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_time_label_repair_v2_microtests\\repaired",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\Astar.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\Edge.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\ICS_PathFinding.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\Map.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\Node.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\Route.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\task.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\Tasks.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\App\\Vertex.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\benchmarks\\java\\hca_time_label_repair_v2\\ICS_GUI\\ICS_GUI.java",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\tests\\java\\hca_time_label_repair_v2\\HcaTimeLabelAudit.java"
+      ],
+      "command": [
+        "C:\\PROGRAMING\\jdk-18\\bin\\java.EXE",
+        "-Djava.awt.headless=true",
+        "-cp",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\hca_time_label_repair_v2_microtests\\repaired",
+        "App.HcaTimeLabelAudit",
+        "repaired",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\legacy\\jichang_origin_readonly\\map2.txt",
+        "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\nanning_legacy.txt"
+      ],
+      "records": [
+        {
+          "case": "five_node",
+          "status": "PASS",
+          "formula_valid": true,
+          "mismatch_count": 0,
+          "path": [
+            {
+              "node": 0,
+              "t1": 0.0,
+              "t2": 0.0
+            },
+            {
+              "node": 2,
+              "t1": 2.0,
+              "t2": 2.0
+            },
+            {
+              "node": 3,
+              "t1": 3.0,
+              "t2": 3.0
+            },
+            {
+              "node": 4,
+              "t1": 4.0,
+              "t2": 4.0
+            }
+          ]
+        },
+        {
+          "case": "nanning_24_to_53",
+          "status": "PASS",
+          "formula_valid": true,
+          "mismatch_count": 0,
+          "path": [
+            {
+              "node": 24,
+              "t1": 8866.0,
+              "t2": 8867.0
+            },
+            {
+              "node": 25,
+              "t1": 8889.852,
+              "t2": 8891.852
+            },
+            {
+              "node": 34,
+              "t1": 8919.300000000001,
+              "t2": 8921.300000000001
+            },
+            {
+              "node": 55,
+              "t1": 8927.960000000001,
+              "t2": 8927.960000000001
+            },
+            {
+              "node": 35,
+              "t1": 8932.412,
+              "t2": 8934.412
+            },
+            {
+              "node": 36,
+              "t1": 8935.212,
+              "t2": 8937.212
+            },
+            {
+              "node": 37,
+              "t1": 8944.812,
+              "t2": 8946.812
+            },
+            {
+              "node": 46,
+              "t1": 8951.096,
+              "t2": 8952.096
+            },
+            {
+              "node": 39,
+              "t1": 8964.02,
+              "t2": 8966.02
+            },
+            {
+              "node": 48,
+              "t1": 8969.224,
+              "t2": 8970.224
+            },
+            {
+              "node": 40,
+              "t1": 8975.308,
+              "t2": 8977.308
+            },
+            {
+              "node": 28,
+              "t1": 8983.604000000001,
+              "t2": 8985.604000000001
+            },
+            {
+              "node": 29,
+              "t1": 8987.604000000001,
+              "t2": 8989.604000000001
+            },
+            {
+              "node": 112,
+              "t1": 9013.084,
+              "t2": 9014.584
+            },
+            {
+              "node": 53,
+              "t1": 9070.384,
+              "t2": 9070.384
+            }
+          ]
+        },
+        {
+          "case": "map2_5_to_47_control",
+          "status": "PASS",
+          "formula_valid": true,
+          "mismatch_count": 0,
+          "path": [
+            {
+              "node": 5,
+              "t1": 12471.0,
+              "t2": 12471.0
+            },
+            {
+              "node": 19,
+              "t1": 12472.6,
+              "t2": 12473.6
+            },
+            {
+              "node": 18,
+              "t1": 12476.4,
+              "t2": 12477.4
+            },
+            {
+              "node": 22,
+              "t1": 12485.8,
+              "t2": 12486.8
+            },
+            {
+              "node": 24,
+              "t1": 12497.199999999999,
+              "t2": 12498.199999999999
+            },
+            {
+              "node": 27,
+              "t1": 12499.8,
+              "t2": 12500.8
+            },
+            {
+              "node": 28,
+              "t1": 12511.599999999999,
+              "t2": 12512.599999999999
+            },
+            {
+              "node": 47,
+              "t1": 12516.599999999999,
+              "t2": 12516.599999999999
+            }
+          ]
+        },
+        {
+          "case": "native_reservations",
+          "status": "PASS",
+          "reservation": [
+            100.0,
+            3.0,
+            4.0
+          ],
+          "conflicting_request_blocked": true,
+          "old_window_request_allowed": true
+        },
+        {
+          "case": "rejected_earlier_candidate",
+          "status": "PASS",
+          "formula_valid": true,
+          "mismatch_count": 0,
+          "path": [
+            {
+              "node": 0,
+              "t1": 0.0,
+              "t2": 0.0
+            },
+            {
+              "node": 1,
+              "t1": 1.0,
+              "t2": 1.0
+            },
+            {
+              "node": 3,
+              "t1": 11.0,
+              "t2": 12.0
+            },
+            {
+              "node": 4,
+              "t1": 13.0,
+              "t2": 13.0
+            }
+          ]
+        },
+        {
+          "status": "PASS",
+          "mode": "repaired",
+          "asserted_checks": 7,
+          "full_simulation_executed": false
+        }
+      ],
+      "core_classes": {
+        "algorithm": "SHA256(sorted relative path + NUL + file SHA256 + newline)",
+        "manifest_sha256": "2e8086f972b110433443223a6113bdc3396009d5b9d9c93e0660e791ef73be4f",
+        "files": [
+          {
+            "path": "App/Astar$1.class",
+            "sha256": "613a21b39b4921e1bb60ce5c7caa2123d5f540bf3e342cd61dc0a08547605d7f",
+            "size_bytes": 681
+          },
+          {
+            "path": "App/Astar.class",
+            "sha256": "a57f497280b9dc603290ac5da8cf659c10709a813eefd4f51f2d2ec43ead53ed",
+            "size_bytes": 3990
+          },
+          {
+            "path": "App/Edge.class",
+            "sha256": "0571d2d1a9f50165d739e7b46268ba7e041d6ec424d83300584d11fefa144db5",
+            "size_bytes": 922
+          },
+          {
+            "path": "App/ICS_PathFinding$1.class",
+            "sha256": "f732269247b71fd2f246f77edd93b007ba13115eb080f7f7c1cee3669be7e469",
+            "size_bytes": 830
+          },
+          {
+            "path": "App/ICS_PathFinding.class",
+            "sha256": "fe0cc9cd8a6a1b042394c4c52fc35cb16d0f76ce029199c4b87458493eb8aa1f",
+            "size_bytes": 13366
+          },
+          {
+            "path": "App/Map.class",
+            "sha256": "2680c349dce42d2ec5cf2a2ea3ee50047911f3732e00486a388811caad53489e",
+            "size_bytes": 4915
+          },
+          {
+            "path": "App/Node.class",
+            "sha256": "146f6f114fc04faad7d0049aa7f50db61db4c4fdbd0382a756389c433683f8bd",
+            "size_bytes": 1142
+          },
+          {
+            "path": "App/Route.class",
+            "sha256": "dd88101b58849f87aee5a327617851ef626d7b423aa49bbaa4b2eed448448013",
+            "size_bytes": 2439
+          },
+          {
+            "path": "App/task.class",
+            "sha256": "b9b76b1d569a4ea29b1cb735cba83c43ed251293585eabec1556d1fe4fc9c080",
+            "size_bytes": 1446
+          },
+          {
+            "path": "App/Tasks.class",
+            "sha256": "1b158d198e8ec630bc9c9b1f0551b27b10c666fe764b5f42c7b7d11353ca5e3d",
+            "size_bytes": 7263
+          },
+          {
+            "path": "App/Vertex.class",
+            "sha256": "1945e31622484c6200fde42a98507411f5823970746e2b1392a9f65507310154",
+            "size_bytes": 1514
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$1.class",
+            "sha256": "34662d98e11b713a6e4726129e9f3a9173dbcbbaa3692c90f1a030a8cbad257b",
+            "size_bytes": 1264
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$2.class",
+            "sha256": "0f5a1f54c1408521de300165f0187a38b606b7996e5bbe672f706be553631c0a",
+            "size_bytes": 1434
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$3.class",
+            "sha256": "5065c19be60a92c7bdd1b8e89034b103598ba964096add7d8b1055fdf7f35c6a",
+            "size_bytes": 1395
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$4.class",
+            "sha256": "9dcd7dc34645893628ce8dce99aac759f8bc6261cf7e0d1a65382d2d0ffe61dd",
+            "size_bytes": 1392
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$5.class",
+            "sha256": "2de738f85bab133a67805f08e6e3240402e056c2356e0aaa2d2bb149d977cee7",
+            "size_bytes": 1126
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$6.class",
+            "sha256": "60e07e98dacd72c6e1684fd204f6df918398837412b9167c785717ee73a7d14e",
+            "size_bytes": 1127
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$7.class",
+            "sha256": "c5ecd240e995aaf3df2444f19d2421acd496275151795006d97b553b53b78231",
+            "size_bytes": 1159
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$8.class",
+            "sha256": "ce31803972a96315e20b292281d67fe74c143fac19c56558761585cb1aae2a01",
+            "size_bytes": 790
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI$9.class",
+            "sha256": "248c25b215068a27fc0fa4664bd37efc7718944414a65bd7c20e81f01d817b36",
+            "size_bytes": 4753
+          },
+          {
+            "path": "ICS_GUI/ICS_GUI.class",
+            "sha256": "5aba3da485fa56bc835d542f5e69316b2fc5a13e53d6c78840ceffe94cd71e04",
+            "size_bytes": 13148
+          }
+        ]
+      }
+    }
+  }
+}

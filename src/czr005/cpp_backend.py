@@ -726,6 +726,7 @@ def g4irsf11_event_runtime_from_records(
     s4_score_component_mask: int = 15,
     queue_time_scaling: str = "raw_count_as_seconds",
     enable_cie_component_activation: bool = False,
+    enable_s4_advertised_fault_potential_repair: bool = False,
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -928,6 +929,10 @@ def g4irsf11_event_runtime_from_records(
     enable_cie_component_activation = strict_bool(
         enable_cie_component_activation,
         "enable_cie_component_activation",
+    )
+    enable_s4_advertised_fault_potential_repair = strict_bool(
+        enable_s4_advertised_fault_potential_repair,
+        "enable_s4_advertised_fault_potential_repair",
     )
     enable_opportunity_telemetry = strict_bool(
         enable_opportunity_telemetry,
@@ -1414,6 +1419,10 @@ def g4irsf11_event_runtime_from_records(
         raise ValueError(
             "CIE component activation telemetry requires the S4 scorer"
         )
+    if enable_s4_advertised_fault_potential_repair and scorer_mode not in {
+        "S4", "S4_queue_aware_rule_only"
+    }:
+        raise ValueError("advertised fault potential repair requires the S4 scorer")
     frozen_mode = scorer_mode in {
         "S1",
         "S1_frozen_g4e_legal_local_adapter",
@@ -2013,7 +2022,20 @@ def g4irsf11_event_runtime_from_records(
         int(legacy_observation_bias_seed),
     )
     map_tail_suffix: tuple[Any, ...] = ()
-    if enable_cie_component_activation:
+    if enable_s4_advertised_fault_potential_repair:
+        # Default-off must preserve the old positional ABI (including b00).
+        # Only the explicitly enabled extension requires the new native build.
+        map_tail_suffix = (
+            normalized_storage_source_nodes,
+            bool(enable_s4_local_potential_descent_guard),
+            bool(enable_s4_direct_neighbor_merge_calendar_visibility),
+            bool(complete_on_goal_arrival),
+            int(s4_score_component_mask),
+            str(queue_time_scaling),
+            bool(enable_cie_component_activation),
+            True,
+        )
+    elif enable_cie_component_activation:
         map_tail_suffix = (
             normalized_storage_source_nodes,
             bool(enable_s4_local_potential_descent_guard),

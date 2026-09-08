@@ -1,0 +1,660 @@
+{
+  "algorithm_rankings_used_for_selection": false,
+  "auditor": {
+    "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\outputs\\evidence\\paper_suite_20260907\\scope_evidence_reduced_v6\\audit_selected_scope.py",
+    "sha256": "d001e123edf274c7a48585b5731ba647041f9ce6eff2500975ee91bc31d64d58"
+  },
+  "base_cell_count_unchanged": 480,
+  "existing_results_to_be_preserved": true,
+  "experimental_cell_results_read_by_this_auditor": 0,
+  "fault_cell_count_reduced": 96,
+  "fault_methods": [
+    "G31_S4_ADVERTISED_FAULT_REPAIR_V1",
+    "HCA_TIME_LABEL_REPAIR_V3"
+  ],
+  "fault_scenarios": [
+    1,
+    2,
+    9,
+    14
+  ],
+  "fault_seeds": [
+    104729,
+    130363,
+    155921
+  ],
+  "fault_speed_mps": 2.5,
+  "horizon_seconds_unchanged": 98259,
+  "load_factors": [
+    1.0,
+    2.0
+  ],
+  "maps": [
+    "map2",
+    "nanning"
+  ],
+  "new_simulations_run_by_this_audit": 0,
+  "original_blinded_preregistration_claimed": false,
+  "original_fault_cell_count": 1280,
+  "original_total_cell_count": 1760,
+  "production_protocol_modified_by_this_auditor": false,
+  "runtime_estimate": {
+    "basis": "parent_supplied_prior_budget_linear_same_concurrency_average_cost_approximation",
+    "estimated_hours_saved": 34.225,
+    "estimated_reduced_fault_hours": 2.775,
+    "estimated_total_hours_from_zero": 16.775,
+    "estimated_total_time_reduction_fraction": 0.6710784313725491,
+    "fault_cell_reduction_fraction": 0.925,
+    "limitations": "cost_varies_by_map_method_load_scenario_and_contention_existing_completed_cells_not_subtracted",
+    "original_base_hours": 14.0,
+    "original_fault_hours_for_1280_cells": 37.0,
+    "original_total_hours": 51.0,
+    "remaining_eta_claimed": false
+  },
+  "schema": "czr005.paper_suite.reduced_scope_structural_review.v1",
+  "scientific_contract": {
+    "inference_scope": "selected_four_scenarios_and_three_paired_seeds_only",
+    "information": "failures_and_common_propagation_closure_known_before_first_routing",
+    "nanning_mapping": "prior_graph_and_workload_based_adaptation_not_original_paper_geometry",
+    "population": "all_original_raw_bags_and_canonical_legs_no_reachability_prefilter",
+    "repair_within_horizon": false,
+    "three_seed_limit": "low_replication_precision_do_not_infer_all_16_failure_patterns",
+    "timing": "THT_only_when_entire_population_completes_otherwise_null"
+  },
+  "scope_amendment": "user_directed_prospective_reduction_after_prior_preflight_observation",
+  "seed_selection_rule": "first_three_in_original_fixed_order_no_replacement",
+  "sources": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\configs\\eval\\feng_paper_suite_fault_20260907.json",
+      "role": "unchanged_parent_fault_protocol",
+      "sha256": "0d258418ed231ba51489822e30ba7ee33db1d28a73f4c4c2951ace4a4d4d8e83"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\docs\\baselines\\feng_paper_suite_source_contract_20260907.json",
+      "role": "paper_map2_line_mapping",
+      "sha256": "f4b8ed35de790776124ac845750e08f1e6ca60c0a49a6ac65d90638dc079508c"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\configs\\eval\\g4irsf31_nanning_fault_scenarios.json",
+      "role": "prior_outcome_independent_nanning_mapping",
+      "sha256": "8c74e73b060961cd92404fd2da451d37bf3c73848f1723c72b96f1dbf10d13f3"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\map2.json",
+      "role": "map2_directed_topology",
+      "sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\data\\processed\\maps\\nanning_airport_profile.json",
+      "role": "nanning_directed_topology",
+      "sha256": "70aeeafe2c774d415fe9f922eedec36e8e35132bcba04596c2b1c486ffb3d1df"
+    }
+  ],
+  "status": "SCOPE_STRUCTURAL_REVIEW_PASS",
+  "structural_checks": [
+    {
+      "disabled_edge_count": 1,
+      "disabled_edges": [
+        [
+          6,
+          12
+        ]
+      ],
+      "extra_disabled_edges_from_propagation": 0,
+      "initial_failed_edge_count": 1,
+      "initial_failed_edges": [
+        [
+          6,
+          12
+        ]
+      ],
+      "line_ids": [
+        1
+      ],
+      "map": "map2",
+      "recomputed_closure_matches_frozen_protocol": true,
+      "redundant_initial_edges_under_common_closure": [],
+      "scenario_index": 1
+    },
+    {
+      "disabled_edge_count": 7,
+      "disabled_edges": [
+        [
+          1,
+          7
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          11,
+          14
+        ]
+      ],
+      "extra_disabled_edges_from_propagation": 6,
+      "initial_failed_edge_count": 1,
+      "initial_failed_edges": [
+        [
+          8,
+          11
+        ]
+      ],
+      "line_ids": [
+        2
+      ],
+      "map": "map2",
+      "recomputed_closure_matches_frozen_protocol": true,
+      "redundant_initial_edges_under_common_closure": [],
+      "scenario_index": 2
+    },
+    {
+      "disabled_edge_count": 2,
+      "disabled_edges": [
+        [
+          6,
+          12
+        ],
+        [
+          33,
+          44
+        ]
+      ],
+      "extra_disabled_edges_from_propagation": 0,
+      "initial_failed_edge_count": 2,
+      "initial_failed_edges": [
+        [
+          6,
+          12
+        ],
+        [
+          33,
+          44
+        ]
+      ],
+      "line_ids": [
+        1,
+        7
+      ],
+      "map": "map2",
+      "recomputed_closure_matches_frozen_protocol": true,
+      "redundant_initial_edges_under_common_closure": [],
+      "scenario_index": 9
+    },
+    {
+      "disabled_edge_count": 36,
+      "disabled_edges": [
+        [
+          0,
+          6
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          3,
+          16
+        ],
+        [
+          4,
+          17
+        ],
+        [
+          5,
+          19
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          6,
+          12
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          23
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          18,
+          22
+        ],
+        [
+          19,
+          18
+        ],
+        [
+          19,
+          25
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          21,
+          23
+        ],
+        [
+          22,
+          24
+        ],
+        [
+          22,
+          26
+        ],
+        [
+          23,
+          24
+        ],
+        [
+          24,
+          27
+        ],
+        [
+          25,
+          26
+        ],
+        [
+          26,
+          43
+        ],
+        [
+          27,
+          28
+        ],
+        [
+          27,
+          45
+        ],
+        [
+          28,
+          29
+        ],
+        [
+          28,
+          47
+        ],
+        [
+          31,
+          43
+        ],
+        [
+          34,
+          12
+        ],
+        [
+          42,
+          25
+        ],
+        [
+          43,
+          15
+        ]
+      ],
+      "extra_disabled_edges_from_propagation": 33,
+      "initial_failed_edge_count": 3,
+      "initial_failed_edges": [
+        [
+          8,
+          11
+        ],
+        [
+          24,
+          27
+        ],
+        [
+          43,
+          15
+        ]
+      ],
+      "line_ids": [
+        2,
+        4,
+        6
+      ],
+      "map": "map2",
+      "recomputed_closure_matches_frozen_protocol": true,
+      "redundant_initial_edges_under_common_closure": [],
+      "scenario_index": 14
+    },
+    {
+      "disabled_edge_count": 1,
+      "disabled_edges": [
+        [
+          50,
+          25
+        ]
+      ],
+      "extra_disabled_edges_from_propagation": 0,
+      "initial_failed_edge_count": 1,
+      "initial_failed_edges": [
+        [
+          50,
+          25
+        ]
+      ],
+      "line_ids": [
+        1
+      ],
+      "map": "nanning",
+      "recomputed_closure_matches_frozen_protocol": true,
+      "redundant_initial_edges_under_common_closure": [],
+      "scenario_index": 1
+    },
+    {
+      "disabled_edge_count": 19,
+      "disabled_edges": [
+        [
+          27,
+          28
+        ],
+        [
+          28,
+          29
+        ],
+        [
+          29,
+          30
+        ],
+        [
+          29,
+          41
+        ],
+        [
+          29,
+          112
+        ],
+        [
+          29,
+          146
+        ],
+        [
+          30,
+          31
+        ],
+        [
+          30,
+          42
+        ],
+        [
+          31,
+          32
+        ],
+        [
+          31,
+          43
+        ],
+        [
+          32,
+          33
+        ],
+        [
+          32,
+          44
+        ],
+        [
+          40,
+          28
+        ],
+        [
+          41,
+          30
+        ],
+        [
+          42,
+          32
+        ],
+        [
+          43,
+          32
+        ],
+        [
+          44,
+          33
+        ],
+        [
+          146,
+          147
+        ],
+        [
+          147,
+          148
+        ]
+      ],
+      "extra_disabled_edges_from_propagation": 18,
+      "initial_failed_edge_count": 1,
+      "initial_failed_edges": [
+        [
+          28,
+          29
+        ]
+      ],
+      "line_ids": [
+        2
+      ],
+      "map": "nanning",
+      "recomputed_closure_matches_frozen_protocol": true,
+      "redundant_initial_edges_under_common_closure": [],
+      "scenario_index": 2
+    },
+    {
+      "disabled_edge_count": 3,
+      "disabled_edges": [
+        [
+          34,
+          55
+        ],
+        [
+          50,
+          25
+        ],
+        [
+          55,
+          35
+        ]
+      ],
+      "extra_disabled_edges_from_propagation": 1,
+      "initial_failed_edge_count": 2,
+      "initial_failed_edges": [
+        [
+          34,
+          55
+        ],
+        [
+          50,
+          25
+        ]
+      ],
+      "line_ids": [
+        1,
+        7
+      ],
+      "map": "nanning",
+      "recomputed_closure_matches_frozen_protocol": true,
+      "redundant_initial_edges_under_common_closure": [],
+      "scenario_index": 9
+    },
+    {
+      "disabled_edge_count": 23,
+      "disabled_edges": [
+        [
+          27,
+          28
+        ],
+        [
+          28,
+          29
+        ],
+        [
+          29,
+          30
+        ],
+        [
+          29,
+          41
+        ],
+        [
+          29,
+          112
+        ],
+        [
+          29,
+          146
+        ],
+        [
+          30,
+          31
+        ],
+        [
+          30,
+          42
+        ],
+        [
+          31,
+          32
+        ],
+        [
+          31,
+          43
+        ],
+        [
+          32,
+          33
+        ],
+        [
+          32,
+          44
+        ],
+        [
+          40,
+          28
+        ],
+        [
+          41,
+          30
+        ],
+        [
+          42,
+          32
+        ],
+        [
+          43,
+          32
+        ],
+        [
+          44,
+          33
+        ],
+        [
+          78,
+          80
+        ],
+        [
+          80,
+          81
+        ],
+        [
+          80,
+          82
+        ],
+        [
+          81,
+          82
+        ],
+        [
+          146,
+          147
+        ],
+        [
+          147,
+          148
+        ]
+      ],
+      "extra_disabled_edges_from_propagation": 20,
+      "initial_failed_edge_count": 3,
+      "initial_failed_edges": [
+        [
+          28,
+          29
+        ],
+        [
+          29,
+          112
+        ],
+        [
+          78,
+          80
+        ]
+      ],
+      "line_ids": [
+        2,
+        4,
+        6
+      ],
+      "map": "nanning",
+      "recomputed_closure_matches_frozen_protocol": true,
+      "redundant_initial_edges_under_common_closure": [
+        [
+          29,
+          112
+        ]
+      ],
+      "scenario_index": 14
+    }
+  ],
+  "total_cell_count_reduced": 576
+}

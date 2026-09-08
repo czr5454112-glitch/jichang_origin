@@ -1,0 +1,271 @@
+{
+  "status": "PASS",
+  "scope": "OLD_TWO_CELL_FORMULA_AND_NATIVE_EVENT_METRIC_RECOMPUTATION_ONLY",
+  "auditor": {
+    "path": "scripts/eval/audit_hca_time_label_repair_v2.py",
+    "sha256": "5d5dd3f9bf9bab670a6a997030b89c30c730c918147145af80841510b11e884a"
+  },
+  "controls": {
+    "path": "tmp/hca_time_label_repair_v2_controls_20260906.json",
+    "sha256": "0f22df85c74e8b3535735dee7af05d4f2ee3e979c427100e35650e7513de8e52"
+  },
+  "freeze": {
+    "path": "outputs/runtime/hca_time_label_repair_v2_20260906/preflight/two_cell_freeze.json",
+    "sha256": "6f3742373bce88f628a673032b8c05b46ef703d95712dde9afe7d31306c6526d"
+  },
+  "cells": [
+    {
+      "cell": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/map2_1p00x/seed_104729/hca_segment_identity",
+      "method": "HCA_SEGMENT_IDENTITY_V1",
+      "source_sha256": "74c1a899b879b0523d039e9fa650ef3c860557c7fc96e80ff3a8978ae3faf92c",
+      "class_sha256": "1fbd4c494aa21a34380ddcde6606a3a0d93883533144f0546a903ccf04a872b3",
+      "map_sha256": "55f578cb4b8fcc61f5b13963fcb8546aca91e517ea6f8ff4a7361670f1b03f8f",
+      "equation": "expected_goal_T2 = planned_epoch + sum(all path node through times INCLUDING source and goal) + sum(edge lengths / configured speed)",
+      "tolerance_seconds": 1e-07,
+      "planned_route_count": 43602,
+      "route_formula_mismatch_count": 2301,
+      "max_excess_seconds": 44.6000000000291,
+      "min_excess_seconds": 0.0,
+      "sum_excess_seconds": 34243.80000000913,
+      "examples": [
+        {
+          "execution_id": 62,
+          "planned_epoch": 12471.0,
+          "recorded_finish_time": 12549.599999999999,
+          "route": [
+            5,
+            19,
+            25,
+            26,
+            43,
+            15,
+            14,
+            46,
+            36,
+            38,
+            39,
+            47
+          ],
+          "sum_all_node_through_seconds": 10.0,
+          "sum_edge_travel_seconds": 66.80000000000001,
+          "expected_finish_time": 12547.8,
+          "excess_seconds": 1.7999999999985334
+        },
+        {
+          "execution_id": 68,
+          "planned_epoch": 12482.0,
+          "recorded_finish_time": 12560.599999999999,
+          "route": [
+            5,
+            19,
+            25,
+            26,
+            43,
+            15,
+            14,
+            46,
+            36,
+            38,
+            39,
+            47
+          ],
+          "sum_all_node_through_seconds": 10.0,
+          "sum_edge_travel_seconds": 66.80000000000001,
+          "expected_finish_time": 12558.8,
+          "excess_seconds": 1.7999999999985334
+        },
+        {
+          "execution_id": 73,
+          "planned_epoch": 12492.0,
+          "recorded_finish_time": 12570.599999999999,
+          "route": [
+            5,
+            19,
+            25,
+            26,
+            43,
+            15,
+            14,
+            46,
+            36,
+            38,
+            39,
+            47
+          ],
+          "sum_all_node_through_seconds": 10.0,
+          "sum_edge_travel_seconds": 66.80000000000001,
+          "expected_finish_time": 12568.8,
+          "excess_seconds": 1.7999999999985334
+        }
+      ],
+      "native_event_metrics": {
+        "completed_raw_bag_count": 28506,
+        "full_population_complete": true,
+        "tht_scheduled_release_min_seconds": 187.01857000000018,
+        "tht_scheduled_release_mean_seconds": 343.2923318968989,
+        "tht_scheduled_release_max_seconds": 1644.9004300000015,
+        "tht_admission_min_seconds": 188.0,
+        "tht_admission_mean_seconds": 237.12716621062233,
+        "tht_admission_max_seconds": 359.0
+      },
+      "native_evidence": [
+        {
+          "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/map2_1p00x/seed_104729/hca_segment_identity/native_archive/routes.csv.gz",
+          "compressed_sha256": "d88025543d2c4f48438ae49909999c9def96e05f635d033aee139bd1d5b4258a",
+          "uncompressed_sha256": "04a14ad4e65cb92898777e297ff5d42e9081ba90e4a414abaae4754e6d0222eb"
+        },
+        {
+          "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/map2_1p00x/seed_104729/hca_segment_identity/native_archive/segment_execution_identity.csv.gz",
+          "compressed_sha256": "4df17920f758ce901747967e6898eca6dea6e6d82798eb435c64aaf58393026b",
+          "uncompressed_sha256": "144c03550a22d314f2c7f4951a77164aea758303233e07f564ce232a411746d4"
+        },
+        {
+          "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/map2_1p00x/seed_104729/hca_segment_identity/native_archive/outputstarttime.txt.gz",
+          "compressed_sha256": "0d65a30ed719a65588ee74d4ecf3807f77d6f2dcc790b72c1132cb8b8f94ae4d",
+          "uncompressed_sha256": "02640dae81e21a790ca5f9fea5ca1e0f07a9394dbb3cf7579919b05a389d7b28"
+        },
+        {
+          "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/map2_1p00x/seed_104729/hca_segment_identity/native_archive/output.txt.gz",
+          "compressed_sha256": "7400ad39746b6c0454ec623be988fe7c3845da3e117c3d66f439f6c40e65e439",
+          "uncompressed_sha256": "73b0a77396cf042769c9b3e950f8670a2cb95f9d5faac87bd6883551761d65eb"
+        }
+      ],
+      "normalized": {
+        "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/map2_1p00x/seed_104729/hca_segment_identity/normalized_result.json",
+        "sha256": "bfbb71f136fac98ccc605e9c2ffbd3cf7eb64c18d823db399bde14e54cf2fa39"
+      }
+    },
+    {
+      "cell": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/nanning_1p00x/seed_104729/hca_segment_identity",
+      "method": "HCA_SEGMENT_IDENTITY_V1",
+      "source_sha256": "74c1a899b879b0523d039e9fa650ef3c860557c7fc96e80ff3a8978ae3faf92c",
+      "class_sha256": "1fbd4c494aa21a34380ddcde6606a3a0d93883533144f0546a903ccf04a872b3",
+      "map_sha256": "daf51cf339862872ec1e6ce86fbdffccd326d83ebd80ebef0e926917c61ac0df",
+      "equation": "expected_goal_T2 = planned_epoch + sum(all path node through times INCLUDING source and goal) + sum(edge lengths / configured speed)",
+      "tolerance_seconds": 1e-07,
+      "planned_route_count": 43602,
+      "route_formula_mismatch_count": 30781,
+      "max_excess_seconds": 106.90399999998806,
+      "min_excess_seconds": 0.0,
+      "sum_excess_seconds": 263368.88400022953,
+      "examples": [
+        {
+          "execution_id": 1,
+          "planned_epoch": 8866.0,
+          "recorded_finish_time": 9073.975999999999,
+          "route": [
+            24,
+            25,
+            34,
+            55,
+            35,
+            36,
+            37,
+            46,
+            39,
+            48,
+            40,
+            28,
+            29,
+            112,
+            53
+          ],
+          "sum_all_node_through_seconds": 22.5,
+          "sum_edge_travel_seconds": 181.884,
+          "expected_finish_time": 9070.384,
+          "excess_seconds": 3.5919999999987624
+        },
+        {
+          "execution_id": 5,
+          "planned_epoch": 9471.0,
+          "recorded_finish_time": 9678.975999999999,
+          "route": [
+            24,
+            25,
+            34,
+            55,
+            35,
+            36,
+            37,
+            46,
+            39,
+            48,
+            40,
+            28,
+            29,
+            112,
+            53
+          ],
+          "sum_all_node_through_seconds": 22.5,
+          "sum_edge_travel_seconds": 181.884,
+          "expected_finish_time": 9675.384,
+          "excess_seconds": 3.5919999999987624
+        },
+        {
+          "execution_id": 8,
+          "planned_epoch": 10086.0,
+          "recorded_finish_time": 10297.135999999997,
+          "route": [
+            49,
+            50,
+            34,
+            55,
+            35,
+            36,
+            37,
+            46,
+            39,
+            48,
+            40,
+            28,
+            29,
+            112,
+            53
+          ],
+          "sum_all_node_through_seconds": 22.5,
+          "sum_edge_travel_seconds": 185.04399999999998,
+          "expected_finish_time": 10293.544,
+          "excess_seconds": 3.5919999999968013
+        }
+      ],
+      "native_event_metrics": {
+        "completed_raw_bag_count": 28506,
+        "full_population_complete": true,
+        "tht_scheduled_release_min_seconds": 48.08817999999883,
+        "tht_scheduled_release_mean_seconds": 5113.604196065845,
+        "tht_scheduled_release_max_seconds": 58923.52921,
+        "tht_admission_min_seconds": 49.0,
+        "tht_admission_mean_seconds": 366.06749456254823,
+        "tht_admission_max_seconds": 1098.0
+      },
+      "native_evidence": [
+        {
+          "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/nanning_1p00x/seed_104729/hca_segment_identity/native_archive/routes.csv.gz",
+          "compressed_sha256": "b4c2ab4fbc2cfb117ecc6b1bff5c8fd782657c048145a77258c9f23cf617f765",
+          "uncompressed_sha256": "98ca5df28bf2caa0ab7f3072a32fb33b3d29a9df7a4e07be70c9ee05845e4ceb"
+        },
+        {
+          "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/nanning_1p00x/seed_104729/hca_segment_identity/native_archive/segment_execution_identity.csv.gz",
+          "compressed_sha256": "35babb074f1a17c4555ac37598f5f6b6ed61c86fda376e17bb5bcd952bb27e36",
+          "uncompressed_sha256": "9103b7964743167cdaf4617041c30e275b7a8a3a9b9af885712588f92adee4c0"
+        },
+        {
+          "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/nanning_1p00x/seed_104729/hca_segment_identity/native_archive/outputstarttime.txt.gz",
+          "compressed_sha256": "66cb8794779da71e3686db09c4990631a0aea0c9e76b43876f5db2b9e688014e",
+          "uncompressed_sha256": "63cb4baef630fb881b94c7849bf8e96323258710d6a49214d4a997e70b2d883b"
+        },
+        {
+          "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/nanning_1p00x/seed_104729/hca_segment_identity/native_archive/output.txt.gz",
+          "compressed_sha256": "4ec9264f2b18140abe27228c4406286a3ca98bbbf6522239a2e871a35c2504d2",
+          "uncompressed_sha256": "1c8089bb36bfed7213f32a2f96ee0d65d587a2b64925f5d1544708c0b75b6738"
+        }
+      ],
+      "normalized": {
+        "path": "outputs/runtime/hca_segment_identity_20260906_fast_cleanup/nanning_1p00x/seed_104729/hca_segment_identity/normalized_result.json",
+        "sha256": "7bc5d8f708724cef98234743d3e73e1b79900e2b19e6df85a49d1f22cb6c18a3"
+      }
+    }
+  ],
+  "new_cells_inspected": 0,
+  "simulations_started": 0
+}

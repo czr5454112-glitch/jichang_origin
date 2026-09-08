@@ -642,6 +642,8 @@ struct EventDrivenJunctionConfig {
   // Exact-off by default.  When enabled, collect bounded streaming counters
   // for the CIE revision's activation-first analysis; routing is unchanged.
   bool enable_cie_component_activation = false;
+  // Exact-off. Repair only S4's potential after advertised topology changes.
+  bool enable_s4_advertised_fault_potential_repair = false;
   std::vector<std::vector<double>> scorer_w1;
   std::vector<double> scorer_b1;
   std::vector<double> scorer_w2;
@@ -1257,6 +1259,15 @@ struct EventRuntimeSummary {
   std::uint64_t s4_strict_descent_filtered_candidate_count = 0;
   std::uint64_t s4_strict_descent_filtered_decision_count = 0;
   std::uint64_t s4_strict_descent_empty_ranking_count = 0;
+  bool s4_advertised_fault_potential_repair_enabled = false;
+  std::uint64_t s4_fault_potential_rebuild_count = 0;
+  std::uint64_t s4_fault_potential_active_advertised_edge_count = 0;
+  std::uint64_t s4_fault_potential_restore_original_count = 0;
+  std::uint64_t s4_fault_potential_relaxation_count = 0;
+  double s4_fault_potential_rebuild_wall_seconds = 0.0;
+  std::uint64_t s4_fault_unreachable_park_count = 0;
+  std::uint64_t s4_fault_unreachable_wakeup_count = 0;
+  std::uint64_t s4_fault_unreachable_active_parked_count = 0;
   int runtime_full_astar_calls = 0;
   int global_reservation_scan_count = 0;
   int max_edges_selected_per_arrive = 0;
@@ -2720,6 +2731,9 @@ class EventDrivenJunctionRuntime {
     std::unordered_map<long long,
                        event_runtime_detail::AdvertisedFaultState>
         advertised_faults;
+    std::set<long long> s4_advertised_failed_edges;
+    std::map<std::pair<int, int>, double> s4_repaired_potential;
+    std::unordered_set<int> s4_topology_parked_bags;
     std::unordered_map<int,
                        event_runtime_detail::CongestionBeaconState>
         congestion_beacons;
@@ -3007,6 +3021,8 @@ class EventDrivenJunctionRuntime {
     result_.summary.queue_time_scaling = config_.queue_time_scaling;
     result_.summary.cie_component_activation_enabled =
         config_.enable_cie_component_activation;
+    result_.summary.s4_advertised_fault_potential_repair_enabled =
+        config_.enable_s4_advertised_fault_potential_repair;
     if (config_.enable_s4_local_potential_descent_guard) {
       result_.summary.s4_local_potential_descent_guard_enabled = true;
       result_.summary.s4_local_potential_descent_guard_learning_active =
@@ -5192,6 +5208,21 @@ class EventDrivenJunctionRuntime {
       throw std::invalid_argument(
           "CIE component activation telemetry requires the S4 scorer");
     }
+    if (config_.enable_s4_advertised_fault_potential_repair &&
+        (canonical_scorer_mode() != "S4" || !config_.enable_fault_policy ||
+         config_.g4irsf24_dlp.mode != "off" ||
+         !config_.enable_s4_local_potential_descent_guard ||
+         config_.enable_source_admission || config_.admission_mode != "off" ||
+         config_.local_queue_capacity != 0 ||
+         !uses_jit_destination_merge_grants() ||
+         canonical_merge_grant_rule() != DestinationMergeGrantRule::kM3DeadlineAging ||
+         canonical_merge_grant_timing_mode() !=
+             DestinationMergeGrantTimingMode::kJitFairAgingDeadline)) {
+      throw std::invalid_argument(
+          "advertised fault potential repair requires S4 with strict descent, "
+          "fault policy, E4/M3/JIT fair timing, DLP off, source admission off, "
+          "and unlimited local queue capacity");
+    }
     if (config_.g4irsf20_event_hotpath_policy != "E0" &&
         config_.g4irsf20_event_hotpath_policy != "E1" &&
         config_.g4irsf20_event_hotpath_policy != "E2") {
@@ -5523,6 +5554,9 @@ class EventDrivenJunctionRuntime {
     corridors_.clear();
     physical_faults_.clear();
     advertised_faults_.clear();
+    s4_advertised_failed_edges_.clear();
+    s4_repaired_potential_.clear();
+    s4_topology_parked_bags_.clear();
     congestion_beacons_.clear();
     destination_merge_controllers_.clear();
     pending_merge_dispatches_.clear();
@@ -7971,6 +8005,10 @@ class EventDrivenJunctionRuntime {
       return !junction.queue.empty();
     }
     for (const int runtime_bag_id : junction.queue) {
+      if (config_.enable_s4_advertised_fault_potential_repair &&
+          s4_topology_parked_bags_.count(runtime_bag_id) != 0) {
+        continue;
+      }
       const auto state =
           g4irsf14_state_->destination_merge_bags.find(
               runtime_bag_id);
@@ -9762,6 +9800,13 @@ class EventDrivenJunctionRuntime {
 
   std::optional<double> s4_local_effective_potential(int node,
                                                       int goal) const {
+    if (config_.enable_s4_advertised_fault_potential_repair &&
+        !s4_advertised_failed_edges_.empty()) {
+      const auto found = s4_repaired_potential_.find({node, goal});
+      // Absence is the explicit unreachable mask, not a finite sentinel.
+      return found == s4_repaired_potential_.end()
+                 ? std::nullopt : std::optional<double>(found->second);
+    }
     const double base = static_potential(node, goal);
     const auto& dlp = config_.g4irsf24_dlp;
     if (!dlp.deterministic_surviving_graph_values || node == goal) {
@@ -13940,14 +13985,53 @@ class EventDrivenJunctionRuntime {
       return {};
     }
 
-    const std::size_t queue_index =
-        choose_bag(controller.queue,
+    std::optional<std::deque<int>> eligible_queue;
+    const std::deque<int>* choice_queue = &controller.queue;
+    if (config_.enable_s4_advertised_fault_potential_repair &&
+        !s4_topology_parked_bags_.empty()) {
+      eligible_queue.emplace();
+      for (const int id : controller.queue) {
+        if (s4_topology_parked_bags_.count(id) == 0) {
+          eligible_queue->push_back(id);
+        }
+      }
+      if (eligible_queue->empty()) {
+        return {};
+      }
+      choice_queue = &*eligible_queue;
+    }
+    const std::size_t choice_index =
+        choose_bag(*choice_queue,
                    time,
                    controller.escape_token_task,
                    priority_comparison_count);
+    const std::size_t queue_index = choice_queue == &controller.queue
+        ? choice_index
+        : static_cast<std::size_t>(std::distance(
+              controller.queue.begin(), std::find(controller.queue.begin(),
+                  controller.queue.end(), (*choice_queue)[choice_index])));
     const auto decision_started = std::chrono::steady_clock::now();
     const int task_id = controller.queue[queue_index];
     auto& bag = bags_.at(task_id);
+    if (config_.enable_s4_advertised_fault_potential_repair &&
+        !s4_advertised_failed_edges_.empty() && node != bag.request.goal &&
+        s4_repaired_potential_.find({node, bag.request.goal}) ==
+            s4_repaired_potential_.end()) {
+      // Retain the real bag in its legal queue, including its age and queue
+      // occupancy. Only attempts are suspended; a later notification can wake it.
+      s4_topology_parked_bags_.insert(task_id);
+      ++result_.summary.s4_fault_unreachable_park_count;
+      result_.summary.s4_fault_unreachable_active_parked_count =
+          s4_topology_parked_bags_.size();
+      RuntimeEvent parked;
+      parked.type = JunctionEventType::kJunctionArbitration;
+      parked.time = time;
+      parked.seq = arrive_event_seq;
+      append_event_trace(parked, task_id, node, node, -1,
+                         "s4_advertised_topology_unreachable_park", 0);
+      schedule_junction_wakeup(node, time);
+      return DispatchResult{task_id, -1, 0, true};
+    }
     bool causal_i3_override_selected = false;
     bool causal_i4_natural_hold_selected = false;
     bool g4irsf16_i3_override_selected = false;
@@ -16229,6 +16313,116 @@ class EventDrivenJunctionRuntime {
     push_event(std::move(event));
   }
 
+  void refresh_s4_advertised_fault_potential(const RuntimeEvent& event) {
+    if (!config_.enable_s4_advertised_fault_potential_repair) {
+      return;
+    }
+    // Only delivered knowledge is eligible. Never inspect physical_faults_,
+    // future event windows, or an undelivered repair to determine reachability.
+    std::set<long long> advertised_failed;
+    for (const auto& entry : advertised_faults_) {
+      if (entry.second.faulted) advertised_failed.insert(entry.first);
+    }
+    if (advertised_failed == s4_advertised_failed_edges_) {
+      return;
+    }
+    const auto started = std::chrono::steady_clock::now();
+    const auto nodes = graph_.node_locations();
+    std::map<std::pair<int, int>, double> repaired;
+    std::uint64_t relaxations = 0;
+    if (!advertised_failed.empty()) {
+      std::map<int, std::vector<std::pair<int, double>>> incoming;
+      for (const int from : nodes) {
+        for (const int to : graph_.outgoing(from)) {
+          if (advertised_failed.count(event_runtime_detail::directed_key(from, to)) != 0) {
+            continue;
+          }
+          incoming[to].emplace_back(from, service_duration(from) +
+              graph_.edge(from, to).travel_time());
+        }
+      }
+      for (auto& entry : incoming) std::sort(entry.second.begin(), entry.second.end());
+      using Item = std::pair<double, int>;
+      for (const int goal : nodes) {
+        std::map<int, double> distances;
+        distances.emplace(goal, 0.0);
+        std::priority_queue<Item, std::vector<Item>, std::greater<Item>> frontier;
+        frontier.emplace(0.0, goal);
+        while (!frontier.empty()) {
+          const auto [cost, node] = frontier.top();
+          frontier.pop();
+          if (cost > distances.at(node)) continue;
+          const auto predecessors = incoming.find(node);
+          if (predecessors == incoming.end()) continue;
+          for (const auto& [predecessor, weight] : predecessors->second) {
+            ++relaxations;
+            const double candidate = cost + weight;
+            const auto known = distances.find(predecessor);
+            if (known == distances.end() || candidate < known->second) {
+              distances[predecessor] = candidate;
+              frontier.emplace(candidate, predecessor);
+            }
+          }
+        }
+        for (const auto& [source, cost] : distances) repaired.emplace(std::make_pair(source, goal), cost);
+      }
+      ++result_.summary.s4_fault_potential_rebuild_count;
+      result_.summary.s4_fault_potential_relaxation_count += relaxations;
+    } else {
+      ++result_.summary.s4_fault_potential_restore_original_count;
+    }
+    s4_advertised_failed_edges_ = std::move(advertised_failed);
+    s4_repaired_potential_ = std::move(repaired);
+    result_.summary.s4_fault_potential_active_advertised_edge_count =
+        s4_advertised_failed_edges_.size();
+
+    // A remote topology notification can invalidate a still-uncommitted next
+    // hop even if that hop's own fault generation did not change. Use the
+    // existing complete rejection path; committed capabilities and in-flight
+    // edges are deliberately outside pending_ and remain untouched.
+    std::vector<std::pair<int, DestinationMergeRequest>> pending;
+    for (const auto& entry : destination_merge_controllers_) {
+      for (const auto& item : entry.second.pending_) {
+        pending.emplace_back(entry.first, item.request);
+      }
+    }
+    std::sort(pending.begin(), pending.end(), [](const auto& left, const auto& right) {
+      return std::tie(left.first, left.second.request_id) <
+             std::tie(right.first, right.second.request_id);
+    });
+    for (const auto& [destination, request] : pending) {
+      reject_destination_merge_request(destination_merge_controllers_.at(destination),
+          request, MergeGrantState::kRevokedFault,
+          MergeGrantReason::kFaultGenerationChanged, event.time);
+    }
+    std::vector<int> waking;
+    for (const int id : s4_topology_parked_bags_) {
+      const auto& bag = bags_.at(id);
+      if (s4_advertised_failed_edges_.empty() ||
+          s4_repaired_potential_.count({bag.current, bag.request.goal}) != 0) {
+        waking.push_back(id);
+      }
+    }
+    std::sort(waking.begin(), waking.end());
+    for (const int id : waking) {
+      s4_topology_parked_bags_.erase(id);
+      ++result_.summary.s4_fault_unreachable_wakeup_count;
+      const auto& bag = bags_.at(id);
+      append_event_trace(event, id, bag.current, bag.current, -1,
+                         "s4_advertised_topology_unreachable_wakeup", 0);
+    }
+    result_.summary.s4_fault_unreachable_active_parked_count = s4_topology_parked_bags_.size();
+    append_event_trace(event, -1, event.from_node, event.from_node, event.to_node,
+        s4_advertised_failed_edges_.empty()
+            ? "s4_advertised_topology_potential_restore_original"
+            : "s4_advertised_topology_potential_rebuild", 0);
+    // All affected legal queues, including those remote from this edge, must
+    // reconsider their next hop. Parked queues remain physically represented.
+    for (const int node : nodes) schedule_junction_wakeup(node, event.time);
+    result_.summary.s4_fault_potential_rebuild_wall_seconds +=
+        std::chrono::duration<double>(std::chrono::steady_clock::now() - started).count();
+  }
+
   void process_fault_message(const RuntimeEvent& event) {
     const long long key = event_runtime_detail::directed_key(event.from_node, event.to_node);
     if (event.notification) {
@@ -16239,6 +16433,7 @@ class EventDrivenJunctionRuntime {
           advertised.faulted = event.type == JunctionEventType::kFault;
           advertised.received_at = event.time;
         }
+        refresh_s4_advertised_fault_potential(event);
         schedule_junction_wakeup(event.from_node, event.time);
       }
       append_event_trace(event,
@@ -16375,6 +16570,7 @@ class EventDrivenJunctionRuntime {
         advertised.generation = physical.physical_generation;
         advertised.faulted = physical.active_count > 0;
         advertised.received_at = event.time;
+        refresh_s4_advertised_fault_potential(event);
       }
       append_fault_audit(event,
                          "local_message_delivery",
@@ -17216,6 +17412,12 @@ class EventDrivenJunctionRuntime {
     if (controller.queue.empty()) {
       return;
     }
+    if (config_.enable_s4_advertised_fault_potential_repair &&
+        !s4_topology_parked_bags_.empty() &&
+        std::all_of(controller.queue.begin(), controller.queue.end(),
+                    [&](int id) { return s4_topology_parked_bags_.count(id) != 0; })) {
+      return;
+    }
     if (batches_junction_same_timestamp()) {
       auto& local = g4irsf14_local_state(node);
       if (controller.junction_wakeup_pending) {
@@ -17570,6 +17772,15 @@ class EventDrivenJunctionRuntime {
     // normalising this cell makes a local policy walk past the sink and loop.
     if (node == goal) {
       return 0.0;
+    }
+    if (config_.enable_s4_advertised_fault_potential_repair &&
+        !s4_advertised_failed_edges_.empty()) {
+      const auto found = s4_repaired_potential_.find({node, goal});
+      if (found != s4_repaired_potential_.end()) {
+        return found->second;
+      }
+      // Candidate feature serialization stays finite; legality uses the
+      // separate optional/mask above, so this is never mistaken for reachable.
     }
     const double value = graph_.heuristic(node, goal);
     if (!std::isfinite(value)) {
@@ -18589,6 +18800,9 @@ class EventDrivenJunctionRuntime {
   std::unordered_map<long long, LocalCalendar> corridors_;
   std::unordered_map<long long, event_runtime_detail::FaultState> physical_faults_;
   std::unordered_map<long long, event_runtime_detail::AdvertisedFaultState> advertised_faults_;
+  std::set<long long> s4_advertised_failed_edges_;
+  std::map<std::pair<int, int>, double> s4_repaired_potential_;
+  std::unordered_set<int> s4_topology_parked_bags_;
   std::unordered_map<int, event_runtime_detail::CongestionBeaconState> congestion_beacons_;
   std::unordered_map<int, DestinationMergeGrantController>
       destination_merge_controllers_;
@@ -18785,6 +18999,9 @@ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
   storage->corridors = corridors_;
   storage->physical_faults = physical_faults_;
   storage->advertised_faults = advertised_faults_;
+  storage->s4_advertised_failed_edges = s4_advertised_failed_edges_;
+  storage->s4_repaired_potential = s4_repaired_potential_;
+  storage->s4_topology_parked_bags = s4_topology_parked_bags_;
   storage->congestion_beacons = congestion_beacons_;
   storage->destination_merge_controllers.reserve(
       destination_merge_controllers_.size());
@@ -18941,6 +19158,9 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
   corridors_ = storage.corridors;
   physical_faults_ = storage.physical_faults;
   advertised_faults_ = storage.advertised_faults;
+  s4_advertised_failed_edges_ = storage.s4_advertised_failed_edges;
+  s4_repaired_potential_ = storage.s4_repaired_potential;
+  s4_topology_parked_bags_ = storage.s4_topology_parked_bags;
   congestion_beacons_ = storage.congestion_beacons;
   destination_merge_controllers_.clear();
   destination_merge_controllers_.reserve(
@@ -20741,6 +20961,21 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
   }
 
   StateFingerprintWriter faults("fault_state");
+  if (config_.enable_s4_advertised_fault_potential_repair) {
+    faults.string("s4_advertised_fault_potential_repair_v1");
+    faults.u64(s4_advertised_failed_edges_.size());
+    for (const auto key : s4_advertised_failed_edges_) faults.i64(key);
+    faults.u64(s4_repaired_potential_.size());
+    for (const auto& entry : s4_repaired_potential_) {
+      faults.i64(entry.first.first);
+      faults.i64(entry.first.second);
+      faults.floating(entry.second);
+    }
+    std::vector<int> parked(s4_topology_parked_bags_.begin(), s4_topology_parked_bags_.end());
+    std::sort(parked.begin(), parked.end());
+    faults.u64(parked.size());
+    for (const auto id : parked) faults.i64(id);
+  }
   std::vector<long long> fault_edges;
   fault_edges.reserve(physical_faults_.size());
   for (const auto& entry : physical_faults_) {
@@ -20968,6 +21203,9 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
     scorer.string("s4_local_potential_descent_guard_v1");
     scorer.boolean(
         config_.g4irsf24_dlp.deterministic_surviving_graph_values);
+  }
+  if (config_.enable_s4_advertised_fault_potential_repair) {
+    scorer.string("s4_advertised_fault_potential_repair_v1");
   }
   if (config_.enable_s4_direct_neighbor_merge_calendar_visibility) {
     scorer.string("s4_direct_neighbor_merge_calendar_visibility_v1");

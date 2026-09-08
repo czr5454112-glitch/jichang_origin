@@ -1,0 +1,830 @@
+import App.ICS_PathFinding;
+import App.Edge;
+import App.Node;
+import App.Tasks;
+import App.Vertex;
+import App.task;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+/**
+ * Isolated paper-suite capability extension from time-label-repaired V2.
+ * V2 App/GUI sources are copied byte-for-byte; dynamic bias is not implemented.
+ * First legs retain raw IDs; storage-out legs receive maxRawId+1+earlyOrdinal.
+ * Distinct IDs affect HashMap traversal/collisions, so equivalence is claimed
+ * only for inputs with no added second-leg IDs, not for repaired EBS traffic.
+ */
+public class HcaPaperSuiteBenchmark {
+    public static final String METHOD = "HCA_TIME_LABEL_REPAIR_V3";
+    private static final String BASELINE = "BASELINE";
+    private static final String ALL_DAY_FAULT = "FULL_DAY_KNOWN_EDGE_FAILURE";
+    private static String suiteMode;
+    private static double biasFraction;
+    private static long suiteSeed;
+    private static String suiteAuditCsv;
+
+    private static final class SegmentIdentity {
+        final int executionId, rawId, start, goal;
+        final String leg;
+        final double scheduledRelease, originalEntry, deadline;
+
+        SegmentIdentity(int executionId, int rawId, String leg, int start, int goal,
+                        double scheduledRelease, double originalEntry, double deadline) {
+            this.executionId = executionId;
+            this.rawId = rawId;
+            this.leg = leg;
+            this.start = start;
+            this.goal = goal;
+            this.scheduledRelease = scheduledRelease;
+            this.originalEntry = originalEntry;
+            this.deadline = deadline;
+        }
+    }
+    private static final class ReleaseEvent {
+        final int ordinal;
+        final int taskId;
+        final int start;
+        final int goal;
+        final double epoch;
+
+        ReleaseEvent(int ordinal, int taskId, int start, int goal, double epoch) {
+            this.ordinal = ordinal;
+            this.taskId = taskId;
+            this.start = start;
+            this.goal = goal;
+            this.epoch = epoch;
+        }
+    }
+
+    private static final class PlannedRoute {
+        final int ordinal;
+        final int taskId;
+        final int start;
+        final int goal;
+        final double epoch;
+        final double finishTime;
+        final ArrayList<Integer> path;
+
+        PlannedRoute(
+            int ordinal,
+            int taskId,
+            int start,
+            int goal,
+            double epoch,
+            double finishTime,
+            ArrayList<Integer> path
+        ) {
+            this.ordinal = ordinal;
+            this.taskId = taskId;
+            this.start = start;
+            this.goal = goal;
+            this.epoch = epoch;
+            this.finishTime = finishTime;
+            this.path = path;
+        }
+    }
+
+    private static final class RunResult {
+        int startEpoch;
+        int maxEpochs;
+        int maxNewTasks;
+        int epochsRun;
+        int generatedCount;
+        int plannedCount;
+        int completedCount;
+        int faultEventCount;
+        int repairEventCount;
+        int generatedFaultEdgeCount;
+        int generatedRepairEdgeCount;
+        int activeFaultCount;
+        int activeRouteCount;
+        int unfinishedCount;
+        double speedMps;
+        long routeSizeChecksum;
+        long routeLocationChecksum;
+        double lastEpoch;
+        ArrayList<ReleaseEvent> releases = new ArrayList<>();
+        ArrayList<PlannedRoute> plannedRoutes = new ArrayList<>();
+        ArrayList<SegmentIdentity> identities = new ArrayList<>();
+        HashMap<Integer, Double> completions = new HashMap<>();
+        HashSet<Integer> terminalActive = new HashSet<>();
+        HashSet<Integer> terminalUnplanned = new HashSet<>();
+        HashSet<Integer> terminalNotReleased = new HashSet<>();
+        int accountingResidual;
+    }
+
+    private static final class ScheduleEvent {
+        final int epoch;
+        final int start;
+        final int end;
+        final boolean repair;
+
+        ScheduleEvent(int epoch, int start, int end, boolean repair) {
+            this.epoch = epoch;
+            this.start = start;
+            this.end = end;
+            this.repair = repair;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length < 9) {
+            throw new IllegalArgumentException(
+                "usage: HcaPaperSuiteBenchmark <mapPath> <inputdataPath> <startEpoch> "
+                + "<maxEpochs> <maxNewTasks> <repeats> <warmupRepeats> <routeCsv> <summaryCsv> "
+                + "[faultSchedule] [faultProbability] [repairProbability] [releaseCsv] [speedMps] "
+                + "[storageInGoal] [storageOutStart] [earlyBagThreshold] [storageLeadSeconds] [identityCsv] [terminalCsv] [suiteMode] [biasFraction] [seed] [suiteAuditCsv]"
+            );
+        }
+        System.setProperty("java.awt.headless", "true");
+        String mapPath = args[0];
+        String inputdataPath = args[1];
+        int startEpoch = Integer.parseInt(args[2]);
+        int maxEpochs = Integer.parseInt(args[3]);
+        int maxNewTasks = Integer.parseInt(args[4]);
+        int repeats = Integer.parseInt(args[5]);
+        int warmupRepeats = Integer.parseInt(args[6]);
+        String routeCsv = args[7];
+        String summaryCsv = args[8];
+        ArrayList<ScheduleEvent> schedule = args.length > 9 ? parseSchedule(args[9]) : new ArrayList<ScheduleEvent>();
+        double faultProbability = args.length > 10 ? Double.parseDouble(args[10]) : 0.0;
+        double repairProbability = args.length > 11 ? Double.parseDouble(args[11]) : 0.0;
+        String releaseCsv = args.length > 12 ? args[12] : null;
+        double speedMps = args.length > 13 ? Double.parseDouble(args[13]) : 2.5;
+        int storageInGoal = args.length > 14 ? Integer.parseInt(args[14]) : 47;
+        int storageOutStart = args.length > 15 ? Integer.parseInt(args[15]) : 52;
+        double earlyBagThreshold = args.length > 16 ? Double.parseDouble(args[16]) : 4800.0;
+        double storageLeadSeconds = args.length > 17 ? Double.parseDouble(args[17]) : 2700.0;
+        File evidenceDirectory = new File(summaryCsv).getAbsoluteFile().getParentFile();
+        String identityCsv = args.length > 18 ? args[18] : new File(evidenceDirectory, "segment_execution_identity.csv").getPath();
+        String terminalCsv = args.length > 19 ? args[19] : new File(evidenceDirectory, "execution_terminal.csv").getPath();
+        suiteMode = args.length > 20 ? args[20] : BASELINE;
+        biasFraction = args.length > 21 ? Double.parseDouble(args[21]) : 0.0;
+        suiteSeed = args.length > 22 ? Long.parseLong(args[22]) : 0L;
+        suiteAuditCsv = args.length > 23 ? args[23] : new File(evidenceDirectory, "suite_audit.csv").getPath();
+        validateSuiteContract(suiteMode, biasFraction, schedule, startEpoch, faultProbability, repairProbability);
+        if (repeats != 1 || warmupRepeats != 0) {
+            throw new IllegalArgumentException("paper suite requires repeats=1 and warmupRepeats=0 for complete native evidence");
+        }
+        if (!Double.isFinite(speedMps) || speedMps <= 0.0) {
+            throw new IllegalArgumentException("speedMps must be finite and positive");
+        }
+        if (!Double.isFinite(earlyBagThreshold) || earlyBagThreshold < 0.0) {
+            throw new IllegalArgumentException("earlyBagThreshold must be finite and non-negative");
+        }
+        if (!Double.isFinite(storageLeadSeconds) || storageLeadSeconds < 0.0) {
+            throw new IllegalArgumentException("storageLeadSeconds must be finite and non-negative");
+        }
+
+        for (int repeat = 0; repeat < warmupRepeats; repeat++) {
+            runOnce(
+                mapPath,
+                inputdataPath,
+                startEpoch,
+                maxEpochs,
+                maxNewTasks,
+                schedule,
+                faultProbability,
+                repairProbability,
+                speedMps,
+                storageInGoal,
+                storageOutStart,
+                earlyBagThreshold,
+                storageLeadSeconds
+            );
+        }
+
+        ArrayList<RunResult> runs = new ArrayList<>();
+        long startNs = System.nanoTime();
+        for (int repeat = 0; repeat < repeats; repeat++) {
+            runs.add(
+                runOnce(
+                    mapPath,
+                    inputdataPath,
+                    startEpoch,
+                    maxEpochs,
+                    maxNewTasks,
+                    schedule,
+                    faultProbability,
+                    repairProbability,
+                    speedMps,
+                    storageInGoal,
+                    storageOutStart,
+                    earlyBagThreshold,
+                    storageLeadSeconds
+                )
+            );
+        }
+        long elapsedNs = System.nanoTime() - startNs;
+        if (runs.isEmpty()) {
+            throw new IllegalArgumentException("repeats must be positive");
+        }
+
+        writeRoutes(routeCsv, runs.get(0).plannedRoutes);
+        if (releaseCsv != null && !releaseCsv.trim().isEmpty()) {
+            writeReleases(releaseCsv, runs.get(0).releases);
+        }
+        writeSummary(summaryCsv, runs);
+        writeIdentities(identityCsv, runs.get(0).identities);
+        writeTerminal(terminalCsv, runs.get(0));
+        writeSuiteAudit(suiteAuditCsv, runs.get(0), schedule);
+
+        RunResult first = runs.get(0);
+        double elapsedSeconds = elapsedNs / 1_000_000_000.0;
+        double windowsPerSecond = elapsedSeconds > 0.0 ? repeats / elapsedSeconds : 0.0;
+        double plansPerSecond = elapsedSeconds > 0.0 ? (double) (first.plannedCount * repeats) / elapsedSeconds : 0.0;
+        System.out.println("repeats=" + repeats);
+        System.out.println("method=" + METHOD);
+        System.out.println("warmup_repeats=" + warmupRepeats);
+        System.out.println("elapsed_seconds=" + elapsedSeconds);
+        System.out.println("windows_per_second=" + windowsPerSecond);
+        System.out.println("plans_per_second=" + plansPerSecond);
+        System.out.println("start_epoch=" + first.startEpoch);
+        System.out.println("max_epochs=" + first.maxEpochs);
+        System.out.println("max_new_tasks=" + first.maxNewTasks);
+        System.out.println("speed_mps=" + first.speedMps);
+        System.out.println("epochs_run=" + first.epochsRun);
+        System.out.println("generated_count=" + first.generatedCount);
+        System.out.println("planned_count=" + first.plannedCount);
+        System.out.println("completed_count=" + first.completedCount);
+        System.out.println("fault_event_count=" + first.faultEventCount);
+        System.out.println("repair_event_count=" + first.repairEventCount);
+        System.out.println("generated_fault_edge_count=" + first.generatedFaultEdgeCount);
+        System.out.println("generated_repair_edge_count=" + first.generatedRepairEdgeCount);
+        System.out.println("active_fault_count=" + first.activeFaultCount);
+        System.out.println("active_route_count=" + first.activeRouteCount);
+        System.out.println("unfinished_count=" + first.unfinishedCount);
+        System.out.println("route_size_checksum=" + first.routeSizeChecksum);
+        System.out.println("route_location_checksum=" + first.routeLocationChecksum);
+        System.out.println("last_epoch=" + first.lastEpoch);
+        System.out.println("total_segment_count=" + first.identities.size());
+        System.out.println("not_released_count=" + first.terminalNotReleased.size());
+        System.out.println("terminal_accounting_residual=" + first.accountingResidual);
+    }
+
+    private static void validateSuiteContract(String mode, double bias, ArrayList<ScheduleEvent> schedule,
+                                              int startEpoch, double faultProbability, double repairProbability) {
+        if (!BASELINE.equals(mode) && !ALL_DAY_FAULT.equals(mode)) {
+            throw new IllegalArgumentException("unsupported suite mode: real dynamic/LRA execution is not implemented");
+        }
+        if (!Double.isFinite(bias) || bias != 0.0) {
+            throw new IllegalArgumentException("nonzero physical speed bias is not implemented; do not substitute static slowdown");
+        }
+        if (faultProbability != 0.0 || repairProbability != 0.0) {
+            throw new IllegalArgumentException("random faults/repairs are outside the deterministic all-day contract");
+        }
+        if (BASELINE.equals(mode) && !schedule.isEmpty()) {
+            throw new IllegalArgumentException("BASELINE requires an empty fault schedule");
+        }
+        if (ALL_DAY_FAULT.equals(mode) && schedule.isEmpty()) {
+            throw new IllegalArgumentException("FULL_DAY_KNOWN_EDGE_FAILURE requires explicit directed failed edges");
+        }
+        HashSet<String> seen = new HashSet<>();
+        for (ScheduleEvent event : schedule) {
+            if (event.epoch != startEpoch || event.repair) {
+                throw new IllegalArgumentException("all-day failures must start at startEpoch and never repair");
+            }
+            if (!seen.add(event.start + ":" + event.end)) {
+                throw new IllegalArgumentException("duplicate directed failed edge");
+            }
+        }
+    }
+
+    private static void writeSuiteAudit(String path, RunResult run, ArrayList<ScheduleEvent> schedule) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write("method,suite_mode,standard_speed_mps,actual_speed_mps,bias_fraction,seed,seed_role,"
+                + "fault_start_epoch,failed_edge_from,failed_edge_to,full_day_known_fault,"
+                + "dynamic_replanning_implemented,static_lra_implemented,active_fault_count,"
+                + "terminal_accounting_residual");
+            writer.newLine();
+            int rows = Math.max(1, schedule.size());
+            for (int i = 0; i < rows; i++) {
+                ScheduleEvent event = schedule.isEmpty() ? null : schedule.get(i);
+                writer.write(METHOD + "," + suiteMode + "," + run.speedMps + "," + run.speedMps
+                    + "," + biasFraction + "," + suiteSeed + ",EXTERNAL_WORKLOAD_LABEL_NO_INTERNAL_RANDOMNESS,"
+                    + (event == null ? ",," : event.epoch + "," + event.start + "," + event.end)
+                    + "," + (event != null) + ",false,false," + run.activeFaultCount + "," + run.accountingResidual);
+                writer.newLine();
+            }
+        }
+    }
+
+    private static RunResult runOnce(
+        String mapPath,
+        String inputdataPath,
+        int startEpoch,
+        int maxEpochs,
+        int maxNewTasks,
+        ArrayList<ScheduleEvent> schedule,
+        double faultProbability,
+        double repairProbability,
+        double speedMps,
+        int storageInGoal,
+        int storageOutStart,
+        double earlyBagThreshold,
+        double storageLeadSeconds
+    ) throws IOException {
+        prepareWorkingFiles();
+        RunResult result = new RunResult();
+        result.startEpoch = startEpoch;
+        result.maxEpochs = maxEpochs;
+        result.maxNewTasks = maxNewTasks;
+        result.speedMps = speedMps;
+
+        ICS_PathFinding ics = new ICS_PathFinding();
+        ics.getMap().read(ics.getMap(), mapPath);
+        configureMapSpeed(ics, speedMps);
+        enableReleaseSource(ics, storageOutStart);
+        requireMapNode(ics, storageInGoal, "storageInGoal");
+        HashMap<Integer, ArrayList<task>> taskList = new HashMap<>();
+        for (Vertex vertex : ics.getMap().getStar()) {
+            taskList.put(vertex.getLocation(), new ArrayList<task>());
+        }
+        readTaskList(
+            inputdataPath,
+            taskList,
+            earlyBagThreshold,
+            storageInGoal,
+            storageOutStart,
+            storageLeadSeconds,
+            result.identities
+        );
+        for (int start : taskList.keySet()) {
+            sortTasks(taskList.get(start));
+        }
+
+        for (int epochIndex = 0; epochIndex < maxEpochs; epochIndex++) {
+            double epoch = startEpoch + epochIndex;
+            result.lastEpoch = epoch;
+            result.epochsRun = epochIndex + 1;
+            applyScheduleEvents(schedule, startEpoch + epochIndex, ics, result);
+            Tasks newTasks = new Tasks();
+            newTasks.generate_tasks(taskList, newTasks, epoch, ics, faultProbability, repairProbability, 0.0);
+            result.generatedFaultEdgeCount += newTasks.getFault_edges().size();
+            result.generatedRepairEdgeCount += newTasks.getRepaired_edges().size();
+            result.generatedCount += newTasks.getNew_tasks_list().size();
+            recordReleases(result, newTasks, epoch);
+            HashSet<Integer> beforeKeys = new HashSet<>(ics.getSaved_routes().keySet());
+            ics.ICS_path_finding(newTasks, ics.getMap(), epoch, ics);
+            recordNewRoutes(result, beforeKeys, ics, epoch);
+            if (maxNewTasks > 0 && result.generatedCount >= maxNewTasks) {
+                break;
+            }
+        }
+
+        result.completedCount = countLines(new File("output.txt"));
+        result.plannedCount = result.plannedRoutes.size();
+        result.activeRouteCount = ics.getSaved_routes().size();
+        result.unfinishedCount = ics.getUnfinishTasks().size();
+        result.activeFaultCount = ics.getFault_edges().size();
+        require(ics.getFault_routes().isEmpty() && ics.getFault_task_id_List().isEmpty(),
+            "all-day known-edge scope unexpectedly entered active fault handling");
+        require(result.activeFaultCount == schedule.size(), "all-day failed-edge population changed");
+        captureAndValidateTerminal(result, ics, taskList);
+        return result;
+    }
+
+    private static void configureMapSpeed(ICS_PathFinding ics, double speedMps) {
+        for (Edge edge : ics.getMap().getE()) {
+            edge.setV(speedMps);
+        }
+        double scale = 2.5 / speedMps;
+        double[][] hcost = ics.getMap().getHcost();
+        for (int row = 0; row < hcost.length; row++) {
+            for (int column = 0; column < hcost[row].length; column++) {
+                hcost[row][column] *= scale;
+            }
+        }
+    }
+
+    private static Vertex requireMapNode(ICS_PathFinding ics, int location, String role) {
+        for (Vertex vertex : ics.getMap().getV()) {
+            if (vertex.getLocation() == location) {
+                return vertex;
+            }
+        }
+        throw new IllegalArgumentException(role + " is not present in the selected map: " + location);
+    }
+
+    private static void enableReleaseSource(ICS_PathFinding ics, int location) {
+        Vertex source = requireMapNode(ics, location, "storageOutStart");
+        source.setCangenerated_task(true);
+        for (Vertex vertex : ics.getMap().getStar()) {
+            if (vertex.getLocation() == location) {
+                return;
+            }
+        }
+        ics.getMap().getStar().add(source);
+    }
+
+    private static void recordReleases(RunResult result, Tasks newTasks, double epoch) {
+        for (task released : newTasks.getNew_tasks_list()) {
+            result.releases.add(
+                new ReleaseEvent(
+                    result.releases.size() + 1,
+                    released.getTask_ID(),
+                    released.getStar(),
+                    released.getGoal(),
+                    epoch
+                )
+            );
+        }
+    }
+
+    private static void applyScheduleEvents(
+        ArrayList<ScheduleEvent> schedule,
+        int epoch,
+        ICS_PathFinding ics,
+        RunResult result
+    ) {
+        for (ScheduleEvent event : schedule) {
+            if (event.epoch != epoch) {
+                continue;
+            }
+            Edge edge = findEdge(event.start, event.end, ics);
+            if (edge == null) {
+                throw new IllegalArgumentException("unknown scheduled edge: " + event.start + "->" + event.end);
+            }
+            edge.setFault(!event.repair);
+            if (event.repair) {
+                result.repairEventCount++;
+            } else {
+                result.faultEventCount++;
+            }
+        }
+    }
+
+    private static Edge findEdge(int start, int end, ICS_PathFinding ics) {
+        for (Edge edge : ics.getMap().getE()) {
+            if (edge.getStar() == start && edge.getEnd() == end) {
+                return edge;
+            }
+        }
+        return null;
+    }
+
+    private static void recordNewRoutes(
+        RunResult result,
+        HashSet<Integer> beforeKeys,
+        ICS_PathFinding ics,
+        double epoch
+    ) {
+        ArrayList<Integer> keys = new ArrayList<>(ics.getSaved_routes().keySet());
+        Collections.sort(keys);
+        for (int key : keys) {
+            if (beforeKeys.contains(key)) {
+                continue;
+            }
+            ArrayList<Node> route = ics.getSaved_routes().get(key);
+            if (route == null || route.isEmpty()) {
+                continue;
+            }
+            ArrayList<Integer> path = new ArrayList<>();
+            for (Node node : route) {
+                path.add(node.getLocation());
+            }
+            PlannedRoute planned = new PlannedRoute(
+                result.plannedRoutes.size() + 1,
+                key,
+                route.get(0).getLocation(),
+                route.get(route.size() - 1).getLocation(),
+                epoch,
+                route.get(route.size() - 1).getT2(),
+                path
+            );
+            for (int index = 0; index + 1 < path.size(); index++) {
+                Edge traversed = findEdge(path.get(index), path.get(index + 1), ics);
+                require(traversed != null && !traversed.isFault(), "planned route uses an unknown or failed edge");
+            }
+            result.plannedRoutes.add(planned);
+            result.routeSizeChecksum += route.size();
+            for (int index = 0; index < route.size(); index++) {
+                result.routeLocationChecksum += (long) (index + 1) * (long) (route.get(index).getLocation() + 1);
+            }
+        }
+    }
+
+    private static void prepareWorkingFiles() {
+        deleteRecursively(new File("task"));
+        new File("task").mkdirs();
+        new File("output.txt").delete();
+        new File("outputstarttime.txt").delete();
+    }
+
+    private static void deleteRecursively(File file) {
+        if (!file.exists()) {
+            return;
+        }
+        if (file.isDirectory()) {
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    deleteRecursively(child);
+                }
+            }
+        }
+        file.delete();
+    }
+
+    private static int countLines(File file) throws IOException {
+        if (!file.exists()) {
+            return 0;
+        }
+        int count = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            while (reader.readLine() != null) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static void sortTasks(ArrayList<task> tasks) {
+        Collections.sort(tasks, new Comparator<task>() {
+            @Override
+            public int compare(task left, task right) {
+                return (int) (left.getPass_time() - right.getPass_time());
+            }
+        });
+    }
+
+    private static void readTaskList(
+        String path,
+        HashMap<Integer, ArrayList<task>> taskList,
+        double earlyBagThreshold,
+        int storageInGoal,
+        int storageOutStart,
+        double storageLeadSeconds,
+        ArrayList<SegmentIdentity> identities
+    ) throws IOException {
+        ArrayList<String[]> orders = new ArrayList<>();
+        HashSet<Integer> rawIds = new HashSet<>();
+        int maxRawId = Integer.MIN_VALUE;
+        int earlyCount = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            reader.readLine();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] order = line.trim().split("\\s+");
+                if (order.length < 5) throw new IllegalArgumentException("expected at least five raw input columns");
+                int rawId = Integer.parseInt(order[0]);
+                if (!rawIds.add(rawId)) throw new IllegalArgumentException("duplicate raw task identity: " + rawId);
+                maxRawId = Math.max(maxRawId, rawId);
+                if (Double.parseDouble(order[2]) - Double.parseDouble(order[1]) >= earlyBagThreshold) earlyCount++;
+                orders.add(order);
+            }
+        }
+        if ((long) maxRawId + earlyCount > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("insufficient integer execution IDs above max raw ID");
+        }
+        long nextSecondLegId = (long) maxRawId + 1L;
+        for (String[] order : orders) {
+            int rawId = Integer.parseInt(order[0]);
+            task newTask = new task();
+            newTask.setTask_ID(rawId);
+            newTask.setPallet_ID(rawId);
+            newTask.setPass_time(Double.valueOf(order[1]));
+            newTask.setSTD(Double.valueOf(order[2]));
+            newTask.setStar(Integer.valueOf(order[3]));
+
+            if (newTask.getSTD() - newTask.getPass_time() < earlyBagThreshold) {
+                newTask.setGoal(Integer.valueOf(order[4]));
+                taskList.get(newTask.getStar()).add(newTask);
+                identities.add(new SegmentIdentity(rawId, rawId, "direct", newTask.getStar(), newTask.getGoal(),
+                    newTask.getPass_time(), newTask.getPass_time(), newTask.getSTD()));
+            } else {
+                newTask.setGoal(storageInGoal);
+                taskList.get(newTask.getStar()).add(newTask);
+                identities.add(new SegmentIdentity(rawId, rawId, "storage_in", newTask.getStar(), newTask.getGoal(),
+                    newTask.getPass_time(), newTask.getPass_time(), newTask.getSTD()));
+
+                task storageOut = new task();
+                int executionId = (int) nextSecondLegId++;
+                storageOut.setTask_ID(executionId);
+                storageOut.setPallet_ID(executionId);
+                storageOut.setSTD(Double.valueOf(order[2]));
+                storageOut.setPass_time(storageOut.getSTD() - storageLeadSeconds);
+                storageOut.setStar(storageOutStart);
+                storageOut.setGoal(Integer.valueOf(order[4]));
+                taskList.get(storageOut.getStar()).add(storageOut);
+                identities.add(new SegmentIdentity(executionId, rawId, "storage_out", storageOut.getStar(), storageOut.getGoal(),
+                    storageOut.getPass_time(), newTask.getPass_time(), storageOut.getSTD()));
+            }
+        }
+    }
+
+    private static void require(boolean condition, String message) {
+        if (!condition) throw new IllegalStateException(message);
+    }
+
+    private static void captureAndValidateTerminal(RunResult result, ICS_PathFinding ics,
+                                                  HashMap<Integer, ArrayList<task>> pending) throws IOException {
+        HashMap<Integer, SegmentIdentity> mapping = new HashMap<>();
+        for (SegmentIdentity identity : result.identities) {
+            require(mapping.put(identity.executionId, identity) == null, "duplicate execution identity");
+        }
+        HashMap<Integer, ReleaseEvent> releases = new HashMap<>();
+        for (ReleaseEvent event : result.releases) {
+            require(releases.put(event.taskId, event) == null, "execution released twice");
+            SegmentIdentity identity = mapping.get(event.taskId);
+            require(identity != null && identity.start == event.start && identity.goal == event.goal, "released identity/OD differs");
+            // Legacy generate_tasks releases when D - epoch < 1, including
+            // floor(D) for fractional D. Preserve and expose that clock.
+            require(event.epoch > identity.scheduledRelease - 1.0, "release violates legacy D-minus-epoch rule");
+        }
+        HashMap<Integer, PlannedRoute> plans = new HashMap<>();
+        for (PlannedRoute plan : result.plannedRoutes) {
+            require(plans.put(plan.taskId, plan) == null, "execution has duplicate successful plans in baseline/all-day-known-edge scope");
+            SegmentIdentity identity = mapping.get(plan.taskId);
+            require(identity != null && releases.containsKey(plan.taskId), "unreleased execution planned");
+            require(identity.start == plan.start && identity.goal == plan.goal, "planned OD differs from segment mapping");
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader("output.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] fields = line.trim().split("\\s+");
+                require(fields.length == 2, "unexpected completion log columns");
+                int id = Integer.parseInt(fields[0]);
+                double epoch = Double.parseDouble(fields[1]);
+                require(result.completions.put(id, epoch) == null, "duplicate execution completion");
+                require(plans.containsKey(id), "completion without exact execution plan");
+                require(epoch >= plans.get(id).epoch && epoch <= result.lastEpoch, "completion time outside lifecycle");
+            }
+        } catch (java.io.FileNotFoundException missing) {
+            require(result.completedCount == 0, "completion file unexpectedly missing");
+        }
+        for (int id : ics.getSaved_routes().keySet()) {
+            require(plans.containsKey(id), "active execution lacks plan");
+            require(result.terminalActive.add(id), "duplicate active execution");
+        }
+        for (task item : ics.getUnfinishTasks()) {
+            require(releases.containsKey(item.getTask_ID()), "unplanned execution was not released");
+            require(result.terminalUnplanned.add(item.getTask_ID()), "duplicate unplanned execution");
+        }
+        for (ArrayList<task> list : pending.values()) {
+            for (task item : list) {
+                require(mapping.containsKey(item.getTask_ID()), "unknown pending execution");
+                require(result.terminalNotReleased.add(item.getTask_ID()), "duplicate pending execution");
+            }
+        }
+        HashSet<Integer> terminal = new HashSet<>();
+        for (java.util.Set<Integer> part : java.util.Arrays.asList(result.completions.keySet(),
+                result.terminalActive, result.terminalUnplanned, result.terminalNotReleased)) {
+            for (int id : part) require(terminal.add(id), "execution in more than one terminal state");
+        }
+        require(terminal.equals(mapping.keySet()), "terminal state population does not cover every input segment");
+        require(releases.size() == result.generatedCount && plans.size() == result.plannedCount
+                && result.completions.size() == result.completedCount, "native counters disagree with unique execution records");
+        result.accountingResidual = result.generatedCount - result.completedCount - result.activeRouteCount - result.unfinishedCount;
+        require(result.accountingResidual == 0, "released execution accounting residual");
+        require(result.identities.size() == result.generatedCount + result.terminalNotReleased.size(), "input/release accounting residual");
+    }
+
+    private static void writeIdentities(String path, ArrayList<SegmentIdentity> identities) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write("execution_id,raw_task_id,leg,start,goal,scheduled_release_seconds,original_entry_seconds,deadline_seconds");
+            writer.newLine();
+            for (SegmentIdentity value : identities) {
+                writer.write(value.executionId + "," + value.rawId + "," + value.leg + "," + value.start + "," + value.goal
+                    + "," + value.scheduledRelease + "," + value.originalEntry + "," + value.deadline);
+                writer.newLine();
+            }
+        }
+    }
+
+    private static void writeTerminal(String path, RunResult run) throws IOException {
+        HashMap<Integer, ReleaseEvent> releases = new HashMap<>();
+        HashMap<Integer, PlannedRoute> plans = new HashMap<>();
+        for (ReleaseEvent event : run.releases) releases.put(event.taskId, event);
+        for (PlannedRoute route : run.plannedRoutes) plans.put(route.taskId, route);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write("execution_id,raw_task_id,leg,start,goal,scheduled_release_seconds,release_epoch,planned_epoch,planned_finish_epoch,completion_epoch,terminal_state,active_route_member,unplanned_member,source_pending_member");
+            writer.newLine();
+            for (SegmentIdentity value : run.identities) {
+                int id = value.executionId;
+                String state = run.completions.containsKey(id) ? "COMPLETED" : run.terminalActive.contains(id) ? "ACTIVE_ROUTE"
+                    : run.terminalUnplanned.contains(id) ? "UNPLANNED" : "NOT_RELEASED";
+                ReleaseEvent released = releases.get(id);
+                PlannedRoute planned = plans.get(id);
+                writer.write(id + "," + value.rawId + "," + value.leg + "," + value.start + "," + value.goal + "," + value.scheduledRelease
+                    + "," + (released == null ? "" : released.epoch) + "," + (planned == null ? "" : planned.epoch)
+                    + "," + (planned == null ? "" : planned.finishTime) + "," + (run.completions.containsKey(id) ? run.completions.get(id) : "") + "," + state
+                    + "," + run.terminalActive.contains(id) + "," + run.terminalUnplanned.contains(id) + "," + run.terminalNotReleased.contains(id));
+                writer.newLine();
+            }
+        }
+    }
+
+    private static ArrayList<ScheduleEvent> parseSchedule(String spec) {
+        ArrayList<ScheduleEvent> events = new ArrayList<>();
+        if (spec == null || spec.trim().isEmpty() || spec.equalsIgnoreCase("none")) {
+            return events;
+        }
+        String[] chunks = spec.split(";");
+        for (String chunk : chunks) {
+            if (chunk.trim().isEmpty()) {
+                continue;
+            }
+            String[] parts = chunk.split(":");
+            if (parts.length != 4) {
+                throw new IllegalArgumentException("invalid schedule event: " + chunk);
+            }
+            String action = parts[3].trim().toLowerCase();
+            boolean repair;
+            if (action.equals("repair") || action.equals("repaired")) {
+                repair = true;
+            } else if (action.equals("fault") || action.equals("fail")) {
+                repair = false;
+            } else {
+                throw new IllegalArgumentException("invalid schedule action: " + parts[3]);
+            }
+            events.add(
+                new ScheduleEvent(
+                    Integer.parseInt(parts[0].trim()),
+                    Integer.parseInt(parts[1].trim()),
+                    Integer.parseInt(parts[2].trim()),
+                    repair
+                )
+            );
+        }
+        return events;
+    }
+
+    private static String pathText(List<Integer> path) {
+        StringBuilder builder = new StringBuilder();
+        for (int index = 0; index < path.size(); index++) {
+            if (index > 0) {
+                builder.append(';');
+            }
+            builder.append(path.get(index));
+        }
+        return builder.toString();
+    }
+
+    private static void writeRoutes(String path, ArrayList<PlannedRoute> routes) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write("ordinal,task_id,start,goal,epoch,finish_time,path");
+            writer.newLine();
+            for (PlannedRoute route : routes) {
+                writer.write(
+                    route.ordinal + "," + route.taskId + "," + route.start + "," + route.goal + ","
+                        + route.epoch + "," + route.finishTime + "," + pathText(route.path)
+                );
+                writer.newLine();
+            }
+        }
+    }
+
+    private static void writeReleases(String path, ArrayList<ReleaseEvent> releases) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write("ordinal,task_id,start,goal,release_epoch");
+            writer.newLine();
+            for (ReleaseEvent release : releases) {
+                writer.write(
+                    release.ordinal + "," + release.taskId + "," + release.start + ","
+                        + release.goal + "," + release.epoch
+                );
+                writer.newLine();
+            }
+        }
+    }
+
+    private static void writeSummary(String path, ArrayList<RunResult> runs) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write(
+                "repeat,speed_mps,start_epoch,max_epochs,max_new_tasks,epochs_run,generated_count,planned_count,"
+                + "completed_count,fault_event_count,repair_event_count,active_fault_count,"
+                    + "generated_fault_edge_count,generated_repair_edge_count,"
+                    + "active_route_count,unfinished_count,route_size_checksum,"
+                    + "route_location_checksum,last_epoch,total_segment_count,not_released_count,terminal_accounting_residual,method"
+            );
+            writer.newLine();
+            for (int index = 0; index < runs.size(); index++) {
+                RunResult run = runs.get(index);
+                writer.write(
+                    (index + 1) + "," + run.speedMps + "," + run.startEpoch + "," + run.maxEpochs + "," + run.maxNewTasks + ","
+                        + run.epochsRun + "," + run.generatedCount + "," + run.plannedCount + ","
+                        + run.completedCount + "," + run.faultEventCount + "," + run.repairEventCount + ","
+                        + run.activeFaultCount + "," + run.generatedFaultEdgeCount + ","
+                        + run.generatedRepairEdgeCount + "," + run.activeRouteCount + "," + run.unfinishedCount + ","
+                        + run.routeSizeChecksum + "," + run.routeLocationChecksum + "," + run.lastEpoch
+                        + "," + run.identities.size() + "," + run.terminalNotReleased.size() + "," + run.accountingResidual + "," + METHOD
+                );
+                writer.newLine();
+            }
+        }
+    }
+}

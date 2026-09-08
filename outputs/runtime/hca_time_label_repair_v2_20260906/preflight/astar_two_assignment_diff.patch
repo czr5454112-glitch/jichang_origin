@@ -1,0 +1,11 @@
+--- material-original/src/App/Astar.java
++++ benchmarks/java/hca_time_label_repair_v2/App/Astar.java
+@@ -107,6 +107,8 @@
+ 				}else {
+ 					//如果子节点nextNode在openList中，并且gcost新值比旧值小，将新值作为节点nextNode的代价值
+ 					 if (gcost<n.gcost) {
++					    n.t1=t1;
++					    n.t2=t2;
+ 					    n.gcost=gcost;
+ 						n.hcost=hcost;
+ 						n.fcost=n.gcost+n.hcost;

@@ -1,0 +1,51 @@
+{
+  "schema": "czr005.dh_native_recovery_readonly_review.v1",
+  "status": "PASS",
+  "case_count": 7,
+  "cases": [
+    {
+      "case": "real_exact_source_and_parameters",
+      "pass": true
+    },
+    {
+      "case": "changed_speed",
+      "pass": true,
+      "rejection": "native experiment parameters changed"
+    },
+    {
+      "case": "changed_horizon",
+      "pass": true,
+      "rejection": "native experiment parameters changed"
+    },
+    {
+      "case": "changed_seed",
+      "pass": true,
+      "rejection": "native experiment parameters changed"
+    },
+    {
+      "case": "source_byte_hash_tamper",
+      "pass": true,
+      "rejection": "source native file drift: segments.csv"
+    },
+    {
+      "case": "missing_source_file_hash",
+      "pass": true,
+      "rejection": "incomplete source native manifest"
+    },
+    {
+      "case": "reuse_original_output",
+      "pass": true,
+      "rejection": "recovery requires a distinct sibling output"
+    }
+  ],
+  "native_simulations_invoked": 0,
+  "native_compiles_invoked": 0,
+  "recovery_output_created_by_review": false,
+  "recovery_source_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\scripts\\eval\\recover_feng_dh_paper_suite_v2.py",
+  "recovery_source_sha256": "69f849c5c02d283dfd89dd774ab322e9a7bc6cffb0f5c0b4d8d0549329958ec8",
+  "normalizer_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\scripts\\eval\\run_feng_dh_paper_suite_v2.py",
+  "normalizer_sha256": "9c93676560b72984c630bd74c23a6e6f6e6114907a79977d06c1853d23f5d290",
+  "original_native_status_sha256": "8e304d0d6e71b3efd1cf527d16bbc304f8a8956b9e8d23db371bf5a638484d8d",
+  "review_driver_sha256": "6bc6a0000cd743700356c81f2770251bcb8afda34dd7ff9df5e36f97667f1658",
+  "scope": "validate_source on the real 87205-segment native attempt plus in-memory parameter/hash rejection probes only; no recover() invocation or destination creation."
+}

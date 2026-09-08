@@ -211,3 +211,12 @@ if(CZR005_BUILD_PYBIND)
       ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cpp/tests/test_pybind_smoke.py)
   set_tests_properties(pybind_smoke PROPERTIES DEPENDS czr005_cpp)
 endif()
+
+add_executable(
+  test_g31_advertised_fault_reset
+  cpp/tests/test_g31_advertised_fault_reset.cpp)
+target_link_libraries(test_g31_advertised_fault_reset PRIVATE ics_core)
+if(MSVC)
+  target_compile_options(test_g31_advertised_fault_reset PRIVATE /bigobj)
+endif()
+add_test(NAME g31_advertised_fault_reset COMMAND test_g31_advertised_fault_reset)

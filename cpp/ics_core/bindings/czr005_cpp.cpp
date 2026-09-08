@@ -3385,6 +3385,17 @@ py::dict g4irsf11_event_runtime_summary_row(
   row["s4_score_component_mask"] =
       summary.s4_score_component_mask;
   row["queue_time_scaling"] = summary.queue_time_scaling;
+  if (summary.s4_advertised_fault_potential_repair_enabled) {
+    row["s4_advertised_fault_potential_repair_enabled"] = true;
+    row["s4_fault_potential_rebuild_count"] = summary.s4_fault_potential_rebuild_count;
+    row["s4_fault_potential_active_advertised_edge_count"] = summary.s4_fault_potential_active_advertised_edge_count;
+    row["s4_fault_potential_restore_original_count"] = summary.s4_fault_potential_restore_original_count;
+    row["s4_fault_potential_relaxation_count"] = summary.s4_fault_potential_relaxation_count;
+    row["s4_fault_potential_rebuild_wall_seconds"] = summary.s4_fault_potential_rebuild_wall_seconds;
+    row["s4_fault_unreachable_park_count"] = summary.s4_fault_unreachable_park_count;
+    row["s4_fault_unreachable_wakeup_count"] = summary.s4_fault_unreachable_wakeup_count;
+    row["s4_fault_unreachable_active_parked_count"] = summary.s4_fault_unreachable_active_parked_count;
+  }
   if (summary.s4_local_potential_descent_guard_enabled) {
     row["s4_local_potential_descent_guard_enabled"] = true;
     row["s4_local_potential_descent_guard_learning_active"] =
@@ -6278,7 +6289,8 @@ py::dict g4irsf11_event_runtime_from_records(
     bool complete_on_goal_arrival,
     const py::object& s4_score_component_mask_value,
     const std::string& queue_time_scaling,
-    bool enable_cie_component_activation) {
+    bool enable_cie_component_activation,
+    bool enable_s4_advertised_fault_potential_repair) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6316,6 +6328,10 @@ py::dict g4irsf11_event_runtime_from_records(
   if (enable_cie_component_activation && !s4_scorer) {
     throw py::value_error(
         "CIE component activation telemetry requires the S4 scorer");
+  }
+  if (enable_s4_advertised_fault_potential_repair && !s4_scorer) {
+    throw py::value_error(
+        "advertised fault potential repair requires the S4 scorer");
   }
   const bool requested_destination_merge_grants =
       event_semantics == "E4" ||
@@ -6555,6 +6571,8 @@ py::dict g4irsf11_event_runtime_from_records(
   config.queue_time_scaling = queue_time_scaling;
   config.enable_cie_component_activation =
       enable_cie_component_activation;
+  config.enable_s4_advertised_fault_potential_repair =
+      enable_s4_advertised_fault_potential_repair;
   // Append-only Table 5.4 reconstruction seam; zero remains exact-off.
   config.legacy_observation_bias_max_seconds =
       legacy_observation_bias_max_seconds;
@@ -7329,7 +7347,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
               py::arg("s4_score_component_mask") = 15,
               py::arg("queue_time_scaling") =
                   std::string("raw_count_as_seconds"),
-              py::arg("enable_cie_component_activation") = false);
+              py::arg("enable_cie_component_activation") = false,
+              py::arg("enable_s4_advertised_fault_potential_repair") = false);
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

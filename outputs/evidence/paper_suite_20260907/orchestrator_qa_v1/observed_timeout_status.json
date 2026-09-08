@@ -1,0 +1,38 @@
+{
+  "cell_id": "qa_1",
+  "method": "HCA_TIME_LABEL_REPAIR_V3",
+  "status": "TIMEOUT_TERMINATION_FAILED",
+  "spec_sha256": "2c47f0147f6be740539ba58dce190f2672630d36abbf56ef423d938b1478b1f3",
+  "runner_sha256": "808e8605020dbb5459801643048f2b741849eb0f8c2c420253b27d8bc666873e",
+  "output_dir": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\paper_suite_orchestrator_qa\\1c89764eee19\\campaign\\cells\\qa_timeout",
+  "started_at_unix": 1788768824.9176064,
+  "command": [
+    "C:\\PROGRAMING\\python3.11.9\\python.exe",
+    "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\scripts\\eval\\run_hca_paper_suite.py",
+    "run",
+    "--spec",
+    "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\paper_suite_orchestrator_qa\\1c89764eee19\\spec_1.json",
+    "--output",
+    "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\build\\paper_suite_orchestrator_qa\\1c89764eee19\\campaign\\cells\\qa_timeout"
+  ],
+  "pid": 956,
+  "termination": {
+    "command": [
+      "taskkill",
+      "/PID",
+      "956",
+      "/T",
+      "/F"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 拒绝访问\n\n",
+    "tree_termination_confirmed": false,
+    "parent_poll": null
+  },
+  "error_type": "RuntimeError",
+  "error": "process-tree termination was not confirmed; child may remain active; retain campaign lock for inspection",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\scripts\\eval\\run_feng_paper_suite.py\", line 315, in execute_cell\n    raise RuntimeError(\"process-tree termination was not confirmed; child may remain active; retain campaign lock for inspection\")\nRuntimeError: process-tree termination was not confirmed; child may remain active; retain campaign lock for inspection\n",
+  "finished_at_unix": 1788768825.5241873,
+  "wall_seconds": 0.6065809726715088
+}

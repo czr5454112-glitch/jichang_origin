@@ -170,3 +170,32 @@ outputs/figures/hca_segment_identity_20260906/** -text -whitespace
 outputs/runtime/feng_cie_dh_zero_through_repair_v1/**/*.tsv -text -whitespace
 outputs/runtime/feng_cie_dh_zero_through_repair_20260905/**/*.tsv -text -whitespace
 outputs/runtime/feng_cie_dh_zero_through_repair_20260905/**/*.gz -text
+# Preserve exact copied-source and evidence bytes for the isolated two-cell HCA probe.
+benchmarks/java/hca_time_label_repair_v2/** -text
+tests/java/hca_time_label_repair_v2/** -text
+scripts/eval/*hca_time_label_repair_v2.py text eol=lf
+docs/baselines/hca_time_label_repair_v2_*.md text eol=lf
+outputs/runtime/hca_time_label_repair_v2_20260906/** -text -whitespace
+outputs/evidence/hca_time_label_repair_v2_20260906/** -text -whitespace
+outputs/reports/hca_time_label_repair_v2_*.md text eol=lf
+outputs/reports/hca_time_label_repair_v2_*.json -text -whitespace
+
+# Exact source and evidence identities for the separate 2026-09-07 paper suite.
+benchmarks/java/hca_paper_suite_v3/** -text
+benchmarks/java/feng_cie_dh_paper_suite_v6/** -text
+tests/java/hca_paper_suite_v3/** -text
+outputs/runtime/*paper_suite*/** -text -whitespace
+outputs/evidence/*paper_suite*/** -text -whitespace
+configs/eval/feng_paper_suite_*.json -text
+tests/test_g31_fault_potential_repair.py text eol=lf
+outputs/runtime/g31_fault_potential_repair_20260907/** -text -whitespace
+outputs/evidence/g31_fault_potential_repair_20260907/** -text -whitespace
+# Preserve the independently versioned suite utilities and source contract.
+cpp/tests/test_g31_advertised_fault_reset.cpp text eol=lf
+scripts/eval/*paper_suite*.py -text
+scripts/eval/*g31_fault*repair*.py -text
+docs/baselines/feng_paper_suite_source_contract_20260907.json -text
+# Published report/index bytes are bound by the complete suite release manifest.
+outputs/reports/feng_paper_suite_20260907/** -text -whitespace
+scripts/eval/*feng_suite_release_20260908.py -text
+tests/test_verify_feng_suite_release_20260908.py -text

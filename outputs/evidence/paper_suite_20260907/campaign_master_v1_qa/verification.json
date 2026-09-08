@@ -1,0 +1,42 @@
+{
+  "schema": "czr005.paper_suite_campaign_master_qa.v1",
+  "status": "PASS",
+  "real_readiness_check_status": "PRECHECK_PASS_NOT_EXECUTED",
+  "synthetic_control_flow_cases": 9,
+  "native_simulations_invoked": 0,
+  "plan_sha256": "ad400a4363958087625903833fa4730e10c3787864e74180b3f5fa4cfcde4e71",
+  "normal_full_2x_ready_at_check": false,
+  "existing_pool_ready_at_check": true,
+  "files": [
+    {
+      "source_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\tmp\\feng_paper_suite_campaign_check.json",
+      "path": "real_readiness_check.json",
+      "sha256": "d673786c8c87852aaeeba5b58df71861f705379b4f4f6baa3ea3d526a007f7c3"
+    },
+    {
+      "source_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\tmp\\test_feng_paper_suite_campaign.py",
+      "path": "test_campaign_control_flow.py",
+      "sha256": "34b032faad3494b313612293df6936dbe6e2fe0f4b76f998c13f85ed4e65042b"
+    },
+    {
+      "source_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\tmp\\feng_paper_suite_campaign_qa_stdout.txt",
+      "path": "test_stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\tmp\\feng_paper_suite_campaign_qa_stderr.txt",
+      "path": "test_stderr.txt",
+      "sha256": "be302ae79c5035fcabe6a1299a0046f29d855ada9b687233c4973ba3beca89bb"
+    },
+    {
+      "source_path": "C:\\PROGRAMING\\czr005\\.feng_cie_dh_worktree\\scripts\\eval\\run_feng_paper_suite_campaign.py",
+      "path": "run_feng_paper_suite_campaign.py",
+      "sha256": "50e390e83dc950e15fc05fbfddb1574655e7e8f4d431424865d12d079dd2c4b5"
+    }
+  ],
+  "commands": [
+    "python scripts/eval/run_feng_paper_suite_campaign.py --check-only",
+    "python tmp/test_feng_paper_suite_campaign.py -v"
+  ],
+  "scope": "Real frozen-plan/prerequisite read-only check plus mocked dispatch/partial-report/lock/timeout failure tests. No campaign pool or native simulation was launched."
+}

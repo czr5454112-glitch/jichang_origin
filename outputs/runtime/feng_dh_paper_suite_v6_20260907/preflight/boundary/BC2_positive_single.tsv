@@ -1,0 +1,27 @@
+task_id	tick	event	node	edge	position	detail
+2	0	RELEASE	0	-1	-1	release_seconds=0.0
+2	0	NODE_SERVICE_START	0	-1	-1	arrival_tick=0;ready_tick=10;SOURCE_FIXED_TRANSFER;reconstructed_transfer_seconds=2.0;basis=HISTORICAL_OD_LOWER_ENVELOPE
+2	9	SELECT	0	0	-1	free_flow_seconds=1.6;moving=0;stopped=0;eta_seconds=1.6;equal_score_candidates=1;nodes=0>1>2
+2	10	NODE_SERVICE_FINISH	0	-1	-1	
+2	10	ENTER_EDGE	0	0	0	free_flow_seconds=1.6;moving=0;stopped=0;eta_seconds=1.6;equal_score_candidates=1;nodes=0>1>2
+2	11	MOVE	0	0	1	
+2	12	MOVE	0	0	2	
+2	13	MOVE	0	0	3	
+2	14	NODE_SERVICE_START	1	0	3	arrival_tick=13;ready_tick=19;MAP_JUNCTION_THROUGH_EXCLUSIVE;map_through_seconds=1.0;basis=LEGACY_NODE_CONSTRAINT;upstream_edge=0
+2	14	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=15
+2	15	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=16
+2	16	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=17
+2	17	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=18
+2	18	HOLD	1	-1	3	reason=MAP_JUNCTION_THROUGH_SERVICE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=19
+2	19	NODE_SERVICE_FINISH	1	0	3	
+2	19	NODE_SERVICE_START	1	0	3	arrival_tick=13;ready_tick=29;clearance_ready_tick=21;INTERMEDIATE_FIXED_TRANSFER_DELAY;reconstructed_transfer_seconds=2.0;basis=HISTORICAL_OD_LOWER_ENVELOPE;upstream_edge=0
+2	19	HOLD	1	-1	3	reason=BOUNDARY_BODY_CLEARANCE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=20
+2	20	HOLD	1	-1	3	reason=BOUNDARY_BODY_CLEARANCE;entry_occupant=-1;entry_occupant_state=NONE;retry_tick=21
+2	21	BOUNDARY_CLEARANCE_FINISH	1	-1	-1	transfer_ready_tick_unchanged=29
+2	28	SELECT	1	1	-1	free_flow_seconds=0.8;moving=0;stopped=0;eta_seconds=0.8;equal_score_candidates=1;nodes=1>2
+2	29	NODE_SERVICE_FINISH	1	-1	-1	
+2	29	ENTER_EDGE	1	1	0	free_flow_seconds=0.8;moving=0;stopped=0;eta_seconds=0.8;equal_score_candidates=1;nodes=1>2
+2	30	MOVE	1	1	1	
+2	31	MOVE	1	1	2	
+2	32	MOVE	1	1	3	
+2	33	COMPLETE	2	-1	-1	
