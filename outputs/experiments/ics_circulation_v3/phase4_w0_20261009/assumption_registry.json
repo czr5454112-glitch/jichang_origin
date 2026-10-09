@@ -1,0 +1,65 @@
+{
+  "scope": "W0 documentation of known/proxy/unconfirmed semantics; no physical-kernel change",
+  "rows": [
+    {
+      "field": "edge length/speed",
+      "known": "Bundled map retains source length/speed fields without edits",
+      "proxy": "Nanning travel ticks = ceil((length/speed)/1 second)",
+      "unconfirmed": "Field units and measured physical transit calibration require supplier confirmation"
+    },
+    {
+      "field": "empty_distance objective component",
+      "known": "runtime accumulates edge.travel_time per empty departure; legacy field name retained",
+      "proxy": "Unit is empty-travel ticks, weighted 0.1 cost per tick",
+      "unconfirmed": "It is not metres; speed/length sensitivity must not mix time and physical distance"
+    },
+    {
+      "field": "edge capacity",
+      "known": "Recorded nonnegative integers are preserved",
+      "proxy": "Positive values act as calendar simultaneous occupancy; zero closes the edge",
+      "unconfirmed": "Real supplier occupancy versus headway/spacing semantics"
+    },
+    {
+      "field": "zero capacity reachability",
+      "known": "Declared 97->98 closure reduces reachable loader/unloader ODs from 462 to 396",
+      "proxy": "Routing benchmark selects only reachable OD subset and stores lost pairs",
+      "unconfirmed": "The 66 lost ODs remain missing from full-business acceptance; closure is not confirmed production semantics"
+    },
+    {
+      "field": "node storage and waiting",
+      "known": "No confirmed node storage/wait authority supplied",
+      "proxy": "Nanning default node capacity4 and all can_wait true; seven-node family node capacity8 exceeds its 3-5 trays",
+      "unconfirmed": "Real buffers, no-wait segments and backpressure limits"
+    },
+    {
+      "field": "unload and hold",
+      "known": "FixedLocalModule controls explicit unload/hold ticks",
+      "proxy": "Nanning OD benchmark unload0/hold0 excludes local service; synthetic cycle defaults unload1",
+      "unconfirmed": "Real unload/service distributions and module interface"
+    },
+    {
+      "field": "source export protection",
+      "known": "Validator enforces export_min_stock; predictor additionally protects known/forecast demand prefixes",
+      "proxy": "Fixed synthetic local permission model",
+      "unconfirmed": "Supplier authority, local dispatch constraints and cancellation rights"
+    },
+    {
+      "field": "reception capacity",
+      "known": "Validator checks scheduled reception resource capacity",
+      "proxy": "FixedLocalModule default one reception slot",
+      "unconfirmed": "Real reception/service lanes and permissions"
+    },
+    {
+      "field": "forecast identities and revisions",
+      "known": "Identified observed units consumed; latest published revision wins; count0 cancels; unobserved overdue retained until TTL",
+      "proxy": "Publication TTL60 ticks; anonymous aggregates expire at nominal arrival",
+      "unconfirmed": "Operational identity mapping, forecast cancellation/latency contracts"
+    },
+    {
+      "field": "evidence source usage",
+      "known": "Explicit original protocol/manifest reproduction adds zero independent source count; fresh evaluation rejects registered prior IDs",
+      "proxy": "Default development permits repeat sources but never claims fresh evidence",
+      "unconfirmed": "Unregistered prior use, renamed identical data, real-world independence and topology-family generalization"
+    }
+  ]
+}

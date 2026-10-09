@@ -176,6 +176,6 @@ def test_deployment_keeps_uncompleted_bags_in_denominator_and_identical_policy_i
 
 def test_run_does_not_overwrite_prior_evidence(tmp_path):
     (tmp_path / "sentinel.json").write_text("{}", encoding="utf-8")
-    with pytest.raises(ValueError, match="not overwritten"):
+    with pytest.raises(ValueError, match="cannot be overwritten"):
         runner.run(tmp_path)
     assert (tmp_path / "sentinel.json").read_text() == "{}"

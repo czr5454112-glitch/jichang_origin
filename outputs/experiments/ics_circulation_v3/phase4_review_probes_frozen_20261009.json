@@ -1,0 +1,2298 @@
+{
+  "schema": "ics_v3_source_review_probes_v1",
+  "prepared_for_commit": "030493a399cdcac3fc005fe2f2cd8ec30fc96277",
+  "execution_utc": "2026-10-09T07:03:27.119807+00:00",
+  "python": "3.11.9",
+  "repository_root": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3",
+  "source_matches_frozen_manifest": true,
+  "source_hashes": {
+    "model.py": {
+      "sha256": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+      "expected_sha256": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+      "matches": true
+    },
+    "runtime.py": {
+      "sha256": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+      "expected_sha256": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+      "matches": true
+    },
+    "routing.py": {
+      "sha256": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+      "expected_sha256": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+      "matches": true
+    },
+    "evaluation.py": {
+      "sha256": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+      "expected_sha256": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+      "matches": true
+    },
+    "learning.py": {
+      "sha256": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+      "expected_sha256": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+      "matches": true
+    },
+    "prebalance.py": {
+      "sha256": "bfba7869bd18d78fa9bd1e9c694d73b4072ec0b3bccdaa6d0c0a2f9b12e37cda",
+      "expected_sha256": "bfba7869bd18d78fa9bd1e9c694d73b4072ec0b3bccdaa6d0c0a2f9b12e37cda",
+      "matches": true
+    },
+    "request_service.py": {
+      "sha256": "f74e81ac19131d199e38de541008c527f189b44594d16cb1346d44c9fa26f0df",
+      "expected_sha256": "f74e81ac19131d199e38de541008c527f189b44594d16cb1346d44c9fa26f0df",
+      "matches": true
+    },
+    "phase2_scenarios.py": {
+      "sha256": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+      "expected_sha256": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+      "matches": true
+    }
+  },
+  "scope": "Targeted diagnostics using the submitted kernel; not an independent simulator, not field evidence, not a replication of the full original experiment",
+  "authoring_status": "Only syntax checked in the report-authoring environment; this invocation supplies actual execution observations",
+  "probes": {
+    "internal_bypass_missing": {
+      "execution": "completed",
+      "kind": "bounded_candidate_coverage_gap_not_a_safety_violation",
+      "setup": "S-U-G statically length 2 but S-U booked on [0,5); S-V-G length 4 is free; horizon 4; all nodes in one control region",
+      "regional_status": "bounded_no_candidate",
+      "regional_candidates": [],
+      "flat_status": "complete",
+      "flat_candidates": [
+        {
+          "candidate_id": "v5:target:target:0",
+          "bag_id": "target",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-V",
+              "depart": 0,
+              "arrive": 2
+            },
+            {
+              "edge_id": "V-G",
+              "depart": 2,
+              "arrive": 4
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 5,
+          "dependency_version": 5,
+          "baseline_id": "v5:target:target:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ],
+      "flat_candidates_pass_same_validator": [
+        true
+      ],
+      "diagnostic_exposed": true,
+      "repair_goal": "Discover an authorized local bypass within the declared budget; do not relabel bounded_no_candidate as physical infeasibility"
+    },
+    "prefix_release_omission": {
+      "execution": "completed",
+      "kind": "firm_supply_vs_conditional_prediction_interface_gap",
+      "original_full_candidate": {
+        "candidate_id": "candidate",
+        "bag_id": "target",
+        "tray_id": "target",
+        "legs": [
+          {
+            "edge_id": "S-M",
+            "depart": 0,
+            "arrive": 1
+          },
+          {
+            "edge_id": "M-G",
+            "depart": 1,
+            "arrive": 2
+          }
+        ],
+        "unload_complete": 3,
+        "usable_at": 3,
+        "dependency_version": 0,
+        "baseline_id": "candidate",
+        "is_baseline": true,
+        "destination_node": "G",
+        "prefix_only": false,
+        "continuation_destination": null
+      },
+      "committed_safe_prefix": {
+        "candidate_id": "candidate",
+        "bag_id": "target",
+        "tray_id": "target",
+        "legs": [
+          {
+            "edge_id": "S-M",
+            "depart": 0,
+            "arrive": 1
+          }
+        ],
+        "unload_complete": 1,
+        "usable_at": 1,
+        "dependency_version": 0,
+        "baseline_id": "candidate",
+        "is_baseline": true,
+        "destination_node": "M",
+        "prefix_only": true,
+        "continuation_destination": "G"
+      },
+      "whole_route_known_supply": [
+        {
+          "tray_id": "target",
+          "node": "G",
+          "at": 3,
+          "source": "committed_release"
+        }
+      ],
+      "next_edge_known_supply": [],
+      "snapshot_fields": [
+        "now",
+        "network",
+        "trays",
+        "bags",
+        "reservations",
+        "version",
+        "old_in_transit",
+        "module",
+        "plans",
+        "completed",
+        "load_times",
+        "empty_targets"
+      ],
+      "diagnostic_exposed": true,
+      "interpretation": "Never count a tentative release as firm stock. Add a separately versioned conditional release forecast; a safe stop is not an empty tray release.",
+      "repair_goal": "Keep correct firm-supply accounting AND make tentative remaining-route releases available to prediction with explicit dependencies"
+    },
+    "unexecuted_suffix_not_updatable": {
+      "execution": "completed",
+      "kind": "old_route_fallback_is_not_general_suffix_replanning",
+      "all_old_departures_in_future": true,
+      "old_route": {
+        "candidate_id": "old",
+        "bag_id": "target",
+        "tray_id": "target",
+        "legs": [
+          {
+            "edge_id": "S-V",
+            "depart": 5,
+            "arrive": 8
+          },
+          {
+            "edge_id": "V-G",
+            "depart": 8,
+            "arrive": 11
+          }
+        ],
+        "unload_complete": 12,
+        "usable_at": 12,
+        "dependency_version": 0,
+        "baseline_id": "old",
+        "is_baseline": true,
+        "destination_node": "G",
+        "prefix_only": false,
+        "continuation_destination": null
+      },
+      "result": {
+        "request_id": "new-update-request",
+        "status": "still_valid_old_route",
+        "reason": "committed_full_route_still_valid",
+        "attempts": 1,
+        "candidate_id": "old",
+        "owner_committed": false,
+        "acknowledged": true,
+        "receipt_replayed": false,
+        "attempts_trace": [
+          {
+            "attempt": 1,
+            "events": [
+              "committed_full_old_route_revalidated"
+            ],
+            "fault": {
+              "queue_ms": 0.0,
+              "snapshot_message_ms": 0.0,
+              "commit_message_ms": 0.0,
+              "acknowledgement_ms": 0.0,
+              "fail_snapshot": false,
+              "fail_commit_message": false,
+              "lose_acknowledgement": false,
+              "invalid_summary": false,
+              "stale_summary_before_delivery": false,
+              "invalidate_before_commit": false
+            },
+            "received_summary": {
+              "version": 1,
+              "observed_tick": 0,
+              "topology_sha256": "ab2438cac0e4bfb40a7066fff4e3ad27664053d65468856862911f3d8ed8ef71",
+              "resources_sha256": "13ce6c461cd56bda73a47f39d54fd64bf9f4d1a48ce2219650a6be95a81fc6ab",
+              "control_partitions": [
+                "r:G",
+                "r:S",
+                "r:U",
+                "r:V"
+              ]
+            }
+          }
+        ],
+        "timings": {
+          "snapshot_compute_ms": 0.5157000050530769,
+          "generation_ms": 0.0,
+          "feature_ms": 0.0,
+          "score_ms": 0.0,
+          "revalidation_ms": 0.1584999990882352,
+          "commit_compute_ms": 0.0,
+          "proof_ms": 0.0,
+          "simulated_queue_ms": 0.0,
+          "simulated_communication_ms": 0.0,
+          "local_wall_ms": 1.2800000040442683,
+          "local_other_ms": 0.6057999999029562,
+          "accounted_end_to_end_ms": 1.2800000040442683,
+          "actual_network_ms": null
+        },
+        "proof": null
+      },
+      "generator_factory_calls": 0,
+      "owner_state_unchanged": true,
+      "diagnostic_exposed": true,
+      "interpretation": "This exposes the current fallback contract, not an idempotency defect. A future explicit update request must distinguish keep-valid from recompute intent and authorized suffix replacement.",
+      "repair_goal": "Add request intent and atomic replacement of legally revocable future suffixes; preserve entered segments and service commitments"
+    },
+    "family_constraint_activity": {
+      "execution": "completed",
+      "kind": "structural_activity_audit_no_new_generalization_evidence",
+      "source_count": 180,
+      "tray_count_range": [
+        3,
+        5
+      ],
+      "bag_count_range": [
+        2,
+        5
+      ],
+      "diagnostic_exposed": true,
+      "all_nodes_waitable": true,
+      "protected_bags_total": 0,
+      "qualification": "Edge capacity and reception capacity CAN bind; this does not establish absence of all congestion.",
+      "rows": [
+        {
+          "source_group": "v3_phase2:train:000",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:001",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:002",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:003",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:004",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:005",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:006",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:007",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:008",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:009",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:010",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:011",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:012",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:013",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:014",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:015",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:016",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:017",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:018",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:019",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:020",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:021",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:022",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:023",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:024",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:025",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:026",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:027",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:028",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:029",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:030",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:031",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:032",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:033",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:034",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:035",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:036",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:037",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:038",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:039",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:040",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:041",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:042",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:043",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:044",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:045",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:046",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:047",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:048",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:049",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:050",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:051",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:052",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:053",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:054",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:055",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:056",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:057",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:058",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:059",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:060",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:061",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:062",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:063",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:064",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:065",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:066",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:067",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:068",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:069",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:070",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:071",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:072",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:073",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:074",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:075",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:076",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:077",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:078",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:train:079",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:000",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:001",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:002",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:003",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:004",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:005",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:006",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:007",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:008",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:009",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:010",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:011",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:012",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:013",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:014",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:015",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:016",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:017",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:018",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:validation:019",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:000",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:001",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:002",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:003",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:004",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:005",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:006",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:007",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:008",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:009",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:010",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:011",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:012",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:013",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:014",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:015",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:016",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:017",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:018",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:019",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:020",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:021",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:022",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:023",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:024",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:025",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:026",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:027",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:028",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:029",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:030",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:031",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:032",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:033",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:034",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:035",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:036",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:037",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:038",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:test:039",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:000",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:001",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:002",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:003",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:004",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:005",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:006",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:007",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:008",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:009",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:010",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:011",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:012",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:013",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:014",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:015",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:016",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:017",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:018",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:019",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:020",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:021",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:022",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:023",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:024",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:025",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:026",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:027",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:028",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:029",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 2,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:030",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:031",
+          "nodes": 7,
+          "trays": 5,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:032",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:033",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:034",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:035",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 5,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:036",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:037",
+          "nodes": 7,
+          "trays": 3,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:038",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 3,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        },
+        {
+          "source_group": "v3_phase2:deployment:039",
+          "nodes": 7,
+          "trays": 4,
+          "min_node_capacity": 8,
+          "bag_count": 4,
+          "all_nodes_waitable": true,
+          "protected_bag_count": 0,
+          "node_capacity_cannot_bind_by_finite_tray_count": true
+        }
+      ]
+    },
+    "identical_prefix_distinct_full_candidates": {
+      "execution": "completed",
+      "kind": "candidate_identity_vs_executed_action_identity",
+      "source_group": "v3_phase2:train:000",
+      "decision_node": "A",
+      "full_candidate_count": 4,
+      "distinct_physical_prefixes": 1,
+      "diagnostic_exposed": true,
+      "candidates_and_prefixes": [
+        {
+          "candidate": {
+            "candidate_id": "regional:v0:bag:target:tray:target:0",
+            "bag_id": "bag:target",
+            "tray_id": "tray:target",
+            "legs": [
+              {
+                "edge_id": "stem",
+                "depart": 0,
+                "arrive": 2
+              },
+              {
+                "edge_id": "S-J",
+                "depart": 2,
+                "arrive": 5
+              },
+              {
+                "edge_id": "J-B",
+                "depart": 5,
+                "arrive": 10
+              }
+            ],
+            "unload_complete": 11,
+            "usable_at": 11,
+            "dependency_version": 0,
+            "baseline_id": "regional:v0:bag:target:tray:target:0",
+            "is_baseline": true,
+            "destination_node": "B",
+            "prefix_only": false,
+            "continuation_destination": null
+          },
+          "committed": {
+            "candidate_id": "regional:v0:bag:target:tray:target:0",
+            "bag_id": "bag:target",
+            "tray_id": "tray:target",
+            "legs": [
+              {
+                "edge_id": "stem",
+                "depart": 0,
+                "arrive": 2
+              }
+            ],
+            "unload_complete": 2,
+            "usable_at": 2,
+            "dependency_version": 0,
+            "baseline_id": "regional:v0:bag:target:tray:target:0",
+            "is_baseline": true,
+            "destination_node": "S",
+            "prefix_only": true,
+            "continuation_destination": "B"
+          }
+        },
+        {
+          "candidate": {
+            "candidate_id": "regional:v0:bag:target:tray:target:1",
+            "bag_id": "bag:target",
+            "tray_id": "tray:target",
+            "legs": [
+              {
+                "edge_id": "stem",
+                "depart": 0,
+                "arrive": 2
+              },
+              {
+                "edge_id": "S-K",
+                "depart": 2,
+                "arrive": 7
+              },
+              {
+                "edge_id": "K-B",
+                "depart": 7,
+                "arrive": 13
+              }
+            ],
+            "unload_complete": 14,
+            "usable_at": 14,
+            "dependency_version": 0,
+            "baseline_id": "regional:v0:bag:target:tray:target:0",
+            "is_baseline": false,
+            "destination_node": "B",
+            "prefix_only": false,
+            "continuation_destination": null
+          },
+          "committed": {
+            "candidate_id": "regional:v0:bag:target:tray:target:1",
+            "bag_id": "bag:target",
+            "tray_id": "tray:target",
+            "legs": [
+              {
+                "edge_id": "stem",
+                "depart": 0,
+                "arrive": 2
+              }
+            ],
+            "unload_complete": 2,
+            "usable_at": 2,
+            "dependency_version": 0,
+            "baseline_id": "regional:v0:bag:target:tray:target:0",
+            "is_baseline": false,
+            "destination_node": "S",
+            "prefix_only": true,
+            "continuation_destination": "B"
+          }
+        },
+        {
+          "candidate": {
+            "candidate_id": "regional:v0:bag:target:tray:target:2",
+            "bag_id": "bag:target",
+            "tray_id": "tray:target",
+            "legs": [
+              {
+                "edge_id": "stem",
+                "depart": 0,
+                "arrive": 2
+              },
+              {
+                "edge_id": "S-L",
+                "depart": 2,
+                "arrive": 9
+              },
+              {
+                "edge_id": "L-B",
+                "depart": 9,
+                "arrive": 14
+              }
+            ],
+            "unload_complete": 15,
+            "usable_at": 15,
+            "dependency_version": 0,
+            "baseline_id": "regional:v0:bag:target:tray:target:0",
+            "is_baseline": false,
+            "destination_node": "B",
+            "prefix_only": false,
+            "continuation_destination": null
+          },
+          "committed": {
+            "candidate_id": "regional:v0:bag:target:tray:target:2",
+            "bag_id": "bag:target",
+            "tray_id": "tray:target",
+            "legs": [
+              {
+                "edge_id": "stem",
+                "depart": 0,
+                "arrive": 2
+              }
+            ],
+            "unload_complete": 2,
+            "usable_at": 2,
+            "dependency_version": 0,
+            "baseline_id": "regional:v0:bag:target:tray:target:0",
+            "is_baseline": false,
+            "destination_node": "S",
+            "prefix_only": true,
+            "continuation_destination": "B"
+          }
+        },
+        {
+          "candidate": {
+            "candidate_id": "regional:v0:bag:target:tray:target:3",
+            "bag_id": "bag:target",
+            "tray_id": "tray:target",
+            "legs": [
+              {
+                "edge_id": "stem",
+                "depart": 0,
+                "arrive": 2
+              },
+              {
+                "edge_id": "S-B",
+                "depart": 2,
+                "arrive": 24
+              }
+            ],
+            "unload_complete": 25,
+            "usable_at": 25,
+            "dependency_version": 0,
+            "baseline_id": "regional:v0:bag:target:tray:target:0",
+            "is_baseline": false,
+            "destination_node": "B",
+            "prefix_only": false,
+            "continuation_destination": null
+          },
+          "committed": {
+            "candidate_id": "regional:v0:bag:target:tray:target:3",
+            "bag_id": "bag:target",
+            "tray_id": "tray:target",
+            "legs": [
+              {
+                "edge_id": "stem",
+                "depart": 0,
+                "arrive": 2
+              }
+            ],
+            "unload_complete": 2,
+            "usable_at": 2,
+            "dependency_version": 0,
+            "baseline_id": "regional:v0:bag:target:tray:target:0",
+            "is_baseline": false,
+            "destination_node": "S",
+            "prefix_only": true,
+            "continuation_destination": "B"
+          }
+        }
+      ],
+      "qualification": "Phase-3 labels were collected at S (tick 2), not this A state. This probe concerns deployment action identity and future data collection, not proof that those S labels are duplicates.",
+      "repair_goal": "Group actual interventions, including any newly retained tentative-plan state; do not mistake different discarded suffixes for different executed actions"
+    }
+  },
+  "execution_error_count": 0
+}

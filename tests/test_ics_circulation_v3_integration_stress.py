@@ -206,11 +206,14 @@ def test_midcourse_forecast_revision_and_checkpoint_preserve_policy_state():
     assert resumed.slow_controller.last_diagnostics["snapshot_time"] == 31
 
 
-def test_zero_capacity_is_rejected_not_silently_upgraded_by_regional_routing():
+def test_zero_capacity_closes_edge_without_silently_upgrading_it():
     state = _junction_state()
     state.network.edges["J-B"] = replace(state.network.edges["J-B"], capacity=0)
-    with pytest.raises(ValueError, match="capacity"):
-        _regional().generate(state, "protected:loaded", "loaded", k=1)
+    # Phase4 supports a declared future-entry closure while retaining the
+    # physical graph. With this sole bottleneck closed, no planner may route.
+    for dynamic in (False, True):
+        generator = RegionalCandidateGenerator(horizon=10, deadline_ms=None, dynamic_local=dynamic)
+        assert not generator.generate(state, "protected:loaded", "loaded", k=1)
     assert state.network.edges["J-B"].capacity == 0
     assert not CandidateGenerator(horizon=10).generate(state, "protected:loaded", "loaded", k=1)
 

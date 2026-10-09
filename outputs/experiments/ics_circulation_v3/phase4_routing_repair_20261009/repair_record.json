@@ -1,0 +1,563 @@
+{
+  "prior_output": "outputs\\experiments\\ics_circulation_v3\\phase4_routing_20261009",
+  "prior_summary_sha256": "a41ec501a46c2a4429722f5be79b7f88ddce7ddb4e860415e688ba352d9c533f",
+  "prior_source_sha256": {
+    "routing.py": "e653fdd8b943eb21d65cfcd0ac5f75fe66f09b6ed331c6ecb347a5b73b48f017",
+    "routing_reference.py": "3d0b329d5afa422a402d487d4838f54a9981ce9a3eccf87a426e06de358485ee",
+    "run_phase4_routing.py": "f25f08df58535d704acc724799b829fc34ea0b773a2cf5bfd37c851c21cd405a",
+    "model.py": "3568699cb1e8863ec0ea2c9a16b28349843941f8ef6af7be3de1d61d90c61785",
+    "runtime.py": "c46720e6f88fe09e6894bff28bab24a67d8f5d21705b75a8d7160ad9618001b6"
+  },
+  "historical_files_modified": false,
+  "reproduced_before_fix": [
+    "terminal-invalid arrivals consumed local cap before execution validation",
+    "several time windows on one physical path displaced another path at fixed cap"
+  ],
+  "mechanism_change": "Only terminal-valid labels enter the bounded probe pool; fixed-size output prioritizes distinct physical edge paths, then departure/arrival windows.",
+  "not_claimed": "No complete candidate-domain or general optimality proof; same-state caps and bounded probing can still omit routes/windows.",
+  "prior_reception_rows": [
+    {
+      "case": "destination_reception_window",
+      "repeat": 0,
+      "planner": "old_single_witness",
+      "order_index": 0,
+      "cache": "cold",
+      "candidate_count": 1,
+      "status": "partial_candidate_set",
+      "all_returned_valid": true,
+      "commit_accepted": true,
+      "oracle_feasible": true,
+      "oracle_feasibility_certified": true,
+      "oracle_complete_enumeration": true,
+      "oracle_earliest_arrival": 5,
+      "best_candidate_arrival": 5,
+      "earliest_arrival_gap": 0,
+      "candidate_set_diagnostic_cost_gap": 2,
+      "physical_path_coverage": 0.5,
+      "generation_ms": 0.21980000019539148,
+      "validation_ms": 0.0625000029685907,
+      "commit_ms": 0.09819999831961468,
+      "local_total_ms": 0.38050000148359686,
+      "expansions": 21,
+      "diagnostics": {
+        "validation_ms": 0.07240000559249893,
+        "static_paths_examined": 1,
+        "completeness": "bounded_static_witness_and_event_aligned_refinement",
+        "missing_candidate_is_not_infeasibility": true,
+        "dynamic_local": false,
+        "preprocessing_budget_included": true,
+        "work_units_by_stage": {
+          "topology_edges": 4,
+          "reverse_lower_bound": 4,
+          "static_local_witness": 5,
+          "macro_arcs": 1
+        },
+        "cold_topology": true,
+        "abstraction_ms": 0.04150000313529745,
+        "static_lower_bound": 2,
+        "portal_count": 0,
+        "partition_count": 1,
+        "macro_arc_count": 1,
+        "search_and_refinement_ms": 0.14500000543193892,
+        "query_ms": 0.21569999807979912,
+        "expansions": 21,
+        "candidate_count": 1
+      },
+      "candidates": [
+        {
+          "candidate_id": "regional:v0:bag:target:0",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-U",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "U-G",
+              "depart": 4,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "regional:v0:bag:target:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    },
+    {
+      "case": "destination_reception_window",
+      "repeat": 0,
+      "planner": "dynamic_local",
+      "order_index": 1,
+      "cache": "cold",
+      "candidate_count": 1,
+      "status": "partial_candidate_set",
+      "all_returned_valid": true,
+      "commit_accepted": true,
+      "oracle_feasible": true,
+      "oracle_feasibility_certified": true,
+      "oracle_complete_enumeration": true,
+      "oracle_earliest_arrival": 5,
+      "best_candidate_arrival": 5,
+      "earliest_arrival_gap": 0,
+      "candidate_set_diagnostic_cost_gap": 2,
+      "physical_path_coverage": 0.5,
+      "generation_ms": 0.4058999984408729,
+      "validation_ms": 0.06059999577701092,
+      "commit_ms": 0.09899999713525176,
+      "local_total_ms": 0.5654999913531356,
+      "expansions": 25,
+      "diagnostics": {
+        "validation_ms": 0.18209999689133838,
+        "static_paths_examined": 0,
+        "completeness": "bounded_dynamic_local_time_labels",
+        "missing_candidate_is_not_infeasibility": true,
+        "dynamic_local": true,
+        "preprocessing_budget_included": true,
+        "work_units_by_stage": {
+          "topology_edges": 4,
+          "reverse_lower_bound": 4,
+          "regional_macro_time_labels": 4,
+          "dynamic_local_time_labels": 9,
+          "event_projection": 4
+        },
+        "cold_topology": true,
+        "portal_count": 0,
+        "partition_count": 1,
+        "local_label_limit": 3,
+        "local_search_calls": 4,
+        "local_labels_returned": 3,
+        "remote_calendar_access": true,
+        "static_lower_bound": 2,
+        "local_label_truncation_possible": true,
+        "query_ms": 0.3995000006398186,
+        "expansions": 25,
+        "candidate_count": 1,
+        "search_queue_exhausted": true
+      },
+      "candidates": [
+        {
+          "candidate_id": "dynamic_regional:v0:bag:target:0",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-U",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "U-G",
+              "depart": 4,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "dynamic_regional:v0:bag:target:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    },
+    {
+      "case": "destination_reception_window",
+      "repeat": 0,
+      "planner": "strong_full_graph_event",
+      "order_index": 2,
+      "cache": "cold",
+      "candidate_count": 2,
+      "status": "partial_candidate_set",
+      "all_returned_valid": true,
+      "commit_accepted": true,
+      "oracle_feasible": true,
+      "oracle_feasibility_certified": true,
+      "oracle_complete_enumeration": true,
+      "oracle_earliest_arrival": 5,
+      "best_candidate_arrival": 5,
+      "earliest_arrival_gap": 0,
+      "candidate_set_diagnostic_cost_gap": 0,
+      "physical_path_coverage": 1.0,
+      "generation_ms": 0.40070000250125304,
+      "validation_ms": 0.1109000004362315,
+      "commit_ms": 0.09649999992689118,
+      "local_total_ms": 0.6081000028643757,
+      "expansions": 19,
+      "diagnostics": {
+        "validation_ms": 0.23609998606843874,
+        "work_units_by_stage": {
+          "topology_edges": 4,
+          "reverse_lower_bound": 4,
+          "full_graph_time_labels": 7,
+          "event_projection": 4
+        },
+        "preprocessing_budget_included": true,
+        "completeness": "bounded_event_time_full_graph",
+        "earliest_arrival_certified": false,
+        "finite_horizon_exhausted": false,
+        "missing_candidate_is_not_infeasibility": true,
+        "cold_topology": true,
+        "static_lower_bound": 2,
+        "query_ms": 0.3958000015700236,
+        "expansions": 19,
+        "candidate_count": 2,
+        "search_queue_exhausted": true
+      },
+      "candidates": [
+        {
+          "candidate_id": "full_graph:v0:bag:target:0",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-U",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "U-G",
+              "depart": 4,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:bag:target:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "full_graph:v0:bag:target:1",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-V",
+              "depart": 0,
+              "arrive": 2
+            },
+            {
+              "edge_id": "V-G",
+              "depart": 3,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:bag:target:0",
+          "is_baseline": false,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    }
+  ],
+  "repaired_reception_rows": [
+    {
+      "case": "destination_reception_window",
+      "repeat": 0,
+      "planner": "old_single_witness",
+      "order_index": 0,
+      "cache": "cold",
+      "candidate_count": 1,
+      "status": "partial_candidate_set",
+      "all_returned_valid": true,
+      "route_mode": "whole_route",
+      "next_edge_authorized_candidates": 1,
+      "next_edge_validation_ms_outside_local_total": 0.10910000128205866,
+      "commit_accepted": true,
+      "oracle_feasible": true,
+      "oracle_feasibility_certified": true,
+      "oracle_complete_enumeration": true,
+      "oracle_earliest_arrival": 5,
+      "best_candidate_arrival": 5,
+      "earliest_arrival_gap": 0,
+      "candidate_set_diagnostic_cost_gap": 2,
+      "physical_path_coverage": 0.5,
+      "generation_ms": 0.22900000476511195,
+      "validation_ms": 0.06280000525293872,
+      "commit_ms": 0.10650000331224874,
+      "local_total_ms": 0.3983000133302994,
+      "expansions": 21,
+      "diagnostics": {
+        "validation_ms": 0.07439999899361283,
+        "static_paths_examined": 1,
+        "route_mode": "whole_route",
+        "completeness": "bounded_static_witness_and_event_aligned_refinement",
+        "missing_candidate_is_not_infeasibility": true,
+        "dynamic_local": false,
+        "preprocessing_budget_included": true,
+        "work_units_by_stage": {
+          "topology_edges": 4,
+          "reverse_lower_bound": 4,
+          "static_local_witness": 5,
+          "macro_arcs": 1
+        },
+        "cold_topology": true,
+        "abstraction_ms": 0.046099994506221265,
+        "static_lower_bound": 2,
+        "portal_count": 0,
+        "partition_count": 1,
+        "macro_arc_count": 1,
+        "search_and_refinement_ms": 0.14840000221738592,
+        "query_ms": 0.22489999537356198,
+        "expansions": 21,
+        "candidate_count": 1
+      },
+      "candidates": [
+        {
+          "candidate_id": "regional:v0:bag:target:0",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-U",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "U-G",
+              "depart": 4,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "regional:v0:bag:target:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    },
+    {
+      "case": "destination_reception_window",
+      "repeat": 0,
+      "planner": "dynamic_local",
+      "order_index": 1,
+      "cache": "cold",
+      "candidate_count": 2,
+      "status": "partial_candidate_set",
+      "all_returned_valid": true,
+      "route_mode": "whole_route",
+      "next_edge_authorized_candidates": 2,
+      "next_edge_validation_ms_outside_local_total": 0.20940000104019418,
+      "commit_accepted": true,
+      "oracle_feasible": true,
+      "oracle_feasibility_certified": true,
+      "oracle_complete_enumeration": true,
+      "oracle_earliest_arrival": 5,
+      "best_candidate_arrival": 5,
+      "earliest_arrival_gap": 0,
+      "candidate_set_diagnostic_cost_gap": 0,
+      "physical_path_coverage": 1.0,
+      "generation_ms": 0.6040000007487833,
+      "validation_ms": 0.11299999459879473,
+      "commit_ms": 0.09720000525703654,
+      "local_total_ms": 0.8142000006046146,
+      "expansions": 23,
+      "diagnostics": {
+        "validation_ms": 0.3498999940347858,
+        "static_paths_examined": 0,
+        "route_mode": "whole_route",
+        "completeness": "bounded_dynamic_local_time_labels",
+        "missing_candidate_is_not_infeasibility": true,
+        "dynamic_local": true,
+        "preprocessing_budget_included": true,
+        "work_units_by_stage": {
+          "topology_edges": 4,
+          "reverse_lower_bound": 4,
+          "regional_macro_time_labels": 3,
+          "dynamic_local_time_labels": 8,
+          "event_projection": 4
+        },
+        "cold_topology": true,
+        "portal_count": 0,
+        "partition_count": 1,
+        "local_label_limit": 3,
+        "local_search_calls": 2,
+        "local_labels_returned": 2,
+        "local_labels_probed": 2,
+        "local_rejected_terminal_labels": 2,
+        "remote_calendar_access": true,
+        "local_selection": "valid_terminal_then_round_robin_physical_path_and_time_window",
+        "local_probe_multiplier": 4,
+        "static_lower_bound": 2,
+        "local_label_truncation_possible": true,
+        "query_ms": 0.5979999987175688,
+        "expansions": 23,
+        "candidate_count": 2,
+        "search_queue_exhausted": true
+      },
+      "candidates": [
+        {
+          "candidate_id": "dynamic_regional:v0:bag:target:0",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-U",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "U-G",
+              "depart": 4,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "dynamic_regional:v0:bag:target:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "dynamic_regional:v0:bag:target:1",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-V",
+              "depart": 0,
+              "arrive": 2
+            },
+            {
+              "edge_id": "V-G",
+              "depart": 3,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "dynamic_regional:v0:bag:target:0",
+          "is_baseline": false,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    },
+    {
+      "case": "destination_reception_window",
+      "repeat": 0,
+      "planner": "strong_full_graph_event",
+      "order_index": 2,
+      "cache": "cold",
+      "candidate_count": 2,
+      "status": "partial_candidate_set",
+      "all_returned_valid": true,
+      "route_mode": "whole_route",
+      "next_edge_authorized_candidates": 2,
+      "next_edge_validation_ms_outside_local_total": 0.2021000036620535,
+      "commit_accepted": true,
+      "oracle_feasible": true,
+      "oracle_feasibility_certified": true,
+      "oracle_complete_enumeration": true,
+      "oracle_earliest_arrival": 5,
+      "best_candidate_arrival": 5,
+      "earliest_arrival_gap": 0,
+      "candidate_set_diagnostic_cost_gap": 0,
+      "physical_path_coverage": 1.0,
+      "generation_ms": 0.4119000004720874,
+      "validation_ms": 0.11359999916749075,
+      "commit_ms": 0.09630000567995012,
+      "local_total_ms": 0.6218000053195283,
+      "expansions": 19,
+      "diagnostics": {
+        "validation_ms": 0.23469999723602086,
+        "work_units_by_stage": {
+          "topology_edges": 4,
+          "reverse_lower_bound": 4,
+          "full_graph_time_labels": 7,
+          "event_projection": 4
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "completeness": "bounded_event_time_full_graph",
+        "earliest_arrival_certified": false,
+        "finite_horizon_exhausted": false,
+        "missing_candidate_is_not_infeasibility": true,
+        "cold_topology": true,
+        "static_lower_bound": 2,
+        "query_ms": 0.4065999964950606,
+        "expansions": 19,
+        "candidate_count": 2,
+        "search_queue_exhausted": true
+      },
+      "candidates": [
+        {
+          "candidate_id": "full_graph:v0:bag:target:0",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-U",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "U-G",
+              "depart": 4,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:bag:target:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "full_graph:v0:bag:target:1",
+          "bag_id": "bag",
+          "tray_id": "target",
+          "legs": [
+            {
+              "edge_id": "S-V",
+              "depart": 0,
+              "arrive": 2
+            },
+            {
+              "edge_id": "V-G",
+              "depart": 3,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 7,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:bag:target:0",
+          "is_baseline": false,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    }
+  ]
+}

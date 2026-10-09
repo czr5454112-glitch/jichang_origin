@@ -1,0 +1,386 @@
+{
+  "initial": {
+    "now": 1,
+    "network": {
+      "nodes": {
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "zone_A",
+          "control_partition": "A",
+          "capacity": 2,
+          "can_wait": true
+        },
+        "J": {
+          "node_id": "J",
+          "logistics_zone": "zone_A",
+          "control_partition": "J",
+          "capacity": 1,
+          "can_wait": false
+        },
+        "B": {
+          "node_id": "B",
+          "logistics_zone": "zone_B",
+          "control_partition": "B",
+          "capacity": 2,
+          "can_wait": true
+        },
+        "K": {
+          "node_id": "K",
+          "logistics_zone": "zone_B",
+          "control_partition": "K",
+          "capacity": 1,
+          "can_wait": false
+        },
+        "C": {
+          "node_id": "C",
+          "logistics_zone": "zone_A",
+          "control_partition": "C",
+          "capacity": 1,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "A-J": {
+          "edge_id": "A-J",
+          "source": "A",
+          "target": "J",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "J-B": {
+          "edge_id": "J-B",
+          "source": "J",
+          "target": "B",
+          "travel_time": 4,
+          "capacity": 1
+        },
+        "B-K": {
+          "edge_id": "B-K",
+          "source": "B",
+          "target": "K",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "K-A": {
+          "edge_id": "K-A",
+          "source": "K",
+          "target": "A",
+          "travel_time": 4,
+          "capacity": 1
+        },
+        "C-A": {
+          "edge_id": "C-A",
+          "source": "C",
+          "target": "A",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "A-C": {
+          "edge_id": "A-C",
+          "source": "A",
+          "target": "C",
+          "travel_time": 1,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "warm_tray": {
+        "tray_id": "warm_tray",
+        "node": null,
+        "mode": "in_transit",
+        "bag_id": "warm",
+        "available_at": 0
+      },
+      "B_stock": {
+        "tray_id": "B_stock",
+        "node": "B",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 0
+      },
+      "C_pool": {
+        "tray_id": "C_pool",
+        "node": "C",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 0
+      }
+    },
+    "bags": {
+      "warm": {
+        "bag_id": "warm",
+        "origin": "A",
+        "destination": "B",
+        "arrival": 0,
+        "deadline": 8,
+        "protected": true
+      }
+    },
+    "reservations": [
+      {
+        "resource": "edge:J-B",
+        "start": 1,
+        "end": 5,
+        "tray_id": "warm_tray"
+      },
+      {
+        "resource": "node:B",
+        "start": 0,
+        "end": 1000000000000,
+        "tray_id": "B_stock"
+      },
+      {
+        "resource": "node:B",
+        "start": 5,
+        "end": 1000000000000,
+        "tray_id": "warm_tray"
+      },
+      {
+        "resource": "node:C",
+        "start": 0,
+        "end": 1000000000000,
+        "tray_id": "C_pool"
+      },
+      {
+        "resource": "reception:B",
+        "start": 5,
+        "end": 6,
+        "tray_id": "warm_tray"
+      }
+    ],
+    "version": 2,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 1,
+      "hold_by_node": {},
+      "export_min_stock": 0,
+      "reception_capacity": 1
+    },
+    "plans": {
+      "warm_tray": {
+        "candidate_id": "dynamic_regional:v0:warm:warm_tray:0",
+        "bag_id": "warm",
+        "tray_id": "warm_tray",
+        "legs": [
+          {
+            "edge_id": "A-J",
+            "depart": 0,
+            "arrive": 1
+          },
+          {
+            "edge_id": "J-B",
+            "depart": 1,
+            "arrive": 5
+          }
+        ],
+        "unload_complete": 6,
+        "usable_at": 6,
+        "dependency_version": 0,
+        "baseline_id": "dynamic_regional:v0:warm:warm_tray:0",
+        "is_baseline": true,
+        "destination_node": "B",
+        "prefix_only": false,
+        "continuation_destination": null
+      }
+    },
+    "completed": {},
+    "load_times": {
+      "warm": 0
+    },
+    "empty_targets": {},
+    "conditional_forecasts": {},
+    "forecast_history": [],
+    "replaceable_trays": []
+  },
+  "forecasts": [
+    {
+      "forecast_id": "stream:B:2",
+      "node": "B",
+      "destination": "A",
+      "at": 2,
+      "deadline": 18,
+      "count": 1,
+      "published_at": 0,
+      "unit_ids": []
+    },
+    {
+      "forecast_id": "stream:B:8",
+      "node": "B",
+      "destination": "A",
+      "at": 8,
+      "deadline": 24,
+      "count": 1,
+      "published_at": 0,
+      "unit_ids": []
+    },
+    {
+      "forecast_id": "stream:B:10",
+      "node": "B",
+      "destination": "A",
+      "at": 10,
+      "deadline": 26,
+      "count": 1,
+      "published_at": 0,
+      "unit_ids": []
+    },
+    {
+      "forecast_id": "stream:A:12",
+      "node": "A",
+      "destination": "B",
+      "at": 12,
+      "deadline": 28,
+      "count": 1,
+      "published_at": 12,
+      "unit_ids": []
+    },
+    {
+      "forecast_id": "stream:A:22",
+      "node": "A",
+      "destination": "B",
+      "at": 22,
+      "deadline": 38,
+      "count": 1,
+      "published_at": 20,
+      "unit_ids": []
+    },
+    {
+      "forecast_id": "stream:B:24",
+      "node": "B",
+      "destination": "A",
+      "at": 24,
+      "deadline": 40,
+      "count": 1,
+      "published_at": 20,
+      "unit_ids": []
+    },
+    {
+      "forecast_id": "stream:A:30",
+      "node": "A",
+      "destination": "B",
+      "at": 30,
+      "deadline": 46,
+      "count": 1,
+      "published_at": 26,
+      "unit_ids": []
+    }
+  ],
+  "future_event_engine_only": [
+    {
+      "bag_id": "stream:B:2:0",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 2,
+      "deadline": 18,
+      "protected": false
+    },
+    {
+      "bag_id": "stream:B:8:0",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 8,
+      "deadline": 24,
+      "protected": false
+    },
+    {
+      "bag_id": "stream:B:10:0",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 10,
+      "deadline": 26,
+      "protected": false
+    },
+    {
+      "bag_id": "stream:A:12:0",
+      "origin": "A",
+      "destination": "B",
+      "arrival": 12,
+      "deadline": 28,
+      "protected": false
+    },
+    {
+      "bag_id": "stream:A:22:0",
+      "origin": "A",
+      "destination": "B",
+      "arrival": 22,
+      "deadline": 38,
+      "protected": false
+    },
+    {
+      "bag_id": "stream:B:24:0",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 24,
+      "deadline": 40,
+      "protected": false
+    },
+    {
+      "bag_id": "stream:A:30:0",
+      "origin": "A",
+      "destination": "B",
+      "arrival": 30,
+      "deadline": 46,
+      "protected": false
+    }
+  ],
+  "horizon": 44,
+  "provenance": {
+    "source": "declared_synthetic_five_node_recirculating_mechanism_not_airport_data",
+    "burn_in": {
+      "ticks": 1,
+      "trace": [
+        {
+          "time": 0,
+          "event": "initial"
+        },
+        {
+          "time": 0,
+          "event": "route_commit",
+          "candidate_id": "dynamic_regional:v0:warm:warm_tray:0",
+          "action_key": "6158322f410d5f9d5d9dec509214d4cfd0d217d85381e62af8d8b43a6657ccbb"
+        },
+        {
+          "time": 0,
+          "event": "depart",
+          "tray_id": "warm_tray",
+          "edge_id": "A-J"
+        },
+        {
+          "time": 0,
+          "event": "tick"
+        },
+        {
+          "time": 1,
+          "event": "depart",
+          "tray_id": "warm_tray",
+          "edge_id": "J-B"
+        },
+        {
+          "time": 1,
+          "event": "tick"
+        }
+      ],
+      "invariant_checks": 6
+    },
+    "finite_initial_trays": 3,
+    "node_capacities": {
+      "A": 2,
+      "J": 1,
+      "B": 2,
+      "K": 1,
+      "C": 1
+    },
+    "no_wait_nodes": [
+      "J",
+      "K"
+    ],
+    "long_edges_ticks": {
+      "J-B": 4,
+      "K-A": 4
+    },
+    "rolling_forecast_publication_is_proxy": true,
+    "design_corrections": "Final A30 balances base recirculation; reversal instead ends at B30 to balance its observed A10. Sufficient control declares B capacity3 with extra B stock to keep initial warm route admissible.",
+    "reversal": null,
+    "claim": "mechanism_fixture_not_heldout_performance_sample"
+  }
+}

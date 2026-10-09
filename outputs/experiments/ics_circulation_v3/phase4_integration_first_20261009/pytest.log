@@ -1,0 +1,31 @@
+........................................................................ [ 22%]
+......................................F................................. [ 44%]
+..........................................F............................. [ 66%]
+........................................................................ [ 88%]
+.......................................                                  [100%]
+================================== FAILURES ===================================
+__ test_zero_capacity_is_rejected_not_silently_upgraded_by_regional_routing ___
+
+    def test_zero_capacity_is_rejected_not_silently_upgraded_by_regional_routing():
+        state = _junction_state()
+        state.network.edges["J-B"] = replace(state.network.edges["J-B"], capacity=0)
+>       with pytest.raises(ValueError, match="capacity"):
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_ics_circulation_v3_integration_stress.py:212: Failed
+_________________ test_run_does_not_overwrite_prior_evidence __________________
+
+tmp_path = WindowsPath('C:/PROGRAMING/czr005/.tmp/ics_phase4_integration_first/test_run_does_not_overwrite_pr0')
+
+    def test_run_does_not_overwrite_prior_evidence(tmp_path):
+        (tmp_path / "sentinel.json").write_text("{}", encoding="utf-8")
+>       with pytest.raises(ValueError, match="not overwritten"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'not overwritten'
+E         Actual message: 'Output cannot be overwritten; existing experiment records are immutable. Use a new or empty directory'
+
+tests\test_ics_circulation_v3_phase3_protocol.py:179: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_ics_circulation_v3_integration_stress.py::test_zero_capacity_is_rejected_not_silently_upgraded_by_regional_routing
+FAILED tests/test_ics_circulation_v3_phase3_protocol.py::test_run_does_not_overwrite_prior_evidence
+2 failed, 325 passed in 26.46s
