@@ -1,0 +1,133 @@
+{
+  "commit": "030493a399cdcac3fc005fe2f2cd8ec30fc96277",
+  "archive": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_code_030493a3.zip",
+  "archive_bytes": 5859702,
+  "archive_sha256": "f275ce1af559d892619a92cc00aa6e9fcd40ecde70b8375589dfa566336b650e",
+  "archive_commit_comment": "030493a399cdcac3fc005fe2f2cd8ec30fc96277",
+  "extracted_directory": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3",
+  "file_count": 959,
+  "test_file_count": 16,
+  "uncompressed_file_bytes": 105145494,
+  "all_files_equal_commit_blobs": true,
+  "contains_dot_git": false,
+  "archive_seconds": 2.2810211000032723,
+  "extraction_verify_seconds": 11.746887199995399,
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "python_executable": "C:\\PROGRAMING\\python3.11.9\\python.exe",
+  "dependencies": {
+    "pytest": "9.1.0",
+    "numpy": "2.1.0"
+  },
+  "run_results": [
+    {
+      "label": "pytest_all_ics",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "-c",
+        "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3\\.tmp\\pytest.ini",
+        "--rootdir",
+        "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3",
+        "--basetemp",
+        "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3\\.tmp\\pytest_basetemp",
+        "tests/test_ics_circulation_v3_checkpoint.py",
+        "tests/test_ics_circulation_v3_evaluation.py",
+        "tests/test_ics_circulation_v3_integration_stress.py",
+        "tests/test_ics_circulation_v3_joint.py",
+        "tests/test_ics_circulation_v3_learning.py",
+        "tests/test_ics_circulation_v3_matched_protocol.py",
+        "tests/test_ics_circulation_v3_nanning.py",
+        "tests/test_ics_circulation_v3_nonlinear_learning.py",
+        "tests/test_ics_circulation_v3_phase2_protocol.py",
+        "tests/test_ics_circulation_v3_phase3_protocol.py",
+        "tests/test_ics_circulation_v3_prebalance.py",
+        "tests/test_ics_circulation_v3_prebalance_reference.py",
+        "tests/test_ics_circulation_v3_request_service.py",
+        "tests/test_ics_circulation_v3_routing.py",
+        "tests/test_ics_circulation_v3_runtime.py",
+        "tests/test_ics_circulation_v3_scene_configuration.py"
+      ],
+      "cwd": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3",
+      "returncode": 1,
+      "seconds": 0.2768798000033712,
+      "expected_failure": false,
+      "log": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_logs_030493a3\\pytest_all_ics.log"
+    },
+    {
+      "label": "phase3_learning_independent_audit",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "outputs/experiments/ics_circulation_v3/phase3_learning_20261009/independent_audit.py"
+      ],
+      "cwd": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3",
+      "returncode": 0,
+      "seconds": 1.4591074000054505,
+      "expected_failure": false,
+      "log": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_logs_030493a3\\phase3_learning_independent_audit.log"
+    },
+    {
+      "label": "phase3_cross_artifact_audit",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "outputs/experiments/ics_circulation_v3/phase3_cross_artifact_audit_20261009.py"
+      ],
+      "cwd": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3",
+      "returncode": 0,
+      "seconds": 0.586450100003276,
+      "expected_failure": false,
+      "log": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_logs_030493a3\\phase3_cross_artifact_audit.log"
+    },
+    {
+      "label": "phase2_artifact_audit",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "outputs/experiments/ics_circulation_v3/verify_phase2_artifacts_20261009.py"
+      ],
+      "cwd": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3",
+      "returncode": 0,
+      "seconds": 0.4188538000016706,
+      "expected_failure": false,
+      "log": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_logs_030493a3\\phase2_artifact_audit.log"
+    },
+    {
+      "label": "configuration_cli_known_failure",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "-m",
+        "scripts.experiments.ics_circulation_v3.run_scene_configuration",
+        "--output",
+        ".tmp/configuration_cli_reproduction"
+      ],
+      "cwd": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_clean_030493a3",
+      "returncode": 1,
+      "seconds": 0.7011966000063694,
+      "expected_failure": true,
+      "log": "C:\\PROGRAMING\\czr005\\.tmp\\ics_v3_review_logs_030493a3\\configuration_cli_known_failure.log",
+      "known_failure_reproduced": true
+    }
+  ],
+  "audit_summaries": {
+    "outputs/experiments/ics_circulation_v3/phase3_learning_20261009/independent_audit.json": {
+      "passed": true,
+      "check_count": 54,
+      "failed_checks": [],
+      "checks_length": 54
+    },
+    "outputs/experiments/ics_circulation_v3/phase3_cross_artifact_audit_20261009.json": {
+      "passed": true,
+      "check_count": 53,
+      "failed_checks": [],
+      "checks_length": 53
+    },
+    "outputs/experiments/ics_circulation_v3/phase2_verification_20261009.json": {
+      "passed": true,
+      "check_count": 20,
+      "failed_checks": [],
+      "checks_length": 20
+    }
+  },
+  "total_seconds": 17.69040590000077,
+  "all_expected_checks_passed": false
+}
