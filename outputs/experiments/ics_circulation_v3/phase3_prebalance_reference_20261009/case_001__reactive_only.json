@@ -1,0 +1,331 @@
+{
+  "metrics": {
+    "source_group": "old_arrival_prevents_duplicate",
+    "family": "mechanism_fixture",
+    "policy": "reactive_only",
+    "status": "completed_run",
+    "route_mode": "whole_route",
+    "initial_sha256": "7603c8610d8432e4916348977580c7f7eaa26e9dfe29cd5cc735fcf38bd71466",
+    "forecast_sha256": "beb4d9620a1c0c1afe2bd0d9cbc5aa4f54a1884c4da6ac94db8c39ad973d7a95",
+    "future_sha256": "71ee59ad1f5580140dc3ab22738ee3864a1bedc5649db889c06cee3db29ba12d",
+    "actual_bag_count": 1,
+    "completed_count": 1,
+    "uncompleted_count": 0,
+    "on_time_count": 1,
+    "total_cost": 0.0,
+    "tray_wait": 0.0,
+    "nonprotected_tardiness": 0.0,
+    "empty_distance": 0.0,
+    "terminal_backlog": 0.0,
+    "terminal_inflight": 0.0,
+    "empty_transfer_commits": 0,
+    "slow_controller_calls": 0,
+    "full_proxy_simulator_calls": 0,
+    "full_evaluation_simulator_calls": 1,
+    "failed_proxy_rollouts": 0,
+    "candidate_generation_calls": 0,
+    "bounded_partial_decisions": 0,
+    "max_proxy_calls_at_one_decision": 0,
+    "max_decision_ms": 0,
+    "proxy_rollout_ms": 0,
+    "slow_controller_ms": 0.0,
+    "runtime_ms": 4.317900005844422,
+    "finite_tray_ids_preserved": true,
+    "all_arrived_bag_ids_preserved": true,
+    "invariant_checks": 38,
+    "failure_type": null
+  },
+  "actual_bag_ledger": [
+    {
+      "bag_id": "B:future",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 8,
+      "deadline": 28,
+      "protected": false,
+      "load_time": 8,
+      "completion_time": 17,
+      "on_time": true
+    }
+  ],
+  "final_snapshot": {
+    "now": 28,
+    "network": {
+      "nodes": {
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "domestic",
+          "control_partition": "control:A",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "B": {
+          "node_id": "B",
+          "logistics_zone": "international",
+          "control_partition": "control:B",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "C": {
+          "node_id": "C",
+          "logistics_zone": "domestic",
+          "control_partition": "control:C",
+          "capacity": 4,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "A-B": {
+          "edge_id": "A-B",
+          "source": "A",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "B-A": {
+          "edge_id": "B-A",
+          "source": "B",
+          "target": "A",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "old-C-B": {
+          "edge_id": "old-C-B",
+          "source": "C",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "donor": {
+        "tray_id": "donor",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 0
+      },
+      "old": {
+        "tray_id": "old",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 17
+      }
+    },
+    "bags": {
+      "B:future": {
+        "bag_id": "B:future",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 8,
+        "deadline": 28,
+        "protected": false
+      }
+    },
+    "reservations": [
+      {
+        "resource": "node:A",
+        "start": 8,
+        "end": 1000000000000,
+        "tray_id": "donor"
+      }
+    ],
+    "version": 34,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 1,
+      "hold_by_node": {
+        "B": 2
+      },
+      "export_min_stock": 0,
+      "reception_capacity": 1
+    },
+    "plans": {},
+    "completed": {
+      "B:future": 17
+    },
+    "load_times": {
+      "B:future": 8
+    },
+    "empty_targets": {}
+  },
+  "trace": [
+    {
+      "time": 0,
+      "event": "initial"
+    },
+    {
+      "time": 0,
+      "event": "tick"
+    },
+    {
+      "time": 1,
+      "event": "tick"
+    },
+    {
+      "time": 2,
+      "event": "tick"
+    },
+    {
+      "time": 3,
+      "event": "tick"
+    },
+    {
+      "time": 4,
+      "event": "tick"
+    },
+    {
+      "time": 5,
+      "event": "tick"
+    },
+    {
+      "time": 6,
+      "event": "old_arrive",
+      "tray_id": "old",
+      "node": "B"
+    },
+    {
+      "time": 6,
+      "event": "tick"
+    },
+    {
+      "time": 7,
+      "event": "tick"
+    },
+    {
+      "time": 8,
+      "event": "module_release",
+      "tray_id": "old"
+    },
+    {
+      "time": 8,
+      "event": "bag_arrival",
+      "bag_id": "B:future"
+    },
+    {
+      "time": 8,
+      "event": "load",
+      "bag_id": "B:future",
+      "tray_id": "old"
+    },
+    {
+      "time": 8,
+      "event": "route_commit",
+      "candidate_id": "regional:v12:B:future:old:0"
+    },
+    {
+      "time": 8,
+      "event": "depart",
+      "tray_id": "old",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 8,
+      "event": "tick"
+    },
+    {
+      "time": 9,
+      "event": "tick"
+    },
+    {
+      "time": 10,
+      "event": "tick"
+    },
+    {
+      "time": 11,
+      "event": "tick"
+    },
+    {
+      "time": 12,
+      "event": "tick"
+    },
+    {
+      "time": 13,
+      "event": "tick"
+    },
+    {
+      "time": 14,
+      "event": "tick"
+    },
+    {
+      "time": 15,
+      "event": "tick"
+    },
+    {
+      "time": 16,
+      "event": "tray_state",
+      "tray_id": "old",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 16,
+      "event": "tick"
+    },
+    {
+      "time": 17,
+      "event": "unload_complete",
+      "bag_id": "B:future",
+      "tray_id": "old"
+    },
+    {
+      "time": 17,
+      "event": "tray_state",
+      "tray_id": "old",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 17,
+      "event": "tick"
+    },
+    {
+      "time": 18,
+      "event": "tick"
+    },
+    {
+      "time": 19,
+      "event": "tick"
+    },
+    {
+      "time": 20,
+      "event": "tick"
+    },
+    {
+      "time": 21,
+      "event": "tick"
+    },
+    {
+      "time": 22,
+      "event": "tick"
+    },
+    {
+      "time": 23,
+      "event": "tick"
+    },
+    {
+      "time": 24,
+      "event": "tick"
+    },
+    {
+      "time": 25,
+      "event": "tick"
+    },
+    {
+      "time": 26,
+      "event": "tick"
+    },
+    {
+      "time": 27,
+      "event": "tick"
+    },
+    {
+      "time": 28,
+      "event": "tick"
+    }
+  ],
+  "controller_history": [],
+  "failure": null
+}

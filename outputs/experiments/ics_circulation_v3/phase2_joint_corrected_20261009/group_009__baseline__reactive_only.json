@@ -1,0 +1,1219 @@
+{
+  "metrics": {
+    "source_group": "v3_phase2:joint:009",
+    "policy_id": "baseline__reactive_only",
+    "routing": "baseline",
+    "balancing": "reactive_only",
+    "predictive": false,
+    "coordination_order": "route_then_prebalance",
+    "route_mode": "next_edge",
+    "status": "completed_run",
+    "initial_sha256": "fba2813afbfe3460889545241e8e551feaec263d84cdf8185893f575d6da24d1",
+    "future_sha256": "00b7f486f4a575ce374c3f7702bfcb67b5b8aa6e8615a4ea89230ce47182b80d",
+    "forecast_sha256": "32dc9e0473c7814fad66d01d3c626c5ca683f735e0e0aa0e676e4e8884d3bf17",
+    "actual_bag_count": 3,
+    "arrived_by_horizon_count": 3,
+    "completed_count": 3,
+    "uncompleted_count": 0,
+    "on_time_count": 3,
+    "on_time_fraction": 1.0,
+    "deadline_failed_count": 0,
+    "protected_bag_count": 0,
+    "protected_deadline_failed_count": 0,
+    "waiting_count": 0,
+    "finite_tray_ids_preserved": true,
+    "all_arrived_bag_ids_preserved": true,
+    "invariant_checks": 99,
+    "final_tick": 72,
+    "total_cost": 0.0,
+    "tray_wait": 0.0,
+    "nonprotected_tardiness": 0.0,
+    "empty_distance": 0.0,
+    "terminal_backlog": 0.0,
+    "terminal_inflight": 0.0,
+    "generation_calls": 5.0,
+    "generation_ms": 6.042100008926354,
+    "selection_calls": 5.0,
+    "selection_ms": 2.694499991775956,
+    "slow_calls": 0.0,
+    "slow_ms": 0.0,
+    "candidate_count": 11.0,
+    "route_commits": 5.0,
+    "slow_commits": 0.0,
+    "generation_no_candidates": 0.0,
+    "generation_no_authorized_candidates": 0.0,
+    "commit_rejections": 0.0,
+    "protected_unadmitted_decisions": 0.0,
+    "protected_commits": 0.0,
+    "runtime_ms": 32.54849999939324,
+    "reactive_commits": 0,
+    "slow_max_call_ms": 0,
+    "failure_type": null
+  },
+  "weights": {
+    "tray_wait": 1.0,
+    "nonprotected_tardiness": 1.0,
+    "empty_distance": 0.1,
+    "terminal_backlog": 10.0,
+    "terminal_inflight": 2.0
+  },
+  "forecasts": [
+    {
+      "forecast_id": "forecast:B",
+      "node": "B",
+      "destination": "A",
+      "at": 17,
+      "deadline": 30,
+      "count": 2,
+      "published_at": 0,
+      "unit_ids": []
+    }
+  ],
+  "bag_ledger": [
+    {
+      "bag_id": "bag:target",
+      "origin": "A",
+      "destination": "B",
+      "arrival": 0,
+      "deadline": 36,
+      "protected": false,
+      "observed": true,
+      "load_time": 0,
+      "completion_time": 10,
+      "status": "completed_on_time",
+      "deadline_failed_by_final_tick": false,
+      "tray_wait_observed": 0
+    },
+    {
+      "bag_id": "forecast:B:0",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 17,
+      "deadline": 30,
+      "protected": false,
+      "observed": true,
+      "load_time": 17,
+      "completion_time": 30,
+      "status": "completed_on_time",
+      "deadline_failed_by_final_tick": false,
+      "tray_wait_observed": 0
+    },
+    {
+      "bag_id": "forecast:B:1",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 15,
+      "deadline": 30,
+      "protected": false,
+      "observed": true,
+      "load_time": 15,
+      "completion_time": 23,
+      "status": "completed_on_time",
+      "deadline_failed_by_final_tick": false,
+      "tray_wait_observed": 0
+    }
+  ],
+  "initial_tray_ids": [
+    "tray:B:0",
+    "tray:B:1",
+    "tray:C",
+    "tray:old",
+    "tray:target"
+  ],
+  "final_snapshot": {
+    "now": 72,
+    "network": {
+      "nodes": {
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "domestic",
+          "control_partition": "control:0",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "S": {
+          "node_id": "S",
+          "logistics_zone": "domestic",
+          "control_partition": "control:0",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "J": {
+          "node_id": "J",
+          "logistics_zone": "domestic",
+          "control_partition": "control:1",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "C": {
+          "node_id": "C",
+          "logistics_zone": "domestic",
+          "control_partition": "control:1",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "K": {
+          "node_id": "K",
+          "logistics_zone": "international",
+          "control_partition": "control:2",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "L": {
+          "node_id": "L",
+          "logistics_zone": "international",
+          "control_partition": "control:2",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "B": {
+          "node_id": "B",
+          "logistics_zone": "international",
+          "control_partition": "control:3",
+          "capacity": 8,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "stem": {
+          "edge_id": "stem",
+          "source": "A",
+          "target": "S",
+          "travel_time": 2,
+          "capacity": 1
+        },
+        "S-J": {
+          "edge_id": "S-J",
+          "source": "S",
+          "target": "J",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "J-B": {
+          "edge_id": "J-B",
+          "source": "J",
+          "target": "B",
+          "travel_time": 6,
+          "capacity": 1
+        },
+        "S-K": {
+          "edge_id": "S-K",
+          "source": "S",
+          "target": "K",
+          "travel_time": 3,
+          "capacity": 1
+        },
+        "K-B": {
+          "edge_id": "K-B",
+          "source": "K",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "S-L": {
+          "edge_id": "S-L",
+          "source": "S",
+          "target": "L",
+          "travel_time": 6,
+          "capacity": 1
+        },
+        "L-B": {
+          "edge_id": "L-B",
+          "source": "L",
+          "target": "B",
+          "travel_time": 5,
+          "capacity": 1
+        },
+        "S-B": {
+          "edge_id": "S-B",
+          "source": "S",
+          "target": "B",
+          "travel_time": 21,
+          "capacity": 1
+        },
+        "C-J": {
+          "edge_id": "C-J",
+          "source": "C",
+          "target": "J",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "B-A": {
+          "edge_id": "B-A",
+          "source": "B",
+          "target": "A",
+          "travel_time": 7,
+          "capacity": 1
+        },
+        "old-long": {
+          "edge_id": "old-long",
+          "source": "A",
+          "target": "B",
+          "travel_time": 40,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "tray:target": {
+        "tray_id": "tray:target",
+        "node": "B",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 14
+      },
+      "tray:C": {
+        "tray_id": "tray:C",
+        "node": "C",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 0
+      },
+      "tray:old": {
+        "tray_id": "tray:old",
+        "node": "B",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 25
+      },
+      "tray:B:0": {
+        "tray_id": "tray:B:0",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 23
+      },
+      "tray:B:1": {
+        "tray_id": "tray:B:1",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 30
+      }
+    },
+    "bags": {
+      "bag:target": {
+        "bag_id": "bag:target",
+        "origin": "A",
+        "destination": "B",
+        "arrival": 0,
+        "deadline": 36,
+        "protected": false
+      },
+      "forecast:B:1": {
+        "bag_id": "forecast:B:1",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 15,
+        "deadline": 30,
+        "protected": false
+      },
+      "forecast:B:0": {
+        "bag_id": "forecast:B:0",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 17,
+        "deadline": 30,
+        "protected": false
+      }
+    },
+    "reservations": [
+      {
+        "resource": "node:B",
+        "start": 17,
+        "end": 1000000000000,
+        "tray_id": "tray:target"
+      },
+      {
+        "resource": "node:C",
+        "start": 17,
+        "end": 1000000000000,
+        "tray_id": "tray:C"
+      }
+    ],
+    "version": 88,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 1,
+      "hold_by_node": {
+        "B": 4
+      },
+      "export_min_stock": 0,
+      "reception_capacity": 2
+    },
+    "plans": {},
+    "completed": {
+      "bag:target": 10,
+      "forecast:B:1": 23,
+      "forecast:B:0": 30
+    },
+    "load_times": {
+      "bag:target": 0,
+      "forecast:B:1": 15,
+      "forecast:B:0": 17
+    },
+    "empty_targets": {}
+  },
+  "trace": [
+    {
+      "time": 0,
+      "event": "initial"
+    },
+    {
+      "time": 0,
+      "event": "route_commit",
+      "candidate_id": "regional:v0:bag:target:tray:target:0"
+    },
+    {
+      "time": 0,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "stem"
+    },
+    {
+      "time": 0,
+      "event": "tick"
+    },
+    {
+      "time": 1,
+      "event": "tick"
+    },
+    {
+      "time": 2,
+      "event": "prefix_arrive",
+      "tray_id": "tray:target",
+      "node": "S"
+    },
+    {
+      "time": 2,
+      "event": "route_commit",
+      "candidate_id": "regional:v4:bag:target:tray:target:0"
+    },
+    {
+      "time": 2,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "S-J"
+    },
+    {
+      "time": 2,
+      "event": "tick"
+    },
+    {
+      "time": 3,
+      "event": "prefix_arrive",
+      "tray_id": "tray:target",
+      "node": "J"
+    },
+    {
+      "time": 3,
+      "event": "route_commit",
+      "candidate_id": "regional:v7:bag:target:tray:target:0"
+    },
+    {
+      "time": 3,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "J-B"
+    },
+    {
+      "time": 3,
+      "event": "tick"
+    },
+    {
+      "time": 4,
+      "event": "tick"
+    },
+    {
+      "time": 5,
+      "event": "tick"
+    },
+    {
+      "time": 6,
+      "event": "tick"
+    },
+    {
+      "time": 7,
+      "event": "tick"
+    },
+    {
+      "time": 8,
+      "event": "tick"
+    },
+    {
+      "time": 9,
+      "event": "tray_state",
+      "tray_id": "tray:target",
+      "mode": "unloading",
+      "node": "B"
+    },
+    {
+      "time": 9,
+      "event": "tick"
+    },
+    {
+      "time": 10,
+      "event": "unload_complete",
+      "bag_id": "bag:target",
+      "tray_id": "tray:target"
+    },
+    {
+      "time": 10,
+      "event": "tray_state",
+      "tray_id": "tray:target",
+      "mode": "holding",
+      "node": "B"
+    },
+    {
+      "time": 10,
+      "event": "tick"
+    },
+    {
+      "time": 11,
+      "event": "tick"
+    },
+    {
+      "time": 12,
+      "event": "tick"
+    },
+    {
+      "time": 13,
+      "event": "tick"
+    },
+    {
+      "time": 14,
+      "event": "tray_state",
+      "tray_id": "tray:target",
+      "mode": "empty",
+      "node": "B"
+    },
+    {
+      "time": 14,
+      "event": "tick"
+    },
+    {
+      "time": 15,
+      "event": "bag_arrival",
+      "bag_id": "forecast:B:1"
+    },
+    {
+      "time": 15,
+      "event": "load",
+      "bag_id": "forecast:B:1",
+      "tray_id": "tray:B:0"
+    },
+    {
+      "time": 15,
+      "event": "route_commit",
+      "candidate_id": "regional:v23:forecast:B:1:tray:B:0:0"
+    },
+    {
+      "time": 15,
+      "event": "depart",
+      "tray_id": "tray:B:0",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 15,
+      "event": "tick"
+    },
+    {
+      "time": 16,
+      "event": "tick"
+    },
+    {
+      "time": 17,
+      "event": "bag_arrival",
+      "bag_id": "forecast:B:0"
+    },
+    {
+      "time": 17,
+      "event": "load",
+      "bag_id": "forecast:B:0",
+      "tray_id": "tray:B:1"
+    },
+    {
+      "time": 17,
+      "event": "route_commit",
+      "candidate_id": "regional:v28:forecast:B:0:tray:B:1:0"
+    },
+    {
+      "time": 17,
+      "event": "tick"
+    },
+    {
+      "time": 18,
+      "event": "tick"
+    },
+    {
+      "time": 19,
+      "event": "tick"
+    },
+    {
+      "time": 20,
+      "event": "tick"
+    },
+    {
+      "time": 21,
+      "event": "old_arrive",
+      "tray_id": "tray:old",
+      "node": "B"
+    },
+    {
+      "time": 21,
+      "event": "tick"
+    },
+    {
+      "time": 22,
+      "event": "depart",
+      "tray_id": "tray:B:1",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 22,
+      "event": "tray_state",
+      "tray_id": "tray:B:0",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 22,
+      "event": "tick"
+    },
+    {
+      "time": 23,
+      "event": "unload_complete",
+      "bag_id": "forecast:B:1",
+      "tray_id": "tray:B:0"
+    },
+    {
+      "time": 23,
+      "event": "tray_state",
+      "tray_id": "tray:B:0",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 23,
+      "event": "tick"
+    },
+    {
+      "time": 24,
+      "event": "tick"
+    },
+    {
+      "time": 25,
+      "event": "module_release",
+      "tray_id": "tray:old"
+    },
+    {
+      "time": 25,
+      "event": "tick"
+    },
+    {
+      "time": 26,
+      "event": "tick"
+    },
+    {
+      "time": 27,
+      "event": "tick"
+    },
+    {
+      "time": 28,
+      "event": "tick"
+    },
+    {
+      "time": 29,
+      "event": "tray_state",
+      "tray_id": "tray:B:1",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 29,
+      "event": "tick"
+    },
+    {
+      "time": 30,
+      "event": "unload_complete",
+      "bag_id": "forecast:B:0",
+      "tray_id": "tray:B:1"
+    },
+    {
+      "time": 30,
+      "event": "tray_state",
+      "tray_id": "tray:B:1",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 30,
+      "event": "tick"
+    },
+    {
+      "time": 31,
+      "event": "tick"
+    },
+    {
+      "time": 32,
+      "event": "tick"
+    },
+    {
+      "time": 33,
+      "event": "tick"
+    },
+    {
+      "time": 34,
+      "event": "tick"
+    },
+    {
+      "time": 35,
+      "event": "tick"
+    },
+    {
+      "time": 36,
+      "event": "tick"
+    },
+    {
+      "time": 37,
+      "event": "tick"
+    },
+    {
+      "time": 38,
+      "event": "tick"
+    },
+    {
+      "time": 39,
+      "event": "tick"
+    },
+    {
+      "time": 40,
+      "event": "tick"
+    },
+    {
+      "time": 41,
+      "event": "tick"
+    },
+    {
+      "time": 42,
+      "event": "tick"
+    },
+    {
+      "time": 43,
+      "event": "tick"
+    },
+    {
+      "time": 44,
+      "event": "tick"
+    },
+    {
+      "time": 45,
+      "event": "tick"
+    },
+    {
+      "time": 46,
+      "event": "tick"
+    },
+    {
+      "time": 47,
+      "event": "tick"
+    },
+    {
+      "time": 48,
+      "event": "tick"
+    },
+    {
+      "time": 49,
+      "event": "tick"
+    },
+    {
+      "time": 50,
+      "event": "tick"
+    },
+    {
+      "time": 51,
+      "event": "tick"
+    },
+    {
+      "time": 52,
+      "event": "tick"
+    },
+    {
+      "time": 53,
+      "event": "tick"
+    },
+    {
+      "time": 54,
+      "event": "tick"
+    },
+    {
+      "time": 55,
+      "event": "tick"
+    },
+    {
+      "time": 56,
+      "event": "tick"
+    },
+    {
+      "time": 57,
+      "event": "tick"
+    },
+    {
+      "time": 58,
+      "event": "tick"
+    },
+    {
+      "time": 59,
+      "event": "tick"
+    },
+    {
+      "time": 60,
+      "event": "tick"
+    },
+    {
+      "time": 61,
+      "event": "tick"
+    },
+    {
+      "time": 62,
+      "event": "tick"
+    },
+    {
+      "time": 63,
+      "event": "tick"
+    },
+    {
+      "time": 64,
+      "event": "tick"
+    },
+    {
+      "time": 65,
+      "event": "tick"
+    },
+    {
+      "time": 66,
+      "event": "tick"
+    },
+    {
+      "time": 67,
+      "event": "tick"
+    },
+    {
+      "time": 68,
+      "event": "tick"
+    },
+    {
+      "time": 69,
+      "event": "tick"
+    },
+    {
+      "time": 70,
+      "event": "tick"
+    },
+    {
+      "time": 71,
+      "event": "tick"
+    },
+    {
+      "time": 72,
+      "event": "tick"
+    }
+  ],
+  "actions": [
+    {
+      "time": 0,
+      "event": "route_commit",
+      "candidate_id": "regional:v0:bag:target:tray:target:0"
+    },
+    {
+      "time": 0,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "stem"
+    },
+    {
+      "time": 2,
+      "event": "prefix_arrive",
+      "tray_id": "tray:target",
+      "node": "S"
+    },
+    {
+      "time": 2,
+      "event": "route_commit",
+      "candidate_id": "regional:v4:bag:target:tray:target:0"
+    },
+    {
+      "time": 2,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "S-J"
+    },
+    {
+      "time": 3,
+      "event": "prefix_arrive",
+      "tray_id": "tray:target",
+      "node": "J"
+    },
+    {
+      "time": 3,
+      "event": "route_commit",
+      "candidate_id": "regional:v7:bag:target:tray:target:0"
+    },
+    {
+      "time": 3,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "J-B"
+    },
+    {
+      "time": 15,
+      "event": "route_commit",
+      "candidate_id": "regional:v23:forecast:B:1:tray:B:0:0"
+    },
+    {
+      "time": 15,
+      "event": "depart",
+      "tray_id": "tray:B:0",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 17,
+      "event": "route_commit",
+      "candidate_id": "regional:v28:forecast:B:0:tray:B:1:0"
+    },
+    {
+      "time": 22,
+      "event": "depart",
+      "tray_id": "tray:B:1",
+      "edge_id": "B-A"
+    }
+  ],
+  "routing_decisions": [
+    {
+      "time": 0,
+      "dependency_version": 0,
+      "visible_bag_ids": [
+        "bag:target"
+      ],
+      "chosen_candidate_id": "regional:v0:bag:target:tray:target:0",
+      "candidates": [
+        {
+          "candidate_id": "regional:v0:bag:target:tray:target:0",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "stem",
+              "depart": 0,
+              "arrive": 2
+            },
+            {
+              "edge_id": "S-J",
+              "depart": 2,
+              "arrive": 3
+            },
+            {
+              "edge_id": "J-B",
+              "depart": 3,
+              "arrive": 9
+            }
+          ],
+          "unload_complete": 10,
+          "usable_at": 14,
+          "dependency_version": 0,
+          "baseline_id": "regional:v0:bag:target:tray:target:0",
+          "is_baseline": true,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "regional:v0:bag:target:tray:target:1",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "stem",
+              "depart": 0,
+              "arrive": 2
+            },
+            {
+              "edge_id": "S-K",
+              "depart": 2,
+              "arrive": 5
+            },
+            {
+              "edge_id": "K-B",
+              "depart": 5,
+              "arrive": 13
+            }
+          ],
+          "unload_complete": 14,
+          "usable_at": 18,
+          "dependency_version": 0,
+          "baseline_id": "regional:v0:bag:target:tray:target:0",
+          "is_baseline": false,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "regional:v0:bag:target:tray:target:2",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "stem",
+              "depart": 0,
+              "arrive": 2
+            },
+            {
+              "edge_id": "S-L",
+              "depart": 2,
+              "arrive": 8
+            },
+            {
+              "edge_id": "L-B",
+              "depart": 8,
+              "arrive": 13
+            }
+          ],
+          "unload_complete": 14,
+          "usable_at": 18,
+          "dependency_version": 0,
+          "baseline_id": "regional:v0:bag:target:tray:target:0",
+          "is_baseline": false,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "regional:v0:bag:target:tray:target:3",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "stem",
+              "depart": 0,
+              "arrive": 2
+            },
+            {
+              "edge_id": "S-B",
+              "depart": 2,
+              "arrive": 23
+            }
+          ],
+          "unload_complete": 24,
+          "usable_at": 28,
+          "dependency_version": 0,
+          "baseline_id": "regional:v0:bag:target:tray:target:0",
+          "is_baseline": false,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    },
+    {
+      "time": 2,
+      "dependency_version": 4,
+      "visible_bag_ids": [
+        "bag:target"
+      ],
+      "chosen_candidate_id": "regional:v4:bag:target:tray:target:0",
+      "candidates": [
+        {
+          "candidate_id": "regional:v4:bag:target:tray:target:0",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "S-J",
+              "depart": 2,
+              "arrive": 3
+            },
+            {
+              "edge_id": "J-B",
+              "depart": 3,
+              "arrive": 9
+            }
+          ],
+          "unload_complete": 10,
+          "usable_at": 14,
+          "dependency_version": 4,
+          "baseline_id": "regional:v4:bag:target:tray:target:0",
+          "is_baseline": true,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "regional:v4:bag:target:tray:target:1",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "S-K",
+              "depart": 2,
+              "arrive": 5
+            },
+            {
+              "edge_id": "K-B",
+              "depart": 5,
+              "arrive": 13
+            }
+          ],
+          "unload_complete": 14,
+          "usable_at": 18,
+          "dependency_version": 4,
+          "baseline_id": "regional:v4:bag:target:tray:target:0",
+          "is_baseline": false,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "regional:v4:bag:target:tray:target:2",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "S-L",
+              "depart": 2,
+              "arrive": 8
+            },
+            {
+              "edge_id": "L-B",
+              "depart": 8,
+              "arrive": 13
+            }
+          ],
+          "unload_complete": 14,
+          "usable_at": 18,
+          "dependency_version": 4,
+          "baseline_id": "regional:v4:bag:target:tray:target:0",
+          "is_baseline": false,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "regional:v4:bag:target:tray:target:3",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "S-B",
+              "depart": 2,
+              "arrive": 23
+            }
+          ],
+          "unload_complete": 24,
+          "usable_at": 28,
+          "dependency_version": 4,
+          "baseline_id": "regional:v4:bag:target:tray:target:0",
+          "is_baseline": false,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    },
+    {
+      "time": 3,
+      "dependency_version": 7,
+      "visible_bag_ids": [
+        "bag:target"
+      ],
+      "chosen_candidate_id": "regional:v7:bag:target:tray:target:0",
+      "candidates": [
+        {
+          "candidate_id": "regional:v7:bag:target:tray:target:0",
+          "bag_id": "bag:target",
+          "tray_id": "tray:target",
+          "legs": [
+            {
+              "edge_id": "J-B",
+              "depart": 3,
+              "arrive": 9
+            }
+          ],
+          "unload_complete": 10,
+          "usable_at": 14,
+          "dependency_version": 7,
+          "baseline_id": "regional:v7:bag:target:tray:target:0",
+          "is_baseline": true,
+          "destination_node": "B",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    },
+    {
+      "time": 15,
+      "dependency_version": 23,
+      "visible_bag_ids": [
+        "bag:target",
+        "forecast:B:1"
+      ],
+      "chosen_candidate_id": "regional:v23:forecast:B:1:tray:B:0:0",
+      "candidates": [
+        {
+          "candidate_id": "regional:v23:forecast:B:1:tray:B:0:0",
+          "bag_id": "forecast:B:1",
+          "tray_id": "tray:B:0",
+          "legs": [
+            {
+              "edge_id": "B-A",
+              "depart": 15,
+              "arrive": 22
+            }
+          ],
+          "unload_complete": 23,
+          "usable_at": 23,
+          "dependency_version": 23,
+          "baseline_id": "regional:v23:forecast:B:1:tray:B:0:0",
+          "is_baseline": true,
+          "destination_node": "A",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    },
+    {
+      "time": 17,
+      "dependency_version": 28,
+      "visible_bag_ids": [
+        "bag:target",
+        "forecast:B:0",
+        "forecast:B:1"
+      ],
+      "chosen_candidate_id": "regional:v28:forecast:B:0:tray:B:1:0",
+      "candidates": [
+        {
+          "candidate_id": "regional:v28:forecast:B:0:tray:B:1:0",
+          "bag_id": "forecast:B:0",
+          "tray_id": "tray:B:1",
+          "legs": [
+            {
+              "edge_id": "B-A",
+              "depart": 22,
+              "arrive": 29
+            }
+          ],
+          "unload_complete": 30,
+          "usable_at": 30,
+          "dependency_version": 28,
+          "baseline_id": "regional:v28:forecast:B:0:tray:B:1:0",
+          "is_baseline": true,
+          "destination_node": "A",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ]
+    }
+  ],
+  "slow_controller_history": [],
+  "slow_rejection_reasons": {},
+  "failure": null
+}

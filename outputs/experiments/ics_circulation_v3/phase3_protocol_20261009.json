@@ -1,0 +1,52 @@
+{
+  "recorded_at_utc": "2026-10-09T04:29:50.332201+00:00",
+  "phase": "before_new_test_labels",
+  "learning": {
+    "schema": "ics_v3_phase3_nonlinear_protocol_v1",
+    "training_source": "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009",
+    "training_groups": 80,
+    "validation_groups": 20,
+    "fresh_test_groups": 40,
+    "fresh_deployment_groups": 40,
+    "evaluation_namespace": "phase3confirm",
+    "label_seeds": [
+      0,
+      1
+    ],
+    "deployment_seed": 991,
+    "architecture": "one_32_unit_tanh_hidden_layer_numpy_full_batch_adam",
+    "primary_training_seed": 17,
+    "additional_fixed_training_seeds": [
+      29,
+      43
+    ],
+    "learning_rates": [
+      0.003,
+      0.01
+    ],
+    "l2_penalties": [
+      0.0,
+      0.001
+    ],
+    "epochs": 400,
+    "validation_selection": "candidate regret, then delta RMSE, then learning rate, then L2",
+    "no_test_selection_of_seed_or_architecture": true,
+    "sample_size_curve": [
+      20,
+      40,
+      80
+    ],
+    "sample_curve_seed": 17,
+    "direct_input_ablations_primary_seed_only": [
+      "no_analytic_scores",
+      "route_only"
+    ],
+    "input_ablation_scope": "bundled input usefulness, not causal isolation of release/resource mechanisms",
+    "all_models_frozen_before_generating_new_test_labels": true,
+    "extra_forecast_rollout_costs_recorded": true
+  },
+  "request_service": "Classify every request; exceptions explicit; local computation separate from synthetic transport accounting.",
+  "prebalance_reference": "No-transfer plus finite legal sequences, public forecast rollout, fixed budgets, original source protection.",
+  "preexisting_cpp_sha256": "b94390501502b61fac64c302fd79ce5a5af1851e13c02932fbddf463284d8951",
+  "requirement_document_sha256": "b9017ba90fbde9fedf673bac4ab3b8768721ad973079360aaa78c06ca7e8c4f5"
+}

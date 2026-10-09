@@ -1,0 +1,4937 @@
+{
+  "metrics": {
+    "source_group": "v3_phase2:phase3_prebalance_reference_holdout_v1:001",
+    "family": "new_synthetic_holdout",
+    "policy": "bounded_forecast_reference",
+    "status": "completed_run",
+    "route_mode": "next_edge",
+    "initial_sha256": "86de917e3fb6b827f84284decb1eb0b3c18744cee3ab7644dd108deb1e88ccaf",
+    "forecast_sha256": "eba13bb6f64ff539aa57fae5697b3e48530de296d807325446f04af4dea77b48",
+    "future_sha256": "84c813ce771a50a069cbd8a4b1755e349208e31028a2051a8f2666b4270a481c",
+    "actual_bag_count": 3,
+    "completed_count": 3,
+    "uncompleted_count": 0,
+    "on_time_count": 2,
+    "total_cost": 6.9,
+    "tray_wait": 0.0,
+    "nonprotected_tardiness": 6.0,
+    "empty_distance": 9.0,
+    "terminal_backlog": 0.0,
+    "terminal_inflight": 0.0,
+    "empty_transfer_commits": 1,
+    "slow_controller_calls": 72,
+    "full_proxy_simulator_calls": 3,
+    "full_evaluation_simulator_calls": 1,
+    "failed_proxy_rollouts": 0,
+    "candidate_generation_calls": 1,
+    "bounded_partial_decisions": 0,
+    "max_proxy_calls_at_one_decision": 3,
+    "max_decision_ms": 51.06000000523636,
+    "proxy_rollout_ms": 48.95479998958763,
+    "slow_controller_ms": 56.5802999844891,
+    "runtime_ms": 127.14160000177799,
+    "finite_tray_ids_preserved": true,
+    "all_arrived_bag_ids_preserved": true,
+    "invariant_checks": 104,
+    "failure_type": null
+  },
+  "actual_bag_ledger": [
+    {
+      "bag_id": "bag:target",
+      "origin": "A",
+      "destination": "B",
+      "arrival": 0,
+      "deadline": 36,
+      "protected": false,
+      "load_time": 0,
+      "completion_time": 19,
+      "on_time": true
+    },
+    {
+      "bag_id": "forecast:B:0",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 18,
+      "deadline": 28,
+      "protected": false,
+      "load_time": 18,
+      "completion_time": 34,
+      "on_time": false
+    },
+    {
+      "bag_id": "forecast:B:1",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 16,
+      "deadline": 28,
+      "protected": false,
+      "load_time": 16,
+      "completion_time": 26,
+      "on_time": true
+    }
+  ],
+  "final_snapshot": {
+    "now": 72,
+    "network": {
+      "nodes": {
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "domestic",
+          "control_partition": "control:0",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "S": {
+          "node_id": "S",
+          "logistics_zone": "domestic",
+          "control_partition": "control:0",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "J": {
+          "node_id": "J",
+          "logistics_zone": "domestic",
+          "control_partition": "control:1",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "C": {
+          "node_id": "C",
+          "logistics_zone": "domestic",
+          "control_partition": "control:1",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "K": {
+          "node_id": "K",
+          "logistics_zone": "international",
+          "control_partition": "control:2",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "L": {
+          "node_id": "L",
+          "logistics_zone": "international",
+          "control_partition": "control:2",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "B": {
+          "node_id": "B",
+          "logistics_zone": "international",
+          "control_partition": "control:3",
+          "capacity": 8,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "stem": {
+          "edge_id": "stem",
+          "source": "A",
+          "target": "S",
+          "travel_time": 2,
+          "capacity": 1
+        },
+        "S-J": {
+          "edge_id": "S-J",
+          "source": "S",
+          "target": "J",
+          "travel_time": 3,
+          "capacity": 1
+        },
+        "J-B": {
+          "edge_id": "J-B",
+          "source": "J",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "S-K": {
+          "edge_id": "S-K",
+          "source": "S",
+          "target": "K",
+          "travel_time": 3,
+          "capacity": 1
+        },
+        "K-B": {
+          "edge_id": "K-B",
+          "source": "K",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "S-L": {
+          "edge_id": "S-L",
+          "source": "S",
+          "target": "L",
+          "travel_time": 5,
+          "capacity": 1
+        },
+        "L-B": {
+          "edge_id": "L-B",
+          "source": "L",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "S-B": {
+          "edge_id": "S-B",
+          "source": "S",
+          "target": "B",
+          "travel_time": 18,
+          "capacity": 1
+        },
+        "C-J": {
+          "edge_id": "C-J",
+          "source": "C",
+          "target": "J",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "B-A": {
+          "edge_id": "B-A",
+          "source": "B",
+          "target": "A",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "old-long": {
+          "edge_id": "old-long",
+          "source": "A",
+          "target": "B",
+          "travel_time": 40,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "tray:target": {
+        "tray_id": "tray:target",
+        "node": "B",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 24
+      },
+      "tray:C": {
+        "tray_id": "tray:C",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 34
+      },
+      "tray:old": {
+        "tray_id": "tray:old",
+        "node": "B",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 28
+      },
+      "tray:B:0": {
+        "tray_id": "tray:B:0",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 26
+      }
+    },
+    "bags": {
+      "bag:target": {
+        "bag_id": "bag:target",
+        "origin": "A",
+        "destination": "B",
+        "arrival": 0,
+        "deadline": 36,
+        "protected": false
+      },
+      "forecast:B:1": {
+        "bag_id": "forecast:B:1",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 16,
+        "deadline": 28,
+        "protected": false
+      },
+      "forecast:B:0": {
+        "bag_id": "forecast:B:0",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 18,
+        "deadline": 28,
+        "protected": false
+      }
+    },
+    "reservations": [],
+    "version": 90,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 2,
+      "hold_by_node": {
+        "B": 5
+      },
+      "export_min_stock": 0,
+      "reception_capacity": 2
+    },
+    "plans": {},
+    "completed": {
+      "bag:target": 19,
+      "forecast:B:1": 26,
+      "forecast:B:0": 34
+    },
+    "load_times": {
+      "bag:target": 0,
+      "forecast:B:1": 16,
+      "forecast:B:0": 18
+    },
+    "empty_targets": {}
+  },
+  "trace": [
+    {
+      "time": 0,
+      "event": "initial"
+    },
+    {
+      "time": 0,
+      "event": "route_commit",
+      "candidate_id": "regional:v0:bag:target:tray:target:0"
+    },
+    {
+      "time": 0,
+      "event": "slow_commit",
+      "candidate_id": "regional:v1:empty:tray:C:0",
+      "tray_id": "tray:C"
+    },
+    {
+      "time": 0,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "stem"
+    },
+    {
+      "time": 0,
+      "event": "depart",
+      "tray_id": "tray:C",
+      "edge_id": "C-J"
+    },
+    {
+      "time": 0,
+      "event": "tick"
+    },
+    {
+      "time": 1,
+      "event": "depart",
+      "tray_id": "tray:C",
+      "edge_id": "J-B"
+    },
+    {
+      "time": 1,
+      "event": "tick"
+    },
+    {
+      "time": 2,
+      "event": "prefix_arrive",
+      "tray_id": "tray:target",
+      "node": "S"
+    },
+    {
+      "time": 2,
+      "event": "route_commit",
+      "candidate_id": "regional:v5:bag:target:tray:target:0"
+    },
+    {
+      "time": 2,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "S-J"
+    },
+    {
+      "time": 2,
+      "event": "tick"
+    },
+    {
+      "time": 3,
+      "event": "tick"
+    },
+    {
+      "time": 4,
+      "event": "tick"
+    },
+    {
+      "time": 5,
+      "event": "prefix_arrive",
+      "tray_id": "tray:target",
+      "node": "J"
+    },
+    {
+      "time": 5,
+      "event": "route_commit",
+      "candidate_id": "regional:v10:bag:target:tray:target:0"
+    },
+    {
+      "time": 5,
+      "event": "tick"
+    },
+    {
+      "time": 6,
+      "event": "tick"
+    },
+    {
+      "time": 7,
+      "event": "tick"
+    },
+    {
+      "time": 8,
+      "event": "tick"
+    },
+    {
+      "time": 9,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "J-B"
+    },
+    {
+      "time": 9,
+      "event": "tray_state",
+      "tray_id": "tray:C",
+      "mode": "holding",
+      "node": "B"
+    },
+    {
+      "time": 9,
+      "event": "tick"
+    },
+    {
+      "time": 10,
+      "event": "tick"
+    },
+    {
+      "time": 11,
+      "event": "tick"
+    },
+    {
+      "time": 12,
+      "event": "tick"
+    },
+    {
+      "time": 13,
+      "event": "tick"
+    },
+    {
+      "time": 14,
+      "event": "tray_state",
+      "tray_id": "tray:C",
+      "mode": "empty",
+      "node": "B"
+    },
+    {
+      "time": 14,
+      "event": "tick"
+    },
+    {
+      "time": 15,
+      "event": "tick"
+    },
+    {
+      "time": 16,
+      "event": "bag_arrival",
+      "bag_id": "forecast:B:1"
+    },
+    {
+      "time": 16,
+      "event": "load",
+      "bag_id": "forecast:B:1",
+      "tray_id": "tray:B:0"
+    },
+    {
+      "time": 16,
+      "event": "route_commit",
+      "candidate_id": "regional:v25:forecast:B:1:tray:B:0:0"
+    },
+    {
+      "time": 16,
+      "event": "depart",
+      "tray_id": "tray:B:0",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 16,
+      "event": "tick"
+    },
+    {
+      "time": 17,
+      "event": "tray_state",
+      "tray_id": "tray:target",
+      "mode": "unloading",
+      "node": "B"
+    },
+    {
+      "time": 17,
+      "event": "tick"
+    },
+    {
+      "time": 18,
+      "event": "bag_arrival",
+      "bag_id": "forecast:B:0"
+    },
+    {
+      "time": 18,
+      "event": "load",
+      "bag_id": "forecast:B:0",
+      "tray_id": "tray:C"
+    },
+    {
+      "time": 18,
+      "event": "route_commit",
+      "candidate_id": "regional:v30:forecast:B:0:tray:C:0"
+    },
+    {
+      "time": 18,
+      "event": "tick"
+    },
+    {
+      "time": 19,
+      "event": "unload_complete",
+      "bag_id": "bag:target",
+      "tray_id": "tray:target"
+    },
+    {
+      "time": 19,
+      "event": "tray_state",
+      "tray_id": "tray:target",
+      "mode": "holding",
+      "node": "B"
+    },
+    {
+      "time": 19,
+      "event": "tick"
+    },
+    {
+      "time": 20,
+      "event": "tick"
+    },
+    {
+      "time": 21,
+      "event": "tick"
+    },
+    {
+      "time": 22,
+      "event": "tick"
+    },
+    {
+      "time": 23,
+      "event": "old_arrive",
+      "tray_id": "tray:old",
+      "node": "B"
+    },
+    {
+      "time": 23,
+      "event": "tick"
+    },
+    {
+      "time": 24,
+      "event": "depart",
+      "tray_id": "tray:C",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 24,
+      "event": "tray_state",
+      "tray_id": "tray:target",
+      "mode": "empty",
+      "node": "B"
+    },
+    {
+      "time": 24,
+      "event": "tray_state",
+      "tray_id": "tray:B:0",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 24,
+      "event": "tick"
+    },
+    {
+      "time": 25,
+      "event": "tick"
+    },
+    {
+      "time": 26,
+      "event": "unload_complete",
+      "bag_id": "forecast:B:1",
+      "tray_id": "tray:B:0"
+    },
+    {
+      "time": 26,
+      "event": "tray_state",
+      "tray_id": "tray:B:0",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 26,
+      "event": "tick"
+    },
+    {
+      "time": 27,
+      "event": "tick"
+    },
+    {
+      "time": 28,
+      "event": "module_release",
+      "tray_id": "tray:old"
+    },
+    {
+      "time": 28,
+      "event": "tick"
+    },
+    {
+      "time": 29,
+      "event": "tick"
+    },
+    {
+      "time": 30,
+      "event": "tick"
+    },
+    {
+      "time": 31,
+      "event": "tick"
+    },
+    {
+      "time": 32,
+      "event": "tray_state",
+      "tray_id": "tray:C",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 32,
+      "event": "tick"
+    },
+    {
+      "time": 33,
+      "event": "tick"
+    },
+    {
+      "time": 34,
+      "event": "unload_complete",
+      "bag_id": "forecast:B:0",
+      "tray_id": "tray:C"
+    },
+    {
+      "time": 34,
+      "event": "tray_state",
+      "tray_id": "tray:C",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 34,
+      "event": "tick"
+    },
+    {
+      "time": 35,
+      "event": "tick"
+    },
+    {
+      "time": 36,
+      "event": "tick"
+    },
+    {
+      "time": 37,
+      "event": "tick"
+    },
+    {
+      "time": 38,
+      "event": "tick"
+    },
+    {
+      "time": 39,
+      "event": "tick"
+    },
+    {
+      "time": 40,
+      "event": "tick"
+    },
+    {
+      "time": 41,
+      "event": "tick"
+    },
+    {
+      "time": 42,
+      "event": "tick"
+    },
+    {
+      "time": 43,
+      "event": "tick"
+    },
+    {
+      "time": 44,
+      "event": "tick"
+    },
+    {
+      "time": 45,
+      "event": "tick"
+    },
+    {
+      "time": 46,
+      "event": "tick"
+    },
+    {
+      "time": 47,
+      "event": "tick"
+    },
+    {
+      "time": 48,
+      "event": "tick"
+    },
+    {
+      "time": 49,
+      "event": "tick"
+    },
+    {
+      "time": 50,
+      "event": "tick"
+    },
+    {
+      "time": 51,
+      "event": "tick"
+    },
+    {
+      "time": 52,
+      "event": "tick"
+    },
+    {
+      "time": 53,
+      "event": "tick"
+    },
+    {
+      "time": 54,
+      "event": "tick"
+    },
+    {
+      "time": 55,
+      "event": "tick"
+    },
+    {
+      "time": 56,
+      "event": "tick"
+    },
+    {
+      "time": 57,
+      "event": "tick"
+    },
+    {
+      "time": 58,
+      "event": "tick"
+    },
+    {
+      "time": 59,
+      "event": "tick"
+    },
+    {
+      "time": 60,
+      "event": "tick"
+    },
+    {
+      "time": 61,
+      "event": "tick"
+    },
+    {
+      "time": 62,
+      "event": "tick"
+    },
+    {
+      "time": 63,
+      "event": "tick"
+    },
+    {
+      "time": 64,
+      "event": "tick"
+    },
+    {
+      "time": 65,
+      "event": "tick"
+    },
+    {
+      "time": 66,
+      "event": "tick"
+    },
+    {
+      "time": 67,
+      "event": "tick"
+    },
+    {
+      "time": 68,
+      "event": "tick"
+    },
+    {
+      "time": 69,
+      "event": "tick"
+    },
+    {
+      "time": 70,
+      "event": "tick"
+    },
+    {
+      "time": 71,
+      "event": "tick"
+    },
+    {
+      "time": 72,
+      "event": "tick"
+    }
+  ],
+  "controller_history": [
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 0,
+      "snapshot_version": 1,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [
+        {
+          "tray_id": "tray:C",
+          "destination": "B",
+          "first_depart": 0,
+          "usable_at": 14,
+          "dependency_version": 1
+        }
+      ],
+      "search_calls": 1,
+      "search_expansions": 6,
+      "generator_statuses": [
+        "partial_candidate_set"
+      ],
+      "rollout_calls": 3,
+      "rollout_ms": 48.95479998958763,
+      "scored_actions": [
+        {
+          "action_index": 0,
+          "transfers": [],
+          "proxy_cost": 18.9,
+          "cost_components": {
+            "tray_wait": 4.0,
+            "nonprotected_tardiness": 4.0,
+            "empty_distance": 9.0,
+            "terminal_backlog": 1.0,
+            "terminal_inflight": 0.0
+          },
+          "uncompleted_bag_ids": [
+            "forecast:B:1"
+          ],
+          "invariant_checks": 64
+        },
+        {
+          "action_index": 1,
+          "transfers": [
+            {
+              "candidate_id": "regional:v1:empty:tray:C:0",
+              "bag_id": null,
+              "tray_id": "tray:C",
+              "legs": [
+                {
+                  "edge_id": "C-J",
+                  "depart": 0,
+                  "arrive": 1
+                },
+                {
+                  "edge_id": "J-B",
+                  "depart": 1,
+                  "arrive": 9
+                }
+              ],
+              "unload_complete": 9,
+              "usable_at": 14,
+              "dependency_version": 1,
+              "baseline_id": "regional:v1:empty:tray:C:0",
+              "is_baseline": true,
+              "destination_node": "B",
+              "prefix_only": false,
+              "continuation_destination": null
+            }
+          ],
+          "proxy_cost": 14.9,
+          "cost_components": {
+            "tray_wait": 0.0,
+            "nonprotected_tardiness": 4.0,
+            "empty_distance": 9.0,
+            "terminal_backlog": 1.0,
+            "terminal_inflight": 0.0
+          },
+          "uncompleted_bag_ids": [
+            "forecast:B:1"
+          ],
+          "invariant_checks": 61
+        },
+        {
+          "action_index": 2,
+          "transfers": [
+            {
+              "candidate_id": "regional:v1:empty:tray:C:0",
+              "bag_id": null,
+              "tray_id": "tray:C",
+              "legs": [
+                {
+                  "edge_id": "C-J",
+                  "depart": 2,
+                  "arrive": 3
+                },
+                {
+                  "edge_id": "J-B",
+                  "depart": 3,
+                  "arrive": 11
+                }
+              ],
+              "unload_complete": 11,
+              "usable_at": 16,
+              "dependency_version": 1,
+              "baseline_id": "regional:v1:empty:tray:C:0",
+              "is_baseline": true,
+              "destination_node": "B",
+              "prefix_only": false,
+              "continuation_destination": null
+            }
+          ],
+          "proxy_cost": 14.9,
+          "cost_components": {
+            "tray_wait": 0.0,
+            "nonprotected_tardiness": 4.0,
+            "empty_distance": 9.0,
+            "terminal_backlog": 1.0,
+            "terminal_inflight": 0.0
+          },
+          "uncompleted_bag_ids": [
+            "forecast:B:1"
+          ],
+          "invariant_checks": 61
+        }
+      ],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 2,
+      "proxy_future": [
+        {
+          "bag_id": "forecast:B:0",
+          "origin": "B",
+          "destination": "A",
+          "arrival": 16,
+          "deadline": 28,
+          "protected": false
+        },
+        {
+          "bag_id": "forecast:B:1",
+          "origin": "B",
+          "destination": "A",
+          "arrival": 16,
+          "deadline": 28,
+          "protected": false
+        }
+      ],
+      "proxy_future_sha256": "d67ad1cc50f061f9dbc80e155778b20a3d77e63e7e3eabe4ce38a12eee51bd6a",
+      "enumerated_action_count": 3,
+      "unscored_enumerated_actions": 0,
+      "selected_action_index": 1,
+      "selected_proxy_cost": 14.9,
+      "status": "all_generated_sequences_scored_within_declared_depth",
+      "proposal_count": 1,
+      "elapsed_ms": 51.06000000523636,
+      "commit_results": [
+        {
+          "tray_id": "tray:C",
+          "accepted": true,
+          "reason": "accepted"
+        }
+      ],
+      "committed_count": 1
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 1,
+      "snapshot_version": 3,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.0827999974717386,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 2,
+      "snapshot_version": 6,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07339999865507707,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 3,
+      "snapshot_version": 7,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.06570000550709665,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 4,
+      "snapshot_version": 8,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.06459999713115394,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 5,
+      "snapshot_version": 11,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07699999696342275,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 6,
+      "snapshot_version": 12,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.06880000000819564,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 7,
+      "snapshot_version": 13,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.06920000305399299,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 8,
+      "snapshot_version": 14,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.21180000476306304,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 9,
+      "snapshot_version": 15,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.09549999958835542,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 10,
+      "snapshot_version": 16,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07380000170087442,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 11,
+      "snapshot_version": 17,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07159999950090423,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 12,
+      "snapshot_version": 18,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07309999637072906,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 13,
+      "snapshot_version": 19,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.06769999890821055,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 14,
+      "snapshot_version": 21,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.6130999972810969,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 15,
+      "snapshot_version": 22,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ],
+          "observed_units_removed": []
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "source": "published_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07809999806340784,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 16,
+      "snapshot_version": 26,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 16,
+          "overdue_pending": true,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0"
+          ],
+          "observed_units_removed": [
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 1,
+          "source": "overdue_identified_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07529999857069924,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 17,
+      "snapshot_version": 27,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 17,
+          "overdue_pending": true,
+          "explicit_cancellation": false,
+          "unit_ids": [
+            "forecast:B:0"
+          ],
+          "observed_units_removed": [
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [
+        {
+          "node": "B",
+          "at": 17,
+          "count": 1,
+          "source": "overdue_identified_forecast"
+        }
+      ],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.06890000076964498,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 18,
+      "snapshot_version": 31,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 18,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.1629999969736673,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 19,
+      "snapshot_version": 32,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 19,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.059600002714432776,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 20,
+      "snapshot_version": 33,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 20,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.05359999340726063,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 21,
+      "snapshot_version": 34,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 21,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.2896999940276146,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 22,
+      "snapshot_version": 35,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 22,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04959999932907522,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 23,
+      "snapshot_version": 37,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 23,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.05339999916031957,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 24,
+      "snapshot_version": 39,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 24,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07850000110920519,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 25,
+      "snapshot_version": 40,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 25,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.05360000068321824,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 26,
+      "snapshot_version": 42,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 26,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.1410000040777959,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 27,
+      "snapshot_version": 43,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 27,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.054100004490464926,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 28,
+      "snapshot_version": 45,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 28,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04760000592796132,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 29,
+      "snapshot_version": 46,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 29,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04780000017490238,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 30,
+      "snapshot_version": 47,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 30,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.046200002543628216,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 31,
+      "snapshot_version": 48,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 31,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.05249999958323315,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 32,
+      "snapshot_version": 49,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 32,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04690000059781596,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 33,
+      "snapshot_version": 50,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 33,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04479999915929511,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 34,
+      "snapshot_version": 52,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 34,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04959999932907522,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 35,
+      "snapshot_version": 53,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 35,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.045199994929134846,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 36,
+      "snapshot_version": 54,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 36,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04220000118948519,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 37,
+      "snapshot_version": 55,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 37,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04459999763639644,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 38,
+      "snapshot_version": 56,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 38,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04220000118948519,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 39,
+      "snapshot_version": 57,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 39,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.041600003896746784,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 40,
+      "snapshot_version": 58,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 40,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.045000000682193786,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 41,
+      "snapshot_version": 59,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 41,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04159999662078917,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 42,
+      "snapshot_version": 60,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 42,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04170000465819612,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 43,
+      "snapshot_version": 61,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 43,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.040599996282253414,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 44,
+      "snapshot_version": 62,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 44,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.07979999645613134,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 45,
+      "snapshot_version": 63,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 45,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.05020000389777124,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 46,
+      "snapshot_version": 64,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 46,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.06219999340828508,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 47,
+      "snapshot_version": 65,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 47,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04400000034365803,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 48,
+      "snapshot_version": 66,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 48,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04230000195093453,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 49,
+      "snapshot_version": 67,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 49,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04199999966658652,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 50,
+      "snapshot_version": 68,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 50,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04140000237384811,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 51,
+      "snapshot_version": 69,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 51,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04020000051241368,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 52,
+      "snapshot_version": 70,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 52,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04150000313529745,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 53,
+      "snapshot_version": 71,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 53,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.056700002460274845,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 54,
+      "snapshot_version": 72,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 54,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.05630000669043511,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 55,
+      "snapshot_version": 73,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 55,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.0427999984822236,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 56,
+      "snapshot_version": 74,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 56,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04170000465819612,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 57,
+      "snapshot_version": 75,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 57,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.04149999585933983,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 58,
+      "snapshot_version": 76,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 58,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.042299994674976915,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 59,
+      "snapshot_version": 77,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 59,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.043300002289470285,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 60,
+      "snapshot_version": 78,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 0,
+          "published_at": 0,
+          "effective_at": 60,
+          "overdue_pending": false,
+          "explicit_cancellation": false,
+          "unit_ids": [],
+          "observed_units_removed": [
+            "forecast:B:0",
+            "forecast:B:1"
+          ]
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.043000000005122274,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 61,
+      "snapshot_version": 79,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.03650000144261867,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 62,
+      "snapshot_version": 80,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.03640000068116933,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 63,
+      "snapshot_version": 81,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.035899996873922646,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 64,
+      "snapshot_version": 82,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.03560000186553225,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 65,
+      "snapshot_version": 83,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.0368999972124584,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 66,
+      "snapshot_version": 84,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.036799996451009065,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 67,
+      "snapshot_version": 85,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.05819999933009967,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 68,
+      "snapshot_version": 86,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.043799998820759356,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 69,
+      "snapshot_version": 87,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.03930000093532726,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 70,
+      "snapshot_version": 88,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.037999998312443495,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_legal_empty_sequence_forecast_rollout",
+      "snapshot_time": 71,
+      "snapshot_version": 89,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "B",
+          "at": 16,
+          "count": 2,
+          "published_at": 0,
+          "reason": "stale_publication"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "generator_statuses": [],
+      "rollout_calls": 0,
+      "rollout_ms": 0.0,
+      "scored_actions": [],
+      "candidate_pool_truncated": false,
+      "demand_units_truncated": false,
+      "search_budget_exhausted": false,
+      "rollout_budget_exhausted": false,
+      "failed_proxy_rollouts": [],
+      "limits": {
+        "max_rollouts": 12,
+        "max_transfer_depth": 2,
+        "paths_per_request": 2,
+        "max_pool_per_state": 8,
+        "max_search_calls": 32,
+        "score_horizon": 32
+      },
+      "claim": "best_scored_action_only_under_one_published_forecast_proxy_not_global_optimum",
+      "continuation": "fixed_earliest_route_and_reactive_empty_dispatch_no_recursive_predictor",
+      "action_family": "up_to_depth_cross_zone_empty_transfers_earliest_or_valid_need_time_shift",
+      "demand": [],
+      "initial_pool_size": 0,
+      "status": "no_transfer_only_from_bounded_candidate_search",
+      "selected_action_index": 0,
+      "proposal_count": 0,
+      "elapsed_ms": 0.037699996028095484,
+      "commit_results": [],
+      "committed_count": 0
+    }
+  ],
+  "failure": null
+}

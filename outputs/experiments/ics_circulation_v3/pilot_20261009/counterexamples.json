@@ -1,0 +1,55 @@
+[
+  {
+    "name": "unloaded_does_not_mean_usable",
+    "unload_complete": 9,
+    "usable_at": 13,
+    "tray_mode_at_unload": "holding",
+    "premature_supply_error_by_tick": {
+      "9": -1,
+      "10": -1,
+      "11": -1,
+      "12": -1,
+      "13": 0
+    },
+    "passed": true
+  },
+  {
+    "name": "same_inventory_different_irrevocable_transit",
+    "same_initial_tray_records": true,
+    "arrival_ticks": [
+      6,
+      18
+    ],
+    "analytic_cost": [
+      0.0,
+      8.0
+    ],
+    "rollout_tray_wait": [
+      0.0,
+      7.0
+    ],
+    "rollout_total_cost": [
+      5.0,
+      12.7
+    ],
+    "passed": true
+  },
+  {
+    "name": "two_controllers_cannot_consume_the_same_capacity",
+    "independently_legal_before_commit": true,
+    "first_commit": {
+      "accepted": true,
+      "reason": "accepted"
+    },
+    "stale_commit": {
+      "accepted": false,
+      "reason": "stale_version"
+    },
+    "refreshed_but_conflicting_commit": {
+      "accepted": false,
+      "reason": "capacity:edge:shared@0"
+    },
+    "owner_model": "single_threaded_serialized_owner_not_distributed_transaction",
+    "passed": true
+  }
+]

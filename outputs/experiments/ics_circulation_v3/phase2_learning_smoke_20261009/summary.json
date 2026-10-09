@@ -1,0 +1,210 @@
+{
+  "scope": "synthetic_first_safe_prefix_value_learning_with_disjoint_deployment_sources",
+  "source_groups": {
+    "train": 8,
+    "validation": 4,
+    "test": 4,
+    "deployment": 4
+  },
+  "candidate_rows": 64,
+  "paired_branch_rollouts": 128,
+  "forecast_model_rollouts": 64,
+  "deployment_runs": 24,
+  "invariant_checks": 16290,
+  "feature_count": 23,
+  "selected_alpha": {
+    "direct": 0.01,
+    "residual": 0.01
+  },
+  "label_and_forecast_evaluation_ms": 3790.607099996123,
+  "ridge_fitting_ms": 12.688300004811026,
+  "candidate_test": {
+    "baseline": {
+      "groups": 4,
+      "mean_regret": 1.75,
+      "max_regret": 5.0,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": null
+    },
+    "analytic": {
+      "groups": 4,
+      "mean_regret": 1.75,
+      "max_regret": 5.0,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": 3.4573291714848327
+    },
+    "timed": {
+      "groups": 4,
+      "mean_regret": 0.0,
+      "max_regret": 0.0,
+      "positive_regret_groups": 0,
+      "mean_gain_over_baseline": 1.75,
+      "delta_rmse": 4.295710069359895
+    },
+    "direct": {
+      "groups": 4,
+      "mean_regret": 1.75,
+      "max_regret": 5.0,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": 3.340060560266774
+    },
+    "residual": {
+      "groups": 4,
+      "mean_regret": 1.75,
+      "max_regret": 5.0,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": 3.27176371805903
+    },
+    "forecast_rollout": {
+      "groups": 4,
+      "mean_regret": 0.0,
+      "max_regret": 0.0,
+      "positive_regret_groups": 0,
+      "mean_gain_over_baseline": 1.75,
+      "delta_rmse": 0.625
+    }
+  },
+  "independent_closed_loop": {
+    "baseline": {
+      "runs": 4,
+      "mean_cost": 18.5,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 0.0,
+      "wall_ms": {
+        "p50": 28.52260000508977,
+        "p95": 30.25270000216551,
+        "p99": 30.25270000216551,
+        "max": 30.25270000216551,
+        "mean": 26.27715000016906
+      }
+    },
+    "analytic": {
+      "runs": 4,
+      "mean_cost": 18.5,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 0.0,
+      "wall_ms": {
+        "p50": 30.40350000082981,
+        "p95": 31.329699995694682,
+        "p99": 31.329699995694682,
+        "max": 31.329699995694682,
+        "mean": 27.344675001586438
+      }
+    },
+    "timed": {
+      "runs": 4,
+      "mean_cost": 18.5,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 0.0,
+      "wall_ms": {
+        "p50": 28.055400005541742,
+        "p95": 31.845700003032107,
+        "p99": 31.845700003032107,
+        "max": 31.845700003032107,
+        "mean": 26.71477500189212
+      }
+    },
+    "direct": {
+      "runs": 4,
+      "mean_cost": 18.5,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 0.0,
+      "wall_ms": {
+        "p50": 29.84120000473922,
+        "p95": 32.877000005100854,
+        "p99": 32.877000005100854,
+        "max": 32.877000005100854,
+        "mean": 28.003175004414516
+      }
+    },
+    "residual": {
+      "runs": 4,
+      "mean_cost": 18.5,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 0.0,
+      "wall_ms": {
+        "p50": 28.405600001860876,
+        "p95": 32.516200000827666,
+        "p99": 32.516200000827666,
+        "max": 32.516200000827666,
+        "mean": 27.541375002329005
+      }
+    },
+    "forecast_rollout": {
+      "runs": 4,
+      "mean_cost": 18.5,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 0.0,
+      "wall_ms": {
+        "p50": 197.97100000141654,
+        "p95": 236.25049999827752,
+        "p99": 236.25049999827752,
+        "max": 236.25049999827752,
+        "mean": 195.44727500033332
+      }
+    }
+  },
+  "generation_ms": {
+    "p50": 0.6340000036288984,
+    "p95": 0.7962000017869286,
+    "p99": 0.7982999959494919,
+    "max": 0.7982999959494919,
+    "mean": 0.6300312506937189
+  },
+  "features_ms": {
+    "p50": 0.6159999975352548,
+    "p95": 0.8014999984879978,
+    "p99": 0.8846999990055338,
+    "max": 0.8846999990055338,
+    "mean": 0.645987499410694
+  },
+  "forecast_scoring_ms": {
+    "p50": 69.1413000022294,
+    "p95": 89.52660000068136,
+    "p99": 100.16319999704137,
+    "max": 100.16319999704137,
+    "mean": 73.19923749946611
+  },
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "scripts/experiments/ics_circulation_v3/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "scripts/experiments/ics_circulation_v3/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "scripts/experiments/ics_circulation_v3/evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "scripts/experiments/ics_circulation_v3/learning.py": "5f37d9077375d112db2fea51f06c4e71a291830d54f3fc71a3f0a38530f4a924",
+    "scripts/experiments/ics_circulation_v3/model.py": "5c9247a5bc6b530978e989dbc15d6f94815a61649fe642e7fccfb61d7a38e45a",
+    "scripts/experiments/ics_circulation_v3/nanning_routing_benchmark.py": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+    "scripts/experiments/ics_circulation_v3/phase2_scenarios.py": "fbd094d1be95269dd331f08297a6ee84f8861f99cb20c7e29d8c9935c5e6702c",
+    "scripts/experiments/ics_circulation_v3/prebalance.py": "781870dc4abea258b08c951bc10ce8018c6cbc8794823bfd710548350edc0a29",
+    "scripts/experiments/ics_circulation_v3/routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "scripts/experiments/ics_circulation_v3/run_phase2_learning.py": "5cb7a5c5921e723c95ac963a20359946267194e18ea5d6c0508a693ae07f1fcf",
+    "scripts/experiments/ics_circulation_v3/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "scripts/experiments/ics_circulation_v3/run_prebalance.py": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "0f0a77dfdc5ba1d6c878cab515584798e24fefc04820f802d57a54824e557b48",
+    "scripts/experiments/ics_circulation_v3/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035"
+  },
+  "limitations": [
+    "Synthetic seven-node family with full visible physical state; no airport-generalization claim",
+    "Linear ridge models only, not a trained MLP or original PPL/DG-PG algorithm",
+    "Candidate interventions stop at the first waitable node; a no-wait chain is an indivisible prefix",
+    "Forecast-rollout reference receives the same published demand forecast and extra compute, not the true tape",
+    "Strict deadline checks for loaded requests are local; future uncertainty can still cause missed service",
+    "No supplier integration and no network end-to-end latency measurement",
+    "Low-sample benefit must be judged from frozen test and independent deployment, not training loss"
+  ]
+}

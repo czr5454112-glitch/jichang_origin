@@ -1,0 +1,58 @@
+{
+  "evaluation_kind": "REGRESSION_ON_PREVIOUSLY_EVALUATED_GROUPS_NOT_UNSEEN",
+  "reference_evidence_directory": "outputs\\experiments\\ics_circulation_v3\\phase2_joint_20261009",
+  "corrected_evidence_directory": "outputs\\experiments\\ics_circulation_v3\\phase2_joint_corrected_20261009",
+  "same_group_count": 24,
+  "same_future_seed": 991,
+  "all_144_input_hash_triples_match_old": true,
+  "changed_source_files_since_discovery": [
+    "prebalance.py",
+    "learning.py",
+    "phase2_scenarios.py"
+  ],
+  "interpretation": "These groups and exogenous tapes were used to discover and repair the forecast identity lifecycle defect. They are regression evidence, not unseen generalization evidence. Negative extra empty-travel costs are retained.",
+  "by_policy": {
+    "baseline__reactive_only": {
+      "old_completed": 97,
+      "corrected_completed": 97,
+      "denominator": 97,
+      "old_mean_cost": 15.541666666666666,
+      "corrected_mean_cost": 15.541666666666666
+    },
+    "baseline__predictive_route_first": {
+      "old_completed": 94,
+      "corrected_completed": 97,
+      "denominator": 97,
+      "old_mean_cost": 31.670833333333334,
+      "corrected_mean_cost": 15.620833333333334
+    },
+    "baseline__predictive_prebalance_first": {
+      "old_completed": 94,
+      "corrected_completed": 97,
+      "denominator": 97,
+      "old_mean_cost": 31.670833333333334,
+      "corrected_mean_cost": 15.620833333333334
+    },
+    "timed__reactive_only": {
+      "old_completed": 97,
+      "corrected_completed": 97,
+      "denominator": 97,
+      "old_mean_cost": 15.125,
+      "corrected_mean_cost": 15.125
+    },
+    "timed__predictive_route_first": {
+      "old_completed": 94,
+      "corrected_completed": 97,
+      "denominator": 97,
+      "old_mean_cost": 31.295833333333334,
+      "corrected_mean_cost": 15.204166666666666
+    },
+    "timed__predictive_prebalance_first": {
+      "old_completed": 93,
+      "corrected_completed": 97,
+      "denominator": 97,
+      "old_mean_cost": 36.69583333333333,
+      "corrected_mean_cost": 15.204166666666666
+    }
+  }
+}

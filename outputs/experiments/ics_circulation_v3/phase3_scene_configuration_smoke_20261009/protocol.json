@@ -1,0 +1,103 @@
+{
+  "schema": "ics_v3_full_information_scene_configuration_protocol_v1",
+  "counts": {
+    "train": 80,
+    "validation": 20,
+    "test": 40
+  },
+  "source_namespace": "phase3_config",
+  "future_seed": 991,
+  "min_leaf_groups": 8,
+  "configurations": [
+    {
+      "routing": "baseline",
+      "balancing": "reactive_only",
+      "predictive": false,
+      "coordination_order": "route_then_prebalance"
+    },
+    {
+      "routing": "timed",
+      "balancing": "reactive_only",
+      "predictive": false,
+      "coordination_order": "route_then_prebalance"
+    },
+    {
+      "routing": "timed",
+      "balancing": "predictive_route_first",
+      "predictive": true,
+      "coordination_order": "route_then_prebalance"
+    },
+    {
+      "routing": "timed",
+      "balancing": "predictive_prebalance_first",
+      "predictive": true,
+      "coordination_order": "prebalance_then_route"
+    }
+  ],
+  "feature_names": [
+    "destination_empty_release_earliest_ticks",
+    "destination_empty_stock",
+    "forecast_demand_before_target_release",
+    "forecast_destination_earliest_ticks",
+    "forecast_destination_origin_count",
+    "forecast_earliest_ticks",
+    "forecast_shared_edges_proxy",
+    "forecast_source_origin_count",
+    "forecast_total_count",
+    "inflight_destination_earliest_ticks",
+    "initial_reservation_count",
+    "known_inflight_count",
+    "loaded_tray_count",
+    "source_empty_stock",
+    "target_deadline_slack",
+    "target_static_travel_ticks",
+    "target_unload_hold_ticks",
+    "total_empty_stock",
+    "total_tray_count",
+    "visible_waiting_bags"
+  ],
+  "decision_time": "initial_snapshot_before_episode_execution",
+  "stump_training": "all adjacent observed training feature midpoints; training-only per-leaf best actions",
+  "fixed_training": "single configuration with minimum training mean cost; declared configuration order breaks ties",
+  "validation_selection": "compare fitted stump with training-best fixed; ties prefer fixed; no refit",
+  "held_out_protocol": "freeze both fitted selectors and validation gate before generating test episode costs",
+  "label_scope": "all four complete episode costs for each source, same future and physical permissions",
+  "estimator": "full_information_supervised_cost_minimization; not_PPL_not_AIPW_no_propensity_estimation",
+  "evaluation": "exact stored full-episode outcome lookup for the once-per-scene selected fixed controller",
+  "expected_episode_calls": 560,
+  "extra_selector_evaluation_simulations": 0,
+  "smoke": true,
+  "pipeline_only_if_smoke": true,
+  "actual_counts": {
+    "train": 8,
+    "validation": 4,
+    "test": 4
+  },
+  "actual_expected_episode_calls": 64,
+  "weights": {
+    "tray_wait": 1.0,
+    "nonprotected_tardiness": 1.0,
+    "empty_distance": 0.1,
+    "terminal_backlog": 10.0,
+    "terminal_inflight": 2.0
+  },
+  "source_sha256_before": {
+    "scene_configuration.py": "b893647615f2cfc99d9df164ec181f970ffb256e621baa7b914f0202b36a4ea0",
+    "run_scene_configuration.py": "36b6ed5be6ffbb5e7f0bc1f6fbbd442eeb8e3e3d2a74368638fb202046021ea0",
+    "joint_control.py": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+    "phase2_scenarios.py": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "prebalance.py": "bfba7869bd18d78fa9bd1e9c694d73b4072ec0b3bccdaa6d0c0a2f9b12e37cda"
+  },
+  "historical_split_manifest_sha256": {
+    "outputs/experiments/ics_circulation_v3/phase2_learning_20261009/split_manifest.json": "f056151c4e63c65c5820725b0c2e3d0c196a25243165f797c39bea669001b9ac",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/split_manifest.json": "6b343e4cf83e0e4503f66bb21fc0d62c88d3070cf6bfac71d67393bd963d9c79",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_smoke_20261009/split_manifest.json": "88eaf1730cc8636ad70d179d0a47796c6e5f6b17c006ef6f64b3a561d3e56945",
+    "outputs/experiments/ics_circulation_v3/phase3_learning_20261009/split_manifest.json": "257b9454b43d102198737d588c397b680fea9680fff3a5449858a3a68cb8ac08",
+    "outputs/experiments/ics_circulation_v3/phase3_learning_smoke_20261009/split_manifest.json": "e1e75525776e900c3c3ccc2908d1553f1a611f061f84bf9c912ce058796b6cac"
+  }
+}

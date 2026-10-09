@@ -1,0 +1,47 @@
+{
+  "groups": {
+    "train": [
+      "v3_phase2:train:000",
+      "v3_phase2:train:001",
+      "v3_phase2:train:002",
+      "v3_phase2:train:003",
+      "v3_phase2:train:004",
+      "v3_phase2:train:005",
+      "v3_phase2:train:006",
+      "v3_phase2:train:007"
+    ],
+    "validation": [
+      "v3_phase2:validation:000",
+      "v3_phase2:validation:001",
+      "v3_phase2:validation:002",
+      "v3_phase2:validation:003"
+    ],
+    "test": [
+      "v3_phase2:test:000",
+      "v3_phase2:test:001",
+      "v3_phase2:test:002",
+      "v3_phase2:test:003"
+    ],
+    "deployment": [
+      "v3_phase2:deployment:000",
+      "v3_phase2:deployment:001",
+      "v3_phase2:deployment:002",
+      "v3_phase2:deployment:003"
+    ]
+  },
+  "unit": "source_initialization_all_snapshots_candidates_futures_stay_together",
+  "label_seeds": [
+    0,
+    1
+  ],
+  "deployment_seed": 991,
+  "ridge_grid_fixed_before_labels": [
+    0.01,
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "validation_selection": "mean candidate regret, then RMSE, then ridge penalty",
+  "no_test_refitting": true
+}

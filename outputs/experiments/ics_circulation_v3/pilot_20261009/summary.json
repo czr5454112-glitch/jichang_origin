@@ -1,0 +1,115 @@
+{
+  "schema": "ics_circulation_v3_pilot_v1",
+  "scope": "synthetic_fixed_proxy_mechanism_pilot",
+  "scene_count": 24,
+  "requested_scene_count": 24,
+  "candidate_count": 72,
+  "branch_rollouts": 288,
+  "future_count_per_scene": 4,
+  "invariant_checks": 21139,
+  "counterexample_count": 3,
+  "counterexamples_passed": true,
+  "route_request_outcomes": {
+    "new_route_success": 24
+  },
+  "ranking_disagreement_scenes": 12,
+  "positive_candidate_space_scenes": 12,
+  "mean_set_regret": 1.7291666666666667,
+  "max_set_regret": 4.0,
+  "group_mean_set_regret_descriptive_only": {
+    "competition=False,hold=0": 0.0,
+    "competition=False,hold=4": 0.0,
+    "competition=True,hold=0": 3.4583333333333335,
+    "competition=True,hold=4": 3.4583333333333335
+  },
+  "timing_ms": {
+    "generation_ms": {
+      "p50": 54.43999999988591,
+      "p95": 60.75119999877643,
+      "p99": 63.028200005646795,
+      "max": 63.028200005646795,
+      "mean": 54.20521250077096
+    },
+    "features_ms": {
+      "p50": 0.1686000032350421,
+      "p95": 0.23990000045159832,
+      "p99": 0.24649999977555126,
+      "max": 0.24649999977555126,
+      "mean": 0.17395416671206476
+    },
+    "scoring_ms": {
+      "p50": 0.08519999391864985,
+      "p95": 0.09450000652577728,
+      "p99": 0.1340000017080456,
+      "max": 0.1340000017080456,
+      "mean": 0.08543750027456554
+    },
+    "validation_ms": {
+      "p50": 0.2497000023140572,
+      "p95": 0.2782000010483898,
+      "p99": 0.371000001905486,
+      "max": 0.371000001905486,
+      "mean": 0.24442916704477588
+    },
+    "commit_ms": {
+      "p50": 0.44320000597508624,
+      "p95": 0.8219000010285527,
+      "p99": 1.115799997933209,
+      "max": 1.115799997933209,
+      "mean": 0.47765416790449916
+    },
+    "local_request_ms": {
+      "p50": 55.71419999614591,
+      "p95": 62.0411999989301,
+      "p99": 64.88009999884525,
+      "max": 64.88009999884525,
+      "mean": 55.504912499297156
+    }
+  },
+  "local_requests_over_100ms": 0,
+  "rollout_ms": {
+    "p50": 32.00970000034431,
+    "p95": 45.01210000307765,
+    "p99": 49.62199999863515,
+    "max": 53.63890000444371,
+    "mean": 27.73782430565714
+  },
+  "suite_ms": 9344.831800000975,
+  "independence_unit": "synthetic_initialization_not_noise_seed_or_operating_day",
+  "trained_model": null,
+  "learning_gate": "inspect_observable_residual_and_interface_before_training",
+  "weights": {
+    "tray_wait": 1,
+    "nonprotected_tardiness": 1,
+    "empty_distance": 0.1,
+    "terminal_backlog": 10,
+    "terminal_inflight": 2
+  },
+  "limits": [
+    "No native G31 or supplier integration",
+    "No regional distributed A* implementation",
+    "Initial intervention commits a whole route until usable; not a V3 single-next-edge intervention",
+    "All initial proxy state is observable; regional partial-observation permissions are not implemented",
+    "No proactive predictive rebalancing; fixed causal continuation uses reactive empty transfers",
+    "No learning gain, causal field effect, novelty or real-airport 100ms claim",
+    "Timing is local in-process only, includes feature/validation/commit; no network measurement",
+    "Forecasts and all physical parameters are synthetic assumptions",
+    "Paired value is finite-horizon under one fixed continuation, not globally optimal Q",
+    "Empty distance uses synthetic unit-speed edge lengths equal to travel ticks, not airport meters",
+    "No train/validation/test or closed-loop trained-policy evaluation in this pilot"
+  ],
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "scripts/experiments/ics_circulation_v3/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "scripts/experiments/ics_circulation_v3/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "scripts/experiments/ics_circulation_v3/evaluation.py": "d8e87810788d4c239a97acee97da04985f96e3e1e8e18d4d06a225bcc79ffa38",
+    "scripts/experiments/ics_circulation_v3/model.py": "61c7d93ed735232bfa8f111f1476bf5a480d17f872f21ddd3d13f750742b3e4f",
+    "scripts/experiments/ics_circulation_v3/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "335ec837d92b8e4f9440b1d1cfb03a6509b13ed850a87cb7ac4e8b941371be41",
+    "scripts/experiments/ics_circulation_v3/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035"
+  }
+}

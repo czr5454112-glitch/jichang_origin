@@ -1,0 +1,105 @@
+{
+  "schema": "ics_v3_matched_tiny_routing_comparison_v1",
+  "scope": "same_synthetic_initializations_local_routing_not_real_map_or_distributed_speedup",
+  "source_groups": 24,
+  "repeats": 3,
+  "request_count": 144,
+  "pair_count": 72,
+  "timed_candidate_set_matches": 72,
+  "same_timed_candidate_sets": true,
+  "all_requested_candidates_found": true,
+  "all_valid_and_committed": true,
+  "horizon": 48,
+  "expansion_limit": 2000,
+  "candidate_count": 3,
+  "wall_budget": null,
+  "order": "reference_first_when_(repeat+scene_index)%2==0_else_regional_first",
+  "time_scope": "generation_plus_full_revalidation_plus_first_candidate_commit_including_authority_checks",
+  "excluded_from_time": [
+    "initial_state_clone",
+    "scenario_construction",
+    "file_IO",
+    "network_communication"
+  ],
+  "cache_protocol": "clear_regional_static_cache_before_suite_then_retain_content_cache_across_queries",
+  "timing_ms": {
+    "reference": {
+      "p50": 52.51469999348046,
+      "p95": 60.314199996355455,
+      "p99": 60.756999999284744,
+      "max": 64.49150000116788,
+      "mean": 52.60974444414993
+    },
+    "regional": {
+      "p50": 0.8251000035670586,
+      "p95": 1.0002000053646043,
+      "p99": 1.1577000041143037,
+      "max": 1.527899999928195,
+      "mean": 0.8267777784567443
+    }
+  },
+  "phase_timing_ms": {
+    "reference": {
+      "generation_ms": {
+        "p50": 52.141000000119675,
+        "p95": 59.68650000431808,
+        "p99": 60.14529999811202,
+        "max": 64.07749999925727,
+        "mean": 52.23300972193101
+      },
+      "validation_ms": {
+        "p50": 0.23270000383490697,
+        "p95": 0.3110000034212135,
+        "p99": 0.46270000166259706,
+        "max": 0.7645000005140901,
+        "mean": 0.24072222256816328
+      },
+      "commit_ms": {
+        "p50": 0.13490000128513202,
+        "p95": 0.16709999908925965,
+        "p99": 0.2517000029911287,
+        "max": 0.27180000324733555,
+        "mean": 0.13402638918099305
+      }
+    },
+    "regional": {
+      "generation_ms": {
+        "p50": 0.46689999726368114,
+        "p95": 0.5571000001509674,
+        "p99": 0.611600000411272,
+        "max": 0.9732000035000965,
+        "mean": 0.4679847226927652
+      },
+      "validation_ms": {
+        "p50": 0.2240999965579249,
+        "p95": 0.33370000164723024,
+        "p99": 0.4298000058042817,
+        "max": 0.5759999985457398,
+        "mean": 0.23047916693030857
+      },
+      "commit_ms": {
+        "p50": 0.12789999891538173,
+        "p95": 0.14670000382466242,
+        "p99": 0.17769999976735562,
+        "max": 0.34240000240970403,
+        "mean": 0.12749583341549928
+      }
+    }
+  },
+  "limits": [
+    "Repeated timing of the same 24 source initializations, not independent operating days",
+    "Exact timed candidate agreement is asserted for these fixtures, not for arbitrary maps",
+    "Regional abstraction intentionally retains bounded static local witnesses and may omit other routes"
+  ],
+  "source_sha256": {
+    "routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+    "run_routing_comparison.py": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b"
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0"
+  }
+}

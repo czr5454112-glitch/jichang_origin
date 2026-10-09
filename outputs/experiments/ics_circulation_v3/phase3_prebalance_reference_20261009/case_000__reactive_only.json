@@ -1,0 +1,323 @@
+{
+  "metrics": {
+    "source_group": "long_connection_needs_advance",
+    "family": "mechanism_fixture",
+    "policy": "reactive_only",
+    "status": "completed_run",
+    "route_mode": "whole_route",
+    "initial_sha256": "5357c30bbc1832a60abf232047978ce6f4ee88b0cc8709e3526b133ab4529869",
+    "forecast_sha256": "beb4d9620a1c0c1afe2bd0d9cbc5aa4f54a1884c4da6ac94db8c39ad973d7a95",
+    "future_sha256": "71ee59ad1f5580140dc3ab22738ee3864a1bedc5649db889c06cee3db29ba12d",
+    "actual_bag_count": 1,
+    "completed_count": 1,
+    "uncompleted_count": 0,
+    "on_time_count": 1,
+    "total_cost": 8.8,
+    "tray_wait": 8.0,
+    "nonprotected_tardiness": 0.0,
+    "empty_distance": 8.0,
+    "terminal_backlog": 0.0,
+    "terminal_inflight": 0.0,
+    "empty_transfer_commits": 0,
+    "slow_controller_calls": 0,
+    "full_proxy_simulator_calls": 0,
+    "full_evaluation_simulator_calls": 1,
+    "failed_proxy_rollouts": 0,
+    "candidate_generation_calls": 0,
+    "bounded_partial_decisions": 0,
+    "max_proxy_calls_at_one_decision": 0,
+    "max_decision_ms": 0,
+    "proxy_rollout_ms": 0,
+    "slow_controller_ms": 0.0,
+    "runtime_ms": 4.069099995831493,
+    "finite_tray_ids_preserved": true,
+    "all_arrived_bag_ids_preserved": true,
+    "invariant_checks": 39,
+    "failure_type": null
+  },
+  "actual_bag_ledger": [
+    {
+      "bag_id": "B:future",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 8,
+      "deadline": 28,
+      "protected": false,
+      "load_time": 16,
+      "completion_time": 25,
+      "on_time": true
+    }
+  ],
+  "final_snapshot": {
+    "now": 28,
+    "network": {
+      "nodes": {
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "domestic",
+          "control_partition": "control:A",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "B": {
+          "node_id": "B",
+          "logistics_zone": "international",
+          "control_partition": "control:B",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "C": {
+          "node_id": "C",
+          "logistics_zone": "domestic",
+          "control_partition": "control:C",
+          "capacity": 4,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "A-B": {
+          "edge_id": "A-B",
+          "source": "A",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "B-A": {
+          "edge_id": "B-A",
+          "source": "B",
+          "target": "A",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "old-C-B": {
+          "edge_id": "old-C-B",
+          "source": "C",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "donor": {
+        "tray_id": "donor",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 25
+      }
+    },
+    "bags": {
+      "B:future": {
+        "bag_id": "B:future",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 8,
+        "deadline": 28,
+        "protected": false
+      }
+    },
+    "reservations": [],
+    "version": 34,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 1,
+      "hold_by_node": {},
+      "export_min_stock": 0,
+      "reception_capacity": 1
+    },
+    "plans": {},
+    "completed": {
+      "B:future": 25
+    },
+    "load_times": {
+      "B:future": 16
+    },
+    "empty_targets": {}
+  },
+  "trace": [
+    {
+      "time": 0,
+      "event": "initial"
+    },
+    {
+      "time": 0,
+      "event": "tick"
+    },
+    {
+      "time": 1,
+      "event": "tick"
+    },
+    {
+      "time": 2,
+      "event": "tick"
+    },
+    {
+      "time": 3,
+      "event": "tick"
+    },
+    {
+      "time": 4,
+      "event": "tick"
+    },
+    {
+      "time": 5,
+      "event": "tick"
+    },
+    {
+      "time": 6,
+      "event": "tick"
+    },
+    {
+      "time": 7,
+      "event": "tick"
+    },
+    {
+      "time": 8,
+      "event": "bag_arrival",
+      "bag_id": "B:future"
+    },
+    {
+      "time": 8,
+      "event": "empty_dispatch",
+      "candidate_id": "regional:v9:empty:donor:0",
+      "visible_bag_id": "B:future"
+    },
+    {
+      "time": 8,
+      "event": "depart",
+      "tray_id": "donor",
+      "edge_id": "A-B"
+    },
+    {
+      "time": 8,
+      "event": "tick"
+    },
+    {
+      "time": 9,
+      "event": "tick"
+    },
+    {
+      "time": 10,
+      "event": "tick"
+    },
+    {
+      "time": 11,
+      "event": "tick"
+    },
+    {
+      "time": 12,
+      "event": "tick"
+    },
+    {
+      "time": 13,
+      "event": "tick"
+    },
+    {
+      "time": 14,
+      "event": "tick"
+    },
+    {
+      "time": 15,
+      "event": "tick"
+    },
+    {
+      "time": 16,
+      "event": "tray_state",
+      "tray_id": "donor",
+      "mode": "empty",
+      "node": "B"
+    },
+    {
+      "time": 16,
+      "event": "load",
+      "bag_id": "B:future",
+      "tray_id": "donor"
+    },
+    {
+      "time": 16,
+      "event": "route_commit",
+      "candidate_id": "regional:v20:B:future:donor:0"
+    },
+    {
+      "time": 16,
+      "event": "depart",
+      "tray_id": "donor",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 16,
+      "event": "tick"
+    },
+    {
+      "time": 17,
+      "event": "tick"
+    },
+    {
+      "time": 18,
+      "event": "tick"
+    },
+    {
+      "time": 19,
+      "event": "tick"
+    },
+    {
+      "time": 20,
+      "event": "tick"
+    },
+    {
+      "time": 21,
+      "event": "tick"
+    },
+    {
+      "time": 22,
+      "event": "tick"
+    },
+    {
+      "time": 23,
+      "event": "tick"
+    },
+    {
+      "time": 24,
+      "event": "tray_state",
+      "tray_id": "donor",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 24,
+      "event": "tick"
+    },
+    {
+      "time": 25,
+      "event": "unload_complete",
+      "bag_id": "B:future",
+      "tray_id": "donor"
+    },
+    {
+      "time": 25,
+      "event": "tray_state",
+      "tray_id": "donor",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 25,
+      "event": "tick"
+    },
+    {
+      "time": 26,
+      "event": "tick"
+    },
+    {
+      "time": 27,
+      "event": "tick"
+    },
+    {
+      "time": 28,
+      "event": "tick"
+    }
+  ],
+  "controller_history": [],
+  "failure": null
+}

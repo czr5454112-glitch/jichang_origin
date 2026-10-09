@@ -1,0 +1,2535 @@
+{
+  "metrics": {
+    "source_group": "source_near_term_demand_protected",
+    "family": "mechanism_fixture",
+    "policy": "predictive_greedy",
+    "status": "completed_run",
+    "route_mode": "whole_route",
+    "initial_sha256": "5357c30bbc1832a60abf232047978ce6f4ee88b0cc8709e3526b133ab4529869",
+    "forecast_sha256": "e7256e84dc57fc227e6109b8360db1a5767636991e3ddcb26d5ff21eab21c8bd",
+    "future_sha256": "6739c845570a6c30621a63a53cc16ded5af39418ca7eee0f9a439cc4fa70b490",
+    "actual_bag_count": 2,
+    "completed_count": 2,
+    "uncompleted_count": 0,
+    "on_time_count": 2,
+    "total_cost": 5.0,
+    "tray_wait": 5.0,
+    "nonprotected_tardiness": 0.0,
+    "empty_distance": 0.0,
+    "terminal_backlog": 0.0,
+    "terminal_inflight": 0.0,
+    "empty_transfer_commits": 0,
+    "slow_controller_calls": 32,
+    "full_proxy_simulator_calls": 0,
+    "full_evaluation_simulator_calls": 1,
+    "failed_proxy_rollouts": 0,
+    "candidate_generation_calls": 0,
+    "bounded_partial_decisions": 0,
+    "max_proxy_calls_at_one_decision": 0,
+    "max_decision_ms": 0.3291000030003488,
+    "proxy_rollout_ms": 0,
+    "slow_controller_ms": 6.897800005390309,
+    "runtime_ms": 23.053799995977897,
+    "finite_tray_ids_preserved": true,
+    "all_arrived_bag_ids_preserved": true,
+    "invariant_checks": 46,
+    "failure_type": null
+  },
+  "actual_bag_ledger": [
+    {
+      "bag_id": "A:future",
+      "origin": "A",
+      "destination": "B",
+      "arrival": 4,
+      "deadline": 24,
+      "protected": false,
+      "load_time": 4,
+      "completion_time": 13,
+      "on_time": true
+    },
+    {
+      "bag_id": "B:future",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 8,
+      "deadline": 28,
+      "protected": false,
+      "load_time": 13,
+      "completion_time": 22,
+      "on_time": true
+    }
+  ],
+  "final_snapshot": {
+    "now": 32,
+    "network": {
+      "nodes": {
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "domestic",
+          "control_partition": "control:A",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "B": {
+          "node_id": "B",
+          "logistics_zone": "international",
+          "control_partition": "control:B",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "C": {
+          "node_id": "C",
+          "logistics_zone": "domestic",
+          "control_partition": "control:C",
+          "capacity": 4,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "A-B": {
+          "edge_id": "A-B",
+          "source": "A",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "B-A": {
+          "edge_id": "B-A",
+          "source": "B",
+          "target": "A",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "old-C-B": {
+          "edge_id": "old-C-B",
+          "source": "C",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "donor": {
+        "tray_id": "donor",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 22
+      }
+    },
+    "bags": {
+      "A:future": {
+        "bag_id": "A:future",
+        "origin": "A",
+        "destination": "B",
+        "arrival": 4,
+        "deadline": 24,
+        "protected": false
+      },
+      "B:future": {
+        "bag_id": "B:future",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 8,
+        "deadline": 28,
+        "protected": false
+      }
+    },
+    "reservations": [],
+    "version": 40,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 1,
+      "hold_by_node": {},
+      "export_min_stock": 0,
+      "reception_capacity": 1
+    },
+    "plans": {},
+    "completed": {
+      "A:future": 13,
+      "B:future": 22
+    },
+    "load_times": {
+      "A:future": 4,
+      "B:future": 13
+    },
+    "empty_targets": {}
+  },
+  "trace": [
+    {
+      "time": 0,
+      "event": "initial"
+    },
+    {
+      "time": 0,
+      "event": "tick"
+    },
+    {
+      "time": 1,
+      "event": "tick"
+    },
+    {
+      "time": 2,
+      "event": "tick"
+    },
+    {
+      "time": 3,
+      "event": "tick"
+    },
+    {
+      "time": 4,
+      "event": "bag_arrival",
+      "bag_id": "A:future"
+    },
+    {
+      "time": 4,
+      "event": "load",
+      "bag_id": "A:future",
+      "tray_id": "donor"
+    },
+    {
+      "time": 4,
+      "event": "route_commit",
+      "candidate_id": "regional:v6:A:future:donor:0"
+    },
+    {
+      "time": 4,
+      "event": "depart",
+      "tray_id": "donor",
+      "edge_id": "A-B"
+    },
+    {
+      "time": 4,
+      "event": "tick"
+    },
+    {
+      "time": 5,
+      "event": "tick"
+    },
+    {
+      "time": 6,
+      "event": "tick"
+    },
+    {
+      "time": 7,
+      "event": "tick"
+    },
+    {
+      "time": 8,
+      "event": "bag_arrival",
+      "bag_id": "B:future"
+    },
+    {
+      "time": 8,
+      "event": "tick"
+    },
+    {
+      "time": 9,
+      "event": "tick"
+    },
+    {
+      "time": 10,
+      "event": "tick"
+    },
+    {
+      "time": 11,
+      "event": "tick"
+    },
+    {
+      "time": 12,
+      "event": "tray_state",
+      "tray_id": "donor",
+      "mode": "unloading",
+      "node": "B"
+    },
+    {
+      "time": 12,
+      "event": "tick"
+    },
+    {
+      "time": 13,
+      "event": "unload_complete",
+      "bag_id": "A:future",
+      "tray_id": "donor"
+    },
+    {
+      "time": 13,
+      "event": "tray_state",
+      "tray_id": "donor",
+      "mode": "empty",
+      "node": "B"
+    },
+    {
+      "time": 13,
+      "event": "load",
+      "bag_id": "B:future",
+      "tray_id": "donor"
+    },
+    {
+      "time": 13,
+      "event": "route_commit",
+      "candidate_id": "regional:v19:B:future:donor:0"
+    },
+    {
+      "time": 13,
+      "event": "depart",
+      "tray_id": "donor",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 13,
+      "event": "tick"
+    },
+    {
+      "time": 14,
+      "event": "tick"
+    },
+    {
+      "time": 15,
+      "event": "tick"
+    },
+    {
+      "time": 16,
+      "event": "tick"
+    },
+    {
+      "time": 17,
+      "event": "tick"
+    },
+    {
+      "time": 18,
+      "event": "tick"
+    },
+    {
+      "time": 19,
+      "event": "tick"
+    },
+    {
+      "time": 20,
+      "event": "tick"
+    },
+    {
+      "time": 21,
+      "event": "tray_state",
+      "tray_id": "donor",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 21,
+      "event": "tick"
+    },
+    {
+      "time": 22,
+      "event": "unload_complete",
+      "bag_id": "B:future",
+      "tray_id": "donor"
+    },
+    {
+      "time": 22,
+      "event": "tray_state",
+      "tray_id": "donor",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 22,
+      "event": "tick"
+    },
+    {
+      "time": 23,
+      "event": "tick"
+    },
+    {
+      "time": 24,
+      "event": "tick"
+    },
+    {
+      "time": 25,
+      "event": "tick"
+    },
+    {
+      "time": 26,
+      "event": "tick"
+    },
+    {
+      "time": 27,
+      "event": "tick"
+    },
+    {
+      "time": 28,
+      "event": "tick"
+    },
+    {
+      "time": 29,
+      "event": "tick"
+    },
+    {
+      "time": 30,
+      "event": "tick"
+    },
+    {
+      "time": 31,
+      "event": "tick"
+    },
+    {
+      "time": 32,
+      "event": "tick"
+    }
+  ],
+  "controller_history": [
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 0,
+      "snapshot_version": 0,
+      "horizon_end": 40,
+      "accepted_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 4,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 8,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "reason": "source_zone_prefix_min_stock:domestic@4"
+        }
+      ],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 0,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "source": "published_forecast"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "published_forecast"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.18989999807672575,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 1,
+      "snapshot_version": 1,
+      "horizon_end": 41,
+      "accepted_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 4,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 8,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "reason": "source_zone_prefix_min_stock:domestic@4"
+        }
+      ],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 1,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "source": "published_forecast"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "published_forecast"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.16109999705804512,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 2,
+      "snapshot_version": 2,
+      "horizon_end": 42,
+      "accepted_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 4,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 8,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "reason": "source_zone_prefix_min_stock:domestic@4"
+        }
+      ],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 2,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "source": "published_forecast"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "published_forecast"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.15929999790387228,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 3,
+      "snapshot_version": 3,
+      "horizon_end": 43,
+      "accepted_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 4,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 8,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        }
+      ],
+      "ignored_forecasts": [],
+      "donor_rejections": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "reason": "source_zone_prefix_min_stock:domestic@4"
+        }
+      ],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 3,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "source": "published_forecast"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "published_forecast"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.15359999815700576,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 4,
+      "snapshot_version": 7,
+      "horizon_end": 44,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 8,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        }
+      ],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "published_forecast"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.29969999741297215,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 5,
+      "snapshot_version": 8,
+      "horizon_end": 45,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 8,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        }
+      ],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "published_forecast"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.20279999444028363,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 6,
+      "snapshot_version": 9,
+      "horizon_end": 46,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 8,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        }
+      ],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "published_forecast"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.23540000256616622,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 7,
+      "snapshot_version": 10,
+      "horizon_end": 47,
+      "accepted_forecasts": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "effective_at": 8,
+          "overdue_pending": false,
+          "explicit_cancellation": false
+        }
+      ],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "published_forecast"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.20260000019334257,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 8,
+      "snapshot_version": 12,
+      "horizon_end": 48,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "source": "visible_queue:B:future"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.24820000544423237,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 9,
+      "snapshot_version": 13,
+      "horizon_end": 49,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 9,
+          "count": 1,
+          "source": "visible_queue:B:future"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.26819999766303226,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 10,
+      "snapshot_version": 14,
+      "horizon_end": 50,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 10,
+          "count": 1,
+          "source": "visible_queue:B:future"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.20940000104019418,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 11,
+      "snapshot_version": 15,
+      "horizon_end": 51,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 11,
+          "count": 1,
+          "source": "visible_queue:B:future"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.2403999969828874,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 12,
+      "snapshot_version": 16,
+      "horizon_end": 52,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "B",
+          "at": 13,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [
+        {
+          "node": "B",
+          "at": 12,
+          "count": 1,
+          "source": "visible_queue:B:future"
+        }
+      ],
+      "proposal_count": 0,
+      "elapsed_ms": 0.1995999991777353,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 13,
+      "snapshot_version": 20,
+      "horizon_end": 53,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.29740000172751024,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 14,
+      "snapshot_version": 21,
+      "horizon_end": 54,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.21859999833395705,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 15,
+      "snapshot_version": 22,
+      "horizon_end": 55,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.2190000013797544,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 16,
+      "snapshot_version": 23,
+      "horizon_end": 56,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.21349999587982893,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 17,
+      "snapshot_version": 24,
+      "horizon_end": 57,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.20460000087041408,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 18,
+      "snapshot_version": 25,
+      "horizon_end": 58,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.2179000002797693,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 19,
+      "snapshot_version": 26,
+      "horizon_end": 59,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.21039999410277233,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 20,
+      "snapshot_version": 27,
+      "horizon_end": 60,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.21130000095581636,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 21,
+      "snapshot_version": 28,
+      "horizon_end": 61,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 1,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "committed_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.19939999765483662,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 22,
+      "snapshot_version": 30,
+      "horizon_end": 62,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 22,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.1604999997653067,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 23,
+      "snapshot_version": 31,
+      "horizon_end": 63,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 23,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.15759999951114878,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 24,
+      "snapshot_version": 32,
+      "horizon_end": 64,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 24,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.1554000045871362,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 25,
+      "snapshot_version": 33,
+      "horizon_end": 65,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 25,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.15690000145696104,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 26,
+      "snapshot_version": 34,
+      "horizon_end": 66,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 26,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.15859999984968454,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 27,
+      "snapshot_version": 35,
+      "horizon_end": 67,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 27,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.1658000037423335,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 28,
+      "snapshot_version": 36,
+      "horizon_end": 68,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 28,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.24190000112866983,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 29,
+      "snapshot_version": 37,
+      "horizon_end": 69,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 29,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.3291000030003488,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 30,
+      "snapshot_version": 38,
+      "horizon_end": 70,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 30,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.14740000187885016,
+      "commit_results": [],
+      "committed_count": 0
+    },
+    {
+      "method": "bounded_greedy_first_known_empty_release",
+      "snapshot_time": 31,
+      "snapshot_version": 39,
+      "horizon_end": 71,
+      "accepted_forecasts": [],
+      "ignored_forecasts": [
+        {
+          "node": "A",
+          "at": 4,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        },
+        {
+          "node": "B",
+          "at": 8,
+          "count": 1,
+          "published_at": 0,
+          "reason": "expired_arrival_use_visible_queue"
+        }
+      ],
+      "donor_rejections": [],
+      "candidate_rejections": [],
+      "proposal_details": [],
+      "pending_empty_obligations": [],
+      "demand_covered_by_pending_empty_obligation": [],
+      "search_calls": 0,
+      "search_expansions": 0,
+      "bounded_stop": null,
+      "irrevocable_existing_plans": 0,
+      "old_in_transit_count": 0,
+      "limits": {
+        "max_candidates": 32,
+        "max_proposals": 8,
+        "max_demand_units": 256,
+        "planning_budget_ms": null
+      },
+      "assumptions": [
+        "Latest published revisions are selected before expiry; cancellations never revive older revisions.",
+        "Identified unobserved units remain overdue demand at now until observed, explicitly cancelled or publication TTL expires; aggregate bins still expire at their nominal arrival.",
+        "Identity-aware forecast units already in the visible bag ledger are removed; aggregate forecasts have no inferred identity matching.",
+        "Only the first known empty release per tray is credited; uncommitted reuse is not forecast.",
+        "An accepted empty continuation with unknown final ETA conservatively covers one target demand; no timed release is invented and no duplicate replacement is sent.",
+        "Source logistics-zone and donor-node demand prefixes are protected within the finite planning horizon.",
+        "Capacity and module permissions are revalidated; accepted routes remain irrevocable.",
+        "Latest-departure shifting is attempted on an earliest route; failed shifts retain the feasible earliest route."
+      ],
+      "initial_supply": [
+        {
+          "tray_id": "donor",
+          "node": "A",
+          "at": 31,
+          "source": "stationary_release"
+        }
+      ],
+      "demand": [],
+      "proposal_count": 0,
+      "elapsed_ms": 0.15700000221841037,
+      "commit_results": [],
+      "committed_count": 0
+    }
+  ],
+  "failure": null
+}

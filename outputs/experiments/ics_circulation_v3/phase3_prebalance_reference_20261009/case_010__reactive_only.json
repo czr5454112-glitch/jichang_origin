@@ -1,0 +1,848 @@
+{
+  "metrics": {
+    "source_group": "v3_phase2:phase3_prebalance_reference_holdout_v1:006",
+    "family": "new_synthetic_holdout",
+    "policy": "reactive_only",
+    "status": "completed_run",
+    "route_mode": "next_edge",
+    "initial_sha256": "2703e18a89f21575291babe709608439a01f2b2fd9b549e2df1377a45aca5382",
+    "forecast_sha256": "ffe851a41cb7ee6c4d3c31f957e6eeeefc997516ac5ab3d63f473f4a1e56a946",
+    "future_sha256": "f72586c9f74707784fe7c8a7ffbde595a4a3069ce0e97754fb1464282fc82317",
+    "actual_bag_count": 4,
+    "completed_count": 4,
+    "uncompleted_count": 0,
+    "on_time_count": 3,
+    "total_cost": 5.0,
+    "tray_wait": 0.0,
+    "nonprotected_tardiness": 5.0,
+    "empty_distance": 0.0,
+    "terminal_backlog": 0.0,
+    "terminal_inflight": 0.0,
+    "empty_transfer_commits": 0,
+    "slow_controller_calls": 0,
+    "full_proxy_simulator_calls": 0,
+    "full_evaluation_simulator_calls": 1,
+    "failed_proxy_rollouts": 0,
+    "candidate_generation_calls": 0,
+    "bounded_partial_decisions": 0,
+    "max_proxy_calls_at_one_decision": 0,
+    "max_decision_ms": 0,
+    "proxy_rollout_ms": 0,
+    "slow_controller_ms": 0.0,
+    "runtime_ms": 22.71199999813689,
+    "finite_tray_ids_preserved": true,
+    "all_arrived_bag_ids_preserved": true,
+    "invariant_checks": 106,
+    "failure_type": null
+  },
+  "actual_bag_ledger": [
+    {
+      "bag_id": "bag:target",
+      "origin": "A",
+      "destination": "B",
+      "arrival": 0,
+      "deadline": 36,
+      "protected": false,
+      "load_time": 0,
+      "completion_time": 11,
+      "on_time": true
+    },
+    {
+      "bag_id": "forecast:B:0",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 24,
+      "deadline": 41,
+      "protected": false,
+      "load_time": 24,
+      "completion_time": 36,
+      "on_time": true
+    },
+    {
+      "bag_id": "forecast:B:1",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 24,
+      "deadline": 41,
+      "protected": false,
+      "load_time": 24,
+      "completion_time": 46,
+      "on_time": false
+    },
+    {
+      "bag_id": "forecast:C:0",
+      "origin": "C",
+      "destination": "B",
+      "arrival": 6,
+      "deadline": 16,
+      "protected": false,
+      "load_time": 6,
+      "completion_time": 15,
+      "on_time": true
+    }
+  ],
+  "final_snapshot": {
+    "now": 72,
+    "network": {
+      "nodes": {
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "domestic",
+          "control_partition": "control:0",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "S": {
+          "node_id": "S",
+          "logistics_zone": "domestic",
+          "control_partition": "control:0",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "J": {
+          "node_id": "J",
+          "logistics_zone": "domestic",
+          "control_partition": "control:1",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "C": {
+          "node_id": "C",
+          "logistics_zone": "domestic",
+          "control_partition": "control:1",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "K": {
+          "node_id": "K",
+          "logistics_zone": "international",
+          "control_partition": "control:2",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "L": {
+          "node_id": "L",
+          "logistics_zone": "international",
+          "control_partition": "control:2",
+          "capacity": 8,
+          "can_wait": true
+        },
+        "B": {
+          "node_id": "B",
+          "logistics_zone": "international",
+          "control_partition": "control:3",
+          "capacity": 8,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "stem": {
+          "edge_id": "stem",
+          "source": "A",
+          "target": "S",
+          "travel_time": 2,
+          "capacity": 1
+        },
+        "S-J": {
+          "edge_id": "S-J",
+          "source": "S",
+          "target": "J",
+          "travel_time": 3,
+          "capacity": 1
+        },
+        "J-B": {
+          "edge_id": "J-B",
+          "source": "J",
+          "target": "B",
+          "travel_time": 4,
+          "capacity": 1
+        },
+        "S-K": {
+          "edge_id": "S-K",
+          "source": "S",
+          "target": "K",
+          "travel_time": 4,
+          "capacity": 1
+        },
+        "K-B": {
+          "edge_id": "K-B",
+          "source": "K",
+          "target": "B",
+          "travel_time": 8,
+          "capacity": 1
+        },
+        "S-L": {
+          "edge_id": "S-L",
+          "source": "S",
+          "target": "L",
+          "travel_time": 7,
+          "capacity": 1
+        },
+        "L-B": {
+          "edge_id": "L-B",
+          "source": "L",
+          "target": "B",
+          "travel_time": 6,
+          "capacity": 1
+        },
+        "S-B": {
+          "edge_id": "S-B",
+          "source": "S",
+          "target": "B",
+          "travel_time": 22,
+          "capacity": 1
+        },
+        "C-J": {
+          "edge_id": "C-J",
+          "source": "C",
+          "target": "J",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "B-A": {
+          "edge_id": "B-A",
+          "source": "B",
+          "target": "A",
+          "travel_time": 10,
+          "capacity": 1
+        },
+        "old-long": {
+          "edge_id": "old-long",
+          "source": "A",
+          "target": "B",
+          "travel_time": 40,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "tray:target": {
+        "tray_id": "tray:target",
+        "node": "B",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 11
+      },
+      "tray:C": {
+        "tray_id": "tray:C",
+        "node": "B",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 15
+      },
+      "tray:old": {
+        "tray_id": "tray:old",
+        "node": "B",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 9
+      },
+      "tray:B:0": {
+        "tray_id": "tray:B:0",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 36
+      },
+      "tray:B:1": {
+        "tray_id": "tray:B:1",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 46
+      }
+    },
+    "bags": {
+      "bag:target": {
+        "bag_id": "bag:target",
+        "origin": "A",
+        "destination": "B",
+        "arrival": 0,
+        "deadline": 36,
+        "protected": false
+      },
+      "forecast:C:0": {
+        "bag_id": "forecast:C:0",
+        "origin": "C",
+        "destination": "B",
+        "arrival": 6,
+        "deadline": 16,
+        "protected": false
+      },
+      "forecast:B:0": {
+        "bag_id": "forecast:B:0",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 24,
+        "deadline": 41,
+        "protected": false
+      },
+      "forecast:B:1": {
+        "bag_id": "forecast:B:1",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 24,
+        "deadline": 41,
+        "protected": false
+      }
+    },
+    "reservations": [
+      {
+        "resource": "node:B",
+        "start": 24,
+        "end": 1000000000000,
+        "tray_id": "tray:C"
+      },
+      {
+        "resource": "node:B",
+        "start": 24,
+        "end": 1000000000000,
+        "tray_id": "tray:old"
+      },
+      {
+        "resource": "node:B",
+        "start": 24,
+        "end": 1000000000000,
+        "tray_id": "tray:target"
+      }
+    ],
+    "version": 93,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 2,
+      "hold_by_node": {
+        "B": 0
+      },
+      "export_min_stock": 0,
+      "reception_capacity": 2
+    },
+    "plans": {},
+    "completed": {
+      "bag:target": 11,
+      "forecast:C:0": 15,
+      "forecast:B:0": 36,
+      "forecast:B:1": 46
+    },
+    "load_times": {
+      "bag:target": 0,
+      "forecast:C:0": 6,
+      "forecast:B:0": 24,
+      "forecast:B:1": 24
+    },
+    "empty_targets": {}
+  },
+  "trace": [
+    {
+      "time": 0,
+      "event": "initial"
+    },
+    {
+      "time": 0,
+      "event": "route_commit",
+      "candidate_id": "regional:v0:bag:target:tray:target:0"
+    },
+    {
+      "time": 0,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "stem"
+    },
+    {
+      "time": 0,
+      "event": "tick"
+    },
+    {
+      "time": 1,
+      "event": "tick"
+    },
+    {
+      "time": 2,
+      "event": "prefix_arrive",
+      "tray_id": "tray:target",
+      "node": "S"
+    },
+    {
+      "time": 2,
+      "event": "route_commit",
+      "candidate_id": "regional:v4:bag:target:tray:target:0"
+    },
+    {
+      "time": 2,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "S-J"
+    },
+    {
+      "time": 2,
+      "event": "tick"
+    },
+    {
+      "time": 3,
+      "event": "tick"
+    },
+    {
+      "time": 4,
+      "event": "tick"
+    },
+    {
+      "time": 5,
+      "event": "prefix_arrive",
+      "tray_id": "tray:target",
+      "node": "J"
+    },
+    {
+      "time": 5,
+      "event": "route_commit",
+      "candidate_id": "regional:v9:bag:target:tray:target:0"
+    },
+    {
+      "time": 5,
+      "event": "depart",
+      "tray_id": "tray:target",
+      "edge_id": "J-B"
+    },
+    {
+      "time": 5,
+      "event": "tick"
+    },
+    {
+      "time": 6,
+      "event": "bag_arrival",
+      "bag_id": "forecast:C:0"
+    },
+    {
+      "time": 6,
+      "event": "load",
+      "bag_id": "forecast:C:0",
+      "tray_id": "tray:C"
+    },
+    {
+      "time": 6,
+      "event": "route_commit",
+      "candidate_id": "regional:v13:forecast:C:0:tray:C:0"
+    },
+    {
+      "time": 6,
+      "event": "depart",
+      "tray_id": "tray:C",
+      "edge_id": "C-J"
+    },
+    {
+      "time": 6,
+      "event": "tick"
+    },
+    {
+      "time": 7,
+      "event": "prefix_arrive",
+      "tray_id": "tray:C",
+      "node": "J"
+    },
+    {
+      "time": 7,
+      "event": "route_commit",
+      "candidate_id": "regional:v16:forecast:C:0:tray:C:0"
+    },
+    {
+      "time": 7,
+      "event": "tick"
+    },
+    {
+      "time": 8,
+      "event": "tick"
+    },
+    {
+      "time": 9,
+      "event": "depart",
+      "tray_id": "tray:C",
+      "edge_id": "J-B"
+    },
+    {
+      "time": 9,
+      "event": "old_arrive",
+      "tray_id": "tray:old",
+      "node": "B"
+    },
+    {
+      "time": 9,
+      "event": "tray_state",
+      "tray_id": "tray:target",
+      "mode": "unloading",
+      "node": "B"
+    },
+    {
+      "time": 9,
+      "event": "tick"
+    },
+    {
+      "time": 10,
+      "event": "tick"
+    },
+    {
+      "time": 11,
+      "event": "unload_complete",
+      "bag_id": "bag:target",
+      "tray_id": "tray:target"
+    },
+    {
+      "time": 11,
+      "event": "tray_state",
+      "tray_id": "tray:target",
+      "mode": "empty",
+      "node": "B"
+    },
+    {
+      "time": 11,
+      "event": "tick"
+    },
+    {
+      "time": 12,
+      "event": "tick"
+    },
+    {
+      "time": 13,
+      "event": "tray_state",
+      "tray_id": "tray:C",
+      "mode": "unloading",
+      "node": "B"
+    },
+    {
+      "time": 13,
+      "event": "tick"
+    },
+    {
+      "time": 14,
+      "event": "tick"
+    },
+    {
+      "time": 15,
+      "event": "unload_complete",
+      "bag_id": "forecast:C:0",
+      "tray_id": "tray:C"
+    },
+    {
+      "time": 15,
+      "event": "tray_state",
+      "tray_id": "tray:C",
+      "mode": "empty",
+      "node": "B"
+    },
+    {
+      "time": 15,
+      "event": "tick"
+    },
+    {
+      "time": 16,
+      "event": "tick"
+    },
+    {
+      "time": 17,
+      "event": "tick"
+    },
+    {
+      "time": 18,
+      "event": "tick"
+    },
+    {
+      "time": 19,
+      "event": "tick"
+    },
+    {
+      "time": 20,
+      "event": "tick"
+    },
+    {
+      "time": 21,
+      "event": "tick"
+    },
+    {
+      "time": 22,
+      "event": "tick"
+    },
+    {
+      "time": 23,
+      "event": "tick"
+    },
+    {
+      "time": 24,
+      "event": "bag_arrival",
+      "bag_id": "forecast:B:0"
+    },
+    {
+      "time": 24,
+      "event": "bag_arrival",
+      "bag_id": "forecast:B:1"
+    },
+    {
+      "time": 24,
+      "event": "load",
+      "bag_id": "forecast:B:0",
+      "tray_id": "tray:B:0"
+    },
+    {
+      "time": 24,
+      "event": "load",
+      "bag_id": "forecast:B:1",
+      "tray_id": "tray:B:1"
+    },
+    {
+      "time": 24,
+      "event": "route_commit",
+      "candidate_id": "regional:v41:forecast:B:0:tray:B:0:0"
+    },
+    {
+      "time": 24,
+      "event": "route_commit",
+      "candidate_id": "regional:v42:forecast:B:1:tray:B:1:0"
+    },
+    {
+      "time": 24,
+      "event": "depart",
+      "tray_id": "tray:B:0",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 24,
+      "event": "tick"
+    },
+    {
+      "time": 25,
+      "event": "tick"
+    },
+    {
+      "time": 26,
+      "event": "tick"
+    },
+    {
+      "time": 27,
+      "event": "tick"
+    },
+    {
+      "time": 28,
+      "event": "tick"
+    },
+    {
+      "time": 29,
+      "event": "tick"
+    },
+    {
+      "time": 30,
+      "event": "tick"
+    },
+    {
+      "time": 31,
+      "event": "tick"
+    },
+    {
+      "time": 32,
+      "event": "tick"
+    },
+    {
+      "time": 33,
+      "event": "tick"
+    },
+    {
+      "time": 34,
+      "event": "depart",
+      "tray_id": "tray:B:1",
+      "edge_id": "B-A"
+    },
+    {
+      "time": 34,
+      "event": "tray_state",
+      "tray_id": "tray:B:0",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 34,
+      "event": "tick"
+    },
+    {
+      "time": 35,
+      "event": "tick"
+    },
+    {
+      "time": 36,
+      "event": "unload_complete",
+      "bag_id": "forecast:B:0",
+      "tray_id": "tray:B:0"
+    },
+    {
+      "time": 36,
+      "event": "tray_state",
+      "tray_id": "tray:B:0",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 36,
+      "event": "tick"
+    },
+    {
+      "time": 37,
+      "event": "tick"
+    },
+    {
+      "time": 38,
+      "event": "tick"
+    },
+    {
+      "time": 39,
+      "event": "tick"
+    },
+    {
+      "time": 40,
+      "event": "tick"
+    },
+    {
+      "time": 41,
+      "event": "tick"
+    },
+    {
+      "time": 42,
+      "event": "tick"
+    },
+    {
+      "time": 43,
+      "event": "tick"
+    },
+    {
+      "time": 44,
+      "event": "tray_state",
+      "tray_id": "tray:B:1",
+      "mode": "unloading",
+      "node": "A"
+    },
+    {
+      "time": 44,
+      "event": "tick"
+    },
+    {
+      "time": 45,
+      "event": "tick"
+    },
+    {
+      "time": 46,
+      "event": "unload_complete",
+      "bag_id": "forecast:B:1",
+      "tray_id": "tray:B:1"
+    },
+    {
+      "time": 46,
+      "event": "tray_state",
+      "tray_id": "tray:B:1",
+      "mode": "empty",
+      "node": "A"
+    },
+    {
+      "time": 46,
+      "event": "tick"
+    },
+    {
+      "time": 47,
+      "event": "tick"
+    },
+    {
+      "time": 48,
+      "event": "tick"
+    },
+    {
+      "time": 49,
+      "event": "tick"
+    },
+    {
+      "time": 50,
+      "event": "tick"
+    },
+    {
+      "time": 51,
+      "event": "tick"
+    },
+    {
+      "time": 52,
+      "event": "tick"
+    },
+    {
+      "time": 53,
+      "event": "tick"
+    },
+    {
+      "time": 54,
+      "event": "tick"
+    },
+    {
+      "time": 55,
+      "event": "tick"
+    },
+    {
+      "time": 56,
+      "event": "tick"
+    },
+    {
+      "time": 57,
+      "event": "tick"
+    },
+    {
+      "time": 58,
+      "event": "tick"
+    },
+    {
+      "time": 59,
+      "event": "tick"
+    },
+    {
+      "time": 60,
+      "event": "tick"
+    },
+    {
+      "time": 61,
+      "event": "tick"
+    },
+    {
+      "time": 62,
+      "event": "tick"
+    },
+    {
+      "time": 63,
+      "event": "tick"
+    },
+    {
+      "time": 64,
+      "event": "tick"
+    },
+    {
+      "time": 65,
+      "event": "tick"
+    },
+    {
+      "time": 66,
+      "event": "tick"
+    },
+    {
+      "time": 67,
+      "event": "tick"
+    },
+    {
+      "time": 68,
+      "event": "tick"
+    },
+    {
+      "time": 69,
+      "event": "tick"
+    },
+    {
+      "time": 70,
+      "event": "tick"
+    },
+    {
+      "time": 71,
+      "event": "tick"
+    },
+    {
+      "time": 72,
+      "event": "tick"
+    }
+  ],
+  "controller_history": [],
+  "failure": null
+}

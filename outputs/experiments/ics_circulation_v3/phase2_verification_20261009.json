@@ -1,0 +1,916 @@
+{
+  "schema": "ics_v3_independent_artifact_verification_v1",
+  "verified_at_utc": "2026-10-09T04:08:00.560110+00:00",
+  "scope": "Read and hash saved evidence only; no experiment imports, simulations, fitting or timing runs",
+  "verifier": "outputs/experiments/ics_circulation_v3/verify_phase2_artifacts_20261009.py",
+  "verifier_sha256": "c8d445fef0066c9762aca9c0e2dff611d652304aae72d6deb63b6717d8061661",
+  "passed": true,
+  "check_count": 20,
+  "failed_checks": [],
+  "checks": [
+    {
+      "check": "confirmed_split_counts_and_disjointness",
+      "status": "passed",
+      "evidence": {
+        "counts": {
+          "train": 80,
+          "validation": 20,
+          "test": 40,
+          "deployment": 40
+        },
+        "cross_split_intersections": {
+          "train/validation": [],
+          "train/test": [],
+          "train/deployment": [],
+          "validation/test": [],
+          "validation/deployment": [],
+          "test/deployment": []
+        }
+      }
+    },
+    {
+      "check": "fresh_confirmatory_test_and_deployment",
+      "status": "passed",
+      "evidence": {
+        "old_source_intersections": {
+          "test": [],
+          "deployment": []
+        },
+        "train_validation_groups_unchanged": {
+          "train": true,
+          "validation": true
+        },
+        "evaluation_namespace": "confirm1"
+      }
+    },
+    {
+      "check": "confirmed_artifact_counts",
+      "status": "passed",
+      "evidence": {
+        "candidate_rows": 560,
+        "paired_branches": 1120,
+        "deployment_runs": 240,
+        "source_records": 140
+      }
+    },
+    {
+      "check": "four_candidates_per_label_source",
+      "status": "passed",
+      "evidence": {
+        "candidate_count_histogram": {
+          "4": 140
+        },
+        "source_groups": 140
+      }
+    },
+    {
+      "check": "paired_branch_key_coverage",
+      "status": "passed",
+      "evidence": {
+        "branch_keys": 1120,
+        "expected_keys": 1120,
+        "future_seeds": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "check": "paired_cost_and_delta_arithmetic",
+      "status": "passed",
+      "evidence": {
+        "rows_checked": 560,
+        "mismatches": []
+      }
+    },
+    {
+      "check": "baseline_deltas_exactly_zero",
+      "status": "passed",
+      "evidence": {
+        "baseline_rows": 140,
+        "errors": [],
+        "fields": [
+          "paired_deltas",
+          "delta_mean",
+          "analytic_delta",
+          "timed_delta",
+          "forecast_delta"
+        ]
+      }
+    },
+    {
+      "check": "independent_deployment_policy_coverage",
+      "status": "passed",
+      "evidence": {
+        "unique_source_policy_keys": 240,
+        "policies": {
+          "baseline": 40,
+          "analytic": 40,
+          "timed": 40,
+          "direct": 40,
+          "residual": 40,
+          "forecast_rollout": 40
+        },
+        "deployment_seed": 991
+      }
+    },
+    {
+      "check": "shared_cost_weight_arithmetic",
+      "status": "passed",
+      "evidence": {
+        "weights": {
+          "tray_wait": 1.0,
+          "nonprotected_tardiness": 1.0,
+          "empty_distance": 0.1,
+          "terminal_backlog": 10.0,
+          "terminal_inflight": 2.0
+        },
+        "rows_checked": 1360,
+        "errors": []
+      }
+    },
+    {
+      "check": "direct_model_byte_identical_to_discovery",
+      "status": "passed",
+      "evidence": {
+        "confirmed_sha256": "1f2c9f83032ea18a4254bf352879fc4605345fdf0d7cec46b1709ef47c9bd6c3",
+        "discovery_sha256": "1f2c9f83032ea18a4254bf352879fc4605345fdf0d7cec46b1709ef47c9bd6c3",
+        "bytes": 2158
+      }
+    },
+    {
+      "check": "residual_model_byte_identical_to_discovery",
+      "status": "passed",
+      "evidence": {
+        "confirmed_sha256": "d5073e9af75e9e7741e2cf5c70fbb59588b7dea30bcabc6ced5589409caa7868",
+        "discovery_sha256": "d5073e9af75e9e7741e2cf5c70fbb59588b7dea30bcabc6ced5589409caa7868",
+        "bytes": 2030
+      }
+    },
+    {
+      "check": "evaluation_source_stable_during_run",
+      "status": "passed",
+      "evidence": {
+        "source_changed_during_run": false
+      }
+    },
+    {
+      "check": "confirmatory_source_hashes_match_confirmed_archive",
+      "status": "passed",
+      "evidence": {
+        "file_count": 18,
+        "matched_files": 18,
+        "files": [
+          {
+            "original": "scripts/experiments/ics_circulation_v3/__init__.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/__init__.py",
+            "expected": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+            "actual": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/audit_nanning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/audit_nanning.py",
+            "expected": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+            "actual": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/counterexamples.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/counterexamples.py",
+            "expected": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+            "actual": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/evaluation.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/evaluation.py",
+            "expected": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+            "actual": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/joint_control.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/joint_control.py",
+            "expected": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+            "actual": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/learning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/learning.py",
+            "expected": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+            "actual": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/model.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/model.py",
+            "expected": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "actual": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/nanning_routing_benchmark.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/nanning_routing_benchmark.py",
+            "expected": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+            "actual": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/phase2_scenarios.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/phase2_scenarios.py",
+            "expected": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+            "actual": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/prebalance.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/prebalance.py",
+            "expected": "cd96c5b7fa4dee1d7586c46275690792beadb6ac2bbf0b75f98dbc03ae0f987a",
+            "actual": "cd96c5b7fa4dee1d7586c46275690792beadb6ac2bbf0b75f98dbc03ae0f987a",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/routing.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/routing.py",
+            "expected": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "actual": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_joint_control.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_joint_control.py",
+            "expected": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+            "actual": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_phase2_learning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_phase2_learning.py",
+            "expected": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+            "actual": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_pilot.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_pilot.py",
+            "expected": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+            "actual": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_prebalance.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_prebalance.py",
+            "expected": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+            "actual": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_routing_comparison.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_routing_comparison.py",
+            "expected": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+            "actual": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/runtime.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/runtime.py",
+            "expected": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "actual": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/scenarios.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/scenarios.py",
+            "expected": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "actual": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "matches": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "confirmed_archive_manifest_matches_files",
+      "status": "passed",
+      "evidence": {
+        "file_count": 30,
+        "matched_files": 30,
+        "files": [
+          {
+            "original": "scripts/experiments/ics_circulation_v3/audit_nanning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/audit_nanning.py",
+            "expected": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+            "actual": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/counterexamples.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/counterexamples.py",
+            "expected": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+            "actual": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/evaluation.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/evaluation.py",
+            "expected": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+            "actual": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/joint_control.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/joint_control.py",
+            "expected": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+            "actual": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/learning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/learning.py",
+            "expected": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+            "actual": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/model.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/model.py",
+            "expected": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "actual": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/nanning_routing_benchmark.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/nanning_routing_benchmark.py",
+            "expected": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+            "actual": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/phase2_scenarios.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/phase2_scenarios.py",
+            "expected": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+            "actual": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/prebalance.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/prebalance.py",
+            "expected": "cd96c5b7fa4dee1d7586c46275690792beadb6ac2bbf0b75f98dbc03ae0f987a",
+            "actual": "cd96c5b7fa4dee1d7586c46275690792beadb6ac2bbf0b75f98dbc03ae0f987a",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/routing.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/routing.py",
+            "expected": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "actual": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/runtime.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/runtime.py",
+            "expected": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "actual": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_joint_control.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_joint_control.py",
+            "expected": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+            "actual": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_phase2_learning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_phase2_learning.py",
+            "expected": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+            "actual": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_pilot.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_pilot.py",
+            "expected": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+            "actual": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_prebalance.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_prebalance.py",
+            "expected": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+            "actual": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_routing_comparison.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_routing_comparison.py",
+            "expected": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+            "actual": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/scenarios.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/scenarios.py",
+            "expected": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "actual": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/__init__.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/__init__.py",
+            "expected": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+            "actual": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/PHASE2.md",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/PHASE2.md",
+            "expected": "8816e66b71e00236b830213fc822cebf8567b749fd96ef34b273e1db0c0b0f79",
+            "actual": "8816e66b71e00236b830213fc822cebf8567b749fd96ef34b273e1db0c0b0f79",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/README.md",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/README.md",
+            "expected": "960105a98934660ead4019618f349a7c33c7af1066bb5b1db874d536384a802b",
+            "actual": "960105a98934660ead4019618f349a7c33c7af1066bb5b1db874d536384a802b",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_checkpoint.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_checkpoint.py",
+            "expected": "17a4ed0275b7162b7d96377ef0fe62e2fcd0eca503596c4ab757d971b49d93c7",
+            "actual": "17a4ed0275b7162b7d96377ef0fe62e2fcd0eca503596c4ab757d971b49d93c7",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_evaluation.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_evaluation.py",
+            "expected": "ac2f95d0d6f81f4b7e69360e63d2335fcb2aedcb2e50f87c15a178d7873543dd",
+            "actual": "ac2f95d0d6f81f4b7e69360e63d2335fcb2aedcb2e50f87c15a178d7873543dd",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_integration_stress.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_integration_stress.py",
+            "expected": "eff3829d91bfb1d2ab088893049fd656690baf15a7dd4523f6c9b8e65f9eccb9",
+            "actual": "eff3829d91bfb1d2ab088893049fd656690baf15a7dd4523f6c9b8e65f9eccb9",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_joint.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_joint.py",
+            "expected": "588563baf20a2da0e600fc891f01c1eb809d9b4a99c216d115ad34eb56227366",
+            "actual": "588563baf20a2da0e600fc891f01c1eb809d9b4a99c216d115ad34eb56227366",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_learning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_learning.py",
+            "expected": "b443d86b24b03968b43bb4688d6d2fa80faa94810570119e51aeada4d74283e8",
+            "actual": "b443d86b24b03968b43bb4688d6d2fa80faa94810570119e51aeada4d74283e8",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_nanning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_nanning.py",
+            "expected": "87706892262b07f9d0af0b9b78ff90b748797c9505f12d380ceb45dfb4f5e0d7",
+            "actual": "87706892262b07f9d0af0b9b78ff90b748797c9505f12d380ceb45dfb4f5e0d7",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_phase2_protocol.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_phase2_protocol.py",
+            "expected": "bd882cf0aa7b625bbae7c689b650214288517f701c882ad91a717e22cb43c1db",
+            "actual": "bd882cf0aa7b625bbae7c689b650214288517f701c882ad91a717e22cb43c1db",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_prebalance.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_prebalance.py",
+            "expected": "19437b09d20b02ee80b66280dfa916d3e24fc6e995b90458dba20c0d9a011742",
+            "actual": "19437b09d20b02ee80b66280dfa916d3e24fc6e995b90458dba20c0d9a011742",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_routing.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_routing.py",
+            "expected": "c0d241f08db4882dcc815cf5bbe1e12ded5a6b52d7b51bbc61374a8beb63d0b4",
+            "actual": "c0d241f08db4882dcc815cf5bbe1e12ded5a6b52d7b51bbc61374a8beb63d0b4",
+            "matches": true
+          },
+          {
+            "original": "tests/test_ics_circulation_v3_runtime.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_runtime.py",
+            "expected": "9fc080db31399bb5ff2a8ac3d168f5998c9853d2465f31e5c2d769f16a2ab5ae",
+            "actual": "9fc080db31399bb5ff2a8ac3d168f5998c9853d2465f31e5c2d769f16a2ab5ae",
+            "matches": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "discovery_source_hashes_match_historical_archive",
+      "status": "passed",
+      "evidence": {
+        "file_count": 18,
+        "matched_files": 18,
+        "files": [
+          {
+            "original": "scripts/experiments/ics_circulation_v3/__init__.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/__init__.py",
+            "expected": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+            "actual": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/audit_nanning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/audit_nanning.py",
+            "expected": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+            "actual": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/counterexamples.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/counterexamples.py",
+            "expected": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+            "actual": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/evaluation.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/evaluation.py",
+            "expected": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+            "actual": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/joint_control.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/joint_control.py",
+            "expected": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+            "actual": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/learning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/learning.py",
+            "expected": "e5bc873e0b1ad5347ad66887f239f7281891e2edf08546f54d18f622fc9a326c",
+            "actual": "e5bc873e0b1ad5347ad66887f239f7281891e2edf08546f54d18f622fc9a326c",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/model.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/model.py",
+            "expected": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "actual": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/nanning_routing_benchmark.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/nanning_routing_benchmark.py",
+            "expected": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+            "actual": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/phase2_scenarios.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/phase2_scenarios.py",
+            "expected": "19785d86e2f1a487e3210a61d26bb6afffe526f9360b517454bba304c96941ee",
+            "actual": "19785d86e2f1a487e3210a61d26bb6afffe526f9360b517454bba304c96941ee",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/prebalance.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/prebalance.py",
+            "expected": "6005b9486570acc13c57778f9eb5d4f85a8a149832b7e6d3ce311fa1116df6ba",
+            "actual": "6005b9486570acc13c57778f9eb5d4f85a8a149832b7e6d3ce311fa1116df6ba",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/routing.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/routing.py",
+            "expected": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "actual": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_joint_control.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_joint_control.py",
+            "expected": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+            "actual": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_phase2_learning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_phase2_learning.py",
+            "expected": "29142adf7e9b587141fdad1ffe3fddbc4c7fd487c4e503592137fc3b1e5b67d0",
+            "actual": "29142adf7e9b587141fdad1ffe3fddbc4c7fd487c4e503592137fc3b1e5b67d0",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_pilot.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_pilot.py",
+            "expected": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+            "actual": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_prebalance.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_prebalance.py",
+            "expected": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+            "actual": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_routing_comparison.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_routing_comparison.py",
+            "expected": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+            "actual": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/runtime.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/runtime.py",
+            "expected": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "actual": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/scenarios.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/scenarios.py",
+            "expected": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "actual": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "matches": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "phase1_source_hashes_match_historical_archive",
+      "status": "passed",
+      "evidence": {
+        "file_count": 8,
+        "matched_files": 8,
+        "files": [
+          {
+            "original": "scripts/experiments/ics_circulation_v3/__init__.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase1_source_20261009/__init__.py",
+            "expected": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+            "actual": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/audit_nanning.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase1_source_20261009/audit_nanning.py",
+            "expected": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+            "actual": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/counterexamples.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase1_source_20261009/counterexamples.py",
+            "expected": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+            "actual": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/evaluation.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase1_source_20261009/evaluation.py",
+            "expected": "d8e87810788d4c239a97acee97da04985f96e3e1e8e18d4d06a225bcc79ffa38",
+            "actual": "d8e87810788d4c239a97acee97da04985f96e3e1e8e18d4d06a225bcc79ffa38",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/model.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase1_source_20261009/model.py",
+            "expected": "61c7d93ed735232bfa8f111f1476bf5a480d17f872f21ddd3d13f750742b3e4f",
+            "actual": "61c7d93ed735232bfa8f111f1476bf5a480d17f872f21ddd3d13f750742b3e4f",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/run_pilot.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase1_source_20261009/run_pilot.py",
+            "expected": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+            "actual": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/runtime.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase1_source_20261009/runtime.py",
+            "expected": "335ec837d92b8e4f9440b1d1cfb03a6509b13ed850a87cb7ac4e8b941371be41",
+            "actual": "335ec837d92b8e4f9440b1d1cfb03a6509b13ed850a87cb7ac4e8b941371be41",
+            "matches": true
+          },
+          {
+            "original": "scripts/experiments/ics_circulation_v3/scenarios.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase1_source_20261009/scenarios.py",
+            "expected": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "actual": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "matches": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "tiny_72_pairs_144_requests_exact_timed_parity",
+      "status": "passed",
+      "evidence": {
+        "requests": 144,
+        "pairs": 72,
+        "independently_matched_pairs": 72,
+        "order_first_counts": {
+          "reference": 36,
+          "regional": 36
+        },
+        "problems": []
+      }
+    },
+    {
+      "check": "tiny_source_hashes_match_confirmed_archive",
+      "status": "passed",
+      "evidence": {
+        "file_count": 5,
+        "matched_files": 5,
+        "files": [
+          {
+            "original": "routing.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/routing.py",
+            "expected": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "actual": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "matches": true
+          },
+          {
+            "original": "runtime.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/runtime.py",
+            "expected": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "actual": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "matches": true
+          },
+          {
+            "original": "model.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/model.py",
+            "expected": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "actual": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "matches": true
+          },
+          {
+            "original": "scenarios.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/scenarios.py",
+            "expected": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "actual": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+            "matches": true
+          },
+          {
+            "original": "run_routing_comparison.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_routing_comparison.py",
+            "expected": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+            "actual": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+            "matches": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "nanning_300_valid_commits_and_shortest_reference",
+      "status": "passed",
+      "evidence": {
+        "requests": 300,
+        "unique_request_keys": 300,
+        "valid_commits": 300,
+        "independent_stored_dijkstra_matches": 300,
+        "requests_by_partition": {
+          "4": 100,
+          "8": 100,
+          "16": 100
+        },
+        "full_k_coverage_by_partition": {
+          "4": 83,
+          "8": 78,
+          "16": 83
+        },
+        "note": "Verifies recorded validation/commit outcomes and arithmetic; does not re-execute runtime."
+      }
+    },
+    {
+      "check": "nanning_source_hashes_match_confirmed_archive",
+      "status": "passed",
+      "evidence": {
+        "file_count": 4,
+        "matched_files": 4,
+        "files": [
+          {
+            "original": "routing.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/routing.py",
+            "expected": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "actual": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+            "matches": true
+          },
+          {
+            "original": "nanning_routing_benchmark.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/nanning_routing_benchmark.py",
+            "expected": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+            "actual": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+            "matches": true
+          },
+          {
+            "original": "runtime.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/runtime.py",
+            "expected": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "actual": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+            "matches": true
+          },
+          {
+            "original": "model.py",
+            "archive": "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/model.py",
+            "expected": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "actual": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+            "matches": true
+          }
+        ]
+      }
+    }
+  ],
+  "input_sha256": {
+    "outputs/experiments/ics_circulation_v3/nanning_routing_100od_20261009/requests.jsonl": "6a15235d9773c655e4f223a9180fa163ecb9f50e1d772bcdc625400e72e9abe2",
+    "outputs/experiments/ics_circulation_v3/nanning_routing_100od_20261009/summary.json": "4a6ac5409852b90e3a4e96b7c68960adb0be79f0d927451144ffacc331c51dd3",
+    "outputs/experiments/ics_circulation_v3/phase1_source_20261009/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "outputs/experiments/ics_circulation_v3/phase1_source_20261009/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "outputs/experiments/ics_circulation_v3/phase1_source_20261009/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "outputs/experiments/ics_circulation_v3/phase1_source_20261009/evaluation.py": "d8e87810788d4c239a97acee97da04985f96e3e1e8e18d4d06a225bcc79ffa38",
+    "outputs/experiments/ics_circulation_v3/phase1_source_20261009/model.py": "61c7d93ed735232bfa8f111f1476bf5a480d17f872f21ddd3d13f750742b3e4f",
+    "outputs/experiments/ics_circulation_v3/phase1_source_20261009/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "outputs/experiments/ics_circulation_v3/phase1_source_20261009/runtime.py": "335ec837d92b8e4f9440b1d1cfb03a6509b13ed850a87cb7ac4e8b941371be41",
+    "outputs/experiments/ics_circulation_v3/phase1_source_20261009/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/PHASE2.md": "8816e66b71e00236b830213fc822cebf8567b749fd96ef34b273e1db0c0b0f79",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/README.md": "960105a98934660ead4019618f349a7c33c7af1066bb5b1db874d536384a802b",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/joint_control.py": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/nanning_routing_benchmark.py": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/phase2_scenarios.py": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/prebalance.py": "cd96c5b7fa4dee1d7586c46275690792beadb6ac2bbf0b75f98dbc03ae0f987a",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_joint_control.py": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_phase2_learning.py": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_prebalance.py": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/run_routing_comparison.py": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/source_manifest.json": "0b7fbefc1e6522202c17057cc0d410fde93c5c3b02d532f612686d4a0fbf0904",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_checkpoint.py": "17a4ed0275b7162b7d96377ef0fe62e2fcd0eca503596c4ab757d971b49d93c7",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_evaluation.py": "ac2f95d0d6f81f4b7e69360e63d2335fcb2aedcb2e50f87c15a178d7873543dd",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_integration_stress.py": "eff3829d91bfb1d2ab088893049fd656690baf15a7dd4523f6c9b8e65f9eccb9",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_joint.py": "588563baf20a2da0e600fc891f01c1eb809d9b4a99c216d115ad34eb56227366",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_learning.py": "b443d86b24b03968b43bb4688d6d2fa80faa94810570119e51aeada4d74283e8",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_nanning.py": "87706892262b07f9d0af0b9b78ff90b748797c9505f12d380ceb45dfb4f5e0d7",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_phase2_protocol.py": "bd882cf0aa7b625bbae7c689b650214288517f701c882ad91a717e22cb43c1db",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_prebalance.py": "19437b09d20b02ee80b66280dfa916d3e24fc6e995b90458dba20c0d9a011742",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_routing.py": "c0d241f08db4882dcc815cf5bbe1e12ded5a6b52d7b51bbc61374a8beb63d0b4",
+    "outputs/experiments/ics_circulation_v3/phase2_confirmed_source_20261009/tests/test_ics_circulation_v3_runtime.py": "9fc080db31399bb5ff2a8ac3d168f5998c9853d2465f31e5c2d769f16a2ab5ae",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/joint_control.py": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/learning.py": "e5bc873e0b1ad5347ad66887f239f7281891e2edf08546f54d18f622fc9a326c",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/nanning_routing_benchmark.py": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/phase2_scenarios.py": "19785d86e2f1a487e3210a61d26bb6afffe526f9360b517454bba304c96941ee",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/prebalance.py": "6005b9486570acc13c57778f9eb5d4f85a8a149832b7e6d3ce311fa1116df6ba",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_joint_control.py": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_phase2_learning.py": "29142adf7e9b587141fdad1ffe3fddbc4c7fd487c4e503592137fc3b1e5b67d0",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_prebalance.py": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/run_routing_comparison.py": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "outputs/experiments/ics_circulation_v3/phase2_discovery_source_20261009/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_20261009/direct_model.json": "1f2c9f83032ea18a4254bf352879fc4605345fdf0d7cec46b1709ef47c9bd6c3",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_20261009/residual_model.json": "d5073e9af75e9e7741e2cf5c70fbb59588b7dea30bcabc6ced5589409caa7868",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_20261009/split_manifest.json": "f056151c4e63c65c5820725b0c2e3d0c196a25243165f797c39bea669001b9ac",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_20261009/summary.json": "71c02b7db61b0d062cf14c8d015138ac10ef4be34835565f929a12aeb0a4c927",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/branches.jsonl": "36ce4da6806d90f6a3e2961b3003188781523f3063dfb881f27f8e6c91169d71",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/candidates.jsonl": "de2b15bbc13d36f404e8288addc60e21d83fe90935e1265a58684b2a83d9acbb",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/deployment.jsonl": "33c99abe45d6cc55c90e5c936dc86eee5cd33758cc3305617418c5b0f60dfce2",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/direct_model.json": "1f2c9f83032ea18a4254bf352879fc4605345fdf0d7cec46b1709ef47c9bd6c3",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/residual_model.json": "d5073e9af75e9e7741e2cf5c70fbb59588b7dea30bcabc6ced5589409caa7868",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/sources.jsonl": "206dfb084adbb39fd7471c44483c0d35904eeda7e76f2666079be3eea3098af4",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/split_manifest.json": "6b343e4cf83e0e4503f66bb21fc0d62c88d3070cf6bfac71d67393bd963d9c79",
+    "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009/summary.json": "f63fe02c1a5a3e054162074f3d70a988288f5ebc089c1ee5745524461597ba7a",
+    "outputs/experiments/ics_circulation_v3/pilot_20261009/summary.json": "9d8f5fec822719f16734c79a14bdbdd7bc2ed147848e323b8995d1f6eb95011f",
+    "outputs/experiments/ics_circulation_v3/tiny_matched_routing_20261009/matched_pairs.jsonl": "92442c046ab2365e3220732598548d2de66a0dd864161a721ba73adc3849e912",
+    "outputs/experiments/ics_circulation_v3/tiny_matched_routing_20261009/requests.jsonl": "ad98bccacf972165140013086933670cd19fafdab3215121537b64207adcf610",
+    "outputs/experiments/ics_circulation_v3/tiny_matched_routing_20261009/summary.json": "68d2de5fa88f76b607d10ad006fea0eee35409c449c90f46466687fc61382c46"
+  },
+  "limitations": [
+    "Matching records proves artifact consistency, not independent operational correctness.",
+    "Hash comparisons use each experiment's archived source, not the current mutable working tree.",
+    "Source-ID disjointness does not imply a different topology family or real-world independence."
+  ]
+}
