@@ -1,0 +1,74 @@
+{
+  "schema": "ics_v3_phase3_nonlinear_protocol_v1",
+  "training_source": "outputs/experiments/ics_circulation_v3/phase2_learning_confirmatory_20261009",
+  "training_groups": 80,
+  "validation_groups": 20,
+  "fresh_test_groups": 40,
+  "fresh_deployment_groups": 40,
+  "evaluation_namespace": "phase3confirm",
+  "label_seeds": [
+    0,
+    1
+  ],
+  "deployment_seed": 991,
+  "architecture": "one_32_unit_tanh_hidden_layer_numpy_full_batch_adam",
+  "primary_training_seed": 17,
+  "additional_fixed_training_seeds": [
+    29,
+    43
+  ],
+  "learning_rates": [
+    0.003,
+    0.01
+  ],
+  "l2_penalties": [
+    0.0,
+    0.001
+  ],
+  "epochs": 400,
+  "validation_selection": "candidate regret, then delta RMSE, then learning rate, then L2",
+  "no_test_selection_of_seed_or_architecture": true,
+  "sample_size_curve": [
+    20,
+    40,
+    80
+  ],
+  "sample_curve_seed": 17,
+  "direct_input_ablations_primary_seed_only": [
+    "no_analytic_scores",
+    "route_only"
+  ],
+  "input_ablation_scope": "bundled input usefulness, not causal isolation of release/resource mechanisms",
+  "all_models_frozen_before_generating_new_test_labels": true,
+  "extra_forecast_rollout_costs_recorded": true,
+  "smoke": true,
+  "actual_evaluation_namespace": "phase3smoke",
+  "source_sha256_before": {
+    "scripts/experiments/ics_circulation_v3/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "scripts/experiments/ics_circulation_v3/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "scripts/experiments/ics_circulation_v3/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "scripts/experiments/ics_circulation_v3/evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "scripts/experiments/ics_circulation_v3/joint_control.py": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+    "scripts/experiments/ics_circulation_v3/learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "scripts/experiments/ics_circulation_v3/model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "scripts/experiments/ics_circulation_v3/nanning_routing_benchmark.py": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+    "scripts/experiments/ics_circulation_v3/nonlinear_learning.py": "63856f7c775d2613b5cb71a8a40dcc2fe558a797e67068c11df0c26f692565f1",
+    "scripts/experiments/ics_circulation_v3/phase2_scenarios.py": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+    "scripts/experiments/ics_circulation_v3/prebalance.py": "bfba7869bd18d78fa9bd1e9c694d73b4072ec0b3bccdaa6d0c0a2f9b12e37cda",
+    "scripts/experiments/ics_circulation_v3/prebalance_reference.py": "b1f22fda1289c0987b149007d6db59c0dddc41654843cece472f474057abd1b6",
+    "scripts/experiments/ics_circulation_v3/request_service.py": "31f6defcf493aa4f6f69ebfba4f547ccc7525788a92c8596cf711c5d2bc55840",
+    "scripts/experiments/ics_circulation_v3/routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "scripts/experiments/ics_circulation_v3/run_joint_control.py": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+    "scripts/experiments/ics_circulation_v3/run_phase2_learning.py": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+    "scripts/experiments/ics_circulation_v3/run_phase3_learning.py": "5a45ca9b208c1e2c99624d9f266ef2adce4282f2f41fb4160e2b24001fdc9a4e",
+    "scripts/experiments/ics_circulation_v3/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "scripts/experiments/ics_circulation_v3/run_prebalance.py": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+    "scripts/experiments/ics_circulation_v3/run_routing_comparison.py": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "scripts/experiments/ics_circulation_v3/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035"
+  },
+  "training_input_sha256": {
+    "candidates.jsonl": "de2b15bbc13d36f404e8288addc60e21d83fe90935e1265a58684b2a83d9acbb",
+    "split_manifest.json": "6b343e4cf83e0e4503f66bb21fc0d62c88d3070cf6bfac71d67393bd963d9c79"
+  }
+}

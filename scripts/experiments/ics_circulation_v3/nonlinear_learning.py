@@ -1,9 +1,10 @@
 """Small, explicitly scoped NumPy value models for the frozen V3 protocol.
 
-The only architecture is one 32-unit tanh hidden layer. Direct and residual
-models have identical capacity for the same selected input features. Direct
-training fits full cost; residual training fits *paired* f(x)-f(x0), not f(x)
-alone. Both return action differences, giving the reference exactly zero.
+The architecture is one 32-unit tanh hidden layer. All modes have identical
+capacity for the same selected input features. Direct training fits full cost;
+paired_direct and residual both train f(x)-f(x0) with the same paired MSE.
+The residual target subtracts the declared analytic delta and restores it when
+scoring. All modes return action differences and the reference exactly zero.
 
 There is no validation, test, early stopping, hyperparameter search, simulator,
 or future access here. Callers choose a configuration using their separate
@@ -33,6 +34,14 @@ FULL_FEATURE_NAMES = tuple(sorted((
     "candidate_deadline_margin", "candidate_first_departure", "forecast_earliest_ticks",
     "forecast_destination_count",
 )))
+# Explicit opt-in physical-prefix schema. Existing defaults and serialized
+# 23-feature models retain their original inputs and parameter counts.
+PHYSICAL_EXTRA_FEATURE_NAMES = tuple(sorted((
+    "current_at_destination", "prefix_completes_delivery", "prefix_end_at_destination",
+    "prefix_travel_ticks", "prefix_elapsed_ticks", "prefix_remaining_shortest_ticks",
+    "prefix_end_headroom", "prefix_edge_occupied_fraction",
+)))
+PHYSICAL_FEATURE_NAMES = tuple(sorted(FULL_FEATURE_NAMES + PHYSICAL_EXTRA_FEATURE_NAMES))
 HIDDEN_WIDTH = 32
 _PARAMETERS = ("w1", "b1", "w2", "b2")
 _SCHEMA = "ics_v3_numpy_mlp_value_v1"
@@ -95,8 +104,8 @@ class MLPConfig:
 
 
 def _feature_names(value: Sequence[str] | None, kind: str) -> tuple[str, ...]:
-    if kind not in {"direct", "residual"}:
-        raise ValueError("Model kind must be direct or residual")
+    if kind not in {"direct", "paired_direct", "residual"}:
+        raise ValueError("Model kind must be direct, paired_direct or residual")
     if value is None:
         names = FULL_FEATURE_NAMES
     else:
@@ -105,7 +114,7 @@ def _feature_names(value: Sequence[str] | None, kind: str) -> tuple[str, ...]:
         names = tuple(value)
         if not names or any(not isinstance(name, str) for name in names) or len(set(names)) != len(names):
             raise ValueError("Feature subset must be nonempty and unique")
-        if not set(names) <= set(FULL_FEATURE_NAMES):
+        if not set(names) <= set(PHYSICAL_FEATURE_NAMES):
             raise ValueError("Feature subset contains unknown features")
         names = tuple(sorted(names))
     if kind == "residual" and "timed_analytic_absolute" not in names:
@@ -116,7 +125,9 @@ def _feature_names(value: Sequence[str] | None, kind: str) -> tuple[str, ...]:
 def _feature_vector(features: Mapping, names: tuple[str, ...]) -> np.ndarray:
     # Explicit ablations accept either the selected schema or the full upstream
     # schema. Removed values are never read, validated, normalized, or scored.
-    if not isinstance(features, Mapping) or set(features) not in (set(names), set(FULL_FEATURE_NAMES)):
+    if (not isinstance(features, Mapping) or set(features) not in
+            (set(names), set(FULL_FEATURE_NAMES), set(PHYSICAL_FEATURE_NAMES))
+            or not set(names) <= set(features)):
         raise ValueError("Feature schema mismatch")
     return np.array([_number(features[name], f"feature {name}") for name in names], dtype=np.float64)
 
@@ -237,13 +248,17 @@ class MLPValueModel:
             y = np.array([_number(row.get("cost_mean"), "cost_mean") for row in rows])
         else:
             delta = np.array([_number(row.get("delta_mean"), "delta_mean") for row in rows])
-            timed = np.array([_number(row.get("timed_delta"), "timed_delta") for row in rows])
-            timed_index = names.index("timed_analytic_absolute")
-            if not np.allclose(timed, x[:, timed_index] - reference_x[:, timed_index], rtol=1e-10, atol=1e-9):
-                raise ValueError("timed_delta must match the paired timed_analytic_absolute features")
-            if any(delta[index] != 0. or timed[index] != 0. for index in baselines.values()):
+            if any(delta[index] != 0. for index in baselines.values()):
                 raise ValueError("Baseline paired deltas must equal zero")
-            y = delta - timed
+            y = delta
+            if kind == "residual":
+                timed = np.array([_number(row.get("timed_delta"), "timed_delta") for row in rows])
+                timed_index = names.index("timed_analytic_absolute")
+                if not np.allclose(timed, x[:, timed_index] - reference_x[:, timed_index], rtol=1e-10, atol=1e-9):
+                    raise ValueError("timed_delta must match the paired timed_analytic_absolute features")
+                if any(timed[index] != 0. for index in baselines.values()):
+                    raise ValueError("Baseline paired deltas must equal zero")
+                y = delta - timed
         # No caller-owned arrays or rows are mutated. Statistics come only from
         # selected features of these training rows, never from reference/test IO.
         with np.errstate(over="ignore", invalid="ignore"):
@@ -252,7 +267,7 @@ class MLPValueModel:
             raise ValueError("Nonfinite training normalization or targets")
         scale[scale < 1e-9] = 1.
         normalized = (x - center) / scale
-        normalized_reference = (reference_x - center) / scale if kind == "residual" else None
+        normalized_reference = None if kind == "direct" else (reference_x - center) / scale
         rng = np.random.default_rng(config.seed)
         parameters = {
             "w1": rng.normal(0., np.sqrt(2. / (len(names) + HIDDEN_WIDTH)), (len(names), HIDDEN_WIDTH)),
@@ -283,7 +298,8 @@ class MLPValueModel:
         metadata = {
             "optimizer": "full_batch_adam", "activation": "tanh", "hidden_width": HIDDEN_WIDTH,
             "parameter_count": (len(names) + 2) * HIDDEN_WIDTH + 1,
-            "target": "cost_mean" if kind == "direct" else "delta_mean_minus_timed_delta",
+            "target": {"direct": "cost_mean", "paired_direct": "delta_mean",
+                       "residual": "delta_mean_minus_timed_delta"}[kind],
             "prediction_in_loss": "f(x)" if kind == "direct" else "f(x)-f(group_baseline)",
             "objective": "mean_squared_error + 0.5*l2*(sum(w1**2)+sum(w2**2)); biases unpenalized",
             "row_count": len(rows), "source_group_count": len(baselines), "source_groups": sorted(baselines),

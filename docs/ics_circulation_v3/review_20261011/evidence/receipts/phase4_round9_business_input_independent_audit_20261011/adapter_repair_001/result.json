@@ -1,0 +1,67 @@
+{
+  "status": "passed",
+  "physics_calls": 0,
+  "rows": [
+    {
+      "mutation": "remove_protection",
+      "resealed": false,
+      "rejected": true,
+      "reason": "audited workload content binding mismatch"
+    },
+    {
+      "mutation": "relax_final_deadline",
+      "resealed": false,
+      "rejected": true,
+      "reason": "audited workload content binding mismatch"
+    },
+    {
+      "mutation": "erase_early_storage",
+      "resealed": false,
+      "rejected": true,
+      "reason": "audited workload content binding mismatch"
+    },
+    {
+      "mutation": "advance_release",
+      "resealed": false,
+      "rejected": true,
+      "reason": "audited workload content binding mismatch"
+    },
+    {
+      "mutation": "remove_protection",
+      "resealed": true,
+      "rejected": true,
+      "reason": "business protection policy mismatch"
+    },
+    {
+      "mutation": "relax_final_deadline",
+      "resealed": true,
+      "rejected": true,
+      "reason": "business final deadline policy mismatch"
+    },
+    {
+      "mutation": "erase_early_storage",
+      "resealed": true,
+      "rejected": true,
+      "reason": "business early lifecycle policy mismatch"
+    },
+    {
+      "mutation": "advance_release",
+      "resealed": true,
+      "rejected": true,
+      "reason": "business scheduled release policy mismatch"
+    }
+  ],
+  "before": {
+    "C:\\PROGRAMING\\czr005\\scripts\\experiments\\ics_circulation_v3\\business_inputs.py": "be26793baf4ad61dfcd6122b2af2b67898f384e4f9d25771bbff23d1ca97eddf",
+    "C:\\PROGRAMING\\czr005\\scripts\\experiments\\ics_circulation_v3\\business_runtime.py": "9fd5820d4a5b48e9f8f1e56469945b83b6c8680747b1cc8999f3a5c76b67d305"
+  },
+  "checks": 8,
+  "after": {
+    "C:\\PROGRAMING\\czr005\\scripts\\experiments\\ics_circulation_v3\\business_inputs.py": "be26793baf4ad61dfcd6122b2af2b67898f384e4f9d25771bbff23d1ca97eddf",
+    "C:\\PROGRAMING\\czr005\\scripts\\experiments\\ics_circulation_v3\\business_runtime.py": "9fd5820d4a5b48e9f8f1e56469945b83b6c8680747b1cc8999f3a5c76b67d305"
+  },
+  "cpu_seconds": 0.375,
+  "wall_seconds": 0.39507529998081736,
+  "scope": "imports, independent fixture load/build, eight adapter tamper cases; zero physics",
+  "prior_gap": "pre-fix was identified by static review and confirmed by source author; no independent pre-fix probe was executed"
+}

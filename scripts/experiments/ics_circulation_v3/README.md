@@ -1,5 +1,7 @@
 # ICS V3 有限盘循环机制原型
 
+当前阶段4第二至十一轮的实现、实验边界与失败记录见 [PHASE4.md](PHASE4.md)，最新显式业务投射、存储筛查和头距研究见 [PHASE4_PROJECTED_RUNTIME_AND_ENTRY_HEADWAY.md](PHASE4_PROJECTED_RUNTIME_AND_ENTRY_HEADWAY.md)。本页以下内容保留第一阶段的历史说明，不能用来判断后续模块是否已经实现。2026-10-11的代码审核材料及完整测试fixture准备说明位于 `docs/ics_circulation_v3/review_20261011/`。
+
 **本页保留第一阶段说明。第二阶段已增加可恢复仿真、单步干预、门点候选、预测预调和轻量学习对照，当前接口与运行方法见 [PHASE2.md](PHASE2.md)。**
 
 第三阶段另补小型 MLP/输入对照、场景级配置选择、有限动作预调参考和请求故障账本，见 [PHASE3.md](PHASE3.md)。逐轮决定、问题和实验记录持续追加于 [PROGRESS.md](PROGRESS.md)。

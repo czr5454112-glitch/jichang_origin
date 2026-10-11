@@ -1,0 +1,216 @@
+{
+  "scope": "synthetic_first_safe_prefix_value_learning_with_disjoint_deployment_sources",
+  "evaluation_namespace": "confirm1",
+  "source_groups": {
+    "train": 80,
+    "validation": 20,
+    "test": 40,
+    "deployment": 40
+  },
+  "candidate_rows": 560,
+  "paired_branch_rollouts": 1120,
+  "label_stage_forecast_model_rollouts": 560,
+  "deployment_runs": 240,
+  "deployment_nested_forecast_model_rollouts": 320,
+  "invariant_checks": 143965,
+  "feature_count": 23,
+  "selected_alpha": {
+    "direct": 100.0,
+    "residual": 10.0
+  },
+  "label_and_forecast_evaluation_ms": 34740.04069999501,
+  "ridge_fitting_ms": 51.146300000254996,
+  "candidate_test": {
+    "baseline": {
+      "groups": 40,
+      "mean_regret": 0.475,
+      "max_regret": 2.5,
+      "positive_regret_groups": 13,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": null
+    },
+    "analytic": {
+      "groups": 40,
+      "mean_regret": 0.475,
+      "max_regret": 2.5,
+      "positive_regret_groups": 13,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": 2.9786427278208443
+    },
+    "timed": {
+      "groups": 40,
+      "mean_regret": 0.025,
+      "max_regret": 1.0,
+      "positive_regret_groups": 1,
+      "mean_gain_over_baseline": 0.45,
+      "delta_rmse": 3.20796859398592
+    },
+    "direct": {
+      "groups": 40,
+      "mean_regret": 0.05,
+      "max_regret": 1.5,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.425,
+      "delta_rmse": 2.710188083565777
+    },
+    "residual": {
+      "groups": 40,
+      "mean_regret": 0.075,
+      "max_regret": 1.5,
+      "positive_regret_groups": 3,
+      "mean_gain_over_baseline": 0.4,
+      "delta_rmse": 2.736463099991092
+    },
+    "forecast_rollout": {
+      "groups": 40,
+      "mean_regret": 0.0,
+      "max_regret": 0.0,
+      "positive_regret_groups": 0,
+      "mean_gain_over_baseline": 0.475,
+      "delta_rmse": 1.455055840852852
+    }
+  },
+  "independent_closed_loop": {
+    "baseline": {
+      "runs": 40,
+      "mean_cost": 19.1275,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.65,
+      "wall_ms": {
+        "p50": 27.744500002881978,
+        "p95": 35.22710000106599,
+        "p99": 35.983699999633245,
+        "max": 35.983699999633245,
+        "mean": 27.97657499977504
+      }
+    },
+    "analytic": {
+      "runs": 40,
+      "mean_cost": 19.1275,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.65,
+      "wall_ms": {
+        "p50": 27.6912999979686,
+        "p95": 34.215299994684756,
+        "p99": 35.90930000063963,
+        "max": 35.90930000063963,
+        "mean": 27.706462500282214
+      }
+    },
+    "timed": {
+      "runs": 40,
+      "mean_cost": 18.2525,
+      "mean_gain_over_baseline": 0.875,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.525,
+      "wall_ms": {
+        "p50": 27.36459999869112,
+        "p95": 34.42950000317069,
+        "p99": 35.94829999929061,
+        "max": 35.94829999929061,
+        "mean": 28.230594999877212
+      }
+    },
+    "direct": {
+      "runs": 40,
+      "mean_cost": 18.2525,
+      "mean_gain_over_baseline": 0.875,
+      "worse_than_baseline": 1,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.65,
+      "wall_ms": {
+        "p50": 29.293600004166365,
+        "p95": 37.43450000183657,
+        "p99": 41.37040000205161,
+        "max": 41.37040000205161,
+        "mean": 29.598362499928044
+      }
+    },
+    "residual": {
+      "runs": 40,
+      "mean_cost": 18.2275,
+      "mean_gain_over_baseline": 0.9,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.525,
+      "wall_ms": {
+        "p50": 30.525499998475425,
+        "p95": 35.34930000023451,
+        "p99": 38.127799998619594,
+        "max": 38.127799998619594,
+        "mean": 30.112705000283313
+      }
+    },
+    "forecast_rollout": {
+      "runs": 40,
+      "mean_cost": 18.2275,
+      "mean_gain_over_baseline": 0.9,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.525,
+      "wall_ms": {
+        "p50": 203.47600000241073,
+        "p95": 250.973400005023,
+        "p99": 256.9156000026851,
+        "max": 256.9156000026851,
+        "mean": 202.84075499985192
+      }
+    }
+  },
+  "generation_ms": {
+    "p50": 0.6554999999934807,
+    "p95": 0.910000002477318,
+    "p99": 1.2753999981214292,
+    "max": 1.6325999968103133,
+    "mean": 0.6881657140703672
+  },
+  "features_ms": {
+    "p50": 1.0619000022416003,
+    "p95": 1.5452000006916933,
+    "p99": 1.8646000025910325,
+    "max": 1.9105000028503127,
+    "mean": 1.0517157146490976
+  },
+  "forecast_scoring_ms": {
+    "p50": 77.42470000084722,
+    "p95": 97.62800000316929,
+    "p99": 106.41659999964759,
+    "max": 108.58860000007553,
+    "mean": 77.48829785720902
+  },
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "scripts/experiments/ics_circulation_v3/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "scripts/experiments/ics_circulation_v3/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "scripts/experiments/ics_circulation_v3/evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "scripts/experiments/ics_circulation_v3/joint_control.py": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+    "scripts/experiments/ics_circulation_v3/learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "scripts/experiments/ics_circulation_v3/model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "scripts/experiments/ics_circulation_v3/nanning_routing_benchmark.py": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+    "scripts/experiments/ics_circulation_v3/phase2_scenarios.py": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+    "scripts/experiments/ics_circulation_v3/prebalance.py": "cd96c5b7fa4dee1d7586c46275690792beadb6ac2bbf0b75f98dbc03ae0f987a",
+    "scripts/experiments/ics_circulation_v3/routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "scripts/experiments/ics_circulation_v3/run_joint_control.py": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+    "scripts/experiments/ics_circulation_v3/run_phase2_learning.py": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+    "scripts/experiments/ics_circulation_v3/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "scripts/experiments/ics_circulation_v3/run_prebalance.py": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+    "scripts/experiments/ics_circulation_v3/run_routing_comparison.py": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "scripts/experiments/ics_circulation_v3/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035"
+  },
+  "source_changed_during_run": false,
+  "limitations": [
+    "Synthetic seven-node family with full visible physical state; no airport-generalization claim",
+    "Linear ridge models only, not a trained MLP or original PPL/DG-PG algorithm",
+    "Candidate interventions stop at the first waitable node; a no-wait chain is an indivisible prefix",
+    "Forecast-rollout reference receives the same published demand forecast and extra compute, not the true tape",
+    "Strict deadline checks for loaded requests are local; future uncertainty can still cause missed service",
+    "No supplier integration and no network end-to-end latency measurement",
+    "Low-sample benefit must be judged from frozen test and independent deployment, not training loss"
+  ]
+}

@@ -15,6 +15,7 @@ from typing import Callable, Protocol, Sequence
 
 from .model import RouteCandidate, Snapshot
 from .runtime import CandidateGenerator, ExecutionValidator, conditional_forecast_failure
+from .storage_contracts import storage_committed_failure, assert_storage_invariants, has_storage_contracts
 
 
 class DemandForecast(Protocol):
@@ -91,11 +92,15 @@ def _forecast_semantics(forecast: DemandForecast) -> tuple:
 
 def known_supply(snapshot: Snapshot) -> tuple[SupplyEvent, ...]:
     """Count each tray once, after unload/hold, prioritizing irrevocable plans."""
+    if has_storage_contracts(snapshot):
+        assert_storage_invariants(snapshot)
     supplies = []
     old = {flight.tray_id: flight for flight in snapshot.old_in_transit}
     for tray_id, tray in sorted(snapshot.trays.items()):
         if tray_id in snapshot.plans:
             plan = snapshot.plans[tray_id]
+            if storage_committed_failure(snapshot, plan):
+                continue
             if getattr(plan, "prefix_only", False):
                 continue  # A safe stopping prefix is not a terminal empty release.
             destination = (snapshot.bags[plan.bag_id].destination if plan.bag_id is not None

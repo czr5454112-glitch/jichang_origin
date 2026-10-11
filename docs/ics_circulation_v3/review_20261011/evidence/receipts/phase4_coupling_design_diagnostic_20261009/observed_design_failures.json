@@ -1,0 +1,46 @@
+{
+  "scope": "predeclared mechanism construction diagnostic, not heldout selection",
+  "initial_schedule": [
+    "B2",
+    "B8",
+    "B10",
+    "A12",
+    "A22",
+    "B24",
+    "B30"
+  ],
+  "observations": {
+    "scarce": {
+      "reactive_cost": 16.6,
+      "predictive_cost": 10.6,
+      "both_completed": 7,
+      "bag_denominator": 8,
+      "both_uncompleted": [
+        "stream:B:30:0"
+      ]
+    },
+    "sufficient": {
+      "reactive_cost": 32.5,
+      "predictive_cost": 190.6,
+      "reactive_completed": 6,
+      "predictive_completed": 1,
+      "bag_denominator": 8,
+      "initial_protected_warm_not_admitted": true
+    },
+    "reversal": {
+      "reactive_cost": 1.1,
+      "predictive_cost": 3.1,
+      "both_completed": 8,
+      "bag_denominator": 8
+    }
+  },
+  "interpretation": [
+    "B-heavy trailing flow can finish with full A storage and no compulsory local A->C parking: not a sustainable balanced finite-buffer control.",
+    "An extra stationary B tray with B capacity2 prevents initial protected warm-route admission; this is not an admitted burn-in comparison."
+  ],
+  "correction_plan": [
+    "Replace the final B30 demand with A30 to balance circulation.",
+    "Declare B capacity3 with extra B stock for the sufficient-stock control.",
+    "Keep initial design failure records and assert the protected burn-in is actually admitted."
+  ]
+}

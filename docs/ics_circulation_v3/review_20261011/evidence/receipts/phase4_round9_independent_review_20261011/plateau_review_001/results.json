@@ -1,0 +1,81 @@
+{
+  "status": "passed",
+  "physical_runs": 0,
+  "standalone_queries": 2,
+  "queries": {
+    "old": {
+      "cpu_seconds_nested": 1.171875,
+      "wall_seconds_nested": 1.2371783999842592,
+      "status": "expansion_budget_exhausted",
+      "expansions": 10000,
+      "pop_count": 9317,
+      "popped_primary_f_counts": {
+        "19749": 9317
+      },
+      "work_units": {
+        "topology_edges": 227,
+        "reverse_lower_bound": 341,
+        "storage_product_time_labels": 9317,
+        "event_projection": 115
+      },
+      "candidate_count": 0
+    },
+    "new": {
+      "cpu_seconds_nested": 0.0,
+      "wall_seconds_nested": 0.004723199992440641,
+      "status": "candidate_limit_reached",
+      "expansions": 670,
+      "pop_count": 68,
+      "popped_primary_f_counts": {
+        "19749": 68
+      },
+      "work_units": {
+        "topology_edges": 227,
+        "reverse_lower_bound": 341,
+        "storage_product_time_labels": 68,
+        "event_projection": 30,
+        "storage_full_witness_validation": 4
+      },
+      "candidate_count": 4
+    }
+  },
+  "exception": null,
+  "independent_witnesses": [
+    {
+      "candidate_id": "storage:v8882:projected:1x:2:proxy-initial-26:0",
+      "ingress": 9027,
+      "release": 19500,
+      "final_arrival": 19749,
+      "unload": 19750,
+      "storage_capacity_maximum": 1
+    },
+    {
+      "candidate_id": "storage:v8882:projected:1x:2:proxy-initial-26:1",
+      "ingress": 9027,
+      "release": 19500,
+      "final_arrival": 19749,
+      "unload": 19750,
+      "storage_capacity_maximum": 1
+    },
+    {
+      "candidate_id": "storage:v8882:projected:1x:2:proxy-initial-26:2",
+      "ingress": 9100,
+      "release": 19500,
+      "final_arrival": 19749,
+      "unload": 19750,
+      "storage_capacity_maximum": 1
+    },
+    {
+      "candidate_id": "storage:v8882:projected:1x:2:proxy-initial-26:3",
+      "ingress": 9100,
+      "release": 19500,
+      "final_arrival": 19749,
+      "unload": 19750,
+      "storage_capacity_maximum": 1
+    }
+  ],
+  "cpu_seconds": 1.25,
+  "wall_seconds": 1.3278540000028443,
+  "limitations": "One genuine saved query only. Instrumented heap minimum checks add audit CPU, so timings are not algorithm performance. K/state caps make ordering affect candidate set; capacity-induced smaller-f plateaus may remain. No completeness or global optimality claim.",
+  "resource_scope": "Parent CPU includes imports, hash/diff, two standalone query replays, instrumentation and independent witness checks; query CPU nested. No physical simulation. Initial imports/final write excluded."
+}

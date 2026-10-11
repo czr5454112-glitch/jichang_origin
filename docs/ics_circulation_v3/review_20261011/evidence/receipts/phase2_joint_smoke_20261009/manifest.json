@@ -1,0 +1,528 @@
+[
+  {
+    "source_group": "v3_phase2:joint:000",
+    "split": "joint",
+    "initial": {
+      "now": 0,
+      "network": {
+        "nodes": {
+          "A": {
+            "node_id": "A",
+            "logistics_zone": "domestic",
+            "control_partition": "control:0",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "S": {
+            "node_id": "S",
+            "logistics_zone": "domestic",
+            "control_partition": "control:0",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "J": {
+            "node_id": "J",
+            "logistics_zone": "domestic",
+            "control_partition": "control:1",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "C": {
+            "node_id": "C",
+            "logistics_zone": "domestic",
+            "control_partition": "control:1",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "K": {
+            "node_id": "K",
+            "logistics_zone": "international",
+            "control_partition": "control:2",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "L": {
+            "node_id": "L",
+            "logistics_zone": "international",
+            "control_partition": "control:2",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "B": {
+            "node_id": "B",
+            "logistics_zone": "international",
+            "control_partition": "control:3",
+            "capacity": 8,
+            "can_wait": true
+          }
+        },
+        "edges": {
+          "stem": {
+            "edge_id": "stem",
+            "source": "A",
+            "target": "S",
+            "travel_time": 2,
+            "capacity": 1
+          },
+          "S-J": {
+            "edge_id": "S-J",
+            "source": "S",
+            "target": "J",
+            "travel_time": 3,
+            "capacity": 1
+          },
+          "J-B": {
+            "edge_id": "J-B",
+            "source": "J",
+            "target": "B",
+            "travel_time": 7,
+            "capacity": 1
+          },
+          "S-K": {
+            "edge_id": "S-K",
+            "source": "S",
+            "target": "K",
+            "travel_time": 5,
+            "capacity": 1
+          },
+          "K-B": {
+            "edge_id": "K-B",
+            "source": "K",
+            "target": "B",
+            "travel_time": 8,
+            "capacity": 1
+          },
+          "S-L": {
+            "edge_id": "S-L",
+            "source": "S",
+            "target": "L",
+            "travel_time": 7,
+            "capacity": 1
+          },
+          "L-B": {
+            "edge_id": "L-B",
+            "source": "L",
+            "target": "B",
+            "travel_time": 6,
+            "capacity": 1
+          },
+          "S-B": {
+            "edge_id": "S-B",
+            "source": "S",
+            "target": "B",
+            "travel_time": 20,
+            "capacity": 1
+          },
+          "C-J": {
+            "edge_id": "C-J",
+            "source": "C",
+            "target": "J",
+            "travel_time": 1,
+            "capacity": 1
+          },
+          "B-A": {
+            "edge_id": "B-A",
+            "source": "B",
+            "target": "A",
+            "travel_time": 11,
+            "capacity": 1
+          },
+          "old-long": {
+            "edge_id": "old-long",
+            "source": "A",
+            "target": "B",
+            "travel_time": 40,
+            "capacity": 1
+          }
+        }
+      },
+      "trays": {
+        "tray:target": {
+          "tray_id": "tray:target",
+          "node": "A",
+          "mode": "loaded",
+          "bag_id": "bag:target",
+          "available_at": 0
+        },
+        "tray:C": {
+          "tray_id": "tray:C",
+          "node": "C",
+          "mode": "empty",
+          "bag_id": null,
+          "available_at": 0
+        },
+        "tray:old": {
+          "tray_id": "tray:old",
+          "node": null,
+          "mode": "in_transit",
+          "bag_id": null,
+          "available_at": 0
+        },
+        "tray:B:0": {
+          "tray_id": "tray:B:0",
+          "node": "B",
+          "mode": "empty",
+          "bag_id": null,
+          "available_at": 0
+        }
+      },
+      "bags": {
+        "bag:target": {
+          "bag_id": "bag:target",
+          "origin": "A",
+          "destination": "B",
+          "arrival": 0,
+          "deadline": 36,
+          "protected": false
+        }
+      },
+      "reservations": [],
+      "version": 0,
+      "old_in_transit": [
+        {
+          "tray_id": "tray:old",
+          "edge_id": "old-long",
+          "depart": -19,
+          "arrive": 21
+        }
+      ],
+      "module": {
+        "unload_ticks": 2,
+        "hold_by_node": {
+          "B": 3
+        },
+        "export_min_stock": 0,
+        "reception_capacity": 2
+      },
+      "plans": {},
+      "completed": {},
+      "load_times": {
+        "bag:target": 0
+      },
+      "empty_targets": {}
+    },
+    "future_event_engine_only": [
+      {
+        "bag_id": "forecast:C:0",
+        "origin": "C",
+        "destination": "B",
+        "arrival": 6,
+        "deadline": 12,
+        "protected": false
+      },
+      {
+        "bag_id": "forecast:B:1",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 16,
+        "deadline": 31,
+        "protected": false
+      },
+      {
+        "bag_id": "forecast:B:2",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 16,
+        "deadline": 31,
+        "protected": false
+      },
+      {
+        "bag_id": "forecast:B:0",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 17,
+        "deadline": 31,
+        "protected": false
+      }
+    ],
+    "forecasts": [
+      {
+        "forecast_id": "forecast:B",
+        "node": "B",
+        "destination": "A",
+        "at": 16,
+        "deadline": 31,
+        "count": 3,
+        "published_at": 0,
+        "unit_ids": []
+      },
+      {
+        "forecast_id": "forecast:C",
+        "node": "C",
+        "destination": "B",
+        "at": 6,
+        "deadline": 12,
+        "count": 1,
+        "published_at": 0,
+        "unit_ids": []
+      }
+    ],
+    "horizon": 72,
+    "truth_shift": 0,
+    "future_seed": 991,
+    "initial_sha256": "6fee42c5d83a06c18a399d746f763ecb1d3fb2cbb1fc600775874083223268d2",
+    "future_sha256": "bc710cc53b16bd086828547cab78589896527a2b3b3b8a5bb3eac91d5168b0d6",
+    "forecast_sha256": "f67d5ac6fefff0845f7cd673def6900caa9061ac832abcd94d0e34797b84ae88",
+    "all_scheduled_bag_ids": [
+      "bag:target",
+      "forecast:B:0",
+      "forecast:B:1",
+      "forecast:B:2",
+      "forecast:C:0"
+    ]
+  },
+  {
+    "source_group": "v3_phase2:joint:001",
+    "split": "joint",
+    "initial": {
+      "now": 0,
+      "network": {
+        "nodes": {
+          "A": {
+            "node_id": "A",
+            "logistics_zone": "domestic",
+            "control_partition": "control:0",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "S": {
+            "node_id": "S",
+            "logistics_zone": "domestic",
+            "control_partition": "control:0",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "J": {
+            "node_id": "J",
+            "logistics_zone": "domestic",
+            "control_partition": "control:1",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "C": {
+            "node_id": "C",
+            "logistics_zone": "domestic",
+            "control_partition": "control:1",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "K": {
+            "node_id": "K",
+            "logistics_zone": "international",
+            "control_partition": "control:2",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "L": {
+            "node_id": "L",
+            "logistics_zone": "international",
+            "control_partition": "control:2",
+            "capacity": 8,
+            "can_wait": true
+          },
+          "B": {
+            "node_id": "B",
+            "logistics_zone": "international",
+            "control_partition": "control:3",
+            "capacity": 8,
+            "can_wait": true
+          }
+        },
+        "edges": {
+          "stem": {
+            "edge_id": "stem",
+            "source": "A",
+            "target": "S",
+            "travel_time": 2,
+            "capacity": 1
+          },
+          "S-J": {
+            "edge_id": "S-J",
+            "source": "S",
+            "target": "J",
+            "travel_time": 1,
+            "capacity": 1
+          },
+          "J-B": {
+            "edge_id": "J-B",
+            "source": "J",
+            "target": "B",
+            "travel_time": 4,
+            "capacity": 1
+          },
+          "S-K": {
+            "edge_id": "S-K",
+            "source": "S",
+            "target": "K",
+            "travel_time": 4,
+            "capacity": 1
+          },
+          "K-B": {
+            "edge_id": "K-B",
+            "source": "K",
+            "target": "B",
+            "travel_time": 4,
+            "capacity": 1
+          },
+          "S-L": {
+            "edge_id": "S-L",
+            "source": "S",
+            "target": "L",
+            "travel_time": 7,
+            "capacity": 1
+          },
+          "L-B": {
+            "edge_id": "L-B",
+            "source": "L",
+            "target": "B",
+            "travel_time": 8,
+            "capacity": 1
+          },
+          "S-B": {
+            "edge_id": "S-B",
+            "source": "S",
+            "target": "B",
+            "travel_time": 19,
+            "capacity": 1
+          },
+          "C-J": {
+            "edge_id": "C-J",
+            "source": "C",
+            "target": "J",
+            "travel_time": 1,
+            "capacity": 1
+          },
+          "B-A": {
+            "edge_id": "B-A",
+            "source": "B",
+            "target": "A",
+            "travel_time": 7,
+            "capacity": 1
+          },
+          "old-long": {
+            "edge_id": "old-long",
+            "source": "A",
+            "target": "B",
+            "travel_time": 40,
+            "capacity": 1
+          }
+        }
+      },
+      "trays": {
+        "tray:target": {
+          "tray_id": "tray:target",
+          "node": "A",
+          "mode": "loaded",
+          "bag_id": "bag:target",
+          "available_at": 0
+        },
+        "tray:C": {
+          "tray_id": "tray:C",
+          "node": "C",
+          "mode": "empty",
+          "bag_id": null,
+          "available_at": 0
+        },
+        "tray:old": {
+          "tray_id": "tray:old",
+          "node": null,
+          "mode": "in_transit",
+          "bag_id": null,
+          "available_at": 0
+        },
+        "tray:B:0": {
+          "tray_id": "tray:B:0",
+          "node": "B",
+          "mode": "empty",
+          "bag_id": null,
+          "available_at": 0
+        }
+      },
+      "bags": {
+        "bag:target": {
+          "bag_id": "bag:target",
+          "origin": "A",
+          "destination": "B",
+          "arrival": 0,
+          "deadline": 36,
+          "protected": false
+        }
+      },
+      "reservations": [],
+      "version": 0,
+      "old_in_transit": [
+        {
+          "tray_id": "tray:old",
+          "edge_id": "old-long",
+          "depart": -31,
+          "arrive": 9
+        }
+      ],
+      "module": {
+        "unload_ticks": 1,
+        "hold_by_node": {
+          "B": 1
+        },
+        "export_min_stock": 0,
+        "reception_capacity": 2
+      },
+      "plans": {},
+      "completed": {},
+      "load_times": {
+        "bag:target": 0
+      },
+      "empty_targets": {}
+    },
+    "future_event_engine_only": [
+      {
+        "bag_id": "forecast:C:0",
+        "origin": "C",
+        "destination": "B",
+        "arrival": 9,
+        "deadline": 14,
+        "protected": false
+      },
+      {
+        "bag_id": "forecast:B:0",
+        "origin": "B",
+        "destination": "A",
+        "arrival": 18,
+        "deadline": 31,
+        "protected": false
+      }
+    ],
+    "forecasts": [
+      {
+        "forecast_id": "forecast:B",
+        "node": "B",
+        "destination": "A",
+        "at": 16,
+        "deadline": 31,
+        "count": 1,
+        "published_at": 0,
+        "unit_ids": []
+      },
+      {
+        "forecast_id": "forecast:C",
+        "node": "C",
+        "destination": "B",
+        "at": 9,
+        "deadline": 14,
+        "count": 1,
+        "published_at": 0,
+        "unit_ids": []
+      }
+    ],
+    "horizon": 72,
+    "truth_shift": 0,
+    "future_seed": 991,
+    "initial_sha256": "e3bddf8ab6ecf3340525b48895be1a4166bcec0cee07257b4df3d62700d0c50d",
+    "future_sha256": "84ec4c53377123b33bdbb890b4dc69c87ba2959cddf6c69140bb205ff4fef3ff",
+    "forecast_sha256": "fc86ef14d78e32232673276f2df5fd26f23b6198cb5dc2a7546a97c1229d8f4f",
+    "all_scheduled_bag_ids": [
+      "bag:target",
+      "forecast:B:0",
+      "forecast:C:0"
+    ]
+  }
+]

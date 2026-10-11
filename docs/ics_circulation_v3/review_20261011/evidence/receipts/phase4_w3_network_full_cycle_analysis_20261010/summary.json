@@ -1,0 +1,175 @@
+{
+  "schema": "ics_v3_network_whole_cycle_analysis_v1",
+  "samples": 18,
+  "nonempty_samples": 17,
+  "zero_candidate_samples": [
+    "near_full:network_timed:d0:t2:near_full:round0:flow0:0:134"
+  ],
+  "requested": 2176,
+  "physical_files": 1388,
+  "exact_memo_classes": 1388,
+  "cache_hit_requests": 788,
+  "status_counts": {
+    "controller_quiescent": 2176
+  },
+  "complete_value_samples": 17,
+  "roles": {
+    "origin": 9,
+    "continuation": 9
+  },
+  "old80_flat_samples": 16,
+  "full_flat_samples": 16,
+  "full_flat_continuation_samples": 9,
+  "full_cost_flat_but_completion_times_differ_samples": 1,
+  "full_cost_flat_but_final_tray_positions_differ_samples": 0,
+  "exact_optset_unchanged_samples": 17,
+  "positive_old80_choice_full_regret_samples": 0,
+  "baseline_full_regret_positive_samples": 0,
+  "old80_choice_full_regret_mean_over_complete_samples": 0.0,
+  "old80_choice_full_regret_max_over_complete_samples": 0.0,
+  "full_baseline_regret_mean_over_complete_samples": 0.0,
+  "full_baseline_regret_max_over_complete_samples": 0.0,
+  "request_weighted": {
+    "old80": {
+      "request_weighted_endpoints": 2176,
+      "physical_or_outcome_incomplete_requests": 0,
+      "counting_scope": "correlated candidate/group/draw/owner request instances; not independent operational bags or days",
+      "cost_components_sum": {
+        "tray_wait": 52932.0,
+        "nonprotected_tardiness": 0.0,
+        "empty_distance": 264080.0,
+        "terminal_backlog": 1936.0,
+        "terminal_inflight": 2804.0
+      },
+      "expected_full_ledger_tasks": 16572,
+      "observed_tasks": 14372,
+      "unobserved_tasks": 2200,
+      "completed_tasks": 12436,
+      "newly_completed_since_checkpoint": 6804,
+      "observed_uncompleted_tasks": 1936,
+      "full_ledger_uncompleted_tasks": 4136,
+      "on_time": 12436,
+      "protected_observed": 2176,
+      "protected_completed": 2176,
+      "protected_on_time": 2176,
+      "protected_uncompleted": 0,
+      "protected_completed_late": 0,
+      "empty_in_transit": 2120,
+      "loaded_in_transit": 684,
+      "holding_or_unloading_trays": 60
+    },
+    "full": {
+      "request_weighted_endpoints": 2176,
+      "physical_or_outcome_incomplete_requests": 0,
+      "counting_scope": "correlated candidate/group/draw/owner request instances; not independent operational bags or days",
+      "cost_components_sum": {
+        "tray_wait": 113760.0,
+        "nonprotected_tardiness": 0.0,
+        "empty_distance": 356332.0,
+        "terminal_backlog": 0.0,
+        "terminal_inflight": 0.0
+      },
+      "expected_full_ledger_tasks": 16572,
+      "observed_tasks": 16572,
+      "unobserved_tasks": 0,
+      "completed_tasks": 16572,
+      "newly_completed_since_checkpoint": 10940,
+      "observed_uncompleted_tasks": 0,
+      "full_ledger_uncompleted_tasks": 0,
+      "on_time": 16572,
+      "protected_observed": 2176,
+      "protected_completed": 2176,
+      "protected_on_time": 2176,
+      "protected_uncompleted": 0,
+      "protected_completed_late": 0,
+      "empty_in_transit": 0,
+      "loaded_in_transit": 0,
+      "holding_or_unloading_trays": 0
+    }
+  },
+  "unique_physical_search_calls": 75444,
+  "unique_physical_search_work": 46436470,
+  "unique_branch_cpu_seconds": 19037.109375,
+  "unique_branch_wall_seconds_sum_not_makespan": 19647.701170700486,
+  "worker_invocation_cpu_seconds": 20275.84375,
+  "parent_cpu_seconds": 0.921875,
+  "parent_wall_makespan_seconds": 3519.235010000004,
+  "resource_note": "branch timing is nested in invocation timing, never add again; requests.json repeats referenced physical-file timings on memo aliases, so sum unique physical files only; worker timings include duplicate recollection/setup; pilot and stopped pilot tracked separately",
+  "new_independent_source_count": 0,
+  "value_scope": "per-state single-intervention conditional means under fixed timed continuation; repeated checkpoints/shared futures are correlated; regrets across states are not additive deployable policy gains",
+  "maximum_controller_quiescent_at": 226,
+  "minimum_controller_quiescent_at": 117,
+  "requests_task_done_before_transport": 64,
+  "requests_with_stationary_occupancy_at_end": 2164,
+  "protected_unadmitted_decision_counter_request_sum": 0.0,
+  "input_manifest_matches_start": true,
+  "analysis_cpu_seconds": 53.015625,
+  "analysis_wall_seconds": 54.739288299984764,
+  "by_scene": {
+    "cross_cycle": {
+      "requests": 768,
+      "physical_memo_classes": 376,
+      "status_counts": {
+        "controller_quiescent": 768
+      },
+      "complete_value_samples": 6,
+      "full_flat_samples": 5,
+      "h80_requests_unobserved_tasks": 256,
+      "h80_requests_observed_uncompleted": 440,
+      "task_complete_before_transport_requests": 12,
+      "full_expected_tasks_request_weighted": 5152,
+      "full_completed_tasks_request_weighted": 5152,
+      "full_on_time_tasks_request_weighted": 5152
+    },
+    "counterflow": {
+      "requests": 768,
+      "physical_memo_classes": 720,
+      "status_counts": {
+        "controller_quiescent": 768
+      },
+      "complete_value_samples": 6,
+      "full_flat_samples": 6,
+      "h80_requests_unobserved_tasks": 508,
+      "h80_requests_observed_uncompleted": 732,
+      "task_complete_before_transport_requests": 52,
+      "full_expected_tasks_request_weighted": 7108,
+      "full_completed_tasks_request_weighted": 7108,
+      "full_on_time_tasks_request_weighted": 7108
+    },
+    "near_full": {
+      "requests": 640,
+      "physical_memo_classes": 292,
+      "status_counts": {
+        "controller_quiescent": 640
+      },
+      "complete_value_samples": 5,
+      "full_flat_samples": 5,
+      "h80_requests_unobserved_tasks": 128,
+      "h80_requests_observed_uncompleted": 324,
+      "task_complete_before_transport_requests": 0,
+      "full_expected_tasks_request_weighted": 4312,
+      "full_completed_tasks_request_weighted": 4312,
+      "full_on_time_tasks_request_weighted": 4312
+    }
+  },
+  "resources_detail": {
+    "actual_recollection_invocations": 18,
+    "recollection_cpu_seconds_nested_in_worker_total": 458.546875,
+    "recollection_search_calls": 1368,
+    "recollection_search_work": 879072,
+    "max_observed_single_worker_peak_working_set_bytes": 109641728,
+    "max_observed_single_worker_peak_commit_bytes": 803381248,
+    "memory_scope": "per-process lifetime peak including imports and earlier scene stages; never sum as simultaneous aggregate peak"
+  },
+  "additional_expense_not_in_formal_total": {
+    "repaired_pilot_physical_calls": 12,
+    "repaired_pilot_worker_cpu_seconds": 218.828125,
+    "repaired_pilot_parent_cpu_seconds": 0.921875,
+    "repaired_pilot_wall_makespan_seconds": 101.87995840000804,
+    "interrupted_pilot_recorded_physical_calls_lower_bound": 5,
+    "interrupted_pilot_recorded_branch_cpu_seconds_lower_bound": 343.9375,
+    "interrupted_pilot_recorded_collection_cpu_seconds": 73.078125,
+    "interrupted_pilot_unrecorded_work_unknown": true
+  },
+  "analysis_timing_scope": "all reads/checks/analysis before output serialization"
+}

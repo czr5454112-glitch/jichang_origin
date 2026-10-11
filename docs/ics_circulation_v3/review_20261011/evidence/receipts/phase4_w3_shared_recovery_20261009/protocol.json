@@ -1,0 +1,122 @@
+{
+  "schema": "ics_v3_shared_recovery_union_v1",
+  "scope": "same-data objective comparison on reused synthetic development streams",
+  "streams": [
+    "stream_L2_D1_slack3",
+    "stream_L2_D3_slack0",
+    "stream_L4_D1_slack3",
+    "stream_L4_D3_slack0"
+  ],
+  "spec": {
+    "routing": "timed",
+    "predictive": true,
+    "reactive": true,
+    "slow_period": 2,
+    "planning_horizon": 20,
+    "route_mode": "next_edge",
+    "coordination_order": "route_then_prebalance",
+    "candidate_count": 4,
+    "expansion_limit": 2000,
+    "static_path_limit": 12,
+    "local_label_limit": 3,
+    "dynamic_local": true
+  },
+  "schema_name": "physical31",
+  "feature_names": [
+    "analytic_absolute",
+    "candidate_deadline_margin",
+    "candidate_first_departure",
+    "current_at_destination",
+    "destination_empty_stock",
+    "destination_supply_before_10",
+    "edge_count",
+    "edge_ticks",
+    "forecast_conflict_delay",
+    "forecast_count",
+    "forecast_destination_count",
+    "forecast_earliest_ticks",
+    "forecast_edge_overlaps",
+    "forecast_tardiness",
+    "forecast_unmatched",
+    "known_waiting_count",
+    "module_hold_ticks",
+    "old_in_transit_count",
+    "old_remaining_ticks",
+    "prefix_completes_delivery",
+    "prefix_edge_occupied_fraction",
+    "prefix_elapsed_ticks",
+    "prefix_end_at_destination",
+    "prefix_end_headroom",
+    "prefix_remaining_shortest_ticks",
+    "prefix_travel_ticks",
+    "remaining_route_ticks",
+    "source_empty_stock",
+    "timed_analytic_absolute",
+    "total_tray_count",
+    "usable_ticks"
+  ],
+  "kinds": [
+    "paired_direct",
+    "residual"
+  ],
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "fits": 24,
+  "architecture": "32_tanh_1057_parameters",
+  "optimizer": {
+    "epochs": 400,
+    "learning_rate": 0.01,
+    "l2": 0.001
+  },
+  "training": "Per held-out stream: R0 rows from its three training streams plus every row from all six physical31 collection owners for that fold; ordered concatenation by declared kind/seed then original row order.",
+  "ownership": "Keep original owner and source_group on every row; validate all six complete owners and all 24 frozen units before fitting. Do not call original single-owner fit_model or rewrite owner identities.",
+  "duplicate_policy": "No approximate or exact deduplication across owners; multiplicity and provenance are explicit, same for both objectives.",
+  "normalization": "Fold training corpus only; identical inputs/bounds and ordered training row SHA across six objectives/seeds in each fold.",
+  "freeze": "All 24 models and fit input hashes frozen before any held-out assessment or deployment.",
+  "assessment": "R0 held-out checkpoint rows only; all kind/seed results retained; no model, seed or hyperparameter selection.",
+  "deployment": {
+    "realizations_per_stream": 9,
+    "nominal_per_stream": 1,
+    "stress_per_stream": 8,
+    "learned_episodes": 216,
+    "control_episodes": 72,
+    "total_episodes": 288,
+    "controls": [
+      "baseline",
+      "timed"
+    ],
+    "stress_seed_rule": "int(digest([scene.name,'role_recovery_deployment_v1'])[:16],16)"
+  },
+  "new_labels": 0,
+  "fresh_confirmation": false,
+  "limits": [
+    "Four reused constructed streams and their common stress family are development evidence, not independent field days.",
+    "Owners collected different trajectories; the entire same union is now used for both objectives. The previous own-policy recovery experiment remains separate.",
+    "Row weighting is unchanged concatenation; owners with more sampled candidate rows contribute more weight. No outcome-dependent balancing or filtering is applied.",
+    "All row provenance is retained even when physical states or features repeat; duplicated trajectories do not become independent samples.",
+    "Label targets continue the fixed timed policy, not either deployed learned policy.",
+    "All elapsed times are descriptive on a shared machine; model quality does not use a timing cutoff."
+  ],
+  "source_sha256": {
+    "run_shared_recovery.py": "c6d44fb01212426c0e72a03f9b8b48e0a31ce6345e3787f93f55054669e8e650",
+    "run_paired_recovery.py": "26051a7976ff59e1d079927597eeebafb7e1a7938f3a8c18763c525a5f7621c7",
+    "role_coverage.py": "80e1e2b2ab06d88f8d2f432917bd1c7757d679e3419168a17a3b8637a8ab7def",
+    "role_features.py": "1868ef11cc20e60c39c50e22c1ec722b5e7a238f02d5f8fbac3694ea83a8d716",
+    "nonlinear_learning.py": "ca307589c3f5bbbfb2fcdd7998020d15028acbc8c6a19335e604b85877e65304",
+    "label_stability.py": "df60fcf2fc6174be61db4b759ce1d0bbadea1815fb907108b5414f02f949e75d",
+    "feedback_scenarios.py": "192081752f5e6f15bea441e8adcd6e3751909eae2fd37c70c6f22b39f8807caf",
+    "phase4_control.py": "70597fe1bce15a2f69d033aa389f0f68833b460a40ec2281b90599f36f475094",
+    "conditional_evaluation.py": "355a85d1840880ef4a7d88ca878d53ece059ec9a3fb62045a5f5b2bfb77abc1f",
+    "prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "routing_reference.py": "0fa5bf23396196a8a31d62a903dd3b2ad4b2e64aebe553bea4d89bf1d132430c",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3"
+  }
+}

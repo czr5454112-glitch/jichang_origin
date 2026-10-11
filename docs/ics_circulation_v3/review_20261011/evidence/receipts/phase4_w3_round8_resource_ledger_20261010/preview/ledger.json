@@ -1,0 +1,604 @@
+{
+  "schema": "ics_round8_resource_ledger_v1",
+  "rows": [
+    {
+      "id": "phase4_w3_terminal_screen_performance_20261010\\protocol.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_screen_performance_20261010\\protocol.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 0.859375,
+          "source_field": "prepare_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 0.874206,
+      "notes": [
+        "Timing excludes unasserted bootstrap and final output writes.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {}
+    },
+    {
+      "id": "phase4_w3_same_zone_stability_20261010\\protocol.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_stability_20261010\\protocol.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 13.046875,
+          "source_field": "preparation_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 13.317513499991037,
+      "notes": [
+        "case invocation includes restore/physics/raw serialization but ends before final receipt write; nested cycle CPU not added; process imports/startup/initializer verification before timers unknown; parent final summary/manifest writes outside timer; single-worker lifetime peak is not aggregate concurrent peak",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {}
+    },
+    {
+      "id": "performance_pilot",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_screen_performance_20261010\\pilot\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "fresh child full OS process lifetime",
+          "cpu_seconds": 383.296875,
+          "source_field": "worker_final_process_cpu_seconds_sum",
+          "quality": "complete_child_process_lifetimes"
+        },
+        {
+          "scope": "coordinator measured interval",
+          "cpu_seconds": 38.0,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 215.1680441,
+      "notes": [
+        "Algorithm/search/screen/observer/run_cycle/child invocation/import CPU is nested inside complete OS CPU. Do not add again.",
+        "Pilot and formal independently repeat identities. Two timing blocks do not create new business samples. Parent comparisons are inside coordinator CPU.",
+        "Individual child launch wall and block makespans overlap; global elapsed time is not their sum."
+      ],
+      "counts": {
+        "planned_physical_calls": 12,
+        "physical_calls_recorded": 12,
+        "unknown_final_process_cpu_arms": 0
+      },
+      "max_single_child_lifetime_peak_working_set_bytes": 103264256
+    },
+    {
+      "id": "performance_formal",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_screen_performance_20261010\\formal\\summary.json",
+      "status": "pending",
+      "cpu_components": [
+        {
+          "scope": "workers and parent",
+          "cpu_seconds": null,
+          "source_field": "pending",
+          "quality": "unknown"
+        }
+      ],
+      "individual_wall_seconds": null,
+      "notes": [],
+      "counts": {
+        "planned_physical_calls": 108
+      }
+    },
+    {
+      "id": "stability_bridge",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_stability_20261010\\bridge\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "unique physical worker intervals",
+          "cpu_seconds": 254.171875,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.65625,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 48.13643620000221,
+      "notes": [
+        "Worker imports/startup/initializer and final receipt output outside intervals are unknown.",
+        "Unique physical computations only. Logical aliases are memo reuse, not new work. Bridge/pilot/formal independent invocations remain separate.",
+        "Nested cycle/search/continuation timing is never added. Concurrent stage makespans never sum to global wall."
+      ],
+      "counts": {
+        "planned_logical_requests": 17,
+        "planned_unique_physical": 17,
+        "actual_physical_calls_recorded": 17,
+        "unknown_physical_call_statuses": 0,
+        "complete_resource_accounting": true
+      }
+    },
+    {
+      "id": "stability_pilot",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_stability_20261010\\pilot\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "unique physical worker intervals",
+          "cpu_seconds": 374.25,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.671875,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 70.68893380000372,
+      "notes": [
+        "Worker imports/startup/initializer and final receipt output outside intervals are unknown.",
+        "Unique physical computations only. Logical aliases are memo reuse, not new work. Bridge/pilot/formal independent invocations remain separate.",
+        "Nested cycle/search/continuation timing is never added. Concurrent stage makespans never sum to global wall."
+      ],
+      "counts": {
+        "planned_logical_requests": 24,
+        "planned_unique_physical": 24,
+        "actual_physical_calls_recorded": 24,
+        "unknown_physical_call_statuses": 0,
+        "complete_resource_accounting": true
+      }
+    },
+    {
+      "id": "stability_full",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_stability_20261010\\full\\summary.json",
+      "status": "pending",
+      "cpu_components": [
+        {
+          "scope": "workers and parent",
+          "cpu_seconds": null,
+          "source_field": "pending",
+          "quality": "unknown"
+        }
+      ],
+      "individual_wall_seconds": null,
+      "notes": [],
+      "counts": {}
+    },
+    {
+      "id": "phase4_w3_round8_performance_authoring_20261010\\author_v2.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_authoring_20261010\\author_v2.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 1.546875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 1.66700009998749,
+      "notes": [
+        "Known parent measurement interval plus complete pytest child OS CPU; parent imports and final JSON output excluded. Nested tiny CPU-probe child CPU is not included by OS pytest CPU and is an explicitly unmetered validation auxiliary.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "new_original_network_physical_calls": 0
+      }
+    },
+    {
+      "id": "phase4_w3_round8_performance_authoring_20261010\\author_v3.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_authoring_20261010\\author_v3.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 1.65625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 1.8278130000107922,
+      "notes": [
+        "Known parent measurement interval plus complete pytest child OS CPU; parent imports and final JSON output excluded. Nested tiny CPU-probe child CPU is not included by OS pytest CPU and is an explicitly unmetered validation auxiliary.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "new_original_network_physical_calls": 0
+      }
+    },
+    {
+      "id": "phase4_w3_round8_performance_authoring_20261010\\frozen20.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_authoring_20261010\\frozen20.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 1.78125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 1.9264339999936055,
+      "notes": [
+        "Known parent measurement interval plus complete pytest child OS CPU; parent imports and final JSON output excluded. Nested tiny CPU-probe child CPU is not included by OS pytest CPU and is an explicitly unmetered validation auxiliary.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "new_original_network_physical_calls": 0
+      }
+    },
+    {
+      "id": "phase4_w3_round8_performance_authoring_20261010\\initial_failure.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_authoring_20261010\\initial_failure.json",
+      "status": "failed",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": null,
+          "source_field": "cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "individual_wall_seconds": 3.6,
+      "notes": [
+        "Authoring unit tests plus one tiny startup CPU measurement child; not original-network experiment. Tool wall included apply_patch and pytest, not a process CPU measurement. No permission escalation required.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "passed": 3,
+        "failed": 3,
+        "fixture_errors": 2
+      },
+      "failure_evidence": {
+        "cause": "Comparator initially accepted persisted JSON only, while three tests passed live RouteCandidate dataclasses; normalize both representations. Two tmp_path fixture failures came from inaccessible default Windows pytest base; later invocations use explicit workspace basetemp.",
+        "status": "failed"
+      }
+    },
+    {
+      "id": "phase4_w3_round8_stability_authoring_20261010\\author_initial.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_stability_authoring_20261010\\author_initial.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": null,
+          "source_field": "child_cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "individual_wall_seconds": 5.8151671,
+      "notes": [
+        "author pytest tiny fixture simulations only; no original-map physical branch; imports/startup CPU unmeasured",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "tests": 15,
+        "passed": 15
+      }
+    },
+    {
+      "id": "stability_inventory_prediction",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_stability_authoring_20261010\\author_initial.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure inventory diagnostic",
+          "cpu_seconds": null,
+          "source_field": "inventory_prediction CPU unrecorded",
+          "quality": "unknown"
+        }
+      ],
+      "individual_wall_seconds": 2.4048229,
+      "notes": [],
+      "counts": {
+        "physical_calls": 0
+      }
+    },
+    {
+      "id": "phase4_w3_round8_stability_authoring_20261010\\author_second.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_stability_authoring_20261010\\author_second.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": null,
+          "source_field": "child_cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "individual_wall_seconds": 5.7014307,
+      "notes": [
+        "same tiny author suite after runner recovery/closure change; no original-map physical branch",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "tests": 15,
+        "passed": 15
+      }
+    },
+    {
+      "id": "phase4_w3_round8_independent_review_20261010\\future_corrected\\result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\future_corrected\\result.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 1.125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 1.2177859999937937,
+      "notes": [
+        "In-process focused pytest and binding interval; excludes Python/pytest import bootstrap. No child physical replay.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "tests": 19
+      }
+    },
+    {
+      "id": "phase4_w3_round8_independent_review_20261010\\future_initial\\result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\future_initial\\result.json",
+      "status": "failed",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 3.140625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 3.4164315999951214,
+      "notes": [
+        "In-process focused pytest and binding interval; excludes Python/pytest import bootstrap. No child physical replay.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "tests": 19
+      },
+      "failure_evidence": {
+        "exit_code": 1,
+        "failures": 1
+      }
+    },
+    {
+      "id": "phase4_w3_round8_independent_review_20261010\\future_repaired\\result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\future_repaired\\result.json",
+      "status": "failed",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 2.859375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 3.014727000001585,
+      "notes": [
+        "In-process focused pytest and binding interval; excludes Python/pytest import bootstrap. No child physical replay.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "tests": 19
+      },
+      "failure_evidence": {
+        "exit_code": 1,
+        "failures": 1
+      }
+    },
+    {
+      "id": "phase4_w3_round8_independent_review_20261010\\initial_binding.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\initial_binding.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 0.046875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 0.047643199999583885,
+      "notes": [
+        "Parent read/hash interval only; no simulation/tests/network, shell bootstrap excluded.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {}
+    },
+    {
+      "id": "phase4_w3_round8_independent_review_20261010\\performance_initial\\result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\performance_initial\\result.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 1.046875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 1.146105699997861,
+      "notes": [
+        "In-process focused pytest and binding interval; excludes Python/pytest import bootstrap. No child physical replay.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "tests": 10
+      }
+    },
+    {
+      "id": "phase4_w3_round8_independent_review_20261010\\stability_bridge_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\stability_bridge_artifact_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 10.828125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 10.883511699998053,
+      "notes": [
+        "Every saved physical branch and resolved logical alias. File-only, no replay. Full expected task ledger, protected service, drain, detached timing maps, exact private checkpoint/action/tape binding. Bridge additionally compares all original result/search/cache/event fields with only declared measurements excluded.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {}
+    },
+    {
+      "id": "phase4_w3_round8_independent_review_20261010\\stability_pilot_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\stability_pilot_artifact_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 7.0625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 7.061755600007018,
+      "notes": [
+        "Every saved physical branch and resolved logical alias. File-only, no replay. Full expected task ledger, protected service, drain, detached timing maps, exact private checkpoint/action/tape binding. Bridge additionally compares all original result/search/cache/event fields with only declared measurements excluded.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {}
+    },
+    {
+      "id": "phase4_w3_round8_independent_review_20261010\\stability_preparation_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\stability_preparation_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 1.984375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 2.0248443000018597,
+      "notes": [
+        "Independent file-only stratification, seed-law/tape regeneration, actual checkpoint event queue and role, memo/request denominator recomputation. No physical replay.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {}
+    },
+    {
+      "id": "phase4_w3_round8_performance_analysis_20261010\\pilot\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_analysis_20261010\\pilot\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 0.046875,
+          "source_field": "analysis_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 0.03601060001528822,
+      "notes": [
+        "Pure SHA/read/paired arithmetic and Markdown preparation; final JSON/Markdown serialization excluded. Nested performance metrics never added to process CPU.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "input_checks": 65,
+        "failed_checks": 0
+      }
+    },
+    {
+      "id": "phase4_w3_round8_stability_analysis_20261010\\statistics_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_stability_analysis_20261010\\statistics_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct invocation interval",
+          "cpu_seconds": 0.015625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "individual_wall_seconds": 0.007457100000465289,
+      "notes": [
+        "Analytical examples only; imports and final receipt serialization excluded.",
+        "Other embedded CPU values are nested metadata and are not added. Measured zero is clock resolution, not no work."
+      ],
+      "counts": {
+        "physical_simulations": 0
+      }
+    },
+    {
+      "id": "unmetered_development_and_closeout",
+      "source": null,
+      "status": "unmetered",
+      "cpu_components": [
+        {
+          "scope": "auxiliary overhead",
+          "cpu_seconds": null,
+          "source_field": "not independently metered",
+          "quality": "unknown"
+        }
+      ],
+      "individual_wall_seconds": null,
+      "notes": [
+        "Includes source edits, small structure reads, tool polling, hashes outside recorded intervals, documentation, Git read/check operations, plot visual QA and process bootstrap not covered by a direct receipt.",
+        "Author unit tests include a tiny child used to validate Windows full-process CPU extraction. Its returned CPU is asserted but not separately persisted as a resource receipt; unmetered auxiliary, not original-network physics.",
+        "No guessed CPU from tool wall or budget limits. This ledger is a known lower bound for Round8, not complete development CPU. Round7 totals are intentionally excluded."
+      ],
+      "counts": {}
+    }
+  ],
+  "known_cpu_seconds_lower_bound": 1098.09375,
+  "unknown_cpu_components": 7,
+  "pending_rows": 2,
+  "global_wall_seconds": null,
+  "checks": [
+    {
+      "name": "performance_pilot_cpu",
+      "okay": true
+    },
+    {
+      "name": "performance_pilot_grid",
+      "okay": true
+    },
+    {
+      "name": "stability_bridge_cpu",
+      "okay": true
+    },
+    {
+      "name": "stability_pilot_cpu",
+      "okay": true
+    }
+  ],
+  "failed_checks": 0,
+  "bound_inputs": {
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_screen_performance_20261010\\protocol.json": "bfd817f05d1b420b2a8c28c1474fc5a8635eb58c0a7d8bfef5bd288c5e31f616",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_stability_20261010\\protocol.json": "1d021717135e3e33a7a6295085c819978c707bb053e30367c64330a5370787b4",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_screen_performance_20261010\\pilot\\summary.json": "3a43fee06733b18355d3d26a3aa5c9a57e343a3da754300f752ec22646f92056",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_stability_20261010\\bridge\\summary.json": "06dccea984f482a1c6d75b4e36d5ad0bf174685e74bb019de7054e19ff4d2a5a",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_stability_20261010\\pilot\\summary.json": "720b7920699a9ed1c1c5dd1ed19d015527e060ce538ce87163c46bffb5b1d51e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_authoring_20261010\\author_v2.json": "da28eb798f5f7a0ff523255aed25369c9d892b32a830557482cffd97f538935a",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_authoring_20261010\\author_v3.json": "7e2daee0bb25a6e7716fbb31608629305b43807f19d2ad11b29f1f21468fdd49",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_authoring_20261010\\frozen20.json": "4d0664a745ee879152bbdac0084c3c723c6551de97cae718440cf64aa4519d13",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_authoring_20261010\\initial_failure.json": "30520de4d8ce2c7178409485994aadc89e60b6e4725deb06bdbbe01afec8cd6a",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_stability_authoring_20261010\\author_initial.json": "26c2ccdff3f0e73c5cc574e570f6e5a4458bed8568c07110ea1b745ca86d6bed",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_stability_authoring_20261010\\author_second.json": "db33d1c418458550c52d767e56afd7d2ec84b137ab30351162db1e7955b40ddc",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\future_corrected\\result.json": "46911a9b35e21d34decdbacc831a06d23d9ebd7c20482f2c181f8aae2fbf5f34",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\future_initial\\result.json": "8c524e3b9421530b40d0c25b46a6675821f99f7485b6963f8fedacd7fd579ba1",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\future_repaired\\result.json": "c4e7f651afb3d2fb7819be02bd436077dfc140cd11be46d4da5c8c0da5e4361d",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\initial_binding.json": "c8c0b60b3339c06887d1e368a878b2633fb26471f84cf4ba3138344c6de63846",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\performance_initial\\result.json": "312169628ba03ce7979620a61201fd95186023a5eeaa9063097e8cc6ee020151",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\stability_bridge_artifact_audit.json": "e81a6a0fe84075bbaecaed7f2f155bf9bce8b02c5502c474ba63d170765bb8a1",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\stability_pilot_artifact_audit.json": "7ee896d0296b462a451135e7a033459dabf5c77b7cd38761ce0023a1fc7d41e2",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_independent_review_20261010\\stability_preparation_audit.json": "ba5a4a074dd05fcd93f3109a082e04e38ae5417c5c9e053fa40395c21f36b2bc",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_performance_analysis_20261010\\pilot\\analysis.json": "45509fa53bed89142f9066b50cb6e1905c628154e3250fe578f01ebc7f278b62",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round8_stability_analysis_20261010\\statistics_validation.json": "c3e39833736da0986481c8d4be4c53287a7793d559c159a03ba41d41726da254"
+  },
+  "ledger_cpu_seconds_separate": 0.046875,
+  "ledger_wall_seconds_separate": 0.04718640001374297,
+  "scope": "Round8 only. Known nonoverlapping measured CPU intervals and full child process lifetimes; nested times and memo aliases excluded. Ledger own interval separate. Parallel wall not added."
+}

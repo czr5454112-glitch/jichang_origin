@@ -17,6 +17,7 @@ from time import perf_counter
 from .model import RouteCandidate, Snapshot, ValidationResult
 from .routing import RegionalCandidateGenerator
 from .runtime import INFINITY, ExecutionValidator, assert_invariants, capacity_conflict, effective_reservations, actual_action_key
+from .storage_contracts import storage_committed_failure, storage_state_payload
 
 
 OUTCOMES = ("new_route_success", "still_valid_old_route", "search_exhausted",
@@ -49,7 +50,8 @@ def summarize(snapshot: Snapshot) -> DependencySummary:
                 "empty_targets": snapshot.empty_targets, "completed": snapshot.completed,
                 "load_times": snapshot.load_times,
                 "conditional_forecasts": {key: asdict(value) for key, value in snapshot.conditional_forecasts.items()},
-                "replaceable_trays": sorted(snapshot.replaceable_trays)}),
+                "replaceable_trays": sorted(snapshot.replaceable_trays),
+                **storage_state_payload(snapshot)}),
         tuple(sorted({node.control_partition for node in snapshot.network.nodes.values()})),
     )
 
@@ -160,6 +162,9 @@ def validate_committed_full_route(snapshot: Snapshot, request: RouteRequest) -> 
         return ValidationResult(False, "old_route_identity_or_completion")
     try:
         assert_invariants(snapshot)
+        storage_failure = storage_committed_failure(snapshot, plan)
+        if storage_failure:
+            return ValidationResult(False, 'old_route_' + storage_failure)
         node = snapshot.network.edges[plan.legs[0].edge_id].source if plan.legs else tray.node
         previous = None
         for leg in plan.legs:

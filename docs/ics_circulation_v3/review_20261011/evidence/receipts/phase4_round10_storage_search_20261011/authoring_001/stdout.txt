@@ -1,0 +1,37 @@
+.....F.......................F..                                         [100%]
+================================== FAILURES ===================================
+_____ test_one_free_storage_slot_is_sufficient_without_unbounded_capacity _____
+
+    def test_one_free_storage_slot_is_sufficient_without_unbounded_capacity():
+        state = case(capacity=2)
+        occupy_storage(state, "occupant", INFINITY)
+        candidate, = generator().generate(state, "bag", "tray", 1)
+        assert signature(candidate) == (("ingress", 0, 1), ("egress", 5, 6))
+        occupy_storage(state, "second", INFINITY)
+>       assert generator().generate(state, "bag", "tray", 1) == ()
+E       AssertionError: assert (RouteCandida...nation=None),) == ()
+E         
+E         Left contains one more item: RouteCandidate(candidate_id='storage:v0:bag:tray:0', bag_id='bag', tray_id='tray', legs=(Leg(edge_id='ingress', depart...e_id='storage:v0:bag:tray:0', is_baseline=True, destination_node='G', prefix_only=False, continuation_destination=None)
+E         Use -v to get more diff
+
+tests\test_ics_circulation_v3_storage_routing.py:109: AssertionError
+___ test_egress_floor_considers_all_exits_and_rejects_only_necessary_bound ____
+
+    def test_egress_floor_considers_all_exits_and_rejects_only_necessary_bound():
+        state = case(release=5, protected=True, deadline=9)
+        state.network.nodes["A"] = Node("A", "zone", "owner")
+        state.network.edges["E-A"] = Edge("E-A", "E", "A", 1)
+        state.network.edges["A-G"] = Edge("A-G", "A", "G", 2)
+        # Even a commitment record without an available idle tray is included by
+        # effective_reservations. The independently checked witness uses the other
+        # physical exit; a single-shortest-exit bound would falsely reject it.
+        state.reservations += (Reservation("edge:egress", 5, 20, "committed"),)
+        planner = generator()
+>       candidate, = planner.generate(state, "bag", "tray", 1)
+        ^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_ics_circulation_v3_storage_routing.py:335: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_ics_circulation_v3_storage_routing.py::test_one_free_storage_slot_is_sufficient_without_unbounded_capacity
+FAILED tests/test_ics_circulation_v3_storage_routing.py::test_egress_floor_considers_all_exits_and_rejects_only_necessary_bound

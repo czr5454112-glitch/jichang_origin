@@ -228,6 +228,7 @@ class SimulationCheckpoint:
     policy_stats: dict[str, float]
     reactive_empty_dispatch: bool = True
     coordination_order: str = "route_then_prebalance"
+    control_mode: str = "automatic"
 
     def clone(self) -> SimulationCheckpoint:
         return deepcopy(self)

@@ -1,0 +1,94 @@
+# 第七轮：新同区策略轨迹标签独立审查
+
+2026-10-10。只改本独立目录和新增的独立测试文件。旧核心、第六轮源码、C++、既存原件均不修改；不提交、不推送。独立审查只执行必要的小图测试和原件分析，原图大批物理由各实现负责人执行并另计资源。
+
+## 继承证据
+
+initial_binding.json 对第六轮 repaired protocol 固定的101个源文件、64个测试文件与用户原C++逐SHA核查，共166文件无漂移。绑定CPU0.0625秒、wall0.0629667秒，不含输出序列化和解释器启动。原C++ SHA 为 b94390501502b61fac64c302fd79ce5a5af1851e13c02932fbddf463284d8951。
+
+## 已发送的设计风险与可测试合同
+
+1. **真实决策边界。** 只在现行策略真实生成候选的callback中捕获，位置必须是_generate之后、_select之前。立即checkpoint().clone()，保存原始候选池、当前tray、stage、route_index、pending_options、物理phase与下一真实slow时钟。恢复不能重新生成候选、重复当前tick的slow或提前重试之前已经无候选的tray。from_visible构造的是预测模型，不能充当真实checkpoint恢复。
+2. **主动续接身份。** 第六轮install_supply_policy替换实际内部类后，base.control_contract可能仍描述旧Predictive配置。因此新标签合同必须另外绑定实际SameZoneSupplyPrebalancer类、全部有效标量、generator_factory、validator、公示forecast序列、cache contract与源码。公开状态相同、旧174标签、旧contract名称或cost碰巧相等都不能证明新续接相同。
+3. **checkpoint中的观测包装。** 第六轮SlowAuditController持有engine回指，直接deepcopy可能将旧整机及循环图带入保存状态。新collector应使用不带整机回指的观测，或仅在克隆副本中剥离已证明透明的包装，同时逐项保留实际controller、history、next_trigger与factory。不能重建一个看似相同但私有状态不同的controller。
+4. **私有cache与预算。** cache内容、LRU顺序、预处理work和factory合同全部绑定；JSON list/tuple可严格规范为JSON值，但不能删字段。各branch重新bind_accounting以移除collection旧owner和已消耗预算，同时保留真实generator/cache。逻辑work和guard工作分别记录，wall上限仅作运行保障；预算截断不能称不可行或赋有限完整周期标签。
+5. **实际选择复现。** _forced_choice路径跳过一次_selector，因而selection_calls/history会与未强制原轨迹少一次；这属于明确干预账差异，不能当作所有policy/query字段都可忽略。优先保留正常恢复所选分支，核对原collection后缀物理/查询/slow/cache；强制候选验证只允许明确的一次selector账差异。其他动作不能替换后续continuation。
+6. **候选身份与复用。** 请求绑定完整pending池和实际action_key，不能只用candidate_id或路径第一边。零候选机会仍入分母、没有selector调用且不伪造动作。memo只在完整checkpoint、实际动作、未来tape、有效续接合同、评估/预算相同时使用；公共观察摘要或几何前缀不是充分身份。跨decision默认不复用。
+7. **隐藏未来边界。** 标签用的剩余tape只进入离线event engine与evaluation ledger。必须等于该checkpoint尚未观察的原nominal任务，排除已观测identity、保留尚未到达全部任务。在线controller仅接收当时已发布forecast，原publication/revision/cancellation/TTL与观察去重规则不变。结果明确是单条nominal条件标签，不能充当32个随机未来均值。
+8. **排空与代价。** 读h80作为可比端点，完整周期仍需全任务账完成、真实运输义务消失、forecast过期并跨实际slow周期。h80最低观察时刻不能替代首次任务/运输完成时间。成本来自真实加载、发车、完成账，不以静态候选分数替代。相关状态的one-step regret不能相加称整段可部署节省。
+9. **失败原件。** collection、checkpoint写入、候选恢复、物理续演、比较、gzip和summary序列化各阶段分别保留状态。已发生物理调用即使后处理失败仍保留完整outcome和资源；partial文件不覆盖，attempt编号不复用。memo失败不能解释成成功节省，未知CPU不写零。父job异常亦保留所有预声明请求身份。
+
+## 独立验证计划
+
+独占新增 tests/test_ics_circulation_v3_same_zone_labels_audit.py，等待作者API后写具体反例：cache/clock/activecontract/pool篡改拒绝，clone isolation，预算owner重绑定，zero分母，forced异常与后处理恢复证据。小型真实物理用于必要的恢复/相位合同，完成源冻结与pilot核对前不启动大批标签；这是内部依赖顺序，用户已授权继续实施，无须另行批准计算。
+
+本轮新增的是可执行collector、恢复和runner逻辑，不是纯文档。全部实现/测试冻结后需执行完整ICS回归一次并绑定前后源/测试/C++；当前既存测试数量预计为777旧全套加2新增比较器测试，但以实际collection为准。第六轮777全套加11专项不能冒称本轮已经完成779全套。最终改动之后是否重复整套按实际变更范围判断，不因小文档变动重复物理或测试。
+
+## 首轮实现审查与修复
+
+作者采纳真实callback克隆、主动续接合同和不带engine回指的观察方案。新增API包括active_continuation_binding、validate_checkpoint_binding、restore_matching_continuation和run_label_branch。正常恢复在原collection共同绝对终点严格比较，强制一次候选保留独立selector差异说明。
+
+独立审查发现并推动修复：
+
+- capture原先先写checkpoint再把机会加入列表；checkpoint写失败会丢掉已经发生的候选生成。现先记录attempt，失败状态保留，零候选故障注入通过。
+- search/selector/trace的前缀计数原先仅存在metadata附加项中。现从checkpoint派生并纳入严格一致性检查；三种单字段篡改全部被拒。
+- 查询pickle写出partial后，原异常路径会再次以同一exclusive文件名写，导致outcome recovery也丢失。现先独立保存物理outcome，再以独立恢复文件保留query列表，不重试partial路径；恢复本身异常另记。分支raw写失败及其恢复再失败也保留failure回执，CPU计量移到恢复之后。
+- 新prepare在绑定当前输入字节之外，新增对第六轮raw/summary与其既存manifest的一致性检查；原C++也直接加入新input固定集合。
+
+focused_initial_validation.json：最初21项独立测试通过，CPU1.96875秒、wall2.154522秒。focused_extended_validation.json：扩展29项全部通过，CPU2.125秒、wall2.3487907秒；每次相关源/测试SHA前后均不变。包括九类真实checkpoint修改、八类metadata修改、pool/tape替换、私有cache与预算owner重新绑定、未到达任务账、normal与forced已选动作的真实物理/query/cache完全吻合、明确差一次selector，以及上述失败保留反例。
+
+query probe的deepcopy/pickle独立验证使用故意不可复制且不可pickle的sink内容，证明观察sink未进入保存图；底层BudgetGenerator与fast/slow factory仍共享同一个复制后的owner，真实LRU/cache保留，live sink不被清空或复制，记录snapshot的修改不能影响运行state。
+
+本轮增加明确历史事后子组：旧策略d19/20/21/22/23/40/41/42/43/46/48/50全部48候选，仅切换未来慢层。它们不是新策略实际覆盖或新训练数据；同状态干预与新策略180次真实机会分别统计。额外full-graph shadow动作不得进入原主部署。
+
+29项独立测试已冻结，collector已开始原3nominal复现；完整回归包装器已准备但等待本轮其它新coverage模块也全部冻结。原件分析抽审另外指出：stage manifest应绑定summary/requested/raw并结束重hash，historical身份集合须等于预声明12而非仅计数12，实际active合同须重新计算其digest，c0条件regret不能默认为旧策略真实选择regret。
+
+## 真实采集与续演原件审计
+
+collection_artifact_audit.json 完整读取180个检查点和289次真实query，12130项检查零错误，绑定1080文件且结束无漂移；CPU59.84375秒、wall61.2375381秒，无新仿真。三场真实分母为cross51/near57/counter72，共174非空、6零候选、692候选；每个pickle先核SHA再读取，验证真实cache/LRU、慢时钟/cursor、完整pool/tape、实际续接方法/publication、三种历史前缀和观察包装剥离。
+
+normal_resume_artifact_audit.json 是保留的首轮审脚本失败：2408项中的10项来自错误假定 invariant_checks 等于trace长度。runtime._update_motion 的 unload_complete 直接追加事件而不再调用_check，因此正确计数须减去这些记录。旧脚本另存audit_labels_v1.py；修后 normal_resume_artifact_audit_v2.json 2408项零错误，全部5条完整结果、事件、query/work/cache、selector、slow严格吻合。首失败CPU9.765625秒、修后CPU9.8125秒分别记账。
+
+作者披露冻结旧 physical_projection 的 completed/load_times/empty_targets 三个map保留原dict引用，历史逐tick投影可能显示后来更新的值。这是记录缺陷，未进入控制输入或改变物理执行。旧原件与692标签保持不改，compatible projection digest只证明同一保存表示，不能作为即时任务账。真实服务时间必须来自完整事件前缀、checkpoint、最终ledger与milestones。root另加opt-in深拷贝即时观测模块和3专项，独立额外3nominal补证；审查确认双向detachment、严格一tick相位与checkpoint不携observerhistory，不以新证据改写历史文件。
+
+query coverage审查另指出：旧raw来源须against旧manifest而不仅冻结当前字节；protocol/selection/各stage产物须绑定manifest；shadow的validation/serialization后处理失败须保留已完成variant和完整failure回执。owner保留当前27collector冻结闭包，完成后将以新输出修正纯查询测量与故障测试，复用经过SHA认证的全部query，新增物理采集为0。全suite等待这次最终源/测试冻结。
+
+pilot_artifact_audit_v2.json：16条先导分支共2900检查零错误，4条实际chosen的完整结果/事件/query/work/cache/selector/slow对原collection相同绝对终点严格吻合，唯一允许差一次forced selector。CPU13.53125秒。old12_artifact_audit_v2.json：48条历史分支共4522检查零错误，预声明12个状态及其全部4候选齐全，d40 c0/c1对第六轮full/h80/search/cache/stop全部严格一致，CPU35.140625秒。这两个批次是各自实际计算，正式批不复用其物理结果。
+
+即时观测补证独立原件审计 instant_observation_artifact_audit.json：8101检查零错误，837个连续tick全部非map物理字段与旧兼容投影相同；即时完成账按completed<=t、加载账按初始加载或load<t、可见任务按arrival<=t逐项复算。旧别名记录共有458个tick的completed及355个tick的load_times不即时，empty_targets本3场未出现差异，不据此否定其代码别名缺陷。补充3场全结果/search/cache/事件等仍严格复现；本独立只读审计CPU7.59375秒，未增加物理调用。
+
+## 最终完整回归
+
+coverage纯测量恢复修复及新即时观测模块冻结后，full_validation/result.json记录一次全量ICS回归：842 passed，0 failures、0 errors、0 skipped。107源文件、69测试文件和用户C++均有运行前后SHA及完整快照，无修改、新增或删除。总计量CPU111.171875秒、wall112.8772162秒；pytest自身CPU110.609375秒/wall112.3245125秒包含在总区间内，不重复相加。该完整结果包含本轮新29独立反例、作者labels/probe/coverage及即时观测测试；没有用旧轮通过数替代本次执行。
+
+## 全查询覆盖独立复核
+
+query_coverage_pilot_audit.json 完整读27次新控制器复跑、2467次真实query和所有旧来源、快照、输入，42257检查零错误，CPU208.015625秒。三场query为counter1190/cross634/near643，2374次candidate_limit_reached和93次expansion_budget_exhausted。按预声明cell及case_id/time/ordinal选择复算得到93全截断加6成功控制，共99正式请求；pilot是4请求，非按收益挑选。每个query公开Snapshot、身份/版本、原K/H、逻辑work/status、真实raw候选池与loaded授权子集均核验；原27的全物理结果及事件/query/cache/slow/selector对第六轮原件严格复现。
+
+query_coverage_formal_audit.json 对上述完整审计及其全部绑定文件重新核SHA，再读取99正式请求的396个variant原件，用未改ExecutionValidator重新验证每个raw候选及其完整授权/拒绝/action_key；20351检查零错误，CPU63.21875秒。regional3000的原池/work/status逐字段复现，12k/48k/fullgraph的原K/H与查询Snapshot保持。earlier/新增action key/解除zero分类均独立复算。审计未新增routing search或物理续演；有限全图event搜索不构成全域最优证明。
+
+## 终点容量筛查追加
+
+这是842整套之后新增的opt-in执行逻辑，未修改原默认generator、旧闭包或既存实验。必要条件来自完整witness在终点的[arrival,INFINITY)占位，arrival<=now+H；因此若其它tray在[now+H,INFINITY)任一非空时段占满终点容量，则任何此查询域内的witness都冲突。证据必须使用effective_reservations、排除自身、合并同owner重复描述并按半开边界；只检查H当刻不充分，迟于H的未来占位仍可能形成证书。该结论只针对当前公开Snapshot中的固定候选域，不能宣称未来业务无法服务。
+
+独立审查推动修复两点：unknown bag原返回空池invalid_request，新wrapper直接索引会抛KeyError；delegate搜索异常原会丢已做screen与部分search账。修后19项独立专项通过，terminal_screen_validation.json CPU0.671875秒，helper与测试前后SHA稳定。测试含future>H、release==H、重复同tray、oldtransit与own排除、zero-leg/no-wait/hold、reception非node、非法时域/预算unknown、输入不变/不跨state缓存及两类故障；并遍历小窗口，证书成立时原validator在whole_route与next_edge对每个H内到达witness均拒绝。
+
+screen_work、search_work与CPU分轴记录，跳过search不冒称零计算。跳过查询可能改变私有cache/LRU温度，后续部署须核验实际候选与物理等价，不能要求或宣称旧cache逐字段不变。待新runner及验证冻结后再完成其原件审查；842整套与这19专项分别计数，不冒称一次861全套。
+
+最终runner审查还发现：只比query时间/version/身份/K和返回空池，不足以证明真实查询Snapshot相同，尤其慢层scratch。实现于prepare之前补齐pre-query完整公开Snapshot SHA，额外哈希观察CPU另列，并继承完整旧输入链与原C++固定哈希，异常raw_complete/recovery文件指针也明确保留。新增同身份/同空池但节点容量不同的反例，20项独立通过（terminal_screen_binding_validation.json，另一次CPU0.671875秒）；初19测试及旧helper快照保留。
+
+最终整合全suite记录 full_validation_terminal/result.json：879 passed，0 failure/error/skip；109源、72测试与C++前后全部不变。总CPU101.921875秒、wall103.2535865秒，pytest自身CPU101.453125秒包含在总数内。原842整套保留，两次实际执行分别计账。
+
+terminal_corpus_artifact_audit.json：全部2467真实query使用独立“半开时点的物理owner集合”算法复算，不调用被审certificate实现；25658检查零错误，93证书、零原非空池误拒。原search_work1666386，其中93项279000，screen_work73465；CPU62.65625秒。每个原pool摘要与公开state SHA保留用于部署终审。
+
+terminal_pilot_artifact_audit.json：3场、289查询、6证书，13119检查零错误，CPU39.359375秒。terminal_formal_artifact_audit.json：27场、2467查询、93证书、194任务，29158检查零错误，CPU74.953125秒。每次实际查询的完整Snapshot SHA和整个有序raw候选池均对原件吻合；证书全部诊断字段（仅计时字段例外）等于独立已核静态query证据，其余delegate逻辑work/status不变。原搜索工作从1666386降至1387386，另有73465筛查record-work。完整物理结果、原端点、事件、loaded机会、selector和slow真实proposal及排空状态严格相同。cache是否相同按原件记录；旧collector和新runner观测开销不同，不宣称CPU speedup。
+
+## 标签全量与聚合终审
+
+full_artifact_audit_v2.json：692条完整原件、174条实际chosen全覆盖，35805检查零错误，1738绑定文件前后不变，CPU188.15625秒。全部full任务账、保护准时、真实库存/运输排空及slow相位已核；174实际选择分支在相同绝对tick的完整事件/query/work/cache/slow/结果与原collection严格吻合，仅豁免明确的当前一次forced selector调用/history差异。
+
+value_aggregation_audit.json：3633检查零错误，CPU25.859375秒。全部692成本对独立原件审值一致，174服务delta及每场/角色聚合独立重算；补取每场首origin和首continuation的6状态共24原始服务向量（按特征选，未按收益选）及全部old48原服务账。其余备用候选服务delta的提取逻辑经绑定analyze.py审查，此次未重新解析整批692备用服务向量，范围明确。
+
+聚合确认：180机会、174非空、6零池、692候选；20池成本不平（cross7/counter13），实际chosen在原池内全部J最优；75池服务完成向量有差异，其中55池J平坦但服务不同，57池存在J最优却让某任务更晚的替代动作。不延后任何任务的子集oracle gap均0。旧12状态换新续接后，不延后旧实际choice服务的集合逐原件均仅c0，d40的1.4成本优势不保留在该服务约束下。这是同一nominal与同一候选域的条件结果，不能外推全图最优、独立确认或在线服务保证，相关状态regret不能相加为可部署收益。
+
+资源账独立审查推动补齐：v1 normal审脚本errors列表应标失败而非complete；显式计root嵌套resources.analysis_cpu_seconds、两个全suite、每次独立pilot/formal、补充即时3物理与screen3+27；嵌套query/cycle/test时间不叠加。最终账本在 ../phase4_w3_round7_resource_ledger_20261010/final/，其未知辅助分量如实保留。本目录最终README与manifest封存之后不再新增审计或读取全体raw。

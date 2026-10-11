@@ -1,0 +1,18 @@
+{
+  "scale": 1,
+  "window_rule": "first exact source arrival <= arrival_seconds < first + 3600 seconds",
+  "burn_in": "advance from source epoch 0 with no clock jump; all earlier tasks retained (none by this window rule)",
+  "tail_cap_rule": "max included deadline tick + 3600",
+  "cpu_cap_seconds": 600,
+  "wall_cap_seconds": 900,
+  "search_horizon": 21600,
+  "route_mode": "whole_route",
+  "scope": "fixed research proxy development; source 1x only; no independent day or throughput claim",
+  "input_contract": "runtime_input_contract_001.json",
+  "runtime_contract": "runtime_proxy_contract_001.json",
+  "only_variant": "search horizon 80 vs 21600, explicitly declared before physics",
+  "remove_unreachable": false,
+  "initial_carriers": 11,
+  "storage_slots": 1,
+  "physics_started": false
+}

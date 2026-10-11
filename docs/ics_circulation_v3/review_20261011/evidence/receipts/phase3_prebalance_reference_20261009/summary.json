@@ -1,0 +1,154 @@
+{
+  "schema": "czr005.ics_circulation_v3.phase3_prebalance_reference.v1",
+  "diagnostic": false,
+  "scope": "FOUR_MECHANISM_FIXTURES_AND_FRESH_SYNTHETIC_SOURCE_GROUPS_NOT_REAL_AIRPORT_VALIDATION",
+  "run_count": 36,
+  "mechanism_fixture_count": 4,
+  "fresh_source_group_count": 8,
+  "holdout_namespace": "phase3_prebalance_reference_holdout_v1",
+  "future_seed": 1457,
+  "settings": {
+    "planning_horizon": 40,
+    "forecast_publication_ttl": 60,
+    "score_horizon": 32,
+    "max_rollouts_per_decision": 12,
+    "max_transfer_depth": 2,
+    "paths_per_request": 2,
+    "max_pool_per_state": 8,
+    "max_search_calls_per_decision": 32,
+    "proxy_continuation": "fixed_earliest_route_plus_reactive_empty_dispatch",
+    "proxy_deadline_slack_for_anonymous_forecasts": 20,
+    "wall_clock_cutoffs_enabled": false,
+    "forecast_destinations_for_four_fixtures": {
+      "A": "B",
+      "B": "A"
+    }
+  },
+  "weights": {
+    "tray_wait": 1.0,
+    "nonprotected_tardiness": 1.0,
+    "empty_distance": 0.1,
+    "terminal_backlog": 10.0,
+    "terminal_inflight": 2.0
+  },
+  "source_sha256": {
+    "__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "phase2_scenarios.py": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+    "prebalance.py": "bfba7869bd18d78fa9bd1e9c694d73b4072ec0b3bccdaa6d0c0a2f9b12e37cda",
+    "prebalance_reference.py": "7905f896459b192f6ed8c803c24b54e4b988c4986f21aaf817bfa6acf3f5e886",
+    "run_prebalance_reference.py": "b23c1161bc15481ad07ea0eaeabbb437d2dd4a284b6908ed8030cc9a3647ec80"
+  },
+  "source_hash_scope": "entrypoint_plus_complete_local_import_dependency_closure",
+  "source_changed_during_run": false,
+  "source_sha256_after": {
+    "__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "phase2_scenarios.py": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+    "prebalance.py": "bfba7869bd18d78fa9bd1e9c694d73b4072ec0b3bccdaa6d0c0a2f9b12e37cda",
+    "prebalance_reference.py": "7905f896459b192f6ed8c803c24b54e4b988c4986f21aaf817bfa6acf3f5e886",
+    "run_prebalance_reference.py": "b23c1161bc15481ad07ea0eaeabbb437d2dd4a284b6908ed8030cc9a3647ec80"
+  },
+  "all_matched_inputs": true,
+  "all_finite_tray_ids_preserved": true,
+  "all_arrived_bag_ids_preserved": true,
+  "failed_run_count": 0,
+  "by_policy": {
+    "reactive_only": {
+      "run_count": 12,
+      "failed_runs": 0,
+      "cost_available_count": 12,
+      "mean_cost": 14.358333333333334,
+      "all_bags_denominator": 37,
+      "completed_count": 37,
+      "on_time_count": 20,
+      "full_proxy_simulator_calls": 0,
+      "full_evaluation_simulator_calls": 12,
+      "failed_proxy_rollouts": 0,
+      "empty_transfer_commits": 0,
+      "bounded_partial_decisions": 0,
+      "mean_runtime_ms": 16.66720833297101,
+      "max_decision_ms": 0
+    },
+    "predictive_greedy": {
+      "run_count": 12,
+      "failed_runs": 0,
+      "cost_available_count": 12,
+      "mean_cost": 14.325000000000001,
+      "all_bags_denominator": 37,
+      "completed_count": 37,
+      "on_time_count": 19,
+      "full_proxy_simulator_calls": 0,
+      "full_evaluation_simulator_calls": 12,
+      "failed_proxy_rollouts": 0,
+      "empty_transfer_commits": 5,
+      "bounded_partial_decisions": 0,
+      "mean_runtime_ms": 80.0558333327596,
+      "max_decision_ms": 1.239299999724608
+    },
+    "bounded_forecast_reference": {
+      "run_count": 12,
+      "failed_runs": 0,
+      "cost_available_count": 12,
+      "mean_cost": 14.325000000000001,
+      "all_bags_denominator": 37,
+      "completed_count": 37,
+      "on_time_count": 19,
+      "full_proxy_simulator_calls": 12,
+      "full_evaluation_simulator_calls": 12,
+      "failed_proxy_rollouts": 0,
+      "empty_transfer_commits": 4,
+      "bounded_partial_decisions": 0,
+      "mean_runtime_ms": 71.47434166715054,
+      "max_decision_ms": 65.16329999431036
+    }
+  },
+  "reference_vs_greedy_by_family": {
+    "mechanism_fixture": {
+      "source_group_count": 4,
+      "cost_pairs_available": 4,
+      "mean_cost_delta": 0.0,
+      "better": 0,
+      "equal": 4,
+      "worse": 0,
+      "completed_delta": 0,
+      "on_time_delta": 0
+    },
+    "new_synthetic_holdout": {
+      "source_group_count": 8,
+      "cost_pairs_available": 8,
+      "mean_cost_delta": 0.0,
+      "better": 0,
+      "equal": 8,
+      "worse": 0,
+      "completed_delta": 0,
+      "on_time_delta": 0
+    }
+  },
+  "reference_vs_greedy": {
+    "cost_pairs_available": 12,
+    "mean_cost_delta": 0.0,
+    "better": 0,
+    "equal": 12,
+    "worse": 0
+  },
+  "limitations": [
+    "The reference chooses the best successfully scored explicit action sequence under one published-forecast proxy, not a globally optimal MPC.",
+    "The action family has bounded transfer depth, bounded path witnesses and earliest/need-time departure variants; truncated searches and unscored actions are logged.",
+    "Candidates are independently generated for current empty donors and destinations with first-use inventory deficits; speculative buffer moves and future-available donor dispatches are outside this action family.",
+    "No-transfer is included. Source inventory and demand-prefix protections reuse the greedy implementation; module and receiver permissions still pass the unchanged validator.",
+    "Hard loaded obligations are admitted before control; old transfers and accepted plans are never cancelled.",
+    "Only the evaluation runner reads actual future bags. The scoring continuation is fixed causal reactive control without recursive predictive decisions.",
+    "Forecast-only decisions can worsen true closed-loop outcomes; negative comparisons and all scheduled bags remain in the report.",
+    "The four old mechanism fixtures are not held out; the separately named new synthetic source groups are held out from prior training and selection.",
+    "Additional rollout/search work is fully counted. This reference is not claimed to meet a 100 ms production deadline."
+  ]
+}

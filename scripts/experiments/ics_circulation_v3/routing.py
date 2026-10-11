@@ -18,6 +18,15 @@ from .model import Leg, Reservation, RouteCandidate, Snapshot
 from .runtime import INFINITY, ExecutionValidator, effective_reservations
 
 
+def _preprocessing_unit(consume, stage, accounting=None, *, reused=False):
+    if consume:
+        consume(stage)
+    if accounting is not None:
+        name = "reused_preprocessing_work" if reused else "actual_preprocessing_work"
+        counts = accounting.setdefault(name, {})
+        counts[stage] = counts.get(stage, 0) + 1
+
+
 def network_signature(network) -> tuple:
     """A content key, since frozen Network records contain mutable dictionaries."""
     return (
@@ -33,16 +42,18 @@ class _SearchBudgetExpired(Exception):
 
 
 class _StaticTopology:
-    def __init__(self, signature: tuple, consume=None):
+    def __init__(self, signature: tuple, consume=None, *, cold_equivalent=False, accounting=None):
         nodes, edges = signature
+        self.cold_equivalent = cold_equivalent
+        self.topology_work = len(edges)
+        self._lower_work, self._local_work = {}, {}
         self.partitions = {key: partition for key, partition, _, _ in nodes}
         self.edges = {}
         self.outgoing = defaultdict(list)
         self.incoming = defaultdict(list)
         self.portals: set[str] = set()
         for edge_id, source, target, travel, capacity in edges:
-            if consume:
-                consume("topology_edges")
+            _preprocessing_unit(consume, "topology_edges", accounting)
             if not isinstance(travel, int) or travel <= 0 or capacity < 0:
                 raise ValueError("Routing requires positive integer travel and nonnegative capacity")
             if source not in self.partitions or target not in self.partitions:
@@ -57,14 +68,15 @@ class _StaticTopology:
         self._local: dict[str, tuple[dict, dict]] = {}
         self._lower: dict[str, dict] = {}
 
-    def lower_bounds(self, goal: str, consume=None) -> dict[str, int]:
+    def lower_bounds(self, goal: str, consume=None, accounting=None) -> dict[str, int]:
         """Exact static reverse-Dijkstra distances, ignoring all reservations."""
         if goal not in self._lower:
             distances = {goal: 0}
             queue = [(0, goal)]
+            work = 0
             while queue:
-                if consume:
-                    consume("reverse_lower_bound")
+                _preprocessing_unit(consume, "reverse_lower_bound", accounting)
+                work += 1
                 distance, node = heappop(queue)
                 if distance != distances[node]:
                     continue
@@ -74,15 +86,20 @@ class _StaticTopology:
                         distances[previous] = value
                         heappush(queue, (value, previous))
             self._lower[goal] = distances
+            self._lower_work[goal] = work
+        elif self.cold_equivalent:
+            for _ in range(self._lower_work[goal]):
+                _preprocessing_unit(consume, "reverse_lower_bound", accounting, reused=True)
         return self._lower[goal]
 
-    def local_paths(self, source: str, consume=None) -> tuple[dict[str, int], dict[str, tuple[str, ...]]]:
+    def local_paths(self, source: str, consume=None, accounting=None) -> tuple[dict[str, int], dict[str, tuple[str, ...]]]:
         if source not in self._local:
             distances, witnesses = {source: 0}, {source: ()}
             queue = [(0, source)]
+            work = 0
             while queue:
-                if consume:
-                    consume("static_local_witness")
+                _preprocessing_unit(consume, "static_local_witness", accounting)
+                work += 1
                 distance, node = heappop(queue)
                 if distance != distances[node]:
                     continue
@@ -95,16 +112,20 @@ class _StaticTopology:
                         witnesses[target] = witnesses[node] + (edge_id,)
                         heappush(queue, (value, target))
             self._local[source] = distances, witnesses
+            self._local_work[source] = work
+        elif self.cold_equivalent:
+            for _ in range(self._local_work[source]):
+                _preprocessing_unit(consume, "static_local_witness", accounting, reused=True)
         return self._local[source]
 
-    def abstraction(self, source: str, goal: str, consume=None) -> dict[str, list[tuple[str, int, tuple[str, ...]]]]:
+    def abstraction(self, source: str, goal: str, consume=None, accounting=None) -> dict[str, list[tuple[str, int, tuple[str, ...]]]]:
         anchors = self.portals | {source, goal}
         groups = defaultdict(list)
         for anchor in sorted(anchors):
             groups[self.partitions[anchor]].append(anchor)
         abstract = defaultdict(list)
         for anchor in sorted(anchors):
-            distances, witnesses = self.local_paths(anchor, consume)
+            distances, witnesses = self.local_paths(anchor, consume, accounting)
             for target in groups[self.partitions[anchor]]:
                 if target != anchor and target in distances:
                     if consume:
@@ -176,7 +197,7 @@ class RegionalCandidateGenerator:
 
     def __init__(self, horizon: int = 80, expansion_limit: int = 5000,
                  static_path_limit: int = 12, deadline_ms: float | None = 80.0,
-                 *, dynamic_local: bool = False, local_label_limit: int = 3):
+                 *, dynamic_local: bool = False, local_label_limit: int = 3, cache_contract: str | None = None):
         if horizon < 0 or expansion_limit < 1 or static_path_limit < 1:
             raise ValueError("Invalid regional routing budgets")
         if deadline_ms is not None and deadline_ms <= 0:
@@ -189,6 +210,26 @@ class RegionalCandidateGenerator:
         self.last_search_status = "not_started"
         self.last_expansions = 0
         self.last_diagnostics: dict = {}
+        self.cache_contract, self._owned_topology_cache = None, None
+        if cache_contract is not None:
+            self.enable_cache_contract(cache_contract)
+
+    def enable_cache_contract(self, contract="isolated_replay_v1"):
+        """Opt-in before the first query; checkpoints own a deep copy of cache."""
+        from .routing_cache_contract import CACHE_CONTRACT, IsolatedTopologyCache
+        if type(self) is not RegionalCandidateGenerator:
+            raise ValueError("Cache replay contract supports RegionalCandidateGenerator only")
+        if contract != CACHE_CONTRACT:
+            raise ValueError("Unknown routing cache contract")
+        if self.deadline_ms is not None:
+            raise ValueError("Deterministic cache replay requires deadline_ms=None")
+        if self.cache_contract == contract:
+            return self
+        if self.last_search_status != "not_started":
+            raise ValueError("Enable cache replay before the first routing query")
+        self.cache_contract = contract
+        self._owned_topology_cache = IsolatedTopologyCache()
+        return self
 
     def _budget(self) -> bool:
         if self.last_expansions >= self.expansion_limit:
@@ -297,6 +338,8 @@ class RegionalCandidateGenerator:
         return None
 
     def _generate(self, snapshot, bag_id, tray_id, destination, k):
+        if self.cache_contract is not None and self.deadline_ms is not None:
+            raise ValueError("Deterministic cache replay requires deadline_ms=None")
         self._started = perf_counter()
         self.last_expansions, self.last_search_status = 0, "searching"
         self.last_diagnostics = {"validation_ms": 0., "static_paths_examined": 0,
@@ -305,6 +348,11 @@ class RegionalCandidateGenerator:
                                  "missing_candidate_is_not_infeasibility": True}
         self.last_diagnostics.update(dynamic_local=self.dynamic_local, preprocessing_budget_included=True,
                                      work_units_by_stage={})
+        accounting = None
+        if self.cache_contract is not None:
+            accounting = {"contract": self.cache_contract, "logical_preprocessing": "cold_equivalent_per_query",
+                          "actual_preprocessing_work": {}, "reused_preprocessing_work": {}}
+            self.last_diagnostics["cache_accounting"] = accounting
         tray = snapshot.trays.get(tray_id)
         if (k < 1 or tray is None or tray.node is None or tray_id in snapshot.plans
                 or tray.available_at > snapshot.now or destination not in snapshot.network.nodes
@@ -316,9 +364,13 @@ class RegionalCandidateGenerator:
         begin = perf_counter()
         try:
             signature = network_signature(snapshot.network)
-            self.last_diagnostics["cold_topology"] = signature not in _TOPOLOGY_CACHE
-            topology = _topology(signature, self._consume)
-            lower = topology.lower_bounds(destination, self._consume)
+            if self.cache_contract is None:
+                self.last_diagnostics["cold_topology"] = signature not in _TOPOLOGY_CACHE
+                topology = _topology(signature, self._consume)
+            else:
+                self.last_diagnostics["cold_topology"] = signature not in self._owned_topology_cache.entries
+                topology = self._owned_topology_cache.get(signature, self._consume, accounting)
+            lower = topology.lower_bounds(destination, self._consume, accounting)
         except _SearchBudgetExpired:
             self.last_diagnostics.update(query_ms=(perf_counter() - self._started) * 1000,
                                          expansions=self.last_expansions, candidate_count=0)
@@ -332,7 +384,7 @@ class RegionalCandidateGenerator:
             from .routing_reference import dynamic_regional_candidates
             return dynamic_regional_candidates(self, snapshot, bag_id, tray_id, destination, k, topology, lower)
         try:
-            abstract = topology.abstraction(tray.node, destination, self._consume)
+            abstract = topology.abstraction(tray.node, destination, self._consume, accounting)
         except _SearchBudgetExpired:
             self.last_diagnostics.update(query_ms=(perf_counter() - self._started) * 1000,
                                          expansions=self.last_expansions, candidate_count=0)

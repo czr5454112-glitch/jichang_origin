@@ -25,6 +25,12 @@ from .model import (
     Tray, ValidationResult, SimulationCheckpoint, ConditionalRouteForecast,
     ForecastDependency, ReplacementContext,
 )
+from .storage_contracts import (
+    StorageBag, StorageSnapshot, StoragePlanningSnapshot, storage_contract,
+    storage_contract_failure, storage_route_failure, storage_committed_failure,
+    observe_storage_arrival, observe_storage_departure, project_storage_prefix,
+    assert_storage_invariants,
+)
 
 INFINITY = 10**12
 _OWNER_LOCK = RLock()
@@ -141,6 +147,8 @@ def _forecast_dependencies(snapshot, candidate):
     resources = {f"edge:{leg.edge_id}" for leg in candidate.legs}
     resources |= {f"node:{snapshot.network.edges[leg.edge_id].target}" for leg in candidate.legs}
     resources.add(f"module:{_destination(snapshot, candidate)}")
+    if storage_contract(snapshot, candidate.bag_id) is not None:
+        resources.add(f"storage:{candidate.bag_id}")
     return tuple(ForecastDependency(resource, _dependency_fingerprint(snapshot, resource)) for resource in sorted(resources))
 
 
@@ -150,6 +158,8 @@ def _dependency_fingerprint(snapshot, resource):
         return _fingerprint(snapshot.network.edges.get(key))
     if kind == "node":
         return _fingerprint(snapshot.network.nodes.get(key))
+    if kind == "storage":
+        return _fingerprint(storage_contract(snapshot, key))
     return _fingerprint(snapshot.module)
 
 
@@ -222,6 +232,9 @@ def conditional_forecast_failure(snapshot: Snapshot, forecast: ConditionalRouteF
     witness = RouteCandidate("forecast", forecast.bag_id, forecast.tray_id, forecast.witness_legs,
                              forecast.unload_complete, forecast.usable_at, snapshot.version, "forecast",
                              destination_node=forecast.destination_node)
+    storage_failure = storage_committed_failure(snapshot, witness)
+    if storage_failure:
+        return "conditional_" + storage_failure
     slots = tuple(s for s in effective_reservations(snapshot) if s.tray_id != tray.tray_id)
     conflict = capacity_conflict(snapshot, slots + candidate_reservations(view, witness))
     return "conditional_" + conflict if conflict else None
@@ -372,6 +385,9 @@ class ExecutionValidator:
             node, tick = edge.target, leg.arrive
         if node != _destination(snapshot, candidate):
             return reject("wrong_destination")
+        storage_failure = storage_route_failure(snapshot, candidate)
+        if storage_failure:
+            return reject(storage_failure)
         unload = tick + (snapshot.module.unload_ticks if candidate.bag_id is not None else 0)
         usable = unload + snapshot.module.hold_ticks(node)
         if candidate.unload_complete != unload or candidate.usable_at != usable:
@@ -386,6 +402,8 @@ class ExecutionValidator:
 
     def commit(self, snapshot: Snapshot, candidate: RouteCandidate, *, route_mode: str = "whole_route") -> ValidationResult:
         with _OWNER_LOCK:
+            if isinstance(snapshot, StoragePlanningSnapshot):
+                return ValidationResult(False, "private_storage_planning_view_is_not_physical")
             result = self.validate(snapshot, candidate, route_mode=route_mode)
             if not result.accepted:
                 return result
@@ -457,6 +475,7 @@ class ExecutionValidator:
         planning.plans.pop(tray_id)
         planning.reservations = tuple(r for r in planning.reservations if r.tray_id != tray_id)
         planning.trays[tray_id] = replace(tray, node=anchor_node, mode="loaded", available_at=anchor_time)
+        planning = project_storage_prefix(snapshot, planning, tray_id, frozen)
         return ReplacementContext(planning, snapshot.version, _fingerprint(snapshot), frozen,
                                   anchor_node, anchor_time, tray_id, plan.bag_id)
 
@@ -611,6 +630,7 @@ class CandidateGenerator:
 
 def assert_invariants(snapshot: Snapshot) -> None:
     """Identity, physical occupancy and committed future occupancy checks."""
+    assert_storage_invariants(snapshot)
     carried: set[str] = set()
     physical_edges: dict[str, int] = defaultdict(int)
     slots = effective_reservations(snapshot)
@@ -676,17 +696,25 @@ class Simulation:
     def __init__(self, snapshot: Snapshot, future_bags=(), *, route_mode="whole_route",
                  generator_factory=None, route_selector=None, slow_controller=None,
                  observer=None, search_horizon=80, candidate_count=3,
-                 reactive_empty_dispatch=True, coordination_order="route_then_prebalance"):
+                 reactive_empty_dispatch=True, coordination_order="route_then_prebalance",
+                 control_mode="automatic"):
         if route_mode not in {"whole_route", "next_edge"}:
             raise ValueError("unknown route_mode")
         if coordination_order not in {"route_then_prebalance", "prebalance_then_route"}:
             raise ValueError("unknown coordination_order")
+        if control_mode not in {"automatic", "external"}:
+            raise ValueError("unknown control_mode")
+        if control_mode == "external" and (route_selector is not None or slow_controller is not None):
+            raise ValueError("external control owns decisions; automatic policy callbacks are forbidden")
+        if isinstance(snapshot, StoragePlanningSnapshot):
+            raise ValueError("private_storage_planning_view_is_not_physical")
         self.state = snapshot.clone()
         self.route_mode = route_mode
         self.search_horizon = search_horizon
         self.candidate_count = candidate_count
         self.reactive_empty_dispatch = reactive_empty_dispatch
         self.coordination_order = coordination_order
+        self.control_mode = control_mode
         self.generator_factory = generator_factory
         self.route_selector = deepcopy(route_selector)
         self.slow_controller = deepcopy(slow_controller)
@@ -713,7 +741,18 @@ class Simulation:
             if bag.arrival < self.state.now or bag.bag_id in seen:
                 raise ValueError("future event overlaps the initial observable ledger or duplicates an ID")
             seen.add(bag.bag_id)
+            if isinstance(bag, StorageBag):
+                # Validate the public contract at its future observation time,
+                # without adding that bag or its contract to today's snapshot.
+                future_view = replace(self.state, now=bag.arrival,
+                                      bags={**self.state.bags, bag.bag_id: bag})
+                reason = storage_contract_failure(future_view, bag.bag_id)
+                if reason:
+                    raise ValueError(reason)
             self._arrivals[bag.arrival].append(bag)
+        for tray in self.state.trays.values():
+            if tray.node is not None and tray.bag_id is not None:
+                observe_storage_arrival(self.state, tray.tray_id, tray.node, self.state.now)
         self._check("initial")
         for tray in self.state.trays.values():
             if tray.bag_id is not None:
@@ -721,12 +760,19 @@ class Simulation:
 
     def _make_generator(self):
         if self.generator_factory is None:
-            return CandidateGenerator(horizon=self.search_horizon)
-        try:
-            signature(self.generator_factory).bind(horizon=self.search_horizon)
-        except (TypeError, ValueError):
-            return self.generator_factory()
-        return self.generator_factory(horizon=self.search_horizon)
+            generator = CandidateGenerator(horizon=self.search_horizon)
+        else:
+            try:
+                signature(self.generator_factory).bind(horizon=self.search_horizon)
+            except (TypeError, ValueError):
+                generator = self.generator_factory()
+            else:
+                generator = self.generator_factory(horizon=self.search_horizon)
+        if isinstance(self.state, StorageSnapshot):
+            from .storage_routing import StorageCandidateGenerator
+            if not isinstance(generator, StorageCandidateGenerator):
+                generator = StorageCandidateGenerator(generator)
+        return generator
 
     def _check(self, event, **details):
         assert set(self.state.trays) == self._tray_ids, "finite tray identity set changed"
@@ -738,6 +784,24 @@ class Simulation:
         # Departure/release is processed before arrivals/acquisitions at a tick.
         # Synchronization builds the atomic simultaneous physical self.state first;
         # per-event checks then see the released-before-acquired valid prefix.
+        # A zero-dwell waypoint may arrive and depart in this same tick. The
+        # entered-leg cursor proves ingress even when no stationary tray state
+        # appears between those events. Merely proposed future legs do not.
+        if isinstance(self.state, StorageSnapshot):
+            for tray_id, plan in self.state.plans.items():
+                for leg in plan.legs:
+                    if leg.arrive == self.state.now and (tray_id, leg.edge_id, leg.depart) in self._entered_legs:
+                        node = self.state.network.edges[leg.edge_id].target
+                        if observe_storage_arrival(self.state, tray_id, node, leg.arrive):
+                            self._trace.append({"time": self.state.now, "event": "storage_arrival",
+                                                "tray_id": tray_id, "bag_id": plan.bag_id, "node": node})
+            for flight in self.state.old_in_transit:
+                if flight.arrive == self.state.now:
+                    node = self.state.network.edges[flight.edge_id].target
+                    if observe_storage_arrival(self.state, flight.tray_id, node, flight.arrive):
+                        self._trace.append({"time": self.state.now, "event": "storage_arrival",
+                                            "tray_id": flight.tray_id, "bag_id": self.state.trays[flight.tray_id].bag_id,
+                                            "node": node})
         departing = []
         for tray_id, plan in list(self.state.plans.items()):
             tray = self.state.trays[tray_id]
@@ -747,6 +811,10 @@ class Simulation:
                     self.state.trays[tray_id] = replace(tray, node=None, mode="in_transit")
                 entry = (tray_id, leg.edge_id, leg.depart)
                 if entry not in self._entered_legs:
+                    edge = self.state.network.edges[leg.edge_id]
+                    if observe_storage_departure(self.state, tray_id, edge, leg.depart):
+                        self._trace.append({"time": self.state.now, "event": "storage_departure",
+                                            "tray_id": tray_id, "bag_id": plan.bag_id, "node": edge.source})
                     self._entered_legs.add(entry)
                     departing.append((tray_id, leg))
         for tray_id, leg in departing:
@@ -850,6 +918,9 @@ class Simulation:
             self.state.trays[tray.tray_id] = replace(tray, mode="loaded", bag_id=bag.bag_id)
             self.state.load_times[bag.bag_id] = self.state.now
             self.state.version += 1
+            if observe_storage_arrival(self.state, tray.tray_id, tray.node, self.state.now):
+                self._trace.append({"time": self.state.now, "event": "storage_arrival",
+                                    "tray_id": tray.tray_id, "bag_id": bag.bag_id, "node": tray.node})
             self._check("load", bag_id=bag.bag_id, tray_id=tray.tray_id)
         self._phase = "routes"
         if self.observer is not None:
@@ -960,6 +1031,12 @@ class Simulation:
 
     def _continue_causally(self):
         self._prepare_routes()
+        # An external coordinator/search controls commitments, not physics.
+        # FIFO loading, arrivals, release, costs and invariants still occur at
+        # their normal tick. Even protected tasks require an explicit legal
+        # admission; disabling automatic policy does not erase their ledger.
+        if self.control_mode == "external":
+            return
         # Protection is admitted before either soft optimization order. A bag
         # with no legal witness stays in the ledger with an explicit unadmitted
         # decision count; the protected flag itself is not an admission proof.
@@ -1058,7 +1135,8 @@ class Simulation:
             deepcopy(dict(self._arrivals)), set(self._entered_legs), set(self._tray_ids), self._phase,
             self.route_mode, self.search_horizon, self.candidate_count, deepcopy(self._generator),
             self.generator_factory, deepcopy(self.route_selector), deepcopy(self.slow_controller),
-            self.observer, dict(self.policy_stats), self.reactive_empty_dispatch, self.coordination_order)
+            self.observer, dict(self.policy_stats), self.reactive_empty_dispatch, self.coordination_order,
+            self.control_mode)
 
     @classmethod
     def from_checkpoint(cls, checkpoint: SimulationCheckpoint):
@@ -1083,6 +1161,7 @@ class Simulation:
         simulation.policy_stats = checkpoint.policy_stats
         simulation.reactive_empty_dispatch = checkpoint.reactive_empty_dispatch
         simulation.coordination_order = checkpoint.coordination_order
+        simulation.control_mode = checkpoint.control_mode
         simulation._validator = ExecutionValidator()
         assert_invariants(simulation.state)
         return simulation

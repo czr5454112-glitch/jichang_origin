@@ -1,0 +1,3644 @@
+{
+  "schema": "ics_round6_resource_ledger_v1",
+  "created_utc": "2026-10-10T08:56:28.472729+00:00",
+  "new_physical_simulations": 0,
+  "rows": [
+    {
+      "id": "prepare_initial",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_20261010\\protocol.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "prepare function",
+          "cpu_seconds": 0.71875,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "preparation_cpu_seconds",
+          "note": "Includes binding, snapshots and workload construction inside the clock; interpreter bootstrap/final serialization excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 0.744043300015619,
+      "counts": {
+        "new_preparation_invocations": 1
+      },
+      "notes": [
+        "Two preparations actually executed; copied source snapshots are artifacts, not extra simulation runs."
+      ]
+    },
+    {
+      "id": "prepare_repaired",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repaired_20261010\\protocol.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "prepare function",
+          "cpu_seconds": 0.734375,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "preparation_cpu_seconds",
+          "note": "Includes binding, snapshots and workload construction inside the clock; interpreter bootstrap/final serialization excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 0.7755810999951791,
+      "counts": {
+        "new_preparation_invocations": 1
+      },
+      "notes": [
+        "Two preparations actually executed; copied source snapshots are artifacts, not extra simulation runs."
+      ]
+    },
+    {
+      "id": "initial_mechanism6",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_20261010\\mechanism\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 142.96875,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "note": "Setup, cycle, trace and raw serialization included; cycle CPU is nested and excluded from addition."
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.265625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 50.25956160001806,
+      "counts": {
+        "planned_cases": 6,
+        "status_counts": {
+          "controller_quiescent": 4,
+          "old32_replication_mismatch": 2
+        },
+        "actual_physical_calls_recorded": 6,
+        "unknown_physical_call_statuses": 0,
+        "unknown_resource_cases": 0,
+        "complete_resource_accounting": true,
+        "search_calls": 378,
+        "search_work": 235352
+      },
+      "notes": [
+        "All stages are separately executed. Formal nominal identities rerun pilot cases; no reuse discount.",
+        "complete_resource_accounting describes recorded invocation intervals, not process bootstrap or all development CPU.",
+        "Two old32 replication flags failed only because Python cache tuple vs persisted JSON list; raw physical results retained and all six rerun after comparator-only repair."
+      ],
+      "nested_cycle_cpu_seconds_not_added": 90.5,
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 206249984,
+        "peak_commit_bytes": 900227072
+      }
+    },
+    {
+      "id": "repaired_mechanism6",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repaired_20261010\\mechanism\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 139.453125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "note": "Setup, cycle, trace and raw serialization included; cycle CPU is nested and excluded from addition."
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.265625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 49.92985289997887,
+      "counts": {
+        "planned_cases": 6,
+        "status_counts": {
+          "controller_quiescent": 6
+        },
+        "actual_physical_calls_recorded": 6,
+        "unknown_physical_call_statuses": 0,
+        "unknown_resource_cases": 0,
+        "complete_resource_accounting": true,
+        "search_calls": 378,
+        "search_work": 235352
+      },
+      "notes": [
+        "All stages are separately executed. Formal nominal identities rerun pilot cases; no reuse discount.",
+        "complete_resource_accounting describes recorded invocation intervals, not process bootstrap or all development CPU."
+      ],
+      "nested_cycle_cpu_seconds_not_added": 88.34375,
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 206090240,
+        "peak_commit_bytes": 900100096
+      }
+    },
+    {
+      "id": "nominal_pilot9",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repaired_20261010\\nominal_pilot\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 384.28125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "note": "Setup, cycle, trace and raw serialization included; cycle CPU is nested and excluded from addition."
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.28125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 134.14817080000648,
+      "counts": {
+        "planned_cases": 9,
+        "status_counts": {
+          "controller_quiescent": 9
+        },
+        "actual_physical_calls_recorded": 9,
+        "unknown_physical_call_statuses": 0,
+        "unknown_resource_cases": 0,
+        "complete_resource_accounting": true,
+        "search_calls": 745,
+        "search_work": 476845
+      },
+      "notes": [
+        "All stages are separately executed. Formal nominal identities rerun pilot cases; no reuse discount.",
+        "complete_resource_accounting describes recorded invocation intervals, not process bootstrap or all development CPU."
+      ],
+      "nested_cycle_cpu_seconds_not_added": 263.078125,
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 371277824,
+        "peak_commit_bytes": 1065746432
+      }
+    },
+    {
+      "id": "formal81",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repaired_20261010\\full\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 3481.78125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "note": "Setup, cycle, trace and raw serialization included; cycle CPU is nested and excluded from addition."
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.328125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 1197.2510790000088,
+      "counts": {
+        "planned_cases": 81,
+        "status_counts": {
+          "controller_quiescent": 81
+        },
+        "actual_physical_calls_recorded": 81,
+        "unknown_physical_call_statuses": 0,
+        "unknown_resource_cases": 0,
+        "complete_resource_accounting": true,
+        "search_calls": 6289,
+        "search_work": 4117528
+      },
+      "notes": [
+        "All stages are separately executed. Formal nominal identities rerun pilot cases; no reuse discount.",
+        "complete_resource_accounting describes recorded invocation intervals, not process bootstrap or all development CPU."
+      ],
+      "nested_cycle_cpu_seconds_not_added": 2393.984375,
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 372477952,
+        "peak_commit_bytes": 1066463232
+      }
+    },
+    {
+      "id": "author_authoring_initial.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_same_zone_authoring_20261010\\authoring_initial.json",
+      "status": "failed_test_collection",
+      "cpu_components": [
+        {
+          "scope": "author host interval",
+          "cpu_seconds": 2.078125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "pytest host process including pytest import; final file serialization excluded; child subprocess CPU not measured"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.1839781000162475,
+      "counts": {
+        "exit_code": 2
+      },
+      "notes": [
+        "Initial import-path collection failure and repaired 23-test invocation are distinct.",
+        "Zero process_time increment means timer resolution, not a proof of no work."
+      ]
+    },
+    {
+      "id": "author_authoring_path_repaired.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_same_zone_authoring_20261010\\authoring_path_repaired.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "author host interval",
+          "cpu_seconds": 1.265625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "pytest host process including pytest import; final file serialization excluded; child subprocess CPU not measured"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.3097503999888431,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "Initial import-path collection failure and repaired 23-test invocation are distinct.",
+        "Zero process_time increment means timer resolution, not a proof of no work."
+      ]
+    },
+    {
+      "id": "author_freeze.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_same_zone_authoring_20261010\\freeze.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "author host interval",
+          "cpu_seconds": 0.0,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file authoring freeze through hash verification; final serialization excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 0.005663300020387396,
+      "counts": {
+        "author_tests_passed": 23
+      },
+      "notes": [
+        "Initial import-path collection failure and repaired 23-test invocation are distinct.",
+        "Zero process_time increment means timer resolution, not a proof of no work."
+      ]
+    },
+    {
+      "id": "review_initial9",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\guard_initial_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "parent",
+          "cpu_seconds": 0.015625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        },
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "child_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 1.324328799993964,
+      "counts": {
+        "passed": 9
+      },
+      "notes": []
+    },
+    {
+      "id": "review_tests_controller_initial_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\controller_initial_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest host interval",
+          "cpu_seconds": 0.859375,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Measured host interval; process bootstrap and output not asserted complete."
+        }
+      ],
+      "wall_seconds_individual_scope": 0.9099928000068758,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": []
+    },
+    {
+      "id": "review_tests_independent_focused_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\independent_focused_validation.json",
+      "status": "failed_test_fixture",
+      "cpu_components": [
+        {
+          "scope": "pytest host interval",
+          "cpu_seconds": 2.953125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Measured host interval; process bootstrap and output not asserted complete."
+        }
+      ],
+      "wall_seconds_individual_scope": 3.172311100002844,
+      "counts": {
+        "exit_code": 1
+      },
+      "notes": []
+    },
+    {
+      "id": "review_tests_independent_focused_repaired_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\independent_focused_repaired_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest host interval",
+          "cpu_seconds": 1.359375,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Measured host interval; process bootstrap and output not asserted complete."
+        }
+      ],
+      "wall_seconds_individual_scope": 1.4154239000054076,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": []
+    },
+    {
+      "id": "review_tests_full_validation/result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\full_validation\\result.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest host interval",
+          "cpu_seconds": 70.109375,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "one process pytest invocation; total cpu includes snapshots and binding, test CPU is nested"
+        }
+      ],
+      "wall_seconds_individual_scope": 72.7449872000143,
+      "counts": {
+        "exit_code": 0,
+        "tests": 777,
+        "failures": 0
+      },
+      "notes": [
+        "777-test suite predates comparator repair. Later 11 affected tests are separate; this is not a 779-test full-suite claim."
+      ],
+      "nested_test_cpu_seconds_not_added": 69.734375
+    },
+    {
+      "id": "repair_test_attempt_1",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repair_validation_20261010\\validation.json",
+      "status": "failed_test_fixture",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "attempts[0].child_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 3.3808933,
+      "counts": {
+        "passed": 9,
+        "setup_errors": 2,
+        "exit_code": 1
+      },
+      "notes": [
+        "PermissionError WinError5 enumerating default C:/Users/38908/AppData/Local/Temp/pytest-of-38908; both tmp_path audit fixtures failed before test body",
+        "Wall is tool wall only. CPU remains unknown; not inferred from duration."
+      ]
+    },
+    {
+      "id": "repair_test_attempt_2",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repair_validation_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "attempts[1].child_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 2.6263753,
+      "counts": {
+        "passed": 11,
+        "setup_errors": 0,
+        "exit_code": 0
+      },
+      "notes": [
+        "Workspace basetemp repair; all 11 affected tests pass.",
+        "Wall is tool wall only. CPU remains unknown; not inferred from duration."
+      ]
+    },
+    {
+      "id": "early_helper6_1",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_resource_ledger_20261010\\auxiliary_invocations.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "runner_helper_tests[0].cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 2.4214393,
+      "counts": {
+        "passed": 6
+      },
+      "notes": [
+        "Author disclosure; no saved process CPU, tool wall only."
+      ]
+    },
+    {
+      "id": "early_helper6_2",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_resource_ledger_20261010\\auxiliary_invocations.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "runner_helper_tests[1].cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 2.3313687,
+      "counts": {
+        "passed": 6
+      },
+      "notes": [
+        "Author disclosure; no saved process CPU, tool wall only."
+      ]
+    },
+    {
+      "id": "unmetered_auxiliary",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_resource_ledger_20261010\\auxiliary_invocations.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "development, inspection, docs and subprocess/bootstrap gaps",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "unmetered_auxiliary",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": null,
+      "counts": {},
+      "notes": [
+        "Two pure-file ast.parse preflights initially failed on parentheses in new resource/mechanism analysis scripts (tool walls 1.2069501s and 1.266183s; CPU unmeasured); repaired before any formal analyzer invocation. No simulation was imported or run.",
+        "Early py_compile; d40 restore seven input-binding checks; validate_input_bindings. These checks did not call engine.advance.",
+        "Ad hoc shell inspections, JSON reads, polling, authoring documentation, source edits and final Markdown rendering were not comprehensively CPU measured.",
+        "No extra original-map physical smoke or failed physical batch beyond initial 6, repaired 6, nominal 9 and formal 81. Unit tests can execute small test simulations and are accounted as test invocations."
+      ]
+    },
+    {
+      "id": "review_final_comparison_premature",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\final_comparison_wait_failure.json",
+      "status": "failed_analysis_missing_file",
+      "cpu_components": [
+        {
+          "scope": "failed pure-file comparison child",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "cpu_seconds=null",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_scope": 1.1036973,
+      "counts": {
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Directory existed while its owner's analysis was still running; no final analysis file was available yet.",
+        "Tool wall only; no child CPU measurement. Later comparison is a separate invocation."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_analysis_census_check_20261010\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_analysis_census_check_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 17.53125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "analysis_cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 17.714349000016227,
+      "counts": {
+        "checks": 3138
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_analysis_initial_20261010\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_analysis_initial_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 5.53125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "analysis_cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 5.785643099981826,
+      "counts": {
+        "checks": 649
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_final_analysis_20261010\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_final_analysis_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 158.796875,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "analysis_cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 162.77467129999422,
+      "counts": {
+        "checks": 32462
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_independent_review_20261010\\final_analysis_comparison.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\final_analysis_comparison.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 0.0,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure file comparison through input rehash; final serialization and bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 0.014985900023020804,
+      "counts": {
+        "checks": 757,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_independent_review_20261010\\formal_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\formal_artifact_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 129.15625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 132.3989140999911,
+      "counts": {
+        "checks": 77560
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_independent_review_20261010\\mechanism_initial_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\mechanism_initial_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 9.234375,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 9.527284699986922,
+      "counts": {
+        "checks": 2165
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_independent_review_20261010\\mechanism_repaired_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\mechanism_repaired_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 9.421875,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 9.586079500004416,
+      "counts": {
+        "checks": 2341
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_independent_review_20261010\\nominal_observation_overlap.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\nominal_observation_overlap.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 16.078125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 16.47055040000123,
+      "counts": {},
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_independent_review_20261010\\nominal_pilot_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\nominal_pilot_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 19.15625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 19.630529999994906,
+      "counts": {
+        "checks": 7365
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_pilot_analysis_20261010\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_pilot_analysis_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 23.765625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "analysis_cpu_seconds",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 24.2161705000035,
+      "counts": {
+        "checks": 2103
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round6_visuals_20261010\\metadata.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_visuals_20261010\\metadata.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 0.890625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds_measured_after_plot_imports",
+          "note": "Clock covers reported analysis interval; final serialization/host bootstrap excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 0.8910511000140104,
+      "counts": {},
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\chain_evidence.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\chain_evidence.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 0.03125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file trace reconstruction through input verification; final serialization excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 0.03332710001268424,
+      "counts": {
+        "checks": 162,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\formal_chain_evidence.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\formal_chain_evidence.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 0.03125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file trace reconstruction through input verification; final serialization excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 0.027987000008579344,
+      "counts": {
+        "checks": 90,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\formal_tradeoffs.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\formal_tradeoffs.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 7.203125,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file load/hash/trace reconstruction through input verification; final serialization excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 7.6248658999975305,
+      "counts": {
+        "checks": 18,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\full\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\full\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 228.421875,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file read/hash/analysis through verification, excluding final serialization and markdown rendering; no simulator imported."
+        }
+      ],
+      "wall_seconds_individual_scope": 234.76951220000046,
+      "counts": {
+        "checks": 11476,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\initial_repaired_consistency.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\initial_repaired_consistency.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 30.484375,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file physical/control comparison through hash verification. Final output serialization excluded."
+        }
+      ],
+      "wall_seconds_individual_scope": 31.081931300024735,
+      "counts": {
+        "checks": 109,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\mechanism\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\mechanism\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 20.25,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file read/hash/analysis through verification, excluding final serialization and markdown rendering; no simulator imported."
+        }
+      ],
+      "wall_seconds_individual_scope": 20.976373200013768,
+      "counts": {
+        "checks": 292,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\nominal_pilot\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\nominal_pilot\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 45.234375,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file read/hash/analysis through verification, excluding final serialization and markdown rendering; no simulator imported."
+        }
+      ],
+      "wall_seconds_individual_scope": 46.254592900018906,
+      "counts": {
+        "checks": 1276,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\repaired_mechanism\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\repaired_mechanism\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 24.34375,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file read/hash/analysis through verification, excluding final serialization and markdown rendering; no simulator imported."
+        }
+      ],
+      "wall_seconds_individual_scope": 24.898790800012648,
+      "counts": {
+        "checks": 292,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_mechanisms_20261010\\service_regressions.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\service_regressions.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 3.765625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "Pure-file raw trace/public route opportunity read/hash through input verification, excluding final serialization."
+        }
+      ],
+      "wall_seconds_individual_scope": 3.8533942000067327,
+      "counts": {
+        "checks": 4,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_repair_diagnostic_20261010\\diagnosis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repair_diagnostic_20261010\\diagnosis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file analysis/audit/plot interval",
+          "cpu_seconds": 2.390625,
+          "quality": "measured_interval_lower_bound",
+          "source_field": "cpu_seconds",
+          "note": "read-only Python-vs-JSON representation diagnosis; no simulation advances, no new actions"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.439441499998793,
+      "counts": {},
+      "notes": [
+        "Embedded experiment metrics are metadata and are not added to this direct CPU. Each saved invocation counts exactly once."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "kind": "worker_cpu_sum",
+      "id": "initial_mechanism6",
+      "okay": true
+    },
+    {
+      "kind": "complete_case_denominator",
+      "id": "initial_mechanism6",
+      "okay": true
+    },
+    {
+      "kind": "worker_cpu_sum",
+      "id": "repaired_mechanism6",
+      "okay": true
+    },
+    {
+      "kind": "complete_case_denominator",
+      "id": "repaired_mechanism6",
+      "okay": true
+    },
+    {
+      "kind": "worker_cpu_sum",
+      "id": "nominal_pilot9",
+      "okay": true
+    },
+    {
+      "kind": "complete_case_denominator",
+      "id": "nominal_pilot9",
+      "okay": true
+    },
+    {
+      "kind": "worker_cpu_sum",
+      "id": "formal81",
+      "okay": true
+    },
+    {
+      "kind": "complete_case_denominator",
+      "id": "formal81",
+      "okay": true
+    },
+    {
+      "kind": "evidence_immutable",
+      "okay": true
+    }
+  ],
+  "failed_checks": 0,
+  "bound_evidence_sha256": {
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_20261010\\protocol.json": "975288e5e819e7b5619e92c828b6d156d81bd59a1d28493e0482b5e5bbf697cf",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repaired_20261010\\protocol.json": "a6e9831a78916aed133949164a465477c02cec13eacb2998c8890f9cbfe1f23c",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_20261010\\mechanism\\summary.json": "fc96c5d9c36885017aef221e4368c1dc57c6477ec3c36454f7339301c33dcb50",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repaired_20261010\\mechanism\\summary.json": "78faa42d4d2154bf64d2f03f85632c500dc2816ee6744b7ec5a04f0295403eb9",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repaired_20261010\\nominal_pilot\\summary.json": "d3de49a4bb96ca0dd97482a1e5d430f4861e15ec51f990ad73c45b2a99065048",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repaired_20261010\\full\\summary.json": "c2137cd0f1bde446ab4df919cf7cd35a7b06dd092b36ba2cb3fef2e8667def7f",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_same_zone_authoring_20261010\\authoring_initial.json": "d3c4c4dbab89683c1d40a437fc6fcc3740d2a57ff3459faacc467813e4a243c4",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_same_zone_authoring_20261010\\authoring_path_repaired.json": "938bd7ac14bf33df9e9ed68bbb8df63ca12963936f150241b021572191182d10",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_same_zone_authoring_20261010\\freeze.json": "95f00f6789c141c0557dd67a165dc81c707fcff56a961e567c0cdb4f217cdfa2",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\guard_initial_validation.json": "ea2e66c331a0bebeb551a3ea8afaf5fe9f856800b11cbd77850ef5d552690c20",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\controller_initial_validation.json": "6ad1f78155a58e090a35687f1e2b63a1552c6146958f67ef707b338a9038227c",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\independent_focused_validation.json": "d7375506e6bb19ffeba2b4c790a49f3195f2546ee1394151c75a4ecfd048e2de",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\independent_focused_repaired_validation.json": "0cd7096854e485a8d9e7a5c0929d09a8c6f40485be43bfe92c534193d5016151",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\full_validation\\result.json": "7a3ded76ba4499a11aa44a21d187d1ec0133a617da46e007513c463a1ecc1069",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repair_validation_20261010\\validation.json": "c3747ccf12aa80f43d1703171d28684f8951bde409ef80e14426c3932d06e59d",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_resource_ledger_20261010\\auxiliary_invocations.json": "7172f9c8d60fa66348ec2fcb5d45893e0cd4e77f12b69e279d50daf2622eaec5",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\final_comparison_wait_failure.json": "c4df1d2142acf03218a30d7c02c91c16f424664c273e6c8b3d59dfbbf50fe038",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_analysis_census_check_20261010\\analysis.json": "5270d5265c9b5b5cd187c7b427be962b798de60cc043256d7076979971aaf9e8",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_analysis_initial_20261010\\analysis.json": "e07dc32da59d28eb667af5e55ff230fbb92a7605b2f4c87f51a80308929d2f92",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_final_analysis_20261010\\analysis.json": "ca7584252ce44f5dc988b2a47562a9e1bf6f90503f2f63b95e086f81f646e298",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\final_analysis_comparison.json": "1e88fed67552d67e4f0b4db7e914ecf894e1f9f5f386a232b3563c8b63e9ca2e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\formal_artifact_audit.json": "7f0937b000fd82bbdb4a73e29777b47628c719738d9b42c40ef25f9b5b556e0d",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\mechanism_initial_audit.json": "89e65784adad416a66d2926240fe2f4c383c69401c2b475de6774b6ff684dbee",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\mechanism_repaired_audit.json": "6605ec36b0cf4f656b049df533b747778f888becdebb61cb4772909ee05f2876",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\nominal_observation_overlap.json": "c3171717b4818224d40e57f35a5c697cc45a19915b84b506e8ae03b4be5b6c01",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_independent_review_20261010\\nominal_pilot_audit.json": "2737c0532dbc489179fbf26fb7ad3b887e33cba6c68b36d1389fea21d3833b0d",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_pilot_analysis_20261010\\analysis.json": "5e2ce28d109b75ffb1abe3021581b30dac21508830ccc0c3dc3c9781a9ddcb81",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_visuals_20261010\\manifest.json": "a6f68f4fa18ba72d05942a81d6707f527f3c5cf6f6a5532d1f8db8e4e0613219",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round6_visuals_20261010\\metadata.json": "014cf4c0b392942f6e9617e30207954687e914c245028695f49e1172a2118c90",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\chain_evidence.json": "bccfbb83b3a8038e76bbdc0cf213f4cbd9728700240b6fbcb74810f89d8cc588",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\formal_chain_evidence.json": "8cc341fc21af11e15d68e2d6025d8b16f5bfe54cfa0a6bc35a62d031767e8000",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\formal_tradeoffs.json": "404c73e149ef0595fc38781008a6454067e627450f3bbf2f5751074de8dc877f",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\full\\analysis.json": "b5374f6a834edddf2b44c05e06e574d287ec3af5f1b2bad6da14fc295feda49f",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\initial_repaired_consistency.json": "9e4db8ccb6f8ae643ee75cce864af4fe40d5b4c81ea6229b58fd5005bc9fd90d",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\mechanism\\analysis.json": "45dba7e2962cd757b8e0af1052fc08590d130e3c9080712dda01d164aa235296",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\nominal_pilot\\analysis.json": "6c08fb11d74019c432cec9e204a62ee1088a0e1f5bdb95bba73764f8b38ac29d",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\repaired_mechanism\\analysis.json": "ff3424bbf6de8c31c3dc2a449d5bf8e9c1d85dbe8997d9e1b3e0028229a701a3",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_mechanisms_20261010\\service_regressions.json": "765c0d9775e199b86219c2e08472ed91acca80d645cce72f4dfdc2d255d471fe",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_repair_diagnostic_20261010\\diagnosis.json": "8f1c87e009befccdbb85506c5dfb9d1f2be4589028d09aa50d81f5c6caa8095c"
+  },
+  "changed_evidence": [],
+  "required_final_files": [
+    "phase4_w3_round6_independent_review_20261010/formal_artifact_audit.json",
+    "phase4_w3_round6_independent_review_20261010/final_analysis_comparison.json",
+    "phase4_w3_round6_independent_review_20261010/nominal_observation_overlap.json",
+    "phase4_w3_round6_final_analysis_20261010/analysis.json",
+    "phase4_w3_round6_visuals_20261010/metadata.json",
+    "phase4_w3_same_zone_supply_mechanisms_20261010/full/analysis.json",
+    "phase4_w3_same_zone_supply_mechanisms_20261010/formal_tradeoffs.json",
+    "phase4_w3_same_zone_supply_mechanisms_20261010/service_regressions.json"
+  ],
+  "pending": [],
+  "totals": {
+    "known_nonoverlapping_cpu_seconds_lower_bound": 4981.4375,
+    "unknown_cpu_components": 7,
+    "whole_round_cpu_completely_measured": false,
+    "global_wall_makespan_seconds": null,
+    "reason": "Disjoint measured intervals can add; bootstrap, child CPU and auxiliary intervals remain unknown. Concurrent walls cannot be added."
+  },
+  "nonadditive_budget_detail": [
+    {
+      "stage": "repaired_mechanism",
+      "case": {
+        "case_id": "counterflow_d0040_c0__old32",
+        "scene": "counterflow",
+        "candidate": 0,
+        "policy": "old32",
+        "tape_id": "checkpoint_nominal",
+        "kind": "checkpoint"
+      },
+      "search_queries": 34,
+      "search_work": 22826,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 14.0625
+    },
+    {
+      "stage": "repaired_mechanism",
+      "case": {
+        "case_id": "counterflow_d0040_c0__old64",
+        "scene": "counterflow",
+        "candidate": 0,
+        "policy": "old64",
+        "tape_id": "checkpoint_nominal",
+        "kind": "checkpoint"
+      },
+      "search_queries": 34,
+      "search_work": 22826,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 14.03125
+    },
+    {
+      "stage": "repaired_mechanism",
+      "case": {
+        "case_id": "counterflow_d0040_c0__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": 0,
+        "policy": "same_zone32plus32",
+        "tape_id": "checkpoint_nominal",
+        "kind": "checkpoint"
+      },
+      "search_queries": 67,
+      "search_work": 39288,
+      "guard_work": 24017,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 12.921875
+    },
+    {
+      "stage": "repaired_mechanism",
+      "case": {
+        "case_id": "counterflow_d0040_c1__old32",
+        "scene": "counterflow",
+        "candidate": 1,
+        "policy": "old32",
+        "tape_id": "checkpoint_nominal",
+        "kind": "checkpoint"
+      },
+      "search_queries": 65,
+      "search_work": 42601,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 15.625
+    },
+    {
+      "stage": "repaired_mechanism",
+      "case": {
+        "case_id": "counterflow_d0040_c1__old64",
+        "scene": "counterflow",
+        "candidate": 1,
+        "policy": "old64",
+        "tape_id": "checkpoint_nominal",
+        "kind": "checkpoint"
+      },
+      "search_queries": 65,
+      "search_work": 42601,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 15.640625
+    },
+    {
+      "stage": "repaired_mechanism",
+      "case": {
+        "case_id": "counterflow_d0040_c1__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": 1,
+        "policy": "same_zone32plus32",
+        "tape_id": "checkpoint_nominal",
+        "kind": "checkpoint"
+      },
+      "search_queries": 113,
+      "search_work": 65210,
+      "guard_work": 22476,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 16.0625
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "counterflow__nominal__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 84,
+      "search_work": 54742,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 41.4375
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "counterflow__nominal__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 84,
+      "search_work": 54742,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 41.390625
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "counterflow__nominal__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 145,
+      "search_work": 92051,
+      "guard_work": 11644,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 42.984375
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "cross_cycle__nominal__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 20.390625
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "cross_cycle__nominal__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 20.5
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "cross_cycle__nominal__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 92,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 20.796875
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "near_full__nominal__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 24.984375
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "near_full__nominal__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 0,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 24.953125
+    },
+    {
+      "stage": "nominal_pilot",
+      "case": {
+        "case_id": "near_full__nominal__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 84,
+      "guard_max_single_call": null,
+      "case_budget_stop": "not extracted in earlier analysis",
+      "search_status_counts": null,
+      "slow_bounded_stop_counts": null,
+      "candidate_budget_omissions": null,
+      "guard_work_limit_reached_calls": null,
+      "invocation_cpu_seconds": null,
+      "cycle_cpu_seconds_nested": 25.640625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error00__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 85,
+      "search_work": 55722,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 85
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 70.84375,
+      "cycle_cpu_seconds_nested": 47.53125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error00__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 85,
+      "search_work": 55722,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 85
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 70.15625,
+      "cycle_cpu_seconds_nested": 47.078125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error00__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 145,
+      "search_work": 92059,
+      "guard_work": 11641,
+      "guard_max_single_call": 1159,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 145
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 70.265625,
+      "cycle_cpu_seconds_nested": 47.421875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error01__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 72,
+      "search_work": 47441,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 72
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 61.421875,
+      "cycle_cpu_seconds_nested": 41.375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error01__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 72,
+      "search_work": 47441,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 72
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 60.84375,
+      "cycle_cpu_seconds_nested": 41.3125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error01__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 129,
+      "search_work": 82255,
+      "guard_work": 11644,
+      "guard_max_single_call": 1159,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 129
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 60.796875,
+      "cycle_cpu_seconds_nested": 41.515625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error02__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 65,
+      "search_work": 41708,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 65
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 48.421875,
+      "cycle_cpu_seconds_nested": 32.390625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error02__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 65,
+      "search_work": 41708,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 65
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 48.96875,
+      "cycle_cpu_seconds_nested": 33.734375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error02__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 122,
+      "search_work": 104833,
+      "guard_work": 26410,
+      "guard_max_single_call": 1958,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 109,
+        "expansion_budget_exhausted": 13
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 49.625,
+      "cycle_cpu_seconds_nested": 34.484375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error03__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 84,
+      "search_work": 54931,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 84
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 70.109375,
+      "cycle_cpu_seconds_nested": 46.9375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error03__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 84,
+      "search_work": 54931,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 84
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 71.21875,
+      "cycle_cpu_seconds_nested": 47.640625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error03__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 149,
+      "search_work": 94513,
+      "guard_work": 14507,
+      "guard_max_single_call": 1719,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 149
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 71.796875,
+      "cycle_cpu_seconds_nested": 48.5625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error04__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 46,
+      "search_work": 28679,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 46
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 38.359375,
+      "cycle_cpu_seconds_nested": 27.140625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error04__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 46,
+      "search_work": 28679,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 46
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 37.90625,
+      "cycle_cpu_seconds_nested": 26.671875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error04__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 58,
+      "search_work": 33991,
+      "guard_work": 12134,
+      "guard_max_single_call": 1283,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 58
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 37.46875,
+      "cycle_cpu_seconds_nested": 26.578125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error05__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 83,
+      "search_work": 54008,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 83
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 72.09375,
+      "cycle_cpu_seconds_nested": 48.8125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error05__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 83,
+      "search_work": 54008,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 83
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 71.109375,
+      "cycle_cpu_seconds_nested": 48.03125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error05__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 148,
+      "search_work": 93806,
+      "guard_work": 13943,
+      "guard_max_single_call": 1159,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 148
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 71.78125,
+      "cycle_cpu_seconds_nested": 49.09375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error06__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 100,
+      "search_work": 66655,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 100
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 62.4375,
+      "cycle_cpu_seconds_nested": 41.546875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error06__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 100,
+      "search_work": 66655,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 100
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 62.734375,
+      "cycle_cpu_seconds_nested": 42.46875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error06__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 149,
+      "search_work": 164471,
+      "guard_work": 17089,
+      "guard_max_single_call": 1931,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 119,
+        "expansion_budget_exhausted": 30
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 65.90625,
+      "cycle_cpu_seconds_nested": 45.140625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error07__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 79,
+      "search_work": 51444,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 79
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 69.84375,
+      "cycle_cpu_seconds_nested": 47.125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error07__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 79,
+      "search_work": 51444,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 79
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 68.453125,
+      "cycle_cpu_seconds_nested": 46.9375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__error07__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 145,
+      "search_work": 90510,
+      "guard_work": 11654,
+      "guard_max_single_call": 1159,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 145
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 68.546875,
+      "cycle_cpu_seconds_nested": 46.90625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__nominal__old32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 84,
+      "search_work": 54742,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 84
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 71.09375,
+      "cycle_cpu_seconds_nested": 47.578125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__nominal__old64",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 84,
+      "search_work": 54742,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 84
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 70.484375,
+      "cycle_cpu_seconds_nested": 47.25
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "counterflow__nominal__same_zone32plus32",
+        "scene": "counterflow",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 145,
+      "search_work": 92051,
+      "guard_work": 11644,
+      "guard_max_single_call": 1159,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 145
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 71.375,
+      "cycle_cpu_seconds_nested": 48.015625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error00__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 61,
+      "search_work": 32272,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 61
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.65625,
+      "cycle_cpu_seconds_nested": 23.921875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error00__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 61,
+      "search_work": 32272,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 61
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.6875,
+      "cycle_cpu_seconds_nested": 23.984375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error00__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 66,
+      "search_work": 36212,
+      "guard_work": 104,
+      "guard_max_single_call": 3,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 66
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 35.125,
+      "cycle_cpu_seconds_nested": 24.171875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error01__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 54,
+      "search_work": 28982,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 54
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 32.0,
+      "cycle_cpu_seconds_nested": 23.046875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error01__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 54,
+      "search_work": 28982,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 54
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 31.703125,
+      "cycle_cpu_seconds_nested": 22.78125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error01__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 54,
+      "search_work": 28982,
+      "guard_work": 94,
+      "guard_max_single_call": 3,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 54
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 32.1875,
+      "cycle_cpu_seconds_nested": 23.0625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error02__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 62,
+      "search_work": 32615,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 62
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 31.6875,
+      "cycle_cpu_seconds_nested": 21.859375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error02__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 62,
+      "search_work": 32615,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 62
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 31.765625,
+      "cycle_cpu_seconds_nested": 22.03125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error02__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 67,
+      "search_work": 36555,
+      "guard_work": 102,
+      "guard_max_single_call": 3,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 67
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 32.125,
+      "cycle_cpu_seconds_nested": 22.21875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error03__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.78125,
+      "cycle_cpu_seconds_nested": 24.0625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error03__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.984375,
+      "cycle_cpu_seconds_nested": 24.28125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error03__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 92,
+      "guard_max_single_call": 3,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 35.21875,
+      "cycle_cpu_seconds_nested": 24.15625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error04__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 51,
+      "search_work": 27721,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 51
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 27.890625,
+      "cycle_cpu_seconds_nested": 19.09375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error04__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 51,
+      "search_work": 27721,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 51
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 27.953125,
+      "cycle_cpu_seconds_nested": 19.109375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error04__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 90,
+      "search_work": 53500,
+      "guard_work": 12813,
+      "guard_max_single_call": 580,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 90
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 28.28125,
+      "cycle_cpu_seconds_nested": 19.453125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error05__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.984375,
+      "cycle_cpu_seconds_nested": 24.234375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error05__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.859375,
+      "cycle_cpu_seconds_nested": 24.1875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error05__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 92,
+      "guard_max_single_call": 3,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 35.046875,
+      "cycle_cpu_seconds_nested": 24.234375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error06__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 72,
+      "search_work": 39213,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 72
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 46.359375,
+      "cycle_cpu_seconds_nested": 31.96875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error06__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 72,
+      "search_work": 39213,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 72
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 46.34375,
+      "cycle_cpu_seconds_nested": 31.703125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error06__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 43855,
+      "guard_work": 6045,
+      "guard_max_single_call": 1178,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 75
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 28.953125,
+      "cycle_cpu_seconds_nested": 20.453125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error07__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 66,
+      "search_work": 34546,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 66
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 31.53125,
+      "cycle_cpu_seconds_nested": 22.0
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error07__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 66,
+      "search_work": 34546,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 66
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 32.078125,
+      "cycle_cpu_seconds_nested": 22.1875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__error07__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 41791,
+      "guard_work": 6034,
+      "guard_max_single_call": 1178,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 75
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 30.09375,
+      "cycle_cpu_seconds_nested": 20.921875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__nominal__old32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 38.078125,
+      "cycle_cpu_seconds_nested": 26.25
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__nominal__old64",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 36.78125,
+      "cycle_cpu_seconds_nested": 25.140625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "cross_cycle__nominal__same_zone32plus32",
+        "scene": "cross_cycle",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 69,
+      "search_work": 36777,
+      "guard_work": 92,
+      "guard_max_single_call": 3,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 37.671875,
+      "cycle_cpu_seconds_nested": 25.921875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error00__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 67,
+      "search_work": 45267,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 4,
+        "candidate_limit_reached": 63
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 31.765625,
+      "cycle_cpu_seconds_nested": 22.0625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error00__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 67,
+      "search_work": 45267,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 4,
+        "candidate_limit_reached": 63
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 31.359375,
+      "cycle_cpu_seconds_nested": 21.953125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error00__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error00",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 67,
+      "search_work": 45267,
+      "guard_work": 96,
+      "guard_max_single_call": 2,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 4,
+        "candidate_limit_reached": 63
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 31.578125,
+      "cycle_cpu_seconds_nested": 22.296875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error01__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.3125,
+      "cycle_cpu_seconds_nested": 23.828125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error01__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.140625,
+      "cycle_cpu_seconds_nested": 23.578125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error01__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error01",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 84,
+      "guard_max_single_call": 2,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.5,
+      "cycle_cpu_seconds_nested": 24.015625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error02__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 64,
+      "search_work": 48947,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 58
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 29.078125,
+      "cycle_cpu_seconds_nested": 20.53125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error02__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 64,
+      "search_work": 48947,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 58
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 28.765625,
+      "cycle_cpu_seconds_nested": 20.140625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error02__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error02",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 64,
+      "search_work": 48947,
+      "guard_work": 96,
+      "guard_max_single_call": 2,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 58
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 29.65625,
+      "cycle_cpu_seconds_nested": 20.734375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error03__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 74,
+      "search_work": 49433,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 70,
+        "expansion_budget_exhausted": 4
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.921875,
+      "cycle_cpu_seconds_nested": 24.5
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error03__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 74,
+      "search_work": 49433,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 70,
+        "expansion_budget_exhausted": 4
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.328125,
+      "cycle_cpu_seconds_nested": 23.9375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error03__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error03",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 74,
+      "search_work": 49433,
+      "guard_work": 86,
+      "guard_max_single_call": 2,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "candidate_limit_reached": 70,
+        "expansion_budget_exhausted": 4
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.328125,
+      "cycle_cpu_seconds_nested": 24.109375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error04__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 56,
+      "search_work": 44211,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 50
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 23.171875,
+      "cycle_cpu_seconds_nested": 16.5625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error04__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 56,
+      "search_work": 44211,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 50
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 23.4375,
+      "cycle_cpu_seconds_nested": 16.828125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error04__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error04",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 58,
+      "search_work": 45533,
+      "guard_work": 679,
+      "guard_max_single_call": 580,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 52
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 24.109375,
+      "cycle_cpu_seconds_nested": 17.25
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error05__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54989,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.359375,
+      "cycle_cpu_seconds_nested": 23.8125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error05__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54989,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.25,
+      "cycle_cpu_seconds_nested": 23.84375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error05__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error05",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 76,
+      "search_work": 55777,
+      "guard_work": 85,
+      "guard_max_single_call": 2,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 70
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 33.640625,
+      "cycle_cpu_seconds_nested": 23.5
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error06__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 77,
+      "search_work": 55864,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 71
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 33.921875,
+      "cycle_cpu_seconds_nested": 23.53125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error06__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 77,
+      "search_work": 55864,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 71
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 33.53125,
+      "cycle_cpu_seconds_nested": 23.453125
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error06__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error06",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 77,
+      "search_work": 55864,
+      "guard_work": 85,
+      "guard_max_single_call": 2,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 71
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.0,
+      "cycle_cpu_seconds_nested": 23.5625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error07__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 77,
+      "search_work": 55864,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 71
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 34.09375,
+      "cycle_cpu_seconds_nested": 23.640625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error07__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 77,
+      "search_work": 55864,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 71
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 33.515625,
+      "cycle_cpu_seconds_nested": 23.765625
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__error07__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "error07",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 77,
+      "search_work": 55864,
+      "guard_work": 84,
+      "guard_max_single_call": 2,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 71
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 32.6875,
+      "cycle_cpu_seconds_nested": 23.1875
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__nominal__old32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 35.09375,
+      "cycle_cpu_seconds_nested": 23.75
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__nominal__old64",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "old64",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 0,
+      "guard_max_single_call": 0,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 35.1875,
+      "cycle_cpu_seconds_nested": 24.375
+    },
+    {
+      "stage": "full",
+      "case": {
+        "case_id": "near_full__nominal__same_zone32plus32",
+        "scene": "near_full",
+        "candidate": null,
+        "policy": "same_zone32plus32",
+        "tape_id": "nominal",
+        "kind": "initial_deployment"
+      },
+      "search_queries": 75,
+      "search_work": 54993,
+      "guard_work": 84,
+      "guard_max_single_call": 2,
+      "case_budget_stop": null,
+      "search_status_counts": {
+        "expansion_budget_exhausted": 6,
+        "candidate_limit_reached": 69
+      },
+      "slow_bounded_stop_counts": {},
+      "candidate_budget_omissions": {
+        "cross_zone": 0,
+        "same_zone": 0
+      },
+      "guard_work_limit_reached_calls": 0,
+      "invocation_cpu_seconds": 36.15625,
+      "cycle_cpu_seconds_nested": 25.515625
+    }
+  ],
+  "budget_interpretation": "old64 and new32+32 share a candidate query-count ceiling only. New temporal reachability/matching guard work is additional and is outside CASE_BUDGET.search_work. Report queries, logical search work, guard work and CPU separately; caps are not observed work.",
+  "source_sha256": "edeafcd294b6119c95afd16224b0063f0b6842e58494109630e1e8c71b065cef",
+  "ledger_cpu_seconds": 0.265625,
+  "ledger_wall_seconds": 0.2754121999896597,
+  "ledger_scope": "Read/hash/aggregation through final evidence verification; final JSON/Markdown serialization and bootstrap excluded. Not added to totals above."
+}

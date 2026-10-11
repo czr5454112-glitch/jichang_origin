@@ -1,0 +1,65 @@
+........................................................................ [ 58%]
+..............................................FF...                      [100%]
+================================== FAILURES ===================================
+_ test_downstream_no_wait_blockage_projects_departure_back_to_full_storage[6-False] _
+
+storage_busy_until = 6, protected = False
+
+    @pytest.mark.parametrize("storage_busy_until,protected", tuple(product((0, 6), (False, True))))
+    def test_downstream_no_wait_blockage_projects_departure_back_to_full_storage(storage_busy_until, protected):
+        case = tiny(release=3, capacity=1, protected=protected, deadline=10)
+        state = case.state
+        state.network.edges.pop("ed")
+        state.network.nodes["B"] = Node("B", "z", "q", can_wait=False)
+        state.network.nodes["C"] = Node("C", "z", "q", capacity=4, can_wait=False)
+        state.network.nodes["Q"] = Node("Q", "z", "q")
+        for name, source, target, travel in [("eb", "E", "B", 1), ("bc", "B", "C", 2),
+                                             ("cd", "C", "D", 1), ("cq", "C", "Q", 1)]:
+            state.network.edges[name] = Edge(name, source, target, travel)
+        # The other tray waits at a real upstream node, then crosses B without
+        # waiting, occupies bc[4,6), crosses C immediately and parks at Q.
+        state.network.nodes["X"] = Node("X", "z", "q")
+        state.network.edges["xb"] = Edge("xb", "X", "B", 1)
+        add_other_plan(case, "downstream", "X", (Leg("xb", 3, 4), Leg("bc", 4, 6), Leg("cq", 6, 7)))
+        storage_occupied(case, storage_busy_until)
+        expected = oracle(case, 14)
+        assert expected[0][0] == 9
+        candidates, planner = query(case)
+        assert candidates, (planner.last_search_status, planner.last_diagnostics)
+>       assert candidates[0].legs[-1].arrive == 9
+E       AssertionError: assert 10 == 9
+E        +  where 10 = Leg(edge_id='cd', depart=9, arrive=10).arrive
+
+tests\test_ics_v3_storage_search_audit.py:451: AssertionError
+_ test_downstream_no_wait_blockage_projects_departure_back_to_full_storage[6-True] _
+
+storage_busy_until = 6, protected = True
+
+    @pytest.mark.parametrize("storage_busy_until,protected", tuple(product((0, 6), (False, True))))
+    def test_downstream_no_wait_blockage_projects_departure_back_to_full_storage(storage_busy_until, protected):
+        case = tiny(release=3, capacity=1, protected=protected, deadline=10)
+        state = case.state
+        state.network.edges.pop("ed")
+        state.network.nodes["B"] = Node("B", "z", "q", can_wait=False)
+        state.network.nodes["C"] = Node("C", "z", "q", capacity=4, can_wait=False)
+        state.network.nodes["Q"] = Node("Q", "z", "q")
+        for name, source, target, travel in [("eb", "E", "B", 1), ("bc", "B", "C", 2),
+                                             ("cd", "C", "D", 1), ("cq", "C", "Q", 1)]:
+            state.network.edges[name] = Edge(name, source, target, travel)
+        # The other tray waits at a real upstream node, then crosses B without
+        # waiting, occupies bc[4,6), crosses C immediately and parks at Q.
+        state.network.nodes["X"] = Node("X", "z", "q")
+        state.network.edges["xb"] = Edge("xb", "X", "B", 1)
+        add_other_plan(case, "downstream", "X", (Leg("xb", 3, 4), Leg("bc", 4, 6), Leg("cq", 6, 7)))
+        storage_occupied(case, storage_busy_until)
+        expected = oracle(case, 14)
+        assert expected[0][0] == 9
+        candidates, planner = query(case)
+>       assert candidates, (planner.last_search_status, planner.last_diagnostics)
+E       AssertionError: ('bounded_no_candidate', {'validation_ms': 0.0, 'work_units_by_stage': {'topology_edges': 8, 'reverse_lower_bound': 8,...': 9, 'storage_relaxed_time_labels': 5, ...}, 'preprocessing_budget_included': True, 'route_mode': 'whole_route', ...})
+E       assert ()
+
+tests\test_ics_v3_storage_search_audit.py:450: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_ics_v3_storage_search_audit.py::test_downstream_no_wait_blockage_projects_departure_back_to_full_storage[6-False]
+FAILED tests/test_ics_v3_storage_search_audit.py::test_downstream_no_wait_blockage_projects_departure_back_to_full_storage[6-True]

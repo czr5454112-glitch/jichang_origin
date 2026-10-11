@@ -1,0 +1,118 @@
+{
+  "scope": "W2_START_CONSTRUCTED_MECHANISMS_NOT_HELDOUT_PERFORMANCE_OR_COMPLETE_MPC",
+  "specifications": [
+    {
+      "routing": "baseline",
+      "predictive": false,
+      "reactive": true,
+      "slow_period": 2,
+      "planning_horizon": 24,
+      "route_mode": "next_edge",
+      "coordination_order": "route_then_prebalance",
+      "candidate_count": 4,
+      "expansion_limit": 2000,
+      "static_path_limit": 12,
+      "local_label_limit": 3,
+      "dynamic_local": true
+    },
+    {
+      "routing": "baseline",
+      "predictive": true,
+      "reactive": true,
+      "slow_period": 2,
+      "planning_horizon": 24,
+      "route_mode": "next_edge",
+      "coordination_order": "route_then_prebalance",
+      "candidate_count": 4,
+      "expansion_limit": 2000,
+      "static_path_limit": 12,
+      "local_label_limit": 3,
+      "dynamic_local": true
+    },
+    {
+      "routing": "timed",
+      "predictive": false,
+      "reactive": true,
+      "slow_period": 2,
+      "planning_horizon": 24,
+      "route_mode": "next_edge",
+      "coordination_order": "route_then_prebalance",
+      "candidate_count": 4,
+      "expansion_limit": 2000,
+      "static_path_limit": 12,
+      "local_label_limit": 3,
+      "dynamic_local": true
+    },
+    {
+      "routing": "timed",
+      "predictive": true,
+      "reactive": true,
+      "slow_period": 2,
+      "planning_horizon": 24,
+      "route_mode": "next_edge",
+      "coordination_order": "route_then_prebalance",
+      "candidate_count": 4,
+      "expansion_limit": 2000,
+      "static_path_limit": 12,
+      "local_label_limit": 3,
+      "dynamic_local": true
+    },
+    {
+      "routing": "conditional_timed",
+      "predictive": false,
+      "reactive": true,
+      "slow_period": 2,
+      "planning_horizon": 24,
+      "route_mode": "next_edge",
+      "coordination_order": "route_then_prebalance",
+      "candidate_count": 4,
+      "expansion_limit": 2000,
+      "static_path_limit": 12,
+      "local_label_limit": 3,
+      "dynamic_local": true
+    },
+    {
+      "routing": "conditional_timed",
+      "predictive": true,
+      "reactive": true,
+      "slow_period": 2,
+      "planning_horizon": 24,
+      "route_mode": "next_edge",
+      "coordination_order": "route_then_prebalance",
+      "candidate_count": 4,
+      "expansion_limit": 2000,
+      "static_path_limit": 12,
+      "local_label_limit": 3,
+      "dynamic_local": true
+    }
+  ],
+  "source_sha256": {
+    "run_phase4_coupling.py": "95809fd895b272dfd816130299c537a8514257126fe3099dfb0ceee02d561031",
+    "phase4_control.py": "2849838e56f4f117032a3a063de6cd354648bcfb3ca6c1d47237a4ab7e837c2f",
+    "phase4_coupled_scenarios.py": "d04c54e3bfc6060be673fb89fbc31d4e12a2c9cb5574dc08cd7733ef7105385b",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3",
+    "conditional_evaluation.py": "355a85d1840880ef4a7d88ca878d53ece059ec9a3fb62045a5f5b2bfb77abc1f",
+    "prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "runtime.py": "c46720e6f88fe09e6894bff28bab24a67d8f5d21705b75a8d7160ad9618001b6",
+    "model.py": "3568699cb1e8863ec0ea2c9a16b28349843941f8ef6af7be3de1d61d90c61785",
+    "routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878"
+  },
+  "known_development_design_failures": "../phase4_coupling_design_diagnostic_20261009",
+  "planned_fixtures": [
+    "scarce",
+    "sufficient",
+    "reversal"
+  ],
+  "planned_runs": 18,
+  "limitations": [
+    "Five nodes, fixed proxy local module, no airport integration or continuous production trace.",
+    "Labels and deployment can share this builder, but no learned model has been trained or compared here.",
+    "Greedy prebalancing remains firm-first-release, not a multicycle optimizer or exact MPC.",
+    "Optional conditional scoring uses uncertain release hints only in prediction; no export authority is added.",
+    "All generator budgets remain bounded; no real-time or globally feasible scheduling guarantee.",
+    "The sufficient-stock control also declares B capacity3 to make its extra stock compatible with admitted burn-in.",
+    "These mechanism cases were designed with explicit feasibility corrections; they are not fresh independent evidence."
+  ]
+}

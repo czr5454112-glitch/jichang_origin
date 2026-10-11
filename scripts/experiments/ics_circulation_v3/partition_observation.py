@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from .model import Network, Reservation, Snapshot, Tray, Bag
 from .runtime import effective_reservations
+from .storage_contracts import reject_unsupported_storage
 
 
 @dataclass(frozen=True)
@@ -50,6 +51,9 @@ def resource_owner(snapshot: Snapshot, resource: str) -> str:
 
 
 def observe_partition(snapshot: Snapshot, partition: str) -> PartitionObservation:
+    # The current private owner message schema carries no storage progress or
+    # release authority. Reject before constructing a lossy observation.
+    reject_unsupported_storage(snapshot, (), 'partition_observation')
     state = snapshot.clone()
     partitions = {node.control_partition for node in state.network.nodes.values()}
     if partition not in partitions:

@@ -1,0 +1,104 @@
+{
+  "schema": "ics_v3_network_role_labels_v1",
+  "mode": "labels",
+  "source_sha256": {
+    "run_network_role_labels.py": "cc14d82c60743061a134b8c41d6e9c4ea90c89e0d57c2f8ab366b0815bbb568e",
+    "network_role_labels.py": "1aee7603206fa58cb086dc75c1ce36a6bcf95ceb3d3c4886ac38b6e0dce615f1",
+    "routing_cache_contract.py": "e966757e69773ae085654831564828b7bb97f7e895eb2d09757962d0493f3826",
+    "experiment_resources.py": "88e48e9702019277cbef49c4422d6fa7eefcf995e6fdd6e7d7c2eb1b0d608f30",
+    "run_role_coverage.py": "1b759a0efd23c7c0fea1996ab330dd552dfc0e2a6a3355f72d8831020e62d857",
+    "role_coverage.py": "2fc428c448baceca580bf646a2ff6ac6715419a7d5206d7f0e2ce7f376fb1de6",
+    "role_features.py": "1868ef11cc20e60c39c50e22c1ec722b5e7a238f02d5f8fbac3694ea83a8d716",
+    "nonlinear_learning.py": "ca307589c3f5bbbfb2fcdd7998020d15028acbc8c6a19335e604b85877e65304",
+    "label_stability.py": "df60fcf2fc6174be61db4b759ce1d0bbadea1815fb907108b5414f02f949e75d",
+    "feedback_scenarios.py": "192081752f5e6f15bea441e8adcd6e3751909eae2fd37c70c6f22b39f8807caf",
+    "phase4_control.py": "70597fe1bce15a2f69d033aa389f0f68833b460a40ec2281b90599f36f475094",
+    "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "conditional_evaluation.py": "355a85d1840880ef4a7d88ca878d53ece059ec9a3fb62045a5f5b2bfb77abc1f",
+    "routing.py": "39ebeb6dadf551f31157f4db2366cbbd29d1258efa4ecdf3a5316c50f86c9082",
+    "routing_reference.py": "0fa5bf23396196a8a31d62a903dd3b2ad4b2e64aebe553bea4d89bf1d132430c",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3",
+    "run_workload_diagnostics.py": "c31e38f8d609b64280c6f0b6ac80ddbf537f5a60e549dd0e254df0d935f12dfd",
+    "phase4_network_workloads.py": "bcefc238fb255f116ea6d2571dc82b6d03f37d0d4d3dfe8fb5e747a37e18ba93",
+    "nanning_routing_benchmark.py": "84a613a3f559736a5ce1ada62b241f1311ce6f1ba2013a55f620772ab29f9c37",
+    "audit_nanning.py": "9ac98e6f3993b2267e2951668995a8270e87d7a6cf6b31ac1c30cc2e0974d57a"
+  },
+  "profile_sha256": "156b701e6a28148009a921359c5d44f6e3f0827676d880a3fb4c2fd0cde83fa3",
+  "all_declared_workloads": [
+    "cross_cycle",
+    "counterflow",
+    "near_full"
+  ],
+  "workloads": [
+    "near_full"
+  ],
+  "rounds": 3,
+  "new_independent_source_count": 0,
+  "source_scope": "reused original Nanning topology with old declared synthetic workload/inventory/service assumptions; development, not operating history or held-out confirmation",
+  "spec": {
+    "routing": "timed",
+    "predictive": true,
+    "reactive": true,
+    "slow_period": 2,
+    "planning_horizon": 180,
+    "route_mode": "next_edge",
+    "coordination_order": "route_then_prebalance",
+    "candidate_count": 4,
+    "expansion_limit": 3000,
+    "static_path_limit": 8,
+    "local_label_limit": 3,
+    "dynamic_local": true
+  },
+  "cache_contract": "isolated_replay_v1",
+  "role_bands": {
+    "roles": [
+      "origin",
+      "continuation",
+      "arrival_at_destination"
+    ],
+    "bands": [
+      0,
+      40,
+      80
+    ],
+    "first_attempt_per_cell": true,
+    "max_per_workload": 6,
+    "minimum_checkpoint_target_per_workload": 3
+  },
+  "pilot_selection": null,
+  "evaluation_horizons": [
+    80
+  ],
+  "planning_horizon": 180,
+  "evaluation_scope": "finite-window accrued and terminal proxy cost, not full-flow J; continuation generation and published forecasts retain original planning horizon180",
+  "stress_groups": 4,
+  "futures_per_group": 8,
+  "future_law": "offline unobserved tasks only: cancellation1/8, arrival jitter{-2,0,2} clipped to now+1, deadline shifted identically preserving slack; OD/ID/protected unchanged; positive-capacity directed witness required; forecasts/publication schedule unchanged",
+  "pairing": "each sample/group/draw tape shared by every action and pilot horizon; no action-dependent sampling",
+  "memoization": "successful full branch outcomes only; per-sample candidate ordinal + full future tape SHA + evaluation horizon, never cross-sample/action/owner; requests and actual calls remain separate",
+  "collection_budget": {
+    "calls": 300,
+    "work": 300000,
+    "wall_seconds": 300.0
+  },
+  "branch_budget": {
+    "calls": 100,
+    "work": 100000,
+    "wall_seconds": 60.0
+  },
+  "max_full_simulator_calls": 768,
+  "total_cpu_seconds": 2400.0,
+  "total_wall_seconds": 3600.0,
+  "simulator_call_cap_scope": "offline branch calls only; three collection episodes and three one-tick physical burn-in episodes reported separately",
+  "setup_budget": "existing make_workload executes one burn-in search per scene under its unchanged 30000-expansion bound; included in total CPU/wall, not instrumented collection/branch expansion sums",
+  "work_budget_boundary": "hard search-call cap; total work checked between queries and may overshoot by one original per-query3000 budget; no per-query limit shrink or wall cutoff within search",
+  "checkpoint": "live loaded-decision cursor including earlier same-tick admissions, slow phase, private remaining tape and opt-in owned replay cache; only offline branch changes future tape",
+  "branch_accounting": "fresh computation cap per branch; counters are instrumentation, not persistent physical policy state; existing inner generator/cache is never rebuilt",
+  "branch_evidence": "one exclusive gzip JSON file per executed branch containing full RolloutResult, search records and cache evidence; summary costs only for reached_horizon branches",
+  "denominators": "all actual attempts incl zero and absent role cells; every requested candidate/group/draw/window has completed/budget/failure/not-executed row; no failed rollout cost used as a complete label",
+  "training": "none; pilot resource results determine a later declared label horizon/budget before reading full labels"
+}

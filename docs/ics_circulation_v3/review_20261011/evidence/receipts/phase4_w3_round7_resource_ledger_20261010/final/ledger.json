@@ -1,0 +1,2267 @@
+{
+  "schema": "ics_round7_resource_ledger_v1",
+  "rows": [
+    {
+      "id": "label_prepare",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\protocol.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 5.78125,
+          "source_field": "preparation_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 5.914951699989615,
+      "counts": {},
+      "notes": [
+        "worker invocation includes setup, physical loop and serialization; loop CPU nested; pilot/formal repeated separately; no physical memo",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "label_historical_prepare",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\historical_preparation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 5.609375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 5.7415786999918055,
+      "counts": {
+        "actual_physical_calls": 0
+      },
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "coverage_prepare",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_coverage_20261010\\protocol.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 0.75,
+          "source_field": "prepare_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 0.7692453999770805,
+      "counts": {},
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "shadow_repaired_prepare",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\protocol.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 30.65625,
+          "source_field": "prepare_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 31.336806599982083,
+      "counts": {},
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "shadow_selection",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\selection.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.21875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.2374141000036616,
+      "counts": {},
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "terminal_screen_prepare",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\protocol.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.9375,
+          "source_field": "prepare_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.9861244999920018,
+      "counts": {},
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "terminal_screen_all2467_corpus",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\corpus.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 13.0,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 13.24357229997986,
+      "counts": {
+        "new_physical_calls": 0,
+        "new_generate_calls": 0,
+        "queries": 2467
+      },
+      "notes": [
+        "Read/SHA/decode and certificate function across all2467 saved queries; final serialization excluded.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "label_collection3",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\collection_run\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 147.296875,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.4375,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 74.7222414999851,
+      "counts": {
+        "planned_requests": 3,
+        "actual_physical_calls_recorded": 3,
+        "unknown_physical_call_statuses": 0,
+        "status_counts": {
+          "controller_quiescent": 3
+        }
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 834449408,
+        "peak_commit_bytes": 1531830272
+      }
+    },
+    {
+      "id": "label_normal5",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\normal_resume\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 148.421875,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 1.046875,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 43.507384399999864,
+      "counts": {
+        "planned_requests": 5,
+        "actual_physical_calls_recorded": 5,
+        "unknown_physical_call_statuses": 0,
+        "status_counts": {
+          "controller_quiescent": 5
+        }
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 742383616,
+        "peak_commit_bytes": 1442652160
+      }
+    },
+    {
+      "id": "label_pilot16",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\pilot\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 283.71875,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 1.09375,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 51.93129440001212,
+      "counts": {
+        "planned_requests": 16,
+        "actual_physical_calls_recorded": 16,
+        "unknown_physical_call_statuses": 0,
+        "status_counts": {
+          "controller_quiescent": 16
+        }
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 98299904,
+        "peak_commit_bytes": 792551424
+      }
+    },
+    {
+      "id": "label_historical48",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\old12\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 1198.578125,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.4375,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 214.6822947000037,
+      "counts": {
+        "planned_requests": 48,
+        "actual_physical_calls_recorded": 48,
+        "unknown_physical_call_statuses": 0,
+        "status_counts": {
+          "controller_quiescent": 48
+        }
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 384983040,
+        "peak_commit_bytes": 1079201792
+      }
+    },
+    {
+      "id": "label_formal692",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\full\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 10051.59375,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 2.109375,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1702.0977602999774,
+      "counts": {
+        "planned_requests": 692,
+        "actual_physical_calls_recorded": 692,
+        "unknown_physical_call_statuses": 0,
+        "status_counts": {
+          "controller_quiescent": 692
+        }
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 153178112,
+        "peak_commit_bytes": 847609856
+      }
+    },
+    {
+      "id": "coverage_collection27",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_coverage_20261010\\collections\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 1008.546875,
+          "source_field": "worker_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 0.328125,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 353.7654310000071,
+      "counts": {
+        "planned_cases": 27,
+        "physical_calls_recorded": 27,
+        "unknown_worker_resources": 0,
+        "truncated_queries": 93
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 917233664,
+        "peak_commit_bytes": 1612333056
+      }
+    },
+    {
+      "id": "coverage_pilot",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\pilot\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 5.078125,
+          "source_field": "worker_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 1.140625,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 4.287794300005771,
+      "counts": {
+        "planned_requests": 4,
+        "unknown_worker_resources": 0,
+        "new_simulation_branches": 0,
+        "memo_reuse": 0
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 0,
+        "peak_commit_bytes": 0
+      }
+    },
+    {
+      "id": "coverage_formal",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\formal\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 269.34375,
+          "source_field": "worker_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 1.25,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 94.03379659997881,
+      "counts": {
+        "planned_requests": 99,
+        "unknown_worker_resources": 0,
+        "new_simulation_branches": 0,
+        "memo_reuse": 0
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 0,
+        "peak_commit_bytes": 0
+      }
+    },
+    {
+      "id": "terminal_screen_pilot3",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\pilot\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 107.671875,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 2.5,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 58.61366810000618,
+      "counts": {
+        "planned_requests": 3,
+        "actual_physical_calls_recorded": 3,
+        "unknown_resource_cases": 0
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 843837440,
+        "peak_commit_bytes": 1540653056
+      }
+    },
+    {
+      "id": "terminal_screen_formal27",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\formal\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocation intervals",
+          "cpu_seconds": 839.890625,
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "coordinator interval",
+          "cpu_seconds": 2.65625,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 294.6061209999898,
+      "counts": {
+        "planned_requests": 27,
+        "actual_physical_calls_recorded": 27,
+        "unknown_resource_cases": 0
+      },
+      "notes": [
+        "Cycle/query/variant timings are nested and not added. Pilot and formal repeated identities are independent calls, no discount.",
+        "Nominal label collection and coverage collection overlap case identities but are separately executed.",
+        "Process-pool makespans overlap other runners and must not be added into global wall."
+      ],
+      "worker_lifetime_peak_memory_not_additive": {
+        "peak_working_set_bytes": 847769600,
+        "peak_commit_bytes": 1543610368
+      }
+    },
+    {
+      "id": "label_author_1",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_labels_authoring_20261010\\validation_attempts.json",
+      "status": "failed_tests",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "attempts.child_cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 3.0135688,
+      "counts": {
+        "tests": 7,
+        "passed": 5,
+        "failed": 2
+      },
+      "notes": [
+        "Tool wall only; child CPU unknown."
+      ]
+    },
+    {
+      "id": "label_author_2",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_labels_authoring_20261010\\validation_attempts.json",
+      "status": "failed_tests",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "attempts.child_cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 3.1613244,
+      "counts": {
+        "tests": 7,
+        "passed": 5,
+        "failed": 2
+      },
+      "notes": [
+        "Tool wall only; child CPU unknown."
+      ]
+    },
+    {
+      "id": "label_author_3",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_labels_authoring_20261010\\validation_attempts.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "attempts.child_cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 3.8793846,
+      "counts": {
+        "tests": 28,
+        "passed": 28,
+        "failed": 0
+      },
+      "notes": [
+        "Tool wall only; child CPU unknown."
+      ]
+    },
+    {
+      "id": "label_auxiliary_1",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_labels_authoring_20261010\\validation_attempts.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "diagnostic child",
+          "cpu_seconds": null,
+          "source_field": "auxiliary_diagnostics.cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.2813898,
+      "counts": {},
+      "notes": []
+    },
+    {
+      "id": "label_auxiliary_2",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_labels_authoring_20261010\\validation_attempts.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "diagnostic child",
+          "cpu_seconds": null,
+          "source_field": "auxiliary_diagnostics.cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.2911678,
+      "counts": {},
+      "notes": []
+    },
+    {
+      "id": "coverage_author_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation.json",
+      "status": "failed",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.90625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.9706258000223897,
+      "counts": {
+        "exit_code": 2
+      },
+      "notes": [
+        "In-process pytest interval after imports; lower bound excluding interpreter startup and final JSON serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ],
+      "failure_evidence": {
+        "exit_code": 2
+      }
+    },
+    {
+      "id": "coverage_author_validation_repaired.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation_repaired.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.28125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.4056621999770869,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "In-process pytest interval after imports; lower bound excluding interpreter startup and final JSON serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "coverage_author_validation_recovery_freeze.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation_recovery_freeze.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.65625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.7036974999937229,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "In-process pytest interval after imports; lower bound excluding interpreter startup and final JSON serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "coverage_author_unmetered_1",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "prior_unmetered_attempts.cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.4448135,
+      "counts": {
+        "tests": 7,
+        "passed": 7
+      },
+      "notes": []
+    },
+    {
+      "id": "coverage_author_unmetered_2",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "prior_unmetered_attempts.cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.1702418,
+      "counts": {
+        "tests": 20,
+        "passed": 20
+      },
+      "notes": []
+    },
+    {
+      "id": "coverage_recovery_author_failed_test",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\recovery_revision.json",
+      "status": "failed_test",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "author_validation_attempt.child_cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.3564129,
+      "counts": {
+        "tests": 24,
+        "passed": 23,
+        "failed": 1
+      },
+      "notes": [
+        "Existing altered-input test expected fail-fast ValueError, but broad variant exception retention returned a structured failure. Restored public input binding check before any shadow loop; later runtime failures still retain partial evidence."
+      ]
+    },
+    {
+      "id": "query_probe_author",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_probe_authoring_20261010\\initial.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.453125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.4664381000038702,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "Pytest host/import through hash verification; final serialization and external child CPU excluded.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "terminal_author_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.34375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.4913347999972757,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "In-process pytest interval after imports; final JSON serialization/bootstrap excluded; old842 suite is a separate earlier invocation.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "terminal_author_validation_snapshot_bound.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation_snapshot_bound.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.40625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.4189489999844227,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "In-process pytest interval after imports; final JSON serialization/bootstrap excluded; old842 suite is a separate earlier invocation.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "terminal_author_unmetered_1",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "prior_unmetered_attempts.cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.6555996,
+      "counts": {
+        "passed": 12
+      },
+      "notes": []
+    },
+    {
+      "id": "terminal_author_unmetered_2",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "prior_unmetered_attempts.cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.6326448,
+      "counts": {
+        "passed": 14
+      },
+      "notes": []
+    },
+    {
+      "id": "terminal_author_unmetered_3",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "prior_unmetered_attempts.cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.7993909,
+      "counts": {
+        "passed": 33
+      },
+      "notes": []
+    },
+    {
+      "id": "terminal_author_unmetered_4",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "prior_unmetered_attempts.cpu_seconds",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.101779,
+      "counts": {
+        "passed": 35
+      },
+      "notes": []
+    },
+    {
+      "id": "search_census_initial_failed",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_search_census_20261010\\census.json",
+      "status": "failed",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 80.171875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 81.69543449999765,
+      "counts": {
+        "checks": 2993,
+        "failed_checks": 28,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Pure-file full54 read/hash/query-opportunity binding and summarization; excludes final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ],
+      "failure_evidence": {
+        "failed_checks": 28,
+        "failures": [
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error00__old32",
+            "query": 13,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error00__old32",
+            "query": 72,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error00__same_zone32plus32",
+            "query": 13,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error00__same_zone32plus32",
+            "query": 143,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error01__old32",
+            "query": 12,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error01__same_zone32plus32",
+            "query": 12,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error03__old32",
+            "query": 71,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error03__same_zone32plus32",
+            "query": 147,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error04__old32",
+            "query": 38,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error05__old32",
+            "query": 70,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error05__same_zone32plus32",
+            "query": 146,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__error07__old32",
+            "query": 71,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__nominal__old32",
+            "query": 71,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "counterflow__nominal__same_zone32plus32",
+            "query": 143,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "cross_cycle__error01__old32",
+            "query": 52,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "cross_cycle__error01__same_zone32plus32",
+            "query": 52,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error01__old32",
+            "query": 73,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error01__same_zone32plus32",
+            "query": 73,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error03__old32",
+            "query": 72,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error03__same_zone32plus32",
+            "query": 72,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error05__old32",
+            "query": 73,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error05__same_zone32plus32",
+            "query": 74,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error06__old32",
+            "query": 75,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error06__same_zone32plus32",
+            "query": 75,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error07__old32",
+            "query": 75,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__error07__same_zone32plus32",
+            "query": 75,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__nominal__old32",
+            "query": 73,
+            "okay": false
+          },
+          {
+            "kind": "loaded_query_opportunity_binding",
+            "case": "near_full__nominal__same_zone32plus32",
+            "query": 73,
+            "okay": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "search_census_repaired",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_search_census_20261010\\census_repaired.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 0.421875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 0.4207635999773629,
+      "counts": {
+        "checks": 2885,
+        "failed_checks": 0,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Pure-file correction of already extracted query bindings and raw SHA revalidation; no repeated generation or simulation. Prior failed analyzer is separate CPU.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "immutable_observation_supplement3",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\supplement\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "3 independent worker intervals",
+          "cpu_seconds": 91.671875,
+          "source_field": "case_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        },
+        {
+          "scope": "parent interval",
+          "cpu_seconds": 0.296875,
+          "source_field": "parent_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 47.68355019998853,
+      "counts": {
+        "new_physical_calls": 3,
+        "all_passed": true
+      },
+      "notes": [
+        "New3 nominal physical invocations; separate from prior label3 and coverage27, no identity reuse discount."
+      ]
+    },
+    {
+      "id": "immutable_observation_author",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.21875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.2413539999979548,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "direct pytest invocation including fixture simulations",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "immutable_observation_author_initial_failure",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\initial_test_failure.json",
+      "status": "failed_tests",
+      "cpu_components": [
+        {
+          "scope": "pytest child",
+          "cpu_seconds": null,
+          "source_field": "unrecorded CPU",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.1432736,
+      "counts": {},
+      "notes": [
+        "{'tests': 3, 'passed': 2, 'failed': 1, 'failed_test': 'test_live_ticks_remain_instantaneous_and_do_not_change_execution', 'failure': 'test incorrectly expected load_times <= row time; advance(t) exposes after events but before load decisions at t; corrected < and direct per-tick snapshot equality', 'source_module_unchanged_by_repair': True, 'cpu_seconds': None, 'wall_seconds': 2.1432736, 'scope': 'authoring unit tests, no formal original-graph simulation'}"
+      ]
+    },
+    {
+      "id": "root_matched_value_analysis",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\results\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure artifact analysis",
+          "cpu_seconds": 213.640625,
+          "source_field": "resources.analysis_cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 215.53421979999985,
+      "counts": {},
+      "notes": [
+        "pure artifact analysis; no simulation",
+        "Explicit direct analysis clock; label outcome metrics are nested metadata."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\collection_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\collection_artifact_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 59.84375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 61.23753809998743,
+      "counts": {
+        "checks": 12130,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Pure file/pickle structural audit through final rehash; report serialization/bootstrap excluded.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\focused_extended_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\focused_extended_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 2.125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.348790700023528,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "Independent focused pytest process interval, excluding report serialization/bootstrap; no batch physics.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\focused_initial_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\focused_initial_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.96875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 2.154521999997087,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "Independent focused pytest process interval, excluding report serialization/bootstrap; no batch physics.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\full_artifact_audit_v2.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_artifact_audit_v2.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 188.15625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 189.96469019999495,
+      "counts": {
+        "checks": 35805,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Pure file audit through final rehash; final serialization/bootstrap excluded. No physical replay.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\full_validation\\result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_validation\\result.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 111.171875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 112.87721619999502,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "one process pytest invocation; total cpu includes snapshots and binding, test CPU is nested",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\full_validation_terminal\\result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_validation_terminal\\result.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 101.921875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 103.25358649998088,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "one process pytest invocation; total cpu includes snapshots and binding, test CPU is nested",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\initial_binding.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\initial_binding.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 0.0625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 0.06296670000301674,
+      "counts": {
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Read and SHA binding only; output serialization/host bootstrap excluded.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\instant_observation_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\instant_observation_artifact_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 7.59375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 7.6719052999978885,
+      "counts": {
+        "checks": 8101,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\normal_resume_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\normal_resume_artifact_audit.json",
+      "status": "failed",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 9.765625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 9.912284499994712,
+      "counts": {
+        "checks": 2408,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Pure file audit through final rehash; final serialization/bootstrap excluded. No physical replay.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ],
+      "failure_evidence": {
+        "errors": [
+          "near_full_d0000_normal:invariant check trace count",
+          "near_full_d0000_normal:all result fields with only explicit tick-tail and one-selector adjustment",
+          "cross_cycle_d0000_normal:invariant check trace count",
+          "cross_cycle_d0000_normal:all result fields with only explicit tick-tail and one-selector adjustment",
+          "near_full_d0001_normal:invariant check trace count",
+          "near_full_d0001_normal:all result fields with only explicit tick-tail and one-selector adjustment",
+          "counterflow_d0000_normal:invariant check trace count",
+          "counterflow_d0000_normal:all result fields with only explicit tick-tail and one-selector adjustment",
+          "counterflow_d0001_normal:invariant check trace count",
+          "counterflow_d0001_normal:all result fields with only explicit tick-tail and one-selector adjustment"
+        ]
+      }
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\normal_resume_artifact_audit_v2.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\normal_resume_artifact_audit_v2.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 9.8125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 9.983799100009492,
+      "counts": {
+        "checks": 2408,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Pure file audit through final rehash; final serialization/bootstrap excluded. No physical replay.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\old12_artifact_audit_v2.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\old12_artifact_audit_v2.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 35.140625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 35.49808020002092,
+      "counts": {
+        "checks": 4522,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Pure file audit through final rehash; final serialization/bootstrap excluded. No physical replay.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\pilot_artifact_audit_v2.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\pilot_artifact_audit_v2.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 13.53125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 13.667092700023204,
+      "counts": {
+        "checks": 2900,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Pure file audit through final rehash; final serialization/bootstrap excluded. No physical replay.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\query_coverage_formal_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\query_coverage_formal_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 63.21875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 63.875842300010845,
+      "counts": {
+        "checks": 20351,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Bind and rehash prior complete independent27/2467 query audit; independently inspect all99 formal shadow options and rerun pure ExecutionValidator only. No prior collection re-parsing or new search.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\query_coverage_pilot_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\query_coverage_pilot_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 208.015625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 210.27590799998143,
+      "counts": {
+        "checks": 42257,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Read all captured query inputs and all selected probe raw options; independently rerun pure ExecutionValidator only. Frozen compatible tick projections are not instantaneous ledgers.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\terminal_corpus_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_corpus_artifact_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 62.65625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 63.385857099987334,
+      "counts": {
+        "checks": 25658,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Independent half-open owner-set interval sweep on all2467 saved public queries, exact original pool digests retained for subsequent deployment audit. Proof is scoped to current Snapshot/H full witnesses; no future business infeasibility or CPU speedup claim.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\terminal_formal_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_formal_artifact_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 74.953125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 76.31979750000755,
+      "counts": {
+        "checks": 29158,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\terminal_pilot_artifact_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_pilot_artifact_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 39.359375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 39.72686809999868,
+      "counts": {
+        "checks": 13119,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\terminal_screen_binding_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_screen_binding_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 0.671875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 0.715693200007081,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "20 independent tiny-state proof/binding/failure tests after full Snapshot hash addition; no original network simulation",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\terminal_screen_validation.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_screen_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 0.671875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 0.6868427000008523,
+      "counts": {
+        "exit_code": 0
+      },
+      "notes": [
+        "Independent tiny-state terminal proof edge-case and fault tests; no original network simulation",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_independent_review_20261010\\value_aggregation_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\value_aggregation_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 25.859375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 26.461243300000206,
+      "counts": {
+        "checks": 3633,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "All692 costs reused from independent primary raw audit; all174 extracted service delta vectors and every scene/role aggregation recomputed. Raw service vectors additionally checked at six feature-selected states and all48 historical branches. Remaining alternative-vector extraction reviewed in bound analyze.py, not independently reparsed a second time.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_query_coverage_analysis_20261010\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_analysis_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.84375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.8855321999872103,
+      "counts": {
+        "checks": 1195,
+        "new_physical_simulations": 0
+      },
+      "notes": [
+        "Saved-file read/hash/comparison interval; final serialization excluded. Embedded worker/search CPU is nested and not added.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_query_coverage_analysis_20261010\\local_yield_trace.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_analysis_20261010\\local_yield_trace.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.046875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.063113100011833,
+      "counts": {
+        "new_physical_simulations": 0,
+        "new_search_invocations": 12
+      },
+      "notes": [
+        "Read/hash and transparent baseline search instrumentation; nested per-query clocks excluded from addition, final serialization excluded.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_terminal_analysis_20261010\\analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_analysis_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 0.03125,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 0.03892459999769926,
+      "counts": {
+        "checks": 73,
+        "new_physical_calls": 0,
+        "new_generate_calls": 0
+      },
+      "notes": [
+        "Saved summary comparison. Independent audit separately checks every raw query/snapshot/candidate/physical record.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_value_analysis_20261010\\historical_mechanisms\\mechanisms.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\historical_mechanisms\\mechanisms.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 10.9375,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 11.096698399982415,
+      "counts": {},
+      "notes": [
+        "pure saved-artifact analysis, no new simulator calls",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round7_value_analysis_20261010\\visuals\\manifest.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\visuals\\manifest.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 1.671875,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 1.764240399992559,
+      "counts": {},
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_labels_20261010\\independent_choice_check\\result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\independent_choice_check\\result.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 150.5,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 152.2221819999977,
+      "counts": {
+        "physical_simulations": 0
+      },
+      "notes": [
+        "Timing excludes unasserted bootstrap/final serialization.",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_labels_20261010\\independent_choice_check\\service_ties_result.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\independent_choice_check\\service_ties_result.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 30.890625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 31.30329310000525,
+      "counts": {
+        "physical_simulations": 0
+      },
+      "notes": [
+        "offline same-tape single-deviation service Pareto evidence; not a causal online selection rule, service guarantee or additive episode saving",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_labels_20261010\\summary_authoring_receipt.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\summary_authoring_receipt.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "direct measured interval",
+          "cpu_seconds": 0.015625,
+          "source_field": "cpu_seconds",
+          "quality": "measured_interval_lower_bound"
+        }
+      ],
+      "wall_seconds_individual_scope": 0.0287151999946218,
+      "counts": {
+        "physical_simulations": 0
+      },
+      "notes": [
+        "write_summary function through resource JSON and Markdown writes; imports and this receipt write excluded",
+        "Embedded prior/worker/cycle CPU is metadata, not another invocation. Zero measured CPU is timer resolution, not proof of no work."
+      ]
+    },
+    {
+      "id": "unmetered_auxiliary",
+      "source": null,
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "edits, shell/tool bootstrap, inspections, polling, docs and unmeasured support",
+          "cpu_seconds": null,
+          "source_field": "author disclosure",
+          "quality": "unknown"
+        }
+      ],
+      "wall_seconds_individual_scope": null,
+      "counts": {},
+      "notes": [
+        "No original-network physical run inferred from inspections; unmeasured CPU is not zero. Source snapshots/manifests are artifacts, not duplicate invocations."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "label_collection3",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "label_collection3",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "label_normal5",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "label_normal5",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "label_pilot16",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "label_pilot16",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "label_historical48",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "label_historical48",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "label_formal692",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "label_formal692",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "coverage_collection27",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "coverage_collection27",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "coverage_pilot",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "coverage_pilot",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "coverage_formal",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "coverage_formal",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "terminal_screen_pilot3",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "terminal_screen_pilot3",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "terminal_screen_formal27",
+      "kind": "cpu_sum",
+      "okay": true
+    },
+    {
+      "id": "terminal_screen_formal27",
+      "kind": "denominator",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\protocol.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\historical_preparation.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_coverage_20261010\\protocol.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\protocol.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\selection.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\protocol.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\corpus.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\collection_run\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\normal_resume\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\pilot\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\old12\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\full\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_coverage_20261010\\collections\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\pilot\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\formal\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\pilot\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\formal\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_labels_authoring_20261010\\validation_attempts.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation_repaired.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation_recovery_freeze.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\recovery_revision.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_probe_authoring_20261010\\initial.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation_snapshot_bound.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_search_census_20261010\\census.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_search_census_20261010\\census_repaired.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\supplement\\summary.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\validation.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\initial_test_failure.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\results\\analysis.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\collection_artifact_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\focused_extended_validation.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\focused_initial_validation.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_artifact_audit_v2.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_validation\\result.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_validation_terminal\\result.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\initial_binding.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\instant_observation_artifact_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\normal_resume_artifact_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\normal_resume_artifact_audit_v2.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\old12_artifact_audit_v2.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\pilot_artifact_audit_v2.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\query_coverage_formal_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\query_coverage_pilot_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_corpus_artifact_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_formal_artifact_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_pilot_artifact_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_screen_binding_validation.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_screen_validation.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\value_aggregation_audit.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_analysis_20261010\\analysis.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_analysis_20261010\\local_yield_trace.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_analysis_20261010\\analysis.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\historical_mechanisms\\mechanisms.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\visuals\\manifest.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\independent_choice_check\\result.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\independent_choice_check\\service_ties_result.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    },
+    {
+      "id": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\summary_authoring_receipt.json",
+      "kind": "evidence_unchanged",
+      "okay": true
+    }
+  ],
+  "failed_checks": 0,
+  "bound_evidence_sha256": {
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\protocol.json": "4123c86c4dc381724351a6ccd453d2fab9fe9f5f0de4090c5446e9223fec2e58",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\historical_preparation.json": "f88b322d0ebb1119b0e81585913ae7d06b6c33172be1993734e445aed824190a",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_coverage_20261010\\protocol.json": "892f39e5445f652c38087a36c2cce1e07f347e5a14586024c535ed7d483a1622",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\protocol.json": "03caa1f704af6e7d3553d5e2c14be7a7306926e970afff625402939435e22673",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\selection.json": "536627bf34340eb4e05eb06ccbe6434439b4282db83ffd099800de1e8e978f84",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\protocol.json": "ee7653209dea0ad55a4e696db163c1e4a79a079e888a6d7c08d0efaf5b969f26",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\corpus.json": "ea4930ac36d4db31c733d70cee9089b4c66d4625639cc2d83e6dcfe1ab83d825",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\collection_run\\summary.json": "cc3e55d1218fc2e7c5191b691c96c4155c1c0730de9519e7afa4b0b6b1d71b8b",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\normal_resume\\summary.json": "ada49e3e871f1984967909c6da964de9564ba53a5d3b2a4cfc471ca063a8758f",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\pilot\\summary.json": "31cf9b8fa5e924238be39fab97766115b78b7502efcd653bde6320a31125843f",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\old12\\summary.json": "e4ef76b973bfdbcd6351e696dab0444bc182bff000266f57f78c0c8db7afb4c6",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\full\\summary.json": "fdc579af5776f31ab0d386f0d82bcb8281aff0426f5b72466900eeb240d5802b",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_coverage_20261010\\collections\\summary.json": "62d8a2d5c42707d415edc70fb001e54a2c345f48289cf2bc21d1e792786cdc91",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\pilot\\summary.json": "79888a1ccea704a8122edea65a51e4bdd1775cc857b58b6c2afa641244eff2d2",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_query_shadow_20261010\\formal\\summary.json": "6aac2ebc4071a2e315339c421ed2adb0c9d47e8858fa74aafdf34e3341191179",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\pilot\\summary.json": "6d93d3b87709d76a45a0fd45cd7852580bf87b5cc2f2461abbd83396fb82fe57",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_terminal_capacity_screen_20261010\\formal\\summary.json": "ad39529e50db05d7e314994f8606abfcf438ff5890447e65cbcaa19f09c3e9ff",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_labels_authoring_20261010\\validation_attempts.json": "0a9219cb46379ae218b92cf0e84fa8ef1d0a9cbd8bfc8b66d52c55fe6c467c0a",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation.json": "f9e75a39d4bdad51768046906a1a22a7823a21e739c19cb9da29c857244a402b",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation_repaired.json": "c24917325c6b04688795a2f4bc96b66174f8b1661bc5db26530567af44dee525",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\validation_recovery_freeze.json": "5f65bd92cabfd0fe3b33249aa723a75fda2d7df3b532587ce598c915ae743400",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_authoring_20261010\\recovery_revision.json": "304949e3a6ce5f866eb7e2142e5e9d5451108e439af871f9ee7dff5cc7489635",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_probe_authoring_20261010\\initial.json": "a63bd90563cc9a586778668c072f351ab80b415aebcdd97e44a79d91e2f351e3",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation.json": "a245aaa72181a176a5851bc190e8fb926ae9685f9e2abcae368bef46ad481141",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_authoring_20261010\\validation_snapshot_bound.json": "1ba570b90a0c9385fe44b2bdc06603866ea5aa1330bc7ddcc42385d713ea3c78",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_search_census_20261010\\census.json": "a404a21abb025134f4c20fb45fb786140dbd84de5095a0fb78b3d0d8d4157395",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_search_census_20261010\\census_repaired.json": "9fc8e2cff0e1b11ca1811b104f9d98d40ab48f25ddbb47d73dd75b06e7aefdfe",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\supplement\\summary.json": "b05f6d6048fd4788ada3ddb6765367963ad0e01c0b2790be2c4922a3228354f0",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\validation.json": "cf8be47988ced39917830fe1bcde608eb218a59dea5676a34894fe92e58da3b8",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_physical_observation_20261010\\initial_test_failure.json": "112d75ccedee714130daa6feb600ac7c0b164c2ac9fce83ddc58c996879a9b4d",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\results\\analysis.json": "6a06b3325be1f7070630a9a61c15dd8d84c4fb6639cd1f2d471f2a5377188339",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\collection_artifact_audit.json": "d45573c257de783ffbbb536348223d7d6f45248d7ff335622471c0522dc0238c",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\focused_extended_validation.json": "7476e84c01243158231292138e4661400785e8fadeb16ade9122c68f1d6c0d68",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\focused_initial_validation.json": "b523799389e09e066263cedf0201db03de4104dda1c5ef2cef38d38268f8d54e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_artifact_audit_v2.json": "1969bb442e76a3cdc976dc9d51d29d6270a94753d7a1bc7f4988debb0139bf96",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_validation\\result.json": "69aeb44c4290dc47016ba52ed52a541ecd1fee0935904b3ae767ca66d2b97c27",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\full_validation_terminal\\result.json": "1afc58d79c518b8ca04c406d907d2ae88bf05bb70dafdbca0467b5bc2b3410e6",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\initial_binding.json": "6d18698bde903c821bc1b508889435dd9bb7f85273fc92b8e0c1eee4eb62c095",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\instant_observation_artifact_audit.json": "dbabfda51d6f2e5d896092742d17fe05b84115868655fd90fd6a268b3eb7c5aa",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\normal_resume_artifact_audit.json": "a9b41b903d28bde1dfc98bb21f8e32a3bcd52468bf48b7402577a6dac8127920",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\normal_resume_artifact_audit_v2.json": "880b07c1b12d5929749aee54cdbde92f728586da407751a817d58953408f6b23",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\old12_artifact_audit_v2.json": "ad5e010381d3d8c3c31c5a17939d133c32dcbfa1c8650de6d254fc1b93fe775e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\pilot_artifact_audit_v2.json": "d1109f7906a10b2d9c5ab01413932c426817a5c9e18438e762a63ff99b56a2a7",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\query_coverage_formal_audit.json": "e25a807a193be5d5b4663b56e1722876ec7ff553aeb3b6217f24425d8b7dee28",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\query_coverage_pilot_audit.json": "fc4a4d56077fb7fa489dec9c692ef20918ed0abcdbaaad5728af14c3cce69ed9",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_corpus_artifact_audit.json": "7bed6ed23147ed614ed768330175fd000525340b823d6068ea281a218442dd07",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_formal_artifact_audit.json": "76b85a167db937ce4b8e9e0e5e18e8911ca1e1b4cf14fbbfcd3b0195c3961e14",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_pilot_artifact_audit.json": "13bebd215b23e480dc890e8078cd7bb0330cc188c57ea19437f440f639b3083c",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_screen_binding_validation.json": "0d2c6d3b182ca818f53196d22491cc89aaa48f67feb768a038311234e22575c5",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\terminal_screen_validation.json": "dba3d8ed00185e47432b1f4d3931c7a3520ebb62c9a330ac0292c069d37170dc",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_independent_review_20261010\\value_aggregation_audit.json": "c926ffae93424fe3bcf7e2934118bafffd371478c786bd08dddfccd4eaa14f06",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_analysis_20261010\\analysis.json": "db04d92464cf10e4590196b8d0d91538510acfd5983f9efb70ca3a55eb97e688",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_query_coverage_analysis_20261010\\local_yield_trace.json": "e0e86bf4705535e6839b23f07a41a05a4db55bb6dc0878cb54c240f074bb1f7f",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_terminal_analysis_20261010\\analysis.json": "a8894e13926cc889f0702a55d7f2f8cdc5c0398f495464e50fe71bb48ee0a5e1",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\historical_mechanisms\\mechanisms.json": "47a13e1bd5fc0816ae8cf52e213039b7da2ecacbf3cd18c451d2294679d81f24",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round7_value_analysis_20261010\\visuals\\manifest.json": "2f57a7a90ebf6bb06abebf2e7f13cc7798c88592967f4aca6f183cdcd45c93f7",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\independent_choice_check\\result.json": "3e95311f3b06a83c40d8572703f594cbf81fcea49ec785b4a3e8e721419933d4",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\independent_choice_check\\service_ties_result.json": "1091ef6aa926a58c67800307ef426657a12c6e4493f9c62e5f029f2e3abfe8ae",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_labels_20261010\\summary_authoring_receipt.json": "95e5b67d3c3f824771037cae7cd5687df69bf94ce333566a477d7c8ba9b425ca"
+  },
+  "pending": [],
+  "known_nonoverlapping_cpu_seconds_lower_bound": 15742.0,
+  "unknown_cpu_components": 14,
+  "whole_round_cpu_completely_measured": false,
+  "global_wall_makespan_seconds": null,
+  "reason": "Measured disjoint CPU intervals add; concurrent wall, worker lifetime memory, branch/query nested work and caps do not.",
+  "source_sha256": "db74bf24ee4d4ec7cab57a0b9490d362005c8a6e993ff324bae19f8d1211567a",
+  "ledger_cpu_seconds": 0.515625,
+  "ledger_wall_seconds": 0.5469980000052601,
+  "ledger_scope": "Own read/hash/aggregation interval excluded from totals; final serialization excluded; no new searches or simulation."
+}

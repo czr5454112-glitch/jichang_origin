@@ -1,0 +1,353 @@
+{
+  "metrics": {
+    "name": "explicit_budget_failure",
+    "status": "work_budget_exhausted",
+    "complete": false,
+    "cost": 24.0,
+    "lower_bound": null,
+    "gap": null,
+    "work_used": 20,
+    "scheduled_bags": 2,
+    "completed": 0,
+    "source_protection_contract": "module_only",
+    "atomic_bundles": true,
+    "wall_seconds": 0.006881900000735186,
+    "process_cpu_seconds": 0.0
+  },
+  "initial": {
+    "now": 0,
+    "network": {
+      "nodes": {
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "A",
+          "control_partition": "A",
+          "capacity": 2,
+          "can_wait": true
+        },
+        "B": {
+          "node_id": "B",
+          "logistics_zone": "B",
+          "control_partition": "B",
+          "capacity": 2,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "AB": {
+          "edge_id": "AB",
+          "source": "A",
+          "target": "B",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "BA": {
+          "edge_id": "BA",
+          "source": "B",
+          "target": "A",
+          "travel_time": 1,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "tray": {
+        "tray_id": "tray",
+        "node": "A",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 0
+      }
+    },
+    "bags": {},
+    "reservations": [],
+    "version": 0,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 0,
+      "hold_by_node": {},
+      "export_min_stock": 0,
+      "reception_capacity": 1
+    },
+    "plans": {},
+    "completed": {},
+    "load_times": {},
+    "empty_targets": {},
+    "conditional_forecasts": {},
+    "forecast_history": [],
+    "replaceable_trays": []
+  },
+  "published_forecasts": [
+    {
+      "forecast_id": "away",
+      "node": "B",
+      "destination": "A",
+      "at": 1,
+      "deadline": 8,
+      "count": 1,
+      "published_at": 0,
+      "unit_ids": []
+    },
+    {
+      "forecast_id": "home",
+      "node": "A",
+      "destination": "B",
+      "at": 3,
+      "deadline": 8,
+      "count": 1,
+      "published_at": 0,
+      "unit_ids": []
+    }
+  ],
+  "future_tape_offline_oracle_only": [
+    {
+      "bag_id": "away:0",
+      "origin": "B",
+      "destination": "A",
+      "arrival": 1,
+      "deadline": 8,
+      "protected": false
+    },
+    {
+      "bag_id": "home:0",
+      "origin": "A",
+      "destination": "B",
+      "arrival": 3,
+      "deadline": 8,
+      "protected": false
+    }
+  ],
+  "search": {
+    "status": "work_budget_exhausted",
+    "complete": false,
+    "total_cost": 24.0,
+    "lower_bound": null,
+    "gap": null,
+    "first_bundles": [],
+    "schedule": [],
+    "cost_components": {
+      "tray_wait": 4.0,
+      "nonprotected_tardiness": 0.0,
+      "empty_distance": 0.0,
+      "terminal_backlog": 2.0,
+      "terminal_inflight": 0.0
+    },
+    "diagnostics": {
+      "domain": {
+        "horizon": 5,
+        "route_tail_ticks": 0,
+        "expansion_limit": 20,
+        "deadline_ms": null,
+        "atomic_bundles": true,
+        "source_protection_contract": "module_only",
+        "guard_max_forecast_age": 60
+      },
+      "route_mode": "whole_route",
+      "control_mode": "external",
+      "permission_domain": "atomic_new_commit_bundles",
+      "domain_description": "all eligible tray subsets, Cartesian products of positive-time walks/integer departures, all same-tick bundle orders, at most one commitment per tray per tick, immutable old plans",
+      "proposal_relaxation": "only other selected eligible members removed from private member view; actual owner state checked atomically",
+      "source_protection_contract": "module_only",
+      "source_protection": "fixed-module cumulative export floor and FIFO; optional shared_forecast_prefix adds greedy first-known-supply source zone/node prefixes, aggregate outgoing peers removed, no credit for same-bundle new inflow or uncommitted reuse",
+      "guard_published_forecasts_sha256": "7fd24aa7794db224191bbdf65f481abbc8da071864ca8640eacc496bad786366",
+      "bound_rule": "accrued wait, empty travel, nonprotected tardiness; no decreasing terminal penalties",
+      "anytime_strategy": "independent idle/warm/reactive incumbents plus exact-phase reactive completion of initial-tick prefixes; all search and seed work charged to shared expansion counter",
+      "budget_scope": "named work units, not primitive operations; forecast projection and final incumbent reconstruction are included in controller wall/CPU timing but outside search expansion counter; cooperative deadline cannot interrupt one validator call",
+      "incumbent_reconstruction_ms": 0.229199999012053,
+      "incumbent_reconstruction_bundle_count": 0,
+      "input_sha256": "b65acec7813433e54216305edebee4b42464afd8c8be5a5118cb2094b00d47bb",
+      "declared_future_sha256": "c25a186d836a699ae51b17b634cf6a2698a237d7400af40f9c9c6079e70b803a",
+      "work_used": 20,
+      "work_counts": {
+        "idle_seed_tick": 5,
+        "warm_seed_tick": 5,
+        "completion_seed_tick": 1,
+        "route_preprocessing_edges": 2,
+        "route_reverse_labels": 2,
+        "route_time_labels": 1,
+        "integer_transitions": 4
+      },
+      "admissibly_pruned_states": 0,
+      "illegal_no_wait_tick_branches": 0,
+      "elapsed_ms": 5.19229999918025,
+      "gap_unknown_if_incomplete": true,
+      "incumbent_completed": {},
+      "incumbent_uncompleted": [
+        "away:0",
+        "home:0"
+      ]
+    }
+  },
+  "independent_replay": {
+    "cost_components": {
+      "tray_wait": 4.0,
+      "nonprotected_tardiness": 0.0,
+      "empty_distance": 0.0,
+      "terminal_backlog": 2.0,
+      "terminal_inflight": 0.0
+    },
+    "total_cost": 24.0,
+    "completed": {},
+    "waiting_bag_ids": [
+      "away:0"
+    ],
+    "uncompleted_bag_ids": [
+      "away:0",
+      "home:0"
+    ],
+    "final_trays": {
+      "tray": {
+        "tray_id": "tray",
+        "node": "A",
+        "mode": "loaded",
+        "bag_id": "home:0",
+        "available_at": 0
+      }
+    },
+    "trace": [
+      {
+        "time": 0,
+        "event": "initial"
+      },
+      {
+        "time": 0,
+        "event": "tick"
+      },
+      {
+        "time": 1,
+        "event": "bag_arrival",
+        "bag_id": "away:0"
+      },
+      {
+        "time": 1,
+        "event": "tick"
+      },
+      {
+        "time": 2,
+        "event": "tick"
+      },
+      {
+        "time": 3,
+        "event": "bag_arrival",
+        "bag_id": "home:0"
+      },
+      {
+        "time": 3,
+        "event": "load",
+        "bag_id": "home:0",
+        "tray_id": "tray"
+      },
+      {
+        "time": 3,
+        "event": "tick"
+      },
+      {
+        "time": 4,
+        "event": "tick"
+      },
+      {
+        "time": 5,
+        "event": "tick"
+      }
+    ],
+    "invariant_checks": 10,
+    "final_snapshot": {
+      "now": 5,
+      "network": {
+        "nodes": {
+          "A": {
+            "node_id": "A",
+            "logistics_zone": "A",
+            "control_partition": "A",
+            "capacity": 2,
+            "can_wait": true
+          },
+          "B": {
+            "node_id": "B",
+            "logistics_zone": "B",
+            "control_partition": "B",
+            "capacity": 2,
+            "can_wait": true
+          }
+        },
+        "edges": {
+          "AB": {
+            "edge_id": "AB",
+            "source": "A",
+            "target": "B",
+            "travel_time": 1,
+            "capacity": 1
+          },
+          "BA": {
+            "edge_id": "BA",
+            "source": "B",
+            "target": "A",
+            "travel_time": 1,
+            "capacity": 1
+          }
+        }
+      },
+      "trays": {
+        "tray": {
+          "tray_id": "tray",
+          "node": "A",
+          "mode": "loaded",
+          "bag_id": "home:0",
+          "available_at": 0
+        }
+      },
+      "bags": {
+        "away:0": {
+          "bag_id": "away:0",
+          "origin": "B",
+          "destination": "A",
+          "arrival": 1,
+          "deadline": 8,
+          "protected": false
+        },
+        "home:0": {
+          "bag_id": "home:0",
+          "origin": "A",
+          "destination": "B",
+          "arrival": 3,
+          "deadline": 8,
+          "protected": false
+        }
+      },
+      "reservations": [],
+      "version": 8,
+      "old_in_transit": [],
+      "module": {
+        "unload_ticks": 0,
+        "hold_by_node": {},
+        "export_min_stock": 0,
+        "reception_capacity": 1
+      },
+      "plans": {},
+      "completed": {},
+      "load_times": {
+        "home:0": 3
+      },
+      "empty_targets": {},
+      "conditional_forecasts": {},
+      "forecast_history": [],
+      "replaceable_trays": []
+    },
+    "policy_stats": {
+      "generation_calls": 0.0,
+      "generation_ms": 0.0,
+      "selection_calls": 0.0,
+      "selection_ms": 0.0,
+      "slow_calls": 0.0,
+      "slow_ms": 0.0,
+      "candidate_count": 0.0,
+      "route_commits": 0.0,
+      "slow_commits": 0.0,
+      "generation_no_candidates": 0.0,
+      "generation_no_authorized_candidates": 0.0,
+      "commit_rejections": 0.0,
+      "protected_unadmitted_decisions": 0.0,
+      "protected_commits": 0.0
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "stage": "init_preflight",
+  "physical_branches": 0,
+  "output_directory_created": false,
+  "error": "ValueError: historical destination sample denominator differs from predeclared 208/24",
+  "diagnosis": "All 208 samples are present but only 22 of the 24 archived owners have destination samples; two empty owners must be preserved rather than rejected or fabricated.",
+  "empty_owners": [
+    "stream_L2_D3_slack0__physical31__paired_direct_seed43",
+    "stream_L4_D3_slack0__physical31__residual_seed17"
+  ],
+  "correction": "Keep exact 208-sample denominator, validate all 24 original immutable units, record zero-sample owner units explicitly."
+}

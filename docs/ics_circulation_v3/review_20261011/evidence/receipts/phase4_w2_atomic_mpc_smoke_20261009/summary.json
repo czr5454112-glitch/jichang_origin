@@ -1,0 +1,101 @@
+{
+  "source_sha256": {
+    "run_joint_atomic_mpc_comparison.py": "df27cbb1073ec9baf55334879497f7d42ecf1f357c29364069af23438592d170",
+    "joint_bundle_reference.py": "615072aac2d6e4ab857278ba0ac8cb5e092e6f2119a8b60ff1b4cd04d6f3f978",
+    "joint_reference.py": "456a865c5d49b6f272c565072968c6629d1bffdb0b365ac835001142b3a20e1e",
+    "joint_transactions.py": "67d69a5fc106aefb81c1c46457515970270e6fd8379391d528f797d6c43ad430",
+    "feedback_scenarios.py": "192081752f5e6f15bea441e8adcd6e3751909eae2fd37c70c6f22b39f8807caf",
+    "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3"
+  },
+  "metrics": [
+    {
+      "scene": "L2_D1_T0_matched",
+      "condition": "matched",
+      "status": "completed_run",
+      "work_budget": 5000,
+      "atomic_bundles": false,
+      "source_protection_contract": "module_only",
+      "planning_horizon": 20,
+      "route_tail_ticks": 3,
+      "scheduled_bags": 2,
+      "completed": 2,
+      "uncompleted": [],
+      "cost_components": {
+        "tray_wait": 0.0,
+        "nonprotected_tardiness": 0.0,
+        "empty_distance": 4.0,
+        "terminal_backlog": 0.0,
+        "terminal_inflight": 0.0
+      },
+      "total_cost": 0.4,
+      "solver_calls": 32,
+      "solver_statuses": {
+        "work_budget_exhausted": 1,
+        "finite_sequential_domain_optimal": 31
+      },
+      "unknown_gap_calls": 1,
+      "no_joint_search_calls": 0,
+      "total_work": 7052,
+      "multi_tray_commits": 0,
+      "commit_rejections": 0,
+      "local_failure_count": 0,
+      "wall_seconds": 3.929329400001734,
+      "process_cpu_seconds": 3.8125,
+      "minus_historical_baselines": {
+        "route_then_prebalance": -0.9999999999999999,
+        "prebalance_then_route": 0.0,
+        "one_round_feedback": 0.0
+      }
+    },
+    {
+      "scene": "L2_D1_T0_matched",
+      "condition": "matched",
+      "status": "completed_run",
+      "work_budget": 5000,
+      "atomic_bundles": true,
+      "source_protection_contract": "module_only",
+      "planning_horizon": 20,
+      "route_tail_ticks": 3,
+      "scheduled_bags": 2,
+      "completed": 2,
+      "uncompleted": [],
+      "cost_components": {
+        "tray_wait": 0.0,
+        "nonprotected_tardiness": 0.0,
+        "empty_distance": 4.0,
+        "terminal_backlog": 0.0,
+        "terminal_inflight": 0.0
+      },
+      "total_cost": 0.4,
+      "solver_calls": 32,
+      "solver_statuses": {
+        "work_budget_exhausted": 1,
+        "finite_atomic_domain_optimal": 31
+      },
+      "unknown_gap_calls": 1,
+      "no_joint_search_calls": 0,
+      "total_work": 7052,
+      "multi_tray_commits": 1,
+      "commit_rejections": 0,
+      "local_failure_count": 0,
+      "wall_seconds": 3.0315511000007973,
+      "process_cpu_seconds": 3.0,
+      "minus_historical_baselines": {
+        "route_then_prebalance": -0.9999999999999999,
+        "prebalance_then_route": 0.0,
+        "one_round_feedback": 0.0
+      }
+    }
+  ],
+  "episode_count": 2,
+  "failed_episode_count": 0,
+  "scheduled_bag_denominator": 4,
+  "completed_bags": 4,
+  "source_changed_during_run": false
+}

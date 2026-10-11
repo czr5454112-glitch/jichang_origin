@@ -1,0 +1,128 @@
+{
+  "status": "passed",
+  "checks": 55279,
+  "oracle_cases": 55245,
+  "physics_calls": 0,
+  "standalone_routing_queries": 0,
+  "rows": [
+    {
+      "case": "capacity_not_headway",
+      "travel": 10,
+      "capacity": 3,
+      "headway": 3,
+      "departures": [
+        0,
+        1
+      ],
+      "edge_allowed": true,
+      "entry_allowed": false
+    },
+    {
+      "case": "pipeline_not_capacity_one",
+      "travel": 10,
+      "capacity": 3,
+      "headway": 3,
+      "departures": [
+        0,
+        3,
+        6
+      ],
+      "edge_allowed": true,
+      "entry_allowed": true
+    },
+    {
+      "case": "headway_not_capacity",
+      "travel": 10,
+      "capacity": 2,
+      "headway": 3,
+      "departures": [
+        0,
+        3,
+        6
+      ],
+      "edge_allowed": false,
+      "entry_allowed": true
+    },
+    {
+      "case": "tail_after_arrival",
+      "travel": 2,
+      "capacity": 3,
+      "headway": 5,
+      "departures": [
+        0,
+        3
+      ],
+      "edge_allowed": true,
+      "entry_allowed": false
+    },
+    {
+      "case": "exact_boundary",
+      "travel": 2,
+      "capacity": 3,
+      "headway": 5,
+      "departures": [
+        0,
+        5
+      ],
+      "edge_allowed": true,
+      "entry_allowed": true
+    },
+    {
+      "case": "same_node_tick_different_self_tail",
+      "node": "A",
+      "tick": 2,
+      "left_signature": [
+        [
+          "e",
+          0,
+          5
+        ]
+      ],
+      "right_signature": [],
+      "left_suffix_allowed": false,
+      "right_suffix_allowed": true
+    }
+  ],
+  "source_sha256_before": {
+    "outputs\\experiments\\ics_circulation_v3\\phase4_round11_headway_design_20261011\\headway_ledger_prototype.py": "0b17de05a188ecd9c3e447d78c66d59e99c2e0a01aaa40182788d9944f21ba78",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_round11_headway_design_20261011\\run_prototype.py": "a149eb8760f9e2c86d7f15d096901d2091e6975021208cf683c9885d45733b15",
+    "scripts\\experiments\\ics_circulation_v3\\model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "scripts\\experiments\\ics_circulation_v3\\runtime.py": "2052c6c961c7f7aaca32f731a614e17bc24763587a7b390890f2f25ea5514fd0",
+    "scripts\\experiments\\ics_circulation_v3\\routing.py": "39ebeb6dadf551f31157f4db2366cbbd29d1258efa4ecdf3a5316c50f86c9082",
+    "scripts\\experiments\\ics_circulation_v3\\routing_reference.py": "0fa5bf23396196a8a31d62a903dd3b2ad4b2e64aebe553bea4d89bf1d132430c",
+    "scripts\\experiments\\ics_circulation_v3\\storage_routing.py": "867018bc951e8afe95840c33dbac42a32f2a2d38e46317e58070534dc502e7e2",
+    "scripts\\experiments\\ics_circulation_v3\\storage_calendar.py": "5b0b5d87aefe954f89d3e00774847a66ef801df49118909624bf2e5fc94f0ed7",
+    "scripts\\experiments\\ics_circulation_v3\\joint_transactions.py": "67d69a5fc106aefb81c1c46457515970270e6fd8379391d528f797d6c43ad430",
+    "scripts\\experiments\\ics_circulation_v3\\dependency_admission.py": "ffb9e05b07e53c588affbf941d3a9de9113a3ef8a8b3d10e9bf9317c5535c9bf",
+    "scripts\\experiments\\ics_circulation_v3\\distributed_clock.py": "22d82c432c9e8fbfd9962d12fa24d2fee0df07162501f3cfd0972bbd12a174ec",
+    "scripts\\experiments\\ics_circulation_v3\\partition_observation.py": "b7e6032463d381d4276ed9e9212ce918c0eb0e9d029faaa7c4b7458952b32c8b",
+    "scripts\\experiments\\ics_circulation_v3\\routing_cache_contract.py": "e966757e69773ae085654831564828b7bb97f7e895eb2d09757962d0493f3826"
+  },
+  "checkpoint_sha256": "1a29da20111c5bbd49e130da8d10202ecc1ed94c0fc8ee66fa78ebe428ec4c60",
+  "source_sha256_after": {
+    "outputs\\experiments\\ics_circulation_v3\\phase4_round11_headway_design_20261011\\headway_ledger_prototype.py": "0b17de05a188ecd9c3e447d78c66d59e99c2e0a01aaa40182788d9944f21ba78",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_round11_headway_design_20261011\\run_prototype.py": "a149eb8760f9e2c86d7f15d096901d2091e6975021208cf683c9885d45733b15",
+    "scripts\\experiments\\ics_circulation_v3\\model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "scripts\\experiments\\ics_circulation_v3\\runtime.py": "2052c6c961c7f7aaca32f731a614e17bc24763587a7b390890f2f25ea5514fd0",
+    "scripts\\experiments\\ics_circulation_v3\\routing.py": "39ebeb6dadf551f31157f4db2366cbbd29d1258efa4ecdf3a5316c50f86c9082",
+    "scripts\\experiments\\ics_circulation_v3\\routing_reference.py": "0fa5bf23396196a8a31d62a903dd3b2ad4b2e64aebe553bea4d89bf1d132430c",
+    "scripts\\experiments\\ics_circulation_v3\\storage_routing.py": "867018bc951e8afe95840c33dbac42a32f2a2d38e46317e58070534dc502e7e2",
+    "scripts\\experiments\\ics_circulation_v3\\storage_calendar.py": "5b0b5d87aefe954f89d3e00774847a66ef801df49118909624bf2e5fc94f0ed7",
+    "scripts\\experiments\\ics_circulation_v3\\joint_transactions.py": "67d69a5fc106aefb81c1c46457515970270e6fd8379391d528f797d6c43ad430",
+    "scripts\\experiments\\ics_circulation_v3\\dependency_admission.py": "ffb9e05b07e53c588affbf941d3a9de9113a3ef8a8b3d10e9bf9317c5535c9bf",
+    "scripts\\experiments\\ics_circulation_v3\\distributed_clock.py": "22d82c432c9e8fbfd9962d12fa24d2fee0df07162501f3cfd0972bbd12a174ec",
+    "scripts\\experiments\\ics_circulation_v3\\partition_observation.py": "b7e6032463d381d4276ed9e9212ce918c0eb0e9d029faaa7c4b7458952b32c8b",
+    "scripts\\experiments\\ics_circulation_v3\\routing_cache_contract.py": "e966757e69773ae085654831564828b7bb97f7e895eb2d09757962d0493f3826"
+  },
+  "cpu_seconds": 1.78125,
+  "wall_seconds": 1.8816695999994408,
+  "scope": "prototype imports, exhaustive pure ledger oracle checks, serialization; no ICS Simulation or route search",
+  "limitation": "design-only ledger; authority, real motion, W2 transport, owner admission and production cache not implemented",
+  "unmetered_auxiliary": [
+    "source reading",
+    "web research",
+    "design/code editing",
+    "tool orchestration",
+    "source snapshot capture"
+  ]
+}

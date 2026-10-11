@@ -1,0 +1,32 @@
+{
+  "repair_scope": "only exact JSON-value cache comparison; tuple/list serialization normalized, no field excluded; two cache-content regressions added",
+  "source_sha256": {
+    "scripts\\experiments\\ics_circulation_v3\\run_same_zone_supply.py": "c78bcbcd6bcdcd2274f497c2235297df8fd542e2efa5374ac05ea7f7f8a884bb",
+    "scripts\\experiments\\ics_circulation_v3\\same_zone_experiment.py": "26f963c2212159ff93050d55010c9f7560ed7d3d4d599cd9629ce93e39ae88b2",
+    "scripts\\experiments\\ics_circulation_v3\\same_zone_supply.py": "dbb9ec25f976157542fc851c3bdfe758e96e9d6ca92284bcf1c39febd1139e2b",
+    "tests\\test_ics_circulation_v3_same_zone_experiment.py": "27be76da6f5e449a28317caba357210860997bf3b3828a5841ecd56f21330e39",
+    "tests\\test_ics_circulation_v3_same_zone_experiment_audit.py": "40bb7e349fed2b388fbcd93be5902ae903cb25e94d70c631c84f779f779c70a0"
+  },
+  "attempts": [
+    {
+      "command": "python -m pytest tests/test_ics_circulation_v3_same_zone_experiment.py tests/test_ics_circulation_v3_same_zone_experiment_audit.py -q",
+      "exit_code": 1,
+      "passed": 9,
+      "setup_errors": 2,
+      "cause": "PermissionError WinError5 enumerating default C:/Users/38908/AppData/Local/Temp/pytest-of-38908; both tmp_path audit fixtures failed before test body",
+      "tool_wall_seconds": 3.3808933,
+      "child_cpu_seconds": null,
+      "raw_output_scope": "tool result 16c9f7 retained; full stdout was not separately captured"
+    },
+    {
+      "command": "python -m pytest tests/test_ics_circulation_v3_same_zone_experiment.py tests/test_ics_circulation_v3_same_zone_experiment_audit.py -q --basetemp .tmp/round6_samezone_repair_tests_20261010",
+      "exit_code": 0,
+      "passed": 11,
+      "setup_errors": 0,
+      "tool_wall_seconds": 2.6263753,
+      "child_cpu_seconds": null
+    }
+  ],
+  "physical_original_map_calls": 0,
+  "regression_scope": "original 777 suite remains its frozen artifact; this records the 11 affected tests only, not a new full-suite claim"
+}
