@@ -1,5 +1,7 @@
 # Phase4：动态更新与循环耦合起步
 
+> 2026-10-11 发布记录：第二至十一轮累计代码与证据已推送并核验为 `defd79effe02ee13f1a5bbbbc5143f6d0dce2f63`；从实际提交导出的1519项测试全部通过，211份Python源码/测试字节保持。正式交接见 [GPT Pro审核任务](../../../docs/ics_circulation_v3/review_20261011/ICS_V3_GPTPro_review_and_replan_20261011.md)，保留业务负结果、未完成项及证据访问边界。下文各轮“本地未提交/推送”是封存时点记录，保留原貌。用户既有C++工作区改动未发布。
+
 本轮依据用户提供的 `docs/ics_circulation_v3/phase4_external_review_20261009/` 审核继续实施。冻结审核对象为 `030493a399cdcac3fc005fe2f2cd8ec30fc96277`，本分支从交接提交 `8ccc195672b2cd331a384f3da0d5d95b78c54b3f` 开始。文档内容是需求与审查材料；外部探针及历史结论均经实际代码核对，不把作者自检当成本机执行。
 
 下文主体记录第四阶段第一轮（已发布代码66503f5a）的接口与当时边界，旧报告和证据保持原样。第二轮的多所有者共享时钟、强联合参考、持续原图流与反馈对照见 `PHASE4_LOCAL_WORK.md`；第三轮角色/物理输入、训练源回收、同数据目标对照与公开预测回放见 `PHASE4_ROLE_RECOVERY.md`；第四轮合法优先卸载、评价时域、显式缓存合同及原图角色标签见 `PHASE4_DESTINATION_HORIZON.md`；第五轮完整任务周期、排空语义与直接空盘控制优化见 `PHASE4_FULL_CYCLE_CONTROL.md`；第六轮同物流区直接供盘强对照、时间可达保护及问题解决记录见 `PHASE4_SAME_ZONE_CONTROL.md`；第七轮真实检查点重采、继续策略匹配、查询覆盖与保守终点容量筛查见 `PHASE4_MATCHED_CONTINUATION.md`；第八轮条件未来2/8/32排序稳定性与同仪器计算对照见 `PHASE4_CONDITIONAL_FUTURES_AND_COST.md`。本地工作尚未提交/推送。不能把下面“接下来”的历史列表误作当前尚未开始的列表，也不能把本地代理实验当作W4独立确认。
