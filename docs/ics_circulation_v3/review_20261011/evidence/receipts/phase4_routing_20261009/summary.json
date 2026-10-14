@@ -1,0 +1,99 @@
+{
+  "schema": "ics_v3_phase4_dynamic_routing_diagnostics_v1",
+  "case_count": 12,
+  "request_count": 216,
+  "repeats": 3,
+  "requested_k": 3,
+  "expansion_limit": 5000,
+  "deadline_ms": 80.0,
+  "source_sha256": {
+    "routing.py": "e653fdd8b943eb21d65cfcd0ac5f75fe66f09b6ed331c6ecb347a5b73b48f017",
+    "routing_reference.py": "3d0b329d5afa422a402d487d4838f54a9981ce9a3eccf87a426e06de358485ee",
+    "run_phase4_routing.py": "f25f08df58535d704acc724799b829fc34ea0b773a2cf5bfd37c851c21cd405a",
+    "model.py": "3568699cb1e8863ec0ea2c9a16b28349843941f8ef6af7be3de1d61d90c61785",
+    "runtime.py": "c46720e6f88fe09e6894bff28bab24a67d8f5d21705b75a8d7160ad9618001b6"
+  },
+  "source_changed_during_run": false,
+  "diagnostic_cost": "travel_ticks + 2*waiting_ticks; declared small-graph quality measure, not business benefit",
+  "by_planner_cache": {
+    "old_single_witness:cold": {
+      "requests": 36,
+      "oracle_feasible_requests": 27,
+      "oracle_unknown_requests": 0,
+      "covered_feasible_requests": 21,
+      "returned_invalid_requests": 0,
+      "failed_commit_requests": 0,
+      "earliest_arrival_matches": 18,
+      "over_declared_deadline": 0,
+      "mean_local_ms_all_requests": 0.31265277680682224,
+      "max_local_ms_all_requests": 0.8352000004379079
+    },
+    "old_single_witness:warm": {
+      "requests": 36,
+      "oracle_feasible_requests": 27,
+      "oracle_unknown_requests": 0,
+      "covered_feasible_requests": 21,
+      "returned_invalid_requests": 0,
+      "failed_commit_requests": 0,
+      "earliest_arrival_matches": 18,
+      "over_declared_deadline": 0,
+      "mean_local_ms_all_requests": 0.2915611118320764,
+      "max_local_ms_all_requests": 0.8522000061930157
+    },
+    "dynamic_local:cold": {
+      "requests": 36,
+      "oracle_feasible_requests": 27,
+      "oracle_unknown_requests": 0,
+      "covered_feasible_requests": 27,
+      "returned_invalid_requests": 0,
+      "failed_commit_requests": 0,
+      "earliest_arrival_matches": 27,
+      "over_declared_deadline": 0,
+      "mean_local_ms_all_requests": 0.5314611102625754,
+      "max_local_ms_all_requests": 1.3113000022713095
+    },
+    "dynamic_local:warm": {
+      "requests": 36,
+      "oracle_feasible_requests": 27,
+      "oracle_unknown_requests": 0,
+      "covered_feasible_requests": 27,
+      "returned_invalid_requests": 0,
+      "failed_commit_requests": 0,
+      "earliest_arrival_matches": 27,
+      "over_declared_deadline": 0,
+      "mean_local_ms_all_requests": 0.49677777719302363,
+      "max_local_ms_all_requests": 1.644399992073886
+    },
+    "strong_full_graph_event:cold": {
+      "requests": 36,
+      "oracle_feasible_requests": 27,
+      "oracle_unknown_requests": 0,
+      "covered_feasible_requests": 27,
+      "returned_invalid_requests": 0,
+      "failed_commit_requests": 0,
+      "earliest_arrival_matches": 27,
+      "over_declared_deadline": 0,
+      "mean_local_ms_all_requests": 0.5361416662910616,
+      "max_local_ms_all_requests": 1.370199999655597
+    },
+    "strong_full_graph_event:warm": {
+      "requests": 36,
+      "oracle_feasible_requests": 27,
+      "oracle_unknown_requests": 0,
+      "covered_feasible_requests": 27,
+      "returned_invalid_requests": 0,
+      "failed_commit_requests": 0,
+      "earliest_arrival_matches": 27,
+      "over_declared_deadline": 0,
+      "mean_local_ms_all_requests": 0.48101388892973773,
+      "max_local_ms_all_requests": 1.7494999992777593
+    }
+  },
+  "limitations": [
+    "All graphs are small declared proxy fixtures; no new airport or distributed-control claim.",
+    "Dynamic local label cap can omit paths/windows; event mode is not labelled complete.",
+    "Remote no-wait-chain calendars remain visible; private regional observations are not implemented here.",
+    "Deadline is checked cooperatively; local time includes cold preprocessing and failed queries.",
+    "Physical-path coverage is reported only against fully enumerated finite-horizon integer fixtures."
+  ]
+}

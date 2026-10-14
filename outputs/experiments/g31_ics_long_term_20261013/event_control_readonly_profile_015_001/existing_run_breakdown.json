@@ -1,0 +1,1076 @@
+{
+  "schema": "g31.event_control_existing_timing_breakdown.v1",
+  "scope": "diagnostic captured under concurrent compilation; no fair P7 timing claim; submit is a subset of owner time, not additive",
+  "policies": {
+    "periodic_predictive": {
+      "source_sha256": "5e9e0d11115cd62fabf14199b597985a4a7e42b599ce9918c29e82169fc87bbf",
+      "wall_seconds": 6.719548400025815,
+      "owner_activations": 2882,
+      "owner_and_preparation_sum_ms": 6398.360000806861,
+      "native_batches": {
+        "n": 2906,
+        "sum_ms": 106.77260073134676,
+        "mean_ms": 0.036742120003904595,
+        "p50_ms": 0.00909995287656784,
+        "p95_ms": 0.21760002709925175,
+        "max_ms": 0.7890000124461949,
+        "over100": 0
+      },
+      "submit_subset": {
+        "n": 431,
+        "sum_ms": 8.595400780905038,
+        "mean_ms": 0.019942925245719344,
+        "p50_ms": 0.015900004655122757,
+        "p95_ms": 0.031200004741549492,
+        "max_ms": 0.32599997939541936,
+        "over100": 0
+      },
+      "unpartitioned_wall_ms": 214.4157984876074,
+      "preparation": {
+        "n": 1441,
+        "sum_ms": 2746.6042003943585,
+        "mean_ms": 1.9060403888926847,
+        "p50_ms": 2.0954000065103173,
+        "p95_ms": 2.863599976990372,
+        "max_ms": 40.54119996726513,
+        "over100": 0
+      },
+      "owners": {
+        "owner:system_domestic": {
+          "compute": {
+            "n": 1441,
+            "sum_ms": 2106.3449001521803,
+            "mean_ms": 1.4617244275865235,
+            "p50_ms": 1.5630999696440995,
+            "p95_ms": 2.2833000402897596,
+            "max_ms": 47.70140000618994,
+            "over100": 0
+          },
+          "causes": {}
+        },
+        "owner:system_international": {
+          "compute": {
+            "n": 1441,
+            "sum_ms": 1545.4109002603218,
+            "mean_ms": 1.0724572520890505,
+            "p50_ms": 0.9699000511318445,
+            "p95_ms": 1.5218000044114888,
+            "max_ms": 30.921199999284,
+            "over100": 0
+          },
+          "causes": {}
+        }
+      },
+      "time_bins": [
+        {
+          "start": 0,
+          "end": 24000,
+          "compute": {
+            "n": 800,
+            "sum_ms": 651.8462981330231,
+            "mean_ms": 0.8148078726662789,
+            "p50_ms": 0.7906999671831727,
+            "p95_ms": 1.3075999449938536,
+            "max_ms": 30.921199999284,
+            "over100": 0
+          },
+          "empty_actions": 796
+        },
+        {
+          "start": 24000,
+          "end": 36000,
+          "compute": {
+            "n": 400,
+            "sum_ms": 462.28430047631264,
+            "mean_ms": 1.1557107511907816,
+            "p50_ms": 1.0999999940395355,
+            "p95_ms": 1.809299981687218,
+            "max_ms": 4.516299988608807,
+            "over100": 0
+          },
+          "empty_actions": 388
+        },
+        {
+          "start": 36000,
+          "end": 45000,
+          "compute": {
+            "n": 300,
+            "sum_ms": 439.69720078166574,
+            "mean_ms": 1.4656573359388858,
+            "p50_ms": 1.3770000077784061,
+            "p95_ms": 2.4007000029087067,
+            "max_ms": 4.4858999899588525,
+            "over100": 0
+          },
+          "empty_actions": 293
+        },
+        {
+          "start": 45000,
+          "end": 86401,
+          "compute": {
+            "n": 1382,
+            "sum_ms": 2097.9280010215007,
+            "mean_ms": 1.5180376273672218,
+            "p50_ms": 1.5463000163435936,
+            "p95_ms": 2.1064000320620835,
+            "max_ms": 47.70140000618994,
+            "over100": 0
+          },
+          "empty_actions": 1382
+        }
+      ],
+      "over100_owner_calls": [],
+      "requests": [
+        {
+          "kind": "demand",
+          "retry": false,
+          "count": 40
+        },
+        {
+          "kind": "service_forecast",
+          "retry": false,
+          "count": 16
+        },
+        {
+          "kind": "transfer",
+          "retry": false,
+          "count": 23
+        },
+        {
+          "kind": "transfer",
+          "retry": true,
+          "count": 352
+        }
+      ],
+      "final_outbox": 79
+    },
+    "event_predictive": {
+      "source_sha256": "28528eb3a72337c7fa18b2a8043ef0dddc83738c1f264eed92c2caef7e4d3a27",
+      "wall_seconds": 68.46030730003258,
+      "owner_activations": 7890,
+      "owner_and_preparation_sum_ms": 62131.660900311545,
+      "native_batches": {
+        "n": 6258,
+        "sum_ms": 389.7357974201441,
+        "mean_ms": 0.06227801173220583,
+        "p50_ms": 0.04469999112188816,
+        "p95_ms": 0.14459999511018395,
+        "max_ms": 0.6702999817207456,
+        "over100": 0
+      },
+      "submit_subset": {
+        "n": 1489,
+        "sum_ms": 66.3289008080028,
+        "mean_ms": 0.044545937413030756,
+        "p50_ms": 0.03980001201853156,
+        "p95_ms": 0.07759995060041547,
+        "max_ms": 0.45849999878555536,
+        "over100": 0
+      },
+      "unpartitioned_wall_ms": 5938.9106023008935,
+      "preparation": {
+        "n": 0,
+        "sum_ms": 0,
+        "mean_ms": 0,
+        "p50_ms": 0,
+        "p95_ms": 0,
+        "max_ms": 0,
+        "over100": 0
+      },
+      "owners": {
+        "owner:system_domestic": {
+          "compute": {
+            "n": 4089,
+            "sum_ms": 27025.696201249957,
+            "mean_ms": 6.60936566428221,
+            "p50_ms": 5.988799966871738,
+            "p95_ms": 11.785899987444282,
+            "max_ms": 125.0997000024654,
+            "over100": 9
+          },
+          "causes": {
+            "periodic_tick": 1441,
+            "notification": 2278,
+            "retry_timer": 370
+          }
+        },
+        "owner:system_international": {
+          "compute": {
+            "n": 3801,
+            "sum_ms": 35105.96469906159,
+            "mean_ms": 9.235981241531594,
+            "p50_ms": 8.60800000373274,
+            "p95_ms": 16.46799995796755,
+            "max_ms": 135.34629996865988,
+            "over100": 10
+          },
+          "causes": {
+            "periodic_tick": 1441,
+            "notification": 2363
+          }
+        }
+      },
+      "time_bins": [
+        {
+          "start": 0,
+          "end": 24000,
+          "compute": {
+            "n": 1636,
+            "sum_ms": 2975.58549803216,
+            "mean_ms": 1.8188175415844499,
+            "p50_ms": 1.6722999862395227,
+            "p95_ms": 2.9881999944336712,
+            "max_ms": 61.80019996827468,
+            "over100": 0
+          },
+          "empty_actions": 1467
+        },
+        {
+          "start": 24000,
+          "end": 36000,
+          "compute": {
+            "n": 2890,
+            "sum_ms": 16861.212899617385,
+            "mean_ms": 5.834329723050998,
+            "p50_ms": 4.987300024367869,
+            "p95_ms": 11.616400035563856,
+            "max_ms": 112.15010000159964,
+            "over100": 2
+          },
+          "empty_actions": 2368
+        },
+        {
+          "start": 36000,
+          "end": 45000,
+          "compute": {
+            "n": 1982,
+            "sum_ms": 23213.36150105344,
+            "mean_ms": 11.71208955653554,
+            "p50_ms": 10.773399961180985,
+            "p95_ms": 16.194699972402304,
+            "max_ms": 135.34629996865988,
+            "over100": 10
+          },
+          "empty_actions": 1600
+        },
+        {
+          "start": 45000,
+          "end": 86401,
+          "compute": {
+            "n": 1382,
+            "sum_ms": 19081.501001608558,
+            "mean_ms": 13.807164255867264,
+            "p50_ms": 14.124500041361898,
+            "p95_ms": 16.785399988293648,
+            "max_ms": 131.1489999643527,
+            "over100": 7
+          },
+          "empty_actions": 1382
+        }
+      ],
+      "over100_owner_calls": [
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 34260.0,
+          "compute_ms": 112.15010000159964,
+          "causes": {
+            "periodic_tick": 571
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 35495.79699999989,
+          "compute_ms": 106.10340000130236,
+          "causes": {
+            "notification": {
+              "sequence": 4387,
+              "observed_at": 35495.79699999989,
+              "change_mask": 16
+            }
+          },
+          "refreshed": 3
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 37272.44799999985,
+          "compute_ms": 101.4636000036262,
+          "causes": {
+            "notification": {
+              "sequence": 4866,
+              "observed_at": 37272.44799999985,
+              "change_mask": 16
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 38703.84499999983,
+          "compute_ms": 107.45349997887388,
+          "causes": {
+            "notification": {
+              "sequence": 5360,
+              "observed_at": 38703.84499999983,
+              "change_mask": 16
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 42427.823999999695,
+          "compute_ms": 123.76839999342337,
+          "causes": {
+            "notification": {
+              "sequence": 6371,
+              "observed_at": 42427.823999999695,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 49860.0,
+          "compute_ms": 125.0997000024654,
+          "causes": {
+            "periodic_tick": 831
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 70140.0,
+          "compute_ms": 123.67949995677918,
+          "causes": {
+            "periodic_tick": 1169
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 74340.0,
+          "compute_ms": 125.02149998908862,
+          "causes": {
+            "periodic_tick": 1239
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 78420.0,
+          "compute_ms": 120.65180001081899,
+          "causes": {
+            "periodic_tick": 1307
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 36376.293999999856,
+          "compute_ms": 135.34629996865988,
+          "causes": {
+            "notification": {
+              "sequence": 4410,
+              "observed_at": 36376.293999999856,
+              "change_mask": 16
+            }
+          },
+          "refreshed": 2
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 38092.90499999983,
+          "compute_ms": 113.57129999669269,
+          "causes": {
+            "notification": {
+              "sequence": 5004,
+              "observed_at": 38092.90499999983,
+              "change_mask": 8
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 39456.2149999998,
+          "compute_ms": 117.28950001997873,
+          "causes": {
+            "notification": {
+              "sequence": 5529,
+              "observed_at": 39456.2149999998,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 40354.28099999977,
+          "compute_ms": 112.09850001614541,
+          "causes": {
+            "notification": {
+              "sequence": 5762,
+              "observed_at": 40354.28099999977,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 41289.12699999973,
+          "compute_ms": 109.99140003696084,
+          "causes": {
+            "notification": {
+              "sequence": 5970,
+              "observed_at": 41289.12699999973,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 41989.4409999997,
+          "compute_ms": 123.53410001378506,
+          "causes": {
+            "notification": {
+              "sequence": 6131,
+              "observed_at": 41989.4409999997,
+              "change_mask": 16
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 43295.90599999966,
+          "compute_ms": 120.65779999829829,
+          "causes": {
+            "notification": {
+              "sequence": 6565,
+              "observed_at": 43295.90599999966,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 45960.0,
+          "compute_ms": 112.74090001825243,
+          "causes": {
+            "periodic_tick": 766
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 61860.0,
+          "compute_ms": 131.1489999643527,
+          "causes": {
+            "periodic_tick": 1031
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 65880.0,
+          "compute_ms": 128.95230000140145,
+          "causes": {
+            "periodic_tick": 1098
+          },
+          "refreshed": 0
+        }
+      ],
+      "requests": [
+        {
+          "kind": "demand",
+          "retry": false,
+          "count": 48
+        },
+        {
+          "kind": "service_forecast",
+          "retry": false,
+          "count": 524
+        },
+        {
+          "kind": "withdraw_service_forecast",
+          "retry": false,
+          "count": 524
+        },
+        {
+          "kind": "transfer",
+          "retry": false,
+          "count": 23
+        },
+        {
+          "kind": "transfer",
+          "retry": true,
+          "count": 370
+        }
+      ],
+      "final_outbox": 1119
+    },
+    "event_reactive": {
+      "source_sha256": "ede34a00a791a83547226ce11c9fc1d84fba41ef236fde91dcbd5e69bc5563e2",
+      "wall_seconds": 14.18839789996855,
+      "owner_activations": 6215,
+      "owner_and_preparation_sum_ms": 12685.895300237462,
+      "native_batches": {
+        "n": 4583,
+        "sum_ms": 269.47690022643656,
+        "mean_ms": 0.05879923635750307,
+        "p50_ms": 0.039700011257082224,
+        "p95_ms": 0.14650000957772136,
+        "max_ms": 0.6408999906852841,
+        "over100": 0
+      },
+      "submit_subset": {
+        "n": 290,
+        "sum_ms": 7.101299823261797,
+        "mean_ms": 0.024487240769868267,
+        "p50_ms": 0.02110004425048828,
+        "p95_ms": 0.03509997623041272,
+        "max_ms": 0.22869999520480633,
+        "over100": 0
+      },
+      "unpartitioned_wall_ms": 1233.0256995046511,
+      "preparation": {
+        "n": 0,
+        "sum_ms": 0,
+        "mean_ms": 0,
+        "p50_ms": 0,
+        "p95_ms": 0,
+        "max_ms": 0,
+        "over100": 0
+      },
+      "owners": {
+        "owner:system_domestic": {
+          "compute": {
+            "n": 3338,
+            "sum_ms": 7282.711299892981,
+            "mean_ms": 2.181758927469437,
+            "p50_ms": 1.8007999751716852,
+            "p95_ms": 4.247599979862571,
+            "max_ms": 83.40649999445304,
+            "over100": 0
+          },
+          "causes": {
+            "periodic_tick": 1441,
+            "notification": 1678,
+            "retry_timer": 219
+          }
+        },
+        "owner:system_international": {
+          "compute": {
+            "n": 2877,
+            "sum_ms": 5403.184000344481,
+            "mean_ms": 1.8780618701232121,
+            "p50_ms": 1.6756000113673508,
+            "p95_ms": 3.101399983279407,
+            "max_ms": 62.0723000029102,
+            "over100": 0
+          },
+          "causes": {
+            "periodic_tick": 1441,
+            "notification": 1439
+          }
+        }
+      },
+      "time_bins": [
+        {
+          "start": 0,
+          "end": 24000,
+          "compute": {
+            "n": 1365,
+            "sum_ms": 1556.8335982970893,
+            "mean_ms": 1.1405374346498822,
+            "p50_ms": 1.1071000481024384,
+            "p95_ms": 1.6847000224515796,
+            "max_ms": 2.8655999922193587,
+            "over100": 0
+          },
+          "empty_actions": 1333
+        },
+        {
+          "start": 24000,
+          "end": 36000,
+          "compute": {
+            "n": 2090,
+            "sum_ms": 3670.815601828508,
+            "mean_ms": 1.7563711013533532,
+            "p50_ms": 1.5105000347830355,
+            "p95_ms": 2.735899994149804,
+            "max_ms": 62.0723000029102,
+            "over100": 0
+          },
+          "empty_actions": 2066
+        },
+        {
+          "start": 36000,
+          "end": 45000,
+          "compute": {
+            "n": 1378,
+            "sum_ms": 3381.2557008932345,
+            "mean_ms": 2.4537414375132327,
+            "p50_ms": 2.3539999965578318,
+            "p95_ms": 3.643799980636686,
+            "max_ms": 77.19039998482913,
+            "over100": 0
+          },
+          "empty_actions": 1363
+        },
+        {
+          "start": 45000,
+          "end": 86401,
+          "compute": {
+            "n": 1382,
+            "sum_ms": 4076.99039921863,
+            "mean_ms": 2.95006541188034,
+            "p50_ms": 2.667499997187406,
+            "p95_ms": 4.801400005817413,
+            "max_ms": 83.40649999445304,
+            "over100": 0
+          },
+          "empty_actions": 1382
+        }
+      ],
+      "over100_owner_calls": [],
+      "requests": [
+        {
+          "kind": "demand",
+          "retry": false,
+          "count": 48
+        },
+        {
+          "kind": "transfer",
+          "retry": false,
+          "count": 23
+        },
+        {
+          "kind": "transfer",
+          "retry": true,
+          "count": 219
+        }
+      ],
+      "final_outbox": 71
+    },
+    "event_joint": {
+      "source_sha256": "7eb74414b4cb05489ff20c9c41ca5a4d2f458d81565caa591ff1bcddb0bbd928",
+      "wall_seconds": 68.51074469997548,
+      "owner_activations": 7890,
+      "owner_and_preparation_sum_ms": 62275.238301663194,
+      "native_batches": {
+        "n": 6258,
+        "sum_ms": 383.120899728965,
+        "mean_ms": 0.06122098110082535,
+        "p50_ms": 0.04379998426884413,
+        "p95_ms": 0.14089996693655849,
+        "max_ms": 0.833700003568083,
+        "over100": 0
+      },
+      "submit_subset": {
+        "n": 1489,
+        "sum_ms": 64.02680010069162,
+        "mean_ms": 0.0429998657492892,
+        "p50_ms": 0.03940000897273421,
+        "p95_ms": 0.06960000609979033,
+        "max_ms": 0.5905000143684447,
+        "over100": 0
+      },
+      "unpartitioned_wall_ms": 5852.385498583317,
+      "preparation": {
+        "n": 0,
+        "sum_ms": 0,
+        "mean_ms": 0,
+        "p50_ms": 0,
+        "p95_ms": 0,
+        "max_ms": 0,
+        "over100": 0
+      },
+      "owners": {
+        "owner:system_domestic": {
+          "compute": {
+            "n": 4089,
+            "sum_ms": 26598.63250196213,
+            "mean_ms": 6.504923575926175,
+            "p50_ms": 5.78120001591742,
+            "p95_ms": 11.840299994219095,
+            "max_ms": 161.26689995871857,
+            "over100": 7
+          },
+          "causes": {
+            "periodic_tick": 1441,
+            "notification": 2278,
+            "retry_timer": 370
+          }
+        },
+        "owner:system_international": {
+          "compute": {
+            "n": 3801,
+            "sum_ms": 35676.605799701065,
+            "mean_ms": 9.38611044454119,
+            "p50_ms": 7.786799978930503,
+            "p95_ms": 16.683599969837815,
+            "max_ms": 173.18969999905676,
+            "over100": 16
+          },
+          "causes": {
+            "periodic_tick": 1441,
+            "notification": 2363
+          }
+        }
+      },
+      "time_bins": [
+        {
+          "start": 0,
+          "end": 24000,
+          "compute": {
+            "n": 1636,
+            "sum_ms": 3106.4619990065694,
+            "mean_ms": 1.8988154028157516,
+            "p50_ms": 1.7151000211015344,
+            "p95_ms": 3.0350000015459955,
+            "max_ms": 85.50760004436597,
+            "over100": 0
+          },
+          "empty_actions": 1467
+        },
+        {
+          "start": 24000,
+          "end": 36000,
+          "compute": {
+            "n": 2890,
+            "sum_ms": 15557.42090230342,
+            "mean_ms": 5.383190623634402,
+            "p50_ms": 5.027699982747436,
+            "p95_ms": 8.157400006894022,
+            "max_ms": 130.91330003226176,
+            "over100": 6
+          },
+          "empty_actions": 2368
+        },
+        {
+          "start": 36000,
+          "end": 45000,
+          "compute": {
+            "n": 1982,
+            "sum_ms": 24499.98490017606,
+            "mean_ms": 12.361243642873895,
+            "p50_ms": 10.870900005102158,
+            "p95_ms": 18.108000047504902,
+            "max_ms": 173.18969999905676,
+            "over100": 10
+          },
+          "empty_actions": 1600
+        },
+        {
+          "start": 45000,
+          "end": 86401,
+          "compute": {
+            "n": 1382,
+            "sum_ms": 19111.370500177145,
+            "mean_ms": 13.828777496510234,
+            "p50_ms": 14.161399973090738,
+            "p95_ms": 16.489400004502386,
+            "max_ms": 164.59510003915057,
+            "over100": 7
+          },
+          "empty_actions": 1382
+        }
+      ],
+      "over100_owner_calls": [
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 29951.37700000002,
+          "compute_ms": 107.31519997352734,
+          "causes": {
+            "notification": {
+              "sequence": 2832,
+              "observed_at": 29951.37700000002,
+              "change_mask": 16
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 32780.76000000002,
+          "compute_ms": 118.24280000291765,
+          "causes": {
+            "notification": {
+              "sequence": 3658,
+              "observed_at": 32780.76000000002,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 35400.0,
+          "compute_ms": 130.91330003226176,
+          "causes": {
+            "periodic_tick": 590
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 37390.247999999854,
+          "compute_ms": 135.32790000317618,
+          "causes": {
+            "retry_timer": true
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 39755.0369999998,
+          "compute_ms": 161.26689995871857,
+          "causes": {
+            "notification": {
+              "sequence": 5641,
+              "observed_at": 39755.0369999998,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 49260.0,
+          "compute_ms": 147.65180001268163,
+          "causes": {
+            "periodic_tick": 821
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_domestic",
+          "at": 81780.0,
+          "compute_ms": 152.78740000212565,
+          "causes": {
+            "periodic_tick": 1363
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 28174.079000000016,
+          "compute_ms": 114.27989997901022,
+          "causes": {
+            "notification": {
+              "sequence": 2081,
+              "observed_at": 28174.079000000016,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 31532.312000000024,
+          "compute_ms": 115.58869999134913,
+          "causes": {
+            "notification": {
+              "sequence": 3078,
+              "observed_at": 31532.312000000024,
+              "change_mask": 16
+            }
+          },
+          "refreshed": 2
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 34220.258999999955,
+          "compute_ms": 123.18049999885261,
+          "causes": {
+            "notification": {
+              "sequence": 3888,
+              "observed_at": 34220.258999999955,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 36425.17399999987,
+          "compute_ms": 138.22730001993477,
+          "causes": {
+            "notification": {
+              "sequence": 4489,
+              "observed_at": 36425.17399999987,
+              "change_mask": 8
+            }
+          },
+          "refreshed": 2
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 38232.89699999982,
+          "compute_ms": 140.4309999779798,
+          "causes": {
+            "notification": {
+              "sequence": 5042,
+              "observed_at": 38232.89699999982,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 39139.691999999806,
+          "compute_ms": 147.99739996669814,
+          "causes": {
+            "notification": {
+              "sequence": 5364,
+              "observed_at": 39139.691999999806,
+              "change_mask": 8
+            }
+          },
+          "refreshed": 2
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 40941.65899999975,
+          "compute_ms": 173.18969999905676,
+          "causes": {
+            "notification": {
+              "sequence": 5868,
+              "observed_at": 40941.65899999975,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 41855.444999999716,
+          "compute_ms": 161.14849998848513,
+          "causes": {
+            "notification": {
+              "sequence": 6058,
+              "observed_at": 41855.444999999716,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 42360.2239999997,
+          "compute_ms": 158.35729998070747,
+          "causes": {
+            "notification": {
+              "sequence": 6338,
+              "observed_at": 42360.2239999997,
+              "change_mask": 16
+            }
+          },
+          "refreshed": 1
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 43140.62899999967,
+          "compute_ms": 160.11909994995221,
+          "causes": {
+            "notification": {
+              "sequence": 6511,
+              "observed_at": 43140.62899999967,
+              "change_mask": 2
+            }
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 44580.0,
+          "compute_ms": 150.61259997310117,
+          "causes": {
+            "periodic_tick": 743
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 58080.0,
+          "compute_ms": 157.98349998658523,
+          "causes": {
+            "periodic_tick": 968
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 62940.0,
+          "compute_ms": 158.10770000098273,
+          "causes": {
+            "periodic_tick": 1049
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 67800.0,
+          "compute_ms": 162.9269999684766,
+          "causes": {
+            "periodic_tick": 1130
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 76920.0,
+          "compute_ms": 164.59510003915057,
+          "causes": {
+            "periodic_tick": 1282
+          },
+          "refreshed": 0
+        },
+        {
+          "owner_id": "owner:system_international",
+          "at": 86400.0,
+          "compute_ms": 160.21910001290962,
+          "causes": {
+            "periodic_tick": 1440
+          },
+          "refreshed": 0
+        }
+      ],
+      "requests": [
+        {
+          "kind": "demand",
+          "retry": false,
+          "count": 48
+        },
+        {
+          "kind": "service_forecast",
+          "retry": false,
+          "count": 524
+        },
+        {
+          "kind": "withdraw_service_forecast",
+          "retry": false,
+          "count": 524
+        },
+        {
+          "kind": "transfer",
+          "retry": false,
+          "count": 23
+        },
+        {
+          "kind": "transfer",
+          "retry": true,
+          "count": 370
+        }
+      ],
+      "final_outbox": 1119
+    }
+  }
+}

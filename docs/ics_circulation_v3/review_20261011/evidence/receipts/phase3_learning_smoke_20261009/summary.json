@@ -1,0 +1,341 @@
+{
+  "scope": "same_synthetic_family_fresh_groups_nonlinear_and_input_comparison",
+  "smoke": true,
+  "source_groups": {
+    "train": 8,
+    "validation": 4,
+    "test": 4,
+    "deployment": 4
+  },
+  "reused_training_validation_candidate_rows": 48,
+  "reused_training_validation_paired_branches": 96,
+  "new_candidate_rows": 16,
+  "new_paired_branch_rollouts": 32,
+  "new_label_stage_forecast_rollouts": 16,
+  "deployment_runs": 40,
+  "deployment_nested_forecast_rollouts": 32,
+  "training_fit_count": 16,
+  "total_fit_ms": 1086.8054000020493,
+  "fresh_label_and_reference_ms": 1104.7611999965739,
+  "test_metrics": {
+    "baseline": {
+      "groups": 4,
+      "mean_regret": 0.875,
+      "max_regret": 2.5,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": null
+    },
+    "analytic": {
+      "groups": 4,
+      "mean_regret": 0.875,
+      "max_regret": 2.5,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": 4.875
+    },
+    "timed": {
+      "groups": 4,
+      "mean_regret": 0.25,
+      "max_regret": 1.0,
+      "positive_regret_groups": 1,
+      "mean_gain_over_baseline": 0.625,
+      "delta_rmse": 7.023398393940073
+    },
+    "forecast_rollout": {
+      "groups": 4,
+      "mean_regret": 0.625,
+      "max_regret": 2.5,
+      "positive_regret_groups": 1,
+      "mean_gain_over_baseline": 0.25,
+      "delta_rmse": 2.692582403567252
+    },
+    "ridge_direct": {
+      "groups": 4,
+      "mean_regret": 0.25,
+      "max_regret": 1.0,
+      "positive_regret_groups": 1,
+      "mean_gain_over_baseline": 0.625,
+      "delta_rmse": 5.479177217704688
+    },
+    "ridge_residual": {
+      "groups": 4,
+      "mean_regret": 0.25,
+      "max_regret": 1.0,
+      "positive_regret_groups": 1,
+      "mean_gain_over_baseline": 0.625,
+      "delta_rmse": 4.496158187908764
+    },
+    "mlp_direct_seed17": {
+      "groups": 4,
+      "mean_regret": 3.375,
+      "max_regret": 11.0,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": -2.5,
+      "delta_rmse": 5.182032080809373
+    },
+    "mlp_residual_seed17": {
+      "groups": 4,
+      "mean_regret": 0.25,
+      "max_regret": 1.0,
+      "positive_regret_groups": 1,
+      "mean_gain_over_baseline": 0.625,
+      "delta_rmse": 6.575540625584532
+    },
+    "mlp_direct_no_analytic_scores": {
+      "groups": 4,
+      "mean_regret": 3.0,
+      "max_regret": 11.0,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": -2.125,
+      "delta_rmse": 4.529845739538561
+    },
+    "mlp_direct_route_only": {
+      "groups": 4,
+      "mean_regret": 0.75,
+      "max_regret": 3.0,
+      "positive_regret_groups": 1,
+      "mean_gain_over_baseline": 0.125,
+      "delta_rmse": 6.442291070969114
+    }
+  },
+  "independent_closed_loop": {
+    "baseline": {
+      "runs": 4,
+      "mean_cost": 12.425,
+      "mean_delta_from_timed": 2.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 2,
+      "worse_than_baseline": 0,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 11,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.75,
+      "wall_ms_whole_episode": {
+        "p50": 29.971099997055717,
+        "p95": 42.00660000060452,
+        "p99": 42.00660000060452,
+        "max": 42.00660000060452,
+        "mean": 31.736374998217798
+      }
+    },
+    "analytic": {
+      "runs": 4,
+      "mean_cost": 12.425,
+      "mean_delta_from_timed": 2.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 2,
+      "worse_than_baseline": 0,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 11,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.75,
+      "wall_ms_whole_episode": {
+        "p50": 34.98109999782173,
+        "p95": 35.07779999927152,
+        "p99": 35.07779999927152,
+        "max": 35.07779999927152,
+        "mean": 32.921224999881815
+      }
+    },
+    "timed": {
+      "runs": 4,
+      "mean_cost": 10.425,
+      "mean_delta_from_timed": 0.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 12,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.0,
+      "wall_ms_whole_episode": {
+        "p50": 40.18579999683425,
+        "p95": 43.41330000170274,
+        "p99": 43.41330000170274,
+        "max": 43.41330000170274,
+        "mean": 35.14345000075991
+      }
+    },
+    "forecast_rollout": {
+      "runs": 4,
+      "mean_cost": 10.425,
+      "mean_delta_from_timed": 0.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 12,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.0,
+      "wall_ms_whole_episode": {
+        "p50": 229.52609999629203,
+        "p95": 291.94810000626603,
+        "p99": 291.94810000626603,
+        "max": 291.94810000626603,
+        "mean": 239.80652499994903
+      }
+    },
+    "ridge_direct": {
+      "runs": 4,
+      "mean_cost": 10.425,
+      "mean_delta_from_timed": 0.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 12,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.0,
+      "wall_ms_whole_episode": {
+        "p50": 37.80720000213478,
+        "p95": 40.065699999104254,
+        "p99": 40.065699999104254,
+        "max": 40.065699999104254,
+        "mean": 36.69952500058571
+      }
+    },
+    "ridge_residual": {
+      "runs": 4,
+      "mean_cost": 10.425,
+      "mean_delta_from_timed": 0.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 12,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.0,
+      "wall_ms_whole_episode": {
+        "p50": 40.1244000022416,
+        "p95": 41.46490000130143,
+        "p99": 41.46490000130143,
+        "max": 41.46490000130143,
+        "mean": 37.962900001730304
+      }
+    },
+    "mlp_direct_seed17": {
+      "runs": 4,
+      "mean_cost": 11.175,
+      "mean_delta_from_timed": 0.75,
+      "better_than_timed": 0,
+      "worse_than_timed": 2,
+      "worse_than_baseline": 1,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 12,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.75,
+      "wall_ms_whole_episode": {
+        "p50": 38.60989999520825,
+        "p95": 42.489500003284775,
+        "p99": 42.489500003284775,
+        "max": 42.489500003284775,
+        "mean": 37.3046249987965
+      }
+    },
+    "mlp_residual_seed17": {
+      "runs": 4,
+      "mean_cost": 11.425,
+      "mean_delta_from_timed": 1.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 1,
+      "worse_than_baseline": 0,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 11,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.75,
+      "wall_ms_whole_episode": {
+        "p50": 38.7403999993694,
+        "p95": 40.45830000541173,
+        "p99": 40.45830000541173,
+        "max": 40.45830000541173,
+        "mean": 36.80542499932926
+      }
+    },
+    "mlp_direct_no_analytic_scores": {
+      "runs": 4,
+      "mean_cost": 11.175,
+      "mean_delta_from_timed": 0.75,
+      "better_than_timed": 0,
+      "worse_than_timed": 2,
+      "worse_than_baseline": 1,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 12,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 2.75,
+      "wall_ms_whole_episode": {
+        "p50": 40.423899998131674,
+        "p95": 40.934099997684825,
+        "p99": 40.934099997684825,
+        "max": 40.934099997684825,
+        "mean": 36.96295000008831
+      }
+    },
+    "mlp_direct_route_only": {
+      "runs": 4,
+      "mean_cost": 13.425,
+      "mean_delta_from_timed": 3.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 2,
+      "worse_than_baseline": 1,
+      "completed": 18,
+      "bag_denominator": 18,
+      "on_time": 12,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 5.0,
+      "wall_ms_whole_episode": {
+        "p50": 35.24549999565352,
+        "p95": 39.51239999878453,
+        "p99": 39.51239999878453,
+        "max": 39.51239999878453,
+        "mean": 34.4518000001699
+      }
+    }
+  },
+  "frozen_models_sha256": "75de5f470674d8a98869b3cd4f286c5fc45253e86e915b048281720bc9dc01af",
+  "invariant_checks": 7993,
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "scripts/experiments/ics_circulation_v3/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "scripts/experiments/ics_circulation_v3/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "scripts/experiments/ics_circulation_v3/evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "scripts/experiments/ics_circulation_v3/joint_control.py": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+    "scripts/experiments/ics_circulation_v3/learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "scripts/experiments/ics_circulation_v3/model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "scripts/experiments/ics_circulation_v3/nanning_routing_benchmark.py": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+    "scripts/experiments/ics_circulation_v3/nonlinear_learning.py": "63856f7c775d2613b5cb71a8a40dcc2fe558a797e67068c11df0c26f692565f1",
+    "scripts/experiments/ics_circulation_v3/phase2_scenarios.py": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+    "scripts/experiments/ics_circulation_v3/prebalance.py": "bfba7869bd18d78fa9bd1e9c694d73b4072ec0b3bccdaa6d0c0a2f9b12e37cda",
+    "scripts/experiments/ics_circulation_v3/prebalance_reference.py": "b1f22fda1289c0987b149007d6db59c0dddc41654843cece472f474057abd1b6",
+    "scripts/experiments/ics_circulation_v3/request_service.py": "31f6defcf493aa4f6f69ebfba4f547ccc7525788a92c8596cf711c5d2bc55840",
+    "scripts/experiments/ics_circulation_v3/routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "scripts/experiments/ics_circulation_v3/run_joint_control.py": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+    "scripts/experiments/ics_circulation_v3/run_phase2_learning.py": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+    "scripts/experiments/ics_circulation_v3/run_phase3_learning.py": "5a45ca9b208c1e2c99624d9f266ef2adce4282f2f41fb4160e2b24001fdc9a4e",
+    "scripts/experiments/ics_circulation_v3/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "scripts/experiments/ics_circulation_v3/run_prebalance.py": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+    "scripts/experiments/ics_circulation_v3/run_routing_comparison.py": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "scripts/experiments/ics_circulation_v3/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035"
+  },
+  "source_changed_during_run": false,
+  "limitations": [
+    "Same seven-node synthetic family, not airport/day generalization.",
+    "Fixed three training seeds are reported individually, never selected on test.",
+    "All input/architecture choices were specified before fresh test labels.",
+    "Route-only/no-score ablations remove input bundles; they do not isolate a single causal mechanism.",
+    "Different ablation input dimensions change parameter count despite identical hidden width.",
+    "Candidate regret is relative to a finite set and two continuation futures, not globally optimal Q.",
+    "Full episode wall time is not a per-request end-to-end contract.",
+    "MLP/rollout approximations do not authorize actions or inherit PPL/DG-PG guarantees."
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "status": "reproduced_assertion_contract_error",
+  "client": {
+    "request_id": "live:1:B:ledger-return",
+    "status": "acknowledged",
+    "attempt": 3,
+    "physical_resolution": "immutable_delivered_snapshot_not_current_truth",
+    "last_delivered_ack": {
+      "sequence": 3,
+      "attempt": 1,
+      "observed_at": 20.0,
+      "delivered_at": 20.2,
+      "status": "dispatching",
+      "reason": ""
+    }
+  },
+  "acks": [
+    {
+      "request_id": "live:1:B:ledger-return",
+      "sequence": 1,
+      "attempt": 2,
+      "observed_at": 20.0,
+      "delivered_at": 20.2,
+      "status": "dispatching",
+      "reason": "",
+      "delivered_copies": 1
+    },
+    {
+      "request_id": "live:1:B:ledger-return",
+      "sequence": 2,
+      "attempt": 3,
+      "observed_at": 20.0,
+      "delivered_at": 20.2,
+      "status": "dispatching",
+      "reason": "",
+      "delivered_copies": 1
+    },
+    {
+      "request_id": "live:1:B:ledger-return",
+      "sequence": 3,
+      "attempt": 1,
+      "observed_at": 20.0,
+      "delivered_at": 20.2,
+      "status": "dispatching",
+      "reason": "",
+      "delivered_copies": 1
+    }
+  ],
+  "incorrect_latest_attempt_assertion": false,
+  "highest_attempt_actually_acknowledged": true,
+  "latest_is_newest_emission_sequence": true,
+  "physical_transfer_count": 1,
+  "grant_count": 1,
+  "explanation": "A later-emitted response to an older attempt may carry the newer physical snapshot. Sequence orders emitted snapshots; delivered_attempt covers retry acknowledgement. No native fix or weaker highest-attempt requirement is needed.",
+  "evidence_scope": "separate deterministic reproduction after the first recorded assertion failure; not a log captured by that failed invocation"
+}

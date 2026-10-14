@@ -1,0 +1,65 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______ test_preferred_resource_wait_does_not_poll_an_unused_alternative _______
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_preferred_resource_wait_does_not_poll_an_unused_alternative(native):
+        data = receiving_release()
+        data["node_records"].append((4, 1, .01, 4, 0, [2]))
+        data["node_records"][0] = (0, 1, .01, 0, 0, [1, 4])
+        data["node_contracts"].append(dict(node=4, zone="A", capacity=1))
+        for u, v, length in [(0, 4, 100.), (4, 2, 100.)]:
+            data["edge_records"].append((u, v, length, 1.))
+            data["edge_contracts"].append({"from": u, "to": v, "capacity": 1, "entry_headway": .01})
+        data = prepare_input(data)
+        result = native.run(data)
+>       assert_complete_without_polling(data, result)
+
+tests\test_g31_circulation_recovery.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'node_records': [(0, 1, 0.01, 0, 0, [1, 4]), (1, 1, 0.01, 1, 0, [2]), (2, 1, 0.01, 2, 0, [3]), (3, 1, 0.01, 3, 0, [0]...': 0, 'to': 4, 'capacity': 1, 'entry_headway': 0.01}, {'from': 4, 'to': 2, 'capacity': 1, 'entry_headway': 0.01}], ...}
+result = {'schema': 'g31.circulation.execution.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [0.0161, 0.015, 0.0167, 0.0059, 0.0025, 0.0043, ...], ...}
+
+    def assert_complete_without_polling(data, result):
+        audit_result(data, result)
+>       assert all(j["status"] == "completed" for j in result["jobs"])
+E       assert False
+E        +  where False = all(<generator object assert_complete_without_polling.<locals>.<genexpr> at 0x000002DBE9C7B2A0>)
+
+tests\test_g31_circulation_recovery.py:52: AssertionError
+____________ test_candidate_queue_change_recomputes_preferred_wait ____________
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_candidate_queue_change_recomputes_preferred_wait(native):
+        edges = [(0, 1, .1, 1.), (1, 2, .1, 1.), (0, 4, .25, 1.),
+                 (4, 2, .1, 1.), (1, 5, 1., 1.), (5, 3, .1, 1.)]
+        data = prepare_input(dict(
+            node_records=[(n, 1, .01, n, 0, [v for u, v, _, _ in edges if u == n]) for n in range(6)],
+            edge_records=edges,
+            node_contracts=[dict(node=n, zone=str(n), capacity=1) for n in range(6)],
+            edge_contracts=[{"from": u, "to": v, "capacity": 1, "entry_headway": .01} for u, v, _, _ in edges],
+            trays=[dict(tray_id="A", node=0), dict(tray_id="B", node=1), dict(tray_id="C", node=5)],
+            jobs=[job("waiting", 0, 2), job("new-queue", 1, 5, 100), job("release", 5, 3, 200)],
+            transfers=[], faults=[], options=dict(max_events=1000, max_simulation_time=300, trace_limit=1000)))
+        result = native.run(data)
+>       assert_complete_without_polling(data, result)
+
+tests\test_g31_circulation_recovery.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'node_records': [(0, 1, 0.01, 0, 0, [1, 4]), (1, 1, 0.01, 1, 0, [2, 5]), (2, 1, 0.01, 2, 0, []), (3, 1, 0.01, 3, 0, [...': 1, 'to': 5, 'capacity': 1, 'entry_headway': 0.01}, {'from': 5, 'to': 3, 'capacity': 1, 'entry_headway': 0.01}], ...}
+result = {'schema': 'g31.circulation.execution.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [0.0058, 0.0094, 0.0063, 0.0044, 0.0028, 0.0026, ...], ...}
+
+    def assert_complete_without_polling(data, result):
+        audit_result(data, result)
+        assert all(j["status"] == "completed" for j in result["jobs"])
+>       assert result["native_summary"]["event_count"] < 500
+E       assert 884 < 500
+
+tests\test_g31_circulation_recovery.py:53: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_recovery.py::test_preferred_resource_wait_does_not_poll_an_unused_alternative
+FAILED tests/test_g31_circulation_recovery.py::test_candidate_queue_change_recomputes_preferred_wait

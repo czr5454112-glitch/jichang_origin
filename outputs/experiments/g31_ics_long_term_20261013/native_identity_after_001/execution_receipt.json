@@ -1,0 +1,60 @@
+{
+  "schema": "g31.native_identity_fix_receipt.v1",
+  "working_directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree",
+  "classification": "correctness_fix_not_research_innovation",
+  "execution_observation": "Commands and exit codes recorded from actual tools; raw process outputs contain actual module and physical identities.",
+  "runs": [
+    {
+      "label": "before",
+      "command": "C:/PROGRAMING/python3.11.9/python.exe outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/probe.py --source outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/native_host.py --first build_lt_session_015/python/czr005_circulation.cp311-win_amd64.pyd --second build_lt_session_011/python/czr005_circulation.cp311-win_amd64.pyd --output outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/result.json",
+      "exit_code": 1,
+      "tool_wall_seconds": 0.7778708,
+      "result_path": "outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/result.json"
+    },
+    {
+      "label": "after_switch",
+      "command": "C:/PROGRAMING/python3.11.9/python.exe outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/probe.py --source scripts/experiments/g31_ics_circulation/native_host.py --first build_lt_session_015/python/czr005_circulation.cp311-win_amd64.pyd --second build_lt_session_011/python/czr005_circulation.cp311-win_amd64.pyd --output outputs/experiments/g31_ics_long_term_20261013/native_identity_after_001/cross_version.json --expect-rejection",
+      "exit_code": 0,
+      "tool_wall_seconds": 0.7267523,
+      "result_path": "outputs/experiments/g31_ics_long_term_20261013/native_identity_after_001/cross_version.json"
+    },
+    {
+      "label": "fresh_011",
+      "command": "C:/PROGRAMING/python3.11.9/python.exe outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/probe.py --source scripts/experiments/g31_ics_circulation/native_host.py --first build_lt_session_011/python/czr005_circulation.cp311-win_amd64.pyd --output outputs/experiments/g31_ics_long_term_20261013/native_identity_after_001/fresh_011.json",
+      "exit_code": 0,
+      "tool_wall_seconds": 0.7119777,
+      "result_path": "outputs/experiments/g31_ics_long_term_20261013/native_identity_after_001/fresh_011.json"
+    },
+    {
+      "label": "fresh_015",
+      "command": "C:/PROGRAMING/python3.11.9/python.exe outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/probe.py --source scripts/experiments/g31_ics_circulation/native_host.py --first build_lt_session_015/python/czr005_circulation.cp311-win_amd64.pyd --output outputs/experiments/g31_ics_long_term_20261013/native_identity_after_001/fresh_015.json",
+      "exit_code": 0,
+      "tool_wall_seconds": 0.7092216,
+      "result_path": "outputs/experiments/g31_ics_long_term_20261013/native_identity_after_001/fresh_015.json"
+    },
+    {
+      "label": "regression",
+      "command": "C:/PROGRAMING/python3.11.9/python.exe -m pytest -q tests/test_g31_circulation_native_identity.py --junitxml=outputs/experiments/g31_ics_long_term_20261013/native_identity_after_001/regression.xml",
+      "exit_code": 0,
+      "tool_wall_seconds": 3.1767301,
+      "junit": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "5",
+        "time": "2.150",
+        "timestamp": "2026-10-13T20:30:54.464941+08:00",
+        "hostname": "LAPTOP-M3GASC4G"
+      }
+    }
+  ],
+  "source_sha256": {
+    "scripts/experiments/g31_ics_circulation/native_host.py": "03c33fbbaff5049b9068471edf7d7208f4921e977cc008e04461c515635bc48b",
+    "tests/test_g31_circulation_native_identity.py": "611bb3ba69464c5035c83ac003075964da9aace93cc6fa188a6a763b776361e0",
+    "outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd",
+    "outputs/experiments/g31_ics_long_term_20261013/native_identity_before_001/probe.py": "ffc9202ad54e2d608a90c38e6fff6bf33538c71c875a28c820a22ac31cfa54bc"
+  },
+  "frozen_after_source_matches": true,
+  "staged_paths_at_completion": []
+}

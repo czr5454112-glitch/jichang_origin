@@ -1,0 +1,44 @@
+{
+  "horizon": 50.0,
+  "start": 0.11,
+  "control_period": 0.5,
+  "command_delay": 0.01,
+  "publication_delay": 0.02,
+  "retry_period": 0.5,
+  "policies": {
+    "r1_only": {
+      "routes": true,
+      "forecasts": true,
+      "prebalance": false,
+      "predictive": false
+    },
+    "reactive_r2": {
+      "routes": false,
+      "forecasts": false,
+      "prebalance": true,
+      "predictive": false
+    },
+    "predictive_r2": {
+      "routes": false,
+      "forecasts": true,
+      "prebalance": true,
+      "predictive": true
+    },
+    "joint_r1_r2": {
+      "routes": true,
+      "forecasts": true,
+      "prebalance": true,
+      "predictive": true
+    }
+  },
+  "cases": [
+    "ordinary",
+    "lost_ack",
+    "duplicate_ack",
+    "source_unavailable",
+    "receiver_unavailable",
+    "receiver_refuses",
+    "known_service_ack_loss"
+  ],
+  "selection": "declared before native execution; all outcomes retained"
+}

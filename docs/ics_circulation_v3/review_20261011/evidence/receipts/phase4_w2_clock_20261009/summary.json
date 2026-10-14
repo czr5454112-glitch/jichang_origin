@@ -1,0 +1,40 @@
+{
+  "experiment": "W2 shared physical/message clock",
+  "fixture_count": 21,
+  "request_count": 23,
+  "outcome_counts": {
+    "new_route_success": 9,
+    "commit_failure": 4,
+    "outcome_unknown": 1,
+    "updated_route_success": 3,
+    "suffix_update_failed_old_route_kept": 2,
+    "owner_failure": 1,
+    "still_valid_old_route": 1,
+    "proven_infeasible": 1,
+    "search_exhausted": 1
+  },
+  "physical_commit_count": 13,
+  "all_checkpoint_replays_exact": true,
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/distributed_clock.py": "90b8514f2eefa41021d7522c42a05023c26751e0c46528e33c9fe0472ace47c3",
+    "scripts/experiments/ics_circulation_v3/run_distributed_clock.py": "9877732b0d5cba4f5d648822698f8f2436da3257b3936596ee24c5d8727cf7c5",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "scripts/experiments/ics_circulation_v3/model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "scripts/experiments/ics_circulation_v3/partition_observation.py": "0b9c925eb3316e0d5ecb10b61f80372fabaa1dc635bab2b78cc8abea65229d77",
+    "scripts/experiments/ics_circulation_v3/request_service.py": "8d2c540b65e2e888c5688149c54455dc5c135178135a6e7556b501b12fa81d62",
+    "scripts/experiments/ics_circulation_v3/routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "tests/test_ics_circulation_v3_distributed_clock.py": "21a194cb2798d97b2e53607ef0c1596061de3419d8ab03a6399e2700658075f5"
+  },
+  "limitations": [
+    "Controlled synthetic development fixtures; no held-out generalization claim.",
+    "In-process event loop and data-flow isolation, not deployed distributed services or process security.",
+    "Public topology/module parameters; local static search permits contiguous traversal and initial waiting only.",
+    "Atomic global physical arbiter is an explicit proxy; planners never receive its global calendars.",
+    "Short local prepare leases are not physical commitments or guaranteed future tray supply.",
+    "Owner outage has an explicit synthetic failure-detector message, itself delayable/droppable.",
+    "Integer transport delays advance physical motion; CPU is zero simulated duration; no real network latency claim.",
+    "Unknown outcomes remain unknown at coordinator; owner_committed is offline ground truth only.",
+    "Suffix authority is original task partition plus explicit replaceable_trays; protected/empty obligations remain irrevocable.",
+    "An unresolved/fenced request can retain an admission token until a resolve reaches the arbiter; no claim of crash consensus."
+  ]
+}

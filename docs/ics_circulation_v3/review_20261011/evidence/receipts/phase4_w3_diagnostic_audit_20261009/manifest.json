@@ -1,0 +1,38 @@
+{
+  "schema": "round4_independent_artifact_audit_manifest_v1",
+  "status": "completed_no_audit_errors",
+  "final_artifacts": [
+    "destination_audit_final.json",
+    "horizon_audit_final.json",
+    "mechanisms_audit_final.json"
+  ],
+  "checks": {
+    "destination_audit_final.json": 101586,
+    "horizon_audit_final.json": 361226,
+    "mechanisms_audit_final.json": 86774
+  },
+  "all_final_audits_error_free": true,
+  "validation": "phase4_w3_round4_validation_corrected_20261009/validation_manifest.json: 657 passed; earlier schema-whitelist failure preserved separately",
+  "verifiers": {
+    "destination": "read_only_verifier.py",
+    "horizon": "read_only_horizon_verifier_v2.py",
+    "mechanisms": "read_only_mechanisms_verifier.py"
+  },
+  "scope": "read-only hashes, complete request grids, every unique horizon gzip, arithmetic and previously stored physics comparison; no fitting or simulation in this audit",
+  "preliminary_not_final": [
+    "destination_audit.json",
+    "read_only_horizon_verifier.py"
+  ],
+  "files_sha256": {
+    "destination_audit.json": "31ed9128623e186b8bb1f55a48236310cd102a8deb81bb4feb6d3b1edb92beaa",
+    "destination_audit_final.json": "6b27f6977c16d9a4b13de93ed29c76cb95fd7ca69183c18fa60ea51f6d18a2c4",
+    "horizon_audit_final.json": "b752adc90e86a3490476cacd5447ec337242716ad2e0690bf4a5aedc6fe15b17",
+    "mechanisms_audit_final.json": "4fc462dc17254cb01f43c88f58cd208baff15210da34471b7d34abf042a44314",
+    "pre_run_source_review.json": "7dcb69a35cab6e3cd8a3c129eaf7d909da20abf5b80844a838e55bb84c29e954",
+    "read_only_horizon_verifier.py": "71798a11f6c65c4f4398682a1ace50e5adf2cb0f8a976470ec826772e00a8fb5",
+    "read_only_horizon_verifier_v2.py": "140b2ac82813d4e0934e4b93ea153cb0f1a17f13a25a34f0a1c877c517fcf2a2",
+    "read_only_mechanisms_verifier.py": "785491f7f56e997ea8fdb2574366306d728406212e2bbc96ab869de51f0cc8d5",
+    "read_only_verifier.py": "2e472607f804f513be6e7dbac937475c7b89300b461ad448a0e65f5c64677f4e",
+    "validation_schema_correction.json": "66d757e97e8ed425ff28e7e073205c1d6e793b433d24cee66abc2ffe89d7c477"
+  }
+}

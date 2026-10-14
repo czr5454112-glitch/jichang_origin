@@ -1,0 +1,145 @@
+{
+  "scenario": {
+    "name": "long_5000m",
+    "length": 5000.0,
+    "speed": 5.0,
+    "future_source": false
+  },
+  "domain_size": 31,
+  "evaluated": 31,
+  "exhaustive": true,
+  "finite_optimality": "optimal_in_enumerated_domain",
+  "global_optimality": "unknown",
+  "protected_candidates": 8,
+  "distinct_physical_outcomes": 15,
+  "conditional_joint_conflicts": 22,
+  "statuses": {
+    "verified": 31
+  },
+  "policies": {
+    "ordinary_public_windows": {
+      "action_id": "s0:d0:t1.65|s1:d1:t1.65",
+      "status": "verified",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 5000,
+        "cost": 3010.399999999999,
+        "offered": 5,
+        "completed": 5,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "U0",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "U1",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "D0",
+            "restricted_time": 1003.2999999999998,
+            "completed": true,
+            "completed_at": 1003.2999999999998,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "D1",
+            "restricted_time": 2003.5499999999995,
+            "completed": true,
+            "completed_at": 2003.5499999999995,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "P",
+            "restricted_time": 2.15,
+            "completed": true,
+            "completed_at": 2.15,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "paired_service_preserved": true
+    },
+    "one_round_same_assignment": {},
+    "joint_conditional_repair": {
+      "action_id": "s0:d0:t1.65",
+      "status": "verified",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 5000,
+        "cost": 6006.849999999999,
+        "offered": 5,
+        "completed": 4,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 1,
+        "per_job": [
+          {
+            "business_bag_id": "U0",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "U1",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "D0",
+            "restricted_time": 1003.2999999999998,
+            "completed": true,
+            "completed_at": 1003.2999999999998,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "D1",
+            "restricted_time": 5000.0,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "waiting_for_tray"
+          },
+          {
+            "business_bag_id": "P",
+            "restricted_time": 2.15,
+            "completed": true,
+            "completed_at": 2.15,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "paired_service_preserved": false
+    }
+  },
+  "best_action_id": "s0:d0:t0.81|s1:d1:t0.81",
+  "reference_headroom": 0.0,
+  "stale_read_set_actual_reply": {
+    "status": "stale_read_set",
+    "submissions": [],
+    "reason": "source_owner_version_changed"
+  },
+  "public_compute_ms": 2.2366000339388847,
+  "native_reference_seconds": 0.4365133999963291
+}

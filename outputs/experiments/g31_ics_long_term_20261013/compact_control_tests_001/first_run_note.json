@@ -1,0 +1,18 @@
+{
+  "schema": "g31.compact_test_first_run_note.v1",
+  "status": "failed",
+  "evidence_type": "transcription of actual captured exec tool result; no saved JUnit or pre-run source hash",
+  "command": "python -m pytest tests/test_g31_circulation_compact_control.py tests/test_g31_circulation_control_projection.py tests/test_g31_circulation_analytic_reference.py -q",
+  "native_binary": "build_lt_session_007/python/czr005_circulation.cp311-win_amd64.pyd",
+  "exit_code": 1,
+  "counts": {"tests": 90, "passed": 87, "failed": 3},
+  "failures": [
+    {"test": "test_compact_native_forecasts_pending_pledge_and_rejected_intents_match", "actual_error": "RuntimeError: Unable to cast Python instance of type <class 'int'> to C++ type '?'", "cause": "Fixture expected_version=-1 cannot be represented by native unsigned version; legal stale positive version is needed to exercise rejection."},
+    {"test": "test_local_loaded_contract_shadows_remote_stale_waiting_snapshot", "actual_error": "AssertionError: local B jobs did not contain B1 at t=10", "cause": "Hold had already finished and tray job pointer was cleared; actual native EDGE_EXIT receipt establishes loaded local visibility at t=6.5."},
+    {"test": "test_future_tape_and_unrelated_owner_do_not_change_compact_projection_or_signature", "actual_error": "ValueError: circulation:zero_hop_contract_unsupported", "cause": "Added hidden future job accidentally used origin=destination=4; replace with legal different destination while preserving hidden future test."}
+  ],
+  "junit_captured": false,
+  "source_before_captured": false,
+  "assertions_relaxed": false,
+  "production_change_for_these_fixtures": false
+}

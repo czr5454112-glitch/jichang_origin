@@ -1,0 +1,105 @@
+{
+  "equal": true,
+  "differences": [],
+  "old_checkpoint_audit_sha256": "42b490dc38a4760ae1196dd920621d13326262a7b6c4c0aecac720bf0afa9217",
+  "new_checkpoint_audit_sha256": "0eb5a183dc33c5cb20ae45079536ed088dbeed1c20ddd3d970a797be51f8ac54",
+  "old_search_work": 31,
+  "new_search_work": 45,
+  "current_contract": {
+    "schema": "ics_v3_phase4_control_contract_v1",
+    "spec": {
+      "routing": "external",
+      "predictive": true,
+      "reactive": true,
+      "slow_period": 2,
+      "planning_horizon": 20,
+      "route_mode": "next_edge",
+      "coordination_order": "route_then_prebalance",
+      "candidate_count": 4,
+      "expansion_limit": 2000,
+      "static_path_limit": 12,
+      "local_label_limit": 3,
+      "dynamic_local": true
+    },
+    "information": {
+      "observable": "Snapshot only, including visible bags and published forecast revisions",
+      "forecast_sha256": "1be1935a41e5b3cb6eab7b20bcc0435727babb5967500a82500b8ecb1a1b1ede",
+      "future_tape_access": "event_engine_only_not_selector_or_slow_controller",
+      "conditional_release_use": "optional_conditional_timed_route_scoring_only_existing_greedy_uses_firm_first_release",
+      "forecast_publication_gate": "filter_on_actual_observed_snapshot_now_before_passing_to_scorers"
+    },
+    "continuation": {
+      "spec": {
+        "routing": "external",
+        "predictive": true,
+        "reactive": true,
+        "slow_period": 2,
+        "planning_horizon": 20,
+        "route_mode": "next_edge",
+        "coordination_order": "route_then_prebalance",
+        "candidate_count": 4,
+        "expansion_limit": 2000,
+        "static_path_limit": 12,
+        "local_label_limit": 3,
+        "dynamic_local": true
+      },
+      "selector": {
+        "implementation": "RecoverySelector",
+        "schema": "physical31",
+        "kind": "paired_direct",
+        "seed": 17,
+        "model_sha256": "b2ade9a3c70498b9a2b5a5e3f359936b3873aa3ee6ed04075ccc12d75464eb8c",
+        "training_bounds_sha256": "27ee5a2a38250b839538b4cd4478aee4ef8cdf43eb360ed0c6bbbfe46b7c90ea"
+      },
+      "prebalancer": "PredictivePrebalancer",
+      "slow_clock_phase": 0,
+      "wall_clock_cutoffs": null,
+      "slow_candidate_budget": 32,
+      "slow_proposal_budget": 8,
+      "forecast_ttl": 60,
+      "permission_owner": "unchanged_ExecutionValidator",
+      "local_module": "input_snapshot_fixed_module",
+      "implementation_sha256": {
+        "phase4_control.py": "70597fe1bce15a2f69d033aa389f0f68833b460a40ec2281b90599f36f475094",
+        "conditional_evaluation.py": "355a85d1840880ef4a7d88ca878d53ece059ec9a3fb62045a5f5b2bfb77abc1f",
+        "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+        "prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+        "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+        "routing.py": "58bfb4b774103516abb66ec8dde1d1c30409b887e8315fa3d1497d25fa8399f6",
+        "routing_reference.py": "0fa5bf23396196a8a31d62a903dd3b2ad4b2e64aebe553bea4d89bf1d132430c",
+        "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+        "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+        "routing_cache_contract.py": "8465d4367794ca0153dfce12774a877932fa8e6eebf646c6ff7465074f65ca0e"
+      },
+      "routing_cache_contract": {
+        "schema": "isolated_replay_v1",
+        "logical_preprocessing": "cold_equivalent_per_query",
+        "physical_cache": "generator_owned_deepcopy; pure_factory_creates_fresh_private_generator",
+        "deadline_ms": null,
+        "fast_factory": {
+          "horizon": 20,
+          "expansion_limit": 2000,
+          "static_path_limit": 12,
+          "dynamic_local": true,
+          "local_label_limit": 3
+        },
+        "slow_factory": {
+          "horizon": 20,
+          "expansion_limit": 2000,
+          "static_path_limit": 12,
+          "dynamic_local": true,
+          "local_label_limit": 3
+        },
+        "external_callback_scope": "only these entrances and propagated CursorSimulation public projections"
+      }
+    },
+    "information_sha256": "6bb772fd87ae5050a1caf987f9c67df0a138d45d3a802f0ab23c80c832535f06",
+    "continuation_sha256": "d7b9e40beaadcf65a33b34176d548e7c757ba3f03ba078cea8e291363d7d978c",
+    "contract_sha256": "007f7b3ef77cdd80806af9ba9defffd7d87e2c0f86162215638ccb925c48c6f2"
+  },
+  "excluded_identity_fields": [
+    "checkpoint_sha256",
+    "search_work",
+    "implementation/cache provenance"
+  ]
+}

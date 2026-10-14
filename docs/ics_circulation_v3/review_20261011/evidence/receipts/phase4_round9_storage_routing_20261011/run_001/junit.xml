@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="23" time="0.748" timestamp="2026-10-11T16:08:23.659926+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_ordinary_bag_and_empty_delegate_exactly[CandidateGenerator]" time="0.026" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_ordinary_bag_and_empty_delegate_exactly[&lt;lambda&gt;]" time="0.002"><failure message="assert 15 == 5&#10; +  where 15 = &lt;scripts.experiments.ics_circulation_v3.storage_routing.StorageCandidateGenerator object at 0x0000017BBA0B8B50&gt;.last_expansions&#10; +  and   5 = &lt;scripts.experiments.ics_circulation_v3.routing.RegionalCandidateGenerator object at 0x0000017BBAC95E90&gt;.last_expansions">factory = &lt;function &lt;lambda&gt; at 0x0000017BBB5BC2C0&gt;
+
+    @pytest.mark.parametrize("factory", [CandidateGenerator, lambda: RegionalCandidateGenerator(deadline_ms=None)])
+    def test_ordinary_bag_and_empty_delegate_exactly(factory):
+        state = case()
+        state.bags["bag"] = Bag("bag", "S", "G", 0, 30)
+        wrapped = StorageCandidateGenerator(factory())
+        plain = deepcopy(wrapped.generator)
+        assert wrapped.generate(state, "bag", "tray", 2) == plain.generate(state, "bag", "tray", 2)
+        assert wrapped.last_search_status == plain.last_search_status
+&gt;       assert wrapped.last_expansions == plain.last_expansions
+E       assert 15 == 5
+E        +  where 15 = &lt;scripts.experiments.ics_circulation_v3.storage_routing.StorageCandidateGenerator object at 0x0000017BBA0B8B50&gt;.last_expansions
+E        +  and   5 = &lt;scripts.experiments.ics_circulation_v3.routing.RegionalCandidateGenerator object at 0x0000017BBAC95E90&gt;.last_expansions
+
+tests\test_ics_circulation_v3_storage_routing.py:48: AssertionError</failure></testcase><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_complete_witness_must_visit_storage_and_hold_same_tray_until_release" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_full_storage_requires_delayed_ingress_and_real_node_reservation" time="0.001"><failure message="ValueError: not enough values to unpack (expected 1, got 0)">def test_full_storage_requires_delayed_ingress_and_real_node_reservation():
+        state = case()
+        state.reservations = (Reservation("node:E", 0, 4, "occupant"),)
+&gt;       candidate, = generator().generate(state, "bag", "tray", 1)
+        ^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_ics_circulation_v3_storage_routing.py:73: ValueError</failure></testcase><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_full_storage_and_blocked_upstream_wait_cannot_be_bypassed" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_one_free_storage_slot_is_sufficient_without_unbounded_capacity" time="0.001"><failure message="ValueError: not enough values to unpack (expected 1, got 0)">def test_one_free_storage_slot_is_sufficient_without_unbounded_capacity():
+        state = case(capacity=2)
+        state.reservations = (Reservation("node:E", 0, INFINITY, "occupant"),)
+&gt;       candidate, = generator().generate(state, "bag", "tray", 1)
+        ^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_ics_circulation_v3_storage_routing.py:91: ValueError</failure></testcase><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_reception_calendar_projects_delay_through_downstream_no_wait_node" time="0.001"><failure message="ValueError: not enough values to unpack (expected 1, got 0)">def test_reception_calendar_projects_delay_through_downstream_no_wait_node():
+        state = case()
+        state.network.nodes["N"] = Node("N", "zone", "other_owner", can_wait=False)
+        state.network.edges.pop("egress")
+        state.network.edges.update({"E-N": Edge("E-N", "E", "N", 1), "N-G": Edge("N-G", "N", "G", 1)})
+        state.reservations = (Reservation("reception:G", 0, 9, "receiver"),)
+&gt;       candidate, = generator().generate(state, "bag", "tray", 1)
+        ^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_ics_circulation_v3_storage_routing.py:103: ValueError</failure></testcase><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_long_release_uses_original_horizon_and_reports_unknown_bound" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_final_protected_deadline_includes_storage_and_unload" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_late_ingress_does_not_travel_backwards_to_scheduled_release" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_real_stored_progress_allows_release_wait_without_second_ingress" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_departed_progress_does_not_reimpose_another_storage_visit" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_presence_at_storage_cannot_invent_missing_ingress_history" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_wrong_tray_or_future_progress_cannot_authorize_departure[update0]" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_wrong_tray_or_future_progress_cannot_authorize_departure[update1]" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_wrong_tray_or_future_progress_cannot_authorize_departure[update2]" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_shared_budget_counts_cold_graph_before_any_product_search" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_wall_deadline_is_enforced_before_cold_preprocessing" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_repeat_and_deepcopy_retain_full_cold_work_and_recompute_changed_release" time="0.002" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_k_is_global_for_complete_candidates_and_ids_have_owned_baseline" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_static_direct_connection_does_not_mask_unreachable_required_storage" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_generator_does_not_hide_storage_contract_on_plain_snapshot" time="0.001" /><testcase classname="tests.test_ics_circulation_v3_storage_routing" name="test_opt_in_wrapper_does_not_change_base_bag_serialization" time="0.001" /></testsuite></testsuites>

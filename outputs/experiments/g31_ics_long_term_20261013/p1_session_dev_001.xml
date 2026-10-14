@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="19" time="0.727" timestamp="2026-10-13T13:11:25.220579+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[0.05]" time="0.010" /><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[0.12]" time="0.005" /><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[1.2]" time="0.005" /><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[3]" time="0.005" /><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[6]" time="0.006" /><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[8.2]" time="0.006" /><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[9]" time="0.006" /><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[10]" time="0.006" /><testcase classname="tests.test_g31_circulation_session" name="test_live_restore_is_same_continuation[14]" time="0.006" /><testcase classname="tests.test_g31_circulation_session" name="test_quiescent_siblings_diverge_only_after_explicit_action" time="0.006" /><testcase classname="tests.test_g31_circulation_session" name="test_future_environment_never_changes_current_observation" time="0.002" /><testcase classname="tests.test_g31_circulation_session" name="test_delayed_demand_is_an_immutable_observed_snapshot" time="0.002" /><testcase classname="tests.test_g31_circulation_session" name="test_asynchronous_route_request_obeys_prefix_and_service_permission[True-0.01-allowed]" time="0.002"><failure message="assert 1 == 6">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+permission = True, delay = 0.01, reason = 'allowed'
+
+    @pytest.mark.parametrize("permission,delay,reason", [(True,.01,"allowed"),(False,.01,"service_obligation_disallows_reroute"),(True,.2,"stale_executed_prefix")])
+    def test_asynchronous_route_request_obeys_prefix_and_service_permission(native,permission,delay,reason):
+        data=without_return();data["jobs"][0]["allow_suffix_reroute"]=permission
+        s=native.NativeSession(data);s.advance_to(.11)
+        assert s.submit_route_intent(route_request(s.observe("A"),delay))["status"]=="pending"
+        result=s.result_at(30)
+        requests=s.observe("A")["route_requests"]
+        assert requests[0]["reason"]==reason
+        first=next(r for r in result["receipts"] if r["event"]=="EDGE_ENTER")
+&gt;       assert first["to"]==(6 if reason=="allowed" else 1)
+E       assert 1 == 6
+
+tests\test_g31_circulation_session.py:88: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_session" name="test_asynchronous_route_request_obeys_prefix_and_service_permission[False-0.01-service_obligation_disallows_reroute]" time="0.002" /><testcase classname="tests.test_g31_circulation_session" name="test_asynchronous_route_request_obeys_prefix_and_service_permission[True-0.2-stale_executed_prefix]" time="0.002" /><testcase classname="tests.test_g31_circulation_session" name="test_transfer_permission_staleness_and_cancellation" time="0.001" /><testcase classname="tests.test_g31_circulation_session" name="test_committed_empty_prefix_cannot_be_cancelled" time="0.002" /><testcase classname="tests.test_g31_circulation_session" name="test_closed_edge_is_preserved_and_never_entered" time="0.007"><failure message="assert False&#10; +  where False = all(&lt;generator object test_closed_edge_is_preserved_and_never_entered.&lt;locals&gt;.&lt;genexpr&gt; at 0x0000021E691A42B0&gt;)">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+
+    def test_closed_edge_is_preserved_and_never_entered(native):
+        data=tiny_cycle();data["edge_contracts"][0]["capacity"]=0
+        result=native.run(data)
+        assert all(not(r["event"]=="EDGE_ENTER" and (r["from"],r["to"])==(0,1)) for r in result["receipts"])
+&gt;       assert all(j["status"]=="completed" for j in result["jobs"])
+E       assert False
+E        +  where False = all(&lt;generator object test_closed_edge_is_preserved_and_never_entered.&lt;locals&gt;.&lt;genexpr&gt; at 0x0000021E691A42B0&gt;)
+
+tests\test_g31_circulation_session.py:114: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_session" name="test_event_budget_does_not_jump_over_unprocessed_physics" time="0.002" /></testsuite></testsuites>

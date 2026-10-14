@@ -1,0 +1,574 @@
+.F.FFFFF...                                                              [100%]
+================================== FAILURES ===================================
+____ test_event_controller_native_checkpoint_json_continuation[protocol1] _____
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_013\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+protocol = {'drop_ack_packets': 1}
+
+    @pytest.mark.parametrize("protocol", [{}, {"drop_ack_packets": 1},
+        {"duplicate_acks": True, "duplicate_ack_delay": .1},
+        {"owner_outages": [{"owner": "B", "start": .2, "end": 12.}]}])
+    def test_event_controller_native_checkpoint_json_continuation(native, protocol):
+        data = scene(protocol)
+        continuous = native.NativeSession(data)
+>       full = run_event_protocol_control(continuous, ["A", "B"], horizon=30., **OPTIONS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_event_control.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <czr005_circulation.NativeSession object at 0x00000252C680A2F0>
+owners = ['A', 'B'], horizon = 30.0, control_period = 1.0, predictive = True
+command_delay = 0.01, publication_delay = 0.02, retry_period = 0.5
+routes = True, forecasts = True, prebalance = True, compact = True
+lease_seconds = 120.0, state = None, event_budget = 100000
+max_activations = 10000
+
+    def run_event_protocol_control(session: Any, owners: list[str], *, horizon: float,
+            control_period: float = 60., predictive: bool = True, command_delay: float = 2.,
+            publication_delay: float = .5, retry_period: float = 60., routes: bool = True,
+            forecasts: bool = True, prebalance: bool = True, compact: bool = True,
+            lease_seconds: float = 120., state: dict | None = None, event_budget: int = 100000,
+            max_activations: int = 10000) -> dict:
+        """Continue actual owner notifications and declared public timers.
+    
+        Computation counters and intermediate native budget stops are diagnostic,
+        not inputs to an owner policy. JSON state must be paired with the native
+        checkpoint. Only completed native timestamps authorize policy activation.
+        """
+        if not owners or len(set(owners)) != len(owners):
+            raise ValueError("event_control:invalid_owners")
+        if not all(math.isfinite(v) and v >= 0 for v in (horizon, command_delay, publication_delay, lease_seconds)):
+            raise ValueError("event_control:invalid_timing")
+        if not all(math.isfinite(v) and v > 0 for v in (control_period, retry_period)):
+            raise ValueError("event_control:invalid_period")
+        if horizon < session.physical_time or event_budget <= 0 or max_activations <= 0:
+            raise ValueError("event_control:invalid_horizon_or_budget")
+        config = {"owners": owners, "control_period": control_period, "predictive": predictive,
+            "command_delay": command_delay, "publication_delay": publication_delay,
+            "retry_period": retry_period, "routes": routes, "forecasts": forecasts,
+            "prebalance": prebalance, "compact": compact, "lease_seconds": lease_seconds}
+        current = copy.deepcopy(state) if state is not None else {
+            "schema": "g31.event_protocol_controller.v1", "config": copy.deepcopy(config),
+            "start": session.physical_time, "next_tick": 0, "after_sequences": {o: 0 for o in owners},
+            "pending_owners": [], "pending_causes": {}, "owner_epochs": {},
+            "published": {}, "routes": {}, "forecasts": {}}
+        if current.get("schema") != "g31.event_protocol_controller.v1" or current.get("config") != config:
+            raise ValueError("event_control:state_configuration_mismatch")
+        client = ProtocolClient(session, retry_period=retry_period, state=current.get("client"))
+        records, native_batches = [], []
+        status, complete = "running", False
+        while True:
+            while current["pending_owners"]:
+                if len(records) >= max_activations:
+                    status = "control_budget_exhausted"
+                    break
+                owner = current["pending_owners"][0]
+                records.append(_activate_owner(client, owner, current, current["pending_causes"][owner]))
+                current["pending_owners"].pop(0)
+                del current["pending_causes"][owner]
+            if status == "control_budget_exhausted":
+                break
+            tick_time = current["start"] + current["next_tick"] * control_period
+            deadline = min(horizon, tick_time, _retry_time(client))
+            if deadline < session.physical_time:
+                raise ValueError("event_control:missed_public_timer")
+            started = time.perf_counter(); cpu = time.process_time()
+            response = session.advance_until_owner_notification(
+                owners, current["after_sequences"], deadline, max_events=event_budget)
+            native_batches.append({"requested_public_deadline": deadline, "status": response["status"],
+                "timestamp_complete": response.get("timestamp_complete", False),
+                "wall_ms": 1000*(time.perf_counter()-started), "cpu_ms": 1000*(time.process_time()-cpu)})
+            if response["status"] == "budget_exhausted":
+                status = "native_budget_exhausted"
+                break
+            if response["status"] not in {"notified", "horizon_reached"} or not response.get("timestamp_complete", False):
+                raise ValueError("event_control:invalid_native_notification_boundary")
+            now = session.physical_time
+            notices = response.get("notifications", {})
+            if any(o not in owners for o in notices):
+                raise ValueError("event_control:unsubscribed_notification")
+            causes = {}
+            for owner, notice in notices.items():
+                sequence = notice["sequence"]
+                if sequence <= current["after_sequences"][owner] or notice["observed_at"] > now:
+>                   raise ValueError("event_control:invalid_notification_identity")
+E                   ValueError: event_control:invalid_notification_identity
+
+scripts\experiments\g31_ics_circulation\event_protocol_control.py:158: ValueError
+____ test_event_controller_native_checkpoint_json_continuation[protocol3] _____
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_013\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+protocol = {'owner_outages': [{'owner': 'B', 'start': 0.2, 'end': 12.0}]}
+
+    @pytest.mark.parametrize("protocol", [{}, {"drop_ack_packets": 1},
+        {"duplicate_acks": True, "duplicate_ack_delay": .1},
+        {"owner_outages": [{"owner": "B", "start": .2, "end": 12.}]}])
+    def test_event_controller_native_checkpoint_json_continuation(native, protocol):
+        data = scene(protocol)
+        continuous = native.NativeSession(data)
+>       full = run_event_protocol_control(continuous, ["A", "B"], horizon=30., **OPTIONS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_event_control.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <czr005_circulation.NativeSession object at 0x00000252C6441C30>
+owners = ['A', 'B'], horizon = 30.0, control_period = 1.0, predictive = True
+command_delay = 0.01, publication_delay = 0.02, retry_period = 0.5
+routes = True, forecasts = True, prebalance = True, compact = True
+lease_seconds = 120.0, state = None, event_budget = 100000
+max_activations = 10000
+
+    def run_event_protocol_control(session: Any, owners: list[str], *, horizon: float,
+            control_period: float = 60., predictive: bool = True, command_delay: float = 2.,
+            publication_delay: float = .5, retry_period: float = 60., routes: bool = True,
+            forecasts: bool = True, prebalance: bool = True, compact: bool = True,
+            lease_seconds: float = 120., state: dict | None = None, event_budget: int = 100000,
+            max_activations: int = 10000) -> dict:
+        """Continue actual owner notifications and declared public timers.
+    
+        Computation counters and intermediate native budget stops are diagnostic,
+        not inputs to an owner policy. JSON state must be paired with the native
+        checkpoint. Only completed native timestamps authorize policy activation.
+        """
+        if not owners or len(set(owners)) != len(owners):
+            raise ValueError("event_control:invalid_owners")
+        if not all(math.isfinite(v) and v >= 0 for v in (horizon, command_delay, publication_delay, lease_seconds)):
+            raise ValueError("event_control:invalid_timing")
+        if not all(math.isfinite(v) and v > 0 for v in (control_period, retry_period)):
+            raise ValueError("event_control:invalid_period")
+        if horizon < session.physical_time or event_budget <= 0 or max_activations <= 0:
+            raise ValueError("event_control:invalid_horizon_or_budget")
+        config = {"owners": owners, "control_period": control_period, "predictive": predictive,
+            "command_delay": command_delay, "publication_delay": publication_delay,
+            "retry_period": retry_period, "routes": routes, "forecasts": forecasts,
+            "prebalance": prebalance, "compact": compact, "lease_seconds": lease_seconds}
+        current = copy.deepcopy(state) if state is not None else {
+            "schema": "g31.event_protocol_controller.v1", "config": copy.deepcopy(config),
+            "start": session.physical_time, "next_tick": 0, "after_sequences": {o: 0 for o in owners},
+            "pending_owners": [], "pending_causes": {}, "owner_epochs": {},
+            "published": {}, "routes": {}, "forecasts": {}}
+        if current.get("schema") != "g31.event_protocol_controller.v1" or current.get("config") != config:
+            raise ValueError("event_control:state_configuration_mismatch")
+        client = ProtocolClient(session, retry_period=retry_period, state=current.get("client"))
+        records, native_batches = [], []
+        status, complete = "running", False
+        while True:
+            while current["pending_owners"]:
+                if len(records) >= max_activations:
+                    status = "control_budget_exhausted"
+                    break
+                owner = current["pending_owners"][0]
+                records.append(_activate_owner(client, owner, current, current["pending_causes"][owner]))
+                current["pending_owners"].pop(0)
+                del current["pending_causes"][owner]
+            if status == "control_budget_exhausted":
+                break
+            tick_time = current["start"] + current["next_tick"] * control_period
+            deadline = min(horizon, tick_time, _retry_time(client))
+            if deadline < session.physical_time:
+                raise ValueError("event_control:missed_public_timer")
+            started = time.perf_counter(); cpu = time.process_time()
+            response = session.advance_until_owner_notification(
+                owners, current["after_sequences"], deadline, max_events=event_budget)
+            native_batches.append({"requested_public_deadline": deadline, "status": response["status"],
+                "timestamp_complete": response.get("timestamp_complete", False),
+                "wall_ms": 1000*(time.perf_counter()-started), "cpu_ms": 1000*(time.process_time()-cpu)})
+            if response["status"] == "budget_exhausted":
+                status = "native_budget_exhausted"
+                break
+            if response["status"] not in {"notified", "horizon_reached"} or not response.get("timestamp_complete", False):
+                raise ValueError("event_control:invalid_native_notification_boundary")
+            now = session.physical_time
+            notices = response.get("notifications", {})
+            if any(o not in owners for o in notices):
+                raise ValueError("event_control:unsubscribed_notification")
+            causes = {}
+            for owner, notice in notices.items():
+                sequence = notice["sequence"]
+                if sequence <= current["after_sequences"][owner] or notice["observed_at"] > now:
+>                   raise ValueError("event_control:invalid_notification_identity")
+E                   ValueError: event_control:invalid_notification_identity
+
+scripts\experiments\g31_ics_circulation\event_protocol_control.py:158: ValueError
+_ test_partial_native_or_owner_budget_resumes_without_advancing_to_audit[1-10000] _
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_013\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+event_budget = 1, activation_budget = 10000
+
+    @pytest.mark.parametrize("event_budget,activation_budget", [(1, 10000), (100000, 1), (1, 1)])
+    def test_partial_native_or_owner_budget_resumes_without_advancing_to_audit(native, event_budget, activation_budget):
+        data = scene({"drop_ack_packets": 1})
+        continuous = native.NativeSession(data)
+>       full = run_event_protocol_control(continuous, ["A", "B"], horizon=30., **OPTIONS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_event_control.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <czr005_circulation.NativeSession object at 0x00000252C649C9B0>
+owners = ['A', 'B'], horizon = 30.0, control_period = 1.0, predictive = True
+command_delay = 0.01, publication_delay = 0.02, retry_period = 0.5
+routes = True, forecasts = True, prebalance = True, compact = True
+lease_seconds = 120.0, state = None, event_budget = 100000
+max_activations = 10000
+
+    def run_event_protocol_control(session: Any, owners: list[str], *, horizon: float,
+            control_period: float = 60., predictive: bool = True, command_delay: float = 2.,
+            publication_delay: float = .5, retry_period: float = 60., routes: bool = True,
+            forecasts: bool = True, prebalance: bool = True, compact: bool = True,
+            lease_seconds: float = 120., state: dict | None = None, event_budget: int = 100000,
+            max_activations: int = 10000) -> dict:
+        """Continue actual owner notifications and declared public timers.
+    
+        Computation counters and intermediate native budget stops are diagnostic,
+        not inputs to an owner policy. JSON state must be paired with the native
+        checkpoint. Only completed native timestamps authorize policy activation.
+        """
+        if not owners or len(set(owners)) != len(owners):
+            raise ValueError("event_control:invalid_owners")
+        if not all(math.isfinite(v) and v >= 0 for v in (horizon, command_delay, publication_delay, lease_seconds)):
+            raise ValueError("event_control:invalid_timing")
+        if not all(math.isfinite(v) and v > 0 for v in (control_period, retry_period)):
+            raise ValueError("event_control:invalid_period")
+        if horizon < session.physical_time or event_budget <= 0 or max_activations <= 0:
+            raise ValueError("event_control:invalid_horizon_or_budget")
+        config = {"owners": owners, "control_period": control_period, "predictive": predictive,
+            "command_delay": command_delay, "publication_delay": publication_delay,
+            "retry_period": retry_period, "routes": routes, "forecasts": forecasts,
+            "prebalance": prebalance, "compact": compact, "lease_seconds": lease_seconds}
+        current = copy.deepcopy(state) if state is not None else {
+            "schema": "g31.event_protocol_controller.v1", "config": copy.deepcopy(config),
+            "start": session.physical_time, "next_tick": 0, "after_sequences": {o: 0 for o in owners},
+            "pending_owners": [], "pending_causes": {}, "owner_epochs": {},
+            "published": {}, "routes": {}, "forecasts": {}}
+        if current.get("schema") != "g31.event_protocol_controller.v1" or current.get("config") != config:
+            raise ValueError("event_control:state_configuration_mismatch")
+        client = ProtocolClient(session, retry_period=retry_period, state=current.get("client"))
+        records, native_batches = [], []
+        status, complete = "running", False
+        while True:
+            while current["pending_owners"]:
+                if len(records) >= max_activations:
+                    status = "control_budget_exhausted"
+                    break
+                owner = current["pending_owners"][0]
+                records.append(_activate_owner(client, owner, current, current["pending_causes"][owner]))
+                current["pending_owners"].pop(0)
+                del current["pending_causes"][owner]
+            if status == "control_budget_exhausted":
+                break
+            tick_time = current["start"] + current["next_tick"] * control_period
+            deadline = min(horizon, tick_time, _retry_time(client))
+            if deadline < session.physical_time:
+                raise ValueError("event_control:missed_public_timer")
+            started = time.perf_counter(); cpu = time.process_time()
+            response = session.advance_until_owner_notification(
+                owners, current["after_sequences"], deadline, max_events=event_budget)
+            native_batches.append({"requested_public_deadline": deadline, "status": response["status"],
+                "timestamp_complete": response.get("timestamp_complete", False),
+                "wall_ms": 1000*(time.perf_counter()-started), "cpu_ms": 1000*(time.process_time()-cpu)})
+            if response["status"] == "budget_exhausted":
+                status = "native_budget_exhausted"
+                break
+            if response["status"] not in {"notified", "horizon_reached"} or not response.get("timestamp_complete", False):
+                raise ValueError("event_control:invalid_native_notification_boundary")
+            now = session.physical_time
+            notices = response.get("notifications", {})
+            if any(o not in owners for o in notices):
+                raise ValueError("event_control:unsubscribed_notification")
+            causes = {}
+            for owner, notice in notices.items():
+                sequence = notice["sequence"]
+                if sequence <= current["after_sequences"][owner] or notice["observed_at"] > now:
+>                   raise ValueError("event_control:invalid_notification_identity")
+E                   ValueError: event_control:invalid_notification_identity
+
+scripts\experiments\g31_ics_circulation\event_protocol_control.py:158: ValueError
+_ test_partial_native_or_owner_budget_resumes_without_advancing_to_audit[100000-1] _
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_013\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+event_budget = 100000, activation_budget = 1
+
+    @pytest.mark.parametrize("event_budget,activation_budget", [(1, 10000), (100000, 1), (1, 1)])
+    def test_partial_native_or_owner_budget_resumes_without_advancing_to_audit(native, event_budget, activation_budget):
+        data = scene({"drop_ack_packets": 1})
+        continuous = native.NativeSession(data)
+>       full = run_event_protocol_control(continuous, ["A", "B"], horizon=30., **OPTIONS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_event_control.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <czr005_circulation.NativeSession object at 0x00000252C60C15B0>
+owners = ['A', 'B'], horizon = 30.0, control_period = 1.0, predictive = True
+command_delay = 0.01, publication_delay = 0.02, retry_period = 0.5
+routes = True, forecasts = True, prebalance = True, compact = True
+lease_seconds = 120.0, state = None, event_budget = 100000
+max_activations = 10000
+
+    def run_event_protocol_control(session: Any, owners: list[str], *, horizon: float,
+            control_period: float = 60., predictive: bool = True, command_delay: float = 2.,
+            publication_delay: float = .5, retry_period: float = 60., routes: bool = True,
+            forecasts: bool = True, prebalance: bool = True, compact: bool = True,
+            lease_seconds: float = 120., state: dict | None = None, event_budget: int = 100000,
+            max_activations: int = 10000) -> dict:
+        """Continue actual owner notifications and declared public timers.
+    
+        Computation counters and intermediate native budget stops are diagnostic,
+        not inputs to an owner policy. JSON state must be paired with the native
+        checkpoint. Only completed native timestamps authorize policy activation.
+        """
+        if not owners or len(set(owners)) != len(owners):
+            raise ValueError("event_control:invalid_owners")
+        if not all(math.isfinite(v) and v >= 0 for v in (horizon, command_delay, publication_delay, lease_seconds)):
+            raise ValueError("event_control:invalid_timing")
+        if not all(math.isfinite(v) and v > 0 for v in (control_period, retry_period)):
+            raise ValueError("event_control:invalid_period")
+        if horizon < session.physical_time or event_budget <= 0 or max_activations <= 0:
+            raise ValueError("event_control:invalid_horizon_or_budget")
+        config = {"owners": owners, "control_period": control_period, "predictive": predictive,
+            "command_delay": command_delay, "publication_delay": publication_delay,
+            "retry_period": retry_period, "routes": routes, "forecasts": forecasts,
+            "prebalance": prebalance, "compact": compact, "lease_seconds": lease_seconds}
+        current = copy.deepcopy(state) if state is not None else {
+            "schema": "g31.event_protocol_controller.v1", "config": copy.deepcopy(config),
+            "start": session.physical_time, "next_tick": 0, "after_sequences": {o: 0 for o in owners},
+            "pending_owners": [], "pending_causes": {}, "owner_epochs": {},
+            "published": {}, "routes": {}, "forecasts": {}}
+        if current.get("schema") != "g31.event_protocol_controller.v1" or current.get("config") != config:
+            raise ValueError("event_control:state_configuration_mismatch")
+        client = ProtocolClient(session, retry_period=retry_period, state=current.get("client"))
+        records, native_batches = [], []
+        status, complete = "running", False
+        while True:
+            while current["pending_owners"]:
+                if len(records) >= max_activations:
+                    status = "control_budget_exhausted"
+                    break
+                owner = current["pending_owners"][0]
+                records.append(_activate_owner(client, owner, current, current["pending_causes"][owner]))
+                current["pending_owners"].pop(0)
+                del current["pending_causes"][owner]
+            if status == "control_budget_exhausted":
+                break
+            tick_time = current["start"] + current["next_tick"] * control_period
+            deadline = min(horizon, tick_time, _retry_time(client))
+            if deadline < session.physical_time:
+                raise ValueError("event_control:missed_public_timer")
+            started = time.perf_counter(); cpu = time.process_time()
+            response = session.advance_until_owner_notification(
+                owners, current["after_sequences"], deadline, max_events=event_budget)
+            native_batches.append({"requested_public_deadline": deadline, "status": response["status"],
+                "timestamp_complete": response.get("timestamp_complete", False),
+                "wall_ms": 1000*(time.perf_counter()-started), "cpu_ms": 1000*(time.process_time()-cpu)})
+            if response["status"] == "budget_exhausted":
+                status = "native_budget_exhausted"
+                break
+            if response["status"] not in {"notified", "horizon_reached"} or not response.get("timestamp_complete", False):
+                raise ValueError("event_control:invalid_native_notification_boundary")
+            now = session.physical_time
+            notices = response.get("notifications", {})
+            if any(o not in owners for o in notices):
+                raise ValueError("event_control:unsubscribed_notification")
+            causes = {}
+            for owner, notice in notices.items():
+                sequence = notice["sequence"]
+                if sequence <= current["after_sequences"][owner] or notice["observed_at"] > now:
+>                   raise ValueError("event_control:invalid_notification_identity")
+E                   ValueError: event_control:invalid_notification_identity
+
+scripts\experiments\g31_ics_circulation\event_protocol_control.py:158: ValueError
+_ test_partial_native_or_owner_budget_resumes_without_advancing_to_audit[1-1] _
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_013\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+event_budget = 1, activation_budget = 1
+
+    @pytest.mark.parametrize("event_budget,activation_budget", [(1, 10000), (100000, 1), (1, 1)])
+    def test_partial_native_or_owner_budget_resumes_without_advancing_to_audit(native, event_budget, activation_budget):
+        data = scene({"drop_ack_packets": 1})
+        continuous = native.NativeSession(data)
+>       full = run_event_protocol_control(continuous, ["A", "B"], horizon=30., **OPTIONS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_event_control.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <czr005_circulation.NativeSession object at 0x00000252C6875070>
+owners = ['A', 'B'], horizon = 30.0, control_period = 1.0, predictive = True
+command_delay = 0.01, publication_delay = 0.02, retry_period = 0.5
+routes = True, forecasts = True, prebalance = True, compact = True
+lease_seconds = 120.0, state = None, event_budget = 100000
+max_activations = 10000
+
+    def run_event_protocol_control(session: Any, owners: list[str], *, horizon: float,
+            control_period: float = 60., predictive: bool = True, command_delay: float = 2.,
+            publication_delay: float = .5, retry_period: float = 60., routes: bool = True,
+            forecasts: bool = True, prebalance: bool = True, compact: bool = True,
+            lease_seconds: float = 120., state: dict | None = None, event_budget: int = 100000,
+            max_activations: int = 10000) -> dict:
+        """Continue actual owner notifications and declared public timers.
+    
+        Computation counters and intermediate native budget stops are diagnostic,
+        not inputs to an owner policy. JSON state must be paired with the native
+        checkpoint. Only completed native timestamps authorize policy activation.
+        """
+        if not owners or len(set(owners)) != len(owners):
+            raise ValueError("event_control:invalid_owners")
+        if not all(math.isfinite(v) and v >= 0 for v in (horizon, command_delay, publication_delay, lease_seconds)):
+            raise ValueError("event_control:invalid_timing")
+        if not all(math.isfinite(v) and v > 0 for v in (control_period, retry_period)):
+            raise ValueError("event_control:invalid_period")
+        if horizon < session.physical_time or event_budget <= 0 or max_activations <= 0:
+            raise ValueError("event_control:invalid_horizon_or_budget")
+        config = {"owners": owners, "control_period": control_period, "predictive": predictive,
+            "command_delay": command_delay, "publication_delay": publication_delay,
+            "retry_period": retry_period, "routes": routes, "forecasts": forecasts,
+            "prebalance": prebalance, "compact": compact, "lease_seconds": lease_seconds}
+        current = copy.deepcopy(state) if state is not None else {
+            "schema": "g31.event_protocol_controller.v1", "config": copy.deepcopy(config),
+            "start": session.physical_time, "next_tick": 0, "after_sequences": {o: 0 for o in owners},
+            "pending_owners": [], "pending_causes": {}, "owner_epochs": {},
+            "published": {}, "routes": {}, "forecasts": {}}
+        if current.get("schema") != "g31.event_protocol_controller.v1" or current.get("config") != config:
+            raise ValueError("event_control:state_configuration_mismatch")
+        client = ProtocolClient(session, retry_period=retry_period, state=current.get("client"))
+        records, native_batches = [], []
+        status, complete = "running", False
+        while True:
+            while current["pending_owners"]:
+                if len(records) >= max_activations:
+                    status = "control_budget_exhausted"
+                    break
+                owner = current["pending_owners"][0]
+                records.append(_activate_owner(client, owner, current, current["pending_causes"][owner]))
+                current["pending_owners"].pop(0)
+                del current["pending_causes"][owner]
+            if status == "control_budget_exhausted":
+                break
+            tick_time = current["start"] + current["next_tick"] * control_period
+            deadline = min(horizon, tick_time, _retry_time(client))
+            if deadline < session.physical_time:
+                raise ValueError("event_control:missed_public_timer")
+            started = time.perf_counter(); cpu = time.process_time()
+            response = session.advance_until_owner_notification(
+                owners, current["after_sequences"], deadline, max_events=event_budget)
+            native_batches.append({"requested_public_deadline": deadline, "status": response["status"],
+                "timestamp_complete": response.get("timestamp_complete", False),
+                "wall_ms": 1000*(time.perf_counter()-started), "cpu_ms": 1000*(time.process_time()-cpu)})
+            if response["status"] == "budget_exhausted":
+                status = "native_budget_exhausted"
+                break
+            if response["status"] not in {"notified", "horizon_reached"} or not response.get("timestamp_complete", False):
+                raise ValueError("event_control:invalid_native_notification_boundary")
+            now = session.physical_time
+            notices = response.get("notifications", {})
+            if any(o not in owners for o in notices):
+                raise ValueError("event_control:unsubscribed_notification")
+            causes = {}
+            for owner, notice in notices.items():
+                sequence = notice["sequence"]
+                if sequence <= current["after_sequences"][owner] or notice["observed_at"] > now:
+>                   raise ValueError("event_control:invalid_notification_identity")
+E                   ValueError: event_control:invalid_notification_identity
+
+scripts\experiments\g31_ics_circulation\event_protocol_control.py:158: ValueError
+___ test_zero_delay_feedback_drains_whole_timestamp_and_reuses_actual_tray ____
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_013\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_zero_delay_feedback_drains_whole_timestamp_and_reuses_actual_tray(native):
+        data = scene({"ack_delay": 0., "duplicate_acks": True, "duplicate_ack_delay": 0.})
+        session = native.NativeSession(data)
+>       run = run_event_protocol_control(session, ["A", "B"], horizon=30., command_delay=0.,
+            publication_delay=0., control_period=60., retry_period=1.)
+
+tests\test_g31_circulation_event_control.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <czr005_circulation.NativeSession object at 0x00000252C6050CB0>
+owners = ['A', 'B'], horizon = 30.0, control_period = 60.0, predictive = True
+command_delay = 0.0, publication_delay = 0.0, retry_period = 1.0, routes = True
+forecasts = True, prebalance = True, compact = True, lease_seconds = 120.0
+state = None, event_budget = 100000, max_activations = 10000
+
+    def run_event_protocol_control(session: Any, owners: list[str], *, horizon: float,
+            control_period: float = 60., predictive: bool = True, command_delay: float = 2.,
+            publication_delay: float = .5, retry_period: float = 60., routes: bool = True,
+            forecasts: bool = True, prebalance: bool = True, compact: bool = True,
+            lease_seconds: float = 120., state: dict | None = None, event_budget: int = 100000,
+            max_activations: int = 10000) -> dict:
+        """Continue actual owner notifications and declared public timers.
+    
+        Computation counters and intermediate native budget stops are diagnostic,
+        not inputs to an owner policy. JSON state must be paired with the native
+        checkpoint. Only completed native timestamps authorize policy activation.
+        """
+        if not owners or len(set(owners)) != len(owners):
+            raise ValueError("event_control:invalid_owners")
+        if not all(math.isfinite(v) and v >= 0 for v in (horizon, command_delay, publication_delay, lease_seconds)):
+            raise ValueError("event_control:invalid_timing")
+        if not all(math.isfinite(v) and v > 0 for v in (control_period, retry_period)):
+            raise ValueError("event_control:invalid_period")
+        if horizon < session.physical_time or event_budget <= 0 or max_activations <= 0:
+            raise ValueError("event_control:invalid_horizon_or_budget")
+        config = {"owners": owners, "control_period": control_period, "predictive": predictive,
+            "command_delay": command_delay, "publication_delay": publication_delay,
+            "retry_period": retry_period, "routes": routes, "forecasts": forecasts,
+            "prebalance": prebalance, "compact": compact, "lease_seconds": lease_seconds}
+        current = copy.deepcopy(state) if state is not None else {
+            "schema": "g31.event_protocol_controller.v1", "config": copy.deepcopy(config),
+            "start": session.physical_time, "next_tick": 0, "after_sequences": {o: 0 for o in owners},
+            "pending_owners": [], "pending_causes": {}, "owner_epochs": {},
+            "published": {}, "routes": {}, "forecasts": {}}
+        if current.get("schema") != "g31.event_protocol_controller.v1" or current.get("config") != config:
+            raise ValueError("event_control:state_configuration_mismatch")
+        client = ProtocolClient(session, retry_period=retry_period, state=current.get("client"))
+        records, native_batches = [], []
+        status, complete = "running", False
+        while True:
+            while current["pending_owners"]:
+                if len(records) >= max_activations:
+                    status = "control_budget_exhausted"
+                    break
+                owner = current["pending_owners"][0]
+                records.append(_activate_owner(client, owner, current, current["pending_causes"][owner]))
+                current["pending_owners"].pop(0)
+                del current["pending_causes"][owner]
+            if status == "control_budget_exhausted":
+                break
+            tick_time = current["start"] + current["next_tick"] * control_period
+            deadline = min(horizon, tick_time, _retry_time(client))
+            if deadline < session.physical_time:
+                raise ValueError("event_control:missed_public_timer")
+            started = time.perf_counter(); cpu = time.process_time()
+            response = session.advance_until_owner_notification(
+                owners, current["after_sequences"], deadline, max_events=event_budget)
+            native_batches.append({"requested_public_deadline": deadline, "status": response["status"],
+                "timestamp_complete": response.get("timestamp_complete", False),
+                "wall_ms": 1000*(time.perf_counter()-started), "cpu_ms": 1000*(time.process_time()-cpu)})
+            if response["status"] == "budget_exhausted":
+                status = "native_budget_exhausted"
+                break
+            if response["status"] not in {"notified", "horizon_reached"} or not response.get("timestamp_complete", False):
+                raise ValueError("event_control:invalid_native_notification_boundary")
+            now = session.physical_time
+            notices = response.get("notifications", {})
+            if any(o not in owners for o in notices):
+                raise ValueError("event_control:unsubscribed_notification")
+            causes = {}
+            for owner, notice in notices.items():
+                sequence = notice["sequence"]
+                if sequence <= current["after_sequences"][owner] or notice["observed_at"] > now:
+>                   raise ValueError("event_control:invalid_notification_identity")
+E                   ValueError: event_control:invalid_notification_identity
+
+scripts\experiments\g31_ics_circulation\event_protocol_control.py:158: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_event_control.py::test_event_controller_native_checkpoint_json_continuation[protocol1]
+FAILED tests/test_g31_circulation_event_control.py::test_event_controller_native_checkpoint_json_continuation[protocol3]
+FAILED tests/test_g31_circulation_event_control.py::test_partial_native_or_owner_budget_resumes_without_advancing_to_audit[1-10000]
+FAILED tests/test_g31_circulation_event_control.py::test_partial_native_or_owner_budget_resumes_without_advancing_to_audit[100000-1]
+FAILED tests/test_g31_circulation_event_control.py::test_partial_native_or_owner_budget_resumes_without_advancing_to_audit[1-1]
+FAILED tests/test_g31_circulation_event_control.py::test_zero_delay_feedback_drains_whole_timestamp_and_reuses_actual_tray

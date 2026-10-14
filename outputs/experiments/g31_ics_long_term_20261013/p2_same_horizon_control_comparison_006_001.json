@@ -1,0 +1,341 @@
+{
+  "schema": "g31.original_control_comparison.v2",
+  "rows": [
+    {
+      "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_1x_reactive_H21600_006_001",
+      "receipt_sha256": "e61b7e820be6e8a2d99ef17e7bd537e776da971c1a5b944ab2d032be013225b2",
+      "policy": "reactive",
+      "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+      "source": {
+        "run_original_control.py": "776cacfe0b4e272bdd1e0586281198c39939221726e0d51ccb856c8929ca7636",
+        "analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+        "original_workload.py": "10ebfd04d614c5d77c467efa89549bbad78eec3080b60bb642d5b5185b9d99dc"
+      },
+      "status": "reached",
+      "source_changed": [],
+      "horizon": 21600.0,
+      "summary": {
+        "offered": 28506,
+        "observed": 3485,
+        "not_yet_observed": 25021,
+        "loaded": 18,
+        "completed": 0,
+        "on_time": 0,
+        "uncompleted": 28506,
+        "job_status_counts": {
+          "in_transit": 18,
+          "waiting_for_tray": 3467,
+          "unreleased": 25021
+        },
+        "unfinished_past_deadline": 0,
+        "tray_mode_counts": {
+          "loaded": 18,
+          "empty_transit": 3,
+          "quarantined": 1
+        },
+        "trays_with_receiving_lease": 3,
+        "physical_clock": 21600.0,
+        "declared_horizon": 21600.0,
+        "horizon_reached": true,
+        "event_budget_reached": false,
+        "leg_failure_reasons": {
+          "departure_lease_expired_before_physical_entry": 1
+        },
+        "budget_finalization_censored_legs": 0,
+        "budget_failure_semantics": "event_limit_reached is computational censoring; native finalize quarantines active legs, not proof of physical impossibility",
+        "restricted_sojourn_sum_seconds_at_actual_clock": 9461711.093042975,
+        "warning": "different observed clocks are censored and must not be ranked by aggregate objective",
+        "native_summary": {
+          "event_count": 6119,
+          "completed_count": 6,
+          "failed_count": 1,
+          "runtime_seconds": 0.0,
+          "edge_enter_event_count": 210,
+          "edge_exit_event_count": 210,
+          "reservation_conflicts": 0,
+          "physical_fault_edge_entry_violation_count": 0,
+          "merge_grant_timing_mode": "jit_fair_aging_deadline",
+          "g4irsf20_event_hotpath_policy": "E2",
+          "local_queue_capacity": 0
+        },
+        "optimality": "unknown"
+      },
+      "audit_status": "passed",
+      "actual_exports": 6,
+      "actual_received": 2,
+      "transfer_rejections": 0,
+      "control_compute_ms": {
+        "count": 50,
+        "max": 34.79120001429692,
+        "sum": 210.80660016741604,
+        "scope": "observation+prediction+assignment+submit-call; serial owner calls; logical delay separate"
+      },
+      "all_business_rows_sha256": "709e4a07cf09a0c595a69f14ed10058c79453d145fe795191beeca13eb6fce01",
+      "all_physical_rows_sha256": "3332265753b17f6ed36feba9dc58c7631790113072e769438278669856591aa8",
+      "build004_comparison": {
+        "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_1x_reactive_H21600_001",
+        "all_business_fields_equal": true,
+        "all_physical_fields_equal": true,
+        "business_mismatch_count": 0
+      }
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_1x_predictive_H21600_006_001",
+      "receipt_sha256": "729fce116d477c25868e9834cb69c11c26a99c6f19eea707a23d9c18dbbd9092",
+      "policy": "predictive",
+      "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+      "source": {
+        "run_original_control.py": "776cacfe0b4e272bdd1e0586281198c39939221726e0d51ccb856c8929ca7636",
+        "analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+        "original_workload.py": "10ebfd04d614c5d77c467efa89549bbad78eec3080b60bb642d5b5185b9d99dc"
+      },
+      "status": "reached",
+      "source_changed": [],
+      "horizon": 21600.0,
+      "summary": {
+        "offered": 28506,
+        "observed": 3485,
+        "not_yet_observed": 25021,
+        "loaded": 18,
+        "completed": 0,
+        "on_time": 0,
+        "uncompleted": 28506,
+        "job_status_counts": {
+          "in_transit": 18,
+          "waiting_for_tray": 3467,
+          "unreleased": 25021
+        },
+        "unfinished_past_deadline": 0,
+        "tray_mode_counts": {
+          "loaded": 18,
+          "empty_transit": 3,
+          "quarantined": 1
+        },
+        "trays_with_receiving_lease": 3,
+        "physical_clock": 21600.0,
+        "declared_horizon": 21600.0,
+        "horizon_reached": true,
+        "event_budget_reached": false,
+        "leg_failure_reasons": {
+          "departure_lease_expired_before_physical_entry": 1
+        },
+        "budget_finalization_censored_legs": 0,
+        "budget_failure_semantics": "event_limit_reached is computational censoring; native finalize quarantines active legs, not proof of physical impossibility",
+        "restricted_sojourn_sum_seconds_at_actual_clock": 9461711.093042975,
+        "warning": "different observed clocks are censored and must not be ranked by aggregate objective",
+        "native_summary": {
+          "event_count": 6131,
+          "completed_count": 6,
+          "failed_count": 1,
+          "runtime_seconds": 0.0,
+          "edge_enter_event_count": 210,
+          "edge_exit_event_count": 210,
+          "reservation_conflicts": 0,
+          "physical_fault_edge_entry_violation_count": 0,
+          "merge_grant_timing_mode": "jit_fair_aging_deadline",
+          "g4irsf20_event_hotpath_policy": "E2",
+          "local_queue_capacity": 0
+        },
+        "optimality": "unknown"
+      },
+      "audit_status": "passed",
+      "actual_exports": 6,
+      "actual_received": 2,
+      "transfer_rejections": 6,
+      "control_compute_ms": {
+        "count": 50,
+        "max": 41.11660004127771,
+        "sum": 291.42149997642264,
+        "scope": "observation+prediction+assignment+submit-call; serial owner calls; logical delay separate"
+      },
+      "all_business_rows_sha256": "709e4a07cf09a0c595a69f14ed10058c79453d145fe795191beeca13eb6fce01",
+      "all_physical_rows_sha256": "becfe1c90638211d6be7ab2ad09b2c49dd4badd41bfba475e93f31dfaf0c8f1a",
+      "build004_comparison": {
+        "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_1x_predictive_H21600_001",
+        "all_business_fields_equal": true,
+        "all_physical_fields_equal": true,
+        "business_mismatch_count": 0
+      }
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_2x_reactive_H21600_006_001",
+      "receipt_sha256": "9d7bfbac112b9e8c3d90942218f9fb0b79aba65456bd307de2c1a9a003e17e02",
+      "policy": "reactive",
+      "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+      "source": {
+        "run_original_control.py": "776cacfe0b4e272bdd1e0586281198c39939221726e0d51ccb856c8929ca7636",
+        "analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+        "original_workload.py": "10ebfd04d614c5d77c467efa89549bbad78eec3080b60bb642d5b5185b9d99dc"
+      },
+      "status": "reached",
+      "source_changed": [],
+      "horizon": 21600.0,
+      "summary": {
+        "offered": 57012,
+        "observed": 6449,
+        "not_yet_observed": 50563,
+        "loaded": 17,
+        "completed": 0,
+        "on_time": 0,
+        "uncompleted": 57012,
+        "job_status_counts": {
+          "in_transit": 17,
+          "waiting_for_tray": 6432,
+          "unreleased": 50563
+        },
+        "unfinished_past_deadline": 0,
+        "tray_mode_counts": {
+          "loaded": 17,
+          "empty_transit": 4,
+          "quarantined": 1
+        },
+        "trays_with_receiving_lease": 4,
+        "physical_clock": 21600.0,
+        "declared_horizon": 21600.0,
+        "horizon_reached": true,
+        "event_budget_reached": false,
+        "leg_failure_reasons": {
+          "departure_lease_expired_before_physical_entry": 1
+        },
+        "budget_finalization_censored_legs": 0,
+        "budget_failure_semantics": "event_limit_reached is computational censoring; native finalize quarantines active legs, not proof of physical impossibility",
+        "restricted_sojourn_sum_seconds_at_actual_clock": 17068677.809465986,
+        "warning": "different observed clocks are censored and must not be ranked by aggregate objective",
+        "native_summary": {
+          "event_count": 8883,
+          "completed_count": 5,
+          "failed_count": 1,
+          "runtime_seconds": 0.0,
+          "edge_enter_event_count": 192,
+          "edge_exit_event_count": 192,
+          "reservation_conflicts": 0,
+          "physical_fault_edge_entry_violation_count": 0,
+          "merge_grant_timing_mode": "jit_fair_aging_deadline",
+          "g4irsf20_event_hotpath_policy": "E2",
+          "local_queue_capacity": 0
+        },
+        "optimality": "unknown"
+      },
+      "audit_status": "passed",
+      "actual_exports": 6,
+      "actual_received": 1,
+      "transfer_rejections": 0,
+      "control_compute_ms": {
+        "count": 50,
+        "max": 31.68399998685345,
+        "sum": 298.4399998676963,
+        "scope": "observation+prediction+assignment+submit-call; serial owner calls; logical delay separate"
+      },
+      "all_business_rows_sha256": "9e8dc0b765afb6f67c26f0225695b0eb2ef111f800bed27a4c972c33705ecebe",
+      "all_physical_rows_sha256": "0bdf83508caaa4840f9126254f15eec53ddb11a6f06d6de5d5e849b1c0e2ef85",
+      "build004_comparison": {
+        "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_2x_reactive_H21600_001",
+        "all_business_fields_equal": true,
+        "all_physical_fields_equal": true,
+        "business_mismatch_count": 0
+      }
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_2x_predictive_H21600_006_001",
+      "receipt_sha256": "507130cda265b13e6b417493cc3404cd0c97dc2ca3a28d515050b32419f28026",
+      "policy": "predictive",
+      "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+      "source": {
+        "run_original_control.py": "776cacfe0b4e272bdd1e0586281198c39939221726e0d51ccb856c8929ca7636",
+        "analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+        "original_workload.py": "10ebfd04d614c5d77c467efa89549bbad78eec3080b60bb642d5b5185b9d99dc"
+      },
+      "status": "reached",
+      "source_changed": [],
+      "horizon": 21600.0,
+      "summary": {
+        "offered": 57012,
+        "observed": 6449,
+        "not_yet_observed": 50563,
+        "loaded": 17,
+        "completed": 0,
+        "on_time": 0,
+        "uncompleted": 57012,
+        "job_status_counts": {
+          "in_transit": 17,
+          "waiting_for_tray": 6432,
+          "unreleased": 50563
+        },
+        "unfinished_past_deadline": 0,
+        "tray_mode_counts": {
+          "loaded": 17,
+          "empty_transit": 4,
+          "quarantined": 1
+        },
+        "trays_with_receiving_lease": 4,
+        "physical_clock": 21600.0,
+        "declared_horizon": 21600.0,
+        "horizon_reached": true,
+        "event_budget_reached": false,
+        "leg_failure_reasons": {
+          "departure_lease_expired_before_physical_entry": 1
+        },
+        "budget_finalization_censored_legs": 0,
+        "budget_failure_semantics": "event_limit_reached is computational censoring; native finalize quarantines active legs, not proof of physical impossibility",
+        "restricted_sojourn_sum_seconds_at_actual_clock": 17068677.809465986,
+        "warning": "different observed clocks are censored and must not be ranked by aggregate objective",
+        "native_summary": {
+          "event_count": 8887,
+          "completed_count": 5,
+          "failed_count": 1,
+          "runtime_seconds": 0.0,
+          "edge_enter_event_count": 192,
+          "edge_exit_event_count": 192,
+          "reservation_conflicts": 0,
+          "physical_fault_edge_entry_violation_count": 0,
+          "merge_grant_timing_mode": "jit_fair_aging_deadline",
+          "g4irsf20_event_hotpath_policy": "E2",
+          "local_queue_capacity": 0
+        },
+        "optimality": "unknown"
+      },
+      "audit_status": "passed",
+      "actual_exports": 6,
+      "actual_received": 1,
+      "transfer_rejections": 2,
+      "control_compute_ms": {
+        "count": 50,
+        "max": 64.99210000038147,
+        "sum": 378.19309980841354,
+        "scope": "observation+prediction+assignment+submit-call; serial owner calls; logical delay separate"
+      },
+      "all_business_rows_sha256": "9e8dc0b765afb6f67c26f0225695b0eb2ef111f800bed27a4c972c33705ecebe",
+      "all_physical_rows_sha256": "eb17fa105d8cea35576c75ab246c65cf2a1d113d52f96a79119ae06dce4e4e93",
+      "build004_comparison": {
+        "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_2x_predictive_H21600_001",
+        "all_business_fields_equal": true,
+        "all_physical_fields_equal": true,
+        "business_mismatch_count": 0
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "offered": 28506,
+      "all_business_fields_equal": true,
+      "all_business_ids_equal": true,
+      "same_horizon": true,
+      "same_binary": true,
+      "same_sources": true,
+      "cost_predictive_minus_reactive": 0.0
+    },
+    {
+      "offered": 57012,
+      "all_business_fields_equal": true,
+      "all_business_ids_equal": true,
+      "same_horizon": true,
+      "same_binary": true,
+      "same_sources": true,
+      "cost_predictive_minus_reactive": 0.0
+    }
+  ],
+  "all_sources_same": true,
+  "all_binary_same": true,
+  "complete_100ms_requirement_certified": false,
+  "claim": "all offered source rows preserved; common observation horizon is not full-day completion; wall owner compute excludes still-unmeasured complete request components"
+}

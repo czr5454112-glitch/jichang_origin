@@ -1,0 +1,95 @@
+{
+  "controller_state": {
+    "schema": "g31.analytic_controller_state.v1",
+    "start": 0.11,
+    "next_tick": 1,
+    "published": {
+      "A": [],
+      "B": [
+        [
+          "D0",
+          3,
+          0.0,
+          4500.0
+        ],
+        [
+          "D1",
+          4,
+          0.0,
+          4500.0
+        ]
+      ],
+      "C": []
+    },
+    "config": {
+      "owners": [
+        "A",
+        "B",
+        "C"
+      ],
+      "predictive": true,
+      "control_period": 10.0,
+      "message_delay": 0.1,
+      "demand_delay": 0.02,
+      "publish": true,
+      "respect_service_forecasts": true
+    }
+  },
+  "publications": {
+    "forecast": {
+      "status": "pending",
+      "reason": "",
+      "message_id": "C:A:service:1"
+    },
+    "demand_publications": [
+      {
+        "source": "A",
+        "target": "B",
+        "reply": {
+          "status": "pending",
+          "reason": ""
+        }
+      },
+      {
+        "source": "A",
+        "target": "C",
+        "reply": {
+          "status": "pending",
+          "reason": ""
+        }
+      },
+      {
+        "source": "B",
+        "target": "A",
+        "reply": {
+          "status": "pending",
+          "reason": ""
+        }
+      },
+      {
+        "source": "B",
+        "target": "C",
+        "reply": {
+          "status": "pending",
+          "reason": ""
+        }
+      },
+      {
+        "source": "C",
+        "target": "A",
+        "reply": {
+          "status": "pending",
+          "reason": ""
+        }
+      },
+      {
+        "source": "C",
+        "target": "B",
+        "reply": {
+          "status": "pending",
+          "reason": ""
+        }
+      }
+    ]
+  }
+}

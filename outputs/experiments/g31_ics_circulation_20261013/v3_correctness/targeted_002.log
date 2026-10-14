@@ -1,0 +1,47 @@
+............................................................F........... [ 80%]
+..................                                                       [100%]
+================================== FAILURES ===================================
+_______ test_checkpoint_does_not_newly_deepcopy_arbitrary_factory_state _______
+
+    def test_checkpoint_does_not_newly_deepcopy_arbitrary_factory_state():
+        class ExternalFactory:
+            def __call__(self, horizon=None):
+                return regional()
+    
+            def __deepcopy__(self, memo):
+                raise AssertionError('external callback ownership was not granted')
+    
+        factory = ExternalFactory()
+        engine = Simulation(four_paths(), generator_factory=factory)
+        install_terminal_screen(engine)
+>       checkpoint = engine.checkpoint()
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests\test_ics_v3_executed_audit_regressions.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\ics_circulation_v3\runtime.py:1152: in checkpoint
+    generator, factory, selector, slow = deepcopy(
+..\..\python3.11.9\Lib\copy.py:146: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\copy.py:211: in _deepcopy_tuple
+    y = [deepcopy(a, memo) for a in x]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\copy.py:211: in <listcomp>
+    y = [deepcopy(a, memo) for a in x]
+         ^^^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\copy.py:153: in deepcopy
+    y = copier(memo)
+        ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_ics_v3_executed_audit_regressions.test_checkpoint_does_not_newly_deepcopy_arbitrary_factory_state.<locals>.ExternalFactory object at 0x000001BB8AD77D90>
+memo = {1904999890320: <test_ics_v3_executed_audit_regressions.test_checkpoint_does_not_newly_deepcopy_arbitrary_factory_stat...8242064: <scripts.experiments.ics_circulation_v3.routing.RegionalCandidateGenerator object at 0x000001BB8AD77410>, ...}
+
+    def __deepcopy__(self, memo):
+>       raise AssertionError('external callback ownership was not granted')
+E       AssertionError: external callback ownership was not granted
+
+tests\test_ics_v3_executed_audit_regressions.py:249: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_ics_v3_executed_audit_regressions.py::test_checkpoint_does_not_newly_deepcopy_arbitrary_factory_state

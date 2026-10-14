@@ -1,0 +1,32 @@
+{
+  "schema": "independent_saa_source_review_v1",
+  "reviewer": "control_method",
+  "scope": "read-only source review, not independent probability calibration or new simulation",
+  "reviewed_sources_sha256": {
+    "scripts/experiments/ics_circulation_v3/empty_scenarios.py": "fa840a3a5c51329a3b2abfb432665df8f66999ccd130c62b30df914d84a31222",
+    "scripts/experiments/ics_circulation_v3/run_empty_scenarios.py": "ce78484fda75d360d4f6a57719b00086e340442b20f6cf886085e00fc30a0258",
+    "scripts/experiments/ics_circulation_v3/empty_factorial.py": "e1b1a9fa329a85109d0127c636558f65e6986018914dbffed3e6cf46adbb94c8",
+    "scripts/experiments/ics_circulation_v3/empty_improvement.py": "9a20386ab205970eb575d14384dcbdcde4e1790dbea61750a4c72b66816a762e",
+    "scripts/experiments/ics_circulation_v3/label_stability.py": "df60fcf2fc6174be61db4b759ce1d0bbadea1815fb907108b5414f02f949e75d",
+    "tests/test_ics_circulation_v3_empty_scenarios.py": "aa25ea6eaa9482c64962aa6972e22fd10bd7cb192649c8eeba081ac9eb03201b"
+  },
+  "blockers": [],
+  "checks": [
+    "public proxy input has future arrival, unobserved distinct identity",
+    "seed uses declared fixed seed, current public tick and sorted public proxy; no actual event tape",
+    "reversal requires topology return path; unsupported prior rejected instead of conditioning silently",
+    "same original snapshot and public proxy yield common scenario tapes across all current candidate actions",
+    "memo local to one original state/action, keyed exact full sampled tape hash",
+    "mean counts all eight requests, retaining duplicate multiplicity",
+    "any incomplete unique scenario invalidates entire action mean",
+    "max_rollouts remains actions; every unique scenario gets same branch budgets and contributes work/ticks",
+    "builder keeps timed actual route, periodic slow context, existing validator, and point-derived candidate family",
+    "runner only passes actual tasks into outer Simulation and shares h80/TTL/quiet drain stopping"
+  ],
+  "limits": [
+    "uncalibrated synthetic prior, no operational posterior or probability guarantee",
+    "point-derived legal action candidate domain is unchanged by scenarios",
+    "row CPU/wall sums unique physical rollouts and excludes scenario construction/hash overhead; plan and episode CPU include it",
+    "source review observes seven existing author tests but does not relabel them independent new tests"
+  ]
+}

@@ -1,0 +1,507 @@
+{
+  "input": {
+    "schema": "g31.circulation.input.v1",
+    "model_scope": "synthetic on-carrier Storage, per-berth unloading, fixed module ports",
+    "node_records": [
+      [
+        0,
+        1,
+        0.05,
+        0,
+        0,
+        [
+          1,
+          6
+        ]
+      ],
+      [
+        1,
+        1,
+        0.05,
+        1,
+        0,
+        [
+          2
+        ]
+      ],
+      [
+        2,
+        3,
+        0.05,
+        2,
+        0,
+        [
+          3
+        ]
+      ],
+      [
+        3,
+        1,
+        0.05,
+        3,
+        0,
+        [
+          4
+        ]
+      ],
+      [
+        4,
+        1,
+        0.05,
+        4,
+        0,
+        [
+          5
+        ]
+      ],
+      [
+        5,
+        1,
+        0.05,
+        5,
+        0,
+        [
+          0
+        ]
+      ],
+      [
+        6,
+        1,
+        0.05,
+        6,
+        0,
+        [
+          2,
+          3
+        ]
+      ]
+    ],
+    "edge_records": [
+      [
+        0,
+        1,
+        1.0,
+        1.0
+      ],
+      [
+        0,
+        6,
+        1.2,
+        1.0
+      ],
+      [
+        1,
+        2,
+        1.0,
+        1.0
+      ],
+      [
+        6,
+        2,
+        1.0,
+        1.0
+      ],
+      [
+        6,
+        3,
+        1.0,
+        1.0
+      ],
+      [
+        2,
+        3,
+        1.0,
+        1.0
+      ],
+      [
+        3,
+        4,
+        1.0,
+        1.0
+      ],
+      [
+        4,
+        5,
+        1.0,
+        1.0
+      ],
+      [
+        5,
+        0,
+        0.25,
+        1.0
+      ]
+    ],
+    "node_contracts": [
+      {
+        "node": 0,
+        "zone": "A",
+        "capacity": 1
+      },
+      {
+        "node": 1,
+        "zone": "A",
+        "capacity": 1
+      },
+      {
+        "node": 2,
+        "zone": "A",
+        "capacity": 1
+      },
+      {
+        "node": 3,
+        "zone": "B",
+        "capacity": 1
+      },
+      {
+        "node": 4,
+        "zone": "B",
+        "capacity": 1
+      },
+      {
+        "node": 5,
+        "zone": "A",
+        "capacity": 1
+      },
+      {
+        "node": 6,
+        "zone": "A",
+        "capacity": 1
+      }
+    ],
+    "edge_contracts": [
+      {
+        "from": 0,
+        "to": 1,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 0,
+        "to": 6,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 6,
+        "to": 2,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 6,
+        "to": 3,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 3,
+        "to": 4,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 5,
+        "to": 0,
+        "capacity": 1,
+        "entry_headway": 0.2
+      }
+    ],
+    "trays": [
+      {
+        "tray_id": "T0",
+        "node": 5
+      }
+    ],
+    "jobs": [
+      {
+        "business_bag_id": "Y",
+        "origin": 0,
+        "destination": 4,
+        "arrival": 0.1,
+        "deadline": 40.0,
+        "storage_node": 2,
+        "storage_release_at": 6.0,
+        "storage_min_dwell": 2.0,
+        "load_seconds": 0.1,
+        "unload_seconds": 0.5,
+        "hold_seconds": 1.25
+      }
+    ],
+    "transfers": [],
+    "faults": [],
+    "options": {
+      "max_simulation_time": 80.0
+    },
+    "heuristic_time": [
+      [
+        0.0,
+        1.05,
+        2.0999999999999996,
+        2.3,
+        3.3499999999999996,
+        4.3999999999999995,
+        1.25
+      ],
+      [
+        4.499999999999999,
+        0.0,
+        1.05,
+        2.0999999999999996,
+        3.1499999999999995,
+        4.199999999999999,
+        5.749999999999999
+      ],
+      [
+        3.4499999999999997,
+        4.499999999999999,
+        0.0,
+        1.05,
+        2.0999999999999996,
+        3.1499999999999995,
+        4.699999999999999
+      ],
+      [
+        2.4,
+        3.4499999999999997,
+        4.499999999999999,
+        0.0,
+        1.05,
+        2.0999999999999996,
+        3.6499999999999995
+      ],
+      [
+        1.35,
+        2.4,
+        3.4499999999999993,
+        3.6499999999999995,
+        0.0,
+        1.05,
+        2.5999999999999996
+      ],
+      [
+        0.3,
+        1.35,
+        2.3999999999999995,
+        2.5999999999999996,
+        3.6499999999999995,
+        0.0,
+        1.55
+      ],
+      [
+        3.4499999999999997,
+        4.499999999999999,
+        1.05,
+        1.05,
+        2.0999999999999996,
+        3.1499999999999995,
+        0.0
+      ]
+    ],
+    "potential_contract": {
+      "mode": "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL",
+      "formula": "H(g,g)=0; H(u,g)=service_duration(u)+min_(u,v)(travel(u,v)+H(v,g))",
+      "service_duration": "max(map_node_service,minimum_service_seconds)",
+      "minimum_service_seconds": 0.001,
+      "candidate_score_identity": "travel(current,candidate)+H(candidate,goal) includes candidate and later non-goal service",
+      "precomputation": "reverse_dijkstra_once_per_goal",
+      "node_count": 7,
+      "directed_edge_count": 9,
+      "unreachable_finite_value_seconds": 9.799999999999999,
+      "runtime_read_scope": "direct_outgoing_candidates_and_one_scalar_each",
+      "runtime_decision_complexity": "O(outdegree)",
+      "runtime_full_astar_required": false,
+      "future_route_materialized": false,
+      "global_reservation_table_required": false
+    },
+    "owner_protocol": {
+      "enabled": true,
+      "timeout": 0.1,
+      "ack_delay": 0.05
+    }
+  },
+  "replies": [
+    {
+      "status": "pending",
+      "reason": "command_enqueued"
+    },
+    {
+      "status": "pending",
+      "reason": "request_enqueued"
+    }
+  ],
+  "result": {
+    "schema": "g31.circulation.live_result.v1",
+    "mode": "circulation",
+    "optimality": "unknown",
+    "native_event_ms": [],
+    "native_summary": {
+      "event_count": 8,
+      "completed_count": 0,
+      "failed_count": 0,
+      "runtime_seconds": 0.0,
+      "edge_enter_event_count": 0,
+      "edge_exit_event_count": 0,
+      "reservation_conflicts": 0,
+      "physical_fault_edge_entry_violation_count": 0,
+      "merge_grant_timing_mode": "jit_fair_aging_deadline",
+      "g4irsf20_event_hotpath_policy": "E2",
+      "local_queue_capacity": 0
+    },
+    "transport_legs": [],
+    "native_events": [],
+    "decisions": [],
+    "receipts": [
+      {
+        "time": 0.0,
+        "event": "MODULE_REQUEST_DELIVERED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "T0",
+        "traversal_id": 0,
+        "node": 5,
+        "from": 5,
+        "to": 0,
+        "reason": "live:1:A:real-tray-return"
+      },
+      {
+        "time": 0.0,
+        "event": "TRANSFER_REJECTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "T0",
+        "traversal_id": 0,
+        "node": 5,
+        "from": 5,
+        "to": 0,
+        "reason": "same_zone_transfer_not_authorized"
+      },
+      {
+        "time": 0.05,
+        "event": "PROTOCOL_ACK_DELIVERED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "",
+        "traversal_id": 0,
+        "node": -1,
+        "from": -1,
+        "to": -1,
+        "reason": "live:1:A:real-tray-return:1"
+      },
+      {
+        "time": 0.1,
+        "event": "BAG_ARRIVAL",
+        "business_bag_id": "Y",
+        "transport_leg_id": "",
+        "tray_id": "",
+        "traversal_id": 0,
+        "node": 0,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 0.25,
+        "event": "PROTOCOL_COMMAND_ACK_DELIVERED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "",
+        "traversal_id": 0,
+        "node": -1,
+        "from": -1,
+        "to": -1,
+        "reason": "live:1:A:demand:one:1"
+      }
+    ],
+    "jobs": [
+      {
+        "business_bag_id": "Y",
+        "status": "waiting_for_tray",
+        "tray": -1,
+        "loaded_at": -1.0,
+        "storage_entered_at": -1.0,
+        "storage_released_at": -1.0,
+        "completed_at": -1.0,
+        "deadline_met": false
+      }
+    ],
+    "trays": [
+      {
+        "tray_id": "T0",
+        "node": 5,
+        "mode": "empty",
+        "job": -1,
+        "active_leg": -1,
+        "edge_from": -1,
+        "edge_to": -1,
+        "reception_node": -1,
+        "available_at": 0.0,
+        "traversal_id": 0
+      }
+    ],
+    "transfers": [
+      {
+        "request_id": "live:1:A:real-tray-return",
+        "status": "rejected",
+        "reason": "same_zone_transfer_not_authorized",
+        "tray": 0,
+        "delivered_at": 0.0,
+        "departed_at": -1.0,
+        "received_at": -1.0
+      }
+    ],
+    "leg_identities": [],
+    "physical_clock": 0.35,
+    "horizon": 0.35,
+    "advance": {
+      "physical_time": 0.35,
+      "processed_events": 0,
+      "status": "reached",
+      "horizon_complete": true,
+      "wall_seconds": 6e-07
+    },
+    "scope": "offline result; contains offered population, never an online observation",
+    "population": {
+      "offered_by_horizon": 1,
+      "observed": 1,
+      "loaded": 0,
+      "completed": 0
+    }
+  },
+  "ack": {
+    "sequence": 1,
+    "attempt": 1,
+    "observed_at": 0.2,
+    "delivered_at": 0.25,
+    "executed_at": 0.2,
+    "completed_at": 0.2,
+    "status": "delivered",
+    "reason": "",
+    "result_id": "A:B:1",
+    "captured_demand_signature": {
+      "schema": "g31.demand_signature.v1",
+      "sha256": "822f8fdd27abb41131ec01c7a0e3ce48d57a7eb908a036793c4a1f59edb900ca",
+      "waiting_count": 1
+    },
+    "captured_demand_observed_at": 0.2,
+    "captured_demand_publication_sequence": 1
+  }
+}

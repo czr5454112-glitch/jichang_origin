@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="7" time="0.695" timestamp="2026-10-13T17:41:10.629159+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_actual_capture_signature_differs_from_submission_and_later_aba_queue" time="0.008"><failure message="AssertionError: assert {'schema': 'g...ing_count': 0} == {'schema': 'g...ing_count': 1}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Differing items:&#10;  {'waiting_count': 0} != {'waiting_count': 1}&#10;  {'sha256': '44c997f3132f7afa3085b402729c247737e2d08a5d612e30ca7868451c4691c3'} != {'sha256': '822f8fdd27abb41131ec01c7a0e3ce48d57a7eb908a036793c4a1f59edb900ca'}&#10;  Use -v to get more diff">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_011\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+
+    def test_actual_capture_signature_differs_from_submission_and_later_aba_queue(native):
+        value = scene()
+        value["trays"] = [dict(tray_id="T0", node=5)]
+        value["jobs"] = [dict(value["jobs"][0], business_bag_id="Y", arrival=.1)]
+        value["edge_records"] = [(u, v, .25 if (u, v) == (5, 0) else length, speed)
+                                 for u, v, length, speed in value["edge_records"]]
+        value = prepare_input(value)
+        s = native.NativeSession(value); s.advance_to(0.)
+        submitted_signature = s.protocol_demand_signature("A")
+        request = demand(message_delay=.2)
+        s.submit_protocol_command(request)
+        s.submit_protocol_transfer(dict(request_id="live:1:A:real-tray-return", owner_id="A", tray_id="T0",
+            source=5, destination=0, earliest_departure=0., expiry=10., message_delay=0.))
+        s.advance_to(.35)
+&gt;       assert submitted_signature == s.protocol_demand_signature("A") == canonical([])
+E       AssertionError: assert {'schema': 'g...ing_count': 0} == {'schema': 'g...ing_count': 1}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'waiting_count': 0} != {'waiting_count': 1}
+E         {'sha256': '44c997f3132f7afa3085b402729c247737e2d08a5d612e30ca7868451c4691c3'} != {'sha256': '822f8fdd27abb41131ec01c7a0e3ce48d57a7eb908a036793c4a1f59edb900ca'}
+E         Use -v to get more diff
+
+tests\test_g31_circulation_demand_ack_signature.py:61: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_old_pending_ack_never_gains_the_later_final_capture_fields" time="0.002" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_lost_final_ack_hides_capture_until_actual_retry_ack_arrives" time="0.001" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_recipient_outage_preserves_actual_source_capture_identity" time="0.001" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_canonical_unicode_order_and_signed_zero_match_local_signature" time="0.001"><failure message="ValueError: circulation:empty_fleet">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_011\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+
+    def test_canonical_unicode_order_and_signed_zero_match_local_signature(native):
+        value = scene(); value["trays"] = []
+        template = value["jobs"][0]
+        value["jobs"] = [dict(template, business_bag_id=name, arrival=-0. if i % 2 else 0., deadline=40.)
+                         for i, name in enumerate(["z", "托盘", "a", "é", "😀"])]
+&gt;       s = native.NativeSession(value); s.advance_to(.01)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: circulation:empty_fleet
+
+tests\test_g31_circulation_demand_ack_signature.py:117: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_snapshot_digest_cache_is_readonly_and_rebuilt_after_restore" time="0.004" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_historical_ack_matches_its_message_after_a_newer_snapshot" time="0.001" /></testsuite></testsuites>

@@ -1,0 +1,139 @@
+{
+  "source": "result.json.gz",
+  "native_event_rows": 9914,
+  "native_event_type_counts": {
+    "BAG_RELEASE": 11,
+    "CONGESTION_BEACON_UPDATE": 4484,
+    "LOCAL_QUEUE_UPDATE": 269,
+    "SOURCE_ARBITRATION": 11,
+    "JUNCTION_SERVICE_COMPLETE": 131,
+    "ARRIVE_JUNCTION": 131,
+    "JUNCTION_ARBITRATION": 4637,
+    "EDGE_ENTER": 120,
+    "EDGE_EXIT": 120
+  },
+  "dominant_node_reason_rows": [
+    {
+      "event": "JUNCTION_ARBITRATION",
+      "reason": "same_timestamp_junction_arbitration",
+      "node": 112,
+      "count": 3626
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "junction_dispatch_snapshot",
+      "node": 112,
+      "count": 3189
+    },
+    {
+      "event": "JUNCTION_ARBITRATION",
+      "reason": "same_timestamp_junction_arbitration",
+      "node": 29,
+      "count": 899
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "junction_dispatch_snapshot",
+      "node": 29,
+      "count": 891
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "queue_change_beacon",
+      "node": 28,
+      "count": 14
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "queue_change_beacon",
+      "node": 29,
+      "count": 13
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "queue_change_beacon",
+      "node": 112,
+      "count": 12
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "queue_change_beacon",
+      "node": 0,
+      "count": 8
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "queue_change_beacon",
+      "node": 27,
+      "count": 8
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "incoming_reservation_snapshot",
+      "node": 112,
+      "count": 8
+    },
+    {
+      "event": "EDGE_EXIT",
+      "reason": "edge_traversal_complete",
+      "node": 112,
+      "count": 8
+    },
+    {
+      "event": "JUNCTION_SERVICE_COMPLETE",
+      "reason": "junction_service_complete",
+      "node": 112,
+      "count": 8
+    },
+    {
+      "event": "ARRIVE_JUNCTION",
+      "reason": "junction_arrival_enqueue",
+      "node": 112,
+      "count": 8
+    },
+    {
+      "event": "LOCAL_QUEUE_UPDATE",
+      "reason": "junction_enqueue",
+      "node": 112,
+      "count": 8
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "queue_change_beacon",
+      "node": 24,
+      "count": 8
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "queue_change_beacon",
+      "node": 26,
+      "count": 8
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "queue_change_beacon",
+      "node": 95,
+      "count": 8
+    },
+    {
+      "event": "CONGESTION_BEACON_UPDATE",
+      "reason": "incoming_reservation_snapshot",
+      "node": 28,
+      "count": 7
+    },
+    {
+      "event": "EDGE_EXIT",
+      "reason": "edge_traversal_complete",
+      "node": 28,
+      "count": 7
+    },
+    {
+      "event": "JUNCTION_SERVICE_COMPLETE",
+      "reason": "junction_service_complete",
+      "node": 28,
+      "count": 7
+    }
+  ],
+  "diagnosis": "G31 S4 tries the ranked preferred candidate without same-bag handoff; a physically free alternative prevents an all-candidate resource wait even though the policy will not take it. Repeated arbitration at 112 and 29 has no physical edge commit.",
+  "claim": "native scheduling engineering and correctness only; no business improvement evidence"
+}

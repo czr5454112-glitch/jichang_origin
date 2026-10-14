@@ -1,0 +1,1419 @@
+{
+  "schema": "ics_round5_resource_ledger_v1",
+  "created_at_utc": "2026-10-10T07:55:13.611207+00:00",
+  "source_only": true,
+  "new_physical_simulations": 0,
+  "rows": [
+    {
+      "id": "empty_pilot28",
+      "label": "empty pilot 28",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_improvement_pilot_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 120.28125,
+          "quality": "complete_recorded_scope",
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 0.609375,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 23.67457820000709,
+      "work_counts": {
+        "planned": 28,
+        "recorded": 28,
+        "statuses": {
+          "controller_quiescent": 28
+        },
+        "unknown_worker_resources": 0
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU."
+      ]
+    },
+    {
+      "id": "empty_formal252",
+      "label": "empty full 252",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_improvement_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 1835.0625,
+          "quality": "complete_recorded_scope",
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 1.109375,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 323.0626399999892,
+      "work_counts": {
+        "planned": 252,
+        "recorded": 252,
+        "statuses": {
+          "controller_quiescent": 252
+        },
+        "unknown_worker_resources": 0
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU."
+      ]
+    },
+    {
+      "id": "factorial_preflight",
+      "label": "factorial first preflight failure",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_20261010\\preflight_failure.json",
+      "status": "failed_preflight",
+      "cpu_components": [
+        {
+          "scope": "preflight process",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "physical_episodes": 0
+      },
+      "notes": [
+        "direct Python asdict tuple vs previously JSON-normalized lists comparison; input contents require JSON normalization before equality"
+      ]
+    },
+    {
+      "id": "factorial_aborted",
+      "label": "factorial aborted artifact-comparison run",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_repaired_20261010\\aborted_run.json",
+      "status": "aborted",
+      "cpu_components": [
+        {
+          "scope": "successful deployment records only",
+          "cpu_seconds": 239.375,
+          "quality": "lower_bound",
+          "source_field": "successful_deployment_cpu_seconds_lower_bound",
+          "note": ""
+        },
+        {
+          "scope": "failed verification, in-flight, coordinator and serialization",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "lost/incomplete accounting",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "preserved_case_files": 74,
+        "physical_episodes_at_least": 74,
+        "case_statuses": {
+          "controller_quiescent": 56,
+          "execution_failure": 18
+        }
+      },
+      "notes": [
+        "default-cell completed physical outcomes were incorrectly discarded when comparing Python tuple history against historical JSON lists; marked execution_failure despite physical h80/final comparison passing. Historical files kept unchanged. Failed verification CPU and in-flight interruption work are not fully reconstructable. Lower bound is not full experiment CPU."
+      ]
+    },
+    {
+      "id": "factorial_debug",
+      "label": "factorial separate default replay diagnostic",
+      "source": ".tmp\\factorial_default_replay_debug.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "one deployment",
+          "cpu_seconds": 4.390625,
+          "quality": "complete_recorded_scope",
+          "source_field": "metrics.process_cpu_seconds",
+          "note": ""
+        },
+        {
+          "scope": "imports, caller and file serialization",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 4.465060699993046,
+      "work_counts": {
+        "new_physical_episodes": 1
+      },
+      "notes": [
+        "Separate run, not a copy of an old episode."
+      ]
+    },
+    {
+      "id": "factorial_full144",
+      "label": "factorial full rerun 144",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_complete_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 1139.96875,
+          "quality": "complete_recorded_scope",
+          "source_field": "case_invocation_cpu_seconds_recorded",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 1.0,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 259.954258200014,
+      "work_counts": {
+        "planned": 144,
+        "recorded": 144,
+        "statuses": {
+          "controller_quiescent": 144
+        },
+        "unknown_worker_resources": 0
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU."
+      ]
+    },
+    {
+      "id": "scenario_pilot16",
+      "label": "public scenario pilot 16",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenarios_pilot_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 388.390625,
+          "quality": "complete_recorded_scope",
+          "source_field": "case_cpu_seconds_recorded",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 0.609375,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 132.90763319999678,
+      "work_counts": {
+        "planned": 16,
+        "recorded": 16,
+        "statuses": {
+          "controller_quiescent": 16
+        },
+        "unknown_worker_resources": 0,
+        "action_evaluations": 666,
+        "requested_scenarios": 4166,
+        "physical_proxy_calls": 2846,
+        "duplicate_reuses": 1320
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU."
+      ]
+    },
+    {
+      "id": "scenario_full144",
+      "label": "public scenario full 144",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenarios_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 5694.171875,
+          "quality": "complete_recorded_scope",
+          "source_field": "case_cpu_seconds_recorded",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 0.75,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 1073.8258834000153,
+      "work_counts": {
+        "planned": 144,
+        "recorded": 144,
+        "statuses": {
+          "controller_quiescent": 144
+        },
+        "unknown_worker_resources": 0,
+        "action_evaluations": 8196,
+        "requested_scenarios": 51078,
+        "physical_proxy_calls": 32360,
+        "duplicate_reuses": 18718
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU."
+      ]
+    },
+    {
+      "id": "network_bad_pilot",
+      "label": "network initial interrupted pilot",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_full_cycle_pilot_20261010\\interruption.json",
+      "status": "aborted",
+      "cpu_components": [
+        {
+          "scope": "three completed collections",
+          "cpu_seconds": 73.078125,
+          "quality": "complete_recorded_scope",
+          "source_field": "recorded_collection_cpu_seconds",
+          "note": ""
+        },
+        {
+          "scope": "completed saved physical branches",
+          "cpu_seconds": 343.9375,
+          "quality": "lower_bound",
+          "source_field": "recorded_branch_cpu_seconds_lower_bound",
+          "note": ""
+        },
+        {
+          "scope": "interrupted in-flight, setup, serialization and parent",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "invocation_cpu_not_recoverable",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "recorded_branch_calls_lower_bound": 5,
+        "collection_invocations": 3
+      },
+      "notes": [
+        "root-authorized interruption after discovering valid stationary INFINITY stock reservations incorrectly prevented transport drain; preserve original output and rerun all12 after fix"
+      ]
+    },
+    {
+      "id": "network_pilot_v2",
+      "label": "network corrected pilot 12",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_full_cycle_pilot_v2_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 218.828125,
+          "quality": "complete_recorded_scope",
+          "source_field": "worker_cpu_seconds_sum",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 0.921875,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 101.87995840000804,
+      "work_counts": {
+        "request_count": 12,
+        "actual_branches": 12,
+        "cache_reused": 0,
+        "status_counts": {
+          "controller_quiescent": 12
+        },
+        "worker_failures": []
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU.",
+        "Fresh three collections and all 12 branches; no reuse from interrupted pilot."
+      ]
+    },
+    {
+      "id": "network_full2176",
+      "label": "network full 2176 requests",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_full_cycle_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 20275.84375,
+          "quality": "complete_recorded_scope",
+          "source_field": "worker_cpu_seconds_sum",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 0.921875,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 3519.235010000004,
+      "work_counts": {
+        "request_count": 2176,
+        "actual_branches": 1388,
+        "cache_reused": 788,
+        "status_counts": {
+          "controller_quiescent": 2176
+        },
+        "worker_failures": []
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU.",
+        "Six global memo shards each newly collect three scenes (18 collection invocations, not 18 independent samples). Expected memo aliases are not new physical branches. Nested scene/branch CPU is already within worker invocation sum. CPU caps are not resource observations."
+      ]
+    },
+    {
+      "id": "network_census",
+      "label": "network opportunity census",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_opportunity_census_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "three worker collections",
+          "cpu_seconds": 77.28125,
+          "quality": "complete_recorded_scope",
+          "source_field": "worker_cpu_seconds",
+          "note": ""
+        },
+        {
+          "scope": "parent",
+          "cpu_seconds": 0.09375,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 38.71589639998274,
+      "work_counts": {
+        "physical_collection_invocations": 3
+      },
+      "notes": [
+        "These are separate census simulations; no new counterfactual labels."
+      ]
+    },
+    {
+      "id": "nominal_preflight",
+      "label": "nominal first collection and denominator preflight",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_20261010\\initialization_failure.json",
+      "status": "failed_preflight_after_collection",
+      "cpu_components": [
+        {
+          "scope": "three completed collections",
+          "cpu_seconds": 106.796875,
+          "quality": "complete_recorded_scope",
+          "source_field": "complete_collection_cpu_seconds",
+          "note": ""
+        },
+        {
+          "scope": "initial parent/setup",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "parent_cpu_seconds=null",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "attempts": 180,
+        "nonempty": 174,
+        "actual_requests": 693,
+        "counterfactual_physical_calls": 0
+      },
+      "notes": [
+        "all three actual collections completed and matched old raw result/searches before final preflight rejected mistaken cardinality; no failure row or physical work is deleted"
+      ]
+    },
+    {
+      "id": "nominal_collection_reuse",
+      "label": "nominal repaired collection reuse",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_repaired_20261010\\collection_summary.json",
+      "status": "reused_artifact",
+      "cpu_components": [
+        {
+          "scope": "new collection physical work",
+          "cpu_seconds": 0,
+          "quality": "certified_zero",
+          "source_field": "new_physical_collection_calls=0",
+          "note": ""
+        },
+        {
+          "scope": "copy/repair setup process",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "new_physical_collection_calls": 0
+      },
+      "notes": [
+        "Original collection CPU 106.796875 s already counted in nominal_preflight; byte copy is not a new collection."
+      ]
+    },
+    {
+      "id": "nominal_pilot12",
+      "label": "nominal pilot 12",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_repaired_20261010\\pilot\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 159.703125,
+          "quality": "complete_recorded_scope",
+          "source_field": "case_cpu_seconds_recorded",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 0.1875,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 32.58369970001513,
+      "work_counts": {
+        "planned_requests": 12,
+        "unique_requested": 12,
+        "actual_physical_calls_recorded": 12,
+        "unknown_physical_call_statuses": 0,
+        "cache_hits": 0,
+        "status_counts": {
+          "controller_quiescent": 12
+        }
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU."
+      ]
+    },
+    {
+      "id": "nominal_full693",
+      "label": "nominal full 693",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_repaired_20261010\\full\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "worker invocations",
+          "cpu_seconds": 8862.15625,
+          "quality": "complete_recorded_scope",
+          "source_field": "case_cpu_seconds_recorded",
+          "note": "Includes nested deployment/branch/collection work within this invocation; do not add those subtotals."
+        },
+        {
+          "scope": "coordinator parent",
+          "cpu_seconds": 1.046875,
+          "quality": "complete_recorded_scope",
+          "source_field": "parent_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 1571.9961082000227,
+      "work_counts": {
+        "planned_requests": 693,
+        "unique_requested": 693,
+        "actual_physical_calls_recorded": 693,
+        "unknown_physical_call_statuses": 0,
+        "cache_hits": 0,
+        "status_counts": {
+          "controller_quiescent": 693
+        }
+      },
+      "notes": [
+        "Measured instrumented scopes exclude unrecorded interpreter/bootstrap work; not a claim of complete machine-wide CPU.",
+        "Full run actually reruns the 12 pilot identities; no cross-run memo reuse. 693 = 172*4 + 1*2 + 1*3, with six K0 attempts retained separately."
+      ]
+    },
+    {
+      "id": "tests700",
+      "label": "regression suite 700",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_validation_20261010\\validation_manifest.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest host process",
+          "cpu_seconds": 94.515625,
+          "quality": "complete_recorded_scope",
+          "source_field": "process_cpu_seconds",
+          "note": "pytest host process including its threads; child subprocess CPU is not included"
+        },
+        {
+          "scope": "any child subprocess CPU",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "excluded by cpu_scope; existence/amount unquantified",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 98.98807130000205,
+      "work_counts": {
+        "testcases": 700,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 700
+      },
+      "notes": [
+        "700 and 717 are separate invocations; neither substitutes for the other."
+      ]
+    },
+    {
+      "id": "tests717",
+      "label": "regression suite 717",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_final_validation_20261010\\validation_manifest.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest host process",
+          "cpu_seconds": 110.75,
+          "quality": "complete_recorded_scope",
+          "source_field": "process_cpu_seconds",
+          "note": "pytest host process including its threads; child subprocess CPU is not included"
+        },
+        {
+          "scope": "any child subprocess CPU",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "excluded by cpu_scope; existence/amount unquantified",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 136.6153666000173,
+      "work_counts": {
+        "testcases": 717,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 717
+      },
+      "notes": [
+        "700 and 717 are separate invocations; neither substitutes for the other."
+      ]
+    },
+    {
+      "id": "tests2_post717",
+      "label": "two post-717 injected failure tests",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_analysis_20261010\\failure_audit_validation.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pytest invocation",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "CPU and pytest wall not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "passed": 2,
+        "failed": 0
+      },
+      "notes": [
+        "Separate timing boundary: report 717 + 2, not a 719-test invocation. Mocked deployments; no new physical episodes."
+      ]
+    },
+    {
+      "id": "authoring_smoke",
+      "label": "empty authoring integration smoke",
+      "source": ".tmp\\round5_empty_authoring_validation_20261010.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "one smoke deployment",
+          "cpu_seconds": 0.796875,
+          "quality": "complete_recorded_scope",
+          "source_field": "pilot.cpu_seconds",
+          "note": ""
+        },
+        {
+          "scope": "smoke imports/caller",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "physical_smoke_episodes": 1
+      },
+      "notes": [
+        "nonformal integration only; no tuning or efficacy claim"
+      ]
+    },
+    {
+      "id": "authoring_tests",
+      "label": "early authoring and focused tests",
+      "source": ".tmp\\round5_empty_authoring_validation_20261010.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "all early focused test invocations",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not metered",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "recorded_checks": [
+          {
+            "stage": "initial_new_tests",
+            "passed": 15,
+            "failed": 1,
+            "reason": "test fixture source-demand guard prevented the expected second export; fixture changed to explicitly bounded greedy incumbent; production guard unchanged"
+          },
+          {
+            "stage": "corrected_new_tests",
+            "passed": 16,
+            "failed": 0
+          },
+          {
+            "stage": "related_suite_default_temp",
+            "passed": 32,
+            "setup_errors": 1,
+            "reason": "Windows Temp pytest-of-38908 ACL denied; no implementation failure"
+          },
+          {
+            "stage": "related_suite_workspace_basetemp_after_guard_test",
+            "passed": 34,
+            "failed": 0,
+            "setup_errors": 0,
+            "command": "python -m pytest tests/test_ics_circulation_v3_empty_improvement.py tests/test_ics_circulation_v3_prebalance_reference.py tests/test_ics_circulation_v3_public_rollout.py -q --basetemp=.tmp/pytest_empty_improvement_20261010"
+          }
+        ]
+      },
+      "notes": [
+        "Includes initial fixture failure and Temp ACL setup error. Later factorial 10, combined 30, SAA 7 and independent small suites were real invocations but not comprehensively CPU-metered; do not infer CPU from test counts."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_empty_factorial_analysis_20261010\\analysis.json",
+      "label": "phase4_w3_empty_factorial_analysis_20261010/analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_analysis_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "checks": {
+          "sha256": 529,
+          "unique_case": 396,
+          "quiescent": 396,
+          "case_source": 396,
+          "matrix_size": 1,
+          "same_inputs": 1,
+          "rollout_accounting": 7056,
+          "mandatory_actions": 3393,
+          "independent_ranking": 3393,
+          "selected_action_committed": 3393,
+          "complete_projection": 8121,
+          "search_accounting": 8121,
+          "original_default_reproduction": 36,
+          "final_sha256": 498
+        },
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_empty_improvement_analysis_20261010\\analysis.json",
+      "label": "phase4_w3_empty_improvement_analysis_20261010/analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_improvement_analysis_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {
+        "checks": 36742,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_empty_scenarios_analysis_20261010\\analysis.json",
+      "label": "phase4_w3_empty_scenarios_analysis_20261010/analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenarios_analysis_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 7.4375,
+          "quality": "complete_recorded_scope",
+          "source_field": "analysis_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 7.500981599994702,
+      "work_counts": {
+        "checks": 343993,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_empty_scenarios_pilot_analysis_v2_20261010\\analysis.json",
+      "label": "phase4_w3_empty_scenarios_pilot_analysis_v2_20261010/analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenarios_pilot_analysis_v2_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 1.5625,
+          "quality": "complete_recorded_scope",
+          "source_field": "analysis_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 1.7364133000082802,
+      "work_counts": {
+        "checks": 29619,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\empty_final_audit.json",
+      "label": "phase4_w3_round5_independent_review_20261010/empty_final_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\empty_final_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 3.09375,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 3.1864854999876115,
+      "work_counts": {
+        "checks": 79333,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\empty_pilot_audit.json",
+      "label": "phase4_w3_round5_independent_review_20261010/empty_pilot_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\empty_pilot_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 0.515625,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 0.6226793999958318,
+      "work_counts": {
+        "checks": 7414,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\final_validation_supplement_binding.json",
+      "label": "phase4_w3_round5_independent_review_20261010/final_validation_supplement_binding.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\final_validation_supplement_binding.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {},
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\full_cycle_analysis_comparison.json",
+      "label": "phase4_w3_round5_independent_review_20261010/full_cycle_analysis_comparison.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\full_cycle_analysis_comparison.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 49.859375,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 52.10700469999574,
+      "work_counts": {
+        "checks": 6047,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\full_cycle_final_audit.json",
+      "label": "phase4_w3_round5_independent_review_20261010/full_cycle_final_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\full_cycle_final_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 143.109375,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 147.74307759999647,
+      "work_counts": {
+        "checks": 69226,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\full_cycle_pilot_audit.json",
+      "label": "phase4_w3_round5_independent_review_20261010/full_cycle_pilot_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\full_cycle_pilot_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 18.203125,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 18.47320919999038,
+      "work_counts": {
+        "checks": 2548,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\full_cycle_pilot_search_audit.json",
+      "label": "phase4_w3_round5_independent_review_20261010/full_cycle_pilot_search_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\full_cycle_pilot_search_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 16.71875,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 16.949438699986786,
+      "work_counts": {
+        "checks": 2608,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\initial_review.json",
+      "label": "phase4_w3_round5_independent_review_20261010/initial_review.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\initial_review.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "not recorded",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {},
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\nominal_checkpoint_binding_audit.json",
+      "label": "phase4_w3_round5_independent_review_20261010/nominal_checkpoint_binding_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\nominal_checkpoint_binding_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 23.734375,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 24.10507879999932,
+      "work_counts": {
+        "checks": 3037,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\scenarios_final_audit.json",
+      "label": "phase4_w3_round5_independent_review_20261010/scenarios_final_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\scenarios_final_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 6.21875,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 6.345867099997122,
+      "work_counts": {
+        "checks": 390125,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_round5_independent_review_20261010\\scenarios_pilot_audit.json",
+      "label": "phase4_w3_round5_independent_review_20261010/scenarios_pilot_audit.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\scenarios_pilot_audit.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 1.765625,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 1.86785609999788,
+      "work_counts": {
+        "checks": 33613,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_same_zone_supply_analysis_20261010\\analysis.json",
+      "label": "phase4_w3_same_zone_supply_analysis_20261010/analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_analysis_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 0.046875,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 0.046383800014154986,
+      "work_counts": {
+        "checks": 10,
+        "failed_checks": 0
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_network_nominal_analysis_20261010\\audit_and_values.json",
+      "label": "phase4_w3_network_nominal_analysis_20261010/audit_and_values.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_analysis_20261010\\audit_and_values.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 56.953125,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 57.7426562999899,
+      "work_counts": {
+        "checks": 25257,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_network_nominal_analysis_20261010\\feature_coverage.json",
+      "label": "phase4_w3_network_nominal_analysis_20261010/feature_coverage.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_analysis_20261010\\feature_coverage.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 3.453125,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 3.7518105000199284,
+      "work_counts": {
+        "checks": 185,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_network_nominal_analysis_20261010\\mechanisms.json",
+      "label": "phase4_w3_network_nominal_analysis_20261010/mechanisms.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_analysis_20261010\\mechanisms.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 1.515625,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 1.5308632999949623,
+      "work_counts": {
+        "checks": 74,
+        "failed_checks": 0,
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_empty_scenario_mechanisms_20261010\\analysis.json",
+      "label": "phase4_w3_empty_scenario_mechanisms_20261010/analysis.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenario_mechanisms_20261010\\analysis.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 2.65625,
+          "quality": "complete_recorded_scope",
+          "source_field": "analysis_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 2.653801400010707,
+      "work_counts": {
+        "checks": {
+          "full144": 1,
+          "complete_statuses": 1,
+          "sha256": 216,
+          "point_factorial_reproduction": 36,
+          "mean_eight": 6
+        },
+        "errors": []
+      },
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_empty_scenario_mechanisms_20261010\\shared_tick_evidence.json",
+      "label": "phase4_w3_empty_scenario_mechanisms_20261010/shared_tick_evidence.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenario_mechanisms_20261010\\shared_tick_evidence.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 0.140625,
+          "quality": "complete_recorded_scope",
+          "source_field": "analysis_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 0.13793940001050942,
+      "work_counts": {},
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis:phase4_w3_network_full_cycle_analysis_20261010\\summary.json",
+      "label": "phase4_w3_network_full_cycle_analysis_20261010/summary.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_full_cycle_analysis_20261010\\summary.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 53.015625,
+          "quality": "complete_recorded_scope",
+          "source_field": "analysis_cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 54.739288299984764,
+      "work_counts": {},
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted.",
+        "These physical work details are metadata for the already-counted formal run, not work performed by this analyzer. Single-worker peak memory must not be summed into a simultaneous process-family peak."
+      ],
+      "nonadditive_physical_work_details": {
+        "unique_physical_search_calls": 75444,
+        "unique_physical_search_work": 46436470,
+        "unique_branch_cpu_seconds": 19037.109375,
+        "resources_detail": {
+          "actual_recollection_invocations": 18,
+          "recollection_cpu_seconds_nested_in_worker_total": 458.546875,
+          "recollection_search_calls": 1368,
+          "recollection_search_work": 879072,
+          "max_observed_single_worker_peak_working_set_bytes": 109641728,
+          "max_observed_single_worker_peak_commit_bytes": 803381248,
+          "memory_scope": "per-process lifetime peak including imports and earlier scene stages; never sum as simultaneous aggregate peak"
+        },
+        "resource_note": "branch timing is nested in invocation timing, never add again; requests.json repeats referenced physical-file timings on memo aliases, so sum unique physical files only; worker timings include duplicate recollection/setup; pilot and stopped pilot tracked separately"
+      }
+    },
+    {
+      "id": "analysis:phase4_w3_round5_visuals_20261010\\all_configurations\\manifest.json",
+      "label": "all_configurations/manifest.json",
+      "source": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_visuals_20261010\\all_configurations\\manifest.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "analysis/audit process",
+          "cpu_seconds": 1.546875,
+          "quality": "complete_recorded_scope",
+          "source_field": "cpu_seconds",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": 1.6451781999785453,
+      "work_counts": {},
+      "notes": [
+        "Pure-file/read-only audit time only; embedded original experiment resources are not added again. Each independently repeated audit invocation is separately counted."
+      ]
+    },
+    {
+      "id": "analysis_unmetered",
+      "label": "other unmetered development and analysis",
+      "source": null,
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file tools, initial failed analysis, plots, py_compile and inspection",
+          "cpu_seconds": null,
+          "quality": "unknown",
+          "source_field": "no saved process CPU measurement",
+          "note": ""
+        }
+      ],
+      "wall_seconds_individual_invocation": null,
+      "work_counts": {},
+      "notes": [
+        "Includes empty tie/coverage analysis, factorial mechanism extraction, first SAA pilot analyzer KeyError(proxy_bags), and three plot generations. Initial SAA analyzer parent reports tool wall 3.2600039s, which is not process CPU and is not added to a makespan. Ad hoc shell/tool probes were not comprehensively timed."
+      ]
+    },
+    {
+      "id": "prior_ledger:preview",
+      "label": "previous resource ledger generation preview",
+      "source": "C:\\PROGRAMING\\czr005\\outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_resource_ledger_20261010\\preview\\ledger.json",
+      "status": "complete",
+      "cpu_components": [
+        {
+          "scope": "pure-file ledger generation",
+          "cpu_seconds": 0.375,
+          "quality": "complete_recorded_scope",
+          "source_field": "ledger_generation_cpu_seconds",
+          "note": "This pure-file generation through evidence verification; final serialization and shell overhead excluded; not included in above subtotals."
+        }
+      ],
+      "wall_seconds_individual_invocation": 0.40341490000719205,
+      "work_counts": {},
+      "notes": [
+        "Only the prior summarizer itself is added; its embedded experiment totals are never re-added."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "empty_pilot28",
+      "worker_cpu_matches_rows": true
+    },
+    {
+      "id": "empty_formal252",
+      "worker_cpu_matches_rows": true
+    },
+    {
+      "id": "factorial_full144",
+      "worker_cpu_matches_rows": true
+    },
+    {
+      "id": "scenario_pilot16",
+      "worker_cpu_matches_rows": true
+    },
+    {
+      "id": "scenario_pilot16",
+      "scenario_requests_equal_physical_plus_reuse": true
+    },
+    {
+      "id": "scenario_full144",
+      "worker_cpu_matches_rows": true
+    },
+    {
+      "id": "scenario_full144",
+      "scenario_requests_equal_physical_plus_reuse": true
+    },
+    {
+      "id": "network_pilot_v2",
+      "requests_equal_physical_plus_reuse": true
+    },
+    {
+      "id": "network_full2176",
+      "requests_equal_physical_plus_reuse": true
+    },
+    {
+      "id": "nominal_pilot12",
+      "requests_equal_physical_plus_reuse": true
+    },
+    {
+      "id": "nominal_full693",
+      "requests_equal_physical_plus_reuse": true
+    }
+  ],
+  "bound_evidence_sha256": {
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_improvement_pilot_20261010\\summary.json": "e0caa9f6e813a06709a23235a830582ccba7e3289ad44f48e588094ca46283ed",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_improvement_20261010\\summary.json": "2d900267e9f9959583b0ff98f025b805c3cb2aebbfcdc9adf29213e90d043989",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_20261010\\preflight_failure.json": "73954cd31946184e740b0dac11147280a2850d22fd409d054657c7bb0d0b231e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_repaired_20261010\\aborted_run.json": "8762cf095dd277cb7646252e856fce984c37ea9322a03321645b2629e8a43bb6",
+    ".tmp\\factorial_default_replay_debug.json": "6d99bd29c7ba536b3bdb3e546be7d8e43daa884b923218a9a665397613efbd32",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_complete_20261010\\summary.json": "89cef7d024f722e19ff6ff5378c183606a61a9724d230d7590a9fb516b5ca21c",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenarios_pilot_20261010\\summary.json": "27a458a87ddb574f3f35ce9100d7970dc705c95dc9023177b5b632cd488fce41",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenarios_20261010\\summary.json": "e14f6798a77d2a17a44ae1a6f57f43695e1cd515bf78ed089bc178cd8ad7abb0",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_full_cycle_pilot_20261010\\interruption.json": "c9e0f9659f283e5fc465889abeb5691a9f4413099c2b707578e94f418ccccb66",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_full_cycle_pilot_v2_20261010\\summary.json": "9eb164b86601c5016eaf6013774543ecb85f3cabbde95078b37f7c95c4198fc5",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_full_cycle_20261010\\summary.json": "98dbf82e3b85efb5c7a75960ad5303e66cb0d74592006b8cbfed971102fb0902",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_opportunity_census_20261010\\summary.json": "296087abdb1c3e0dbaa64174ece9aed147b183173b74c0a3f746071b0e5417cd",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_20261010\\initialization_failure.json": "180ac0446e99a98ba0773d730b3b5e15b95c12461ce26e64294dadec124355cb",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_repaired_20261010\\collection_summary.json": "7f045bf6d7df797e32eaa35a007a0ff9b8614d18c729f7567c836411fdc0db6e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_repaired_20261010\\pilot\\summary.json": "c7d280057aa448dd4276be8f0afdd2c2957159b6bc441128bbda0a19d0bdea44",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_repaired_20261010\\full\\summary.json": "eba9ce81471ca4f6aeb404428dc3ed97b023f375186820908c8e9ccebe7b9e62",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_validation_20261010\\validation_manifest.json": "9bca89464c14e94e01b1186695f59516bed0560afbcb40ca34dbcaa497043427",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_final_validation_20261010\\validation_manifest.json": "a4f34861990e17a55d4aa5bbbcee9d4f5825110fcb7a839cfd5f4f7857bf5fb2",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_analysis_20261010\\failure_audit_validation.json": "ab611cbb0b47146ac533733cda255d26b37b8536dbfe328ccf57034b98f81b41",
+    ".tmp\\round5_empty_authoring_validation_20261010.json": "895fd23419de3a4c255704198d67b1c75469c9771621e8bddaa21cc3b682134c",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_factorial_analysis_20261010\\analysis.json": "15c368a8003bcde21c905d1e5ca1a02fd5d6210bae059048cb233e0a91da17a7",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_improvement_analysis_20261010\\analysis.json": "5e54461472b2d13f9b4cf730801f9aee7933de562bcb224776220ed95a798b4e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenarios_analysis_20261010\\analysis.json": "34b3c1a396a500b80c7499bc250665ab3097c1f99e77dbe33222551fb6220d71",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenarios_pilot_analysis_v2_20261010\\analysis.json": "5e7d4a96b10d88d869ac1ae655ac3b6c668c1674307f1f6b93ea9df991f412a2",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\empty_final_audit.json": "42a5d713d767da07b9cdef19ac20642436925af14f8e0645f02092cfe30f9a74",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\empty_pilot_audit.json": "a35ea1a04d37d79c4efebb7c5aa44278815804721caea4816522f45c9ba6b665",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\final_validation_supplement_binding.json": "91bc1d4c377726334c51fb6fb2cd0c8f296035e033e13ebc1676d39939c73eb6",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\full_cycle_analysis_comparison.json": "649b017f5f5c33c62937fc2c6416608b364f14fd2fe55fd1b9549495c93d2e39",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\full_cycle_final_audit.json": "0509281c9f2bb2df4be97d3012f83a5912060a6c024ec6ee46d06a37bd517d7e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\full_cycle_pilot_audit.json": "62be76696ef3fe786a5e82cee62511eaf92112a99c000f40f270a9361597aedd",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\full_cycle_pilot_search_audit.json": "31f5e64ea8930fdc2a7aa4d997cb57ed18fcca9179098c38b005b402999f7c2f",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\initial_review.json": "7a99ca0deba9080e30a983fb2ee276430c9c33092a1f2fb82b238405d0459262",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\nominal_checkpoint_binding_audit.json": "e196f44f99aecb2f3ac75f8dd6e06072f56faf282773fd1959bc42811eab8b68",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\scenarios_final_audit.json": "0f08a647bdccba9360a8f731ab60dbeb445ec7ded04873fdfb4ea2bd8466d8f3",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_independent_review_20261010\\scenarios_pilot_audit.json": "0e3e56041dbc2a0b7e8ba6a57e11d7e3a258d2e404533a9c3f0df02784a41abd",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_same_zone_supply_analysis_20261010\\analysis.json": "fca4ddba71ab3380c2a4a15c72ba16e86bf31d56261233606d6a462fcd073648",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_analysis_20261010\\audit_and_values.json": "61ac80d69d43ba6bbe203a58162002ae53fd183c856c3683754ecd49df8f53c3",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_analysis_20261010\\feature_coverage.json": "ba2db65e6e2073695758a5e58998f278a39dc492da0b8992ab139cf9b3e7a79e",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_analysis_20261010\\mechanisms.json": "9cbcde584b6ac743ab6e81cc784b891f72405a93444ec6458ad39a8f42ed0fcb",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenario_mechanisms_20261010\\analysis.json": "22b0a8e681b06f99ea099bdd0895e5ad3a3f5cef3ef8224706ecc8c927e6f1c1",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_empty_scenario_mechanisms_20261010\\shared_tick_evidence.json": "ce01098a527be7b5b64bf7f7cff15459189c99fb674d4605a621ead8d574ab49",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_full_cycle_analysis_20261010\\summary.json": "c1b2ed7770e1116f0fd9434b85e877423a7588ff4674fa4f5148a83f13d3c463",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_visuals_20261010\\all_configurations\\manifest.json": "781a2345514f71d220c04db956e4d19b2b88ebf33961dbd0dd99d8e382d4579a",
+    "C:\\PROGRAMING\\czr005\\outputs\\experiments\\ics_circulation_v3\\phase4_w3_round5_resource_ledger_20261010\\preview\\ledger.json": "366b668620ef0f902eb29de405fea5c51c831fadc1549611e73beb38f67742bb"
+  },
+  "bound_evidence_changed": [],
+  "pending_runs": [],
+  "totals": {
+    "sum_complete_recorded_scope_cpu_seconds": 39561.1875,
+    "additional_lower_bound_cpu_seconds": 583.3125,
+    "known_nonoverlapping_cpu_seconds_floor": 40144.5,
+    "unknown_cpu_component_count": 16,
+    "pending_cpu_component_count": 0,
+    "complete_fifth_round_cpu_known": false,
+    "global_wall_makespan_seconds": null,
+    "reason": "Known disjoint measured CPU scopes can add; unknown and pending work prevents full total. Concurrent run walls cannot be summed without a timeline."
+  },
+  "ledger_generation_cpu_seconds": 0.4375,
+  "ledger_generation_wall_seconds": 0.4519605999812484,
+  "ledger_generation_scope": "This pure-file generation through evidence verification; final serialization and shell overhead excluded; not included in above subtotals.",
+  "script_sha256": "ad6bff21b72149880302f45194d47a78fdc07953046234233384798d3b22e775"
+}

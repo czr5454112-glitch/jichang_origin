@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="1" skipped="0" tests="12" time="1.237" timestamp="2026-10-13T20:25:09.543928+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_actual_loaded_message_obeys_resource_owner_not_broadcast" time="0.015" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_inconsistent_conditional_predictions_are_reported_without_fake_physical_infeasibility" time="0.016" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_budget_failure_does_not_cancel_actual_soft_requests" time="0.013" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_no_change_no_native_mutation" time="0.012" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_historical_epsilon_order_scope_later_soft_retime_can_harm_other_service" time="0.010"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\38908\\AppData\\Local\\Temp\\pytest-of-38908'&quot;">tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=&lt;pluggy._tracing.TagTracerSub object at 0x0000023E8EE0CFD0&gt;, _basetemp=None, _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def historical_epsilon_order_scope(tmp_path_factory):
+        """Keep the original counterexample on the exact native011 it describes.
+    
+        Extension imports cache this module name across paths in one process, so
+        loading a second DLL in the main pytest process can silently return the
+        current build. The historical witness must run in its own process.
+        """
+        root = Path(__file__).absolute().parents[1]
+        binary = Path(os.environ.get("G31_HISTORICAL_ORDER_BINARY",
+            str(root / "build_lt_session_011/python/czr005_circulation.cp311-win_amd64.pyd")))
+        expected = "19b55703676810bacc156e474aac364e4016dda2d2fa7b4fa315a3237a1bdbec"
+        assert hashlib.sha256(binary.read_bytes()).hexdigest() == expected, "historical native011 identity mismatch"
+&gt;       output = tmp_path_factory.mktemp("historical_epsilon_order_scope") / "native011.json"
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_p5_dependency_repair.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\python3.11.9\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\python3.11.9\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\python3.11.9\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\site-packages\_pytest\pathlib.py:228: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\site-packages\_pytest\pathlib.py:187: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/38908/AppData/Local/Temp/pytest-of-38908')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -&gt; Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+&gt;       for x in os.scandir(root):
+                 ^^^^^^^^^^^^^^^^
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\38908\\AppData\\Local\\Temp\\pytest-of-38908'
+
+..\..\python3.11.9\Lib\site-packages\_pytest\pathlib.py:175: PermissionError</error></testcase><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_strict_time_retime_cannot_preempt_an_earlier_ready_competing_tray" time="0.331"><failure message="assert 0.8500000000000001 == 401.75">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_015\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+
+    def test_strict_time_retime_cannot_preempt_an_earlier_ready_competing_tray(native):
+        """The same old input now checks real chronological precedence, not its bug."""
+        data = circulation_factor_input(SCENARIOS[3])
+        one, first = execute_branch(native, data, "ordinary_public_windows", "source_only_with_publication")
+        two, second = execute_branch(native, data, "ordinary_public_windows", "two_boundary_dependency")
+        assert one["audit"]["status"] == two["audit"]["status"] == "passed"
+        assert one["metrics"]["completed"] == two["metrics"]["completed"] == 6
+        assert one["metrics"] == two["metrics"]
+        repair = second["resource_repair"]
+        assert repair["status"] == "repair_submitted"
+        assert repair["normal_service_guarantee"] is False
+        assert not repair["selected_action"]["observed_minimum_conflicts"]
+        committed = next(w for w in repair["windows"] if w["resource"] == "node:2")
+        assert committed["proof"]["tray_id"] == "T0"
+        assert committed["proof"]["edge_exit_at"] == 401.7 and committed["end"] == 401.75
+        request = repair["submissions"][0]["request"]
+        assert (request["tray_id"], request["source"], request["destination"]) == ("T1", 1, 4)
+        assert request["earliest_departure"] == math.nextafter(401.7, math.inf)
+        assert all(c["reply"]["status"] == "cancelled" for c in repair["cancellations"])
+        for raw in (first, second):
+            result = raw["controller_run"]["result"]
+            for kind, key in (("native_events", "time"), ("receipts", "time"), ("decisions", "event_time")):
+                times = [event[key] for event in result[kind]]
+                assert all(a &lt;= b for a, b in zip(times, times[1:])), kind
+            arrivals = [e for e in result["receipts"] if e["event"] == "EDGE_ENTER" and e["to"] == 2]
+            tp = next(e for e in arrivals if e["tray_id"] == "TP")
+            t1 = next(e for e in arrivals if e["tray_id"] == "T1")
+&gt;           assert tp["time"] == 401.75
+E           assert 0.8500000000000001 == 401.75
+
+tests\test_g31_circulation_p5_dependency_repair.py:163: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_fixed_graph_cut_excludes_unsupported_joint_baseline_target" time="0.002" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_cut_certificate_does_not_generalize_beyond_its_conditions[capacity]" time="0.003" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_cut_certificate_does_not_generalize_beyond_its_conditions[bypass]" time="0.003" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_cut_certificate_does_not_generalize_beyond_its_conditions[new_tray]" time="0.002" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_cut_certificate_does_not_generalize_beyond_its_conditions[late_target]" time="0.003" /><testcase classname="tests.test_g31_circulation_p5_dependency_repair" name="test_cut_certificate_does_not_generalize_beyond_its_conditions[one_crossing_two_sequential_services]" time="0.003" /></testsuite></testsuites>

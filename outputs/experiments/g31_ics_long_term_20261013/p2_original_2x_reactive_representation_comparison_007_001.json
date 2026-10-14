@@ -1,0 +1,449 @@
+{
+  "schema": "g31.control_representation_comparison.v1",
+  "status": "equivalent",
+  "runs": [
+    "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_2x_reactive_full_H86400_007_001",
+    "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_2x_reactive_compact_H86400_007_001"
+  ],
+  "receipt_sha256": [
+    "138bee2f976e41f47ff29372de60fae238b7d8afe7450137155f8c92dd830418",
+    "5da88cc908b05bca68aa652a2d58f8c166a2a3aad731f0514d4b4384d4c3409a"
+  ],
+  "checks": {
+    "same_declared_configuration": true,
+    "same_business_input_manifest": true,
+    "source_unchanged_in_both_runs": true,
+    "both_reached": true,
+    "same_submitted_requests_and_replies": true,
+    "same_control_boundaries_and_decisions": true,
+    "same_final_native_state": true,
+    "same_final_controller_state": true
+  },
+  "row_checks": {
+    "business_crosswalk.jsonl.gz": {
+      "equal": true,
+      "counts": [
+        57012,
+        57012
+      ],
+      "canonical_sha256": [
+        "bfd891ed836865b9976cde98c61cff89cd236a3ea878e7125e879bc60db2f6b6",
+        "bfd891ed836865b9976cde98c61cff89cd236a3ea878e7125e879bc60db2f6b6"
+      ],
+      "mismatch_count": 0,
+      "first_mismatches": []
+    },
+    "business_results.jsonl.gz": {
+      "equal": true,
+      "counts": [
+        57012,
+        57012
+      ],
+      "canonical_sha256": [
+        "2320c1648ed2614199b96462b1a37ea090bfa86c30374bbf91941538cb07a83a",
+        "2320c1648ed2614199b96462b1a37ea090bfa86c30374bbf91941538cb07a83a"
+      ],
+      "mismatch_count": 0,
+      "first_mismatches": []
+    },
+    "physical_events.jsonl.gz": {
+      "equal": true,
+      "counts": [
+        57544,
+        57544
+      ],
+      "canonical_sha256": [
+        "a2ec869ee89dd0edf2a083eab2d9f3a507266e135ac5701d1ebfcb3ad1c24805",
+        "a2ec869ee89dd0edf2a083eab2d9f3a507266e135ac5701d1ebfcb3ad1c24805"
+      ],
+      "mismatch_count": 0,
+      "first_mismatches": []
+    }
+  },
+  "timing": {
+    "baseline": {
+      "owner_compute_ms": {
+        "count": 194,
+        "sum": 33377.19060003292,
+        "max": 399.8743999982253,
+        "p50": 175.14899995876476,
+        "p95": 358.7775000487454,
+        "p99": 365.6318000284955,
+        "over_100ms": 127,
+        "over_100ms_fraction": 0.654639175257732
+      },
+      "publication_compute_ms": {
+        "count": 194,
+        "sum": 4064.464499708265,
+        "max": 52.21419996814802,
+        "p50": 20.873900037258863,
+        "p95": 45.50649999873713,
+        "p99": 51.80190003011376,
+        "over_100ms": 0,
+        "over_100ms_fraction": 0.0
+      },
+      "publication_batch_including_due_native_delivery_ms": {
+        "count": 97,
+        "sum": 4069.7662002639845,
+        "max": 93.38279999792576,
+        "p50": 43.01990004023537,
+        "p95": 86.77130000432953,
+        "p99": 93.38279999792576,
+        "over_100ms": 0,
+        "over_100ms_fraction": 0.0
+      },
+      "shared_native_event_batch_wall_ms": {
+        "count": 194,
+        "sum": 126128.41499922797,
+        "max": 3708.942900004331,
+        "p50": 0.017000013031065464,
+        "p95": 2816.5884999907576,
+        "p99": 3516.7328999959864,
+        "over_100ms": 72,
+        "over_100ms_fraction": 0.3711340206185567
+      },
+      "shared_native_event_batch_cpu_ms": {
+        "count": 194,
+        "sum": 120953.125,
+        "max": 3562.5,
+        "p50": 0.0,
+        "p95": 2687.5,
+        "p99": 3375.0,
+        "over_100ms": 72,
+        "over_100ms_fraction": 0.3711340206185567
+      },
+      "result_advance_and_offline_render_wall_ms": {
+        "count": 97,
+        "sum": 9846.67810011888,
+        "max": 146.13219996681437,
+        "p50": 105.35129997879267,
+        "p95": 138.78980005392805,
+        "p99": 146.13219996681437,
+        "over_100ms": 57,
+        "over_100ms_fraction": 0.5876288659793815
+      },
+      "owner_plus_publication_compute_ms": {
+        "count": 194,
+        "sum": 37441.65509974118,
+        "max": 450.96320001175627,
+        "p50": 197.66180001897737,
+        "p95": 401.0145000065677,
+        "p99": 414.32179999537766,
+        "over_100ms": 131,
+        "over_100ms_fraction": 0.6752577319587629
+      },
+      "largest_owner_calls": [
+        {
+          "target": 81000.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 399.8743999982253,
+          "compute_parts_ms": {
+            "observe": 108.47079998347908,
+            "initial_prediction_and_assignment": 291.3984000333585,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 56913,
+          "represented_demands": 56913,
+          "waiting": 56917,
+          "demand_identity_scope": "all_visible_uncovered",
+          "decision_identity": "5bcf4613853b8d529d105c6f3b57472afb640a30805d5982c83a576ca97bd308",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 51.088800013531
+        },
+        {
+          "target": 74700.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 365.6318000284955,
+          "compute_parts_ms": {
+            "observe": 94.4526000530459,
+            "initial_prediction_and_assignment": 271.1703999666497,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 54281,
+          "represented_demands": 54281,
+          "waiting": 54285,
+          "demand_identity_scope": "all_visible_uncovered",
+          "decision_identity": "fad9c5c01eb9df9f71705b5889c7765ad6215653e221c0d7a3c9884dd12653e1",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 44.301899964921176
+        },
+        {
+          "target": 82800.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 365.55599997518584,
+          "compute_parts_ms": {
+            "observe": 102.26070001954213,
+            "initial_prediction_and_assignment": 263.28859996283427,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 56989,
+          "represented_demands": 56989,
+          "waiting": 56993,
+          "demand_identity_scope": "all_visible_uncovered",
+          "decision_identity": "25a3f74213a1b4ff0983d9e41833acc06353d075eefd4ec28e772e9d36b56b91",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 48.464199993759394
+        },
+        {
+          "target": 85500.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 364.02300000190735,
+          "compute_parts_ms": {
+            "observe": 101.4636000036262,
+            "initial_prediction_and_assignment": 262.5508999917656,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 56991,
+          "represented_demands": 56991,
+          "waiting": 56995,
+          "demand_identity_scope": "all_visible_uncovered",
+          "decision_identity": "70333856e329b6fb80c43a3862a450f663e9eef6363458da5948ac9ffceec503",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 36.852799996268004
+        },
+        {
+          "target": 86400.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 363.190800009761,
+          "compute_parts_ms": {
+            "observe": 103.1453000032343,
+            "initial_prediction_and_assignment": 260.0372000015341,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 56991,
+          "represented_demands": 56991,
+          "waiting": 56995,
+          "demand_identity_scope": "all_visible_uncovered",
+          "decision_identity": "310ad313e9305f67be68b6f78c94b49ba8f78c36adaa7b9d327c4986f3c1e964",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 36.22029995312914
+        }
+      ]
+    },
+    "candidate": {
+      "owner_compute_ms": {
+        "count": 194,
+        "sum": 6468.8841992174275,
+        "max": 89.24400003161281,
+        "p50": 31.815599999390543,
+        "p95": 71.50069996714592,
+        "p99": 83.00699997926131,
+        "over_100ms": 0,
+        "over_100ms_fraction": 0.0
+      },
+      "publication_compute_ms": {
+        "count": 194,
+        "sum": 4065.570199745707,
+        "max": 55.52170000737533,
+        "p50": 20.202699990477413,
+        "p95": 48.12499997206032,
+        "p99": 53.34720003884286,
+        "over_100ms": 0,
+        "over_100ms_fraction": 0.0
+      },
+      "publication_batch_including_due_native_delivery_ms": {
+        "count": 97,
+        "sum": 4070.2536996104755,
+        "max": 95.42450000299141,
+        "p50": 41.24479996971786,
+        "p95": 90.80170001834631,
+        "p99": 95.42450000299141,
+        "over_100ms": 0,
+        "over_100ms_fraction": 0.0
+      },
+      "shared_native_event_batch_wall_ms": {
+        "count": 194,
+        "sum": 125100.7271000417,
+        "max": 3715.015100024175,
+        "p50": 0.01680001150816679,
+        "p95": 2868.658800027333,
+        "p99": 3588.2036999682896,
+        "over_100ms": 72,
+        "over_100ms_fraction": 0.3711340206185567
+      },
+      "shared_native_event_batch_cpu_ms": {
+        "count": 194,
+        "sum": 120406.25,
+        "max": 3531.25,
+        "p50": 0.0,
+        "p95": 2750.0,
+        "p99": 3453.125,
+        "over_100ms": 72,
+        "over_100ms_fraction": 0.3711340206185567
+      },
+      "result_advance_and_offline_render_wall_ms": {
+        "count": 97,
+        "sum": 8582.10010023322,
+        "max": 151.1742000002414,
+        "p50": 89.44280003197491,
+        "p95": 119.23519999254495,
+        "p99": 151.1742000002414,
+        "over_100ms": 30,
+        "over_100ms_fraction": 0.30927835051546393
+      },
+      "owner_plus_publication_compute_ms": {
+        "count": 194,
+        "sum": 10534.454398963135,
+        "max": 131.46760006202385,
+        "p50": 53.07880003238097,
+        "p95": 115.99860002752393,
+        "p99": 129.29909996455535,
+        "over_100ms": 31,
+        "over_100ms_fraction": 0.15979381443298968
+      },
+      "largest_owner_calls": [
+        {
+          "target": 76500.0,
+          "owner_id": "owner:system_international",
+          "compute_ms": 89.24400003161281,
+          "compute_parts_ms": {
+            "observe": 88.34080002270639,
+            "initial_prediction_and_assignment": 0.901699997484684,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 55628,
+          "represented_demands": 176,
+          "waiting": 55632,
+          "demand_identity_scope": "bounded_fifo_representatives",
+          "decision_identity": "a5f1bae7edd957cb9e31e30b07b6833e8a6f889fef480144b909d6a63b5094b4",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 42.223600030411035
+        },
+        {
+          "target": 85500.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 83.00699997926131,
+          "compute_parts_ms": {
+            "observe": 82.00469997245818,
+            "initial_prediction_and_assignment": 1.0009999969042838,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 56991,
+          "represented_demands": 286,
+          "waiting": 56995,
+          "demand_identity_scope": "bounded_fifo_representatives",
+          "decision_identity": "70333856e329b6fb80c43a3862a450f663e9eef6363458da5948ac9ffceec503",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 41.824899963103235
+        },
+        {
+          "target": 76500.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 76.15569996414706,
+          "compute_parts_ms": {
+            "observe": 75.35270001972094,
+            "initial_prediction_and_assignment": 0.8018999942578375,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 55493,
+          "represented_demands": 286,
+          "waiting": 55497,
+          "demand_identity_scope": "bounded_fifo_representatives",
+          "decision_identity": "660411c4dcf46b7290f61ed342c40fa50d562e44e76736bf71c69996628c85a9",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 53.14340000040829
+        },
+        {
+          "target": 82800.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 74.86819999758154,
+          "compute_parts_ms": {
+            "observe": 74.05519997701049,
+            "initial_prediction_and_assignment": 0.8119000121951103,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 56989,
+          "represented_demands": 286,
+          "waiting": 56993,
+          "demand_identity_scope": "bounded_fifo_representatives",
+          "decision_identity": "25a3f74213a1b4ff0983d9e41833acc06353d075eefd4ec28e772e9d36b56b91",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 53.34720003884286
+        },
+        {
+          "target": 86400.0,
+          "owner_id": "owner:system_domestic",
+          "compute_ms": 74.80320002650842,
+          "compute_parts_ms": {
+            "observe": 74.01350000873208,
+            "initial_prediction_and_assignment": 0.7885000086389482,
+            "submit": 0.0,
+            "residual_observe_and_replan": 0.0
+          },
+          "candidate_pairs": 0,
+          "supplies": 0,
+          "demands": 56991,
+          "represented_demands": 286,
+          "waiting": 56995,
+          "demand_identity_scope": "bounded_fifo_representatives",
+          "decision_identity": "310ad313e9305f67be68b6f78c94b49ba8f78c36adaa7b9d327c4986f3c1e964",
+          "residual_decision_identities": [],
+          "intents": 0,
+          "forecast_ledgers": {},
+          "reply_statuses": {},
+          "publication_compute_ms": 41.195400001015514
+        }
+      ]
+    }
+  },
+  "complete_100ms_certified": false,
+  "limits": [
+    "Measured owner plus publication compute still omits delivery-time revalidation and actual confirmation/transport.",
+    "Serial technical executions are not independent source instances or two-machine deployment evidence.",
+    "Equal decision digests do not by themselves prove all hidden candidate arrays equal; actual requests, complete event rows, jobs and native state are additionally compared."
+  ]
+}

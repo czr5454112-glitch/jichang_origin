@@ -1,0 +1,34 @@
+E                                                                        [100%]
+=================================== ERRORS ====================================
+_ ERROR at setup of test_receive_completion_at_arrival_timestamp_preserves_normal_source_service _
+
+    @pytest.fixture(scope='module')
+    def native():
+        configured = os.environ.get('G31_CIRCULATION_BINARY')
+        if configured:
+            return load_native(configured)
+        folder = Path(__file__).resolve().parents[1] / 'build_g31_circulation' / 'python'
+        binaries = [*folder.glob('czr005_circulation*.pyd'), *folder.glob('czr005_circulation*.so')]
+        assert len(binaries) == 1, 'Build czr005_circulation or set G31_CIRCULATION_BINARY'
+>       return load_native(binaries[0])
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_same_timestamp.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\native_host.py:17: in load_native
+    path = Path(binary).resolve(strict=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\pathlib.py:993: in resolve
+    s = os.path.realpath(self, strict=strict)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_g31_circulation\\python\\czr005_circulation.cp311-win_amd64.pyd'
+strict = True
+
+>   ???
+E   PermissionError: [WinError 5] 拒绝访问。: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_g31_circulation\\python\\czr005_circulation.cp311-win_amd64.pyd'
+
+<frozen ntpath>:696: PermissionError
+=========================== short test summary info ===========================
+ERROR tests/test_g31_circulation_same_timestamp.py::test_receive_completion_at_arrival_timestamp_preserves_normal_source_service

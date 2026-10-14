@@ -1,0 +1,140 @@
+{
+  "scope": "W3_development_diagnosis_no_training_or_unseen_confirmation",
+  "source_sha256": {
+    "run_label_stability.py": "8a8270ac0a95ea855fc4cc63efe7a26f33d599f7618fb30097d7623fd016a964",
+    "label_stability.py": "df60fcf2fc6174be61db4b759ce1d0bbadea1815fb907108b5414f02f949e75d",
+    "feedback_scenarios.py": "192081752f5e6f15bea441e8adcd6e3751909eae2fd37c70c6f22b39f8807caf",
+    "phase4_control.py": "70597fe1bce15a2f69d033aa389f0f68833b460a40ec2281b90599f36f475094",
+    "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "conditional_evaluation.py": "355a85d1840880ef4a7d88ca878d53ece059ec9a3fb62045a5f5b2bfb77abc1f",
+    "routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "routing_reference.py": "0fa5bf23396196a8a31d62a903dd3b2ad4b2e64aebe553bea4d89bf1d132430c",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3",
+    "run_joint_feedback.py": "4fe2063745147b5ba5621fce9e76746cfdc00b914d04ee9e1ad11c517a448848"
+  },
+  "scenes": [
+    "stream_L2_D1_slack3",
+    "stream_L2_D3_slack0",
+    "stream_L4_D1_slack3",
+    "stream_L4_D3_slack0"
+  ],
+  "factors": [
+    {
+      "shared_travel": 2,
+      "detour_extra": 1,
+      "demand_shift": 0,
+      "condition": "matched",
+      "source": "synthetic_six_node_shared_corridor_single_route_deviation_mechanism",
+      "prediction_error": null,
+      "node_capacity": 2,
+      "reception_capacity": 1,
+      "unload_ticks": 1,
+      "no_wait_nodes": [
+        "X",
+        "Y"
+      ],
+      "independent_confirmation": false,
+      "rounds": 3,
+      "loaded_deadline_slack": 3,
+      "source_role": "constructed_development_not_confirmation"
+    },
+    {
+      "shared_travel": 2,
+      "detour_extra": 3,
+      "demand_shift": 0,
+      "condition": "matched",
+      "source": "synthetic_six_node_shared_corridor_single_route_deviation_mechanism",
+      "prediction_error": null,
+      "node_capacity": 2,
+      "reception_capacity": 1,
+      "unload_ticks": 1,
+      "no_wait_nodes": [
+        "X",
+        "Y"
+      ],
+      "independent_confirmation": false,
+      "rounds": 3,
+      "loaded_deadline_slack": 0,
+      "source_role": "constructed_development_not_confirmation"
+    },
+    {
+      "shared_travel": 4,
+      "detour_extra": 1,
+      "demand_shift": 0,
+      "condition": "matched",
+      "source": "synthetic_six_node_shared_corridor_single_route_deviation_mechanism",
+      "prediction_error": null,
+      "node_capacity": 2,
+      "reception_capacity": 1,
+      "unload_ticks": 1,
+      "no_wait_nodes": [
+        "X",
+        "Y"
+      ],
+      "independent_confirmation": false,
+      "rounds": 3,
+      "loaded_deadline_slack": 3,
+      "source_role": "constructed_development_not_confirmation"
+    },
+    {
+      "shared_travel": 4,
+      "detour_extra": 3,
+      "demand_shift": 0,
+      "condition": "matched",
+      "source": "synthetic_six_node_shared_corridor_single_route_deviation_mechanism",
+      "prediction_error": null,
+      "node_capacity": 2,
+      "reception_capacity": 1,
+      "unload_ticks": 1,
+      "no_wait_nodes": [
+        "X",
+        "Y"
+      ],
+      "independent_confirmation": false,
+      "rounds": 3,
+      "loaded_deadline_slack": 0,
+      "source_role": "constructed_development_not_confirmation"
+    }
+  ],
+  "deployed_spec": {
+    "routing": "timed",
+    "predictive": true,
+    "reactive": true,
+    "slow_period": 2,
+    "planning_horizon": 20,
+    "route_mode": "next_edge",
+    "coordination_order": "route_then_prebalance",
+    "candidate_count": 4,
+    "expansion_limit": 2000,
+    "static_path_limit": 12,
+    "local_label_limit": 3,
+    "dynamic_local": true
+  },
+  "labels": "restore_exact_collected_controller_checkpoint_then_intervene",
+  "label_horizon_ticks": 24,
+  "sample_bands": [
+    0,
+    20,
+    40
+  ],
+  "expanded_candidate_count": 12,
+  "sampling_rule": "first feasible soft decision in each time band; no label-dependent filtering",
+  "replicate_groups": 4,
+  "futures_per_group": 32,
+  "nested_prefixes": [
+    2,
+    8,
+    32
+  ],
+  "future_law": "Per nominal pending task: cancel 1/8, reverse OD 1/8, keep 6/8; independent uniform arrival jitter {-2,0,2}; clip strictly after observed now. Public forecast publication schedule is held fixed.",
+  "label_information": "Offline only; scenario nominal pending tasks are not supplied to any scorer or features.",
+  "forecast_quality_claim": "Synthetic stress law, not calibrated probabilities or airport conditional posterior.",
+  "coverage_claim": "larger bounded candidate pool only, not exhaustive joint oracle",
+  "drift_diagnostic": "baseline-vs-timed observed state distributions with identical greedy predictive controller; no learned deployment yet",
+  "independent_airport_day_count": 0,
+  "no_model_or_seed_selected_on_these_labels": true
+}

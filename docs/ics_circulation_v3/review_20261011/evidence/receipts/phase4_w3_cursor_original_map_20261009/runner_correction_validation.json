@@ -1,0 +1,90 @@
+{
+  "purpose": "Validate corrected pure diagnostic helpers against saved raw runs; no physical rerun",
+  "original_summary_preserved": true,
+  "original_comparison_false_flags_preserved": true,
+  "current_sources": {
+    "scripts/experiments/ics_circulation_v3/run_cursor_original_map.py": "59fcfbffed07a76c873687d500f05b5bbd42730840ae36138d7343e66613ea2e",
+    "tests/test_ics_circulation_v3_cursor_original_map.py": "10b6e0d9bf6fad337a0b3dd4fa0d91822cf1d27fa63907830ae449bc13525073"
+  },
+  "source_unchanged_during_validation": true,
+  "targeted_tests_passed": 9,
+  "pairs": [
+    {
+      "scene": "cross_cycle",
+      "comparisons": {
+        "result": true,
+        "route_history": true,
+        "slow_history": true,
+        "slow_trigger_times": true,
+        "slow_next_trigger_at": true,
+        "searches": true,
+        "observer_boundaries": true,
+        "attempt_role_node_denominator": true
+      },
+      "all_equal": true,
+      "attempt_count": 51,
+      "zero_authorized": 0,
+      "reductions": []
+    },
+    {
+      "scene": "counterflow",
+      "comparisons": {
+        "result": true,
+        "route_history": true,
+        "slow_history": true,
+        "slow_trigger_times": true,
+        "slow_next_trigger_at": true,
+        "searches": true,
+        "observer_boundaries": true,
+        "attempt_role_node_denominator": true
+      },
+      "all_equal": true,
+      "attempt_count": 72,
+      "zero_authorized": 0,
+      "reductions": [
+        {
+          "time": 202,
+          "node": "37",
+          "role": "continuation",
+          "bag_id": "counterflow:round2:flow2:0",
+          "tray_id": "initial:26:0",
+          "protected": false,
+          "candidate_count": 2,
+          "authorized_candidate_count": 2,
+          "generated_candidate_count": 4
+        }
+      ]
+    },
+    {
+      "scene": "near_full",
+      "comparisons": {
+        "result": true,
+        "route_history": true,
+        "slow_history": true,
+        "slow_trigger_times": true,
+        "slow_next_trigger_at": true,
+        "searches": true,
+        "observer_boundaries": true,
+        "attempt_role_node_denominator": true
+      },
+      "all_equal": true,
+      "attempt_count": 57,
+      "zero_authorized": 6,
+      "reductions": [
+        {
+          "time": 125,
+          "node": "37",
+          "role": "continuation",
+          "bag_id": "near_full:round2:flow1:0",
+          "tray_id": "initial:134:0",
+          "protected": false,
+          "candidate_count": 3,
+          "authorized_candidate_count": 3,
+          "generated_candidate_count": 4
+        }
+      ]
+    }
+  ],
+  "all_comparisons_pass": true,
+  "historical_source_note": "Only new runner changed after original measurement; original source_snapshot and 60-check audit remain historical. Current corrected runner + dedicated tests are copied separately; role_coverage and R1 dependencies are unchanged."
+}

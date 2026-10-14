@@ -1,0 +1,52 @@
+{
+  "schema": "ics_v3_full_cycle_analysis_independent_comparison_v1",
+  "checks": 6047,
+  "failed_checks": 0,
+  "errors": [],
+  "requests": 2176,
+  "physical_files": 1388,
+  "independent_request_weighted": {
+    "old80": {
+      "expected_full_ledger_tasks": 16572.0,
+      "observed_tasks": 14372.0,
+      "unobserved_tasks": 2200.0,
+      "completed_tasks": 12436.0,
+      "newly_completed_since_checkpoint": 6804.0,
+      "observed_uncompleted_tasks": 1936.0,
+      "full_ledger_uncompleted_tasks": 4136.0,
+      "on_time": 12436.0,
+      "protected_observed": 2176.0,
+      "protected_completed": 2176.0,
+      "protected_on_time": 2176.0,
+      "protected_uncompleted": 0.0,
+      "protected_completed_late": 0.0,
+      "empty_in_transit": 2120.0,
+      "loaded_in_transit": 684.0,
+      "holding_or_unloading_trays": 60.0
+    },
+    "full": {
+      "expected_full_ledger_tasks": 16572.0,
+      "observed_tasks": 16572.0,
+      "unobserved_tasks": 0.0,
+      "completed_tasks": 16572.0,
+      "newly_completed_since_checkpoint": 10940.0,
+      "observed_uncompleted_tasks": 0.0,
+      "full_ledger_uncompleted_tasks": 0.0,
+      "on_time": 16572.0,
+      "protected_observed": 2176.0,
+      "protected_completed": 2176.0,
+      "protected_on_time": 2176.0,
+      "protected_uncompleted": 0.0,
+      "protected_completed_late": 0.0,
+      "empty_in_transit": 0.0,
+      "loaded_in_transit": 0.0,
+      "holding_or_unloading_trays": 0.0
+    }
+  },
+  "bound_files": 1416,
+  "all_bound_files_unchanged": true,
+  "cpu_seconds": 49.859375,
+  "wall_seconds": 52.10700469999574,
+  "script_sha256": "546c1882a81d8c1b885b167f2fbf8cb4c0aa59bc80e1d6b84007b69c66ce64d1",
+  "scope": "Compares independently audited 17x4x32 vectors and independently recomputed per-request endpoint task/protection/in-transit and cost ledgers against analysis. Uses actual raw outcomes, no new simulation. Request-weighted bag instances are correlated, not unique operational tasks."
+}

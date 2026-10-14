@@ -1,0 +1,33 @@
+{
+  "schema": "g31.forecast_timing_audit.v1",
+  "scope": "Diagnostic evidence, correctness issue and test suggestions. No claim of original-workload throughput gain or research novelty.",
+  "observed": {
+    "original_requests_per_predictive_policy": 16,
+    "original_rejections": 16,
+    "original_actual_request_execution_after_departure": 16,
+    "earliest_local_boundary_strictly_too_late": 10,
+    "earliest_local_boundary_exact_tie": 6,
+    "original_exact_tie_counterfactual_not_replayed": true,
+    "synthetic_exact_tie_accepted": true,
+    "synthetic_accepted_loaded_forecast_readds_elapsed_service": true
+  },
+  "readiness_contract": [
+    "During real loading, the observed LOAD_START plus declared load duration supplies a lawful readiness estimate; remaining node service follows that estimate. Future contention remains conditional.",
+    "After actual source admission or physical intermediate arrival, use the actual committed local service end. Do not restart the full service duration at forecast capture.",
+    "After service completion while waiting for arbitration or receiving capacity, remaining node service is zero; earliest dispatch is now, conditional on resources.",
+    "Before source admission, LOAD_COMPLETE alone does not prove service has started. Source queue contention can delay actual admission.",
+    "A per-leg, per-node observed service-ready field must be reset on stage changes and included in protocol checkpoint integrity. Source-only BagState.admitted_time cannot represent later nodes.",
+    "Do not infer service readiness by inspecting the future event heap, unannounced faults, unarrived business tape, or remote private reservations."
+  ],
+  "event_notification_tests": [
+    "Paired worlds with identical owner-local events and delivered packets but different remote private events produce identical owner notification records, sequence numbers and returned wake-up times before a legitimate causal influence.",
+    "Future local jobs and future faults do not appear or alter notification sequence before arrival or lawful advertisement.",
+    "A zero-duration LOAD_START and LOAD_COMPLETE at one timestamp cannot expose an interruptible loading state; the returned notification accompanies the fully processed timestamp state.",
+    "Whole-timestamp processing includes all same-time events and newly scheduled same-time events. A budget-exhausted partial timestamp may not produce a completed-boundary notification or permit controller mutation.",
+    "Local service durations below, equal to and above command delay retain unchanged physical priorities; exact ties are not assumed failures.",
+    "Owner outage, dropped ACK, stale forecast withdrawal, restart and native-plus-JSON continuation preserve notifications and the client outbox without accessing server truth.",
+    "An empty owner notification queue must not expose the next private global event time as the controller's wake time."
+  ],
+  "r2_limit": "A next-hop soft service window helps avoid conditional local contention. It does not announce final unloading/hold completion, create an empty tray, permit remote export, certify future receiving capacity, or prove normal-service protection. Existing release_forecasts uses a lawful local tray and public job contract with capacity-relaxed timing; all actual transfers remain owner-validated.",
+  "acceptance_limit": "Measure whether the delivered window remains temporally useful and matches actual service timing. ACK delivered alone is not predictive value: in the service=2 case the peer receives at 2.5 after real edge entry at 2 while the old estimate incorrectly says 4."
+}

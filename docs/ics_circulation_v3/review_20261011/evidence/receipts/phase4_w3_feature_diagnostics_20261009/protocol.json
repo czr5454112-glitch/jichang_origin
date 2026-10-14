@@ -1,0 +1,48 @@
+{
+  "schema": "ics_v3_old_feature_diagnostics_v1",
+  "input_paired": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_paired_development_20261009",
+  "input_labels": "outputs\\experiments\\ics_circulation_v3\\phase4_w3_label_stability_20261009",
+  "source_sha256": {
+    "run_feature_diagnostics.py": "b941a7e40009daa5620171bc1d263d1f39f93d42f655e36881b92d40e881d653",
+    "feature_diagnostics.py": "4f83aca28fa70709b0477b8ccde3f1b5f10486f0e4a7299cec9cc05b83cdf257",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3",
+    "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471"
+  },
+  "old_feature_names": [
+    "analytic_absolute",
+    "candidate_deadline_margin",
+    "candidate_first_departure",
+    "destination_empty_stock",
+    "destination_supply_before_10",
+    "edge_count",
+    "edge_ticks",
+    "forecast_conflict_delay",
+    "forecast_count",
+    "forecast_destination_count",
+    "forecast_earliest_ticks",
+    "forecast_edge_overlaps",
+    "forecast_tardiness",
+    "forecast_unmatched",
+    "known_waiting_count",
+    "module_hold_ticks",
+    "old_in_transit_count",
+    "old_remaining_ticks",
+    "remaining_route_ticks",
+    "source_empty_stock",
+    "timed_analytic_absolute",
+    "total_tray_count",
+    "usable_ticks"
+  ],
+  "scope": "post-hoc development diagnosis; no training, simulation, new label or seed selection",
+  "collision": "exact float feature tuples, separately paired baseline+candidate tuples; original paired MC deltas retained for uncertainty",
+  "neighborhood": "Euclidean RMS after per-feature training-fold standard deviation normalization, constant dimensions scaled by one; top three rows, no outcome-tuned threshold",
+  "observable_context": "current node inferred from validated candidate sources; immutable bag fields read only after visible-identity check; public graph and owner safe prefix",
+  "unavailable": [
+    "full Snapshot at every saved deployment call",
+    "paired true rollout costs/regret at learned deployment states"
+  ],
+  "new_independent_source_count": 0,
+  "simulator_calls": 0,
+  "fits": 0
+}

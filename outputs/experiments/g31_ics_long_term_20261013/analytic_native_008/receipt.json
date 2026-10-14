@@ -1,0 +1,608 @@
+{
+  "schema": "g31.analytic_native_campaign.v1",
+  "status": "passed",
+  "cases": [
+    {
+      "case": "command_delay_2",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 27.750000000000007,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 19.100000000000005,
+              "completed": true,
+              "completed_at": 19.300000000000004,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 25.650000000000006,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 17.000000000000007,
+              "completed": true,
+              "completed_at": 17.200000000000006,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": -2.1000000000000014,
+      "paired_service_preserved": true
+    },
+    {
+      "case": "zero_delay",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 25.750000000000007,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 17.10000000000001,
+              "completed": true,
+              "completed_at": 17.300000000000008,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 25.650000000000006,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 17.000000000000007,
+              "completed": true,
+              "completed_at": 17.200000000000006,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": -0.10000000000000142,
+      "paired_service_preserved": true
+    },
+    {
+      "case": "storage_delay_20",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 55.75,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 22.650000000000002,
+              "completed": true,
+              "completed_at": 22.650000000000002,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 33.1,
+              "completed": true,
+              "completed_at": 33.300000000000004,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 53.65000000000001,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 22.650000000000002,
+              "completed": true,
+              "completed_at": 22.650000000000002,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 31.00000000000001,
+              "completed": true,
+              "completed_at": 31.20000000000001,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": -2.099999999999987,
+      "paired_service_preserved": true
+    },
+    {
+      "case": "source_reserve_refusal",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 88.45,
+          "offered": 2,
+          "completed": 1,
+          "unfinished": 1,
+          "failed": 0,
+          "deadline_violations": 1,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 79.8,
+              "completed": false,
+              "completed_at": null,
+              "deadline_violated_by_horizon": true,
+              "status": "waiting_for_tray"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 88.45,
+          "offered": 2,
+          "completed": 1,
+          "unfinished": 1,
+          "failed": 0,
+          "deadline_violations": 1,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 79.8,
+              "completed": false,
+              "completed_at": null,
+              "deadline_violated_by_horizon": true,
+              "status": "waiting_for_tray"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": 0.0,
+      "paired_service_preserved": true
+    },
+    {
+      "case": "receiver_refusal",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 88.45,
+          "offered": 2,
+          "completed": 1,
+          "unfinished": 1,
+          "failed": 0,
+          "deadline_violations": 1,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 79.8,
+              "completed": false,
+              "completed_at": null,
+              "deadline_violated_by_horizon": true,
+              "status": "waiting_for_tray"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 88.45,
+          "offered": 2,
+          "completed": 1,
+          "unfinished": 1,
+          "failed": 0,
+          "deadline_violations": 1,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 79.8,
+              "completed": false,
+              "completed_at": null,
+              "deadline_violated_by_horizon": true,
+              "status": "waiting_for_tray"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": 0.0,
+      "paired_service_preserved": true
+    },
+    {
+      "case": "unpublished_future_demand",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 18.449999999999996,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 9.799999999999997,
+              "completed": true,
+              "completed_at": 34.8,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 18.449999999999996,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 9.799999999999997,
+              "completed": true,
+              "completed_at": 34.8,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": 0.0,
+      "paired_service_preserved": true
+    },
+    {
+      "case": "two_trays_terminal_pressure",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 22.050000000000004,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 13.400000000000002,
+              "completed": true,
+              "completed_at": 13.600000000000001,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 20.550000000000004,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 11.900000000000002,
+              "completed": true,
+              "completed_at": 12.100000000000001,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": -1.5,
+      "paired_service_preserved": true
+    },
+    {
+      "case": "two_trays_spare_terminal_no_benefit",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 18.451,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 9.801000000000002,
+              "completed": true,
+              "completed_at": 10.001000000000001,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 18.451,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 9.801000000000002,
+              "completed": true,
+              "completed_at": 10.001000000000001,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": 0.0,
+      "paired_service_preserved": true
+    },
+    {
+      "case": "longer_return_research_factor",
+      "metrics": {
+        "reactive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 36.75000000000001,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 28.10000000000001,
+              "completed": true,
+              "completed_at": 28.300000000000008,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        },
+        "predictive": {
+          "objective": "sum_restricted_arrival_to_unload_time",
+          "horizon": 80,
+          "cost": 34.65000000000001,
+          "offered": 2,
+          "completed": 2,
+          "unfinished": 0,
+          "failed": 0,
+          "deadline_violations": 0,
+          "per_job": [
+            {
+              "business_bag_id": "B1",
+              "restricted_time": 8.65,
+              "completed": true,
+              "completed_at": 8.65,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            },
+            {
+              "business_bag_id": "B2",
+              "restricted_time": 26.00000000000001,
+              "completed": true,
+              "completed_at": 26.20000000000001,
+              "deadline_violated_by_horizon": false,
+              "status": "completed"
+            }
+          ]
+        }
+      },
+      "cost_difference_predictive_minus_reactive": -2.0999999999999943,
+      "paired_service_preserved": true
+    }
+  ],
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_analytic_control.py": "8b0d5d87bcba9de333014313a8fc4c311990776f4f5f694823835e947ed73838",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "531ea285c1126fd318d692fd19a50b8d332798a4a60e7e0e0ae03d8d1f8acb05",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "dd34cb1d0269118b07015beb09ee4db07a2df0961ab416f2612e19a0ca5fa54e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd"
+  },
+  "binary_sha256": "0ff16d8ce3bdf7826773b8b187210e6d5458090da8e1543748ed92b9876c21a5",
+  "information": "owner projection plus delayed observed-demand snapshots; no input transfers",
+  "research_scope": "synthetic mechanism development; not original-map confirmation",
+  "acceptance_scope": "independent native physical replay and full-population paired service; no main-method or 100ms claim",
+  "finite_reference": {
+    "schema": "g31.finite_intervention_reference.v1",
+    "domain_size": 3,
+    "evaluated": 3,
+    "exhaustive": true,
+    "best_action_id": "transfer-0",
+    "best_cost": 25.750000000000007,
+    "optimality": "optimal_in_enumerated_domain",
+    "global_native_optimality": "unknown",
+    "elapsed_seconds": 0.006911999953445047,
+    "distinct_verified_physical_outcomes": 3,
+    "information_track": "offline_common_real_future_diagnostic",
+    "strict_paired_service": true,
+    "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future",
+    "strong_baseline_action_id": "transfer-0",
+    "wait_control_gap_only": 62.699999999999996
+  },
+  "source_after": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_analytic_control.py": "8b0d5d87bcba9de333014313a8fc4c311990776f4f5f694823835e947ed73838",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "531ea285c1126fd318d692fd19a50b8d332798a4a60e7e0e0ae03d8d1f8acb05",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "dd34cb1d0269118b07015beb09ee4db07a2df0961ab416f2612e19a0ca5fa54e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd"
+  },
+  "source_changed": [],
+  "elapsed_seconds": 1.6193124999990687
+}

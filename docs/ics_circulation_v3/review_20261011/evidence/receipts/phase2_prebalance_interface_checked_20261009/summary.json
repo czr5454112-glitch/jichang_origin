@@ -1,0 +1,59 @@
+{
+  "schema": "czr005.ics_circulation_v3.prebalance_closed_loop.v1",
+  "scope": "FOUR_SYNTHETIC_MECHANISMS_FIXED_LOCAL_MODULE_PROXY_NOT_AIRPORT_VALIDATION",
+  "route_mode": "whole_route",
+  "policy_count": 4,
+  "run_count": 16,
+  "source_sha256": {
+    "run_prebalance.py": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+    "prebalance.py": "bfba7869bd18d78fa9bd1e9c694d73b4072ec0b3bccdaa6d0c0a2f9b12e37cda",
+    "model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee"
+  },
+  "source_changed_during_run": false,
+  "all_matched": true,
+  "all_finite_tray_ids_preserved": true,
+  "comparisons": [
+    {
+      "fixture": "long_connection_needs_advance",
+      "reactive_cost": 8.8,
+      "predictive_plus_reactive_cost": 0.8,
+      "cost_delta": -8.0,
+      "tray_wait_delta": -8.0,
+      "matched_initial_and_future": true
+    },
+    {
+      "fixture": "old_arrival_prevents_duplicate",
+      "reactive_cost": 0.0,
+      "predictive_plus_reactive_cost": 0.0,
+      "cost_delta": 0.0,
+      "tray_wait_delta": 0.0,
+      "matched_initial_and_future": true
+    },
+    {
+      "fixture": "source_near_term_demand_protected",
+      "reactive_cost": 5.0,
+      "predictive_plus_reactive_cost": 5.0,
+      "cost_delta": 0.0,
+      "tray_wait_delta": 0.0,
+      "matched_initial_and_future": true
+    },
+    {
+      "fixture": "forecast_reversal_irrevocable",
+      "reactive_cost": 0.0,
+      "predictive_plus_reactive_cost": 20.6,
+      "cost_delta": 20.6,
+      "tray_wait_delta": 14.0,
+      "matched_initial_and_future": true
+    }
+  ],
+  "limitations": [
+    "All capacities, durations, forecasts and future arrivals are explicit synthetic assumptions.",
+    "This is bounded greedy first-use supply accounting, not a global optimum or MPC.",
+    "Forecasts are observations; future_bags are passed only to the event engine.",
+    "The demand reversal is deliberately retained even when predictive transfers worsen service.",
+    "Only physical simulator invariants are checked; no production supplier integration or distributed guarantee is claimed.",
+    "The wall-clock budget is checked between generator calls; it is not a hard real-time interrupt."
+  ]
+}

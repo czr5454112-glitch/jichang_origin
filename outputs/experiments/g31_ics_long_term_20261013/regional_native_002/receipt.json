@@ -1,0 +1,448 @@
+{
+  "schema": "g31.regional_native_campaign.v1",
+  "status": "passed",
+  "cases": [
+    {
+      "name": "asynchronous_nonperiodic",
+      "response": {
+        "request_id": "asynchronous_nonperiodic",
+        "status": "updated",
+        "reason": "allowed"
+      },
+      "compute_wall_ms": 0.4254999803379178,
+      "compute_cpu_ms": 0.0,
+      "meets_measured_100ms": true,
+      "cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      },
+      "baseline_cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      }
+    },
+    {
+      "name": "already_executed_prefix",
+      "response": {
+        "request_id": "already_executed_prefix",
+        "status": "updated",
+        "reason": "allowed"
+      },
+      "compute_wall_ms": 0.34849997609853745,
+      "compute_cpu_ms": 0.0,
+      "meets_measured_100ms": true,
+      "cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      },
+      "baseline_cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      }
+    },
+    {
+      "name": "stale_computation",
+      "response": {
+        "request_id": "stale_computation",
+        "status": "rejected",
+        "reason": "stale_executed_prefix"
+      },
+      "compute_wall_ms": 0.39850000757724047,
+      "compute_cpu_ms": 0.0,
+      "meets_measured_100ms": true,
+      "cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      },
+      "baseline_cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      }
+    },
+    {
+      "name": "expired_message",
+      "response": {
+        "request_id": "expired_message",
+        "status": "rejected",
+        "reason": "request_expired"
+      },
+      "compute_wall_ms": 0.3738999948836863,
+      "compute_cpu_ms": 0.0,
+      "meets_measured_100ms": true,
+      "cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      },
+      "baseline_cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      }
+    },
+    {
+      "name": "permission_refusal",
+      "response": {
+        "status": "rejected",
+        "reason": "route:service_obligation_disallows_reroute"
+      },
+      "compute_wall_ms": 0.10210002074018121,
+      "compute_cpu_ms": 0.0,
+      "meets_measured_100ms": true,
+      "cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      },
+      "baseline_cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delivered_fault_detour",
+      "response": {
+        "request_id": "delivered_fault_detour",
+        "status": "updated",
+        "reason": "allowed"
+      },
+      "compute_wall_ms": 0.38510002195835114,
+      "compute_cpu_ms": 0.0,
+      "meets_measured_100ms": true,
+      "cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      },
+      "baseline_cost": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 30,
+        "cost": 38.45,
+        "offered": 2,
+        "completed": 1,
+        "unfinished": 1,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 8.65,
+            "completed": true,
+            "completed_at": 8.65,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 29.8,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": false,
+            "status": "waiting_for_tray"
+          }
+        ]
+      }
+    }
+  ],
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_regional_control.py": "9fabbb57f290322d838a4e70d1a61a1c72b11c7f8d7decee5738a1690b018afa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "0493b084fe692644f4ad0f885c947bcd69e60d6222008c6b0cd77a295a2b7180",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "dd34cb1d0269118b07015beb09ee4db07a2df0961ab416f2612e19a0ca5fa54e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd"
+  },
+  "binary_sha256": "0ff16d8ce3bdf7826773b8b187210e6d5458090da8e1543748ed92b9876c21a5",
+  "scope": "synthetic R1 integration and finite offline reference; not research gain or full 100ms validation",
+  "reference": {
+    "schema": "g31.finite_intervention_reference.v1",
+    "domain_size": 3,
+    "evaluated": 3,
+    "exhaustive": true,
+    "best_action_id": "WAIT",
+    "best_cost": 38.45,
+    "optimality": "optimal_in_enumerated_domain",
+    "global_native_optimality": "unknown",
+    "elapsed_seconds": 0.004400599980726838,
+    "distinct_verified_physical_outcomes": 2,
+    "information_track": "offline_common_real_future_diagnostic",
+    "strict_paired_service": true,
+    "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future"
+  },
+  "headroom": {
+    "status": "finite_domain_comparison",
+    "verified_candidate_count": 3,
+    "deployment_candidate_count": 3,
+    "reference_headroom": 0.0,
+    "pool_loss": 0.0,
+    "ranking_loss": 0.0,
+    "complete_reference_domain": true,
+    "global_lower_bound": null
+  },
+  "source_after": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_regional_control.py": "9fabbb57f290322d838a4e70d1a61a1c72b11c7f8d7decee5738a1690b018afa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "0493b084fe692644f4ad0f885c947bcd69e60d6222008c6b0cd77a295a2b7180",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "dd34cb1d0269118b07015beb09ee4db07a2df0961ab416f2612e19a0ca5fa54e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd"
+  },
+  "source_changed": [],
+  "wall_seconds": 0.11252359999343753
+}

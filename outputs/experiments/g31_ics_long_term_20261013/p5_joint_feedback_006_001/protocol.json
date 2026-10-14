@@ -1,0 +1,27 @@
+{
+  "scenarios": [
+    {
+      "name": "long_2000m",
+      "length": 2000.0,
+      "speed": 5.0,
+      "future_source": false
+    },
+    {
+      "name": "long_2000m_unknown_source_demand",
+      "length": 2000.0,
+      "speed": 5.0,
+      "future_source": true
+    }
+  ],
+  "boundary": 0.91,
+  "schedule": ".11 + eight .1 control ticks for both worlds; not triggered by hidden future tape",
+  "intervention": "cancel own uncommitted stale-source promises, preserve remaining assignment, retime after observed change",
+  "comparators": [
+    "frozen_joint",
+    "one_round_observed_source_feedback",
+    "ordinary_public_windows"
+  ],
+  "horizon": 5000,
+  "budget": "six full native continuations, no sweep",
+  "novelty": "not_established"
+}

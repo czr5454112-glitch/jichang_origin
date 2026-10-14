@@ -1,0 +1,65 @@
+{
+  "schema": "ics_v3_validated_destination_first_v1",
+  "purpose": "Post-hoc motivated simple rule comparison on reused synthetic development streams; not dominance pruning or confirmation.",
+  "streams": [
+    "stream_L2_D1_slack3",
+    "stream_L2_D3_slack0",
+    "stream_L4_D1_slack3",
+    "stream_L4_D3_slack0"
+  ],
+  "spec": {
+    "routing": "timed",
+    "predictive": true,
+    "reactive": true,
+    "slow_period": 2,
+    "planning_horizon": 20,
+    "route_mode": "next_edge",
+    "coordination_order": "route_then_prebalance",
+    "candidate_count": 4,
+    "expansion_limit": 2000,
+    "static_path_limit": 12,
+    "local_label_limit": 3,
+    "dynamic_local": true
+  },
+  "normal_candidate_count": 4,
+  "realizations": [
+    "nominal",
+    "stress_0",
+    "stress_1",
+    "stress_2",
+    "stress_3",
+    "stress_4",
+    "stress_5",
+    "stress_6",
+    "stress_7"
+  ],
+  "families": {
+    "controls": 2,
+    "r0_paired23_and_physical31": 12,
+    "r1_own_physical31": 6,
+    "shared_physical31": 6
+  },
+  "policies_per_stream": 26,
+  "variants": [
+    "original",
+    "destination_first"
+  ],
+  "units": 36,
+  "episodes_per_unit": 52,
+  "episodes": 1872,
+  "new_labels": 0,
+  "new_fits": 0,
+  "rule": "At a real loaded decision boundary, choose the first complete zero-edge candidate in the normal pool only when current node is the bag destination and unchanged ExecutionValidator accepts it. Otherwise keep the original delegate choice.",
+  "delegate": "Exactly one call per selector invocation; retain its original choice, scores and features before any override. Baseline/single-candidate shortcuts log no invented scores.",
+  "authorization": "No direct state mutation, no generated replacement candidate, no cancellation; runtime revalidates and commits normally.",
+  "freeze": "Predeclare before smoke/formal, freeze current dependency closure after coordination. Keep archived old sources and compare original replay physics to saved originals, without requiring current bytes to equal historical sources.",
+  "units_immutable": "Each stream/tape unit contains all 26 policies times both variants; a completed unit may only be reused with identical protocol/input/source hashes.",
+  "limits": [
+    "All 36 tapes were used in earlier development; no fresh generalization claim.",
+    "No seed, model, objective or schema selection and no new fitting.",
+    "Rule changes the policy; it is not a proved globally dominating action or a new supplier requirement.",
+    "Observational override counts have different policy trajectories and are not matched-state causal effects.",
+    "Memory peaks cover the worker process lifetime including imports and previous units. Sum of worker peaks is not a simultaneous aggregate peak.",
+    "CPU/wall are descriptive shared-machine measurements; there is no outcome-dependent time cutoff."
+  ]
+}

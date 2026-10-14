@@ -1,0 +1,6 @@
+@echo off
+call "C:\PROGRAMING\visual studio\Visual studio\VC\Auxiliary\Build\vcvars64.bat"
+if errorlevel 1 exit /b %errorlevel%
+set VSLANG=1033
+"C:\Program Files\CMake\bin\ctest.EXE" --test-dir C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\build_g31_circulation --output-on-failure -R ^circulation_runtime$ --output-junit C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_circulation_20261013\build_final_001\native_junit.xml
+exit /b %errorlevel%

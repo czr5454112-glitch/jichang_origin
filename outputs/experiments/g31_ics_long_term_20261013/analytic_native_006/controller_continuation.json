@@ -1,0 +1,41 @@
+{
+  "status": "passed",
+  "checkpoint_time": 8,
+  "controller_state": {
+    "schema": "g31.analytic_controller_state.v1",
+    "config": {
+      "owners": [
+        "A",
+        "B"
+      ],
+      "predictive": true,
+      "control_period": 0.5,
+      "message_delay": 2,
+      "demand_delay": 0.5,
+      "publish": true
+    },
+    "start": 0.0,
+    "next_tick": 17,
+    "published": {
+      "A": [
+        [
+          "B2",
+          0,
+          0.2,
+          60.0
+        ]
+      ],
+      "B": []
+    }
+  },
+  "parent_state_unchanged": true,
+  "equal_fields": [
+    "receipts",
+    "jobs",
+    "trays",
+    "transfers",
+    "leg_identities"
+  ],
+  "sibling_controller_states_equal": true,
+  "scope": "one real pending-message boundary; native fork plus JSON controller state; no duplicate current control tick"
+}

@@ -1,0 +1,59 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ test_route_update_cannot_claim_a_known_invalid_old_or_new_route[static_suffix-no_static_legal_suffix] _
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+blocker = 'static_suffix', reason = 'no_static_legal_suffix'
+
+    @pytest.mark.parametrize("blocker,reason", [("static_suffix", "no_static_legal_suffix"),
+                                               ("notified_fault", "advertised_fault")])
+    def test_route_update_cannot_claim_a_known_invalid_old_or_new_route(native, blocker, reason):
+        data = without_return()
+        data["jobs"][0].update(allow_suffix_reroute=True, deadline=-1)
+        if blocker == "static_suffix":
+            for edge in data["edge_contracts"]:
+                if edge["from"] == 6:
+                    edge["capacity"] = 0
+        else:
+            data["faults"] = [{"from": 0, "to": 6, "start": 0., "end": 20., "message_delay": 0.}]
+        s = native.NativeSession(data); s.advance_to(.11)
+        assert s.submit_route_intent(route_request(s.observe("A")))["status"] == "pending"
+        result = s.result_at(30)
+        reply = s.observe("A")["route_requests"][0]
+>       assert reply["status"] == "rejected" and reply["reason"] == reason
+E       AssertionError: assert ('updated' == 'rejected'
+E         
+E         - rejected
+E         + updated)
+
+tests\test_g31_circulation_session.py:160: AssertionError
+_ test_route_update_cannot_claim_a_known_invalid_old_or_new_route[notified_fault-advertised_fault] _
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+blocker = 'notified_fault', reason = 'advertised_fault'
+
+    @pytest.mark.parametrize("blocker,reason", [("static_suffix", "no_static_legal_suffix"),
+                                               ("notified_fault", "advertised_fault")])
+    def test_route_update_cannot_claim_a_known_invalid_old_or_new_route(native, blocker, reason):
+        data = without_return()
+        data["jobs"][0].update(allow_suffix_reroute=True, deadline=-1)
+        if blocker == "static_suffix":
+            for edge in data["edge_contracts"]:
+                if edge["from"] == 6:
+                    edge["capacity"] = 0
+        else:
+            data["faults"] = [{"from": 0, "to": 6, "start": 0., "end": 20., "message_delay": 0.}]
+        s = native.NativeSession(data); s.advance_to(.11)
+        assert s.submit_route_intent(route_request(s.observe("A")))["status"] == "pending"
+        result = s.result_at(30)
+        reply = s.observe("A")["route_requests"][0]
+>       assert reply["status"] == "rejected" and reply["reason"] == reason
+E       AssertionError: assert ('updated' == 'rejected'
+E         
+E         - rejected
+E         + updated)
+
+tests\test_g31_circulation_session.py:160: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_session.py::test_route_update_cannot_claim_a_known_invalid_old_or_new_route[static_suffix-no_static_legal_suffix]
+FAILED tests/test_g31_circulation_session.py::test_route_update_cannot_claim_a_known_invalid_old_or_new_route[notified_fault-advertised_fault]

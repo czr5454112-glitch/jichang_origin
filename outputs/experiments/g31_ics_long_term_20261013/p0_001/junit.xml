@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="1.771" timestamp="2026-10-13T12:57:59.658101+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_same_timestamp" name="test_receive_completion_at_arrival_timestamp_preserves_normal_source_service" time="0.006"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_g31_circulation\\python\\czr005_circulation.cp311-win_amd64.pyd'&quot;">@pytest.fixture(scope='module')
+    def native():
+        configured = os.environ.get('G31_CIRCULATION_BINARY')
+        if configured:
+            return load_native(configured)
+        folder = Path(__file__).resolve().parents[1] / 'build_g31_circulation' / 'python'
+        binaries = [*folder.glob('czr005_circulation*.pyd'), *folder.glob('czr005_circulation*.so')]
+        assert len(binaries) == 1, 'Build czr005_circulation or set G31_CIRCULATION_BINARY'
+&gt;       return load_native(binaries[0])
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_same_timestamp.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\native_host.py:17: in load_native
+    path = Path(binary).resolve(strict=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\python3.11.9\Lib\pathlib.py:993: in resolve
+    s = os.path.realpath(self, strict=strict)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_g31_circulation\\python\\czr005_circulation.cp311-win_amd64.pyd'
+strict = True
+
+&gt;   ???
+E   PermissionError: [WinError 5] 拒绝访问。: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_g31_circulation\\python\\czr005_circulation.cp311-win_amd64.pyd'
+
+&lt;frozen ntpath&gt;:696: PermissionError</error></testcase></testsuite></testsuites>

@@ -1,0 +1,226 @@
+{
+  "schema": "g31.protocol_route_aba_probe.v1",
+  "status": "passed",
+  "controller_source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py",
+  "source_before": "07d396d69b819b685c551d45454319bf52978edb686e54633a3ece7f358ba3dc",
+  "probe_sha256": "d686eb5060c1685b8853864c3fce6997009a035825d05ca4d1bc056f150263b4",
+  "binary_sha256": "19b55703676810bacc156e474aac364e4016dda2d2fa7b4fa315a3237a1bdbec",
+  "case": {
+    "name": "native_same_stage_route_aba",
+    "fixture_valid": true,
+    "transitions": [
+      {
+        "at": 0.11,
+        "next": 1
+      },
+      {
+        "at": 0.61,
+        "next": 6
+      },
+      {
+        "at": 1.61,
+        "next": 1
+      }
+    ],
+    "first_a_updated": true,
+    "b_updated": true,
+    "first_a_lease_live_on_return": true,
+    "fresh_a_updated_on_return": true,
+    "fixed": true,
+    "route_calls": [
+      {
+        "at": 0.11,
+        "business_bag_id": "B1",
+        "tray_id": "T0",
+        "from": 0,
+        "next": 1,
+        "expected_generation": 1,
+        "expected_traversal": 0,
+        "expiry": 5.11,
+        "message_delay": 0.01,
+        "request_id": "live:1:A:route:1",
+        "owner_id": "A",
+        "kind": "route"
+      },
+      {
+        "at": 0.61,
+        "business_bag_id": "B1",
+        "tray_id": "T0",
+        "from": 0,
+        "next": 6,
+        "expected_generation": 1,
+        "expected_traversal": 0,
+        "expiry": 5.61,
+        "message_delay": 0.01,
+        "request_id": "live:1:A:route:2",
+        "owner_id": "A",
+        "kind": "route"
+      },
+      {
+        "at": 1.61,
+        "business_bag_id": "B1",
+        "tray_id": "T0",
+        "from": 0,
+        "next": 1,
+        "expected_generation": 1,
+        "expected_traversal": 0,
+        "expiry": 6.61,
+        "message_delay": 0.01,
+        "request_id": "live:1:A:route:4",
+        "owner_id": "A",
+        "kind": "route"
+      }
+    ],
+    "route_acks": [
+      {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 0.12,
+        "delivered_at": 0.13999999999999999,
+        "executed_at": 0.12,
+        "completed_at": 0.12,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:1:A:route:1",
+        "request_id": "live:1:A:route:1",
+        "kind": "route",
+        "delivered_copies": 1
+      },
+      {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 0.62,
+        "delivered_at": 0.64,
+        "executed_at": 0.62,
+        "completed_at": 0.62,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:1:A:route:2",
+        "request_id": "live:1:A:route:2",
+        "kind": "route",
+        "delivered_copies": 1
+      },
+      {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 1.62,
+        "delivered_at": 1.6400000000000001,
+        "executed_at": 1.62,
+        "completed_at": 1.62,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:1:A:route:4",
+        "request_id": "live:1:A:route:4",
+        "kind": "route",
+        "delivered_copies": 1
+      }
+    ],
+    "audit": {
+      "status": "passed",
+      "completed_traversals": 2,
+      "open_traversals": 0,
+      "tray_count": 2,
+      "optimality": "unknown",
+      "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+    },
+    "public_observations": [
+      {
+        "at": 0.11,
+        "path": [
+          0,
+          1,
+          2
+        ],
+        "stage_identity": [
+          0,
+          1,
+          0,
+          "B1"
+        ],
+        "known_faults": [],
+        "branch_occupancy": {
+          "1": 0,
+          "6": 0
+        }
+      },
+      {
+        "at": 0.61,
+        "path": [
+          0,
+          6,
+          2
+        ],
+        "stage_identity": [
+          0,
+          1,
+          0,
+          "B1"
+        ],
+        "known_faults": [],
+        "branch_occupancy": {
+          "1": 1,
+          "6": 0
+        }
+      },
+      {
+        "at": 1.11,
+        "path": [
+          0,
+          6,
+          2
+        ],
+        "stage_identity": [
+          0,
+          1,
+          0,
+          "B1"
+        ],
+        "known_faults": [],
+        "branch_occupancy": {
+          "1": 1,
+          "6": 0
+        }
+      },
+      {
+        "at": 1.61,
+        "path": [
+          0,
+          1,
+          2
+        ],
+        "stage_identity": [
+          0,
+          1,
+          0,
+          "B1"
+        ],
+        "known_faults": [],
+        "branch_occupancy": {
+          "1": 0,
+          "6": 0
+        }
+      },
+      {
+        "at": 2.11,
+        "path": [
+          0,
+          1,
+          2
+        ],
+        "stage_identity": [
+          0,
+          1,
+          0,
+          "B1"
+        ],
+        "known_faults": [],
+        "branch_occupancy": {
+          "1": 0,
+          "6": 0
+        }
+      }
+    ]
+  },
+  "source_after": "07d396d69b819b685c551d45454319bf52978edb686e54633a3ece7f358ba3dc",
+  "source_changed": []
+}

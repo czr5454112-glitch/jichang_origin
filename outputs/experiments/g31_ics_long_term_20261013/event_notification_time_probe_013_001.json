@@ -1,0 +1,1148 @@
+{
+  "input": {
+    "schema": "g31.circulation.input.v1",
+    "model_scope": "synthetic on-carrier Storage, per-berth unloading, fixed module ports",
+    "node_records": [
+      [
+        0,
+        1,
+        0.05,
+        0,
+        0,
+        [
+          1,
+          6
+        ]
+      ],
+      [
+        1,
+        1,
+        0.05,
+        1,
+        0,
+        [
+          2
+        ]
+      ],
+      [
+        2,
+        3,
+        0.05,
+        2,
+        0,
+        [
+          3
+        ]
+      ],
+      [
+        3,
+        1,
+        0.05,
+        3,
+        0,
+        [
+          4
+        ]
+      ],
+      [
+        4,
+        1,
+        0.05,
+        4,
+        0,
+        [
+          5
+        ]
+      ],
+      [
+        5,
+        1,
+        0.05,
+        5,
+        0,
+        [
+          0
+        ]
+      ],
+      [
+        6,
+        1,
+        0.05,
+        6,
+        0,
+        [
+          2,
+          3
+        ]
+      ]
+    ],
+    "edge_records": [
+      [
+        0,
+        1,
+        1.0,
+        1.0
+      ],
+      [
+        0,
+        6,
+        1.2,
+        1.0
+      ],
+      [
+        1,
+        2,
+        1.0,
+        1.0
+      ],
+      [
+        6,
+        2,
+        1.0,
+        1.0
+      ],
+      [
+        6,
+        3,
+        1.0,
+        1.0
+      ],
+      [
+        2,
+        3,
+        1.0,
+        1.0
+      ],
+      [
+        3,
+        4,
+        1.0,
+        1.0
+      ],
+      [
+        4,
+        5,
+        1.0,
+        1.0
+      ],
+      [
+        5,
+        0,
+        1.0,
+        1.0
+      ]
+    ],
+    "node_contracts": [
+      {
+        "node": 0,
+        "zone": "A",
+        "capacity": 1
+      },
+      {
+        "node": 1,
+        "zone": "A",
+        "capacity": 1
+      },
+      {
+        "node": 2,
+        "zone": "A",
+        "capacity": 1
+      },
+      {
+        "node": 3,
+        "zone": "B",
+        "capacity": 1
+      },
+      {
+        "node": 4,
+        "zone": "B",
+        "capacity": 1
+      },
+      {
+        "node": 5,
+        "zone": "A",
+        "capacity": 1
+      },
+      {
+        "node": 6,
+        "zone": "A",
+        "capacity": 1
+      }
+    ],
+    "edge_contracts": [
+      {
+        "from": 0,
+        "to": 1,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 0,
+        "to": 6,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 6,
+        "to": 2,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 6,
+        "to": 3,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 3,
+        "to": 4,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 5,
+        "to": 0,
+        "capacity": 1,
+        "entry_headway": 0.2
+      }
+    ],
+    "trays": [
+      {
+        "tray_id": "T0",
+        "node": 0
+      }
+    ],
+    "jobs": [
+      {
+        "business_bag_id": "B1",
+        "origin": 0,
+        "destination": 4,
+        "arrival": 0.0,
+        "deadline": 40.0,
+        "storage_node": 2,
+        "storage_release_at": 6.0,
+        "storage_min_dwell": 2.0,
+        "load_seconds": 0.1,
+        "unload_seconds": 0.5,
+        "hold_seconds": 1.25,
+        "allow_suffix_reroute": true
+      },
+      {
+        "business_bag_id": "B2",
+        "origin": 0,
+        "destination": 4,
+        "arrival": 0.2,
+        "deadline": 60.0,
+        "storage_node": 2,
+        "storage_release_at": 0.0,
+        "storage_min_dwell": 0.25,
+        "load_seconds": 0.1,
+        "unload_seconds": 0.5,
+        "hold_seconds": 1.25,
+        "allow_suffix_reroute": true
+      }
+    ],
+    "transfers": [],
+    "faults": [],
+    "options": {
+      "max_simulation_time": 80.0
+    },
+    "heuristic_time": [
+      [
+        0.0,
+        1.05,
+        2.0999999999999996,
+        2.3,
+        3.3499999999999996,
+        4.3999999999999995,
+        1.25
+      ],
+      [
+        5.249999999999999,
+        0.0,
+        1.05,
+        2.0999999999999996,
+        3.1499999999999995,
+        4.199999999999999,
+        6.499999999999999
+      ],
+      [
+        4.199999999999999,
+        5.249999999999999,
+        0.0,
+        1.05,
+        2.0999999999999996,
+        3.1499999999999995,
+        5.449999999999999
+      ],
+      [
+        3.1499999999999995,
+        4.199999999999999,
+        5.249999999999999,
+        0.0,
+        1.05,
+        2.0999999999999996,
+        4.3999999999999995
+      ],
+      [
+        2.0999999999999996,
+        3.1499999999999995,
+        4.199999999999999,
+        4.3999999999999995,
+        0.0,
+        1.05,
+        3.3499999999999996
+      ],
+      [
+        1.05,
+        2.0999999999999996,
+        3.1499999999999995,
+        3.3499999999999996,
+        4.3999999999999995,
+        0.0,
+        2.3
+      ],
+      [
+        4.199999999999999,
+        5.249999999999999,
+        1.05,
+        1.05,
+        2.0999999999999996,
+        3.1499999999999995,
+        0.0
+      ]
+    ],
+    "potential_contract": {
+      "mode": "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL",
+      "formula": "H(g,g)=0; H(u,g)=service_duration(u)+min_(u,v)(travel(u,v)+H(v,g))",
+      "service_duration": "max(map_node_service,minimum_service_seconds)",
+      "minimum_service_seconds": 0.001,
+      "candidate_score_identity": "travel(current,candidate)+H(candidate,goal) includes candidate and later non-goal service",
+      "precomputation": "reverse_dijkstra_once_per_goal",
+      "node_count": 7,
+      "directed_edge_count": 9,
+      "unreachable_finite_value_seconds": 10.549999999999999,
+      "runtime_read_scope": "direct_outgoing_candidates_and_one_scalar_each",
+      "runtime_decision_complexity": "O(outdegree)",
+      "runtime_full_astar_required": false,
+      "future_route_materialized": false,
+      "global_reservation_table_required": false
+    },
+    "owner_protocol": {
+      "enabled": true,
+      "timeout": 0.2,
+      "ack_delay": 0.02,
+      "drop_ack_packets": 1
+    },
+    "owner_notifications": {
+      "enabled": true
+    }
+  },
+  "error": "ValueError('event_control:invalid_notification_identity')",
+  "batches": [
+    {
+      "cursor": {
+        "A": 0,
+        "B": 0
+      },
+      "horizon": 0.0,
+      "previous_now": 0.0,
+      "now": 0.0,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.0,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {
+          "A": {
+            "sequence": 2,
+            "observed_at": 0.0,
+            "change_mask": 3
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 2,
+        "B": 0
+      },
+      "horizon": 0.5,
+      "previous_now": 0.0,
+      "now": 0.03,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.03,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 4,
+            "observed_at": 0.03,
+            "change_mask": 12
+          },
+          "B": {
+            "sequence": 1,
+            "observed_at": 0.03,
+            "change_mask": 4
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 4,
+        "B": 1
+      },
+      "horizon": 0.5,
+      "previous_now": 0.03,
+      "now": 0.1,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.1,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 6,
+            "observed_at": 0.1,
+            "change_mask": 2
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 6,
+        "B": 1
+      },
+      "horizon": 0.5,
+      "previous_now": 0.1,
+      "now": 0.15000000000000002,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.15000000000000002,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 12,
+            "observed_at": 0.15000000000000002,
+            "change_mask": 2
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 12,
+        "B": 1
+      },
+      "horizon": 0.5,
+      "previous_now": 0.15000000000000002,
+      "now": 0.18000000000000002,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.18000000000000002,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 13,
+            "observed_at": 0.18000000000000002,
+            "change_mask": 8
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 13,
+        "B": 1
+      },
+      "horizon": 0.5,
+      "previous_now": 0.18000000000000002,
+      "now": 0.2,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.2,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 16,
+            "observed_at": 0.2,
+            "change_mask": 33
+          },
+          "B": {
+            "sequence": 2,
+            "observed_at": 0.2,
+            "change_mask": 32
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 16,
+        "B": 2
+      },
+      "horizon": 0.5,
+      "previous_now": 0.2,
+      "now": 0.30000000000000004,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.30000000000000004,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 17,
+            "observed_at": 0.30000000000000004,
+            "change_mask": 32
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 17,
+        "B": 2
+      },
+      "horizon": 0.5,
+      "previous_now": 0.30000000000000004,
+      "now": 0.35000000000000003,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.35000000000000003,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 18,
+            "observed_at": 0.35000000000000003,
+            "change_mask": 32
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 18,
+        "B": 2
+      },
+      "horizon": 0.5,
+      "previous_now": 0.35000000000000003,
+      "now": 0.5,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 0.5,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 18,
+        "B": 2
+      },
+      "horizon": 0.6,
+      "previous_now": 0.5,
+      "now": 0.53,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.53,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 20,
+            "observed_at": 0.53,
+            "change_mask": 16
+          },
+          "B": {
+            "sequence": 3,
+            "observed_at": 0.53,
+            "change_mask": 16
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 20,
+        "B": 3
+      },
+      "horizon": 0.6,
+      "previous_now": 0.53,
+      "now": 0.56,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.56,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "B": {
+            "sequence": 4,
+            "observed_at": 0.56,
+            "change_mask": 4
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 20,
+        "B": 4
+      },
+      "horizon": 0.6,
+      "previous_now": 0.56,
+      "now": 0.6,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 0.6,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 20,
+        "B": 4
+      },
+      "horizon": 0.65,
+      "previous_now": 0.6,
+      "now": 0.63,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.63,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 21,
+            "observed_at": 0.63,
+            "change_mask": 16
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 21,
+        "B": 4
+      },
+      "horizon": 0.65,
+      "previous_now": 0.63,
+      "now": 0.65,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 0.65,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 21,
+        "B": 4
+      },
+      "horizon": 1.0,
+      "previous_now": 0.65,
+      "now": 0.68,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.68,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 22,
+            "observed_at": 0.68,
+            "change_mask": 16
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 22,
+        "B": 4
+      },
+      "horizon": 1.0,
+      "previous_now": 0.68,
+      "now": 0.73,
+      "response": {
+        "status": "notified",
+        "physical_time": 0.73,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 23,
+            "observed_at": 0.73,
+            "change_mask": 32
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 23,
+        "B": 4
+      },
+      "horizon": 1.0,
+      "previous_now": 0.73,
+      "now": 1.0,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 1.0,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 23,
+        "B": 4
+      },
+      "horizon": 1.03,
+      "previous_now": 1.0,
+      "now": 1.03,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 1.03,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 23,
+        "B": 4
+      },
+      "horizon": 1.53,
+      "previous_now": 1.03,
+      "now": 1.06,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.06,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 24,
+            "observed_at": 1.06,
+            "change_mask": 16
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 24,
+        "B": 4
+      },
+      "horizon": 2.0,
+      "previous_now": 1.06,
+      "now": 1.15,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.15,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 27,
+            "observed_at": 1.15,
+            "change_mask": 2
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 27,
+        "B": 4
+      },
+      "horizon": 1.65,
+      "previous_now": 1.15,
+      "now": 1.18,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.18,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 28,
+            "observed_at": 1.18,
+            "change_mask": 8
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 28,
+        "B": 4
+      },
+      "horizon": 1.65,
+      "previous_now": 1.18,
+      "now": 1.2,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.2,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 34,
+            "observed_at": 1.2,
+            "change_mask": 2
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 34,
+        "B": 4
+      },
+      "horizon": 1.65,
+      "previous_now": 1.2,
+      "now": 1.23,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.23,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 35,
+            "observed_at": 1.23,
+            "change_mask": 8
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 35,
+        "B": 4
+      },
+      "horizon": 1.65,
+      "previous_now": 1.23,
+      "now": 1.3499999999999999,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.3499999999999999,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 37,
+            "observed_at": 1.3499999999999999,
+            "change_mask": 32
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 37,
+        "B": 4
+      },
+      "horizon": 1.65,
+      "previous_now": 1.3499999999999999,
+      "now": 1.4,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.4,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 38,
+            "observed_at": 1.4,
+            "change_mask": 32
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 38,
+        "B": 4
+      },
+      "horizon": 1.65,
+      "previous_now": 1.4,
+      "now": 1.65,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 1.65,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 38,
+        "B": 4
+      },
+      "horizon": 1.7,
+      "previous_now": 1.65,
+      "now": 1.68,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.68,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 40,
+            "observed_at": 1.68,
+            "change_mask": 16
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 40,
+        "B": 4
+      },
+      "horizon": 1.7,
+      "previous_now": 1.68,
+      "now": 1.7,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 1.7,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 40,
+        "B": 4
+      },
+      "horizon": 2.0,
+      "previous_now": 1.7,
+      "now": 1.73,
+      "response": {
+        "status": "notified",
+        "physical_time": 1.73,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 41,
+            "observed_at": 1.73,
+            "change_mask": 16
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 41,
+        "B": 4
+      },
+      "horizon": 2.0,
+      "previous_now": 1.73,
+      "now": 2.0,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 2.0,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 41,
+        "B": 4
+      },
+      "horizon": 3.0,
+      "previous_now": 2.0,
+      "now": 2.2,
+      "response": {
+        "status": "notified",
+        "physical_time": 2.2,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 44,
+            "observed_at": 2.2,
+            "change_mask": 2
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 44,
+        "B": 4
+      },
+      "horizon": 3.0,
+      "previous_now": 2.2,
+      "now": 2.25,
+      "response": {
+        "status": "notified",
+        "physical_time": 2.25,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 46,
+            "observed_at": 2.25,
+            "change_mask": 2
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 46,
+        "B": 4
+      },
+      "horizon": 3.0,
+      "previous_now": 2.25,
+      "now": 3.0,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 3.0,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 46,
+        "B": 4
+      },
+      "horizon": 4.0,
+      "previous_now": 3.0,
+      "now": 4.0,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 4.0,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 46,
+        "B": 4
+      },
+      "horizon": 5.0,
+      "previous_now": 4.0,
+      "now": 5.0,
+      "response": {
+        "status": "horizon_reached",
+        "physical_time": 5.0,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {}
+      }
+    },
+    {
+      "cursor": {
+        "A": 46,
+        "B": 4
+      },
+      "horizon": 6.0,
+      "previous_now": 5.0,
+      "now": 6.0,
+      "response": {
+        "status": "notified",
+        "physical_time": 6.0,
+        "timestamp_complete": true,
+        "horizon_complete": true,
+        "notifications": {
+          "A": {
+            "sequence": 48,
+            "observed_at": 6.0,
+            "change_mask": 2
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 48,
+        "B": 4
+      },
+      "horizon": 6.5,
+      "previous_now": 6.0,
+      "now": 6.029999999999999,
+      "response": {
+        "status": "notified",
+        "physical_time": 6.029999999999999,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "B": {
+            "sequence": 5,
+            "observed_at": 6.029999999999999,
+            "change_mask": 8
+          }
+        }
+      }
+    },
+    {
+      "cursor": {
+        "A": 48,
+        "B": 5
+      },
+      "horizon": 6.5,
+      "previous_now": 6.029999999999999,
+      "now": 6.049999999999999,
+      "response": {
+        "status": "notified",
+        "physical_time": 6.049999999999999,
+        "timestamp_complete": true,
+        "horizon_complete": false,
+        "notifications": {
+          "A": {
+            "sequence": 49,
+            "observed_at": 6.05,
+            "change_mask": 2
+          }
+        }
+      }
+    }
+  ]
+}

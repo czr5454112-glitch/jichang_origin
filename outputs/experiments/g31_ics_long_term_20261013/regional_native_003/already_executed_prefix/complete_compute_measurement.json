@@ -1,0 +1,51 @@
+{
+  "submission": {
+    "response": {
+      "status": "pending",
+      "reason": ""
+    },
+    "request": {
+      "request_id": "already_executed_prefix",
+      "owner_id": "A",
+      "business_bag_id": "B1",
+      "tray_id": "T0",
+      "from": 1,
+      "next": 2,
+      "expected_generation": 1,
+      "expected_traversal": 1,
+      "expiry": 6.16,
+      "message_delay": 0.01
+    },
+    "encoded_route": "{\"business_bag_id\":\"B1\",\"committed_prefix\":[0,1],\"generation\":1,\"observed_at\":1.16,\"owner_id\":\"A\",\"replaceable_suffix\":[1,2],\"schema\":\"g31.route_intent.v1\",\"stage\":\"storage_in\",\"stage_goal\":2,\"traversal_id\":1,\"tray_id\":\"T0\"}",
+    "submission_compute_ms": 0.26780000189319253,
+    "submission_cpu_ms": 0.0,
+    "logical_compute_delay": 0.01,
+    "message_delay": 0.0,
+    "timing_scope": "observe+conversion+candidate A*+codec+submit; delivery owner compute excluded",
+    "complete_100ms_requirement_certified": false
+  },
+  "final_response": {
+    "request_id": "already_executed_prefix",
+    "status": "updated",
+    "reason": "allowed"
+  },
+  "advance": {
+    "physical_time": 1.17,
+    "processed_events": 1,
+    "status": "reached",
+    "horizon_complete": true,
+    "wall_seconds": 4.3e-06
+  },
+  "compute_wall_ms": 0.34829997457563877,
+  "compute_cpu_ms": 0.0,
+  "meets_measured_100ms": true,
+  "overrun_is_failure": false,
+  "physical_started_at": 1.16,
+  "physical_finished_at": 1.17,
+  "logical_network_delay_seconds": 0.0,
+  "logical_processing_delay_seconds": 0.01,
+  "timing_scope": "observe+conversion+A*+codec+submit+all intervening native events including owner revalidation+confirmation+response codec",
+  "hard_realtime_guarantee": false,
+  "complete_100ms_requirement_certified": false,
+  "limits": "single-process synthetic/request sample; modeled network wait; external controller ticks not automatically replayed"
+}

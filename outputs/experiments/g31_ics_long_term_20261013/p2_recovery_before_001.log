@@ -1,0 +1,146 @@
+FFFFF                                                                    [100%]
+================================== FAILURES ===================================
+____________ test_full_receiving_berth_wakes_after_real_departure _____________
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_full_receiving_berth_wakes_after_real_departure(native):
+        data = receiving_release()
+        result = native.run(data)
+>       assert_complete_without_polling(data, result)
+
+tests\test_g31_circulation_recovery.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'node_records': [(0, 1, 0.01, 0, 0, [1]), (1, 1, 0.01, 1, 0, [2]), (2, 1, 0.01, 2, 0, [3]), (3, 1, 0.01, 3, 0, [0])],...': 2, 'to': 3, 'capacity': 1, 'entry_headway': 0.01}, {'from': 3, 'to': 0, 'capacity': 1, 'entry_headway': 0.01}], ...}
+result = {'schema': 'g31.circulation.execution.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [0.0152, 0.0125, 0.0158, 0.0078, 0.0041, 0.0024, ...], ...}
+
+    def assert_complete_without_polling(data, result):
+        audit_result(data, result)
+>       assert all(j["status"] == "completed" for j in result["jobs"])
+E       assert False
+E        +  where False = all(<generator object assert_complete_without_polling.<locals>.<genexpr> at 0x000001C7F4121B10>)
+
+tests\test_g31_circulation_recovery.py:52: AssertionError
+_________________ test_committed_headway_expiry_does_not_poll _________________
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_committed_headway_expiry_does_not_poll(native):
+        data = edge_release()
+        result = native.run(data)
+>       assert_complete_without_polling(data, result)
+
+tests\test_g31_circulation_recovery.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'node_records': [(0, 1, 0.001, 0, 0, [1]), (1, 1, 0.001, 1, 0, [0])], 'edge_records': [(0, 1, 1.0, 1.0), (1, 0, 1.0, ..., 'to': 1, 'capacity': 1, 'entry_headway': 10000.0}, {'from': 1, 'to': 0, 'capacity': 1, 'entry_headway': 0.001}], ...}
+result = {'schema': 'g31.circulation.execution.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [0.0057, 0.0028, 0.007, 0.0048, 0.0074, 0.0027, ...], ...}
+
+    def assert_complete_without_polling(data, result):
+        audit_result(data, result)
+>       assert all(j["status"] == "completed" for j in result["jobs"])
+E       assert False
+E        +  where False = all(<generator object assert_complete_without_polling.<locals>.<genexpr> at 0x000001C7F4BB28E0>)
+
+tests\test_g31_circulation_recovery.py:52: AssertionError
+_______________ test_inflight_capacity_wakes_on_real_edge_exit ________________
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_inflight_capacity_wakes_on_real_edge_exit(native):
+        data = edge_release(travel=10000, headway=.001)
+        result = native.run(data)
+>       assert_complete_without_polling(data, result)
+
+tests\test_g31_circulation_recovery.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'node_records': [(0, 1, 0.001, 0, 0, [1]), (1, 1, 0.001, 1, 0, [0])], 'edge_records': [(0, 1, 10000, 1.0), (1, 0, 1.0... 0, 'to': 1, 'capacity': 1, 'entry_headway': 0.001}, {'from': 1, 'to': 0, 'capacity': 1, 'entry_headway': 0.001}], ...}
+result = {'schema': 'g31.circulation.execution.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [0.0058, 0.0034, 0.0071, 0.0051, 0.0076, 0.0029, ...], ...}
+
+    def assert_complete_without_polling(data, result):
+        audit_result(data, result)
+>       assert all(j["status"] == "completed" for j in result["jobs"])
+E       assert False
+E        +  where False = all(<generator object assert_complete_without_polling.<locals>.<genexpr> at 0x000001C7F41381E0>)
+
+tests\test_g31_circulation_recovery.py:52: AssertionError
+__ test_pending_wait_checkpoint_and_sibling_continuation[receiving_release] ___
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+data_factory = <function receiving_release at 0x000001C7F4A7B2E0>
+
+    @pytest.mark.parametrize("data_factory", [receiving_release, edge_release])
+    def test_pending_wait_checkpoint_and_sibling_continuation(native, data_factory):
+        data = data_factory()
+        parent = native.NativeSession(data)
+        parent.advance_to(100)
+        before = parent.offline_state_sha256()
+        restored = native.NativeSession(data)
+        restored.restore(parent.checkpoint())
+        sibling = parent.fork()
+        assert before == restored.offline_state_sha256() == sibling.offline_state_sha256()
+        result = restored.result_at(data["options"]["max_simulation_time"])
+        assert parent.offline_state_sha256() == sibling.offline_state_sha256() == before
+        other = sibling.result_at(data["options"]["max_simulation_time"])
+        assert result["receipts"] == other["receipts"]
+        assert result["jobs"] == other["jobs"]
+        assert restored.offline_state_sha256() == sibling.offline_state_sha256()
+>       assert_complete_without_polling(data, result)
+
+tests\test_g31_circulation_recovery.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'node_records': [(0, 1, 0.01, 0, 0, [1]), (1, 1, 0.01, 1, 0, [2]), (2, 1, 0.01, 2, 0, [3]), (3, 1, 0.01, 3, 0, [0])],...': 2, 'to': 3, 'capacity': 1, 'entry_headway': 0.01}, {'from': 3, 'to': 0, 'capacity': 1, 'entry_headway': 0.01}], ...}
+result = {'schema': 'g31.circulation.live_result.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [], ...}
+
+    def assert_complete_without_polling(data, result):
+        audit_result(data, result)
+>       assert all(j["status"] == "completed" for j in result["jobs"])
+E       assert False
+E        +  where False = all(<generator object assert_complete_without_polling.<locals>.<genexpr> at 0x000001C7F4B73AC0>)
+
+tests\test_g31_circulation_recovery.py:52: AssertionError
+_____ test_pending_wait_checkpoint_and_sibling_continuation[edge_release] _____
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+data_factory = <function edge_release at 0x000001C7F4A7B380>
+
+    @pytest.mark.parametrize("data_factory", [receiving_release, edge_release])
+    def test_pending_wait_checkpoint_and_sibling_continuation(native, data_factory):
+        data = data_factory()
+        parent = native.NativeSession(data)
+        parent.advance_to(100)
+        before = parent.offline_state_sha256()
+        restored = native.NativeSession(data)
+        restored.restore(parent.checkpoint())
+        sibling = parent.fork()
+        assert before == restored.offline_state_sha256() == sibling.offline_state_sha256()
+        result = restored.result_at(data["options"]["max_simulation_time"])
+        assert parent.offline_state_sha256() == sibling.offline_state_sha256() == before
+        other = sibling.result_at(data["options"]["max_simulation_time"])
+        assert result["receipts"] == other["receipts"]
+        assert result["jobs"] == other["jobs"]
+        assert restored.offline_state_sha256() == sibling.offline_state_sha256()
+>       assert_complete_without_polling(data, result)
+
+tests\test_g31_circulation_recovery.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'node_records': [(0, 1, 0.001, 0, 0, [1]), (1, 1, 0.001, 1, 0, [0])], 'edge_records': [(0, 1, 1.0, 1.0), (1, 0, 1.0, ..., 'to': 1, 'capacity': 1, 'entry_headway': 10000.0}, {'from': 1, 'to': 0, 'capacity': 1, 'entry_headway': 0.001}], ...}
+result = {'schema': 'g31.circulation.live_result.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [], ...}
+
+    def assert_complete_without_polling(data, result):
+        audit_result(data, result)
+>       assert all(j["status"] == "completed" for j in result["jobs"])
+E       assert False
+E        +  where False = all(<generator object assert_complete_without_polling.<locals>.<genexpr> at 0x000001C7F4F3F850>)
+
+tests\test_g31_circulation_recovery.py:52: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_recovery.py::test_full_receiving_berth_wakes_after_real_departure
+FAILED tests/test_g31_circulation_recovery.py::test_committed_headway_expiry_does_not_poll
+FAILED tests/test_g31_circulation_recovery.py::test_inflight_capacity_wakes_on_real_edge_exit
+FAILED tests/test_g31_circulation_recovery.py::test_pending_wait_checkpoint_and_sibling_continuation[receiving_release]
+FAILED tests/test_g31_circulation_recovery.py::test_pending_wait_checkpoint_and_sibling_continuation[edge_release]

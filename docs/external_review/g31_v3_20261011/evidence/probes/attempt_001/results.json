@@ -1,0 +1,220 @@
+{
+  "production_sha": "defd79effe02ee13f1a5bbbbc5143f6d0dce2f63",
+  "uploaded_release_sha": "fccd4819532701ee4173ec598822450d962d4e61",
+  "results": {
+    "P01_storage_integer_oracle": {
+      "returned_count": 0,
+      "search_status": "bounded_no_candidate",
+      "diagnostics": {
+        "validation_ms": 0.036513999987164425,
+        "work_units_by_stage": {
+          "topology_edges": 5,
+          "reverse_lower_bound": 5,
+          "full_graph_time_labels": 25
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "completeness": "finite_integer_earliest",
+        "earliest_arrival_certified": false,
+        "finite_horizon_exhausted": true,
+        "missing_candidate_is_not_infeasibility": true,
+        "cold_topology": true,
+        "static_lower_bound": 3,
+        "state_label_truncations": 12,
+        "query_ms": 0.23057700002482306,
+        "expansions": 35,
+        "candidate_count": 0,
+        "search_queue_exhausted": true
+      },
+      "independent_hand_witness": {
+        "candidate_id": "known-feasible",
+        "bag_id": "b",
+        "tray_id": "t",
+        "legs": [
+          {
+            "edge_id": "b-SW",
+            "depart": 0,
+            "arrive": 1
+          },
+          {
+            "edge_id": "d-WX",
+            "depart": 1,
+            "arrive": 2
+          },
+          {
+            "edge_id": "e-XG",
+            "depart": 2,
+            "arrive": 3
+          }
+        ],
+        "unload_complete": 4,
+        "usable_at": 4,
+        "dependency_version": 0,
+        "baseline_id": "known-feasible",
+        "is_baseline": true,
+        "destination_node": "G",
+        "prefix_only": false,
+        "continuation_destination": null
+      },
+      "witness_validation": {
+        "accepted": true,
+        "reason": "accepted"
+      },
+      "storage_generator_count": 1,
+      "storage_candidates": [
+        {
+          "candidate_id": "storage:v0:b:t:0",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "b-SW",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "d-WX",
+              "depart": 1,
+              "arrive": 2
+            },
+            {
+              "edge_id": "e-XG",
+              "depart": 2,
+              "arrive": 3
+            }
+          ],
+          "unload_complete": 4,
+          "usable_at": 4,
+          "dependency_version": 0,
+          "baseline_id": "storage:v0:b:t:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ],
+      "defect_observed": true,
+      "scope": "Direct FullGraphReferenceGenerator Storage call. Not claiming latest business runner calls this oracle."
+    },
+    "P02_ordinary_screen_default_k": {
+      "unwrapped_count": 1,
+      "wrapped_count": 1,
+      "unwrapped": [
+        {
+          "candidate_id": "regional:v0:b:t:0",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "SA",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "AG",
+              "depart": 1,
+              "arrive": 2
+            }
+          ],
+          "unload_complete": 3,
+          "usable_at": 3,
+          "dependency_version": 0,
+          "baseline_id": "regional:v0:b:t:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ],
+      "wrapped": [
+        {
+          "candidate_id": "regional:v0:b:t:0",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "SA",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "AG",
+              "depart": 1,
+              "arrive": 2
+            }
+          ],
+          "unload_complete": 3,
+          "usable_at": 3,
+          "dependency_version": 0,
+          "baseline_id": "regional:v0:b:t:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ],
+      "defect_observed": false,
+      "scope": "omitted-k API only; latest explicit-k1 Storage result is not invalidated."
+    },
+    "P03_ordinary_factory_checkpoint_alias": {
+      "checkpoint_counts_before": [
+        0,
+        0
+      ],
+      "checkpoint_counts_after_original_factory_query": [
+        0,
+        1
+      ],
+      "restored_counts": [
+        0,
+        1
+      ],
+      "checkpoint_factory_is_original_factory": true,
+      "defect_observed": true,
+      "scope": "ordinary screen accounting checkpoint contamination, not evidence of physical trajectory contamination."
+    },
+    "P04_storage_can_have_slow_callback": {
+      "completed": {
+        "b": 4
+      },
+      "slow_calls": 6.0,
+      "scope": "no-op slow callback compatibility only, not predictive balancing evidence."
+    },
+    "P05_partition_storage_guard": {
+      "observed": "partition_observation:storage_contract_not_supported"
+    },
+    "P05_joint_storage_guard": {
+      "observed": "joint_reference:storage_contract_not_supported"
+    },
+    "P06_protected_replacement": {
+      "refusal": "protected_itinerary_irrevocable",
+      "scope": "intentional contract limitation; no assertion of causality for 0/44."
+    },
+    "P07_terminal_actual_empty_occupancy": {
+      "completed": {
+        "b": 2
+      },
+      "plans": [],
+      "tray": {
+        "tray_id": "t",
+        "node": "G",
+        "mode": "empty",
+        "bag_id": null,
+        "available_at": 2
+      },
+      "effective_reservations": [
+        {
+          "resource": "node:G",
+          "start": 3,
+          "end": 1000000000000,
+          "tray_id": "t"
+        }
+      ]
+    }
+  },
+  "wall_seconds": 0.019535340999993878,
+  "process_cpu_seconds": 0.019533865999999955,
+  "interpretation": "Independent probes; observed defects do not retroactively change historical experiments.",
+  "explicit_simulation_advance_calls": 3,
+  "full_business_replay": false
+}

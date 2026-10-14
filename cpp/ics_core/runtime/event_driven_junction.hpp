@@ -30,6 +30,9 @@
 #include "ics_core/io/canonical_map2_reader.hpp"
 #include "ics_core/models/edge_score.hpp"
 #include "ics_core/runtime/bounded_local_pibt.hpp"
+#include "ics_core/runtime/circulation.hpp"
+#include "ics_core/runtime/circulation_checkpoint.hpp"
+#include "ics_core/runtime/circulation_static_domain.hpp"
 #include "ics_core/runtime/destination_merge_grant.hpp"
 #include "ics_core/runtime/expiring_first_edge_credit.hpp"
 #include "ics_core/runtime/g4irsf14_causal_intervention.hpp"
@@ -59,6 +62,7 @@ enum class JunctionEventType {
   kSourceArbitration,
   kJunctionArbitration,
   kDestinationMergeArbitration,
+  kCirculation,
 };
 
 // G4IRSF17 source-wait attribution is deliberately a small canonical enum,
@@ -153,6 +157,8 @@ inline const char* junction_event_name(JunctionEventType type) {
       return "JUNCTION_ARBITRATION";
     case JunctionEventType::kDestinationMergeArbitration:
       return "DESTINATION_MERGE_ARBITRATION";
+    case JunctionEventType::kCirculation:
+      return "CIRCULATION";
   }
   return "UNKNOWN";
 }
@@ -1945,6 +1951,14 @@ class LocalCalendar {
     return value;
   }
 
+  // Local committed service only; no inspection of the private event tape.
+  [[nodiscard]] double task_service_end(int task_id, double now) const noexcept {
+    double end=now;
+    for(const auto& interval:intervals_)
+      if(interval.task_id==task_id) end=std::max(end,interval.end);
+    return end;
+  }
+
   void reserve(int task_id, double start, double end) {
     if (end <= start) {
       return;
@@ -2408,6 +2422,9 @@ struct RuntimeEvent {
   JunctionEventType type = JunctionEventType::kBagRelease;
   double time = 0.0;
   std::uint64_t seq = 0;
+  // Physical traversal identity is independent of business/leg identity.
+  // Legacy events keep zero and retain their historical replay projection.
+  std::uint64_t traversal_id = 0;
   int task_id = -1;
   int node = -1;
   int from_node = -1;
@@ -2448,6 +2465,9 @@ inline int event_priority(const RuntimeEvent& event) {
   if (event.type == JunctionEventType::kBagRelease) {
     return 6;
   }
+  if (event.type == JunctionEventType::kCirculation) {
+    return 6;
+  }
   if (event.type == JunctionEventType::kSourceArbitration) {
     return 7;
   }
@@ -2464,8 +2484,9 @@ inline int event_priority(const RuntimeEvent& event) {
 }
 
 struct RuntimeEventLater {
+  bool exact_time_order = false;
   bool operator()(const RuntimeEvent& left, const RuntimeEvent& right) const {
-    if (std::abs(left.time - right.time) > kEpsilon) {
+    if (exact_time_order ? left.time != right.time : std::abs(left.time - right.time) > kEpsilon) {
       return left.time > right.time;
     }
     const int left_priority = left.microphase_priority >= 0
@@ -2486,6 +2507,11 @@ class RuntimeEventQueue
                                  std::vector<RuntimeEvent>,
                                  RuntimeEventLater> {
  public:
+  void set_exact_time_order(bool enabled) {
+    this->comp.exact_time_order=enabled;
+    std::make_heap(this->c.begin(),this->c.end(),this->comp);
+  }
+  [[nodiscard]] bool exact_time_order() const noexcept {return this->comp.exact_time_order;}
   void reserve(std::size_t capacity) {
     this->c.reserve(capacity);
   }
@@ -2610,6 +2636,9 @@ class EventDrivenJunctionRuntime {
   struct CheckpointStorage {
     const Graph* graph_identity = nullptr;
     std::string graph_sha256;
+    // Value-owned physical state, module messages/leases, accounting and
+    // environment inputs. Never shared mutably with the source or siblings.
+    CirculationState circulation;
     EventDrivenJunctionConfig config;
     std::optional<EdgeScoreModel> scorer_model;
     std::map<std::pair<int, int>, int> scorer_static_hops;
@@ -3116,6 +3145,68 @@ class EventDrivenJunctionRuntime {
                          : EventDrivenJunctionRuntimePhase::kReady;
   }
 
+  // One native event heap and one physical clock also own the carrier cycle.
+  void initialize_circulation(
+      const CirculationInput& input,
+      const std::vector<EventRuntimeFaultWindow>& fault_windows = {});
+
+  [[nodiscard]] const CirculationState& circulation_state() const noexcept {
+    return circulation_;
+  }
+
+  // Environment/session APIs. The next event and complete result must never be
+  // exposed as online policy features: they include the private future tape.
+  [[nodiscard]] std::optional<double> next_physical_event_time() const {
+    return events_.empty() ? std::nullopt : std::optional<double>(events_.top().time);
+  }
+  int advance_circulation_to(double horizon, int event_budget);
+  bool same_runtime_timestamp(double left,double right) const noexcept {
+    return circulation_.enabled ? left==right : event_runtime_detail::same_timestamp(left,right);
+  }
+  bool runtime_time_before(double left,double right) const noexcept {
+    return circulation_.enabled ? left<right : left<right-event_runtime_detail::kEpsilon;
+  }
+  CirculationNotificationAdvance advance_circulation_until_owner_notification(
+      const std::map<std::string,std::uint64_t>& after, double horizon, int event_budget);
+  std::string submit_circulation_transfer(CirculationTransfer request,
+                                         const std::string& owner, bool protocol_internal = false);
+  std::string submit_circulation_protocol_transfer(CirculationTransfer request, const std::string& owner);
+  bool circulation_protocol_owner_available(const std::string& owner) const;
+  bool circulation_protocol_transfer_available(int transfer) const;
+  void circulation_protocol_send_ack(int request, double time, std::uint64_t attempt = 0);
+  bool process_circulation_protocol_event(const event_runtime_detail::RuntimeEvent& event);
+  std::string submit_circulation_protocol_command(CirculationProtocolCommandInput request);
+  bool process_circulation_protocol_command_event(const event_runtime_detail::RuntimeEvent& event);
+  void circulation_protocol_command_ack(int command,double time,std::uint64_t attempt);
+  void circulation_protocol_command_complete(const std::string& kind,int native_index,const std::string& status,
+                                             const std::string& reason,const std::string& result_id,double time);
+  bool circulation_protocol_publication_available(const std::string& kind,int native_index);
+  std::string cancel_circulation_transfer(const std::string& id, const std::string& owner,bool protocol_internal=false);
+  std::string submit_circulation_route(CirculationRouteIntent request, double message_delay,bool protocol_internal=false);
+  std::string publish_circulation_demand(const std::string& source,
+                                       const std::string& target, double delay,bool protocol_internal=false);
+  std::string publish_circulation_service_forecast(const std::string& source,
+      const std::string& target, const std::string& tray_id, int next_node, double delay,bool protocol_internal=false);
+  std::string withdraw_circulation_service_forecast(const std::string& source,
+      const std::string& original_message_id, double delay,bool protocol_internal=false);
+  double circulation_minimum_service_seconds() const noexcept { return config_.minimum_service_seconds; }
+  std::vector<CirculationOfflineJunction> circulation_offline_junctions() const {
+    if(!circulation_.enabled || runtime_phase_==EventDrivenJunctionRuntimePhase::kIdle)
+      throw std::logic_error("circulation:live_session_required");
+    require_checkpoint_safe_boundary();
+    std::vector<CirculationOfflineJunction> rows;
+    for(const auto& [node,state]:junctions_) {
+      CirculationOfflineJunction row;row.node=node;
+      row.queue.assign(state.queue.begin(),state.queue.end());
+      row.source_queue.assign(state.source_queue.begin(),state.source_queue.end());
+      row.scheduled_incoming=state.scheduled_incoming;row.next_dispatch_time=state.next_dispatch_time;
+      rows.push_back(std::move(row));
+    }
+    return rows;
+  }
+  std::string request_circulation_empty_recovery(CirculationRecoveryIntent request, double delay);
+  std::vector<std::tuple<int,int,bool,double>> circulation_known_faults(const std::string& owner) const;
+
   [[nodiscard]] std::optional<EventDrivenJunctionSafeBoundary>
   peek_safe_boundary() const {
     if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
@@ -3173,9 +3264,11 @@ class EventDrivenJunctionRuntime {
       return false;
     }
     auto event = events_.top();
+    if(circulation_.enabled && event.time<now_)
+      throw std::logic_error("circulation:past_event_would_reverse_clock");
     events_.pop();
-    if (event.time >
-        time_limit_ + event_runtime_detail::kEpsilon) {
+    if (circulation_.enabled ? event.time>time_limit_ :
+        event.time>time_limit_+event_runtime_detail::kEpsilon) {
       result_.summary.time_limit_reached = true;
       runtime_phase_ = EventDrivenJunctionRuntimePhase::kStopped;
       return false;
@@ -3820,6 +3913,16 @@ class EventDrivenJunctionRuntime {
 
   [[nodiscard]] StateCheckpoint capture_state_checkpoint() const;
   void restore_state_checkpoint(const StateCheckpoint& checkpoint);
+  // Offline identity only: includes the hidden environment tape and therefore
+  // must not be exposed as a regional observation or policy feature.
+  [[nodiscard]] std::string circulation_state_sha256() const;
+  [[nodiscard]] double circulation_static_potential(int node, int goal) const {
+    return static_potential(node,goal);
+  }
+  [[nodiscard]] bool circulation_static_reachable(int node, int goal) const {
+    return circulation_.static_route_reachable.empty() ||
+        circulation_.static_route_reachable.at(node).at(goal);
+  }
   [[nodiscard]] G4IRSF14RuntimeStateDigests
   deterministic_state_digests() const;
   [[nodiscard]] std::string deterministic_state_sha256() const;
@@ -3949,7 +4052,7 @@ class EventDrivenJunctionRuntime {
       const auto& next = events_.top();
       if (target.runtime_state_sha256 != state_sha256 ||
           target.event_seq != next.seq ||
-          !event_runtime_detail::same_timestamp(
+          !same_runtime_timestamp(
               target.time, next.time) ||
           target.node != next.node) {
         throw std::invalid_argument(
@@ -5259,6 +5362,7 @@ class EventDrivenJunctionRuntime {
   }
 
   void reset() {
+    circulation_ = {};
     runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
     time_limit_ = 0.0;
     result_ = {};
@@ -5388,7 +5492,8 @@ class EventDrivenJunctionRuntime {
         return 1;
       }
       if (event.type == JunctionEventType::kArriveJunction ||
-          event.type == JunctionEventType::kBagRelease) {
+          event.type == JunctionEventType::kBagRelease ||
+          event.type == JunctionEventType::kCirculation) {
         return 2;
       }
       if (event.type ==
@@ -5438,6 +5543,10 @@ class EventDrivenJunctionRuntime {
 
   void prepare_event_for_publication(
       RuntimeEvent& event) {
+    if (circulation_.enabled &&
+        (!std::isfinite(event.time) || !std::isfinite(event.service_end))) {
+      throw std::invalid_argument("circulation:nonfinite_event_time");
+    }
     const int base_priority =
         g4irsf14_microphase_priority(event);
     event.microphase_priority = base_priority;
@@ -5445,7 +5554,7 @@ class EventDrivenJunctionRuntime {
         canonical_event_semantics() !=
             "E0_immediate_dispatch_f2" &&
         g4irsf14_state_->microphase_floor_active &&
-        event_runtime_detail::same_timestamp(
+        same_runtime_timestamp(
             event.time,
             g4irsf14_state_->microphase_floor_time)) {
       const int effective_base =
@@ -5460,12 +5569,14 @@ class EventDrivenJunctionRuntime {
   }
 
   void publish_prepared_event(RuntimeEvent event) {
+    circulation_publish_event(event);
     event.seq = next_event_seq_++;
     events_.push(std::move(event));
   }
 
   void publish_prepared_reserved_event(
       RuntimeEvent event) noexcept {
+    circulation_publish_event(event);
     event.seq = next_event_seq_++;
     events_.push(std::move(event));
   }
@@ -5485,7 +5596,7 @@ class EventDrivenJunctionRuntime {
                 ? event.microphase_priority
                 : event_runtime_detail::event_priority(event);
         if (!g4irsf14_state_->microphase_floor_active ||
-            !event_runtime_detail::same_timestamp(
+            !same_runtime_timestamp(
                 event.time,
                 g4irsf14_state_->microphase_floor_time)) {
           g4irsf14_state_->microphase_floor_active = true;
@@ -5548,6 +5659,9 @@ class EventDrivenJunctionRuntime {
       case JunctionEventType::kDestinationMergeArbitration:
         ++result_.summary.destination_merge_arbitration_event_count;
         process_destination_merge_arbitration(event);
+        break;
+      case JunctionEventType::kCirculation:
+        process_circulation_event(event);
         break;
     }
   }
@@ -6436,6 +6550,7 @@ class EventDrivenJunctionRuntime {
     bag.status = BagStatus::kInService;
     bag.current = node;
     bag.admitted_time = time;
+    circulation_.notify_node(node,now_,2);
     bag.total_wait += std::max(0.0, time - bag.source_enqueued_at);
     schedule(JunctionEventType::kJunctionServiceComplete,
              time + duration,
@@ -7086,6 +7201,7 @@ class EventDrivenJunctionRuntime {
     // never contributes simulated service time.
     found->second.node_service_time_seconds +=
         service_duration(event.node);
+    circulation_.notify_node(event.node,now_,2);
     if (g4irsf17_source_policy_enabled() ||
         config_.enable_g4irsf17_causal_source_features ||
         (config_.enable_g4irsf23_source_admission_causal_action &&
@@ -8098,7 +8214,7 @@ class EventDrivenJunctionRuntime {
         !state_found->second.wakeup_pending ||
         state_found->second.wakeup_generation !=
             event.wakeup_generation ||
-        !event_runtime_detail::same_timestamp(
+        !same_runtime_timestamp(
             state_found->second.wakeup_time,
             event.time)) {
       ++result_.summary
@@ -8559,6 +8675,26 @@ class EventDrivenJunctionRuntime {
 
     auto& destination =
         junctions_[request.destination_merge_node];
+    if (circulation_.enabled) {
+      const auto reason = circulation_.can_enter(
+          request.runtime_bag_id, request.upstream_node,
+          request.destination_merge_node, event.time);
+      if (reason != "allowed") {
+        circulation_receipt(event.time, "native_merge_hold",
+            circulation_.legs.at(request.runtime_bag_id).tray,
+            request.runtime_bag_id, request.upstream_node,
+            request.destination_merge_node, reason);
+        reject_destination_merge_request(controller, request,
+            MergeGrantState::kRolledBack,
+            MergeGrantReason::kQueueCapacityBlock, event.time);
+        if (!circulation_wait_for_resources(request.runtime_bag_id,
+                                           request.upstream_node, event.time))
+          schedule_junction_wakeup(request.upstream_node,
+                                   event.time + config_.retry_interval);
+        reschedule_destination_merge_after_rejection(true);
+        return;
+      }
+    }
     destination.service_calendar.purge(event.time);
     if (destination.service_calendar.generation() !=
         request.destination_calendar_generation) {
@@ -9220,7 +9356,7 @@ class EventDrivenJunctionRuntime {
               static_cast<int>(controller.queue.size()) &&
           advertised->second.scheduled_incoming ==
               controller.scheduled_incoming &&
-          event_runtime_detail::same_timestamp(
+          same_runtime_timestamp(
               advertised->second.service_calendar_reserved_until,
               controller.service_calendar.reserved_until(event.time));
     }
@@ -9266,7 +9402,10 @@ class EventDrivenJunctionRuntime {
                            : (event.retry ? "junction_retry"
                                           : "junction_arrival"),
                        dispatch.selected_edge_count);
-    if (junction_has_unrepresented_merge_work(controller) &&
+    const bool circulation_resource_wait_pending = circulation_.enabled &&
+        circulation_.resource_waits.find(dispatch.task_id) != circulation_.resource_waits.end();
+    if (!circulation_resource_wait_pending &&
+        junction_has_unrepresented_merge_work(controller) &&
         !controller.junction_wakeup_pending) {
       schedule_junction_wakeup(event.node, event.time + config_.retry_interval);
     }
@@ -10111,6 +10250,7 @@ class EventDrivenJunctionRuntime {
                    record.fault_message_age_seconds);
     }
     apply_scorer(trace);
+    apply_circulation_route_preference(trace);
     std::vector<std::size_t> ranking(trace.candidates.size());
     for (std::size_t index = 0; index < ranking.size(); ++index) {
       ranking[index] = index;
@@ -11039,6 +11179,27 @@ class EventDrivenJunctionRuntime {
         static_cast<int>(actions.size()) > config_.pibt_max_ready_bags) {
       blocker = "empty_or_oversized_action_batch";
       return false;
+    }
+    if (circulation_.enabled) {
+      // Validate the exact publication order against projected physical
+      // state. Two individually legal actions must not jointly exceed edge
+      // capacity/headway or double-count an already-held receiving lease.
+      // Audit history and business state are intentionally not copied.
+      CirculationState projected;
+      projected.enabled = true;
+      projected.input = circulation_.input;
+      projected.trays = circulation_.trays;
+      projected.legs = circulation_.legs;
+      projected.transfers = circulation_.transfers;
+      projected.next_entry = circulation_.next_entry;
+      projected.next_traversal = circulation_.next_traversal;
+      for (const auto& action : actions) {
+        blocker = projected.can_enter(action.bag_id, action.from_node,
+                                       action.next_node, time);
+        if (blocker != "allowed") return false;
+        projected.reserve_enter(action.bag_id, action.from_node,
+                                 action.next_node, time);
+      }
     }
     if (merge_grant_authority != nullptr &&
         !merge_grant_authority_is_commit_ready(
@@ -13350,6 +13511,7 @@ class EventDrivenJunctionRuntime {
       }
     }
     apply_scorer(trace);
+    apply_circulation_route_preference(trace);
     // G24 deliberately lives only on the ordinary Route path.  PIBT builds
     // its own trace through pibt_trace_for_bag() and never calls this hook.
     apply_g4irsf24_dlp_residual(trace);
@@ -13476,6 +13638,9 @@ class EventDrivenJunctionRuntime {
             physical_interlock_rejected && config_.enable_fault_policy;
         const bool legacy_same_bag_handoff =
             !physical_interlock_rejected && config_.enable_pibt_lite;
+        const bool circulation_static_domain_handoff = circulation_.enabled &&
+            (predicted.shield_reason == "circulation:edge_closed" ||
+             predicted.shield_reason == "circulation:no_static_legal_suffix");
         const bool bounded_local_same_bag_handoff =
             !physical_interlock_rejected &&
             predicted.shield_reason == "destination_queue_full" &&
@@ -13500,7 +13665,8 @@ class EventDrivenJunctionRuntime {
           }
         }
         if (selected < 0 &&
-            (physical_fault_local_handoff || legacy_same_bag_handoff)) {
+            (physical_fault_local_handoff || legacy_same_bag_handoff ||
+             circulation_static_domain_handoff)) {
           for (std::size_t rank = 1; rank < ranking.size(); ++rank) {
             const auto& alternative = trace.candidates[ranking[rank]];
             const bool alternative_advertised_block =
@@ -13508,9 +13674,11 @@ class EventDrivenJunctionRuntime {
             if (alternative.shield_allowed && !alternative_advertised_block) {
               selected = alternative.next_node;
               trace.fallback_selected_next = selected;
-              selected_reason = physical_interlock_rejected
-                                    ? "physical_fault_interlock_local_handoff"
-                                    : "same_bag_alternative_edge_scan_handoff";
+              selected_reason = circulation_static_domain_handoff
+                                    ? "circulation_static_domain_local_handoff"
+                                    : physical_interlock_rejected
+                                        ? "physical_fault_interlock_local_handoff"
+                                        : "same_bag_alternative_edge_scan_handoff";
               if (config_.enable_pibt_lite) {
                 ++result_.summary.pibt_lite_handoff_count;
                 ++result_.summary
@@ -14223,7 +14391,9 @@ class EventDrivenJunctionRuntime {
               ? std::max(time + config_.retry_interval,
                          earliest_resource_retry)
               : time + config_.retry_interval;
-      schedule_junction_wakeup(node, retry_time);
+      if (!circulation_wait_for_resources(task_id, node, time, &trace,
+            ranking.empty() ? -1 : trace.candidates[ranking.front()].next_node))
+        schedule_junction_wakeup(node, retry_time);
       if (g4irsf16_i4_natural_hold_selected) {
         if (!g4irsf16_context.has_value() ||
             !g4irsf16_decision.has_value() ||
@@ -14262,7 +14432,7 @@ class EventDrivenJunctionRuntime {
       if (causal_i4_natural_hold_selected) {
         const auto& local = g4irsf14_local_state(node);
         if (!controller.junction_wakeup_pending ||
-            !event_runtime_detail::same_timestamp(
+            !same_runtime_timestamp(
                 local.junction_wakeup_time, retry_time)) {
           throw std::logic_error(
               "I4 natural hold did not commit its next local service "
@@ -14468,6 +14638,23 @@ class EventDrivenJunctionRuntime {
     return features;
   }
 
+  void apply_circulation_route_preference(EventDecisionTraceRow& trace) {
+    if (!circulation_.enabled || trace.runtime_bag_id < 0 ||
+        trace.runtime_bag_id >= static_cast<int>(circulation_.legs.size())) return;
+    const auto& leg=circulation_.legs[trace.runtime_bag_id];
+    const auto& tray=circulation_.trays[leg.tray];
+    for(auto it=circulation_.route_intents.rbegin();it!=circulation_.route_intents.rend();++it) {
+      if(it->status!="updated" || it->tray_id!=tray.tray_id ||
+          it->expected_generation!=tray.generation || it->expected_traversal!=tray.public_traversal_version ||
+          it->from!=trace.current_node || it->expiry<trace.event_time) continue;
+      for(auto& candidate:trace.candidates)
+        if(candidate.next_node==it->next && candidate.shield_allowed && !candidate.advertised_fault)
+          candidate.model_score-=1.0e9;
+      // Latest accepted intent supersedes an earlier intent at this prefix.
+      break;
+    }
+  }
+
   EventCandidateRecord candidate_record(const BagState& bag,
                                         int current,
                                         int candidate,
@@ -14630,6 +14817,13 @@ class EventDrivenJunctionRuntime {
                             bool first_edge_credit_required,
                             bool first_edge_credit_ready,
                             int first_edge_credit_to) {
+    if (circulation_.enabled) {
+      const auto reason = circulation_.can_enter(
+          bag.request.runtime_bag_id, current, candidate, time);
+      if (reason != "allowed") return reason;
+      if (!circulation_static_reachable(candidate,bag.request.goal))
+        return "circulation:no_static_legal_suffix";
+    }
     // A terminal node is safe only when it is this bag's actual goal.  This
     // is a one-hop topology check on the candidate itself: it needs neither
     // a future route nor a global search, and prevents local backpressure from
@@ -14713,10 +14907,21 @@ class EventDrivenJunctionRuntime {
       PIBTActionDelta* transaction_delta = nullptr,
       const MergeGrantCapability*
           destination_merge_grant_authority = nullptr) {
+    if (circulation_.enabled && circulation_.can_enter(
+            bag.request.runtime_bag_id, current, selected, time) != "allowed") {
+      throw std::logic_error("circulation:physical_commit_state_changed");
+    }
     const auto& edge = graph_.edge(current, selected);
     const double travel = std::max(edge.travel_time(), config_.minimum_service_seconds);
     const double exit_time = time + travel;
     const double service_end = exit_time + service_duration(selected);
+    if (circulation_.enabled &&
+        (!std::isfinite(exit_time) || !std::isfinite(service_end))) {
+      throw std::invalid_argument("circulation:nonfinite_event_time");
+    }
+    if (circulation_.enabled && exit_time <= time) {
+      throw std::invalid_argument("circulation:time_resolution_insufficient");
+    }
     auto& target = junctions_[selected];
     LocalCalendar* corridor = nullptr;
     const double corridor_end =
@@ -14847,6 +15052,7 @@ class EventDrivenJunctionRuntime {
   }
 
   void process_edge_enter(const RuntimeEvent& event) {
+    if (!circulation_edge_enter(event)) return;
     const auto found = bags_.find(event.task_id);
     const bool valid_entry =
         found != bags_.end() && found->second.status == BagStatus::kInTransit &&
@@ -14911,6 +15117,7 @@ class EventDrivenJunctionRuntime {
       return;
     }
     auto& bag = found->second;
+    if (!circulation_edge_exit(event)) return;
     bool inflight_fault_generation_recovered = false;
     const long long directed =
         event_runtime_detail::directed_key(event.from_node, event.to_node);
@@ -15315,6 +15522,9 @@ class EventDrivenJunctionRuntime {
         beacon.queue_length + beacon.scheduled_incoming;
     const double previous_received_at = beacon.received_at;
     const bool had_previous_snapshot = beacon.generation > 0;
+    const int previous_queue = beacon.queue_length;
+    const int previous_incoming = beacon.scheduled_incoming;
+    const double previous_calendar = beacon.service_calendar_reserved_until;
     beacon.queue_length = static_cast<int>(controller.queue.size());
     beacon.scheduled_incoming = controller.scheduled_incoming;
     beacon.queue_length_by_goal.clear();
@@ -15392,6 +15602,11 @@ class EventDrivenJunctionRuntime {
     }
     beacon.received_at = event.time;
     ++beacon.generation;
+    if (!had_previous_snapshot || previous_queue != beacon.queue_length ||
+        previous_incoming != beacon.scheduled_incoming ||
+        (std::max(previous_calendar, beacon.service_calendar_reserved_until) > event.time &&
+         previous_calendar != beacon.service_calendar_reserved_until))
+      circulation_notify_ranking_state(event.node, event.time);
     if (uses_first_edge_credit()) {
       credit_ledger_.revoke_destination_generation(event.node,
                                                    beacon.generation,
@@ -15453,6 +15668,7 @@ class EventDrivenJunctionRuntime {
           advertised.generation = event.message_generation;
           advertised.faulted = event.type == JunctionEventType::kFault;
           advertised.received_at = event.time;
+          circulation_.notify_node(event.from_node,now_,64);
         }
         schedule_junction_wakeup(event.from_node, event.time);
       }
@@ -15582,7 +15798,8 @@ class EventDrivenJunctionRuntime {
                          0,
                          true);
     } else if (
-        event.message_delay <= event_runtime_detail::kEpsilon &&
+        (circulation_.enabled ? event.message_delay==0.0 :
+         event.message_delay<=event_runtime_detail::kEpsilon) &&
         canonical_event_semantics() !=
             "E3_batch_source_and_junction_same_timestamp") {
       if (config_.enable_fault_policy) {
@@ -15590,6 +15807,7 @@ class EventDrivenJunctionRuntime {
         advertised.generation = physical.physical_generation;
         advertised.faulted = physical.active_count > 0;
         advertised.received_at = event.time;
+        circulation_.notify_node(event.from_node,now_,64);
       }
       append_fault_audit(event,
                          "local_message_delivery",
@@ -15600,7 +15818,8 @@ class EventDrivenJunctionRuntime {
     } else {
       RuntimeEvent notification = event;
       notification.time =
-          event.message_delay <= event_runtime_detail::kEpsilon
+          (circulation_.enabled ? event.message_delay==0.0 :
+           event.message_delay<=event_runtime_detail::kEpsilon)
               ? event.time
               : event.time + event.message_delay;
       notification.notification = true;
@@ -15769,7 +15988,7 @@ class EventDrivenJunctionRuntime {
     ++result_.summary.opportunity_event_queue_inspection_count;
     events_.inspect([&](const RuntimeEvent& pending) {
       if (!valid_source_dispatch_event(pending) ||
-          !event_runtime_detail::same_timestamp(pending.time,
+          !same_runtime_timestamp(pending.time,
                                                 time)) {
         return;
       }
@@ -15802,7 +16021,7 @@ class EventDrivenJunctionRuntime {
           pending.type == JunctionEventType::kArriveJunction &&
           !pending.retry;
       if (!valid_junction_dispatch_event(pending) ||
-          !event_runtime_detail::same_timestamp(pending.time,
+          !same_runtime_timestamp(pending.time,
                                                 time)) {
         return;
       }
@@ -15828,7 +16047,7 @@ class EventDrivenJunctionRuntime {
     int count = 0;
     ++result_.summary.opportunity_event_queue_inspection_count;
     events_.inspect([&](const RuntimeEvent& pending) {
-      if (!event_runtime_detail::same_timestamp(pending.time,
+      if (!same_runtime_timestamp(pending.time,
                                                 time) ||
           pending.node < 0 ||
           pending.node == upstream_node) {
@@ -15882,7 +16101,7 @@ class EventDrivenJunctionRuntime {
       auto& local = g4irsf14_local_state(event.node);
       generation = event.wakeup_generation;
       if (local.source_batch_open &&
-          event_runtime_detail::same_timestamp(
+          same_runtime_timestamp(
               local.source_batch_time, event.time)) {
         queue_before_enqueue =
             local.source_queue_before_enqueue;
@@ -16010,7 +16229,7 @@ class EventDrivenJunctionRuntime {
       auto& local = g4irsf14_local_state(event.node);
       generation = event.wakeup_generation;
       if (local.junction_batch_open &&
-          event_runtime_detail::same_timestamp(
+          same_runtime_timestamp(
               local.junction_batch_time, event.time)) {
         queue_before_enqueue =
             local.junction_queue_before_enqueue;
@@ -16268,7 +16487,7 @@ class EventDrivenJunctionRuntime {
     const int after =
         static_cast<int>(junctions_[node].source_queue.size());
     if (!local.source_batch_open ||
-        !event_runtime_detail::same_timestamp(
+        !same_runtime_timestamp(
             local.source_batch_time, time)) {
       local.source_batch_open = true;
       local.source_batch_time = time;
@@ -16288,7 +16507,7 @@ class EventDrivenJunctionRuntime {
     const int after =
         static_cast<int>(junctions_[node].queue.size());
     if (!local.junction_batch_open ||
-        !event_runtime_detail::same_timestamp(
+        !same_runtime_timestamp(
             local.junction_batch_time, time)) {
       local.junction_batch_open = true;
       local.junction_batch_time = time;
@@ -16315,7 +16534,7 @@ class EventDrivenJunctionRuntime {
     local.source_wakeup_time =
         std::numeric_limits<double>::infinity();
     if (local.has_last_source_arbitration &&
-        event_runtime_detail::same_timestamp(
+        same_runtime_timestamp(
             local.last_source_arbitration_time,
             event.time)) {
       ++result_.summary
@@ -16344,7 +16563,7 @@ class EventDrivenJunctionRuntime {
     local.junction_wakeup_time =
         std::numeric_limits<double>::infinity();
     if (local.has_last_junction_arbitration &&
-        event_runtime_detail::same_timestamp(
+        same_runtime_timestamp(
             local.last_junction_arbitration_time,
             event.time)) {
       ++result_.summary
@@ -16376,9 +16595,7 @@ class EventDrivenJunctionRuntime {
     if (batches_source_same_timestamp()) {
       auto& local = g4irsf14_local_state(node);
       if (controller.source_wakeup_pending) {
-        if (time <
-            local.source_wakeup_time -
-                event_runtime_detail::kEpsilon) {
+        if (runtime_time_before(time,local.source_wakeup_time)) {
           local.source_wakeup_time = time;
           const auto generation =
               ++controller.source_wakeup_generation;
@@ -16390,7 +16607,7 @@ class EventDrivenJunctionRuntime {
                    -1,
                    true,
                    generation);
-        } else if (event_runtime_detail::same_timestamp(
+        } else if (same_runtime_timestamp(
                        time, local.source_wakeup_time)) {
           ++result_.summary
                 .duplicate_same_time_arbitration_prevented_count;
@@ -16434,9 +16651,7 @@ class EventDrivenJunctionRuntime {
     if (batches_junction_same_timestamp()) {
       auto& local = g4irsf14_local_state(node);
       if (controller.junction_wakeup_pending) {
-        if (time <
-            local.junction_wakeup_time -
-                event_runtime_detail::kEpsilon) {
+        if (runtime_time_before(time,local.junction_wakeup_time)) {
           local.junction_wakeup_time = time;
           const auto generation =
               ++controller.junction_wakeup_generation;
@@ -16448,7 +16663,7 @@ class EventDrivenJunctionRuntime {
                    node,
                    true,
                    generation);
-        } else if (event_runtime_detail::same_timestamp(
+        } else if (same_runtime_timestamp(
                        time, local.junction_wakeup_time)) {
           ++result_.summary
                 .duplicate_same_time_arbitration_prevented_count;
@@ -16496,16 +16711,15 @@ class EventDrivenJunctionRuntime {
         g4irsf14_state_
             ->destination_merge[destination_node];
     if (state.wakeup_pending) {
-      if (event_runtime_detail::same_timestamp(
+      if (same_runtime_timestamp(
               state.wakeup_time, time)) {
         ++result_.summary
               .merge_grant_duplicate_wakeup_prevented_count;
         ++result_.summary.merge_grant_wakeup_coalesced_count;
         return;
       }
-      if (time >
-          state.wakeup_time -
-              event_runtime_detail::kEpsilon) {
+      if (circulation_.enabled ? time>state.wakeup_time :
+          time>state.wakeup_time-event_runtime_detail::kEpsilon) {
         ++result_.summary.merge_grant_wakeup_coalesced_count;
         return;
       }
@@ -16786,6 +17000,9 @@ class EventDrivenJunctionRuntime {
     if (node == goal) {
       return 0.0;
     }
+    if (circulation_.enabled && !circulation_.static_route_potential.empty()) {
+      return circulation_.static_route_potential.at(node).at(goal);
+    }
     const double value = graph_.heuristic(node, goal);
     if (!std::isfinite(value)) {
       throw std::logic_error("event runtime requires a finite canonical heuristic value");
@@ -16833,6 +17050,7 @@ class EventDrivenJunctionRuntime {
     bag.goal_completion_time_seconds =
         std::max(0.0, time - bag.request.release_time);
     record_wait_outcome(bag, time);
+    circulation_leg_completed(bag.request.runtime_bag_id, time);
   }
 
   void fail_bag(BagState& bag, const std::string& reason, double time) {
@@ -16853,6 +17071,7 @@ class EventDrivenJunctionRuntime {
           std::max(result_.summary.max_deadlock_duration, time - bag.deadlock_started_at);
     }
     record_wait_outcome(bag, time);
+    circulation_leg_failed(bag.request.runtime_bag_id, reason, time);
   }
 
   void record_wait_outcome(BagState& bag, double time) {
@@ -17801,6 +18020,29 @@ class EventDrivenJunctionRuntime {
   }
 
   const Graph& graph_;
+  CirculationState circulation_;
+  void circulation_publish_event(RuntimeEvent& event) noexcept;
+  bool circulation_edge_enter(const RuntimeEvent& event);
+  bool circulation_edge_exit(const RuntimeEvent& event);
+  void process_circulation_event(const RuntimeEvent& event);
+  void circulation_leg_completed(int runtime_id, double time);
+  void circulation_leg_failed(int runtime_id, const std::string& reason, double time);
+  void circulation_progress(double time);
+  void circulation_create_leg(int tray, int job, int destination,
+                              const std::string& kind, double time);
+  void circulation_schedule(const std::string& reason, double time, int index,
+                            std::uint64_t generation = 0);
+  void circulation_receipt(double time, const std::string& event, int tray,
+                           int leg = -1, int from = -1, int to = -1,
+                           const std::string& reason = {});
+  bool circulation_wait_for_resources(int runtime_id, int node, double time,
+      const EventDecisionTraceRow* trace = nullptr, int preferred = -1);
+  void circulation_notify_ranking_state(int node, double time);
+  void circulation_forget_resource_wait(int runtime_id);
+  void circulation_wake_resource_wait(int runtime_id, std::uint64_t generation,
+                                      double time, const std::string& reason);
+  void circulation_notify_resource(bool receiving, int resource, double time,
+                                   const std::string& reason);
   EventDrivenJunctionConfig config_;
   std::optional<EdgeScoreModel> scorer_model_;
   std::unique_ptr<G4IRSF16SelectiveLinearModel>
@@ -17999,15 +18241,19 @@ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
         "G4IRSF16 online supervisor state is not a G4IRSF14 causal-clone "
         "checkpoint payload; use a separate exact-off causal runtime");
   }
-  if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
-      events_.empty()) {
+  const bool live_prepop =
+      runtime_phase_ == EventDrivenJunctionRuntimePhase::kReady && !events_.empty();
+  const bool quiescent_circulation = circulation_.enabled &&
+      runtime_phase_ == EventDrivenJunctionRuntimePhase::kStopped && events_.empty();
+  if (!live_prepop && !quiescent_circulation) {
     throw std::logic_error(
-        "runtime checkpoint requires a live pre-pop event boundary");
+        "runtime checkpoint requires a live pre-pop or unfinalized quiescent circulation boundary");
   }
   require_checkpoint_safe_boundary();
   auto storage = std::make_shared<CheckpointStorage>();
   storage->graph_identity = &graph_;
   storage->graph_sha256 = scorer_graph_fingerprint();
+  storage->circulation = circulation_;
   storage->config = config_;
   storage->scorer_model = scorer_model_;
   storage->scorer_static_hops = scorer_static_hops_;
@@ -18135,6 +18381,8 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
         "cannot restore an empty runtime checkpoint");
   }
   const auto& storage = *checkpoint.storage_;
+  if(storage.events.exact_time_order()!=storage.circulation.enabled)
+    throw std::invalid_argument("circulation:checkpoint_event_ordering_mismatch");
   g4irsf14_clone_detail::require_sha256(
       "checkpoint seal", checkpoint.sealed_state_sha256_);
   storage.state_digests.validate();
@@ -18144,10 +18392,13 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
     throw std::invalid_argument(
         "runtime checkpoint seal does not bind its state inventory");
   }
-  if (storage.phase != EventDrivenJunctionRuntimePhase::kReady ||
-      storage.events.empty()) {
+  const bool live_prepop =
+      storage.phase == EventDrivenJunctionRuntimePhase::kReady && !storage.events.empty();
+  const bool quiescent_circulation = storage.circulation.enabled &&
+      storage.phase == EventDrivenJunctionRuntimePhase::kStopped && storage.events.empty();
+  if (!live_prepop && !quiescent_circulation) {
     throw std::invalid_argument(
-        "runtime checkpoint is not a live pre-pop boundary");
+        "runtime checkpoint is not a supported safe circulation/legacy boundary");
   }
   if (scorer_graph_fingerprint() != storage.graph_sha256) {
     throw std::invalid_argument(
@@ -18155,6 +18406,12 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
   }
   config_ = storage.config;
   validate_config();
+  // Supported checkpoints never contain the excluded online supervisor.
+  // A target may previously have used it; do not retain its mutable caches.
+  g4irsf16_i3_model_.reset();
+  g4irsf16_i4_model_.reset();
+  g4irsf16_supervisor_.reset();
+  g4irsf16_physical_fault_generation_by_bag_.clear();
   scorer_model_.reset();
   scorer_static_hops_.clear();
   pibt_regret_prior_.clear();
@@ -18168,6 +18425,7 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
         "runtime checkpoint scorer derivation mismatch");
   }
   result_ = storage.result;
+  circulation_ = storage.circulation;
   bags_ = storage.bags;
   segment_runtime_ids_ = storage.segment_runtime_ids;
   junctions_ = storage.junctions;
@@ -19440,6 +19698,9 @@ EventDrivenJunctionRuntime::compute_replay_hashes_projection() const {
 
 inline G4IRSF14CloneReplayHashes
 EventDrivenJunctionRuntime::deterministic_replay_hashes() const {
+  if (circulation_.enabled) {
+    throw std::logic_error("circulation:replay_projection_not_implemented");
+  }
   if (runtime_phase_ !=
       EventDrivenJunctionRuntimePhase::kFinalized) {
     throw std::logic_error(
@@ -19451,10 +19712,19 @@ EventDrivenJunctionRuntime::deterministic_replay_hashes() const {
 inline G4IRSF14RuntimeStateDigests
 EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
   StateFingerprintWriter event_queue("event_queue");
+  if(circulation_.enabled) {
+    event_queue.string("circulation_strict_time_order.v1");
+    event_queue.boolean(events_.exact_time_order());
+  }
   auto ordered_events = events_;
   event_queue.u64(ordered_events.size());
   while (!ordered_events.empty()) {
     fingerprint_event(event_queue, ordered_events.top());
+    if (circulation_.enabled) {
+      // Legacy events keep their frozen encoding. Physical traversal identity
+      // is essential to new-mode stale/duplicate EDGE_ENTER/EXIT rejection.
+      event_queue.u64(ordered_events.top().traversal_id);
+    }
     ordered_events.pop();
   }
 
@@ -20347,6 +20617,11 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
   runtime_hashes.string(canonical_priority_mode_name());
   runtime_hashes.string(canonical_scorer_mode());
   runtime_hashes.string(canonical_framework_mode());
+  if (circulation_.enabled) {
+    StateFingerprintWriter circulation("circulation_state");
+    fingerprint_circulation_state(circulation, circulation_);
+    runtime_hashes.string(circulation.sha256());
+  }
 
   std::vector<int> beacon_nodes;
   beacon_nodes.reserve(congestion_beacons_.size());
@@ -20476,10 +20751,13 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
 
 inline G4IRSF14RuntimeStateDigests
 EventDrivenJunctionRuntime::deterministic_state_digests() const {
-  if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
-      events_.empty()) {
+  const bool live_prepop =
+      runtime_phase_ == EventDrivenJunctionRuntimePhase::kReady && !events_.empty();
+  const bool quiescent_circulation = circulation_.enabled &&
+      runtime_phase_ == EventDrivenJunctionRuntimePhase::kStopped && events_.empty();
+  if (!live_prepop && !quiescent_circulation) {
     throw std::logic_error(
-        "deterministic state digests require a live pre-pop boundary");
+        "deterministic state digests require a supported safe circulation/legacy boundary");
   }
   require_checkpoint_safe_boundary();
   auto digests = compute_runtime_state_digests();
@@ -20492,4 +20770,21 @@ EventDrivenJunctionRuntime::deterministic_state_sha256() const {
   return deterministic_state_digests().aggregate_sha256();
 }
 
+inline std::string
+EventDrivenJunctionRuntime::circulation_state_sha256() const {
+  if (!circulation_.enabled ||
+      runtime_phase_ == EventDrivenJunctionRuntimePhase::kIdle) {
+    throw std::logic_error("circulation:state_identity_requires_initialized_runtime");
+  }
+  require_checkpoint_safe_boundary();
+  return compute_runtime_state_digests().aggregate_sha256();
+}
+
 }  // namespace czr005::ics
+
+#include "ics_core/runtime/circulation_runtime_impl.hpp"
+#include "ics_core/runtime/circulation_online_impl.hpp"
+#include "ics_core/runtime/circulation_notifications_impl.hpp"
+#include "ics_core/runtime/circulation_protocol_impl.hpp"
+#include "ics_core/runtime/circulation_protocol_commands_impl.hpp"
+#include "ics_core/runtime/circulation_recovery_impl.hpp"

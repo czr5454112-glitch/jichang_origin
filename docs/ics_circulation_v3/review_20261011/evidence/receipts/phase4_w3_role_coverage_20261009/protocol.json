@@ -1,0 +1,86 @@
+{
+  "schema": "ics_v3_role_coverage_R0_v1",
+  "spec": {
+    "routing": "timed",
+    "predictive": true,
+    "reactive": true,
+    "slow_period": 2,
+    "planning_horizon": 20,
+    "route_mode": "next_edge",
+    "coordination_order": "route_then_prebalance",
+    "candidate_count": 4,
+    "expansion_limit": 2000,
+    "static_path_limit": 12,
+    "local_label_limit": 3,
+    "dynamic_local": true
+  },
+  "quota": {
+    "bands": [
+      0,
+      20,
+      40
+    ],
+    "nodes": [
+      "S",
+      "B",
+      "C",
+      "G"
+    ],
+    "roles": [
+      "origin",
+      "continuation",
+      "arrival_at_destination"
+    ],
+    "per_cell": 1,
+    "max_samples": 9,
+    "selection_rule": "node_role_round_robin"
+  },
+  "labels_enabled": true,
+  "stress_groups": 4,
+  "stress_futures_per_group": 8,
+  "nominal_groups": 1,
+  "nominal_futures_per_group": 1,
+  "label_horizon_ticks": 20,
+  "source_sha256": {
+    "run_role_coverage.py": "1b759a0efd23c7c0fea1996ab330dd552dfc0e2a6a3355f72d8831020e62d857",
+    "role_coverage.py": "80e1e2b2ab06d88f8d2f432917bd1c7757d679e3419168a17a3b8637a8ab7def",
+    "role_features.py": "1868ef11cc20e60c39c50e22c1ec722b5e7a238f02d5f8fbac3694ea83a8d716",
+    "nonlinear_learning.py": "ca307589c3f5bbbfb2fcdd7998020d15028acbc8c6a19335e604b85877e65304",
+    "label_stability.py": "df60fcf2fc6174be61db4b759ce1d0bbadea1815fb907108b5414f02f949e75d",
+    "feedback_scenarios.py": "192081752f5e6f15bea441e8adcd6e3751909eae2fd37c70c6f22b39f8807caf",
+    "phase4_control.py": "70597fe1bce15a2f69d033aa389f0f68833b460a40ec2281b90599f36f475094",
+    "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "conditional_evaluation.py": "355a85d1840880ef4a7d88ca878d53ece059ec9a3fb62045a5f5b2bfb77abc1f",
+    "routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "routing_reference.py": "0fa5bf23396196a8a31d62a903dd3b2ad4b2e64aebe553bea4d89bf1d132430c",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3",
+    "test_ics_circulation_v3_role_coverage.py": "c682913dae8b9cc2b16294da3c20e5fd4632ff6600f2533b34818ded75738baa"
+  },
+  "sampling": "actual generation/selector position; first attempt per cell including zero; round-robin node/role then time band; no labels/outcomes used",
+  "checkpoint": "actual physical engine checkpoint plus exact loaded-route cursor and already-generated options; no reconstruction from Snapshot",
+  "R1_gate_predeclared": {
+    "all_states_and_B_subgroup_required": true,
+    "nested_future2_vs8_optimal_agreement_min": 0.95,
+    "two_groups_vs4_optimal_agreement_min": 0.95,
+    "nested2_other_groups_regret_max": 0.1,
+    "group8_other_groups_regret_max": 0.1,
+    "two_groups_heldout_regret_max": 0.1,
+    "if_any_fail_R1_groups": 4,
+    "if_all_pass_R1_groups": 2,
+    "futures_per_group": 8
+  },
+  "scope": "four reused constructed development streams; fixed timed continuation; not independent airport days, not held-out confirmation",
+  "future_law": "Stress only: existing declared independent cancellation 1/8, OD reversal 1/8, jitter {-2,0,2}; unobserved task tape only; fixed publication schedule. Nominal is separately recorded.",
+  "features": "same candidate/checkpoint labels serve observable base23 and physical31; no hidden future inputs",
+  "limitations": [
+    "Empty C/G strata are reported, never filled with synthetic checkpoints.",
+    "First attempts with zero candidates consume quota and remain unlabelable; all attempts stay in the opportunity denominator.",
+    "Label groups/candidates/checkpoints from one trajectory are correlated; noise summaries are descriptive conditional Monte Carlo diagnostics.",
+    "The copied finite continuation dispatcher is tested against the unchanged runtime; all physics, FIFO, authorizations and candidate generator remain shared.",
+    "Shared-machine wall/CPU time is recorded, not used as a production performance claim."
+  ]
+}

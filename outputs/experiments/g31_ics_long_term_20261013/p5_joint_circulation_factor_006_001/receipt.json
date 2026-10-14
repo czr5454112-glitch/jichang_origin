@@ -1,0 +1,3878 @@
+{
+  "schema": "g31.joint_circulation_factor.v1",
+  "status": "passed",
+  "cases": [
+    {
+      "scenario": {
+        "name": "long_2000m",
+        "length": 2000.0,
+        "speed": 5.0,
+        "future_source": false
+      },
+      "evaluated": 31,
+      "domain_size": 31,
+      "exhaustive": true,
+      "strict_bundle_optimality": "optimal_in_this_domain_and_continuation",
+      "global_native_optimality": "unknown",
+      "finite_reference_headroom": 0.0,
+      "qualified_bundle_count": 12,
+      "best_action_id": "s0:d0:t0x1.a666666666667p+0|s1:d1:t0x1.91b3333333334p+8",
+      "initial_bundle_statuses": {
+        "asynchronous_rejected": 8,
+        "verified": 23
+      },
+      "elapsed_seconds": 12.750621600018349,
+      "policies": {
+        "WAIT": {
+          "action_id": "WAIT",
+          "status": "verified",
+          "completion": {
+            "status": "reached",
+            "problems": [],
+            "evidence": {
+              "requested_horizon": 2000.0,
+              "result_horizon": 2000.0,
+              "physical_clock": 2000.0,
+              "advance_physical_time": 2000.0,
+              "branch_physical_time": 2000.0,
+              "controller_requested_horizon": 2000.0,
+              "controller_physical_time": 2000.0
+            },
+            "advance_status": "reached",
+            "outer_status": "reached"
+          },
+          "initial_submission": {
+            "status": "submitted",
+            "submissions": [],
+            "atomic": false
+          },
+          "initial_conditional_conflicts": [],
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 18,
+            "open_traversals": 0,
+            "tray_count": 3,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 2000.0,
+            "cost": 1227.52,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 411.86000000000007,
+                "completed": true,
+                "completed_at": 411.86000000000007,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 812.1099999999998,
+                "completed": true,
+                "completed_at": 812.1099999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "initial_resolutions": [],
+          "TP_business_sequence": [
+            "P"
+          ],
+          "TP_cross_zone_return": [],
+          "raw_file": "branch_000.json.gz",
+          "raw_sha256": "11553af963b2c47567eb5c15fb77b1fda3a4e5beecebb63594f60755eb05cf95",
+          "relative_to_ordinary_all_offered": {
+            "preserved": false,
+            "denominator": 5,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 8.560000000000002,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 411.86000000000007,
+                  "completed": true,
+                  "completed_at": 411.86000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 8.559999999999945,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 812.1099999999998,
+                  "completed": true,
+                  "completed_at": 812.1099999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_all_offered": {
+            "preserved": true,
+            "denominator": 5,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 411.86000000000007,
+                  "completed": true,
+                  "completed_at": 411.86000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 411.86000000000007,
+                  "completed": true,
+                  "completed_at": 411.86000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 812.1099999999998,
+                  "completed": true,
+                  "completed_at": 812.1099999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 812.1099999999998,
+                  "completed": true,
+                  "completed_at": 812.1099999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_precommitted": {
+            "preserved": true,
+            "denominator": 3,
+            "business_bag_ids": [
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          }
+        },
+        "ordinary_public_windows": {
+          "action_id": "s0:d0:t0x1.a666666666667p+0|s1:d1:t0x1.a666666666667p+0",
+          "status": "verified",
+          "completion": {
+            "status": "reached",
+            "problems": [],
+            "evidence": {
+              "requested_horizon": 2000.0,
+              "result_horizon": 2000.0,
+              "physical_clock": 2000.0,
+              "advance_physical_time": 2000.0,
+              "branch_physical_time": 2000.0,
+              "controller_requested_horizon": 2000.0,
+              "controller_physical_time": 2000.0
+            },
+            "advance_status": "reached",
+            "outer_status": "reached"
+          },
+          "initial_submission": {
+            "status": "submitted",
+            "submissions": [
+              {
+                "request": {
+                  "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+                  "tray_id": "T0",
+                  "source": 0,
+                  "destination": 3,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 1.6500000000000001,
+                  "expiry": 462.2,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              },
+              {
+                "request": {
+                  "request_id": "live:joint:s1:d1:t0x1.a666666666667p+0",
+                  "tray_id": "T1",
+                  "source": 1,
+                  "destination": 4,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 1.6500000000000001,
+                  "expiry": 462.40000000000003,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              }
+            ],
+            "atomic": false
+          },
+          "initial_conditional_conflicts": [
+            {
+              "resource": "node:2",
+              "start": 1.7000000000000002,
+              "end": 401.75,
+              "used": 2,
+              "capacity": 1,
+              "tasks": [
+                "s0:d0:t0x1.a666666666667p+0",
+                "s1:d1:t0x1.a666666666667p+0"
+              ]
+            }
+          ],
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 18,
+            "open_traversals": 0,
+            "tray_count": 3,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 2000.0,
+            "cost": 1210.4,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 403.30000000000007,
+                "completed": true,
+                "completed_at": 403.30000000000007,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 803.5499999999998,
+                "completed": true,
+                "completed_at": 803.5499999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "initial_resolutions": [
+            {
+              "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+              "status": "received",
+              "reason": "",
+              "tray": 0,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 1.7000000000000002,
+              "received_at": 402.2
+            },
+            {
+              "request_id": "live:joint:s1:d1:t0x1.a666666666667p+0",
+              "status": "received",
+              "reason": "",
+              "tray": 1,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 401.75,
+              "received_at": 802.4499999999999
+            }
+          ],
+          "TP_business_sequence": [
+            "P"
+          ],
+          "TP_cross_zone_return": [],
+          "raw_file": "branch_002.json.gz",
+          "raw_sha256": "0a7f78fe6cff2a63ac2770ad294591d913baf251223d8258d904fed96b2ac6bf",
+          "relative_to_ordinary_all_offered": {
+            "preserved": true,
+            "denominator": 5,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_all_offered": {
+            "preserved": true,
+            "denominator": 5,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": -8.560000000000002,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 411.86000000000007,
+                  "completed": true,
+                  "completed_at": 411.86000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": -8.559999999999945,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 812.1099999999998,
+                  "completed": true,
+                  "completed_at": 812.1099999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_precommitted": {
+            "preserved": true,
+            "denominator": 3,
+            "business_bag_ids": [
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          }
+        },
+        "one_round_same_assignment": {
+          "action_id": "s0:d0:t0x1.a666666666667p+0|s1:d1:t0x1.91b3333333334p+8",
+          "status": "verified",
+          "completion": {
+            "status": "reached",
+            "problems": [],
+            "evidence": {
+              "requested_horizon": 2000.0,
+              "result_horizon": 2000.0,
+              "physical_clock": 2000.0,
+              "advance_physical_time": 2000.0,
+              "branch_physical_time": 2000.0,
+              "controller_requested_horizon": 2000.0,
+              "controller_physical_time": 2000.0
+            },
+            "advance_status": "reached",
+            "outer_status": "reached"
+          },
+          "initial_submission": {
+            "status": "submitted",
+            "submissions": [
+              {
+                "request": {
+                  "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+                  "tray_id": "T0",
+                  "source": 0,
+                  "destination": 3,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 1.6500000000000001,
+                  "expiry": 462.2,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              },
+              {
+                "request": {
+                  "request_id": "live:joint:s1:d1:t0x1.91b3333333334p+8",
+                  "tray_id": "T1",
+                  "source": 1,
+                  "destination": 4,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 401.70000000000005,
+                  "expiry": 862.45,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              }
+            ],
+            "atomic": false
+          },
+          "initial_conditional_conflicts": [],
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 18,
+            "open_traversals": 0,
+            "tray_count": 3,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 2000.0,
+            "cost": 1210.4,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 403.30000000000007,
+                "completed": true,
+                "completed_at": 403.30000000000007,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 803.5499999999998,
+                "completed": true,
+                "completed_at": 803.5499999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "initial_resolutions": [
+            {
+              "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+              "status": "received",
+              "reason": "",
+              "tray": 0,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 1.7000000000000002,
+              "received_at": 402.2
+            },
+            {
+              "request_id": "live:joint:s1:d1:t0x1.91b3333333334p+8",
+              "status": "received",
+              "reason": "",
+              "tray": 1,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 401.75000000000006,
+              "received_at": 802.4499999999999
+            }
+          ],
+          "TP_business_sequence": [
+            "P"
+          ],
+          "TP_cross_zone_return": [],
+          "raw_file": "branch_001.json.gz",
+          "raw_sha256": "9c356f49b53ef9f0779ab9c4a3b2661967d2608a9fb72b2db81b90e6a5008359",
+          "relative_to_ordinary_all_offered": {
+            "preserved": true,
+            "denominator": 5,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_all_offered": {
+            "preserved": true,
+            "denominator": 5,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": -8.560000000000002,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 411.86000000000007,
+                  "completed": true,
+                  "completed_at": 411.86000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": -8.559999999999945,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 812.1099999999998,
+                  "completed": true,
+                  "completed_at": 812.1099999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_precommitted": {
+            "preserved": true,
+            "denominator": 3,
+            "business_bag_ids": [
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          }
+        },
+        "joint_conditional_repair": {
+          "action_id": "s0:d0:t0x1.a666666666667p+0|s1:d1:t0x1.91b3333333334p+8",
+          "status": "verified",
+          "completion": {
+            "status": "reached",
+            "problems": [],
+            "evidence": {
+              "requested_horizon": 2000.0,
+              "result_horizon": 2000.0,
+              "physical_clock": 2000.0,
+              "advance_physical_time": 2000.0,
+              "branch_physical_time": 2000.0,
+              "controller_requested_horizon": 2000.0,
+              "controller_physical_time": 2000.0
+            },
+            "advance_status": "reached",
+            "outer_status": "reached"
+          },
+          "initial_submission": {
+            "status": "submitted",
+            "submissions": [
+              {
+                "request": {
+                  "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+                  "tray_id": "T0",
+                  "source": 0,
+                  "destination": 3,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 1.6500000000000001,
+                  "expiry": 462.2,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              },
+              {
+                "request": {
+                  "request_id": "live:joint:s1:d1:t0x1.91b3333333334p+8",
+                  "tray_id": "T1",
+                  "source": 1,
+                  "destination": 4,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 401.70000000000005,
+                  "expiry": 862.45,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              }
+            ],
+            "atomic": false
+          },
+          "initial_conditional_conflicts": [],
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 18,
+            "open_traversals": 0,
+            "tray_count": 3,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 2000.0,
+            "cost": 1210.4,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 403.30000000000007,
+                "completed": true,
+                "completed_at": 403.30000000000007,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 803.5499999999998,
+                "completed": true,
+                "completed_at": 803.5499999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "initial_resolutions": [
+            {
+              "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+              "status": "received",
+              "reason": "",
+              "tray": 0,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 1.7000000000000002,
+              "received_at": 402.2
+            },
+            {
+              "request_id": "live:joint:s1:d1:t0x1.91b3333333334p+8",
+              "status": "received",
+              "reason": "",
+              "tray": 1,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 401.75000000000006,
+              "received_at": 802.4499999999999
+            }
+          ],
+          "TP_business_sequence": [
+            "P"
+          ],
+          "TP_cross_zone_return": [],
+          "raw_file": "branch_001.json.gz",
+          "raw_sha256": "9c356f49b53ef9f0779ab9c4a3b2661967d2608a9fb72b2db81b90e6a5008359",
+          "relative_to_ordinary_all_offered": {
+            "preserved": true,
+            "denominator": 5,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_all_offered": {
+            "preserved": true,
+            "denominator": 5,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": -8.560000000000002,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 403.30000000000007,
+                  "completed": true,
+                  "completed_at": 403.30000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 411.86000000000007,
+                  "completed": true,
+                  "completed_at": 411.86000000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": -8.559999999999945,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 812.1099999999998,
+                  "completed": true,
+                  "completed_at": 812.1099999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_precommitted": {
+            "preserved": true,
+            "denominator": 3,
+            "business_bag_ids": [
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          }
+        }
+      }
+    },
+    {
+      "scenario": {
+        "name": "long_2000m_unknown_source_demand",
+        "length": 2000.0,
+        "speed": 5.0,
+        "future_source": true
+      },
+      "evaluated": 31,
+      "domain_size": 31,
+      "exhaustive": true,
+      "strict_bundle_optimality": "optimal_in_this_domain_and_continuation",
+      "global_native_optimality": "unknown",
+      "finite_reference_headroom": 0.0,
+      "qualified_bundle_count": 1,
+      "best_action_id": "s1:d1:t0x1.a666666666667p+0",
+      "initial_bundle_statuses": {
+        "asynchronous_rejected": 19,
+        "verified": 12
+      },
+      "elapsed_seconds": 10.258753200003412,
+      "policies": {
+        "WAIT": {
+          "action_id": "WAIT",
+          "status": "verified",
+          "completion": {
+            "status": "reached",
+            "problems": [],
+            "evidence": {
+              "requested_horizon": 2000.0,
+              "result_horizon": 2000.0,
+              "physical_clock": 2000.0,
+              "advance_physical_time": 2000.0,
+              "branch_physical_time": 2000.0,
+              "controller_requested_horizon": 2000.0,
+              "controller_physical_time": 2000.0
+            },
+            "advance_status": "reached",
+            "outer_status": "reached"
+          },
+          "initial_submission": {
+            "status": "submitted",
+            "submissions": [],
+            "atomic": false
+          },
+          "initial_conditional_conflicts": [],
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 16,
+            "open_traversals": 0,
+            "tray_count": 3,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 2000.0,
+            "cost": 2649.330999999999,
+            "offered": 6,
+            "completed": 6,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 882.8599999999998,
+                "completed": true,
+                "completed_at": 882.8599999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 1283.1099999999994,
+                "completed": true,
+                "completed_at": 1283.1099999999994,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time": 479.8110000000001,
+                "completed": true,
+                "completed_at": 480.71100000000007,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "initial_resolutions": [],
+          "TP_business_sequence": [
+            "P",
+            "D0"
+          ],
+          "TP_cross_zone_return": [
+            {
+              "time": 480.21000000000004,
+              "event": "EXPORT_GRANTED",
+              "business_bag_id": "",
+              "transport_leg_id": "",
+              "tray_id": "TP",
+              "traversal_id": 4,
+              "node": 10,
+              "from": 10,
+              "to": 3,
+              "reason": "live:predictive:C:48:108:TP:D0"
+            },
+            {
+              "time": 881.7599999999999,
+              "event": "EMPTY_RECEIVED",
+              "business_bag_id": "",
+              "transport_leg_id": "live:predictive:C:48:108:TP:D0:empty_return:5",
+              "tray_id": "TP",
+              "traversal_id": 12,
+              "node": 3,
+              "from": -1,
+              "to": 3,
+              "reason": "live:predictive:C:48:108:TP:D0"
+            }
+          ],
+          "raw_file": "branch_000.json.gz",
+          "raw_sha256": "18ee852819c294706305a6a7bfd7cbb3b448671d6f058ca2f911cfe38544aa0f",
+          "relative_to_ordinary_all_offered": {
+            "preserved": false,
+            "denominator": 6,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1",
+              "UNSEEN"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": -320.53999999999985,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 882.8599999999998,
+                  "completed": true,
+                  "completed_at": 882.8599999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 879.6099999999993,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 1283.1099999999994,
+                  "completed": true,
+                  "completed_at": 1283.1099999999994,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 403.5000000000001,
+                  "completed": true,
+                  "completed_at": 403.5000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time_delta": -321.5389999999998,
+                "candidate": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 479.8110000000001,
+                  "completed": true,
+                  "completed_at": 480.71100000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 801.3499999999999,
+                  "completed": true,
+                  "completed_at": 802.2499999999999,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_all_offered": {
+            "preserved": true,
+            "denominator": 6,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1",
+              "UNSEEN"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 882.8599999999998,
+                  "completed": true,
+                  "completed_at": 882.8599999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 882.8599999999998,
+                  "completed": true,
+                  "completed_at": 882.8599999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 1283.1099999999994,
+                  "completed": true,
+                  "completed_at": 1283.1099999999994,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 1283.1099999999994,
+                  "completed": true,
+                  "completed_at": 1283.1099999999994,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 479.8110000000001,
+                  "completed": true,
+                  "completed_at": 480.71100000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 479.8110000000001,
+                  "completed": true,
+                  "completed_at": 480.71100000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_precommitted": {
+            "preserved": true,
+            "denominator": 3,
+            "business_bag_ids": [
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          }
+        },
+        "ordinary_public_windows": {
+          "action_id": "s0:d0:t0x1.a666666666667p+0|s1:d1:t0x1.a666666666667p+0",
+          "status": "asynchronous_rejected",
+          "completion": {
+            "status": "reached",
+            "problems": [],
+            "evidence": {
+              "requested_horizon": 2000.0,
+              "result_horizon": 2000.0,
+              "physical_clock": 2000.0,
+              "advance_physical_time": 2000.0,
+              "branch_physical_time": 2000.0,
+              "controller_requested_horizon": 2000.0,
+              "controller_physical_time": 2000.0
+            },
+            "advance_status": "reached",
+            "outer_status": "reached"
+          },
+          "initial_submission": {
+            "status": "submitted",
+            "submissions": [
+              {
+                "request": {
+                  "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+                  "tray_id": "T0",
+                  "source": 0,
+                  "destination": 3,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 1.6500000000000001,
+                  "expiry": 462.2,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              },
+              {
+                "request": {
+                  "request_id": "live:joint:s1:d1:t0x1.a666666666667p+0",
+                  "tray_id": "T1",
+                  "source": 1,
+                  "destination": 4,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 1.6500000000000001,
+                  "expiry": 462.40000000000003,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              }
+            ],
+            "atomic": false
+          },
+          "initial_conditional_conflicts": [
+            {
+              "resource": "node:2",
+              "start": 1.7000000000000002,
+              "end": 401.75,
+              "used": 2,
+              "capacity": 1,
+              "tasks": [
+                "s0:d0:t0x1.a666666666667p+0",
+                "s1:d1:t0x1.a666666666667p+0"
+              ]
+            }
+          ],
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 18,
+            "open_traversals": 0,
+            "tray_count": 3,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 2000.0,
+            "cost": 2411.7999999999997,
+            "offered": 6,
+            "completed": 6,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 1203.3999999999996,
+                "completed": true,
+                "completed_at": 1203.3999999999996,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 403.5000000000001,
+                "completed": true,
+                "completed_at": 403.5000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time": 801.3499999999999,
+                "completed": true,
+                "completed_at": 802.2499999999999,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "initial_resolutions": [
+            {
+              "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+              "status": "rejected",
+              "reason": "departure_lease_expired",
+              "tray": 0,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": -1.0,
+              "received_at": -1.0
+            },
+            {
+              "request_id": "live:joint:s1:d1:t0x1.a666666666667p+0",
+              "status": "received",
+              "reason": "",
+              "tray": 1,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 1.7000000000000002,
+              "received_at": 402.40000000000003
+            }
+          ],
+          "TP_business_sequence": [
+            "P",
+            "D0"
+          ],
+          "TP_cross_zone_return": [
+            {
+              "time": 10.209999999999999,
+              "event": "EXPORT_GRANTED",
+              "business_bag_id": "",
+              "transport_leg_id": "",
+              "tray_id": "TP",
+              "traversal_id": 4,
+              "node": 10,
+              "from": 10,
+              "to": 3,
+              "reason": "live:predictive:C:1:14:TP:D0"
+            },
+            {
+              "time": 1202.3,
+              "event": "EMPTY_RECEIVED",
+              "business_bag_id": "",
+              "transport_leg_id": "live:predictive:C:1:14:TP:D0:empty_return:5",
+              "tray_id": "TP",
+              "traversal_id": 15,
+              "node": 3,
+              "from": -1,
+              "to": 3,
+              "reason": "live:predictive:C:1:14:TP:D0"
+            }
+          ],
+          "raw_file": "branch_002.json.gz",
+          "raw_sha256": "863b294e133a3074df191d58ebbd8ab167c39237b5b7e191e2aab5ec67def30d",
+          "relative_to_ordinary_all_offered": {
+            "preserved": true,
+            "denominator": 6,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1",
+              "UNSEEN"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 403.5000000000001,
+                  "completed": true,
+                  "completed_at": 403.5000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 403.5000000000001,
+                  "completed": true,
+                  "completed_at": 403.5000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 801.3499999999999,
+                  "completed": true,
+                  "completed_at": 802.2499999999999,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 801.3499999999999,
+                  "completed": true,
+                  "completed_at": 802.2499999999999,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_all_offered": {
+            "preserved": false,
+            "denominator": 6,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1",
+              "UNSEEN"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 320.53999999999985,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 882.8599999999998,
+                  "completed": true,
+                  "completed_at": 882.8599999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": -879.6099999999993,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 403.5000000000001,
+                  "completed": true,
+                  "completed_at": 403.5000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 1283.1099999999994,
+                  "completed": true,
+                  "completed_at": 1283.1099999999994,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time_delta": 321.5389999999998,
+                "candidate": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 801.3499999999999,
+                  "completed": true,
+                  "completed_at": 802.2499999999999,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 479.8110000000001,
+                  "completed": true,
+                  "completed_at": 480.71100000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_precommitted": {
+            "preserved": true,
+            "denominator": 3,
+            "business_bag_ids": [
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          }
+        },
+        "one_round_same_assignment": {
+          "action_id": "s0:d0:t0x1.a666666666667p+0|s1:d1:t0x1.91b3333333334p+8",
+          "status": "asynchronous_rejected",
+          "completion": {
+            "status": "reached",
+            "problems": [],
+            "evidence": {
+              "requested_horizon": 2000.0,
+              "result_horizon": 2000.0,
+              "physical_clock": 2000.0,
+              "advance_physical_time": 2000.0,
+              "branch_physical_time": 2000.0,
+              "controller_requested_horizon": 2000.0,
+              "controller_physical_time": 2000.0
+            },
+            "advance_status": "reached",
+            "outer_status": "reached"
+          },
+          "initial_submission": {
+            "status": "submitted",
+            "submissions": [
+              {
+                "request": {
+                  "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+                  "tray_id": "T0",
+                  "source": 0,
+                  "destination": 3,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 1.6500000000000001,
+                  "expiry": 462.2,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              },
+              {
+                "request": {
+                  "request_id": "live:joint:s1:d1:t0x1.91b3333333334p+8",
+                  "tray_id": "T1",
+                  "source": 1,
+                  "destination": 4,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 401.70000000000005,
+                  "expiry": 862.45,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              }
+            ],
+            "atomic": false
+          },
+          "initial_conditional_conflicts": [],
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 18,
+            "open_traversals": 0,
+            "tray_count": 3,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 2000.0,
+            "cost": 2411.7999999999997,
+            "offered": 6,
+            "completed": 6,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 1203.3999999999996,
+                "completed": true,
+                "completed_at": 1203.3999999999996,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 803.5499999999998,
+                "completed": true,
+                "completed_at": 803.5499999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time": 401.30000000000007,
+                "completed": true,
+                "completed_at": 402.20000000000005,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "initial_resolutions": [
+            {
+              "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+              "status": "rejected",
+              "reason": "carrier_not_at_export_port",
+              "tray": 0,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": -1.0,
+              "received_at": -1.0
+            },
+            {
+              "request_id": "live:joint:s1:d1:t0x1.91b3333333334p+8",
+              "status": "received",
+              "reason": "",
+              "tray": 1,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 401.75000000000006,
+              "received_at": 802.4499999999999
+            }
+          ],
+          "TP_business_sequence": [
+            "P",
+            "D0"
+          ],
+          "TP_cross_zone_return": [
+            {
+              "time": 10.209999999999999,
+              "event": "EXPORT_GRANTED",
+              "business_bag_id": "",
+              "transport_leg_id": "",
+              "tray_id": "TP",
+              "traversal_id": 4,
+              "node": 10,
+              "from": 10,
+              "to": 3,
+              "reason": "live:predictive:C:1:14:TP:D0"
+            },
+            {
+              "time": 1202.3,
+              "event": "EMPTY_RECEIVED",
+              "business_bag_id": "",
+              "transport_leg_id": "live:predictive:C:1:14:TP:D0:empty_return:4",
+              "tray_id": "TP",
+              "traversal_id": 15,
+              "node": 3,
+              "from": -1,
+              "to": 3,
+              "reason": "live:predictive:C:1:14:TP:D0"
+            }
+          ],
+          "raw_file": "branch_001.json.gz",
+          "raw_sha256": "902ab2f037e018287ee7db2b7522ac727a12894cfa181334ec237d8507ef655f",
+          "relative_to_ordinary_all_offered": {
+            "preserved": false,
+            "denominator": 6,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1",
+              "UNSEEN"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 400.0499999999997,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 403.5000000000001,
+                  "completed": true,
+                  "completed_at": 403.5000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time_delta": -400.04999999999984,
+                "candidate": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 401.30000000000007,
+                  "completed": true,
+                  "completed_at": 402.20000000000005,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 801.3499999999999,
+                  "completed": true,
+                  "completed_at": 802.2499999999999,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_all_offered": {
+            "preserved": false,
+            "denominator": 6,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1",
+              "UNSEEN"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 320.53999999999985,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 882.8599999999998,
+                  "completed": true,
+                  "completed_at": 882.8599999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": -479.5599999999996,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 1283.1099999999994,
+                  "completed": true,
+                  "completed_at": 1283.1099999999994,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time_delta": -78.51100000000002,
+                "candidate": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 401.30000000000007,
+                  "completed": true,
+                  "completed_at": 402.20000000000005,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 479.8110000000001,
+                  "completed": true,
+                  "completed_at": 480.71100000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_precommitted": {
+            "preserved": true,
+            "denominator": 3,
+            "business_bag_ids": [
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          }
+        },
+        "joint_conditional_repair": {
+          "action_id": "s0:d0:t0x1.a666666666667p+0|s1:d1:t0x1.91b3333333334p+8",
+          "status": "asynchronous_rejected",
+          "completion": {
+            "status": "reached",
+            "problems": [],
+            "evidence": {
+              "requested_horizon": 2000.0,
+              "result_horizon": 2000.0,
+              "physical_clock": 2000.0,
+              "advance_physical_time": 2000.0,
+              "branch_physical_time": 2000.0,
+              "controller_requested_horizon": 2000.0,
+              "controller_physical_time": 2000.0
+            },
+            "advance_status": "reached",
+            "outer_status": "reached"
+          },
+          "initial_submission": {
+            "status": "submitted",
+            "submissions": [
+              {
+                "request": {
+                  "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+                  "tray_id": "T0",
+                  "source": 0,
+                  "destination": 3,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 1.6500000000000001,
+                  "expiry": 462.2,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              },
+              {
+                "request": {
+                  "request_id": "live:joint:s1:d1:t0x1.91b3333333334p+8",
+                  "tray_id": "T1",
+                  "source": 1,
+                  "destination": 4,
+                  "issued_at": 0.11,
+                  "message_delay": 0.1,
+                  "earliest_departure": 401.70000000000005,
+                  "expiry": 862.45,
+                  "owner_id": "A",
+                  "expected_version": 11
+                },
+                "reply": {
+                  "status": "pending",
+                  "reason": ""
+                }
+              }
+            ],
+            "atomic": false
+          },
+          "initial_conditional_conflicts": [],
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 18,
+            "open_traversals": 0,
+            "tray_count": 3,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 2000.0,
+            "cost": 2411.7999999999997,
+            "offered": 6,
+            "completed": 6,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 1203.3999999999996,
+                "completed": true,
+                "completed_at": 1203.3999999999996,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 803.5499999999998,
+                "completed": true,
+                "completed_at": 803.5499999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time": 401.30000000000007,
+                "completed": true,
+                "completed_at": 402.20000000000005,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "initial_resolutions": [
+            {
+              "request_id": "live:joint:s0:d0:t0x1.a666666666667p+0",
+              "status": "rejected",
+              "reason": "carrier_not_at_export_port",
+              "tray": 0,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": -1.0,
+              "received_at": -1.0
+            },
+            {
+              "request_id": "live:joint:s1:d1:t0x1.91b3333333334p+8",
+              "status": "received",
+              "reason": "",
+              "tray": 1,
+              "delivered_at": 0.21000000000000002,
+              "departed_at": 401.75000000000006,
+              "received_at": 802.4499999999999
+            }
+          ],
+          "TP_business_sequence": [
+            "P",
+            "D0"
+          ],
+          "TP_cross_zone_return": [
+            {
+              "time": 10.209999999999999,
+              "event": "EXPORT_GRANTED",
+              "business_bag_id": "",
+              "transport_leg_id": "",
+              "tray_id": "TP",
+              "traversal_id": 4,
+              "node": 10,
+              "from": 10,
+              "to": 3,
+              "reason": "live:predictive:C:1:14:TP:D0"
+            },
+            {
+              "time": 1202.3,
+              "event": "EMPTY_RECEIVED",
+              "business_bag_id": "",
+              "transport_leg_id": "live:predictive:C:1:14:TP:D0:empty_return:4",
+              "tray_id": "TP",
+              "traversal_id": 15,
+              "node": 3,
+              "from": -1,
+              "to": 3,
+              "reason": "live:predictive:C:1:14:TP:D0"
+            }
+          ],
+          "raw_file": "branch_001.json.gz",
+          "raw_sha256": "902ab2f037e018287ee7db2b7522ac727a12894cfa181334ec237d8507ef655f",
+          "relative_to_ordinary_all_offered": {
+            "preserved": false,
+            "denominator": 6,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1",
+              "UNSEEN"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": 400.0499999999997,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 403.5000000000001,
+                  "completed": true,
+                  "completed_at": 403.5000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time_delta": -400.04999999999984,
+                "candidate": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 401.30000000000007,
+                  "completed": true,
+                  "completed_at": 402.20000000000005,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 801.3499999999999,
+                  "completed": true,
+                  "completed_at": 802.2499999999999,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_all_offered": {
+            "preserved": false,
+            "denominator": 6,
+            "business_bag_ids": [
+              "D0",
+              "D1",
+              "P",
+              "U0",
+              "U1",
+              "UNSEEN"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "D0",
+                "restricted_time_delta": 320.53999999999985,
+                "candidate": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 1203.3999999999996,
+                  "completed": true,
+                  "completed_at": 1203.3999999999996,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D0",
+                  "restricted_time": 882.8599999999998,
+                  "completed": true,
+                  "completed_at": 882.8599999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time_delta": -479.5599999999996,
+                "candidate": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 803.5499999999998,
+                  "completed": true,
+                  "completed_at": 803.5499999999998,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "D1",
+                  "restricted_time": 1283.1099999999994,
+                  "completed": true,
+                  "completed_at": 1283.1099999999994,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time_delta": -78.51100000000002,
+                "candidate": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 401.30000000000007,
+                  "completed": true,
+                  "completed_at": 402.20000000000005,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "UNSEEN",
+                  "restricted_time": 479.8110000000001,
+                  "completed": true,
+                  "completed_at": 480.71100000000007,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          },
+          "relative_to_wait_precommitted": {
+            "preserved": true,
+            "denominator": 3,
+            "business_bag_ids": [
+              "P",
+              "U0",
+              "U1"
+            ],
+            "per_job": [
+              {
+                "business_bag_id": "P",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "P",
+                  "restricted_time": 2.15,
+                  "completed": true,
+                  "completed_at": 2.15,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U0",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U0",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time_delta": 0.0,
+                "candidate": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                },
+                "baseline": {
+                  "business_bag_id": "U1",
+                  "restricted_time": 0.7000000000000001,
+                  "completed": true,
+                  "completed_at": 0.7000000000000001,
+                  "deadline_violated_by_horizon": false,
+                  "status": "completed"
+                }
+              }
+            ],
+            "guarantee_scope": "post_run_paired_restricted_horizon_only; no future or universal guarantee"
+          }
+        }
+      }
+    }
+  ],
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_joint_circulation_factor.py": "41ca187123d327bf8d83600275033a59f135146026278da6f054208087c9a4c0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\joint_window_repair.py": "3c5da1fe022c885c851eeb99f28fc957b45275024cf29aafa7bb3522e90eda78",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "c65084b848e918026837301e3be62c94ae91d2c1b627490e337b903a340850fc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\assess_joint_window_protection.py": "d687203d6bb5ed931e772f5081e102c509aa4be222c6b52cf494cb6fceb5ad42",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\boundary_reference.py": "537c7849dfd6890c6abc2f200869765149844a0cb3f3d0bf15b6e4d4b92ca025",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_joint_window_repair.py": "9d5b896dee4430d4f2de4cfb62922f9192eefa9950e89fbcf196b88bd9afe5f0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_analytic_control.py": "1e5ccf985974dce9779e0ce8a26b2a757793b7bd0afd8a09b4f11d57aed3a3cd"
+  },
+  "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+  "protocol_sha256": "96d13a032eb7bfda41419ef954ee08288e699b2039de47aefb22172679a02707",
+  "initial_public_worlds_identical": true,
+  "source_after": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_joint_circulation_factor.py": "41ca187123d327bf8d83600275033a59f135146026278da6f054208087c9a4c0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\joint_window_repair.py": "3c5da1fe022c885c851eeb99f28fc957b45275024cf29aafa7bb3522e90eda78",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "c65084b848e918026837301e3be62c94ae91d2c1b627490e337b903a340850fc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\assess_joint_window_protection.py": "d687203d6bb5ed931e772f5081e102c509aa4be222c6b52cf494cb6fceb5ad42",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\boundary_reference.py": "537c7849dfd6890c6abc2f200869765149844a0cb3f3d0bf15b6e4d4b92ca025",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_joint_window_repair.py": "9d5b896dee4430d4f2de4cfb62922f9192eefa9950e89fbcf196b88bd9afe5f0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_analytic_control.py": "1e5ccf985974dce9779e0ce8a26b2a757793b7bd0afd8a09b4f11d57aed3a3cd"
+  },
+  "source_changed": []
+}

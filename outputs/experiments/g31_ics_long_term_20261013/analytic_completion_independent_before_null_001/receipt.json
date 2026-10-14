@@ -1,0 +1,3511 @@
+{
+  "schema": "g31.independent.completion_review.v1",
+  "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+  "source_before": {
+    "scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+    "scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "7ed5bfde1aacd2fbce9dcff0ed1168d935d486139ae55da8fb7896b14978050f"
+  },
+  "cases": [
+    {
+      "case": "native_budget_0.1_raw",
+      "reference": {
+        "schema": "g31.finite_intervention_reference.v1",
+        "rows": [
+          {
+            "action": {
+              "action_id": "WAIT",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "advance_not_reached",
+                "controller_continuation_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 0.1,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1,
+                "controller_requested_horizon": 0.1,
+                "controller_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": null
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 4,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 3.93e-05
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              },
+              "control_continuation": {
+                "status": "budget_exhausted",
+                "requested_horizon": 0.1,
+                "physical_time": 0.1
+              }
+            },
+            "elapsed_seconds": 0.0011057999799959362
+          },
+          {
+            "action": {
+              "action_id": "other-wait",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "advance_not_reached",
+                "controller_continuation_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 0.1,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1,
+                "controller_requested_horizon": 0.1,
+                "controller_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": null
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 4,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 2.35e-05
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              },
+              "control_continuation": {
+                "status": "budget_exhausted",
+                "requested_horizon": 0.1,
+                "physical_time": 0.1
+              }
+            },
+            "elapsed_seconds": 0.001294999965466559
+          }
+        ],
+        "domain_size": 2,
+        "evaluated": 2,
+        "exhaustive": false,
+        "best_action_id": null,
+        "best_cost": null,
+        "optimality": "unknown",
+        "global_native_optimality": "unknown",
+        "elapsed_seconds": 0.00241499999538064,
+        "distinct_verified_physical_outcomes": 0,
+        "information_track": "offline_common_real_future_diagnostic",
+        "strict_paired_service": true,
+        "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future"
+      },
+      "audit_calls": []
+    },
+    {
+      "case": "native_budget_0.1_stripped",
+      "reference": {
+        "schema": "g31.finite_intervention_reference.v1",
+        "rows": [
+          {
+            "action": {
+              "action_id": "WAIT",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "advance_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 0.1,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": null
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 4,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 2.13e-05
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              }
+            },
+            "elapsed_seconds": 0.0008072000346146524
+          },
+          {
+            "action": {
+              "action_id": "other-wait",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "advance_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 0.1,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": null
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 4,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 0.000197
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              }
+            },
+            "elapsed_seconds": 0.0012603000504896045
+          }
+        ],
+        "domain_size": 2,
+        "evaluated": 2,
+        "exhaustive": false,
+        "best_action_id": null,
+        "best_cost": null,
+        "optimality": "unknown",
+        "global_native_optimality": "unknown",
+        "elapsed_seconds": 0.0020931000472046435,
+        "distinct_verified_physical_outcomes": 0,
+        "information_track": "offline_common_real_future_diagnostic",
+        "strict_paired_service": true,
+        "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future"
+      },
+      "audit_calls": []
+    },
+    {
+      "case": "native_budget_0.1_envelope",
+      "reference": {
+        "schema": "g31.finite_intervention_reference.v1",
+        "rows": [
+          {
+            "action": {
+              "action_id": "WAIT",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "advance_not_reached",
+                "outer_continuation_not_reached",
+                "controller_continuation_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 0.1,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1,
+                "controller_requested_horizon": 0.1,
+                "controller_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": "budget_exhausted"
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 4,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 2.51e-05
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              },
+              "control_continuation": {
+                "status": "budget_exhausted",
+                "requested_horizon": 0.1,
+                "physical_time": 0.1
+              }
+            },
+            "elapsed_seconds": 0.0008686999790370464
+          },
+          {
+            "action": {
+              "action_id": "other-wait",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "advance_not_reached",
+                "outer_continuation_not_reached",
+                "controller_continuation_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 0.1,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1,
+                "controller_requested_horizon": 0.1,
+                "controller_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": "budget_exhausted"
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 4,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 2.05e-05
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              },
+              "control_continuation": {
+                "status": "budget_exhausted",
+                "requested_horizon": 0.1,
+                "physical_time": 0.1
+              }
+            },
+            "elapsed_seconds": 0.0008093999931588769
+          }
+        ],
+        "domain_size": 2,
+        "evaluated": 2,
+        "exhaustive": false,
+        "best_action_id": null,
+        "best_cost": null,
+        "optimality": "unknown",
+        "global_native_optimality": "unknown",
+        "elapsed_seconds": 0.001691900019068271,
+        "distinct_verified_physical_outcomes": 0,
+        "information_track": "offline_common_real_future_diagnostic",
+        "strict_paired_service": true,
+        "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future"
+      },
+      "audit_calls": []
+    },
+    {
+      "case": "native_budget_20_raw",
+      "reference": {
+        "schema": "g31.finite_intervention_reference.v1",
+        "rows": [
+          {
+            "action": {
+              "action_id": "WAIT",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "result_horizon:does_not_equal_requested_horizon",
+                "physical_clock:does_not_equal_requested_horizon",
+                "advance_physical_time:does_not_equal_requested_horizon",
+                "branch_physical_time:does_not_equal_requested_horizon",
+                "controller_physical_time:does_not_equal_requested_horizon",
+                "advance_not_reached",
+                "controller_continuation_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 20,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1,
+                "controller_requested_horizon": 20,
+                "controller_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": null
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 0,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 7e-07
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              },
+              "control_continuation": {
+                "status": "budget_exhausted",
+                "requested_horizon": 20,
+                "physical_time": 0.1
+              }
+            },
+            "elapsed_seconds": 0.0007961999508552253
+          },
+          {
+            "action": {
+              "action_id": "other-wait",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "result_horizon:does_not_equal_requested_horizon",
+                "physical_clock:does_not_equal_requested_horizon",
+                "advance_physical_time:does_not_equal_requested_horizon",
+                "branch_physical_time:does_not_equal_requested_horizon",
+                "controller_physical_time:does_not_equal_requested_horizon",
+                "advance_not_reached",
+                "controller_continuation_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 20,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1,
+                "controller_requested_horizon": 20,
+                "controller_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": null
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 0,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 7e-07
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              },
+              "control_continuation": {
+                "status": "budget_exhausted",
+                "requested_horizon": 20,
+                "physical_time": 0.1
+              }
+            },
+            "elapsed_seconds": 0.0008512000204063952
+          }
+        ],
+        "domain_size": 2,
+        "evaluated": 2,
+        "exhaustive": false,
+        "best_action_id": null,
+        "best_cost": null,
+        "optimality": "unknown",
+        "global_native_optimality": "unknown",
+        "elapsed_seconds": 0.001658499997574836,
+        "distinct_verified_physical_outcomes": 0,
+        "information_track": "offline_common_real_future_diagnostic",
+        "strict_paired_service": true,
+        "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future"
+      },
+      "audit_calls": []
+    },
+    {
+      "case": "native_budget_20_stripped",
+      "reference": {
+        "schema": "g31.finite_intervention_reference.v1",
+        "rows": [
+          {
+            "action": {
+              "action_id": "WAIT",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "result_horizon:does_not_equal_requested_horizon",
+                "physical_clock:does_not_equal_requested_horizon",
+                "advance_physical_time:does_not_equal_requested_horizon",
+                "branch_physical_time:does_not_equal_requested_horizon",
+                "advance_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 20,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": null
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 0,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 1e-06
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              }
+            },
+            "elapsed_seconds": 0.0007941999938338995
+          },
+          {
+            "action": {
+              "action_id": "other-wait",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "result_horizon:does_not_equal_requested_horizon",
+                "physical_clock:does_not_equal_requested_horizon",
+                "advance_physical_time:does_not_equal_requested_horizon",
+                "branch_physical_time:does_not_equal_requested_horizon",
+                "advance_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 20,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": null
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 0,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 7e-07
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              }
+            },
+            "elapsed_seconds": 0.000775099964812398
+          }
+        ],
+        "domain_size": 2,
+        "evaluated": 2,
+        "exhaustive": false,
+        "best_action_id": null,
+        "best_cost": null,
+        "optimality": "unknown",
+        "global_native_optimality": "unknown",
+        "elapsed_seconds": 0.0015827000024728477,
+        "distinct_verified_physical_outcomes": 0,
+        "information_track": "offline_common_real_future_diagnostic",
+        "strict_paired_service": true,
+        "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future"
+      },
+      "audit_calls": []
+    },
+    {
+      "case": "native_budget_20_envelope",
+      "reference": {
+        "schema": "g31.finite_intervention_reference.v1",
+        "rows": [
+          {
+            "action": {
+              "action_id": "WAIT",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "result_horizon:does_not_equal_requested_horizon",
+                "physical_clock:does_not_equal_requested_horizon",
+                "advance_physical_time:does_not_equal_requested_horizon",
+                "branch_physical_time:does_not_equal_requested_horizon",
+                "controller_physical_time:does_not_equal_requested_horizon",
+                "advance_not_reached",
+                "outer_continuation_not_reached",
+                "controller_continuation_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 20,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1,
+                "controller_requested_horizon": 20,
+                "controller_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": "budget_exhausted"
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 0,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 5e-07
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              },
+              "control_continuation": {
+                "status": "budget_exhausted",
+                "requested_horizon": 20,
+                "physical_time": 0.1
+              }
+            },
+            "elapsed_seconds": 0.0007538999780081213
+          },
+          {
+            "action": {
+              "action_id": "other-wait",
+              "kind": "wait",
+              "request": null
+            },
+            "reply": {
+              "status": "accepted",
+              "reason": "wait"
+            },
+            "status": "incomplete_horizon",
+            "completion": {
+              "status": "unknown",
+              "problems": [
+                "result_horizon:does_not_equal_requested_horizon",
+                "physical_clock:does_not_equal_requested_horizon",
+                "advance_physical_time:does_not_equal_requested_horizon",
+                "branch_physical_time:does_not_equal_requested_horizon",
+                "controller_physical_time:does_not_equal_requested_horizon",
+                "advance_not_reached",
+                "outer_continuation_not_reached",
+                "controller_continuation_not_reached",
+                "native_horizon_incomplete"
+              ],
+              "evidence": {
+                "requested_horizon": 20,
+                "result_horizon": 0.1,
+                "physical_clock": 0.1,
+                "advance_physical_time": 0.1,
+                "branch_physical_time": 0.1,
+                "controller_requested_horizon": 20,
+                "controller_physical_time": 0.1
+              },
+              "advance_status": "budget_exhausted",
+              "outer_status": "budget_exhausted"
+            },
+            "result": {
+              "schema": "g31.circulation.live_result.v1",
+              "mode": "circulation",
+              "optimality": "unknown",
+              "native_event_ms": [],
+              "native_summary": {
+                "event_count": 5,
+                "completed_count": 0,
+                "failed_count": 0,
+                "runtime_seconds": 0.0,
+                "edge_enter_event_count": 0,
+                "edge_exit_event_count": 0,
+                "reservation_conflicts": 0,
+                "physical_fault_edge_entry_violation_count": 0,
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "g4irsf20_event_hotpath_policy": "E2",
+                "local_queue_capacity": 0
+              },
+              "transport_legs": [],
+              "native_events": [
+                {
+                  "seq": 4,
+                  "event": "BAG_RELEASE",
+                  "time": 0.1,
+                  "runtime_bag_id": 0,
+                  "segment_id": "B1:storage_in:0",
+                  "node": 0,
+                  "from_node": -1,
+                  "to_node": -1,
+                  "reason": "source_release_enqueue"
+                },
+                {
+                  "seq": 5,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 1,
+                  "from_node": -1,
+                  "to_node": 1,
+                  "reason": "circulation_leg_initial_snapshot"
+                },
+                {
+                  "seq": 6,
+                  "event": "CONGESTION_BEACON_UPDATE",
+                  "time": 0.1,
+                  "runtime_bag_id": -1,
+                  "segment_id": "",
+                  "node": 6,
+                  "from_node": -1,
+                  "to_node": 6,
+                  "reason": "circulation_leg_initial_snapshot"
+                }
+              ],
+              "decisions": [],
+              "receipts": [
+                {
+                  "time": 0.0,
+                  "event": "BAG_ARRIVAL",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.0,
+                  "event": "LOAD_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LOAD_COMPLETE",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": -1,
+                  "to": -1,
+                  "reason": ""
+                },
+                {
+                  "time": 0.1,
+                  "event": "LEG_START",
+                  "business_bag_id": "B1",
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray_id": "T0",
+                  "traversal_id": 0,
+                  "node": 0,
+                  "from": 0,
+                  "to": 2,
+                  "reason": "storage_in"
+                }
+              ],
+              "jobs": [
+                {
+                  "business_bag_id": "B1",
+                  "status": "in_transit",
+                  "tray": 0,
+                  "loaded_at": 0.1,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                },
+                {
+                  "business_bag_id": "B2",
+                  "status": "unreleased",
+                  "tray": -1,
+                  "loaded_at": -1.0,
+                  "storage_entered_at": -1.0,
+                  "storage_released_at": -1.0,
+                  "completed_at": -1.0,
+                  "deadline_met": false
+                }
+              ],
+              "trays": [
+                {
+                  "tray_id": "T0",
+                  "node": 0,
+                  "mode": "loaded",
+                  "job": 0,
+                  "active_leg": 0,
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "available_at": 0.0,
+                  "traversal_id": 0
+                }
+              ],
+              "transfers": [],
+              "leg_identities": [
+                {
+                  "runtime_id": 0,
+                  "transport_leg_id": "B1:storage_in:0",
+                  "tray": 0,
+                  "job": 0,
+                  "kind": "storage_in"
+                }
+              ],
+              "physical_clock": 0.1,
+              "horizon": 0.1,
+              "advance": {
+                "physical_time": 0.1,
+                "processed_events": 0,
+                "status": "budget_exhausted",
+                "horizon_complete": false,
+                "wall_seconds": 6e-07
+              },
+              "scope": "offline result; contains offered population, never an online observation",
+              "population": {
+                "offered_by_horizon": 1,
+                "observed": 1,
+                "loaded": 1,
+                "completed": 0
+              },
+              "control_continuation": {
+                "status": "budget_exhausted",
+                "requested_horizon": 20,
+                "physical_time": 0.1
+              }
+            },
+            "elapsed_seconds": 0.001415700011420995
+          }
+        ],
+        "domain_size": 2,
+        "evaluated": 2,
+        "exhaustive": false,
+        "best_action_id": null,
+        "best_cost": null,
+        "optimality": "unknown",
+        "global_native_optimality": "unknown",
+        "elapsed_seconds": 0.002181599964387715,
+        "distinct_verified_physical_outcomes": 0,
+        "information_track": "offline_common_real_future_diagnostic",
+        "strict_paired_service": true,
+        "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future"
+      },
+      "audit_calls": []
+    },
+    {
+      "case": "valid_complete_native",
+      "optimality": "optimal_in_enumerated_domain",
+      "exhaustive": true,
+      "audit_calls": [
+        "WAIT",
+        "other-wait"
+      ],
+      "completion": [
+        {
+          "status": "reached",
+          "problems": [],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "reached",
+          "problems": [],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "missing_horizon",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "result_horizon:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": null,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "result_horizon:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": null,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "short_horizon",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "result_horizon:does_not_equal_requested_horizon"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 0.9,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "result_horizon:does_not_equal_requested_horizon"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 0.9,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "missing_physical_clock",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "physical_clock:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": null,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "physical_clock:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": null,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "nan_physical_clock",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "physical_clock:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": NaN,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "physical_clock:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": NaN,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "missing_advance",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_physical_time:missing_or_nonfinite",
+            "advance_not_reached",
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": null,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": null,
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_physical_time:missing_or_nonfinite",
+            "advance_not_reached",
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": null,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": null,
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "null_advance",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_physical_time:missing_or_nonfinite",
+            "advance_not_reached",
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": null,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": null,
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_physical_time:missing_or_nonfinite",
+            "advance_not_reached",
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": null,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": null,
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "short_advance_time",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_physical_time:does_not_equal_requested_horizon"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 0.9,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_physical_time:does_not_equal_requested_horizon"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 0.9,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "infinite_advance_time",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_physical_time:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": Infinity,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_physical_time:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": Infinity,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "advance_budget",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "budget_exhausted",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "budget_exhausted",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "missing_advance_status",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": null,
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "advance_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": null,
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "false_native_complete",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "missing_native_complete",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "integer_native_complete",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "native_horizon_incomplete"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "result_budget",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "result_explicitly_censored"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "result_explicitly_censored"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "controller_budget",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": 1,
+            "controller_physical_time": 1
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": 1,
+            "controller_physical_time": 1
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "controller_missing_horizon",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_requested_horizon:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": null,
+            "controller_physical_time": 1
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_requested_horizon:missing_or_nonfinite"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": null,
+            "controller_physical_time": 1
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "controller_wrong_time",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_physical_time:does_not_equal_requested_horizon"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": 1,
+            "controller_physical_time": 0.9
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_physical_time:does_not_equal_requested_horizon"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": 1,
+            "controller_physical_time": 0.9
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "empty_controller",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_requested_horizon:missing_or_nonfinite",
+            "controller_physical_time:missing_or_nonfinite",
+            "controller_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": null,
+            "controller_physical_time": null
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_requested_horizon:missing_or_nonfinite",
+            "controller_physical_time:missing_or_nonfinite",
+            "controller_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": null,
+            "controller_physical_time": null
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "null_controller",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_requested_horizon:missing_or_nonfinite",
+            "controller_physical_time:missing_or_nonfinite",
+            "controller_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": null,
+            "controller_physical_time": null
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "controller_requested_horizon:missing_or_nonfinite",
+            "controller_physical_time:missing_or_nonfinite",
+            "controller_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0,
+            "controller_requested_horizon": null,
+            "controller_physical_time": null
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    },
+    {
+      "case": "envelope_budget",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "outer_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": "budget_exhausted"
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "outer_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": "budget_exhausted"
+        }
+      ]
+    },
+    {
+      "case": "envelope_missing_status",
+      "optimality": "unknown",
+      "exhaustive": false,
+      "audit_calls": [],
+      "completion": [
+        {
+          "status": "unknown",
+          "problems": [
+            "outer_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": "missing"
+        },
+        {
+          "status": "unknown",
+          "problems": [
+            "outer_continuation_not_reached"
+          ],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": "missing"
+        }
+      ]
+    },
+    {
+      "case": "envelope_null_status",
+      "optimality": "optimal_in_enumerated_domain",
+      "exhaustive": true,
+      "audit_calls": [
+        "WAIT",
+        "other-wait"
+      ],
+      "completion": [
+        {
+          "status": "reached",
+          "problems": [],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        },
+        {
+          "status": "reached",
+          "problems": [],
+          "evidence": {
+            "requested_horizon": 1,
+            "result_horizon": 1.0,
+            "physical_clock": 1.0,
+            "advance_physical_time": 1.0,
+            "branch_physical_time": 1.0
+          },
+          "advance_status": "reached",
+          "outer_status": null
+        }
+      ]
+    }
+  ],
+  "status": "failed",
+  "exception": "AssertionError()",
+  "source_after": {
+    "scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+    "scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "7ed5bfde1aacd2fbce9dcff0ed1168d935d486139ae55da8fb7896b14978050f"
+  },
+  "source_changed": []
+}

@@ -1,0 +1,1374 @@
+{
+  "old": {
+    "status": "pending",
+    "reason": "",
+    "message_id": "A:B:service:1"
+  },
+  "revised": {
+    "status": "pending",
+    "reason": "",
+    "message_id": "A:B:service:2"
+  },
+  "withdrawal": {
+    "status": "pending",
+    "reason": "",
+    "message_id": "A:B:service:3"
+  },
+  "route_reply": {
+    "status": "pending",
+    "reason": ""
+  },
+  "observation": {
+    "schema": "g31.regional_observation.v1",
+    "now": 6.9,
+    "owner_id": "B",
+    "version": 11,
+    "node_records": [
+      [
+        0,
+        1,
+        0.05,
+        0,
+        0,
+        [
+          1,
+          2
+        ]
+      ],
+      [
+        1,
+        1,
+        0.05,
+        1,
+        0,
+        [
+          3,
+          4
+        ]
+      ],
+      [
+        2,
+        1,
+        0.05,
+        2,
+        0,
+        [
+          3
+        ]
+      ],
+      [
+        3,
+        1,
+        0.05,
+        3,
+        0,
+        [
+          6
+        ]
+      ],
+      [
+        4,
+        1,
+        0.05,
+        4,
+        0,
+        [
+          5
+        ]
+      ],
+      [
+        5,
+        1,
+        0.05,
+        5,
+        0,
+        [
+          0
+        ]
+      ],
+      [
+        6,
+        1,
+        0.05,
+        6,
+        0,
+        [
+          1
+        ]
+      ]
+    ],
+    "edge_records": [
+      [
+        0,
+        1,
+        1.0,
+        1.0
+      ],
+      [
+        1,
+        3,
+        4.0,
+        1.0
+      ],
+      [
+        0,
+        2,
+        1.3,
+        1.0
+      ],
+      [
+        2,
+        3,
+        4.0,
+        1.0
+      ],
+      [
+        3,
+        6,
+        0.4,
+        1.0
+      ],
+      [
+        6,
+        1,
+        0.4,
+        1.0
+      ],
+      [
+        1,
+        4,
+        0.4,
+        1.0
+      ],
+      [
+        4,
+        5,
+        1.0,
+        1.0
+      ],
+      [
+        5,
+        0,
+        1.0,
+        1.0
+      ]
+    ],
+    "node_contracts": [
+      {
+        "node": 0,
+        "zone": "A",
+        "logistics_zone": "A",
+        "control_partition": "A",
+        "resource_owner": "A",
+        "capacity": 2,
+        "export_min_stock": 1,
+        "allow_export": true,
+        "allow_receive": true
+      },
+      {
+        "node": 1,
+        "zone": "B",
+        "logistics_zone": "B",
+        "control_partition": "B",
+        "resource_owner": "B",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true,
+        "occupancy": 0,
+        "actual_available": 0
+      },
+      {
+        "node": 2,
+        "zone": "B",
+        "logistics_zone": "B",
+        "control_partition": "B",
+        "resource_owner": "B",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true,
+        "occupancy": 1,
+        "actual_available": 0
+      },
+      {
+        "node": 3,
+        "zone": "B",
+        "logistics_zone": "B",
+        "control_partition": "B",
+        "resource_owner": "B",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true,
+        "occupancy": 1,
+        "actual_available": 1
+      },
+      {
+        "node": 4,
+        "zone": "C",
+        "logistics_zone": "C",
+        "control_partition": "C",
+        "resource_owner": "C",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true
+      },
+      {
+        "node": 5,
+        "zone": "C",
+        "logistics_zone": "C",
+        "control_partition": "C",
+        "resource_owner": "C",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true
+      },
+      {
+        "node": 6,
+        "zone": "B",
+        "logistics_zone": "B",
+        "control_partition": "B",
+        "resource_owner": "B",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true,
+        "occupancy": 0,
+        "actual_available": 0
+      }
+    ],
+    "edge_contracts": [
+      {
+        "from": 0,
+        "to": 1,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 1,
+        "to": 3,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 0,
+        "to": 2,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 3,
+        "to": 6,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 6,
+        "to": 1,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 1,
+        "to": 4,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 5,
+        "to": 0,
+        "capacity": 1,
+        "entry_headway": 0.2
+      }
+    ],
+    "trays": [
+      {
+        "tray_id": "T0",
+        "node": 3,
+        "mode": "empty",
+        "edge_from": -1,
+        "edge_to": -1,
+        "available_at": 5.75,
+        "reception_node": -1,
+        "generation": 2,
+        "traversal_id": 2,
+        "business_bag_id": "",
+        "committed_prefix": [
+          3
+        ]
+      }
+    ],
+    "jobs": [],
+    "transfers": [],
+    "delivered_messages": [
+      {
+        "kind": "service_forecast",
+        "message_id": "A:B:service:1",
+        "source_owner": "A",
+        "target_owner": "B",
+        "business_bag_id": "B2",
+        "tray_id": "T1",
+        "from": 0,
+        "next": 1,
+        "generation": 1,
+        "traversal_id": 0,
+        "observed_at": 6.31,
+        "delivered_at": 6.81,
+        "entry_estimate": 6.359999999999999,
+        "release_estimate": 7.409999999999999,
+        "status": "conditional",
+        "publication_sequence": 1,
+        "supersedes": "",
+        "estimate_scope": "next_node_service_completion"
+      },
+      {
+        "kind": "service_forecast",
+        "message_id": "A:B:service:2",
+        "source_owner": "A",
+        "target_owner": "B",
+        "business_bag_id": "B2",
+        "tray_id": "T1",
+        "from": 0,
+        "next": 2,
+        "generation": 1,
+        "traversal_id": 0,
+        "observed_at": 6.31,
+        "delivered_at": 6.409999999999999,
+        "entry_estimate": 6.359999999999999,
+        "release_estimate": 7.709999999999999,
+        "status": "conditional",
+        "publication_sequence": 2,
+        "supersedes": "",
+        "estimate_scope": "next_node_service_completion"
+      },
+      {
+        "kind": "service_forecast",
+        "message_id": "A:B:service:3",
+        "source_owner": "A",
+        "target_owner": "B",
+        "business_bag_id": "B2",
+        "tray_id": "T1",
+        "from": 0,
+        "next": 1,
+        "generation": 1,
+        "traversal_id": 0,
+        "observed_at": 6.31,
+        "delivered_at": 6.359999999999999,
+        "entry_estimate": 6.359999999999999,
+        "release_estimate": 7.409999999999999,
+        "status": "withdrawn",
+        "publication_sequence": 3,
+        "supersedes": "A:B:service:1",
+        "estimate_scope": "next_node_service_completion"
+      }
+    ],
+    "known_faults": [],
+    "route_requests": [],
+    "recovery_requests": []
+  },
+  "windows": [
+    {
+      "kind": "service_forecast",
+      "message_id": "A:B:service:2",
+      "source_owner": "A",
+      "target_owner": "B",
+      "business_bag_id": "B2",
+      "tray_id": "T1",
+      "from": 0,
+      "next": 2,
+      "generation": 1,
+      "traversal_id": 0,
+      "observed_at": 6.31,
+      "delivered_at": 6.409999999999999,
+      "entry_estimate": 6.359999999999999,
+      "release_estimate": 7.709999999999999,
+      "status": "conditional",
+      "publication_sequence": 2,
+      "supersedes": "",
+      "estimate_scope": "next_node_service_completion"
+    }
+  ],
+  "result": {
+    "schema": "g31.circulation.live_result.v1",
+    "mode": "circulation",
+    "optimality": "unknown",
+    "native_event_ms": [],
+    "native_summary": {
+      "event_count": 60,
+      "completed_count": 1,
+      "failed_count": 0,
+      "runtime_seconds": 0.0,
+      "edge_enter_event_count": 3,
+      "edge_exit_event_count": 2,
+      "reservation_conflicts": 0,
+      "physical_fault_edge_entry_violation_count": 0,
+      "merge_grant_timing_mode": "jit_fair_aging_deadline",
+      "g4irsf20_event_hotpath_policy": "E2",
+      "local_queue_capacity": 0
+    },
+    "transport_legs": [],
+    "native_events": [
+      {
+        "seq": 5,
+        "event": "BAG_RELEASE",
+        "time": 0.1,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": -1,
+        "reason": "source_release_enqueue"
+      },
+      {
+        "seq": 6,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 0.1,
+        "runtime_bag_id": -1,
+        "segment_id": "",
+        "node": 1,
+        "from_node": -1,
+        "to_node": 1,
+        "reason": "circulation_leg_initial_snapshot"
+      },
+      {
+        "seq": 7,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 0.1,
+        "runtime_bag_id": -1,
+        "segment_id": "",
+        "node": 2,
+        "from_node": -1,
+        "to_node": 2,
+        "reason": "circulation_leg_initial_snapshot"
+      },
+      {
+        "seq": 8,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 0.1,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "source_enqueue"
+      },
+      {
+        "seq": 10,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 0.1,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 9,
+        "event": "SOURCE_ARBITRATION",
+        "time": 0.1,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": -1,
+        "reason": "same_timestamp_source_arbitration"
+      },
+      {
+        "seq": 12,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 0.1,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "source_dequeue"
+      },
+      {
+        "seq": 13,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 0.1,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 11,
+        "event": "JUNCTION_SERVICE_COMPLETE",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "junction_service_complete"
+      },
+      {
+        "seq": 14,
+        "event": "ARRIVE_JUNCTION",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "junction_arrival_enqueue"
+      },
+      {
+        "seq": 15,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "junction_enqueue"
+      },
+      {
+        "seq": 17,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 16,
+        "event": "JUNCTION_ARBITRATION",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 1,
+        "reason": "same_timestamp_junction_arbitration"
+      },
+      {
+        "seq": 19,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "incoming_reservation_snapshot"
+      },
+      {
+        "seq": 22,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "merge_grant_junction_dequeue"
+      },
+      {
+        "seq": 23,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 20,
+        "event": "EDGE_ENTER",
+        "time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 0,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "one_step_merge_grant_committed"
+      },
+      {
+        "seq": 21,
+        "event": "EDGE_EXIT",
+        "time": 1.15,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "edge_traversal_complete"
+      },
+      {
+        "seq": 25,
+        "event": "JUNCTION_SERVICE_COMPLETE",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "junction_service_complete"
+      },
+      {
+        "seq": 26,
+        "event": "ARRIVE_JUNCTION",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "junction_arrival_enqueue"
+      },
+      {
+        "seq": 27,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "junction_enqueue"
+      },
+      {
+        "seq": 29,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 0,
+        "to_node": 1,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 28,
+        "event": "JUNCTION_ARBITRATION",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": -1,
+        "to_node": 3,
+        "reason": "same_timestamp_junction_arbitration"
+      },
+      {
+        "seq": 30,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 3,
+        "from_node": 1,
+        "to_node": 3,
+        "reason": "incoming_reservation_snapshot"
+      },
+      {
+        "seq": 33,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 1,
+        "to_node": 3,
+        "reason": "junction_dequeue"
+      },
+      {
+        "seq": 34,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 1,
+        "to_node": 3,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 31,
+        "event": "EDGE_ENTER",
+        "time": 1.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 1,
+        "from_node": 1,
+        "to_node": 3,
+        "reason": "one_step_reservation_committed"
+      },
+      {
+        "seq": 32,
+        "event": "EDGE_EXIT",
+        "time": 5.2,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 3,
+        "from_node": 1,
+        "to_node": 3,
+        "reason": "edge_traversal_complete"
+      },
+      {
+        "seq": 35,
+        "event": "JUNCTION_SERVICE_COMPLETE",
+        "time": 5.25,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 3,
+        "from_node": 1,
+        "to_node": 3,
+        "reason": "junction_service_complete"
+      },
+      {
+        "seq": 36,
+        "event": "ARRIVE_JUNCTION",
+        "time": 5.25,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 3,
+        "from_node": 1,
+        "to_node": 3,
+        "reason": "goal_reached"
+      },
+      {
+        "seq": 38,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 5.25,
+        "runtime_bag_id": 0,
+        "segment_id": "B1:direct:0",
+        "node": 3,
+        "from_node": 1,
+        "to_node": 3,
+        "reason": "goal_service_release_snapshot"
+      },
+      {
+        "seq": 40,
+        "event": "BAG_RELEASE",
+        "time": 6.3,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": -1,
+        "reason": "source_release_enqueue"
+      },
+      {
+        "seq": 41,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 6.3,
+        "runtime_bag_id": -1,
+        "segment_id": "",
+        "node": 1,
+        "from_node": -1,
+        "to_node": 1,
+        "reason": "circulation_leg_initial_snapshot"
+      },
+      {
+        "seq": 42,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 6.3,
+        "runtime_bag_id": -1,
+        "segment_id": "",
+        "node": 2,
+        "from_node": -1,
+        "to_node": 2,
+        "reason": "circulation_leg_initial_snapshot"
+      },
+      {
+        "seq": 43,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 6.3,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "source_enqueue"
+      },
+      {
+        "seq": 45,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 6.3,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 44,
+        "event": "SOURCE_ARBITRATION",
+        "time": 6.3,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": -1,
+        "reason": "same_timestamp_source_arbitration"
+      },
+      {
+        "seq": 47,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 6.3,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "source_dequeue"
+      },
+      {
+        "seq": 48,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 6.3,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 46,
+        "event": "JUNCTION_SERVICE_COMPLETE",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "junction_service_complete"
+      },
+      {
+        "seq": 53,
+        "event": "ARRIVE_JUNCTION",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "junction_arrival_enqueue"
+      },
+      {
+        "seq": 54,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "junction_enqueue"
+      },
+      {
+        "seq": 56,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 0,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 55,
+        "event": "JUNCTION_ARBITRATION",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": -1,
+        "to_node": 2,
+        "reason": "same_timestamp_junction_arbitration"
+      },
+      {
+        "seq": 57,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 2,
+        "from_node": 0,
+        "to_node": 2,
+        "reason": "incoming_reservation_snapshot"
+      },
+      {
+        "seq": 60,
+        "event": "LOCAL_QUEUE_UPDATE",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": 0,
+        "to_node": 2,
+        "reason": "junction_dequeue"
+      },
+      {
+        "seq": 61,
+        "event": "CONGESTION_BEACON_UPDATE",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": 0,
+        "to_node": 2,
+        "reason": "queue_change_beacon"
+      },
+      {
+        "seq": 58,
+        "event": "EDGE_ENTER",
+        "time": 6.35,
+        "runtime_bag_id": 1,
+        "segment_id": "B2:direct:1",
+        "node": 0,
+        "from_node": 0,
+        "to_node": 2,
+        "reason": "one_step_reservation_committed"
+      }
+    ],
+    "decisions": [
+      {
+        "event_time": 0.15000000000000002,
+        "runtime_bag_id": 0,
+        "current_node": 0,
+        "goal_node": 3,
+        "selected_next": 1,
+        "scorer_id": "S4_queue_aware_rule_only",
+        "scorer_effective_id": "S4_queue_aware_rule_only",
+        "full_astar_used": false,
+        "decision_source": "destination_owned_merge_grant",
+        "candidates": [
+          {
+            "next_node": 1,
+            "shield_allowed": true,
+            "shield_reason": "allowed",
+            "model_score": 5.05
+          },
+          {
+            "next_node": 2,
+            "shield_allowed": true,
+            "shield_reason": "allowed",
+            "model_score": 5.35
+          }
+        ]
+      },
+      {
+        "event_time": 1.2,
+        "runtime_bag_id": 0,
+        "current_node": 1,
+        "goal_node": 3,
+        "selected_next": 3,
+        "scorer_id": "S4_queue_aware_rule_only",
+        "scorer_effective_id": "S4_queue_aware_rule_only",
+        "full_astar_used": false,
+        "decision_source": "S4_queue_aware_rule_only",
+        "candidates": [
+          {
+            "next_node": 3,
+            "shield_allowed": true,
+            "shield_reason": "allowed",
+            "model_score": 4.0
+          },
+          {
+            "next_node": 4,
+            "shield_allowed": true,
+            "shield_reason": "allowed",
+            "model_score": 7.6
+          }
+        ]
+      },
+      {
+        "event_time": 6.35,
+        "runtime_bag_id": 1,
+        "current_node": 0,
+        "goal_node": 3,
+        "selected_next": 2,
+        "scorer_id": "S4_queue_aware_rule_only",
+        "scorer_effective_id": "S4_queue_aware_rule_only",
+        "full_astar_used": false,
+        "decision_source": "S4_queue_aware_rule_only",
+        "candidates": [
+          {
+            "next_node": 1,
+            "shield_allowed": true,
+            "shield_reason": "allowed",
+            "model_score": 5.05
+          },
+          {
+            "next_node": 2,
+            "shield_allowed": true,
+            "shield_reason": "allowed",
+            "model_score": -999999994.65
+          }
+        ]
+      }
+    ],
+    "receipts": [
+      {
+        "time": 0.0,
+        "event": "BAG_ARRIVAL",
+        "business_bag_id": "B1",
+        "transport_leg_id": "",
+        "tray_id": "",
+        "traversal_id": 0,
+        "node": 0,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 0.0,
+        "event": "LOAD_START",
+        "business_bag_id": "B1",
+        "transport_leg_id": "",
+        "tray_id": "T0",
+        "traversal_id": 0,
+        "node": 0,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 0.1,
+        "event": "LOAD_COMPLETE",
+        "business_bag_id": "B1",
+        "transport_leg_id": "",
+        "tray_id": "T0",
+        "traversal_id": 0,
+        "node": 0,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 0.1,
+        "event": "LEG_START",
+        "business_bag_id": "B1",
+        "transport_leg_id": "B1:direct:0",
+        "tray_id": "T0",
+        "traversal_id": 0,
+        "node": 0,
+        "from": 0,
+        "to": 3,
+        "reason": "direct"
+      },
+      {
+        "time": 0.15000000000000002,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "B1",
+        "transport_leg_id": "B1:direct:0",
+        "tray_id": "T0",
+        "traversal_id": 1,
+        "node": 0,
+        "from": 0,
+        "to": 1,
+        "reason": ""
+      },
+      {
+        "time": 0.5,
+        "event": "BAG_ARRIVAL",
+        "business_bag_id": "B2",
+        "transport_leg_id": "",
+        "tray_id": "",
+        "traversal_id": 0,
+        "node": 0,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 0.5,
+        "event": "LOAD_START",
+        "business_bag_id": "B2",
+        "transport_leg_id": "",
+        "tray_id": "T1",
+        "traversal_id": 0,
+        "node": 0,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 0.5,
+        "event": "BAG_ARRIVAL",
+        "business_bag_id": "B3",
+        "transport_leg_id": "",
+        "tray_id": "",
+        "traversal_id": 0,
+        "node": 4,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 1.15,
+        "event": "EDGE_EXIT",
+        "business_bag_id": "B1",
+        "transport_leg_id": "B1:direct:0",
+        "tray_id": "T0",
+        "traversal_id": 1,
+        "node": 1,
+        "from": 0,
+        "to": 1,
+        "reason": ""
+      },
+      {
+        "time": 1.2,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "B1",
+        "transport_leg_id": "B1:direct:0",
+        "tray_id": "T0",
+        "traversal_id": 2,
+        "node": 1,
+        "from": 1,
+        "to": 3,
+        "reason": ""
+      },
+      {
+        "time": 5.2,
+        "event": "EDGE_EXIT",
+        "business_bag_id": "B1",
+        "transport_leg_id": "B1:direct:0",
+        "tray_id": "T0",
+        "traversal_id": 2,
+        "node": 3,
+        "from": 1,
+        "to": 3,
+        "reason": ""
+      },
+      {
+        "time": 5.25,
+        "event": "LEG_COMPLETE",
+        "business_bag_id": "B1",
+        "transport_leg_id": "B1:direct:0",
+        "tray_id": "T0",
+        "traversal_id": 2,
+        "node": 3,
+        "from": -1,
+        "to": 3,
+        "reason": "direct"
+      },
+      {
+        "time": 5.25,
+        "event": "UNLOAD_START",
+        "business_bag_id": "B1",
+        "transport_leg_id": "B1:direct:0",
+        "tray_id": "T0",
+        "traversal_id": 2,
+        "node": 3,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 5.55,
+        "event": "UNLOAD_COMPLETE",
+        "business_bag_id": "B1",
+        "transport_leg_id": "",
+        "tray_id": "T0",
+        "traversal_id": 2,
+        "node": 3,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 5.55,
+        "event": "HOLD_START",
+        "business_bag_id": "B1",
+        "transport_leg_id": "",
+        "tray_id": "T0",
+        "traversal_id": 2,
+        "node": 3,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 5.75,
+        "event": "HOLD_COMPLETE",
+        "business_bag_id": "B1",
+        "transport_leg_id": "",
+        "tray_id": "T0",
+        "traversal_id": 2,
+        "node": 3,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 6.3,
+        "event": "LOAD_COMPLETE",
+        "business_bag_id": "B2",
+        "transport_leg_id": "",
+        "tray_id": "T1",
+        "traversal_id": 0,
+        "node": 0,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      {
+        "time": 6.3,
+        "event": "LEG_START",
+        "business_bag_id": "B2",
+        "transport_leg_id": "B2:direct:1",
+        "tray_id": "T1",
+        "traversal_id": 0,
+        "node": 0,
+        "from": 0,
+        "to": 3,
+        "reason": "direct"
+      },
+      {
+        "time": 6.31,
+        "event": "ROUTE_INTENT_updated",
+        "business_bag_id": "B2",
+        "transport_leg_id": "",
+        "tray_id": "T1",
+        "traversal_id": 0,
+        "node": 0,
+        "from": 0,
+        "to": 2,
+        "reason": "allowed"
+      },
+      {
+        "time": 6.35,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "B2",
+        "transport_leg_id": "B2:direct:1",
+        "tray_id": "T1",
+        "traversal_id": 3,
+        "node": 0,
+        "from": 0,
+        "to": 2,
+        "reason": ""
+      }
+    ],
+    "jobs": [
+      {
+        "business_bag_id": "B1",
+        "status": "completed",
+        "tray": 0,
+        "loaded_at": 0.1,
+        "storage_entered_at": -1.0,
+        "storage_released_at": -1.0,
+        "completed_at": 5.55,
+        "deadline_met": true
+      },
+      {
+        "business_bag_id": "B2",
+        "status": "in_transit",
+        "tray": 1,
+        "loaded_at": 6.3,
+        "storage_entered_at": -1.0,
+        "storage_released_at": -1.0,
+        "completed_at": -1.0,
+        "deadline_met": false
+      },
+      {
+        "business_bag_id": "B3",
+        "status": "waiting_for_tray",
+        "tray": -1,
+        "loaded_at": -1.0,
+        "storage_entered_at": -1.0,
+        "storage_released_at": -1.0,
+        "completed_at": -1.0,
+        "deadline_met": false
+      }
+    ],
+    "trays": [
+      {
+        "tray_id": "T0",
+        "node": 3,
+        "mode": "empty",
+        "job": -1,
+        "active_leg": -1,
+        "edge_from": -1,
+        "edge_to": -1,
+        "reception_node": -1,
+        "available_at": 5.75,
+        "traversal_id": 2
+      },
+      {
+        "tray_id": "T1",
+        "node": 0,
+        "mode": "loaded",
+        "job": 1,
+        "active_leg": 1,
+        "edge_from": 0,
+        "edge_to": 2,
+        "reception_node": -1,
+        "available_at": 0.0,
+        "traversal_id": 3
+      }
+    ],
+    "transfers": [],
+    "leg_identities": [
+      {
+        "runtime_id": 0,
+        "transport_leg_id": "B1:direct:0",
+        "tray": 0,
+        "job": 0,
+        "kind": "direct"
+      },
+      {
+        "runtime_id": 1,
+        "transport_leg_id": "B2:direct:1",
+        "tray": 1,
+        "job": 1,
+        "kind": "direct"
+      }
+    ],
+    "physical_clock": 7.0,
+    "horizon": 7.0,
+    "advance": {
+      "physical_time": 7.0,
+      "processed_events": 0,
+      "status": "reached",
+      "horizon_complete": true,
+      "wall_seconds": 9e-07
+    },
+    "scope": "offline result; contains offered population, never an online observation",
+    "population": {
+      "offered_by_horizon": 3,
+      "observed": 3,
+      "loaded": 2,
+      "completed": 1
+    }
+  },
+  "audit": {
+    "status": "passed",
+    "completed_traversals": 2,
+    "open_traversals": 1,
+    "tray_count": 2,
+    "optimality": "unknown",
+    "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+  }
+}

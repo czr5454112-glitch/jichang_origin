@@ -1,0 +1,2986 @@
+diff --git a/.gitattributes b/.gitattributes
+index 1d790fc0..522b3771 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -1,6 +1,13 @@
+ # G4IRSF14 frozen evidence uses physical byte hashes. Keep these exact
+ # checkout encodings independent of each contributor's core.autocrlf setting.
+ .gitattributes text eol=lf
++
++# Retain the audited V3 namespace as exact-byte reference assets on G31.
++scripts/experiments/ics_circulation_v3/** -text
++tests/test_ics_circulation_v3_*.py -text
++tests/test_ics_v3_*.py -text
++docs/ics_circulation_v3/** -text
++docs/external_review/g31_v3_20261011/** -text
+ data/processed/maps/map2.json text eol=crlf
+ artifacts/models/g4e_risk_calibrated_policy.json text eol=crlf
+ legacy/jichang_origin_readonly/inputdata.txt text eol=crlf
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c789cba0..f432c3fa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -7,6 +7,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
+ 
+ enable_testing()
+ 
++add_executable(test_circulation_runtime cpp/tests/test_circulation_runtime.cpp)
++target_include_directories(test_circulation_runtime PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cpp)
++target_compile_definitions(test_circulation_runtime PRIVATE CZR005_EVENT_RUNTIME_TESTING=1)
++if(MSVC)
++  target_compile_options(test_circulation_runtime PRIVATE /bigobj)
++endif()
++add_test(NAME circulation_runtime COMMAND test_circulation_runtime)
++
+ option(CZR005_BUILD_PYBIND "Build Python bindings with pybind11" ON)
+ 
+ add_library(ics_core INTERFACE)
+@@ -187,6 +195,16 @@ if(CZR005_BUILD_PYBIND)
+   find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+   find_package(pybind11 CONFIG REQUIRED)
+ 
++  pybind11_add_module(czr005_circulation cpp/ics_core/bindings/circulation.cpp)
++  target_link_libraries(czr005_circulation PRIVATE ics_core)
++  if(MSVC)
++    target_compile_options(czr005_circulation PRIVATE /bigobj /Brepro)
++    target_link_options(czr005_circulation PRIVATE /Brepro)
++  endif()
++  set_target_properties(czr005_circulation PROPERTIES
++    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python
++    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python)
++
+   pybind11_add_module(czr005_cpp cpp/ics_core/bindings/czr005_cpp.cpp)
+   target_link_libraries(czr005_cpp PRIVATE ics_core)
+   if(MSVC)
+diff --git a/cpp/ics_core/runtime/event_driven_junction.hpp b/cpp/ics_core/runtime/event_driven_junction.hpp
+index 1a1ae6f3..106a6ff3 100644
+--- a/cpp/ics_core/runtime/event_driven_junction.hpp
++++ b/cpp/ics_core/runtime/event_driven_junction.hpp
+@@ -30,6 +30,7 @@
+ #include "ics_core/io/canonical_map2_reader.hpp"
+ #include "ics_core/models/edge_score.hpp"
+ #include "ics_core/runtime/bounded_local_pibt.hpp"
++#include "ics_core/runtime/circulation.hpp"
+ #include "ics_core/runtime/destination_merge_grant.hpp"
+ #include "ics_core/runtime/expiring_first_edge_credit.hpp"
+ #include "ics_core/runtime/g4irsf14_causal_intervention.hpp"
+@@ -59,6 +60,7 @@ enum class JunctionEventType {
+   kSourceArbitration,
+   kJunctionArbitration,
+   kDestinationMergeArbitration,
++  kCirculation,
+ };
+ 
+ // G4IRSF17 source-wait attribution is deliberately a small canonical enum,
+@@ -153,6 +155,8 @@ inline const char* junction_event_name(JunctionEventType type) {
+       return "JUNCTION_ARBITRATION";
+     case JunctionEventType::kDestinationMergeArbitration:
+       return "DESTINATION_MERGE_ARBITRATION";
++    case JunctionEventType::kCirculation:
++      return "CIRCULATION";
+   }
+   return "UNKNOWN";
+ }
+@@ -2408,6 +2412,9 @@ struct RuntimeEvent {
+   JunctionEventType type = JunctionEventType::kBagRelease;
+   double time = 0.0;
+   std::uint64_t seq = 0;
++  // Physical traversal identity is independent of business/leg identity.
++  // Legacy events keep zero and retain their historical replay projection.
++  std::uint64_t traversal_id = 0;
+   int task_id = -1;
+   int node = -1;
+   int from_node = -1;
+@@ -2448,6 +2455,9 @@ inline int event_priority(const RuntimeEvent& event) {
+   if (event.type == JunctionEventType::kBagRelease) {
+     return 6;
+   }
++  if (event.type == JunctionEventType::kCirculation) {
++    return 6;
++  }
+   if (event.type == JunctionEventType::kSourceArbitration) {
+     return 7;
+   }
+@@ -3116,6 +3126,15 @@ class EventDrivenJunctionRuntime {
+                          : EventDrivenJunctionRuntimePhase::kReady;
+   }
+ 
++  // One native event heap and one physical clock also own the carrier cycle.
++  void initialize_circulation(
++      const CirculationInput& input,
++      const std::vector<EventRuntimeFaultWindow>& fault_windows = {});
++
++  [[nodiscard]] const CirculationState& circulation_state() const noexcept {
++    return circulation_;
++  }
++
+   [[nodiscard]] std::optional<EventDrivenJunctionSafeBoundary>
+   peek_safe_boundary() const {
+     if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+@@ -5259,6 +5278,7 @@ class EventDrivenJunctionRuntime {
+   }
+ 
+   void reset() {
++    circulation_ = {};
+     runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
+     time_limit_ = 0.0;
+     result_ = {};
+@@ -5388,7 +5408,8 @@ class EventDrivenJunctionRuntime {
+         return 1;
+       }
+       if (event.type == JunctionEventType::kArriveJunction ||
+-          event.type == JunctionEventType::kBagRelease) {
++          event.type == JunctionEventType::kBagRelease ||
++          event.type == JunctionEventType::kCirculation) {
+         return 2;
+       }
+       if (event.type ==
+@@ -5438,6 +5459,10 @@ class EventDrivenJunctionRuntime {
+ 
+   void prepare_event_for_publication(
+       RuntimeEvent& event) {
++    if (circulation_.enabled &&
++        (!std::isfinite(event.time) || !std::isfinite(event.service_end))) {
++      throw std::invalid_argument("circulation:nonfinite_event_time");
++    }
+     const int base_priority =
+         g4irsf14_microphase_priority(event);
+     event.microphase_priority = base_priority;
+@@ -5460,12 +5485,14 @@ class EventDrivenJunctionRuntime {
+   }
+ 
+   void publish_prepared_event(RuntimeEvent event) {
++    circulation_publish_event(event);
+     event.seq = next_event_seq_++;
+     events_.push(std::move(event));
+   }
+ 
+   void publish_prepared_reserved_event(
+       RuntimeEvent event) noexcept {
++    circulation_publish_event(event);
+     event.seq = next_event_seq_++;
+     events_.push(std::move(event));
+   }
+@@ -5549,6 +5576,9 @@ class EventDrivenJunctionRuntime {
+         ++result_.summary.destination_merge_arbitration_event_count;
+         process_destination_merge_arbitration(event);
+         break;
++      case JunctionEventType::kCirculation:
++        process_circulation_event(event);
++        break;
+     }
+   }
+ 
+@@ -8559,6 +8589,24 @@ class EventDrivenJunctionRuntime {
+ 
+     auto& destination =
+         junctions_[request.destination_merge_node];
++    if (circulation_.enabled) {
++      const auto reason = circulation_.can_enter(
++          request.runtime_bag_id, request.upstream_node,
++          request.destination_merge_node, event.time);
++      if (reason != "allowed") {
++        circulation_receipt(event.time, "native_merge_hold",
++            circulation_.legs.at(request.runtime_bag_id).tray,
++            request.runtime_bag_id, request.upstream_node,
++            request.destination_merge_node, reason);
++        reject_destination_merge_request(controller, request,
++            MergeGrantState::kRolledBack,
++            MergeGrantReason::kQueueCapacityBlock, event.time);
++        schedule_junction_wakeup(request.upstream_node,
++                                 event.time + config_.retry_interval);
++        reschedule_destination_merge_after_rejection(true);
++        return;
++      }
++    }
+     destination.service_calendar.purge(event.time);
+     if (destination.service_calendar.generation() !=
+         request.destination_calendar_generation) {
+@@ -11040,6 +11088,27 @@ class EventDrivenJunctionRuntime {
+       blocker = "empty_or_oversized_action_batch";
+       return false;
+     }
++    if (circulation_.enabled) {
++      // Validate the exact publication order against projected physical
++      // state. Two individually legal actions must not jointly exceed edge
++      // capacity/headway or double-count an already-held receiving lease.
++      // Audit history and business state are intentionally not copied.
++      CirculationState projected;
++      projected.enabled = true;
++      projected.input = circulation_.input;
++      projected.trays = circulation_.trays;
++      projected.legs = circulation_.legs;
++      projected.transfers = circulation_.transfers;
++      projected.next_entry = circulation_.next_entry;
++      projected.next_traversal = circulation_.next_traversal;
++      for (const auto& action : actions) {
++        blocker = projected.can_enter(action.bag_id, action.from_node,
++                                       action.next_node, time);
++        if (blocker != "allowed") return false;
++        projected.reserve_enter(action.bag_id, action.from_node,
++                                 action.next_node, time);
++      }
++    }
+     if (merge_grant_authority != nullptr &&
+         !merge_grant_authority_is_commit_ready(
+             merge_grant_authority,
+@@ -14630,6 +14699,11 @@ class EventDrivenJunctionRuntime {
+                             bool first_edge_credit_required,
+                             bool first_edge_credit_ready,
+                             int first_edge_credit_to) {
++    if (circulation_.enabled) {
++      const auto reason = circulation_.can_enter(
++          bag.request.runtime_bag_id, current, candidate, time);
++      if (reason != "allowed") return reason;
++    }
+     // A terminal node is safe only when it is this bag's actual goal.  This
+     // is a one-hop topology check on the candidate itself: it needs neither
+     // a future route nor a global search, and prevents local backpressure from
+@@ -14713,10 +14787,21 @@ class EventDrivenJunctionRuntime {
+       PIBTActionDelta* transaction_delta = nullptr,
+       const MergeGrantCapability*
+           destination_merge_grant_authority = nullptr) {
++    if (circulation_.enabled && circulation_.can_enter(
++            bag.request.runtime_bag_id, current, selected, time) != "allowed") {
++      throw std::logic_error("circulation:physical_commit_state_changed");
++    }
+     const auto& edge = graph_.edge(current, selected);
+     const double travel = std::max(edge.travel_time(), config_.minimum_service_seconds);
+     const double exit_time = time + travel;
+     const double service_end = exit_time + service_duration(selected);
++    if (circulation_.enabled &&
++        (!std::isfinite(exit_time) || !std::isfinite(service_end))) {
++      throw std::invalid_argument("circulation:nonfinite_event_time");
++    }
++    if (circulation_.enabled && exit_time <= time) {
++      throw std::invalid_argument("circulation:time_resolution_insufficient");
++    }
+     auto& target = junctions_[selected];
+     LocalCalendar* corridor = nullptr;
+     const double corridor_end =
+@@ -14847,6 +14932,7 @@ class EventDrivenJunctionRuntime {
+   }
+ 
+   void process_edge_enter(const RuntimeEvent& event) {
++    if (!circulation_edge_enter(event)) return;
+     const auto found = bags_.find(event.task_id);
+     const bool valid_entry =
+         found != bags_.end() && found->second.status == BagStatus::kInTransit &&
+@@ -14911,6 +14997,7 @@ class EventDrivenJunctionRuntime {
+       return;
+     }
+     auto& bag = found->second;
++    if (!circulation_edge_exit(event)) return;
+     bool inflight_fault_generation_recovered = false;
+     const long long directed =
+         event_runtime_detail::directed_key(event.from_node, event.to_node);
+@@ -16833,6 +16920,7 @@ class EventDrivenJunctionRuntime {
+     bag.goal_completion_time_seconds =
+         std::max(0.0, time - bag.request.release_time);
+     record_wait_outcome(bag, time);
++    circulation_leg_completed(bag.request.runtime_bag_id, time);
+   }
+ 
+   void fail_bag(BagState& bag, const std::string& reason, double time) {
+@@ -16853,6 +16941,7 @@ class EventDrivenJunctionRuntime {
+           std::max(result_.summary.max_deadlock_duration, time - bag.deadlock_started_at);
+     }
+     record_wait_outcome(bag, time);
++    circulation_leg_failed(bag.request.runtime_bag_id, reason, time);
+   }
+ 
+   void record_wait_outcome(BagState& bag, double time) {
+@@ -17801,6 +17890,21 @@ class EventDrivenJunctionRuntime {
+   }
+ 
+   const Graph& graph_;
++  CirculationState circulation_;
++  void circulation_publish_event(RuntimeEvent& event) noexcept;
++  bool circulation_edge_enter(const RuntimeEvent& event);
++  bool circulation_edge_exit(const RuntimeEvent& event);
++  void process_circulation_event(const RuntimeEvent& event);
++  void circulation_leg_completed(int runtime_id, double time);
++  void circulation_leg_failed(int runtime_id, const std::string& reason, double time);
++  void circulation_progress(double time);
++  void circulation_create_leg(int tray, int job, int destination,
++                              const std::string& kind, double time);
++  void circulation_schedule(const std::string& reason, double time, int index,
++                            std::uint64_t generation = 0);
++  void circulation_receipt(double time, const std::string& event, int tray,
++                           int leg = -1, int from = -1, int to = -1,
++                           const std::string& reason = {});
+   EventDrivenJunctionConfig config_;
+   std::optional<EdgeScoreModel> scorer_model_;
+   std::unique_ptr<G4IRSF16SelectiveLinearModel>
+@@ -17994,6 +18098,9 @@ EventDrivenJunctionRuntime::restore_g4irsf14_state(
+ 
+ inline EventDrivenJunctionRuntime::StateCheckpoint
+ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
++  if (circulation_.enabled) {
++    throw std::logic_error("circulation:checkpoint_payload_not_implemented");
++  }
+   if (g4irsf16_enabled()) {
+     throw std::logic_error(
+         "G4IRSF16 online supervisor state is not a G4IRSF14 causal-clone "
+@@ -18122,6 +18229,9 @@ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
+ 
+ inline void EventDrivenJunctionRuntime::
+ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
++  if (circulation_.enabled) {
++    throw std::logic_error("circulation:checkpoint_payload_not_implemented");
++  }
+   // A restore attempt is itself a phase boundary.  Fail closed before even
+   // inspecting the supplied checkpoint so a bad seal/graph/phase cannot
+   // leave an already-Ready target able to process its previous event queue.
+@@ -19440,6 +19550,9 @@ EventDrivenJunctionRuntime::compute_replay_hashes_projection() const {
+ 
+ inline G4IRSF14CloneReplayHashes
+ EventDrivenJunctionRuntime::deterministic_replay_hashes() const {
++  if (circulation_.enabled) {
++    throw std::logic_error("circulation:replay_projection_not_implemented");
++  }
+   if (runtime_phase_ !=
+       EventDrivenJunctionRuntimePhase::kFinalized) {
+     throw std::logic_error(
+@@ -20476,6 +20589,9 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
+ 
+ inline G4IRSF14RuntimeStateDigests
+ EventDrivenJunctionRuntime::deterministic_state_digests() const {
++  if (circulation_.enabled) {
++    throw std::logic_error("circulation:checkpoint_payload_not_implemented");
++  }
+   if (runtime_phase_ != EventDrivenJunctionRuntimePhase::kReady ||
+       events_.empty()) {
+     throw std::logic_error(
+@@ -20493,3 +20609,5 @@ EventDrivenJunctionRuntime::deterministic_state_sha256() const {
+ }
+ 
+ }  // namespace czr005::ics
++
++#include "ics_core/runtime/circulation_runtime_impl.hpp"
+diff --git a/cpp/ics_core/bindings/circulation.cpp b/cpp/ics_core/bindings/circulation.cpp
+new file mode 100644
+index 00000000..a63106b5
+--- /dev/null
++++ b/cpp/ics_core/bindings/circulation.cpp
+@@ -0,0 +1,236 @@
++#include <chrono>
++#include <pybind11/pybind11.h>
++#include <pybind11/stl.h>
++#include "ics_core/runtime/event_driven_junction.hpp"
++
++namespace py = pybind11;
++using namespace czr005::ics;
++
++namespace {
++template<class T> T field(const py::dict& d, const char* k, T fallback) {
++  return d.contains(k) ? py::cast<T>(d[k]) : fallback;
++}
++template<class T> T required(const py::dict& d, const char* k) { return py::cast<T>(d[k]); }
++
++EventDrivenJunctionConfig g31_config(const py::dict& options) {
++  EventDrivenJunctionConfig c;
++  // Mature build_s4_request + its frozen G14 controls, without a learned scorer.
++  c.queue_discipline = "fifo";
++  c.resource_semantics = "R3_java_node_window_compatible";
++  c.event_semantics = "E4_batch_plus_destination_merge_request";
++  c.enable_source_admission = false;
++  c.enable_backpressure = false;
++  c.enable_pibt_lite = false;
++  c.enable_deadlock_escape = true;
++  c.enable_fault_policy = true;
++  c.pressure_mode = "off";
++  c.admission_mode = "off";
++  c.pibt_mode = "P2";
++  c.priority_mode = "Q0";
++  c.scorer_mode = field<std::string>(options, "scorer_mode", "S4_queue_aware_rule_only");
++  if (c.scorer_mode != "S4_queue_aware_rule_only" && c.scorer_mode != "S3_shortest_potential_only")
++    throw py::value_error("circulation binding supports S4 or S3 same-model reference only");
++  c.merge_grant_rule = "M3";
++  c.merge_grant_timing_mode = "jit_fair_aging_deadline";
++  c.merge_grant_max_pending_requests = 256;
++  c.merge_grant_lifecycle_limit = 8192;
++  c.g4irsf20_event_hotpath_policy = "E2";
++  c.g4irsf16_supervisor_mode = "off";
++  c.local_queue_capacity = 0;
++  c.max_simulation_time = field<double>(options,"max_simulation_time",-1.0);
++  c.max_events = field<int>(options,"max_events",1000000);
++  c.max_decisions_per_bag = field<int>(options,"max_decisions_per_bag",512);
++  c.trace_limit = field<int>(options,"trace_limit",100000);
++  c.event_trace_limit = c.trace_limit;
++  return c;
++}
++CirculationInput read_input(const py::dict& data) {
++  CirculationInput in;
++  for (auto h : data["node_contracts"]) {
++    auto d=py::cast<py::dict>(h);
++    in.nodes.push_back({required<int>(d,"node"),required<std::string>(d,"zone"),
++      required<int>(d,"capacity"),field<int>(d,"export_min_stock",0),
++      field<bool>(d,"allow_export",true),field<bool>(d,"allow_receive",true)});
++  }
++  for (auto h : data["edge_contracts"]) {
++    auto d=py::cast<py::dict>(h);
++    in.edges.push_back({required<int>(d,"from"),required<int>(d,"to"),
++      required<int>(d,"capacity"),required<double>(d,"entry_headway")});
++  }
++  for (auto h : data["trays"]) {
++    auto d=py::cast<py::dict>(h);
++    in.trays.push_back({required<std::string>(d,"tray_id"),required<int>(d,"node")});
++  }
++  for (auto h : data["jobs"]) {
++    auto d=py::cast<py::dict>(h); CirculationJob j;
++    j.business_bag_id=required<std::string>(d,"business_bag_id");
++    j.origin=required<int>(d,"origin"); j.destination=required<int>(d,"destination");
++    j.arrival=required<double>(d,"arrival"); j.deadline=required<double>(d,"deadline");
++    j.storage_node=field<int>(d,"storage_node",-1);
++    j.storage_release_at=field<double>(d,"storage_release_at",0);
++    j.storage_min_dwell=field<double>(d,"storage_min_dwell",0);
++    j.load_seconds=field<double>(d,"load_seconds",0);
++    j.unload_seconds=required<double>(d,"unload_seconds");
++    j.hold_seconds=required<double>(d,"hold_seconds"); in.jobs.push_back(j);
++  }
++  for (auto h : data["transfers"]) {
++    auto d=py::cast<py::dict>(h); CirculationTransfer t;
++    t.request_id=required<std::string>(d,"request_id"); t.tray_id=required<std::string>(d,"tray_id");
++    t.source=required<int>(d,"source"); t.destination=required<int>(d,"destination");
++    t.issued_at=required<double>(d,"issued_at"); t.message_delay=required<double>(d,"message_delay");
++    t.earliest_departure=required<double>(d,"earliest_departure"); t.expiry=required<double>(d,"expiry");
++    in.transfers.push_back(t);
++  }
++  return in;
++}
++py::dict run(const py::dict& data, const std::string& mode) {
++  if (mode != "circulation" && mode != "legacy_g31") throw py::value_error("unknown host mode");
++  Graph graph;
++  std::set<int> declared_nodes;
++  std::set<std::pair<int,int>> declared_edges;
++  for (auto h : data["node_records"]) {
++    auto r=py::cast<py::sequence>(h);
++    if (mode == "circulation" && (py::len(r) != 6 || py::cast<int>(r[0]) < 0 ||
++        !declared_nodes.insert(py::cast<int>(r[0])).second))
++      throw py::value_error("circulation:invalid_graph_node_record");
++    graph.add_node(Node{py::cast<int>(r[0]),py::cast<int>(r[1]),py::cast<double>(r[2]),
++      py::cast<int>(r[3]),py::cast<int>(r[4]),py::cast<std::vector<int>>(r[5])});
++  }
++  for (auto h : data["edge_records"]) {
++    auto r=py::cast<py::sequence>(h);
++    if (mode == "circulation" && (py::len(r) != 4 ||
++        !declared_edges.emplace(py::cast<int>(r[0]),py::cast<int>(r[1])).second))
++      throw py::value_error("circulation:invalid_graph_edge_record");
++    graph.add_edge(Edge{py::cast<int>(r[0]),py::cast<int>(r[1]),py::cast<double>(r[2]),py::cast<double>(r[3])});
++  }
++  auto heuristic=required<std::vector<std::vector<double>>>(data,"heuristic_time");
++  if(mode == "circulation") {
++    if(declared_nodes.empty()) throw py::value_error("circulation:empty_graph");
++    const auto dimension=static_cast<std::size_t>(*declared_nodes.rbegin())+1;
++    if(heuristic.size()!=dimension) throw py::value_error("circulation:invalid_heuristic_shape");
++    for(const auto& row:heuristic) {
++      if(row.size()!=dimension) throw py::value_error("circulation:invalid_heuristic_shape");
++      for(double value:row)
++        if(!std::isfinite(value) || value < 0) throw py::value_error("circulation:invalid_heuristic_value");
++    }
++  }
++  graph.set_heuristic(std::move(heuristic));
++  auto options=field<py::dict>(data,"options",py::dict());
++  auto config=g31_config(options);
++  std::vector<EventRuntimeFaultWindow> faults;
++  for (auto h : field<py::list>(data,"faults",py::list())) {
++    auto d=py::cast<py::dict>(h);
++    faults.push_back({required<int>(d,"from"),required<int>(d,"to"),required<double>(d,"start"),
++      required<double>(d,"end"),field<double>(d,"message_delay",0),field<bool>(d,"drop_notification",false)});
++  }
++  EventDrivenJunctionRuntime runtime(graph,config);
++  if (mode == "circulation") runtime.initialize_circulation(read_input(data),faults);
++  else {
++    std::vector<EventRuntimeBagRequest> requests;
++    for(auto h : data["bag_records"]) {
++      auto r=py::cast<py::sequence>(h);
++      requests.push_back({py::cast<std::string>(r[0]),py::cast<int>(r[1]),py::cast<double>(r[2]),
++        py::cast<double>(r[3]),py::cast<int>(r[4]),py::cast<int>(r[5]),py::cast<std::string>(r[6])});
++    }
++    runtime.initialize(requests,faults);
++  }
++  std::vector<double> event_ms;
++  while(runtime.phase()==EventDrivenJunctionRuntimePhase::kReady) {
++    const auto start=std::chrono::steady_clock::now(); runtime.process_one_event();
++    event_ms.push_back(std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count());
++  }
++  const auto& result=runtime.finalize();
++  py::dict out; out["schema"]="g31.circulation.execution.v1"; out["mode"]=mode;
++  out["optimality"]="unknown"; out["native_event_ms"]=event_ms;
++  py::dict summary;
++#define SUMMARY(name) summary[#name]=result.summary.name
++  SUMMARY(event_count); SUMMARY(completed_count); SUMMARY(failed_count); SUMMARY(runtime_seconds);
++  SUMMARY(edge_enter_event_count); SUMMARY(edge_exit_event_count); SUMMARY(reservation_conflicts);
++  SUMMARY(physical_fault_edge_entry_violation_count); SUMMARY(merge_grant_timing_mode);
++  SUMMARY(g4irsf20_event_hotpath_policy); SUMMARY(local_queue_capacity);
++#undef SUMMARY
++  out["native_summary"]=summary;
++  py::list transport;
++  for(const auto& b:result.bags) {
++    py::dict d;
++#define FIELD(name) d[#name]=b.name
++    FIELD(segment_id);FIELD(runtime_bag_id);FIELD(task_id);FIELD(start);FIELD(goal);FIELD(final_node);
++    FIELD(release_time);FIELD(finish_time);FIELD(completed);FIELD(failure_reason);
++    FIELD(edge_travel_time_seconds);FIELD(node_service_time_seconds);FIELD(decision_count);
++#undef FIELD
++    transport.append(d);
++  } out["transport_legs"]=transport;
++  py::list events;
++  for(const auto& e:result.events) {
++    py::dict d;
++#define FIELD(name) d[#name]=e.name
++    FIELD(seq);FIELD(event);FIELD(time);FIELD(runtime_bag_id);FIELD(segment_id);FIELD(node);
++    FIELD(from_node);FIELD(to_node);FIELD(reason);
++#undef FIELD
++    events.append(d);
++  } out["native_events"]=events;
++  py::list decisions;
++  for(const auto& e:result.decisions) {
++    py::dict d;
++#define FIELD(name) d[#name]=e.name
++    FIELD(event_time);FIELD(runtime_bag_id);FIELD(current_node);FIELD(goal_node);FIELD(selected_next);
++    FIELD(scorer_id);FIELD(scorer_effective_id);FIELD(full_astar_used);FIELD(decision_source);
++#undef FIELD
++    py::list candidates;
++    for(const auto& c:e.candidates) {
++      py::dict row; row["next_node"]=c.next_node; row["shield_allowed"]=c.shield_allowed;
++      row["shield_reason"]=c.shield_reason; row["model_score"]=c.model_score; candidates.append(row);
++    } d["candidates"]=candidates; decisions.append(d);
++  } out["decisions"]=decisions;
++  if(mode == "circulation") {
++    const auto& state=runtime.circulation_state();
++    py::list receipts,jobs,trays,transfers,identities;
++    for(const auto& r:state.receipts) {
++      py::dict d;
++#define FIELD(name) d[#name]=r.name
++      FIELD(time);FIELD(event);FIELD(business_bag_id);FIELD(transport_leg_id);FIELD(tray_id);
++      FIELD(traversal_id);FIELD(node);FIELD(from);FIELD(to);FIELD(reason);
++#undef FIELD
++      receipts.append(d);
++    }
++    for(std::size_t i=0;i<state.jobs.size();++i) {
++      const auto& r=state.jobs[i]; py::dict d; d["business_bag_id"]=state.input.jobs[i].business_bag_id;
++#define FIELD(name) d[#name]=r.name
++      FIELD(status);FIELD(tray);FIELD(loaded_at);FIELD(storage_entered_at);FIELD(storage_released_at);
++      FIELD(completed_at);FIELD(deadline_met);
++#undef FIELD
++      jobs.append(d);
++    }
++    for(const auto& r:state.trays) {
++      py::dict d;
++#define FIELD(name) d[#name]=r.name
++      FIELD(tray_id);FIELD(node);FIELD(mode);FIELD(job);FIELD(active_leg);FIELD(edge_from);FIELD(edge_to);
++      FIELD(reception_node);FIELD(available_at);FIELD(traversal_id);
++#undef FIELD
++      trays.append(d);
++    }
++    for(std::size_t i=0;i<state.transfers.size();++i) {
++      const auto& r=state.transfers[i]; py::dict d; d["request_id"]=state.input.transfers[i].request_id;
++#define FIELD(name) d[#name]=r.name
++      FIELD(status);FIELD(reason);FIELD(tray);FIELD(delivered_at);FIELD(departed_at);FIELD(received_at);
++#undef FIELD
++      transfers.append(d);
++    }
++    for(const auto& r:state.legs) {
++      py::dict d;
++#define FIELD(name) d[#name]=r.name
++      FIELD(runtime_id);FIELD(transport_leg_id);FIELD(tray);FIELD(job);FIELD(kind);
++#undef FIELD
++      identities.append(d);
++    }
++    out["receipts"]=receipts;out["jobs"]=jobs;out["trays"]=trays;out["transfers"]=transfers;
++    out["leg_identities"]=identities;out["physical_clock"]=runtime.progress_snapshot().simulated_time;
++  }
++  return out;
++}
++} // namespace
++
++PYBIND11_MODULE(czr005_circulation,module) {
++  module.doc()="Finite tray lifecycle on the mature G31 native event runtime";
++  module.def("run",&run,py::arg("input"),py::arg("mode")="circulation");
++}
+diff --git a/cpp/ics_core/runtime/circulation.hpp b/cpp/ics_core/runtime/circulation.hpp
+new file mode 100644
+index 00000000..522cc11d
+--- /dev/null
++++ b/cpp/ics_core/runtime/circulation.hpp
+@@ -0,0 +1,194 @@
++#pragma once
++
++#include <algorithm>
++#include <cmath>
++#include <cstdint>
++#include <map>
++#include <stdexcept>
++#include <string>
++#include <vector>
++
++namespace czr005::ics {
++
++// Opt-in physical contract, shared by every policy in circulation mode.
++// All times are native G31 seconds. Storage is explicitly on-carrier.
++struct CirculationNodeContract {
++  int node = -1;
++  std::string zone;
++  int capacity = 1;  // includes parked, held and incoming carriers
++  int export_min_stock = 0;
++  bool allow_export = true;
++  bool allow_receive = true;
++};
++struct CirculationEdgeContract {
++  int from = -1;
++  int to = -1;
++  int capacity = 1;  // simultaneous traversals, independent of entry headway
++  double entry_headway = 0.001;
++};
++struct CirculationTrayInput {
++  std::string tray_id;
++  int node = -1;
++};
++struct CirculationJob {
++  std::string business_bag_id;
++  int origin = -1;
++  int destination = -1;
++  double arrival = 0;
++  double deadline = -1;
++  int storage_node = -1;
++  double storage_release_at = 0;
++  double storage_min_dwell = 0;
++  double load_seconds = 0;
++  double unload_seconds = 1;
++  double hold_seconds = 0;
++};
++struct CirculationTransfer {
++  std::string request_id;
++  std::string tray_id;
++  int source = -1;
++  int destination = -1;
++  double issued_at = 0;
++  double message_delay = 0;
++  double earliest_departure = 0;
++  double expiry = 1.0e9;  // departure lease, reception berth stays held in transit
++};
++struct CirculationInput {
++  std::vector<CirculationNodeContract> nodes;
++  std::vector<CirculationEdgeContract> edges;
++  std::vector<CirculationTrayInput> trays;
++  std::vector<CirculationJob> jobs;
++  std::vector<CirculationTransfer> transfers;
++};
++struct CirculationTrayState {
++  std::string tray_id;
++  int node = -1;
++  std::string mode = "empty";
++  int job = -1;
++  int active_leg = -1;
++  int edge_from = -1;
++  int edge_to = -1;
++  int reception_node = -1;
++  int transfer = -1;
++  double available_at = 0;
++  double storage_arrived_at = -1;
++  std::uint64_t generation = 0;
++  std::uint64_t traversal_id = 0;
++  bool edge_entry_observed = false;
++};
++struct CirculationJobState {
++  std::string status = "unreleased";
++  int tray = -1;
++  double loaded_at = -1;
++  double storage_entered_at = -1;
++  double storage_released_at = -1;
++  double completed_at = -1;
++  bool deadline_met = false;
++};
++struct CirculationTransferState {
++  std::string status = "undelivered";
++  std::string reason;
++  int tray = -1;
++  double delivered_at = -1;
++  double departed_at = -1;
++  double received_at = -1;
++};
++struct CirculationLeg {
++  int runtime_id = -1;
++  std::string transport_leg_id;
++  int tray = -1;
++  int job = -1;  // -1 denotes a real empty-carrier movement
++  std::string kind;  // storage_in, storage_out, direct, empty_return
++};
++struct CirculationReceipt {
++  double time = 0;
++  std::string event;
++  std::string business_bag_id;
++  std::string transport_leg_id;
++  std::string tray_id;
++  std::uint64_t traversal_id = 0;
++  int node = -1;
++  int from = -1;
++  int to = -1;
++  std::string reason;
++};
++
++struct CirculationState {
++  bool enabled = false;
++  CirculationInput input;
++  std::vector<CirculationTrayState> trays;
++  std::vector<CirculationJobState> jobs;
++  std::vector<CirculationTransferState> transfers;
++  std::vector<CirculationLeg> legs; // indexed by G31 runtime_id
++  std::vector<CirculationReceipt> receipts;
++  std::vector<double> next_entry;
++  std::uint64_t next_traversal = 1;
++
++  const CirculationNodeContract& node_contract(int node) const {
++    const auto found = std::find_if(input.nodes.begin(), input.nodes.end(),
++        [node](const auto& n) { return n.node == node; });
++    if (found == input.nodes.end()) throw std::invalid_argument("circulation:missing_node_contract");
++    return *found;
++  }
++  int edge_index(int from, int to) const noexcept {
++    for (std::size_t i = 0; i < input.edges.size(); ++i)
++      if (input.edges[i].from == from && input.edges[i].to == to) return static_cast<int>(i);
++    return -1;
++  }
++  int occupancy(int node, int exclude_tray = -1) const noexcept {
++    int count = 0;
++    for (std::size_t i = 0; i < trays.size(); ++i) {
++      if (static_cast<int>(i) == exclude_tray) continue;
++      const auto& t = trays[i];
++      // One carrier is counted once even when its remote reception lease
++      // becomes the currently reserved one-hop receiving berth.
++      if ((t.edge_to < 0 && t.node == node) || t.edge_to == node ||
++          t.reception_node == node) ++count;
++    }
++    return count;
++  }
++  int empty_stock(int node, double time) const noexcept {
++    int count = 0;
++    for (const auto& t : trays)
++      if (t.node == node && t.edge_to < 0 && t.mode == "empty" &&
++          t.available_at <= time + 1e-9 && t.active_leg < 0) ++count;
++    return count;
++  }
++  std::string can_enter(int runtime_id, int from, int to, double time) const {
++    if (!enabled) return "allowed";
++    if (runtime_id < 0 || runtime_id >= static_cast<int>(legs.size())) return "circulation:unbound_leg";
++    const int ti = legs[runtime_id].tray;
++    const auto& tray = trays.at(ti);
++    if (tray.node != from || tray.edge_to >= 0 || tray.active_leg != runtime_id)
++      return "circulation:carrier_not_at_source";
++    if (tray.transfer >= 0 && transfers[tray.transfer].status == "dispatching" &&
++        time > input.transfers[tray.transfer].expiry + 1e-9)
++      return "circulation:departure_lease_expired";
++    const int ei = edge_index(from, to);
++    if (ei < 0) return "circulation:missing_edge_contract";
++    const auto& edge = input.edges[ei];
++    if (!std::isfinite(time + edge.entry_headway))
++      throw std::invalid_argument("circulation:nonfinite_derived_time");
++    if (next_entry[ei] > time + 1e-9) return "circulation:entry_headway";
++    int inflight = 0;
++    for (const auto& t : trays)
++      if (t.edge_from == from && t.edge_to == to) ++inflight;
++    if (inflight >= edge.capacity) return "circulation:edge_capacity";
++    if (occupancy(to, ti) >= node_contract(to).capacity) return "circulation:receiving_full";
++    return "allowed";
++  }
++  // Called only at the native transaction's irreversible publication point.
++  // Fixed-size state only: no allocations, no callbacks and no exceptions.
++  void reserve_enter(int runtime_id, int from, int to, double time) noexcept {
++    if (!enabled) return;
++    auto& tray = trays[legs[runtime_id].tray];
++    const int ei = edge_index(from, to);
++    next_entry[ei] = time + input.edges[ei].entry_headway;
++    tray.edge_from = from;
++    tray.edge_to = to;
++    tray.traversal_id = next_traversal++;
++    tray.edge_entry_observed = false;
++  }
++};
++
++} // namespace czr005::ics
+diff --git a/cpp/ics_core/runtime/circulation_runtime_impl.hpp b/cpp/ics_core/runtime/circulation_runtime_impl.hpp
+new file mode 100644
+index 00000000..fd4d51dd
+--- /dev/null
++++ b/cpp/ics_core/runtime/circulation_runtime_impl.hpp
+@@ -0,0 +1,475 @@
++#pragma once
++
++// Definitions are included after the mature runtime class. Every lifecycle
++// transition is consumed by that runtime's existing native priority queue.
++namespace czr005::ics {
++
++inline void EventDrivenJunctionRuntime::initialize_circulation(
++    const CirculationInput& input,
++    const std::vector<EventRuntimeFaultWindow>& faults) {
++  if (config_.complete_on_goal_arrival)
++    throw std::invalid_argument("circulation:goal_arrival_completion_unsupported");
++  if ((canonical_scorer_mode() != "S4" && canonical_scorer_mode() != "S3") ||
++      !uses_jit_destination_merge_grants() ||
++      canonical_merge_grant_timing_mode() != DestinationMergeGrantTimingMode::kJitFairAgingDeadline ||
++      config_.queue_discipline != "fifo" ||
++      config_.g4irsf20_event_hotpath_policy != "E2" ||
++      config_.g4irsf24_dlp.mode != "off" || g4irsf16_enabled()) {
++    throw std::invalid_argument("circulation:requires_S4_or_S3_FIFO_J2_E2_learning_off");
++  }
++  if (input.trays.empty()) throw std::invalid_argument("circulation:empty_fleet");
++  const auto nonnegative = [](double x) { return std::isfinite(x) && x >= 0; };
++  const auto finite_sum = [](std::initializer_list<double> values) {
++    double sum = 0;
++    for (double value : values) {
++      sum += value;
++      if (!std::isfinite(sum))
++        throw std::invalid_argument("circulation:nonfinite_derived_time");
++    }
++    return sum;
++  };
++  const auto locations = graph_.node_locations();
++  for (std::size_t i = 0; i < locations.size(); ++i) {
++    const int node = locations[i];
++    if (!nonnegative(graph_.service_time(node)))
++      throw std::invalid_argument("circulation:invalid_node_service");
++    if (node != static_cast<int>(i))
++      throw std::invalid_argument("circulation:invalid_heuristic_matrix");
++    for (int next : graph_.outgoing(node)) {
++      const auto& edge = graph_.edge(node, next);
++      if (!nonnegative(edge.length) || !std::isfinite(edge.speed) || edge.speed <= 0)
++        throw std::invalid_argument("circulation:invalid_edge_geometry");
++      if (!std::isfinite(edge.travel_time()))
++        throw std::invalid_argument("circulation:invalid_edge_travel");
++    }
++    for (int goal : locations) {
++      try {
++        if (!nonnegative(graph_.heuristic(node, goal)))
++          throw std::invalid_argument("circulation:invalid_heuristic_matrix");
++      } catch (const std::out_of_range&) {
++        throw std::invalid_argument("circulation:invalid_heuristic_matrix");
++      }
++    }
++  }
++  std::set<int> nodes;
++  for (const auto& n : input.nodes) {
++    (void)graph_.node(n.node);
++    if (!nodes.insert(n.node).second || n.capacity <= 0 ||
++        n.export_min_stock < 0 || n.export_min_stock > n.capacity || n.zone.empty())
++      throw std::invalid_argument("circulation:invalid_node_contract");
++  }
++  if (nodes.size() != graph_.node_count())
++    throw std::invalid_argument("circulation:node_contract_coverage");
++  std::set<std::pair<int,int>> edges;
++  for (const auto& e : input.edges) {
++    if (!graph_.has_edge(e.from, e.to) || !edges.emplace(e.from,e.to).second ||
++        e.capacity <= 0 || !nonnegative(e.entry_headway))
++      throw std::invalid_argument("circulation:invalid_edge_contract");
++  }
++  if (edges.size() != graph_.edge_count())
++    throw std::invalid_argument("circulation:edge_contract_coverage");
++  std::set<std::string> tray_ids, job_ids, request_ids;
++  for (const auto& t : input.trays) {
++    if (t.tray_id.empty() || !tray_ids.insert(t.tray_id).second || !nodes.count(t.node))
++      throw std::invalid_argument("circulation:invalid_tray");
++  }
++  for (const auto& j : input.jobs) {
++    if (j.business_bag_id.empty() || !job_ids.insert(j.business_bag_id).second ||
++        !nodes.count(j.origin) || !nodes.count(j.destination) ||
++        (j.storage_node >= 0 && !nodes.count(j.storage_node)) ||
++        !nonnegative(j.arrival) || !std::isfinite(j.deadline) ||
++        !nonnegative(j.storage_release_at) || !nonnegative(j.storage_min_dwell) ||
++        !nonnegative(j.load_seconds) || !nonnegative(j.unload_seconds) ||
++        !nonnegative(j.hold_seconds))
++      throw std::invalid_argument("circulation:invalid_job");
++    (void)finite_sum({j.arrival, j.load_seconds, j.storage_min_dwell,
++                      j.unload_seconds, j.hold_seconds});
++    (void)finite_sum({j.storage_release_at, j.unload_seconds, j.hold_seconds});
++    // Zero-hop contracts require explicit handling of source service and are
++    // rejected rather than counted as a physical movement in this first slice.
++    if (j.origin == j.destination || j.storage_node == j.origin ||
++        j.storage_node == j.destination)
++      throw std::invalid_argument("circulation:zero_hop_contract_unsupported");
++  }
++  for (const auto& t : input.transfers) {
++    if (t.request_id.empty() || !request_ids.insert(t.request_id).second ||
++        !tray_ids.count(t.tray_id) || !nodes.count(t.source) ||
++        !nodes.count(t.destination) || t.source == t.destination ||
++        !nonnegative(t.issued_at) || !nonnegative(t.message_delay) ||
++        !nonnegative(t.earliest_departure) || !nonnegative(t.expiry))
++      throw std::invalid_argument("circulation:invalid_transfer");
++    (void)finite_sum({t.issued_at, t.message_delay});
++  }
++  // Fault notifications are queued by initialize before the circulation flag
++  // becomes active, so validate their derived delivery times here as well.
++  for (const auto& fault : faults) {
++    validate_fault_window(fault);
++    (void)finite_sum({fault.fault_time, fault.message_delay});
++    (void)finite_sum({fault.repair_time, fault.message_delay});
++  }
++  initialize({}, faults);
++  circulation_.enabled = true;
++  circulation_.input = input;
++  if (config_.max_simulation_time < 0) {
++    double latest = 0;
++    for (const auto& job : input.jobs)
++      latest = std::max({latest, job.storage_release_at,
++          job.arrival + job.load_seconds + job.storage_min_dwell +
++              job.unload_seconds + job.hold_seconds});
++    for (const auto& request : input.transfers)
++      latest = std::max({latest, request.issued_at + request.message_delay,
++                         request.earliest_departure});
++    for (const auto& fault : faults)
++      latest = std::max(latest, fault.repair_time + fault.message_delay);
++    time_limit_ = finite_sum({latest, 86400.0});
++  }
++  circulation_.next_entry.assign(input.edges.size(), 0.0);
++  circulation_.jobs.resize(input.jobs.size());
++  circulation_.transfers.resize(input.transfers.size());
++  for (const auto& t : input.trays) {
++    CirculationTrayState state;
++    state.tray_id = t.tray_id;
++    state.node = t.node;
++    circulation_.trays.push_back(std::move(state));
++  }
++  for (const auto& n : input.nodes) {
++    if (circulation_.occupancy(n.node) > n.capacity)
++      throw std::invalid_argument("circulation:initial_receiving_full");
++  }
++  for (std::size_t i = 0; i < input.jobs.size(); ++i)
++    circulation_schedule("job_arrival", input.jobs[i].arrival, static_cast<int>(i));
++  for (std::size_t i = 0; i < input.transfers.size(); ++i) {
++    const auto& request = input.transfers[i];
++    circulation_schedule("module_message", request.issued_at + request.message_delay,
++                          static_cast<int>(i));
++  }
++  runtime_phase_ = events_.empty() ? EventDrivenJunctionRuntimePhase::kStopped
++                                 : EventDrivenJunctionRuntimePhase::kReady;
++}
++
++inline void EventDrivenJunctionRuntime::circulation_schedule(
++    const std::string& reason, double time, int index, std::uint64_t generation) {
++  if (!std::isfinite(time))
++    throw std::invalid_argument("circulation:nonfinite_event_time");
++  RuntimeEvent event;
++  event.type = JunctionEventType::kCirculation;
++  event.time = time;
++  event.task_id = index;
++  event.wakeup_generation = generation;
++  event.reason = reason;
++  push_event(std::move(event));
++}
++
++inline void EventDrivenJunctionRuntime::circulation_receipt(
++    double time, const std::string& event, int tray, int leg, int from, int to,
++    const std::string& reason) {
++  CirculationReceipt row;
++  row.time = time; row.event = event; row.from = from; row.to = to; row.reason = reason;
++  if (tray >= 0) {
++    const auto& t = circulation_.trays.at(tray);
++    row.tray_id = t.tray_id; row.node = t.node; row.traversal_id = t.traversal_id;
++    if (t.job >= 0) row.business_bag_id = circulation_.input.jobs.at(t.job).business_bag_id;
++  }
++  if (leg >= 0) {
++    const auto& l = circulation_.legs.at(leg);
++    row.transport_leg_id = l.transport_leg_id;
++    if (l.job >= 0) row.business_bag_id = circulation_.input.jobs.at(l.job).business_bag_id;
++  }
++  circulation_.receipts.push_back(std::move(row));
++}
++
++inline void EventDrivenJunctionRuntime::circulation_create_leg(
++    int tray_index, int job_index, int destination, const std::string& kind, double time) {
++  auto& tray = circulation_.trays.at(tray_index);
++  if (tray.active_leg >= 0 || tray.edge_to >= 0 || tray.node == destination)
++    throw std::logic_error("circulation:invalid_leg_activation");
++  const int id = static_cast<int>(circulation_.legs.size());
++  CirculationLeg leg;
++  leg.runtime_id = id; leg.tray = tray_index; leg.job = job_index; leg.kind = kind;
++  const std::string owner = job_index >= 0
++      ? circulation_.input.jobs[job_index].business_bag_id
++      : circulation_.input.transfers.at(tray.transfer).request_id;
++  leg.transport_leg_id = owner + ":" + kind + ":" + std::to_string(id);
++  EventRuntimeBagRequest request;
++  request.segment_id = leg.transport_leg_id;
++  request.task_id = job_index >= 0 ? job_index : static_cast<int>(circulation_.jobs.size()) + tray.transfer;
++  request.runtime_bag_id = id; request.release_time = time;
++  request.deadline = job_index >= 0 ? circulation_.input.jobs[job_index].deadline : -1;
++  request.start = tray.node; request.goal = destination;
++  request.source = kind == "storage_out" ? "storage" : "circulation";
++  validate_request(request);
++  BagState bag; bag.request = request; bag.current = tray.node;
++  bags_.emplace(id, std::move(bag));
++  segment_runtime_ids_.emplace(request.segment_id, id);
++  circulation_.legs.push_back(std::move(leg));
++  tray.active_leg = id;
++  ++result_.summary.requested_count;
++  circulation_receipt(time, "LEG_START", tray_index, id, tray.node, destination, kind);
++  schedule(JunctionEventType::kBagRelease, time, id, tray.node, -1, -1);
++  for (const int downstream : graph_.outgoing(tray.node))
++    schedule_passive(JunctionEventType::kCongestionBeaconUpdate, time, -1,
++                     downstream, -1, downstream, "circulation_leg_initial_snapshot");
++}
++
++inline void EventDrivenJunctionRuntime::circulation_publish_event(RuntimeEvent& event) noexcept {
++  if (!circulation_.enabled || event.task_id < 0 ||
++      event.task_id >= static_cast<int>(circulation_.legs.size())) return;
++  auto& tray = circulation_.trays[circulation_.legs[event.task_id].tray];
++  if (event.type == JunctionEventType::kEdgeEnter) {
++    circulation_.reserve_enter(event.task_id, event.from_node, event.to_node, event.time);
++    event.traversal_id = tray.traversal_id;
++  } else if (event.type == JunctionEventType::kEdgeExit) {
++    event.traversal_id = tray.traversal_id;
++  }
++}
++
++inline bool EventDrivenJunctionRuntime::circulation_edge_enter(const RuntimeEvent& event) {
++  if (!circulation_.enabled) return true;
++  if (event.task_id < 0 || event.task_id >= static_cast<int>(circulation_.legs.size())) return false;
++  const int ti = circulation_.legs[event.task_id].tray;
++  auto& tray = circulation_.trays[ti];
++  if (tray.active_leg != event.task_id || tray.traversal_id != event.traversal_id ||
++      tray.edge_from != event.from_node || tray.edge_to != event.to_node || tray.edge_entry_observed) {
++    circulation_receipt(event.time, "STALE_TRAVERSAL_REJECTED", ti, event.task_id,
++                         event.from_node, event.to_node, "entry_identity_mismatch");
++    return false;
++  }
++  tray.edge_entry_observed = true;
++  if (tray.transfer >= 0) {
++    auto& transfer = circulation_.transfers[tray.transfer];
++    if (transfer.status == "dispatching") {
++      transfer.status = "departed";
++      transfer.departed_at = event.time;
++    }
++  }
++  circulation_receipt(event.time, "EDGE_ENTER", ti, event.task_id, event.from_node, event.to_node);
++  return true;
++}
++
++inline bool EventDrivenJunctionRuntime::circulation_edge_exit(const RuntimeEvent& event) {
++  if (!circulation_.enabled) return true;
++  if (event.task_id < 0 || event.task_id >= static_cast<int>(circulation_.legs.size())) return false;
++  const int ti = circulation_.legs[event.task_id].tray;
++  auto& tray = circulation_.trays[ti];
++  if (tray.active_leg != event.task_id || tray.traversal_id != event.traversal_id ||
++      tray.edge_from != event.from_node || tray.edge_to != event.to_node || !tray.edge_entry_observed) {
++    circulation_receipt(event.time, "STALE_TRAVERSAL_REJECTED", ti, event.task_id,
++                         event.from_node, event.to_node, "exit_identity_mismatch");
++    return false;
++  }
++  tray.node = event.to_node; tray.edge_from = -1; tray.edge_to = -1;
++  circulation_receipt(event.time, "EDGE_EXIT", ti, event.task_id, event.from_node, event.to_node);
++  return true;
++}
++
++inline void EventDrivenJunctionRuntime::circulation_leg_completed(int runtime_id, double time) {
++  if (!circulation_.enabled) return;
++  const auto leg = circulation_.legs.at(runtime_id);
++  auto& tray = circulation_.trays.at(leg.tray);
++  if (tray.active_leg != runtime_id || tray.edge_to >= 0)
++    throw std::logic_error("circulation:completion_without_physical_arrival");
++  circulation_receipt(time, "LEG_COMPLETE", leg.tray, runtime_id, -1, tray.node, leg.kind);
++  tray.active_leg = -1;
++  ++tray.generation;
++  if (leg.kind == "storage_in") {
++    const auto& job = circulation_.input.jobs.at(leg.job);
++    auto& state = circulation_.jobs.at(leg.job);
++    tray.mode = "storage"; tray.storage_arrived_at = time;
++    state.status = "storage"; state.storage_entered_at = time;
++    const double ready = std::max({time, job.storage_release_at, time + job.storage_min_dwell});
++    circulation_receipt(time, "STORAGE_ENTER", leg.tray, runtime_id);
++    circulation_schedule("storage_ready", ready, leg.tray, tray.generation);
++  } else if (leg.kind == "empty_return") {
++    auto& transfer = circulation_.transfers.at(tray.transfer);
++    transfer.status = "received"; transfer.received_at = time;
++    tray.mode = "empty"; tray.reception_node = -1; tray.available_at = time;
++    circulation_receipt(time, "EMPTY_RECEIVED", leg.tray, runtime_id, -1, tray.node,
++                         circulation_.input.transfers[tray.transfer].request_id);
++    tray.transfer = -1;
++    circulation_progress(time);
++  } else {
++    tray.mode = "unloading";
++    circulation_.jobs.at(leg.job).status = "unloading";
++    circulation_receipt(time, "UNLOAD_START", leg.tray, runtime_id);
++    circulation_schedule("unload_complete", time + circulation_.input.jobs[leg.job].unload_seconds,
++                          leg.tray, tray.generation);
++  }
++}
++
++inline void EventDrivenJunctionRuntime::circulation_leg_failed(
++    int runtime_id, const std::string& reason, double time) {
++  if (!circulation_.enabled || runtime_id < 0 || runtime_id >= static_cast<int>(circulation_.legs.size())) return;
++  const auto& leg = circulation_.legs[runtime_id];
++  auto& tray = circulation_.trays[leg.tray];
++  tray.mode = "quarantined";
++  if (leg.job >= 0) circulation_.jobs[leg.job].status = "failed";
++  if (tray.transfer >= 0) {
++    auto& transfer = circulation_.transfers[tray.transfer];
++    transfer.status = "failed";
++    transfer.reason = reason;
++    if (transfer.departed_at < 0 && tray.edge_to < 0 && tray.reception_node >= 0) {
++      const int released = tray.reception_node;
++      tray.reception_node = -1;
++      circulation_receipt(time, "UNUSED_RECEIVING_RELEASED", leg.tray, runtime_id,
++                           tray.node, released, reason);
++    }
++  }
++  // Preserve the real carrier and any in-flight/receiving occupancy. A failed
++  // operation cannot manufacture an available tray or erase a physical load.
++  circulation_receipt(time, "LEG_FAILED", leg.tray, runtime_id,
++                       -1, tray.node, reason);
++}
++
++inline void EventDrivenJunctionRuntime::circulation_progress(double time) {
++  // Owner-local load permission is consumed before discretionary empty export.
++  std::vector<std::size_t> waiting;
++  for (std::size_t ji = 0; ji < circulation_.jobs.size(); ++ji)
++    if (circulation_.jobs[ji].status == "waiting_for_tray") waiting.push_back(ji);
++  std::sort(waiting.begin(), waiting.end(), [&](std::size_t a, std::size_t b) {
++    const auto& left = circulation_.input.jobs[a];
++    const auto& right = circulation_.input.jobs[b];
++    return std::tie(left.arrival, left.business_bag_id) <
++           std::tie(right.arrival, right.business_bag_id);
++  });
++  for (const std::size_t ji : waiting) {
++    auto& state = circulation_.jobs[ji];
++    if (state.status != "waiting_for_tray") continue;
++    const auto& job = circulation_.input.jobs[ji];
++    for (std::size_t ti = 0; ti < circulation_.trays.size(); ++ti) {
++      auto& tray = circulation_.trays[ti];
++      if (tray.node != job.origin || tray.mode != "empty" || tray.active_leg >= 0 ||
++          tray.edge_to >= 0 || tray.available_at > time + 1e-9) continue;
++      tray.mode = "loading"; tray.job = static_cast<int>(ji); ++tray.generation;
++      state.status = "loading"; state.tray = static_cast<int>(ti);
++      circulation_receipt(time, "LOAD_START", static_cast<int>(ti));
++      circulation_schedule("load_complete", time + job.load_seconds,
++                            static_cast<int>(ti), tray.generation);
++      break;
++    }
++  }
++  for (std::size_t xi = 0; xi < circulation_.transfers.size(); ++xi) {
++    auto& state = circulation_.transfers[xi];
++    if (state.status != "pending") continue;
++    const auto& request = circulation_.input.transfers[xi];
++    auto& tray = circulation_.trays.at(state.tray);
++    const auto reject = [&](const std::string& reason) {
++      state.status = "rejected"; state.reason = reason;
++      circulation_receipt(time, "TRANSFER_REJECTED", state.tray, -1,
++                           request.source, request.destination, reason);
++    };
++    if (time > request.expiry + 1e-9) { reject("departure_lease_expired"); continue; }
++    if (time + 1e-9 < request.earliest_departure) continue;
++    if (tray.mode != "empty" || tray.active_leg >= 0 || tray.edge_to >= 0 ||
++        tray.available_at > time + 1e-9) continue;
++    if (tray.node != request.source) { reject("carrier_not_at_export_port"); continue; }
++    const auto& source = circulation_.node_contract(request.source);
++    const auto& destination = circulation_.node_contract(request.destination);
++    if (source.zone == destination.zone) {
++      reject("same_zone_transfer_not_authorized"); continue;
++    }
++    if (!source.allow_export) { reject("source_module_refused"); continue; }
++    if (!destination.allow_receive) { reject("destination_module_refused"); continue; }
++    if (circulation_.empty_stock(request.source, time) <= source.export_min_stock) {
++      reject("source_module_min_stock"); continue;
++    }
++    if (circulation_.occupancy(request.destination, state.tray) >= destination.capacity) {
++      reject("receiving_full"); continue;
++    }
++    tray.reception_node = request.destination; tray.transfer = static_cast<int>(xi);
++    tray.mode = "empty_transit"; state.status = "dispatching";
++    circulation_receipt(time, "EXPORT_GRANTED", state.tray, -1,
++                         request.source, request.destination, request.request_id);
++    circulation_create_leg(state.tray, -1, request.destination, "empty_return", time);
++  }
++}
++
++inline void EventDrivenJunctionRuntime::process_circulation_event(const RuntimeEvent& event) {
++  if (!circulation_.enabled) throw std::logic_error("circulation:event_in_legacy_mode");
++  const double time = event.time;
++  if (event.reason == "job_arrival") {
++    auto& state = circulation_.jobs.at(event.task_id);
++    if (state.status != "unreleased") return;
++    state.status = "waiting_for_tray";
++    CirculationReceipt row; row.time = time; row.event = "BAG_ARRIVAL";
++    row.business_bag_id = circulation_.input.jobs[event.task_id].business_bag_id;
++    row.node = circulation_.input.jobs[event.task_id].origin;
++    circulation_.receipts.push_back(std::move(row));
++    circulation_progress(time);
++    return;
++  }
++  if (event.reason == "module_message") {
++    auto& state = circulation_.transfers.at(event.task_id);
++    if (state.status != "undelivered") return;
++    const auto& request = circulation_.input.transfers[event.task_id];
++    state.delivered_at = time;
++    for (std::size_t i = 0; i < circulation_.trays.size(); ++i)
++      if (circulation_.trays[i].tray_id == request.tray_id) state.tray = static_cast<int>(i);
++    circulation_receipt(time, "MODULE_REQUEST_DELIVERED", state.tray, -1,
++                         request.source, request.destination, request.request_id);
++    state.status = "pending";
++    if (request.earliest_departure > time && request.earliest_departure <= time_limit_)
++      circulation_schedule("transfer_wakeup", request.earliest_departure, event.task_id);
++    if (request.expiry >= time && request.expiry + 1e-8 <= time_limit_)
++      circulation_schedule("transfer_expiry", request.expiry + 1e-8, event.task_id);
++    circulation_progress(time);
++    return;
++  }
++  if (event.reason == "transfer_wakeup" || event.reason == "transfer_expiry") {
++    auto& state = circulation_.transfers.at(event.task_id);
++    if (event.reason == "transfer_expiry" && state.status == "dispatching") {
++      const int tray_index = state.tray;
++      auto& tray = circulation_.trays.at(tray_index);
++      const int id = tray.active_leg;
++      if (id >= 0 && tray.edge_to < 0) {
++        auto& bag = bags_.at(id);
++        for (auto& pair : junctions_) {
++          auto& q = pair.second.queue;
++          q.erase(std::remove(q.begin(), q.end(), id), q.end());
++          auto& sq = pair.second.source_queue;
++          sq.erase(std::remove(sq.begin(), sq.end(), id), sq.end());
++        }
++        fail_bag(bag, "departure_lease_expired_before_physical_entry", time);
++      }
++    }
++    circulation_progress(time);
++    return;
++  }
++  auto& tray = circulation_.trays.at(event.task_id);
++  if (tray.generation != event.wakeup_generation) {
++    circulation_receipt(time, "STALE_LIFECYCLE_REJECTED", event.task_id, -1, -1, -1, event.reason);
++    return;
++  }
++  const int job_index = tray.job;
++  if (job_index < 0) throw std::logic_error("circulation:lifecycle_without_load");
++  auto& state = circulation_.jobs.at(job_index);
++  const auto& job = circulation_.input.jobs.at(job_index);
++  if (event.reason == "load_complete" && tray.mode == "loading") {
++    tray.mode = "loaded"; state.status = "in_transit"; state.loaded_at = time;
++    circulation_receipt(time, "LOAD_COMPLETE", event.task_id);
++    circulation_create_leg(event.task_id, job_index,
++        job.storage_node >= 0 ? job.storage_node : job.destination,
++        job.storage_node >= 0 ? "storage_in" : "direct", time);
++  } else if (event.reason == "storage_ready" && tray.mode == "storage") {
++    if (time + 1e-9 < job.storage_release_at ||
++        time + 1e-9 < tray.storage_arrived_at + job.storage_min_dwell)
++      throw std::logic_error("circulation:premature_storage_release");
++    tray.mode = "loaded"; state.status = "in_transit"; state.storage_released_at = time;
++    circulation_receipt(time, "STORAGE_RELEASE", event.task_id);
++    circulation_create_leg(event.task_id, job_index, job.destination, "storage_out", time);
++  } else if (event.reason == "unload_complete" && tray.mode == "unloading") {
++    state.status = "completed"; state.completed_at = time;
++    state.deadline_met = job.deadline < 0 || time <= job.deadline + 1e-9;
++    tray.mode = "hold"; tray.available_at = time + job.hold_seconds;
++    circulation_receipt(time, "UNLOAD_COMPLETE", event.task_id);
++    circulation_receipt(time, "HOLD_START", event.task_id);
++    circulation_schedule("hold_complete", tray.available_at, event.task_id, tray.generation);
++  } else if (event.reason == "hold_complete" && tray.mode == "hold") {
++    circulation_receipt(time, "HOLD_COMPLETE", event.task_id);
++    tray.mode = "empty"; tray.job = -1;
++    circulation_progress(time);
++  } else {
++    throw std::logic_error("circulation:invalid_lifecycle_transition:" + event.reason);
++  }
++}
++
++} // namespace czr005::ics
+diff --git a/cpp/tests/g31_legacy_replay_fixture.cpp b/cpp/tests/g31_legacy_replay_fixture.cpp
+new file mode 100644
+index 00000000..46557a7d
+--- /dev/null
++++ b/cpp/tests/g31_legacy_replay_fixture.cpp
+@@ -0,0 +1,49 @@
++// Compile this identical fixture against the pinned mature and updated headers.
++// Runtime timings are excluded by G31's five deterministic replay projections.
++#include <iostream>
++#include "ics_core/runtime/event_driven_junction.hpp"
++using namespace czr005::ics;
++int main() {
++  Graph g;
++  for(int i=0;i<5;++i) g.add_node(Node{i,0,0.1,0,0,{}});
++  for(auto edge:std::vector<std::pair<int,int>>{{0,2},{1,2},{2,3},{2,4},{4,3},{3,0}})
++    g.add_edge(Edge{edge.first,edge.second,1,1});
++  std::vector<std::vector<double>> h(5,std::vector<double>(5,100));
++  for(int i=0;i<5;++i) { h[i][i]=0; for(int j:g.outgoing(i)) h[i][j]=1.1; }
++  for(int k=0;k<5;++k) for(int i=0;i<5;++i) for(int j=0;j<5;++j)
++    h[i][j]=std::min(h[i][j],h[i][k]+h[k][j]);
++  g.set_heuristic(h);
++  EventDrivenJunctionConfig c;
++  c.queue_discipline="fifo"; c.resource_semantics="R3";
++  c.event_semantics="E4_batch_plus_destination_merge_request";
++  c.enable_source_admission=false; c.enable_backpressure=false;
++  c.enable_pibt_lite=false; c.pressure_mode="off"; c.admission_mode="off";
++  c.pibt_mode="P2"; c.priority_mode="Q0"; c.scorer_mode="S4";
++  c.merge_grant_rule="M3"; c.merge_grant_timing_mode="J2";
++  c.g4irsf20_event_hotpath_policy="E2"; c.local_queue_capacity=0;
++  c.max_events=100000; c.max_simulation_time=100; c.trace_limit=10000;
++  c.event_trace_limit=10000;
++  const std::vector<EventRuntimeBagRequest> requests={
++    {"a:direct",1,0,20,0,3,"normal"},
++    {"b:direct",2,0,15,1,3,"normal"},
++    {"c:storage_out",3,0.05,18,1,3,"storage"},
++    {"d:direct",4,0.3,30,0,3,"normal"}};
++  std::cout << "[";
++  for(int scenario=0;scenario<2;++scenario) {
++    EventDrivenJunctionRuntime runtime(g,c);
++    std::vector<EventRuntimeFaultWindow> faults;
++    if(scenario) faults.push_back({2,3,1,5,0.2,false});
++    auto result=runtime.run(requests,faults);
++    auto hash=runtime.deterministic_replay_hashes();
++    if(scenario) std::cout<<",";
++    std::cout<<"{\"scenario\":"<<scenario
++      <<",\"completed\":"<<result.summary.completed_count
++      <<",\"failed\":"<<result.summary.failed_count
++      <<",\"complete_bags_sha256\":\""<<hash.complete_bags_sha256
++      <<"\",\"segment_result_sha256\":\""<<hash.segment_result_sha256
++      <<"\",\"junction_state_sha256\":\""<<hash.junction_state_sha256
++      <<"\",\"algorithm_summary_sha256\":\""<<hash.algorithm_summary_sha256
++      <<"\",\"deterministic_result_sha256\":\""<<hash.deterministic_result_sha256<<"\"}";
++  }
++  std::cout<<"]\n";
++}
+diff --git a/cpp/tests/test_circulation_runtime.cpp b/cpp/tests/test_circulation_runtime.cpp
+new file mode 100644
+index 00000000..6b098f68
+--- /dev/null
++++ b/cpp/tests/test_circulation_runtime.cpp
+@@ -0,0 +1,161 @@
++#include <iostream>
++#include <stdexcept>
++#include <string>
++#include "ics_core/runtime/event_driven_junction.hpp"
++
++using namespace czr005::ics;
++
++namespace {
++void require(bool ok, const std::string& message) {
++  if (!ok) throw std::runtime_error(message);
++}
++Graph graph() {
++  Graph g;
++  for (int i=0;i<4;++i) g.add_node(Node{i,0,0.001,0,0,{}});
++  for (auto edge : std::vector<std::pair<int,int>>{{0,1},{1,2},{2,3},{3,0},{0,2}})
++    g.add_edge(Edge{edge.first,edge.second,1,1});
++  std::vector<std::vector<double>> h(4,std::vector<double>(4,100));
++  for (int i=0;i<4;++i) { h[i][i]=0; for(int j:g.outgoing(i)) h[i][j]=1.001; }
++  for(int k=0;k<4;++k) for(int i=0;i<4;++i) for(int j=0;j<4;++j)
++    h[i][j]=std::min(h[i][j],h[i][k]+h[k][j]);
++  g.set_heuristic(h); return g;
++}
++EventDrivenJunctionConfig config() {
++  EventDrivenJunctionConfig c;
++  c.queue_discipline="fifo"; c.resource_semantics="R3";
++  c.event_semantics="E4_batch_plus_destination_merge_request";
++  c.enable_source_admission=false; c.enable_backpressure=false;
++  c.enable_pibt_lite=false; c.pressure_mode="off"; c.admission_mode="off";
++  c.pibt_mode="P2"; c.priority_mode="Q0"; c.scorer_mode="S4";
++  c.merge_grant_rule="M3"; c.merge_grant_timing_mode="J2";
++  c.g4irsf20_event_hotpath_policy="E2"; c.local_queue_capacity=0;
++  c.max_events=100000; c.max_simulation_time=100; c.trace_limit=10000;
++  return c;
++}
++CirculationInput input(double offset=0) {
++  CirculationInput in;
++  for(int i=0;i<4;++i) in.nodes.push_back({i,i==0?"A":"B",1,0,true,true});
++  for(auto edge:std::vector<std::pair<int,int>>{{0,1},{1,2},{2,3},{3,0},{0,2}})
++    in.edges.push_back({edge.first,edge.second,1,0.1});
++  in.trays.push_back({"physical-tray",0});
++  CirculationJob first;
++  first.business_bag_id="bag-a"; first.origin=0; first.destination=3;
++  first.arrival=offset; first.storage_node=1; first.storage_release_at=offset+3;
++  first.storage_min_dwell=1; first.load_seconds=0.1;
++  first.unload_seconds=0.2; first.hold_seconds=0.3; first.deadline=offset+30;
++  auto second=first; second.business_bag_id="bag-b"; second.arrival=offset+1;
++  in.jobs={first,second};
++  in.transfers.push_back({"authorized-return","physical-tray",3,0,offset,0,offset,offset+50});
++  return in;
++}
++void cycle(bool injected) {
++  auto g=graph(); auto c=config();
++  c.test_merge_grant_fail_after_calendar_prepare=injected;
++  EventDrivenJunctionRuntime runtime(g,c);
++  runtime.initialize_circulation(input());
++  runtime.drain(); const auto& result=runtime.finalize(); const auto& s=runtime.circulation_state();
++  require(result.summary.failed_count==0,"native failed transport");
++  require(s.jobs[0].status=="completed" && s.jobs[1].status=="completed","both bags must unload");
++  require(s.trays.size()==1 && s.jobs[0].tray==s.jobs[1].tray,"same finite tray");
++  require(s.transfers[0].status=="received","authorized physical empty return");
++  require(s.jobs[1].loaded_at>=s.transfers[0].received_at,"no predicted tray creation");
++  require(s.jobs[0].storage_released_at>=3,"actual storage gate");
++  std::map<std::uint64_t,std::pair<int,int>> traversals;
++  for(const auto& r:s.receipts) {
++    if(r.event=="EDGE_ENTER") ++traversals[r.traversal_id].first;
++    if(r.event=="EDGE_EXIT") ++traversals[r.traversal_id].second;
++  }
++  require(!traversals.empty(),"actual edge events absent");
++  for(const auto& item:traversals)
++    require(item.first>0 && item.second==std::make_pair(1,1),"phantom or duplicate traversal");
++  for(const auto& tray:s.trays) require(tray.edge_to<0,"resource ledger leaked in-flight capacity");
++  if(injected) require(result.summary.merge_grant_rolled_back_count>0,"prepare failure not exercised");
++}
++void default_horizon_and_checkpoint() {
++  auto g=graph(); auto c=config(); c.max_simulation_time=-1;
++  EventDrivenJunctionRuntime runtime(g,c);
++  runtime.initialize_circulation(input(90000));
++  bool checkpoint_rejected=false, digest_rejected=false;
++  try { (void)runtime.capture_state_checkpoint(); }
++  catch(const std::logic_error& e) { checkpoint_rejected=std::string(e.what())=="circulation:checkpoint_payload_not_implemented"; }
++  try { (void)runtime.deterministic_state_sha256(); }
++  catch(const std::logic_error& e) { digest_rejected=std::string(e.what())=="circulation:checkpoint_payload_not_implemented"; }
++  require(checkpoint_rejected && digest_rejected,"unsupported circulation clone must reject explicitly");
++  runtime.drain(); const auto& result=runtime.finalize();
++  require(!result.summary.time_limit_reached,"default circulation horizon truncated late input");
++  require(runtime.circulation_state().jobs[1].status=="completed","late physical cycle incomplete");
++  bool replay_rejected=false;
++  try { (void)runtime.deterministic_replay_hashes(); }
++  catch(const std::logic_error& e) {
++    replay_rejected=std::string(e.what())=="circulation:replay_projection_not_implemented";
++  }
++  require(replay_rejected,"legacy leg-only hash must not masquerade as circulation replay identity");
++  auto delayed=input(); delayed.transfers[0].earliest_departure=200000;
++  delayed.transfers[0].expiry=250000;
++  EventDrivenJunctionRuntime delayed_runtime(g,c);
++  delayed_runtime.initialize_circulation(delayed); delayed_runtime.drain();
++  const auto& delayed_result=delayed_runtime.finalize();
++  require(!delayed_result.summary.time_limit_reached &&
++      delayed_runtime.circulation_state().jobs[1].status=="completed",
++      "explicit future module departure was omitted from default horizon");
++}
++void departure_lease_boundary() {
++  CirculationState state; state.enabled=true; state.input=input();
++  state.next_entry.assign(state.input.edges.size(),0);
++  CirculationTrayState tray; tray.tray_id="physical-tray"; tray.node=3;
++  tray.active_leg=0; tray.transfer=0; tray.reception_node=0;
++  state.trays.push_back(tray); state.legs.push_back({0,"empty-leg",0,-1,"empty_return"});
++  state.transfers.resize(1); state.transfers[0].status="dispatching";
++  require(state.can_enter(0,3,0,50+5e-9)=="circulation:departure_lease_expired",
++          "edge commit slipped between expiry and expiry wakeup");
++  state.transfers[0].status="departed";
++  require(state.can_enter(0,3,0,50+5e-9)=="allowed","departure lease wrongly cancels in-flight continuation");
++}
++void simultaneous_terminal_capacity_and_tail_headway() {
++  Graph g; g.add_node(Node{0,0,0.001,0,0,{}}); g.add_node(Node{1,0,0.001,0,0,{}});
++  g.add_edge(Edge{0,1,1,1}); g.set_heuristic({{0,1},{100,0}});
++  auto c=config(); CirculationInput in;
++  in.nodes={{0,"A",2,0,true,true},{1,"B",2,0,true,true}};
++  in.edges={{0,1,1,2.5}};
++  in.trays={{"physical-tray",0},{"second-physical-tray",0}};
++  in.jobs=input().jobs;
++  for(auto& job:in.jobs) {
++    job.storage_node=-1; job.destination=1; job.arrival=0;
++    job.load_seconds=0; job.unload_seconds=0; job.hold_seconds=0;
++  }
++  EventDrivenJunctionRuntime runtime(g,c);
++  runtime.initialize_circulation(in); runtime.drain(); runtime.finalize();
++  std::vector<double> entries, exits;
++  for(const auto& receipt:runtime.circulation_state().receipts) {
++    if(receipt.from==0 && receipt.to==1 && receipt.event=="EDGE_ENTER") entries.push_back(receipt.time);
++    if(receipt.from==0 && receipt.to==1 && receipt.event=="EDGE_EXIT") exits.push_back(receipt.time);
++  }
++  require(entries.size()==2 && exits.size()==2,"both carriers must use real direct terminal edge");
++  require(entries[1]+1e-9>=entries[0]+2.5,"entry headway tail vanished after first exit");
++  require(entries[1]+1e-9>=exits[0],"finite in-transit capacity exceeded");
++}
++void explicit_goal_service_contract() {
++  auto g=graph(); auto c=config(); c.complete_on_goal_arrival=true;
++  auto in=input(); in.trays[0].node=3; in.jobs.resize(1);
++  in.jobs[0].arrival=1.001; in.jobs[0].storage_node=-1;
++  in.transfers.push_back({"second-export","physical-tray",0,3,0,0,0,50});
++  EventDrivenJunctionRuntime runtime(g,c); bool rejected=false;
++  try { runtime.initialize_circulation(in); }
++  catch(const std::invalid_argument& e) {
++    rejected=std::string(e.what())=="circulation:goal_arrival_completion_unsupported";
++  }
++  if(!rejected) {
++    runtime.drain(); runtime.finalize();
++    for(const auto& r:runtime.circulation_state().receipts)
++      std::cout<<"contract_probe "<<r.time<<" "<<r.event<<" "<<r.business_bag_id<<"\n";
++  }
++  require(rejected,"circulation must reject bypassing declared goal service");
++}
++}
++int main() {
++  try { cycle(false); cycle(true); default_horizon_and_checkpoint(); departure_lease_boundary();
++        simultaneous_terminal_capacity_and_tail_headway(); explicit_goal_service_contract(); }
++  catch(const std::exception& e) { std::cerr<<e.what()<<'\n'; return 1; }
++  std::cout<<"native circulation cycle, rollback, horizon, clone and departure lease checks passed\n";
++  return 0;
++}
+diff --git a/docs/g31_ics_circulation/NOVELTY_LEDGER.md b/docs/g31_ics_circulation/NOVELTY_LEDGER.md
+new file mode 100644
+index 00000000..11fc2ba9
+--- /dev/null
++++ b/docs/g31_ics_circulation/NOVELTY_LEDGER.md
+@@ -0,0 +1,188 @@
++# G31 × ICS circulation 创新证据账
++
++更新日期：2026-10-13。当前门：I0 已完成查新；I1 工程门在声明的合成合同与回归域内已取得支持，当前执行版本为 `native_acceptance_final` 与 `build_final_002`，legacy 复核见第 11 节；方法增量仍待证。
++本文记录本轮独立阅读、实际实现与尚待证实的主张。历史审核包保留在 `docs/external_review/g31_v3_20261011/`，其中他人的阅读和运行不计作本文件作者重新执行。
++
++## 1. 当前决定与不可削减的目标
++
++**当前仅可批准统一物理宿主的工程研发，不批准“联合新方法已经成立”、学习有效或实时性已达标的表述。** 三项 V3 缺陷修复属于正确性；在成熟 native G31 内接通有限盘重复服务属于必要工程基础。C1/C2/C3 仍是待验证假设。
++
++最终交付保持：成熟 G31 执行、区域按需自主路由、依据载盘目的地/路线的跨区有限盘预测预平衡；正常分拣保护、固定区内模块权限、声明规模/负载下完整单任务更新计算 ≤100ms，以及 TRE/CIE 量级机制与证据要求不下降。第一闭环允许 learning/screen 关闭，只改变实施顺序，不删除任何需求。
++
++100ms 后续必须覆盖观察、候选、评分/优化、owner 复验及提交等完整计算链；通信/排队/回执另报端到端，失败和冷缓存仍在分母。小图 native 总耗时、单次神经推理和均值均不能替代此验收。
++
++## 2. 固定源与本次实际阅读
++
++| 对象 | 固定身份与本轮用途 |
++|---|---|
++| 成熟 G31 基线 | `46cc46ab6bc121628fd6357e9f3c7636745fd732`；独立整合工作区以此为基，不整分支合并 |
++| V3 生产/发布 | `defd79effe02ee13f1a5bbbbc5143f6d0dce2f63` / `fccd4819532701ee4173ec598822450d962d4e61`；定点迁入与修复 |
++| 最新任务材料 | 已按顺序完整读 next-stage、executed audit/integration plan、原 NOVELTY_LEDGER 三份 MD；审核结论仍需执行核验 |
++| 本文件维护者的 G31 阅读 | `g4irsf31_map_adapter.py` 与 `run_g4irsf28_service_potential.py` 全文；`event_driven_junction.hpp` 原基线 4318–4446、7079–7196、16828–16881 的模式识别、服务完成、到达/完成逻辑；新增 `circulation.hpp`、`circulation_runtime_impl.hpp`、`bindings/circulation.cpp`、`native_host.py`、`validate_native_cycle.py` 全文及随后相关修订；另检索 Python/native binding 与事务发布接点。不是整个 native 内核的独立逐行审计 |
++| 原始阅读记录 | `literature_read_receipt_20261013.json`；只保存访问与范围，不复制论文全文 |
++
++已直接核对的既有资产：
++
++- G31 adapter 已固定 FIFO、S4 rule-only、M3、J2 `jit_fair_aging_deadline`、G4IRSF20 E2，关闭 G16 supervisor，并移除 scorer model / G24 learning artifact。
++- G28 服务势已由每个目标的一次 reverse Dijkstra 计算 `H(u,g)=service(u)+min(travel(u,v)+H(v,g))`、`H(g,g)=0`。服务势、邻接候选标量查询与事件减枝不能再次列作本轮创新。
++- native 的 G4IRSF20 E2 热路径与 `event_semantics=E2` 是不同枚举含义；已有服务完成与任务完成事件不能从名字推定为真实托盘释放。
++- 本轮新增生命周期须挂到已有真实执行事件；原 `complete_bag` 只完成运输请求，不含新持久 tray 的完整业务合同。保留 legacy 轨道，再在共同 circulation 合同内评价算法。
++
++## 3. 最近邻核查：本轮独立取得范围
++
++下表是定向查新，不是系统综述，也没有通过“尚未取得全文”排除任何近邻。
++
++| 原始来源/固定版本 | 本轮实际读取范围 | 对本项目主张的约束 |
++|---|---|---|
++| [L1：Zeinaly 等，TCST 2015，作者报告 15-019](https://www.bartdeschutter.org/publications/15-019-integrated-model-predictive-scheme/15-019-integrated-model-predictive-scheme.pdf)，DOI 10.1109/TCST.2014.2363135 | PDF 摘要、§I、§II-A/B 的建模与装卸段，特别是连续流、有限队列/库位假设；未复现优化器 | BHS 路由、线平衡、空车联合和容量均已有研究。个体阶段/owner/局部修复是待比较差别，不能据此直接宣称新颖。 |
++| [L2：Beojone 等，TRC 168 (2024) 104717，EPFL 期刊全文](https://infoscience.epfl.ch/server/api/core/bitstreams/28f8c92d-a35a-4893-b987-037ba3e59cab/content)，DOI 10.1016/j.trc.2024.104717 | PDF 摘要、§3 架构与 §3.1 开头；出版社检索返回的 §3 文字及模块组合说明。未核完优化公式/全部实验 | 宏观 MPC、个体分配、局部覆盖与可插接匹配模块已有。三层架构、保留既有模块不够作为主创新。作者主页误链 DOI 不采纳。 |
++| [L3：Gu 等，arXiv:2608.30512v1](https://arxiv.org/html/2608.30512v1)，2026-08-31 | HTML 摘要、§I–II-E、§III-A/B 和 III-C 开头；未把未读完的 §IV/附录称全文审查 | 工业 OHT 已有局部下一跳共享网络、轨迹初始化、Double-Q 及安全机制外置。给 G31 加小网络不足以支持本轮新主张。该来源是预印本。 |
++| [L4：Daszczuk 等，arXiv:1710.06331](https://arxiv.org/abs/1710.06331)，文内期刊 DOI 10.1002/atr.1365 | 作者稿摘要、引言的本地通信/腾位说明及 §2 calling/expelling/balancing 描述；未完整复算 §3 参数规则/实验 | 本地站间信息、预计到车、提前调拨与满站腾位都有先例。“让满终点空盘离开”属于物理/控制基础，不能当首创。 |
++| [L5：Wollenstein-Betech 等，arXiv:2003.04335](https://arxiv.org/pdf/2003.04335) | 作者稿摘要/贡献说明、§II-A 流量与旅行时间定义、§II-B 联合目标开头；未读完凸近似证明 | 路由与再平衡的拥堵耦合已有直接近邻；需要区分个体盘阶段/时间窗授权/修复算法，不能泛称首次考虑反馈。 |
++| [L6：Ahn & Park，IISE 53(10), 2021](https://pure.kaist.ac.kr/en/publications/cooperative-zone-based-rebalancing-of-idle-overhead-hoist-transpo/)，DOI 10.1080/24725854.2020.1851823 | KAIST 原作者机构条目和摘要；出版社 DOI 打开失败，未取得方法全文 | 图表征、去中心化区域空闲 OHT 再平衡学习已有。全文未排查前，不能排除其覆盖拟议区域学习。 |
++| [L7：Guo 等，TRB 206 (2026) 103411](https://www.sciencedirect.com/science/article/pii/S0191261526000238)，DOI 10.1016/j.trb.2026.103411 | 出版社检索返回的摘要、引言和章节简介；机构元数据；直接页面打开失败，未读完整 §3/4/理论 | 决策损失训练、区域供需预测与离散再平衡已有。不能把 predict-then-optimize 或“学习决策价值”列作独有创新。 |
++| [L8：Koenig、Likhachev、Furcy，Lifelong Planning A*，AIJ 155 (2004)](https://idm-lab.org/bib/abstracts/Koen04a.html) | 作者原始条目/摘要，含伪码勘误提醒；未逐页读 54 页论文 | 重用未变化搜索结构是成熟增量思想。C2 需提出循环供给依赖闭合条件与算法；“只重算变化部分”本身不够。 |
++| [L9：Parimi & Williams，arXiv:2603.28968v1](https://arxiv.org/html/2603.28968v1)，2026-03-30 | 摘要、§1–4.5；未独立复现实验 | 已有任务后继传递闭合、冻结外部、边界修补/重定时、跨边界释放界、阶段化 SIPPS 和全局候选复验。C2 宽泛措辞受到直接覆盖，必须细化。 |
++| [L10：Li 等，MAPF-LNS，IJCAI2021](https://jiaoyangli.me/files/2021-IJCAI.pdf) | 摘要、§2、§4、§5.1 和 §5.2 开头 | 固定其他路径、重规划子集及阻塞相关邻域已有；单纯局部重规划不新。 |
++| [L11：Huang 等，MAPF-ML-LNS，AAAI2022](https://jiaoyangli.me/files/2022-AAAI-2.pdf) | 摘要、§1–4.1 及 §4.2 开头 | 离线昂贵 oracle 标注邻域收益、学习排序以省在线计算已有；C3 也需具体差异。 |
++| [L12：Wang 等，LNS2+RL，arXiv:2405.17794v3](https://arxiv.org/abs/2405.17794v3)，2025-01-31，条目标注 AAAI2025 接收 | 作者摘要和版本信息；未读方法全文 | 学习与局部修复相结合已有直接近邻；不能以“RL+repair”命名视为新方法。 |
++| [L13：Wan & Shin，IJPR 60(10), 2022, 3063–3077](https://pure.kaist.ac.kr/en/publications/predictive-vehicle-dispatching-method-for-overhead-hoist-transpor/)，DOI 10.1080/00207543.2021.1910870 | 原作者机构与出版社摘要、作者 PDF 检索返回的引言开头；PDF 直接获取超时，未读完整成本公式/实验 | 预测近未来任务和已占用车辆何时变空闲、按确定性加权并做线性分配已有 BPD/CWPD 近邻。未来盘释放预测本身不够新；将其同模型适配为强解析候选，待补全文后定义公平版本。 |
++
++访问限制：三条 DOI/出版社直接打开返回工具的 `Internal Error`，未提供 HTTP 状态或网络异常栈；不能补写为 DNS/403。L2 已通过 EPFL 正式全文补取得；L6/L7 的方法全文仍待深核。没有用第三方综述替代原作者材料。
++
++随后补查 L6 的出版社 full 页面，本次工具明确返回 `(403) Forbidden`；作者实验室目录返回 `(502) Bad Gateway`。L13 作者 PDF 返回 `(400) Timeout fetching`，但原机构/出版社摘要可读。这些是后续请求的工具报告，不反向补证前面仅有 `Internal Error` 的失败；L6/L13 的完整方法仍未取得。
++
++## 4. Claim 登记与 I0 判定
++
++| ID | 拟议机制/主张 | 本轮实际地位 | 下一阶段可证伪差异与门槛 |
++|---|---|---|---|
++| C0 | 成熟 G31 与有限盘 Storage/返供在唯一 native 宿主接通 | `engineering_only` | 同一 tray 实际重复服务；每个入边/工序有事件；无复用预测制造库存。该成功不等于算法增益。 |
++| C1 | 动作相关的时间化循环释放/共享资源/服务后果反馈给 G31 排序与跨区预平衡 | `hypothesis` | 在同物理、同信息、同候选预算下开/关反馈，须改变合法实际动作，并超过强解析、单向和一轮反馈之一的质量—计算前沿。当前尚无这些比较。 |
++| C2 | 沿时间化资源—供给依赖闭合实施受限修复 | `hypothesis / refine_mechanism`；宽泛“先后闭合+冻结外部+repair”已被 L9 覆盖 | 必须给出在线循环供给、JIT owner 授权与资源尾窗所需的新闭合判据；与同模型适配的任务先后 LNS 及全量修复对照。漏依赖、不能闭合或超预算必须扩域/unknown，最坏全局。 |
++| C3 | 学习近似昂贵循环边际值/修复优先级 | `hypothesis`，未放行扩大旧标签训练 | G31 真实继续策略重新采标签；解析、小树/线性、paired-direct、residual、公开 rollout 同特征/预算比较。学习不产生硬安全许可。 |
++| C4 | 任意未来、任意规模逐件不增时且所有更新均 ≤100ms | 不得主张 | 保持原保护要求，先明确可实现的正常服务合同与负载域；完整请求时延和失效边界需要实测/证明，不能外推。 |
++| C5 | 三项正确性修复、更多回归/模块/哈希构成创新 | 不作为方法贡献 | 这些是保留成果和可信执行的最低工程要求，不能抵扣 C1/C2/C3 证据。 |
++
++**I0 决定：go（仅主机制研究与工程基础开发）；创新确立状态未通过。** 首选继续检验 C2 的循环依赖表示、闭合修复域与计算—质量边界，C1 提供真实耦合量；如果最终只剩现成 MPC 或分层网络拼接，调整机制和贡献，不降低双需求。
++
++**2026-10-13 新近邻触发的 C2 修订。** L9 的离线任务先后闭合已经非常接近原“依赖闭合修复”措辞，不能只以 Storage 或机场命名替换。可研究但尚未证实的差别是：G31 在线逐跳/JIT 权利与条件未来供给共同影响的动态后果边界，如何包含非任务 DAG 中的接收回压、入口尾窗和源保护义务；何时允许冻结外部、何时必须扩大。须用实际反例说明普通任务先后闭合不足，并与公平适配 L9 思路比较。适配版单列，不称原论文复现；其原离线全信息设置也不能直接冒充在线同信息基线。这次查新细化机制，工程主线和双需求不变。
++
++C1 的动作量必须区分条件预测、合同承诺、实际可用盘，且包含可观测依赖。给同一个终点的所有候选加相同区域价值会完全抵消，不能称为循环感知路由。固定模块查询/导出/接收是权限边界；中央规划不能把模块内部动作据为己有。
++
++L13 进一步约束 C1 的表述：同时预测请求与忙车空闲时刻已有直接工业近邻，不能把“利用载盘完成时刻提前调空盘”单独列作原创。应补读其成本与信息模型，再构建同权限的 BPD/CWPD 类解析基线；当前尚无证据说明本项目的闭环反馈超过该类方法。
++
++## 5. 首闭环后 I1 的审查规则
++
++I1 包含两项，不能混写：
++
++1. **执行接通门**：真实同盘两次服务、Storage 进度依赖、卸载/hold、合法空盘返供、满载/拒绝/失败/迟到/无收益变体，以及 legacy 兼容性。
++2. **方法增量门**：同 circulation 模型中 C1/C2 开关导致的合法动作与质量—计算变化。第一项通过仍不意味着第二项通过。
++
++本轮 I1 首次真实事件账见第 7 节；各变体未生成数据前不填写预期成功数，也不把外部审核的 1519 项当作本轮新结果。最优状态只接受同模型完整参考/界；可行事件见证应明确写“可行，最优未知”。
++
++后续强基线固定为：同宿主反应式空盘、最强同权限解析预测、单向预测、一轮反馈、同信息滚动约束优化/小域完整参考、新闭合修复无学习、同机制加学习。基础物理和权限公平共享；核心修复算法通过消融区分；全状态中央 oracle 另列信息优势。
++
++## 6. 必须执行的机制反证与接入顺序
++
++| 反证/负对照 | 诊断目的 |
++|---|---|
++| 同终点常数价值 | 验证动作相关量确实能改变排序；只有训练损失下降不算业务增量 |
++| 下游满缓冲 → 延迟盘释放 → 别区源保护 | 检验依赖闭合，防止固定地理半径遗漏远处供给后果 |
++| 相同当前信息、未来分别在供区/受区突发 | 明确保护合同与预测不确定性，不以事后删任务掩盖外调代价 |
++| 多条长线、预测反转、消息陈旧/丢 ACK | 验证授权失效、真实在途及晚到幂等，不允许凭消息创造盘 |
++| 盘充足或没有共享瓶颈 | 接受无收益；若持续“普遍改善”，先查模型、输入、权限、计量是否不公平 |
++| 强解析/一轮反馈追平 | 检查是否仍有相同质量下计算节省；否则停止当前优越主张，重构具体机制 |
++
++下一步实际接入顺序：持久 tray/工序事件与模块 port 稳定后，加入区域局部观察、按需请求和 A* 路线版本编解码；随后从已在途载盘的路线/阶段生成条件释放轮廓，慢层通过 port 提出跨区请求，并把真实连接占用反馈给快层；最后实现 C2 修复和同域参考，再决定是否值得训练 C3。不得将无动作 slow callback、单次授权返盘或条件释放表命名为“预测预平衡已完成”。
++
++I2 大规模训练前、I3 正式 W4 确认前、I4 写作前再次核最近邻、代码差异、完整分母与强参考；开发结果不改名为独立确认。旧 G31 成果和 V3 负结果单独保留，不能双重计算贡献。
++
++## 7. I1 首次真实闭环登记：native_first_001
++
++原件目录：`outputs/experiments/g31_ics_circulation_20261013/native_first_001/`，含 `input.json`、`result.json`、`audit.json`。此运行由本轮实现者在成熟 native G31 宿主执行；本文件维护者另行解析并校验原件，未把这次读取描述成第二次独立 native 复跑。
++
++输入为明确声明的合成 on-carrier Storage / 每泊位卸载 / 固定模块 port 合同：7 节点、9 条有向边、1 盘 T0、2 件业务 B1/B2；节点/边容量均为 1、入口头距 0.2 秒、native 节点服务 0.05 秒，显式观察时域 80 秒。图中有替代下一跳，实际决策记录来自 S4，并保留 J2 destination-owned merge 与 E2 热路径。
++
++| 实际事件 | native 物理秒 | 身份与后果 |
++|---|---:|---|
++| 第一件装载完成 | 0.10 | B1 / T0，随后真实 0→1→2 |
++| Storage 工序接收 | 2.25 | B1 / T0，未脱盘；最后入边在 2.20 完成，节点服务后入库 |
++| Storage 释放 | 6.00 | 同时满足绝对释放时刻和至少 2 秒持盘存储，才创建 storage_out 段 |
++| 第一件实际卸载完成 | 8.65 | B1 完成，T0 仍在节点 4，进入 hold |
++| hold 完成并获导出授权 | 9.90 | 接收泊位由固定 port 检查后保留；此前没有可用空盘 |
++| 真实空盘出发 | 9.95 | T0 从 B 区节点 4 经 5→0 返回 A 区；不是瞬移或新增盘 |
++| 接收及第二次装载开始 | 12.05 | 原 T0 真正收到，B2 此前从 0.20 起等待；同刻开始装载 |
++| 第二次装载完成 | 12.15 | B2 / T0，第二轮真实逐跳和存储 |
++| 第二件实际卸载完成 | 17.20 | B2 完成；T0 最终仍保留，18.45 完成第二次 hold |
++
++实际结果：2 件业务完成且满足各自 deadline；5 个运输段完成、10 次独立 traversal、166 个 native 事件，0 个原生运输失败。按原件重新核对的 20 条入/出边回执，均在 native event trace 中找到唯一相同运输段、方向、时间的对应事件；10 对 traversal ID 完整；两件 Storage 释放时刻和先卸载/hold/真实返供再装载的次序均通过。`audit.json` 记录 `passed`、无开放 traversal、托盘数 1；其证明范围是执行回执一致性，不是全域最优。
++
++原件 SHA256：input `f170c019912fd2ffbfedf5004a674d0d0fd28467b5bdfc1d3dc261fb48468ab8`；result `a3e36e0b93a6afa1b72d14540663de67c3ce82f951d8a90853cef7d824e72489`；audit `866e0da540bb913bd7c38e55a349c29214ed27aa1cfdb9a07311f309acbed4b3`。保留此首次运行；随后修复/变体使用新目录，不能覆盖它再称原始结果。
++
++**I1 工程判断：C0 的“一盘两服务”垂直闭环已有实际事件支持，限定于这份合成物理合同。I1 方法判断：C1/C2/C3 均未通过。** 空盘请求 `return-T0` 是输入中显式给定的条件请求，0.10 送达、9.90 才具备执行条件；这证明权限和库存约束下的物理返供，不证明预测控制器生成了请求，也不证明区域自治与跨区预测形成双向算法反馈。
++
++此小图中的最大单个 native 事件调用耗时为 0.2366ms，原件记录 native runtime 约 0.0012079s。二者均不是完整单任务更新计时，不据此宣布 100ms 要求已验收。当前见证为**可行，最优未知**。接收满载、拒绝/故障、迟到、无收益、跨卸载头距与同模型参考随后见第 9 节；legacy 兼容和更大业务须各自验证，不由正例外推。
++
++## 8. 变体验收中的已观察问题：保留失败原件
++
++`native_acceptance_001/receipt.json` 的整场状态为 **failed**。前 12 个场景留下了逐场输入、输出及容量/生命周期回放；第 13 个 S3 同模型参考在初始化时抛出 `ValueError: circulation:requires_S4_J2_E2_learning_off`，未产生参考结果。不能把 12 份 audit 的 `passed` 合并表述为整场验收通过。
++
++这一轮实际执行的二进制 SHA256 为 `337e5a99ec58d919c9c0040d203e9b659d2643ac64e53ab97e3e295c704f5a8d`。运行回执中的 `source_changed=[]` 仅说明运行期间记录的源码没变，并不能证明二进制由这些源码构建；在支持 S3 的源码改动后仍执行旧二进制，是本次中断需要纠正的构建/证据问题。下一次应重新构建并在新目录执行，保留两轮记录及构建身份。
++
++该轮还保留一个已定位的工程缺陷：`fault_before_departure_lease/result.json` 中空盘因故障无法进入首边，在出发租约到期后被真实保留为 `quarantined`，但 `reception_node` 仍为 0，泄漏了从未使用的远端接收预留。原审计未将这个保守占位认定为容量超限，故其通过不能证明资源回收正确。源码后续已加入“未出发且未在边上才释放未用接收预留”的分支；修复验收须来自新运行中的 `UNUSED_RECEIVING_RELEASED` 和最终 `reception_node=-1`，不得用代码已改代替执行证据，也不得清掉真实在途盘的接收保护。
++
++已独立读取的无收益对照同样保留：`sufficient_trays_with_return` 与 `sufficient_trays_no_return` 两份原件的 B1/B2 完成时刻均为 8.65/9.65 秒；返供版为 10 次 traversal，无返供版为 8 次。该输入下多一次空盘返供没有业务收益、增加了运动，支持保留负对照，不能解释为预测控制有效。它仍属于失败验收轮中的独立已执行场景，后续固定构建需重新核验。
++
++## 9. I1 变体与同模型见证：native_acceptance_002
++
++`outputs/experiments/g31_ics_circulation_20261013/native_acceptance_002/receipt.json` 记录 **13 场景整场 passed**，二进制 SHA256 为 `84d99f496972e3b8892d8d4352083a30deff62cf9827a1279e8ba2622acad948`，receipt 文件 SHA256 为 `b0800ff47176a1c1617535a9edbcf293bf70ca11b729b748c9aac8c2deb68005`。本文件维护者读入所有逐场 input/result，并在本机重新运行 `audit_result` 的独立物理/生命周期回放和 `check_campaign` 的跨场景断言，全部通过；这属于原始 native 结果的独立重算，不是再次执行 native 仿真。
++
++| 已执行场景 | 实际结果与边界 |
++|---|---|
++| 同盘两服务 | T0 的 B1/B2 完成于 8.65/17.20；5 段、10 次 traversal，真实返供后才第二次装载 |
++| 关闭返供 | B1 完成，B2 持续等盘；T0 真实保留于节点 4，不能凭预测继续完成 |
++| Storage 绝对释放改为 20 | B1 完成 22.65，返供接收 26.05，B2 装载 26.15、完成 31.20；等待真实传导到下游 |
++| 源库存保护拒绝 | `source_module_min_stock`；B2 未装载 |
++| 接收模块拒绝 | `destination_module_refused`；B2 未装载 |
++| 迟到过期消息 | 消息 60.10 到达，`departure_lease_expired`；没有出发 |
++| Storage 接收满载 | B1 未入库/未完成，T0 保留为节点 1 的 quarantined；另一个真实盘仍在节点 2，不扩容、不删除 |
++| 空盘接收满载 | `return-T0` 被 `receiving_full` 拒绝；先占接收位的另一盘真实收到。其后 B2 又在节点 3 失败并保留；这是安全拒绝/失败见证，不是全业务成功 |
++| 首边故障并到租约期 | 未出发，失败原因为 `departure_lease_expired_before_physical_entry`；T0 保留在节点 4。11.00000001 出现唯一 `UNUSED_RECEIVING_RELEASED`，最终 `reception_node=-1`，已执行验证第 8 节的资源修复 |
++| 卸载和返供后入口尾窗 | 对应 0 出边两次进入为 0.15/30.20，满足 30 秒头距；B2 完成于 35.20，没有因跨段/卸载清空尾窗 |
++| 两盘充足：返供/无返供两场 | 两场完成时刻都为 8.65/9.65；10 对 8 次 traversal，保留无业务收益和额外空行成本 |
++| 同模型 S3 参考 | 同一有限盘/存储/权限模型中，两件完成时刻与 S4 均为 8.65/17.20；这是执行可行见证，**最优未知**，没有 S4 胜出证据 |
++
++所有逐场回放均包含业务/运输段/tray/traversal 身份、Storage/装卸/hold 次序、有向边容量和入口头距，以及每个节点 parked + incoming + remote reception lease 去重计数。13 场均无未闭合 traversal；满载/故障场的业务失败按实保留在分母。当前回放通过是这些输入与声明合同的有限检查，不是所有图/负载的安全完备证明。
++
++进一步逐字段比较输入：S4 正例与 S3 参考仅 `/options/scorer_mode` 不同；两盘充足的两场仅 `/transfers` 不同。没有给参考改变图方向、盘量、Storage 进度、服务或容量；这里能检验共同物理下的可行性与局部负对照，仍没有求解最优参考。
++
++当前固定 port 的实际权限来自 `CirculationNodeContract` 的容量、`allow_export`、`allow_receive`、`export_min_stock` 及 native 校验，是清楚声明的合成模块合同。尚未取得供应商真实模块的实现/接口与权限确认，不能把这层代理写成现场原模块接入完成；后续接入保持模块内动作权不开放给中央算法。
++
++**I1 更新：真实闭环与上述必要变体的工程证据已取得；C1、C2、C3 仍是待检验研究假设。** S3 与 S4 在这一小图追平，显式返盘请求尚非预测预平衡策略。002 是带版本的阶段结果；后续目的服务合同/输入边界修复、构建溯源和 legacy 复核须使用新固定构建再验证，不能把 002 的通过移植到未执行的新源码。
++
++方法取证尚有实质依赖：circulation 完整 checkpoint/clone 当前明确拒绝，不能调用 legacy 的不完整状态副本生成反事实标签或“最优”比较；区域观察的公开信息边界、动态请求权限、预测控制器和 C2 修复算法也尚未成为本轮执行对象。下一步应接到已有真实生命周期、G31 原子候选提交与 port 复验点，取得同模型续跑证据后再放行 C3 训练。
++
++## 10. I1 当前固定执行版本：native_acceptance_final
++
++后续合同/输入边界修复完成后，`build_final_002/receipt.json` 记录了 CMake 配置、带 `--clean-first` 的实际编译和原生 `circulation_runtime` CTest；三条命令退出码均为 0，`status=passed`，54 个 CMake/C++ 输入文件的构建前后 SHA256 完全一致，`source_changed=[]`。本文件维护者直接读取并重算了这些文件的当前哈希，均与构建后记录一致；当前 `.pyd` 的 SHA256 也与构建及执行回执一致：
++
++`897f6e966df84129deda79d432d36d2df8bf0bf4f11aab8f743caca9a07fb47c`
++
++`native_acceptance_final/receipt.json` 为 **13 场景整场 passed**。本文件维护者重新读入 final 目录每场 input/result，再执行 `audit_result` 与 `check_campaign`，全部通过；两次服务时刻、满载/拒绝/失败、资源回收、30 秒入口尾窗、无收益和 S3 见证的业务判断与第 9 节一致。此处执行对象已更新为固定构建，不再用 002 的阶段通过替代新源码验证。可行见证的最优状态仍为 **unknown**。
++
++`native_pytest_final.xml` 与 `.log` 实际记录 48 项通过、0 失败、0 错误、0 跳过；已解析 XML 并数到 48 个 testcase。该数量属于新增 circulation Python 回归，不等于成熟 G31 全部旧回归。原生构建回执中的单项 CTest 也不能改称完整 legacy 兼容通过；独立的原生套件与固定基线对照见第 11 节。
++
++固定回执 SHA256：build `abcad62cd7410b235048ae4629db4a7d44fdc718b90c59b368ff0277c64fc490`；final campaign `fcc24f7d16bdb27b9a993d5a4d0efc542cd994c0bccab54eeabd7cbf1ea60817`。此前 001 的失败与 002 的阶段通过保留为历史，不覆盖。工程结论加强，C1/C2/C3 的创新状态和完整 100ms 请求评价仍未通过，不因回归数量增加而升级。
++
++## 11. Legacy 兼容证据与 I1 收口
++
++已直接读取 `build_g31_current/final_all_002_ctest.log`、JUnit、构建/源哈希回执：当前 CMake 注册的 **16/16 native CTest 通过**（15 个既有测试目标与 1 个新增 circulation 目标），无失败/跳过。53 个 C++ 源文件清单在 clean-first 构建前后相同，本文件维护者又重算当前文件，均与清单相符。该结果覆盖已注册原生回归，不能改述为重跑全部历史论文实验或所有 Python 实验组合。
++
++另读了同一个 `g31_legacy_replay_fixture.cpp`、两份编译命令、`build_g31_parity/pinned_result.json`、`current_result.json` 和 `final_receipt.json`。固定参照编译目录 HEAD 实际为 `46cc46ab6bc121628fd6357e9f3c7636745fd732`，`git status --short -- cpp` 无变化；最终版编译使用本轮源码。独立比较两份结果：无故障和真实故障两场均完成 4 段、失败 0；每场的完成袋、运输段结果、junction 状态、算法摘要、确定性结果五个哈希家族全部相等。两份可执行文件的重新计算哈希与回执相符。
++
++这证明了该固定小图对照与上述回归域中的 legacy 兼容，保留旧 G31 结果有实际检查；它既不是新 circulation 的最优证明，也不是成熟 G31 全域性能不变的证明。重放摘要有意排除机器运行耗时，不能由哈希相等推出性能回归为零。
++
++审查过程中须区分“假设被反证”与“真实缺陷”：默认完整目的服务合同下，同刻返盘是否抢走正常需求的独立探针没有复现问题；新/旧两条请求处理的完成时刻相同。直接 C++ API 的 `complete_on_goal_arrival=true` 则能绕过本轮声明的目标服务并触发反例，circulation 现明确拒绝这种合同，legacy 仍保留其原能力。不能把默认合同的疑点写成修复成功，也不能把拒绝另一个物理合同写成算法创新。完整证据和权限/数值边界见 `v3_correctness/NATIVE_INDEPENDENT_REVIEW.md` 及对应原件。
++
++**I1 最终判断：C0 工程门在当前合成、on-carrier、每泊位卸载、固定 port 与保守接收授权的声明域内通过；方法门尚未通过。** 满泊位同时换位/链式原子 handoff 的候选域目前保守，真实模块/off-carrier 原图业务、完整 checkpoint、区域自主请求、载盘驱动预测预平衡、C2 求解机制及完整请求 100ms 评价仍待后续实际开发验证。上述缺口不取消双需求、不折减正常分拣保护，也不降低 TRE/CIE 的机制和证据目标。
++
+diff --git a/docs/g31_ics_circulation/README.md b/docs/g31_ics_circulation/README.md
+new file mode 100644
+index 00000000..14b86b9d
+--- /dev/null
++++ b/docs/g31_ics_circulation/README.md
+@@ -0,0 +1,134 @@
++# G31 × ICS V3：第一阶段实际研发交付
++
++日期：2026-10-13。实施分支：`codex/g31-ics-v3-circulation`。独立工作区：`C:/PROGRAMING/czr005/.g31_ics_circulation_worktree`。本轮修改尚未提交，未推送。
++
++## 已实现的内容
++
++1. 修复最新执行包复现的三个 V3 正确性问题，保留修前失败、独立探针修后验收和原测试字节。
++2. 在成熟 G31 的 `EventDrivenJunctionRuntime` 中加入 opt-in circulation 生命周期。载盘、Storage、卸载、hold、授权空盘返供、再次装载均由同一个原生事件堆和物理时钟执行。
++3. 保留 S4 逐跳选择、FIFO、M3/J2 即时合流、E2 热路径和 P2 事务。普通派发、PIBT 批量、JIT merge 均经过新物理合同检查；不可回滚的事件发布点才提交有限盘资源账。
++4. 区分业务袋、运输段、盘和每次边遍历四种身份。业务卸载完成与托盘可用分离，未用接收授权过期释放，在途/失败实体不会被删掉造盘。
++5. 新增可运行 native Python binding、场景执行器、独立事件账重放检查和回归，含同物理模型的 S3 可行见证。没有求得最优，最优性标为 unknown。
++
++这次是正确性修复与工程闭环。区域按需自主控制、跨区预测预平衡和学习评价尚未完成，不把显式返供请求称为预测控制。两项需求、100ms 单任务更新目标和 TRE/CIE 量级方法及证据要求不变。
++
++## 基线、读取和保护
++
++原工作树仍是 `codex/ics-v3-phase4` / `fccd4819532701ee4173ec598822450d962d4e61`。原 `cpp/ics_core/runtime/bounded_local_pibt.hpp` 用户修改保留，进入工作前 SHA256 为 `b94390501502b61fac64c302fd79ce5a5af1851e13c02932fbddf463284d8951`。
++
++独立分支以成熟 G31 `46cc46ab6bc121628fd6357e9f3c7636745fd732` 为底，不回滚 V3、不整分支合并。仅从 `fccd481…` 导入 V3 专属生产、测试和文档命名空间，共 1652 个既有文件；这不是本轮新增工作量。原始 blob 导入清单在 `outputs/experiments/g31_ics_circulation_20261013/v3_import_manifest.json`，可复现导入工具是 `scripts/experiments/g31_ics_circulation/import_v3_reference.py`。成熟 G31 的其余源码保留。
++
++已按指定顺序完整读取最新 next-stage MD、executed-audit MD、NOVELTY_LEDGER、独立探针及 portable 原始 JSON。外审目录最初未在磁盘，已从提供的 ZIP 安全解压；ZIP SHA256 为 `341e3683d5c16c9c53048d7329216255ef63db45d1222fa2afe6bf365a618607`。外审已经实际跑过 1519 项，不能沿用更早“只读 GitHub、未运行测试”的结论。
++
++成熟 G31 的读取与实现定位包括：`g4irsf31_map_adapter.build_s4_request`、`run_g4irsf28_service_potential.service_aware_potential`、南宁 workload 入口、`src/czr005/cpp_backend.py`、旧真实 pybind binding、native initialize/release/service/arrive/merge/PIBT/publication/edge-exit/complete，以及 destination-merge、first-edge-credit、bounded-PIBT 实现。服务势能和 S4 既有机制不计本轮创新。
++
++## 三项正确性证据
++
++证据根目录：`outputs/experiments/g31_ics_circulation_20261013/v3_correctness/`。
++
++| 问题 | 修前独立证据 | 实际修复 | 修后 |
++|---|---|---|---|
++| N1 Storage 状态合并/错误最早认证 | `before_probes.json`：K=1 返回到达5却认证最早，同 validator 接受到达3见证；删长备选后漏解 | 旧 FullGraph 公共入口准确拒绝未支持 Storage，清除上次证书；不伪称新增 Storage 最优参考 | `after_probes.json`：K=1/2/3 及无长备选准确理由 `full_graph_reference:storage_contract_not_supported` |
++| N2 普通筛查默认 K | 普通3、包装4 | 普通包装默认改3，显式K不改、空盘默认1保留 | 默认完整有序候选相等；冷/热/预算/回退等回归 |
++| N3 checkpoint 工厂共享可变账 | 保存账本从(0,0)变(0,1) | 支持对象图用同一 deepcopy memo 复制，保留同分支 fast/slow/new-factory 累计关系，兄弟分支隔离 | 实际 checkpoint/fork 不串账、不漏计数，缓存归属正确 |
++
++原探针 `--require-fixed` 修前 exit=1、三项 defect，修后 exit=0、defect空；两次 `source_changed=[]`。原89测试文件逐字节匹配冻结清单，1519 项全部保持；新增61项，总 **1580 passed / 0 failed / 0 errors / 0 skipped**。原件 `full_001/results.json`、JUnit、stdout/stderr、source_before/after。完整说明见同目录 `REPAIR_EVIDENCE.md`，实际补丁 `v3_correctness.patch`。
++
++## 原生同盘真实事件账
++
++首个不可覆盖回执：`outputs/experiments/g31_ics_circulation_20261013/native_first_001/`。其中 input.json、result.json、audit.json 是本机实际运行结果。
++
++| 实际事件 | T0 的物理/业务状态 | 秒 |
++|---|---|---:|
++| B1 装载完成 | 第一件行李在 T0 上 | 0.10 |
++| Storage 入段服务完成 | 持盘存储，继续占库位 | 2.25 |
++| Storage 实际释放 | 此刻才生成 storage_out 运输段 | 6.00 |
++| B1 卸载完成 | 业务完成，盘进入 hold | 8.65 |
++| hold 完成 | 盘成为可用空盘 | 9.90 |
++| 真实返程 EDGE_ENTER | 经过源端/接收端模块授权 | 9.95 |
++| EMPTY_RECEIVED | 经两条真实边回到源区 | 12.05 |
++| B2 装载完成 | 同一 T0 再次服务，非新造盘 | 12.15 |
++| B2 卸载完成 | 第二件业务完成 | 17.20 |
++
++共 5 个运输段、10 个 traversal、166 个原生事件。没有另一个 Python 仿真器推进物理状态。native transport completed_count=5 是段数，不能误当5件业务。
++
++## 场景、同模型参考与负结果
++
++`outputs/experiments/g31_ics_circulation_20261013/native_acceptance_final/receipt.json` 记录最终冻结源码对应的13场通过；每场均保存 input/result/audit/events.jsonl。独立审计重放盘身份、装卸/hold、Storage 门控、边容量/头距、实际驻留+在途目标+接收授权占用，并交叉检查业务完成时刻。它不是最优性证书。001 的失败与较早 002 的通过均保留，最终验收以 final 为准。
++
++| 变体 | 实际结果与意义 |
++|---|---|
++| 不返盘控制 | B1完成，T0真实留在终点；B2未装载，不能拿预测释放替代 |
++| Storage 释放延迟到20秒 | B2的真实装载也随循环延后，后段没有预排偷跑 |
++| 源端保底库存=1 | 拒绝 `source_module_min_stock`，保留实体与未服务任务 |
++| 接收模块禁止 | 拒绝 `destination_module_refused` |
++| 真实接收口被另一空盘占满 | 拒绝 `receiving_full`，没有扩容或删盘 |
++| Storage 被真实停盘占满 | 载盘不能进入，业务失败/未完成如实保留 |
++| 迟到且已过期消息 | 拒绝 `departure_lease_expired`，不能复活权限 |
++| 出口故障持续到出发租约之后 | 未实际出发，T0隔离在源端；未用远端接收位释放 |
++| 同盘重复进入同一条边、头距30秒 | 入边0.15/30.20秒；第一次卸载和返程不抹除尾窗 |
++| 两盘充足，有/无返供 | 完成时刻都为8.65/9.65秒；返供多两次遍历，无收益 |
++| S3 同物理/同权限参考 | 两件也在8.65/17.20秒完成；是可行见证，最优未知 |
++
++13场小例不等于业务全规模评价，不证明预测/学习收益，也不证明100ms全流程单任务更新。每个 native event 的测时只作局部计算诊断，不混同路由更新响应上界。
++
++## 最终构建、回归和 legacy 兼容性
++
++以下都是实际执行结果，原始回执在 `outputs/experiments/g31_ics_circulation_20261013/`；集中复核见 `verification_summary.json`。
++
++- `build_final_002/receipt.json`：clean-first 构建，配置、编译、native 单项验收3条命令 exit=0。54份 C++/CMake 源文件构建前后相同且与交付源码相符。验收加载的 binding SHA256 为 `897f6e966df84129deda79d432d36d2df8bf0bf4f11aab8f743caca9a07fb47c`，与构建产物一致。
++- `native_pytest_final.xml`：新增 native Python 接口回归 **48 passed，0失败/错误/跳过**，包括同刻正常需求保护、输入合同拒绝、生命周期与物理账反例。
++- `native_legacy_final/ctest/final_all_002_junit.xml`：全部 **16/16 CTest 通过**，其中15个既有 native 测试程序、1个新增 circulation 测试程序。它们是程序数量，不与 Python 测试项相加冒充同一统计口径。全量原始构建源清单含53份 C++，另一个54份清单还包含 CMake。
++- `native_legacy_final/parity/`：同一固定 fixture 分别用成熟 `46cc46ab…` 和当前 runtime 编译，在无故障、有故障两场中各5类确定性输出哈希逐项相同。只证明这两场的直接兼容性，加上既有 native 回归；没有声称重跑全部旧规模实验。
++
++原工作树受保护用户文件交付时再次核对，SHA256 未变。生产修改仅在独立工作区。
++
++## 可审核的实际代码交付
++
++`outputs/experiments/g31_ics_circulation_20261013/delivery_001/` 提供：
++
++- `native_circulation.patch`：相对成熟 G31 的 native 实现、binding、执行/审计工具、测试和本文档差异；已对当前工作树执行 `git apply --reverse --check`。
++- `v3_correctness.patch`：相对冻结 V3 导入文件的3项修复和61项新增回归。复现完整工作树时先在成熟 G31 上执行 `import_v3_reference.py` 导入选定命名空间，再应用这份修复；不是直接整分支合并。
++- `implementation_and_diffs.zip`：本轮 native 相关实现源文件、V3 修复源文件、两份补丁和逐文件 SHA256 清单。**这是增量实现交付，不是完整仓库或完整实验数据 ZIP。**
++
++原始场景输入/事件账、修复前后的失败和成功回执保存在同级证据目录，未用新的摘要覆盖。后续整仓发布应连同必要 fixture 和输入清单另行打包；本轮不擅自发布。
++
++## 运行与审计入口
++
++在独立工作区执行；每次选新的 receipt/output 目录以保留失败历史。
++
++```powershell
++$env:PYTHONPATH='src;.'
++$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'
++& C:/PROGRAMING/python3.11.9/python.exe -m scripts.experiments.g31_ics_circulation.build_native --receipt-dir outputs/experiments/g31_ics_circulation_20261013/build_recheck --vcvars 'C:/PROGRAMING/visual studio/Visual studio/VC/Auxiliary/Build/vcvars64.bat' --ninja C:/Users/38908/.conda/envs/czr005/Library/bin/ninja.exe
++& C:/PROGRAMING/python3.11.9/python.exe -m scripts.experiments.g31_ics_circulation.validate_native_cycle --binary build_g31_circulation/python/czr005_circulation.cp311-win_amd64.pyd --output outputs/experiments/g31_ics_circulation_20261013/native_recheck
++& C:/PROGRAMING/python3.11.9/python.exe -m pytest tests/test_g31_circulation_native.py tests/test_g31_circulation_same_timestamp.py tests/test_g31_circulation_input_boundaries.py -q
++& C:/PROGRAMING/python3.11.9/python.exe docs/external_review/g31_v3_20261011/reproduce_audit_probes.py --root . --output outputs/experiments/g31_ics_circulation_20261013/v3_recheck.json --require-fixed
++```
++
++Linux 使用相同 CMake/pybind11/C++17源码，省略 Windows vcvars 参数、传实际 `.so`。本轮尚未独立执行 Linux native，不把可编译预期写成已验证跨平台结果。
++
++## 遇到的问题与处理
++
++- Managed worktree 建在当前沙箱可写范围外，写文件返回 WinError5。转为 root 授权可写目录内的独立 Git worktree；原用户工作树无覆盖。
++- MSVC 默认 Debug try-compile 遇 PDB 管理器不匹配。保留失败日志，使用明确 Release try-compile 成功，不跳编译器检查。
++- 中文 showIncludes 环境下增量构建复用旧 header 二进制，`native_acceptance_001` 第13场仍报旧 S4-only 拒绝。保留001失败，改用 clean-first、编译前后全 C++ 源哈希与二进制哈希，002通过。仅运行时 `source_changed=[]` 不足以证明编译输入身份。
++- 未真正出发就失效的返供曾保留远端泊位。已修未用接收租约清理，源实体仍隔离，在途租约不随出发期限消失。
++- 分盘原按输入顺序，改为到达时刻与稳定业务ID的 FIFO；不通过重新排列测试掩盖。
++- 常见的同刻返盘抢盘假设，在当前完整 goal service 模式实跑未成立，保留正例对照。直接启用旧 `complete_on_goal_arrival=true` 则实跑发现 phase1 先返盘再导出、phase2才到正常任务。新 circulation 明确要求完整目的服务，拒绝这个未经覆盖的旧捷径；legacy 保留原选项。
++- 独立畸形输入实验暴露非有限派生时间、负几何/服务和无效矩阵。新模式增加准确边界拒绝；原 legacy 行为不被默默改写。修前后原件与新增回归分别保留。
++
++## 新模型边界和下一步具体接入点
++
++当前为**合成、on-carrier Storage、逐盘有限泊位**合同。供应方端口目前是固定的容量、允许/拒绝、保底库存规则代理，尚未连接现场供应商区内空盘模块。附加卸载是完成 G31 目的服务后的每泊位卸载步骤，并非已校准的单卸载台模型。零跳合同、旧 goal-arrival 完成捷径、circulation checkpoint/clone 与旧五类状态摘要/回放投影均显式拒绝；不能复用旧 V3 checkpoint/标签或不完整状态哈希声称已支持新宿主。
++
++满泊位的同步换位/交接仍受保守当前占用检查限制，没有声称保留所有旧 PIBT 可行域、无死锁或全域最优。节点/边账扫描与批量预验证也尚无全规模100ms证据。
++
++接下来保持同一宿主继续推进：
++
++1. **区域自主接口**：在 `candidate_record`/S4合法候选排序处接入版本化 RouteIntent 与区域观测；完整业务约束及资源 owner 仍由 shield、JIT 和事务提交复验。先定义只含本地/已送达摘要的观察投影，不能把 binding 的全局离线结果直接当在线特征。系统级 A* 路线只作为可编解码意图/同域参考，实际已进入前缀不可撤。
++2. **预测预平衡**：从 native `STORAGE_RELEASE`、`UNLOAD_COMPLETE`、`HOLD_COMPLETE` 及未完成载盘合法阶段生成有依赖的条件释放轮廓；滚动控制选择新的跨区方向/数量/窗口，通过固定模块查询/导出/接收接口提交版本化请求。真实库存只认执行回执。当前显式 transfers 输入不是预测器。
++3. **主求解机制**：先把正常服务义务、源供应包络、共享边头距、Storage/泊位与供盘后继表达为时间化依赖。实现与全量同域修复相比的可行域覆盖及计算检查，再研究闭合边界修复。常数终点价值、一般分层和一般增量重用不算创新。
++4. **状态与强基线**：实现含所有新生命周期、租约/尾窗、owner消息和计账的原生 checkpoint，再生成同一物理宿主下的参考/continuation标签。先做强解析、S3/S4、受限精确/全量参考、一轮与双向反馈；未求最优明确unknown。learning/screen之后接回，不删除后续评价。
++
++创新结论及最新原始文献核对见 `NOVELTY_LEDGER.md`。新近邻已覆盖通用任务先后依赖闭合、冻结外部和局部修复，因此 C2 需要具体细化；不是把现有接通称为新方法，也不是降低两项研究要求。
+diff --git a/docs/g31_ics_circulation/literature_read_receipt_20261013.json b/docs/g31_ics_circulation/literature_read_receipt_20261013.json
+new file mode 100644
+index 00000000..50d56a5a
+--- /dev/null
++++ b/docs/g31_ics_circulation/literature_read_receipt_20261013.json
+@@ -0,0 +1,183 @@
++{
++  "schema": "g31_ics_circulation.literature_read_receipt.v1",
++  "read_date": "2026-10-13",
++  "purpose": "I0 novelty check; targeted primary-source reading, not systematic review or replication.",
++  "local_materials_full_read": [
++    "docs/external_review/g31_v3_20261011/ICS_V3_G31_Codex_next_stage_20261011.md",
++    "docs/external_review/g31_v3_20261011/ICS_V3_G31_executed_audit_and_integration_plan_20261011.md",
++    "docs/external_review/g31_v3_20261011/NOVELTY_LEDGER_20261011.md"
++  ],
++  "sources": [
++    {
++      "id": "L1",
++      "url": "https://www.bartdeschutter.org/publications/15-019-integrated-model-predictive-scheme/15-019-integrated-model-predictive-scheme.pdf",
++      "source_kind": "author manuscript",
++      "version": "Delft technical report 15-019; TCST2015 DOI10.1109/TCST.2014.2363135",
++      "access": "pdf text available",
++      "read_scope": "abstract, introduction, II-A and II-B loading/unloading excerpts; not full optimizer/theory",
++      "independently_replicated": false
++    },
++    {
++      "id": "L2",
++      "url": "https://infoscience.epfl.ch/server/api/core/bitstreams/28f8c92d-a35a-4893-b987-037ba3e59cab/content",
++      "source_kind": "author institution journal PDF",
++      "version": "TRC168(2024)104717; DOI10.1016/j.trc.2024.104717",
++      "access": "pdf text available; publisher search text available",
++      "read_scope": "abstract, section3 overview and section3.1 opening, modular matching description; not all formulas or experiments",
++      "independently_replicated": false
++    },
++    {
++      "id": "L3",
++      "url": "https://arxiv.org/html/2608.30512v1",
++      "source_kind": "author preprint",
++      "version": "v1; 2026-08-31",
++      "access": "HTML available",
++      "read_scope": "abstract, I-II-E, III-A/B, opening III-C; IV and appendix not fully reviewed",
++      "independently_replicated": false
++    },
++    {
++      "id": "L4",
++      "url": "https://arxiv.org/pdf/1710.06331",
++      "source_kind": "author manuscript",
++      "version": "arXiv1710.06331; manuscript DOI10.1002/atr.1365",
++      "access": "pdf text available",
++      "read_scope": "abstract, introduction, section2 calling/expelling/balancing opening; full section3 and experiments not independently reviewed",
++      "independently_replicated": false
++    },
++    {
++      "id": "L5",
++      "url": "https://arxiv.org/pdf/2003.04335",
++      "source_kind": "author preprint",
++      "version": "v1 shown in PDF 2020-03-09",
++      "access": "pdf text available",
++      "read_scope": "abstract, introduction/contribution, II-A flow/travel definitions and II-B joint-objective opening; not convex proof",
++      "independently_replicated": false
++    },
++    {
++      "id": "L6",
++      "url": "https://pure.kaist.ac.kr/en/publications/cooperative-zone-based-rebalancing-of-idle-overhead-hoist-transpo/",
++      "source_kind": "author institution record",
++      "version": "IISE53(10),1140-1156,2021; DOI10.1080/24725854.2020.1851823",
++      "access": "institution abstract available; publisher DOI direct open failed",
++      "read_scope": "abstract and bibliography only; methods full text remains unknown",
++      "independently_replicated": false
++    },
++    {
++      "id": "L7",
++      "url": "https://www.sciencedirect.com/science/article/pii/S0191261526000238",
++      "source_kind": "publisher",
++      "version": "TRB206,103411,2026; DOI10.1016/j.trb.2026.103411",
++      "access": "search returned abstract/introduction and section snippets; direct page open failed",
++      "read_scope": "abstract/introduction/section overview and author institution metadata; not full section3/4/theory",
++      "independently_replicated": false
++    },
++    {
++      "id": "L8",
++      "url": "https://idm-lab.org/bib/abstracts/Koen04a.html",
++      "source_kind": "author paper record",
++      "version": "Artificial Intelligence Journal155(1-2),93-146,2004",
++      "access": "record and abstract available",
++      "read_scope": "author abstract and erratum; full proof not reviewed",
++      "independently_replicated": false
++    },
++    {
++      "id": "L9",
++      "url": "https://arxiv.org/html/2603.28968v1",
++      "source_kind": "author preprint",
++      "version": "v1; 2026-03-30",
++      "access": "HTML available",
++      "read_scope": "abstract and sections 1 through 4.5; full results/appendix not reviewed; no replication",
++      "independently_replicated": false
++    },
++    {
++      "id": "L10",
++      "url": "https://jiaoyangli.me/files/2021-IJCAI.pdf",
++      "source_kind": "author paper PDF",
++      "version": "IJCAI2021; DOI10.24963/ijcai.2021/568",
++      "access": "PDF text available",
++      "read_scope": "abstract, sections 2 and 4, section5.1 and opening5.2; no replication",
++      "independently_replicated": false
++    },
++    {
++      "id": "L11",
++      "url": "https://jiaoyangli.me/files/2022-AAAI-2.pdf",
++      "source_kind": "author paper PDF",
++      "version": "AAAI2022; DOI10.1609/aaai.v36i9.21168",
++      "access": "PDF text available",
++      "read_scope": "abstract and sections1 through4.1, opening4.2; no replication",
++      "independently_replicated": false
++    },
++    {
++      "id": "L12",
++      "url": "https://arxiv.org/abs/2405.17794v3",
++      "source_kind": "author preprint",
++      "version": "v3; 2025-01-31; arXiv record states accepted AAAI2025",
++      "access": "abstract and version metadata available",
++      "read_scope": "abstract only; no methods full-text review or replication",
++      "independently_replicated": false
++    },
++    {
++      "id": "L13",
++      "url": "https://pure.kaist.ac.kr/en/publications/predictive-vehicle-dispatching-method-for-overhead-hoist-transpor/",
++      "source_kind": "author institution record; publisher abstract; author-hosted PDF search excerpts",
++      "version": "IJPR60(10),3063-3077,2022; DOI10.1080/00207543.2021.1910870; first online2021-04-13",
++      "access": "institution/publisher abstract and author PDF search text available; direct author PDF fetch timed out",
++      "read_scope": "abstract and introduction opening only; full BPD/CWPD cost functions and experiments not independently reviewed",
++      "independently_replicated": false
++    }
++  ],
++  "access_failures": [
++    {
++      "url": "https://www.sciencedirect.com/science/article/pii/S0968090X24002389",
++      "tool_return": "Internal Error",
++      "http_status": null,
++      "resolved_by": "EPFL journal PDF and publisher search"
++    },
++    {
++      "url": "https://doi.org/10.1080/24725854.2020.1851823",
++      "tool_return": "Internal Error",
++      "http_status": null,
++      "resolved_by": "KAIST abstract only; methods not obtained"
++    },
++    {
++      "url": "https://doi.org/10.1016/j.trb.2026.103411",
++      "tool_return": "Internal Error",
++      "http_status": null,
++      "resolved_by": "publisher search text; full methods not obtained"
++    },
++    {
++      "url": "https://www.sciencedirect.com/science/article/pii/S0191261526000238",
++      "tool_return": "Internal Error",
++      "http_status": null,
++      "resolved_by": "publisher search text"
++    },
++    {
++      "url": "https://www.tandfonline.com/doi/full/10.1080/24725854.2020.1851823",
++      "tool_return": "Failed to fetch https://www.tandfonline.com/doi/full/10.1080/24725854.2020.1851823: (403) Forbidden",
++      "reported_fetch_status": 403,
++      "note": "Later separate fetch; does not retroactively explain prior generic DOI error. No method full text obtained."
++    },
++    {
++      "url": "https://silab.kaist.ac.kr/publications-2/",
++      "tool_return": "Failed to fetch https://silab.kaist.ac.kr/publications-2/: (502) Bad Gateway",
++      "reported_fetch_status": 502,
++      "note": "Author publication directory only available as search excerpt."
++    },
++    {
++      "url": "https://sal.kaist.ac.kr/wordpress/wp-content/uploads/2021/04/Predictive-vehicle-dispatching-method-for-overhead-hoist-transport-systems-in-semiconductor-fabs.pdf",
++      "tool_return": "Failed to fetch https://sal.kaist.ac.kr/wordpress/wp-content/uploads/2021/04/Predictive-vehicle-dispatching-method-for-overhead-hoist-transport-systems-in-semiconductor-fabs.pdf: (400) Timeout fetching",
++      "reported_fetch_status": 400,
++      "resolved_by": "Author institution and publisher abstracts, author PDF search excerpt only; full cost functions not obtained."
++    }
++  ],
++  "claims": {
++    "C0": "engineering_only",
++    "C1": "hypothesis",
++    "C2": "hypothesis_refine_mechanism: broad precedence closure/frozen exterior/local repair already covered by L9",
++    "C3": "hypothesis",
++    "C4": "unsupported_unconditional_claim",
++    "C5": "not_method_innovation"
++  },
++  "limits": "No full paper replication. No inference that an inaccessible method does not cover the proposal. No HTTP/DNS error fabricated from generic tool error.",
++  "i0_revision": "L9 explicitly covers transitive successor closure, boundary-task replanning/retiming, cross-boundary release bounds and stage-indexed repair. Any distinct online circulation/owner/resource-tail closure mechanism remains unproven."
++}
+diff --git a/scripts/experiments/g31_ics_circulation/__init__.py b/scripts/experiments/g31_ics_circulation/__init__.py
+new file mode 100644
+index 00000000..2898d724
+--- /dev/null
++++ b/scripts/experiments/g31_ics_circulation/__init__.py
+@@ -0,0 +1 @@
++"""One mature G31 physical host; Python only constructs inputs and audits receipts."""
+diff --git a/scripts/experiments/g31_ics_circulation/build_native.py b/scripts/experiments/g31_ics_circulation/build_native.py
+new file mode 100644
+index 00000000..91b3cd80
+--- /dev/null
++++ b/scripts/experiments/g31_ics_circulation/build_native.py
+@@ -0,0 +1,94 @@
++"""Clean native build with source/binary identity and raw command receipts.
++
++The MSVC environment can be supplied using --vcvars. A clean rebuild is
++intentional: localized /showIncludes output must not silently reuse old headers.
++"""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import importlib
++import json
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import time
++
++ROOT = Path(__file__).absolute().parents[3]
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--build-dir", type=Path, default=ROOT / "build_g31_circulation")
++    parser.add_argument("--receipt-dir", type=Path, required=True)
++    parser.add_argument("--vcvars", type=Path)
++    parser.add_argument("--ninja", type=Path)
++    parser.add_argument("--jobs", type=int, default=2)
++    args = parser.parse_args()
++    build = args.build_dir.absolute()
++    receipt_dir = args.receipt_dir.absolute()
++    receipt_dir.mkdir(parents=True, exist_ok=False)
++    build.mkdir(parents=True, exist_ok=True)
++    source_files = sorted([ROOT / "CMakeLists.txt", *ROOT.glob("cpp/**/*.hpp"), *ROOT.glob("cpp/**/*.cpp")])
++    snapshot = lambda: {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in source_files}
++    receipt = {"schema": "g31.circulation.clean_build.v1", "source_before": snapshot(),
++               "commands": [], "status": "started", "clean_first": True,
++               "source_root": str(ROOT), "build_root": str(build), "python": sys.executable}
++    pybind11 = importlib.import_module("pybind11")
++    cmake = shutil.which("cmake")
++    if not cmake:
++        raise RuntimeError("cmake unavailable")
++    configure = [cmake, "-S", str(ROOT), "-B", str(build), "-DCMAKE_BUILD_TYPE=Release",
++                 "-DCMAKE_TRY_COMPILE_CONFIGURATION=Release", "-DCZR005_BUILD_PYBIND=ON",
++                 f"-DPython3_EXECUTABLE={sys.executable}", f"-Dpybind11_DIR={pybind11.get_cmake_dir()}"]
++    if args.ninja:
++        configure += ["-G", "Ninja", f"-DCMAKE_MAKE_PROGRAM={args.ninja.absolute()}"]
++    commands = [configure, [cmake, "--build", str(build), "--clean-first", "--parallel", str(args.jobs),
++                           "--target", "czr005_circulation", "test_circulation_runtime"],
++                [shutil.which("ctest") or "ctest", "--test-dir", str(build), "--output-on-failure",
++                 "-R", "^circulation_runtime$", "--output-junit", str(receipt_dir / "native_junit.xml")]]
++    start = time.perf_counter()
++    try:
++        for i, command in enumerate(commands):
++            executable = command
++            if args.vcvars:
++                if os.name != "nt":
++                    raise ValueError("--vcvars requires Windows")
++                # Arguments are paths/tool switches, never user-authored script bodies.
++                # Keep the environment and build in one cmd process; no file deletion.
++                script = receipt_dir / f"command_{i:02d}.cmd"
++                script.write_text('@echo off\ncall "' + str(args.vcvars.absolute()) + '"\n'
++                                  'if errorlevel 1 exit /b %errorlevel%\nset VSLANG=1033\n'
++                                  + subprocess.list2cmdline(command) + '\nexit /b %errorlevel%\n', encoding="utf-8")
++                executable = ["cmd.exe", "/c", str(script)]
++            with (receipt_dir / f"command_{i:02d}.stdout.log").open("wb") as stdout, \
++                 (receipt_dir / f"command_{i:02d}.stderr.log").open("wb") as stderr:
++                t = time.perf_counter()
++                process = subprocess.run(executable, cwd=ROOT, stdout=stdout, stderr=stderr, check=False)
++            receipt["commands"].append({"argv": command, "actual_argv": executable,
++                                        "exit_code": process.returncode, "wall_seconds": time.perf_counter()-t})
++            if process.returncode:
++                raise RuntimeError(f"command {i} failed with exit {process.returncode}; raw logs preserved")
++        receipt["source_after"] = snapshot()
++        receipt["source_changed"] = [p for p, h in receipt["source_before"].items() if receipt["source_after"].get(p) != h]
++        if receipt["source_changed"]:
++            raise RuntimeError("C++ source changed during the build; result not frozen")
++        binaries = sorted([*build.glob("python/czr005_circulation*.pyd"), *build.glob("python/czr005_circulation*.so"),
++                           *build.glob("test_circulation_runtime*exe")])
++        receipt["binary_sha256"] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in binaries if p.is_file()}
++        if not receipt["binary_sha256"]:
++            raise RuntimeError("no built binary found")
++        receipt["status"] = "passed"
++    except Exception as exc:
++        receipt["status"] = "failed"
++        receipt["error"] = str(exc)
++    receipt["wall_seconds"] = time.perf_counter()-start
++    (receipt_dir / "receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
++    print(json.dumps({k: receipt[k] for k in ("status", "wall_seconds")}, indent=2))
++    return 0 if receipt["status"] == "passed" else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/scripts/experiments/g31_ics_circulation/export_delivery.py b/scripts/experiments/g31_ics_circulation/export_delivery.py
+new file mode 100644
+index 00000000..64b0f14c
+--- /dev/null
++++ b/scripts/experiments/g31_ics_circulation/export_delivery.py
+@@ -0,0 +1,75 @@
++"""Export reviewable local diffs without staging, committing or pushing."""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import subprocess
++import zipfile
++
++ROOT = Path(__file__).absolute().parents[3]
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--output", type=Path, required=True)
++    args = parser.parse_args()
++    out = args.output.absolute()
++    out.mkdir(parents=True, exist_ok=False)
++    files = {".gitattributes", "CMakeLists.txt", "cpp/ics_core/runtime/event_driven_junction.hpp",
++             "cpp/ics_core/runtime/circulation.hpp", "cpp/ics_core/runtime/circulation_runtime_impl.hpp",
++             "cpp/ics_core/bindings/circulation.cpp", "cpp/tests/test_circulation_runtime.cpp",
++             "cpp/tests/g31_legacy_replay_fixture.cpp"}
++    for pattern in ("scripts/experiments/g31_ics_circulation/*.py", "tests/test_g31_circulation*.py", "docs/g31_ics_circulation/*"):
++        files.update(p.relative_to(ROOT).as_posix() for p in ROOT.glob(pattern) if p.is_file())
++    files = sorted(files)
++    tracked = set(subprocess.check_output(["git", "ls-tree", "-r", "--name-only", "HEAD"], cwd=ROOT, text=True).splitlines())
++    patch = subprocess.check_output(["git", "diff", "--binary", "HEAD", "--", *[p for p in files if p in tracked]], cwd=ROOT)
++    commands = []
++    for path in files:
++        if path in tracked:
++            continue
++        null = "NUL" if __import__("os").name == "nt" else "/dev/null"
++        argv = ["git", "diff", "--no-index", "--binary", "--", null, path]
++        p = subprocess.run(argv, cwd=ROOT, capture_output=True, check=False)
++        if p.returncode not in (0, 1):
++            raise RuntimeError(p.stderr.decode(errors="replace"))
++        patch += p.stdout
++        commands.append({"argv": argv, "exit_code": p.returncode, "stderr": p.stderr.decode(errors="replace")})
++    patch_path = out / "native_circulation.patch"
++    patch_path.write_bytes(patch)
++    check = subprocess.run(["git", "apply", "--reverse", "--check", str(patch_path)], cwd=ROOT, capture_output=True)
++    if check.returncode:
++        raise RuntimeError("Native reverse-apply check failed: " + check.stderr.decode(errors="replace"))
++    correctness = ROOT / "outputs/experiments/g31_ics_circulation_20261013/v3_correctness/v3_correctness.patch"
++    (out / correctness.name).write_bytes(correctness.read_bytes())
++    v3_files = ["scripts/experiments/ics_circulation_v3/" + name for name in
++                ("routing_reference.py", "runtime.py", "terminal_capacity_screen.py")]
++    v3_files.append("tests/test_ics_v3_executed_audit_regressions.py")
++    protected = ROOT.parent / "cpp/ics_core/runtime/bounded_local_pibt.hpp"
++    protected_sha = hashlib.sha256(protected.read_bytes()).hexdigest()
++    expected = "b94390501502b61fac64c302fd79ce5a5af1851e13c02932fbddf463284d8951"
++    if protected_sha != expected:
++        raise RuntimeError("Original user modification changed since the baseline receipt")
++    manifest = {"schema": "g31.circulation.delivery.v1", "branch": subprocess.check_output(["git","branch","--show-current"],cwd=ROOT,text=True).strip(),
++                "base_commit": subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),
++                "v3_reference_commit": "fccd4819532701ee4173ec598822450d962d4e61", "pushed": False,
++                "protected_original_file_sha256": protected_sha, "native_patch_reverse_check_exit_code": check.returncode,
++                "implementation_files": {p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in files},
++                "v3_correctness_files": {p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in v3_files},
++                "patch_sha256": {p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (patch_path,out/correctness.name)},
++                "diff_commands": commands}
++    (out / "manifest.json").write_text(json.dumps(manifest,indent=2),encoding="utf-8")
++    with zipfile.ZipFile(out / "implementation_and_diffs.zip", "w", zipfile.ZIP_DEFLATED) as archive:
++        for path in files:
++            archive.write(ROOT/path,"working_source/"+path)
++        for path in v3_files:
++            archive.write(ROOT/path,"working_source/"+path)
++        for path in (patch_path,out/correctness.name,out/"manifest.json"):
++            archive.write(path,path.name)
++    print(json.dumps({"output":str(out),"native_files":len(files),"native_patch_bytes":len(patch),"protected_original_unchanged":True}))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/scripts/experiments/g31_ics_circulation/import_v3_reference.py b/scripts/experiments/g31_ics_circulation/import_v3_reference.py
+new file mode 100644
+index 00000000..af39cb53
+--- /dev/null
++++ b/scripts/experiments/g31_ics_circulation/import_v3_reference.py
+@@ -0,0 +1,57 @@
++"""Import only the frozen V3 reference namespace, never an entire branch merge.
++
++Run once on the mature G31 checkout before applying v3_correctness.patch.
++Existing differing paths are rejected, including already corrected V3 files.
++"""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import subprocess
++
++REFERENCE = "fccd4819532701ee4173ec598822450d962d4e61"
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--source-repository", type=Path, required=True)
++    parser.add_argument("--destination", type=Path, required=True)
++    parser.add_argument("--manifest", type=Path, required=True)
++    args = parser.parse_args()
++    destination = args.destination.absolute()
++    if args.manifest.exists():
++        raise FileExistsError("Use a new manifest path")
++    paths = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", REFERENCE],
++                                    cwd=args.source_repository, text=True).splitlines()
++    selected = [p for p in paths if p.startswith(("scripts/experiments/ics_circulation_v3/", "docs/ics_circulation_v3/"))
++                or (p.startswith("tests/test_ics_") and ("circulation_v3" in p or "ics_v3_" in p))]
++    payload = subprocess.check_output(["git", "cat-file", "--batch"], cwd=args.source_repository,
++                                      input="".join(f"{REFERENCE}:{p}\n" for p in selected).encode())
++    files = []
++    offset = 0
++    for path in selected:
++        end = payload.index(b"\n", offset)
++        count = int(payload[offset:end].split()[-1])
++        offset = end + 1
++        data = payload[offset:offset+count]
++        offset += count+1
++        target = destination / path
++        if target.exists() and target.read_bytes() != data:
++            raise FileExistsError(f"Refusing to overwrite differing path: {target}")
++        files.append((path, data))
++    # Mutation starts only after all collision checks, and preserves blob bytes.
++    for path, data in files:
++        target = destination / path
++        target.parent.mkdir(parents=True, exist_ok=True)
++        if not target.exists():
++            target.write_bytes(data)
++    args.manifest.parent.mkdir(parents=True, exist_ok=True)
++    args.manifest.write_text(json.dumps({"source_commit": REFERENCE,
++        "files": [{"path": p, "sha256": hashlib.sha256(b).hexdigest()} for p,b in files]}, indent=2), encoding="utf-8")
++    print(f"Imported/verified {len(files)} namespace files from {REFERENCE}")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/scripts/experiments/g31_ics_circulation/native_host.py b/scripts/experiments/g31_ics_circulation/native_host.py
+new file mode 100644
+index 00000000..b4d2a035
+--- /dev/null
++++ b/scripts/experiments/g31_ics_circulation/native_host.py
+@@ -0,0 +1,234 @@
++"""Run declared circulation contracts on the compiled G31 host.
++
++No Python simulation clock, routing executor, or inventory is advanced here.
++The potential calculation is the existing mature G31 preprocessing algorithm.
++"""
++from __future__ import annotations
++
++import importlib.util
++import math
++from pathlib import Path
++from typing import Any
++
++from scripts.eval.run_g4irsf28_service_potential import service_aware_potential
++
++
++def load_native(binary: str | Path):
++    path = Path(binary).resolve(strict=True)
++    spec = importlib.util.spec_from_file_location("czr005_circulation", path)
++    if spec is None or spec.loader is None:
++        raise ValueError(f"cannot load native module: {path}")
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++def prepare_input(data: dict[str, Any]) -> dict[str, Any]:
++    result = dict(data)
++    potential, contract = service_aware_potential(
++        data["node_records"], data["edge_records"], minimum_service_seconds=0.001
++    )
++    result["heuristic_time"] = potential
++    result["potential_contract"] = contract
++    return result
++
++
++def tiny_cycle() -> dict[str, Any]:
++    edges = [(0, 1, 1.0, 1.0), (0, 6, 1.2, 1.0), (1, 2, 1.0, 1.0),
++             (6, 2, 1.0, 1.0), (6, 3, 1.0, 1.0), (2, 3, 1.0, 1.0),
++             (3, 4, 1.0, 1.0), (4, 5, 1.0, 1.0), (5, 0, 1.0, 1.0)]
++    return prepare_input({
++        "schema": "g31.circulation.input.v1",
++        "model_scope": "synthetic on-carrier Storage, per-berth unloading, fixed module ports",
++        "node_records": [(n, 3 if n == 2 else 1, 0.05, n, 0,
++                          [v for u, v, _, _ in edges if u == n]) for n in range(7)],
++        "edge_records": edges,
++        "node_contracts": [{"node": n, "zone": "B" if n in (3, 4) else "A",
++                            "capacity": 1} for n in range(7)],
++        "edge_contracts": [{"from": u, "to": v, "capacity": 1, "entry_headway": 0.2}
++                           for u, v, _, _ in edges],
++        "trays": [{"tray_id": "T0", "node": 0}],
++        "jobs": [
++            {"business_bag_id": "B1", "origin": 0, "destination": 4, "arrival": 0.0,
++             "deadline": 40.0, "storage_node": 2, "storage_release_at": 6.0,
++             "storage_min_dwell": 2.0, "load_seconds": 0.1,
++             "unload_seconds": 0.5, "hold_seconds": 1.25},
++            {"business_bag_id": "B2", "origin": 0, "destination": 4, "arrival": 0.2,
++             "deadline": 60.0, "storage_node": 2, "storage_release_at": 0.0,
++             "storage_min_dwell": 0.25, "load_seconds": 0.1,
++             "unload_seconds": 0.5, "hold_seconds": 1.25},
++        ],
++        "transfers": [{"request_id": "return-T0", "tray_id": "T0", "source": 4,
++                       "destination": 0, "issued_at": 0.1, "message_delay": 0.0,
++                       "earliest_departure": 0.0, "expiry": 50.0}],
++        "faults": [],
++        "options": {"max_simulation_time": 80.0},
++    })
++
++
++def audit_result(data: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]:
++    """Independent consistency checks over executed receipts, not expected success.
++
++    Checks flow conservation, traversal pairs, travel duration, tail headway,
++    business/leg/tray identity separation and causal Storage/reuse bounds.
++    It does not prove optimality or every owner-internal invariant.
++    """
++    assert result["mode"] == "circulation"
++    expected_trays = {t["tray_id"] for t in data["trays"]}
++    assert {t["tray_id"] for t in result["trays"]} == expected_trays
++    assert len(result["trays"]) == len(expected_trays)
++    leg_map = {r["transport_leg_id"]: r for r in result["leg_identities"]}
++    assert len(leg_map) == len(result["leg_identities"])
++    business_ids = {j["business_bag_id"] for j in data["jobs"]}
++    assert not set(leg_map) & business_ids
++    assert not set(leg_map) & expected_trays
++    travel = {(u, v): max(length / speed, 0.001) for u, v, length, speed in data["edge_records"]}
++    edges = {(e["from"], e["to"]): e for e in data["edge_contracts"]}
++    last_entry: dict[tuple[int, int], float] = {}
++    active: dict[int, dict[str, Any]] = {}
++    completed: set[int] = set()
++    physical = {t["tray_id"]: t["node"] for t in data["trays"]}
++    edge_counts = {key: 0 for key in edges}
++    node_contracts = {n["node"]: n for n in data["node_contracts"]}
++    job_specs = {j["business_bag_id"]: j for j in data["jobs"]}
++    transfer_specs = {t["request_id"]: t for t in data["transfers"]}
++    phases = {t: "empty" for t in expected_trays}
++    phase_time = {t: 0.0 for t in expected_trays}
++    lease: dict[str, int] = {}
++    transit_target: dict[str, int] = {}
++    active_load: dict[str, str] = {}
++    actual_completed: dict[str, float] = {}
++
++    def check_berths():
++        counts = {n: 0 for n in node_contracts}
++        for tray_id in expected_trays:
++            # Remote reception is a real owner reservation, and an in-flight
++            # next hop is counted before arrival. Same tray/node is deduplicated.
++            for n in {physical.get(tray_id), transit_target.get(tray_id), lease.get(tray_id)} - {None}:
++                counts[n] += 1
++        for n, count in counts.items():
++            assert count <= node_contracts[n]["capacity"], ("berth or reception oversubscription", n, count)
++
++    check_berths()
++    time = -math.inf
++    for r in result["receipts"]:
++        assert r["time"] + 1e-8 >= time, ("receipt time reversed", r)
++        time = r["time"]
++        tray_id, event = r["tray_id"], r["event"]
++        if event == "LOAD_START":
++            spec = job_specs[r["business_bag_id"]]
++            assert phases[tray_id] == "empty" and tray_id not in active_load
++            assert physical[tray_id] == spec["origin"] and time + 1e-8 >= spec["arrival"]
++            phases[tray_id] = "loading"
++            phase_time[tray_id] = time
++            active_load[tray_id] = r["business_bag_id"]
++        elif event == "LOAD_COMPLETE":
++            spec = job_specs[active_load[tray_id]]
++            assert phases[tray_id] == "loading"
++            assert time + 1e-8 >= phase_time[tray_id] + spec.get("load_seconds", 0)
++            phases[tray_id] = "loaded"
++        elif event == "STORAGE_ENTER":
++            spec = job_specs[active_load[tray_id]]
++            assert phases[tray_id] == "loaded" and physical[tray_id] == spec["storage_node"]
++            phases[tray_id] = "storage"
++            phase_time[tray_id] = time
++        elif event == "STORAGE_RELEASE":
++            spec = job_specs[active_load[tray_id]]
++            assert phases[tray_id] == "storage"
++            assert time + 1e-8 >= max(spec.get("storage_release_at", 0), phase_time[tray_id] + spec.get("storage_min_dwell", 0))
++            phases[tray_id] = "loaded"
++        elif event == "UNLOAD_START":
++            spec = job_specs[active_load[tray_id]]
++            assert phases[tray_id] == "loaded" and physical[tray_id] == spec["destination"]
++            phases[tray_id] = "unloading"
++            phase_time[tray_id] = time
++        elif event == "UNLOAD_COMPLETE":
++            spec = job_specs[active_load[tray_id]]
++            assert phases[tray_id] == "unloading"
++            assert time + 1e-8 >= phase_time[tray_id] + spec["unload_seconds"]
++            actual_completed[active_load[tray_id]] = time
++            phases[tray_id] = "hold"
++            phase_time[tray_id] = time + spec["hold_seconds"]
++        elif event == "HOLD_COMPLETE":
++            assert phases[tray_id] == "hold" and time + 1e-8 >= phase_time[tray_id]
++            phases[tray_id] = "empty"
++            del active_load[tray_id]
++        elif event == "EXPORT_GRANTED":
++            spec = transfer_specs[r["reason"]]
++            assert phases[tray_id] == "empty" and physical[tray_id] == spec["source"]
++            assert node_contracts[spec["source"]]["zone"] != node_contracts[spec["destination"]]["zone"]
++            assert node_contracts[spec["source"]].get("allow_export", True)
++            assert node_contracts[spec["destination"]].get("allow_receive", True)
++            available = sum(phases[t] == "empty" and physical[t] == spec["source"] for t in expected_trays)
++            assert available > node_contracts[spec["source"]].get("export_min_stock", 0)
++            assert time + 1e-8 >= max(spec["issued_at"] + spec["message_delay"], spec["earliest_departure"])
++            assert time <= spec["expiry"] + 1e-8
++            lease[tray_id] = spec["destination"]
++            phases[tray_id] = "empty_transit"
++            check_berths()
++        elif event == "EMPTY_RECEIVED":
++            assert phases[tray_id] == "empty_transit" and physical[tray_id] == lease[tray_id]
++            del lease[tray_id]
++            phases[tray_id] = "empty"
++        elif event == "UNUSED_RECEIVING_RELEASED":
++            assert physical[tray_id] is not None and tray_id not in transit_target
++            lease.pop(tray_id)
++        elif event == "LEG_FAILED":
++            phases[tray_id] = "quarantined"
++        if r["event"] not in ("EDGE_ENTER", "EDGE_EXIT"):
++            continue
++        assert r["tray_id"] in expected_trays
++        assert r["transport_leg_id"] in leg_map
++        identity = leg_map[r["transport_leg_id"]]
++        assert data["trays"][identity["tray"]]["tray_id"] == r["tray_id"]
++        assert r["business_bag_id"] == ("" if identity["job"] < 0 else data["jobs"][identity["job"]]["business_bag_id"])
++        key = (r["from"], r["to"])
++        assert key in travel
++        tid = r["traversal_id"]
++        assert tid > 0
++        if r["event"] == "EDGE_ENTER":
++            assert tid not in active and tid not in completed
++            assert physical[r["tray_id"]] == r["from"]
++            assert phases[tray_id] in ("loaded", "empty_transit")
++            assert r["time"] + 1e-8 >= last_entry.get(key, -math.inf) + edges[key]["entry_headway"]
++            last_entry[key] = r["time"]
++            active[tid] = r
++            physical[r["tray_id"]] = None
++            transit_target[tray_id] = r["to"]
++            edge_counts[key] += 1
++            assert edge_counts[key] <= edges[key]["capacity"]
++        else:
++            assert tid in active, ("exit without unique entry", r)
++            entry = active.pop(tid)
++            assert (entry["tray_id"], entry["from"], entry["to"], entry["transport_leg_id"]) == (
++                r["tray_id"], r["from"], r["to"], r["transport_leg_id"])
++            assert abs(r["time"] - entry["time"] - travel[key]) < 1e-7
++            physical[r["tray_id"]] = r["to"]
++            del transit_target[tray_id]
++            completed.add(tid)
++            edge_counts[key] -= 1
++        check_berths()
++    for tray in result["trays"]:
++        if tray["edge_to"] < 0:
++            assert tray["node"] == physical[tray["tray_id"]]
++    for spec, job in zip(data["jobs"], result["jobs"], strict=True):
++        if job["loaded_at"] >= 0:
++            assert job["loaded_at"] + 1e-8 >= spec["arrival"]
++        if job["storage_released_at"] >= 0:
++            assert job["storage_entered_at"] >= 0
++            assert job["storage_released_at"] + 1e-8 >= max(
++                spec.get("storage_release_at", 0),
++                job["storage_entered_at"] + spec.get("storage_min_dwell", 0))
++        if job["completed_at"] >= 0:
++            assert actual_completed[spec["business_bag_id"]] == job["completed_at"]
++            assert job["loaded_at"] >= 0
++            assert job["completed_at"] >= job["loaded_at"]
++            if spec.get("storage_node", -1) >= 0:
++                assert job["storage_released_at"] >= 0
++            assert job["deadline_met"] == (spec["deadline"] < 0 or job["completed_at"] <= spec["deadline"] + 1e-8)
++    assert result["native_summary"]["reservation_conflicts"] == 0
++    assert result["native_summary"]["physical_fault_edge_entry_violation_count"] == 0
++    assert all(not d["full_astar_used"] for d in result["decisions"])
++    return {"status": "passed", "completed_traversals": len(completed),
++            "open_traversals": len(active), "tray_count": len(expected_trays),
++            "optimality": "unknown", "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"}
+diff --git a/scripts/experiments/g31_ics_circulation/validate_native_cycle.py b/scripts/experiments/g31_ics_circulation/validate_native_cycle.py
+new file mode 100644
+index 00000000..29a1d295
+--- /dev/null
++++ b/scripts/experiments/g31_ics_circulation/validate_native_cycle.py
+@@ -0,0 +1,173 @@
++"""Execute and archive the first G31 circulation acceptance campaign.
++
++python -m scripts.experiments.g31_ics_circulation.validate_native_cycle \
++  --binary build_g31_circulation/python/czr005_circulation.cp311-win_amd64.pyd \
++  --output outputs/experiments/g31_ics_circulation_20261013/native_acceptance_001
++"""
++from __future__ import annotations
++
++import argparse
++from copy import deepcopy
++import hashlib
++import json
++from pathlib import Path
++import platform
++import sys
++import time
++import traceback
++
++from .native_host import audit_result, load_native, tiny_cycle
++
++
++def scenarios():
++    base = tiny_cycle()
++    yield "same_tray_two_services", base
++    s = deepcopy(base)
++    s["transfers"] = []
++    yield "no_return_control", s
++    s = deepcopy(base)
++    s["jobs"][0]["storage_release_at"] = 20
++    yield "delayed_storage", s
++    s = deepcopy(base)
++    s["node_contracts"][4]["export_min_stock"] = 1
++    yield "source_protection_refusal", s
++    s = deepcopy(base)
++    s["node_contracts"][0]["allow_receive"] = False
++    yield "destination_module_refusal", s
++    s = deepcopy(base)
++    s["transfers"][0].update(message_delay=60, expiry=30)
++    yield "late_expired_message", s
++    s = deepcopy(base)
++    s["trays"].append({"tray_id": "parked-storage", "node": 2})
++    s["options"].update(max_simulation_time=15, max_decisions_per_bag=32)
++    yield "storage_receiving_full", s
++    s = deepcopy(base)
++    s["trays"].append({"tray_id": "reserve-at-source", "node": 5})
++    s["node_contracts"][5]["zone"] = "B"
++    s["jobs"][1]["arrival"] = 25
++    s["transfers"].append({"request_id": "occupy-receiving", "tray_id": "reserve-at-source",
++                           "source": 5, "destination": 0, "issued_at": 1.0,
++                           "message_delay": 0.0, "earliest_departure": 1.0, "expiry": 5.0})
++    yield "empty_receiving_full", s
++    s = deepcopy(base)
++    s["transfers"][0]["expiry"] = 11
++    s["faults"] = [{"from": 4, "to": 5, "start": 0.0, "end": 30.0,
++                     "message_delay": 4.0}]
++    s["options"]["max_simulation_time"] = 40
++    yield "fault_before_departure_lease", s
++    s = deepcopy(base)
++    for e in s["edge_contracts"]:
++        if e["from"] == 0:
++            e["entry_headway"] = 30.0
++    # Both outbound choices have long tail windows; use a single outbound edge
++    # to make the same-edge repeated-entry condition unavoidable in this witness.
++    s["edge_records"] = [e for e in s["edge_records"] if e[:2] != (0, 6)]
++    s["edge_contracts"] = [e for e in s["edge_contracts"] if (e["from"], e["to"]) != (0, 6)]
++    s["node_records"][0] = (0, 1, 0.05, 0, 0, [1])
++    from .native_host import prepare_input
++    yield "headway_survives_unload_and_return", prepare_input(s)
++    for control in (False, True):
++        s = deepcopy(base)
++        s["trays"].append({"tray_id": "T1", "node": 0})
++        # Same finite physical model for the two members of this comparison.
++        for n in s["node_contracts"]:
++            n["capacity"] = 2
++        s["jobs"][1]["storage_release_at"] = 6
++        s["jobs"][1]["unload_seconds"] = 0.5
++        if control:
++            s["transfers"] = []
++        yield "sufficient_trays_no_return" if control else "sufficient_trays_with_return", s
++    s = deepcopy(base)
++    s["options"]["scorer_mode"] = "S3_shortest_potential_only"
++    yield "same_model_S3_reference", s
++
++
++def check_campaign(rows):
++    r = rows["same_tray_two_services"]
++    assert all(j["status"] == "completed" and j["deadline_met"] for j in r["jobs"])
++    assert {j["tray"] for j in r["jobs"]} == {0}
++    assert r["jobs"][1]["loaded_at"] >= r["transfers"][0]["received_at"] > r["jobs"][0]["completed_at"]
++    assert any(d["scorer_effective_id"].startswith("S4") for d in r["decisions"])
++    assert len(r["leg_identities"]) == 5
++    assert len({e["traversal_id"] for e in r["receipts"] if e["event"] == "EDGE_ENTER"}) == 10
++    assert rows["no_return_control"]["jobs"][1]["loaded_at"] < 0
++    assert rows["no_return_control"]["trays"][0]["node"] == 4
++    assert rows["delayed_storage"]["jobs"][1]["loaded_at"] > r["jobs"][1]["loaded_at"] + 13.9
++    for name, reason in (("source_protection_refusal", "source_module_min_stock"),
++                         ("destination_module_refusal", "destination_module_refused"),
++                         ("empty_receiving_full", "receiving_full"),
++                         ("late_expired_message", "departure_lease_expired")):
++        assert rows[name]["transfers"][0]["status"] == "rejected", name
++        assert rows[name]["transfers"][0]["reason"] == reason, name
++    full = rows["storage_receiving_full"]
++    assert full["jobs"][0]["completed_at"] < 0
++    assert full["jobs"][0]["storage_entered_at"] < 0
++    assert full["trays"][1]["node"] == 2
++    failure = rows["fault_before_departure_lease"]
++    assert failure["transfers"][0]["status"] == "failed"
++    assert failure["transfers"][0]["departed_at"] < 0
++    assert failure["trays"][0]["node"] == 4
++    assert failure["trays"][0]["mode"] == "quarantined"
++    assert failure["trays"][0]["reception_node"] == -1
++    assert not any(e["event"] == "EDGE_ENTER" and e["from"] == 4 for e in failure["receipts"])
++    tail = rows["headway_survives_unload_and_return"]
++    entries = [e["time"] for e in tail["receipts"] if e["event"] == "EDGE_ENTER" and e["from"] == 0]
++    assert len(entries) == 2 and entries[1] >= entries[0] + 30 - 1e-8
++    assert all(j["status"] == "completed" for j in tail["jobs"])
++    no_benefit = [[j["completed_at"] for j in rows[key]["jobs"]]
++                  for key in ("sufficient_trays_no_return", "sufficient_trays_with_return")]
++    assert all(t >= 0 for t in no_benefit[0] + no_benefit[1])
++    assert no_benefit[0] == no_benefit[1]
++    assert all(j["status"] == "completed" for j in rows["same_model_S3_reference"]["jobs"])
++    return {"status": "passed", "scenario_count": len(rows),
++            "same_tray_two_service_completion": [j["completed_at"] for j in r["jobs"]],
++            "no_benefit_completion_times": no_benefit[0],
++            "same_model_reference": "S3 feasible executed witness; optimality unknown",
++            "method_claim": "engineering_only; no predictive controller or learning claim"}
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--binary", type=Path, required=True)
++    parser.add_argument("--output", type=Path, required=True)
++    args = parser.parse_args()
++    out = args.output.absolute()
++    out.mkdir(parents=True, exist_ok=False)
++    receipt = {"command": sys.argv, "python": sys.version, "platform": platform.platform(),
++               "binary": str(args.binary.absolute()), "binary_sha256": hashlib.sha256(args.binary.read_bytes()).hexdigest(),
++               "status": "running", "scenarios": []}
++    source_paths = [Path("cpp/ics_core/runtime/event_driven_junction.hpp"),
++                    Path("cpp/ics_core/runtime/circulation.hpp"),
++                    Path("cpp/ics_core/runtime/circulation_runtime_impl.hpp"),
++                    Path("cpp/ics_core/bindings/circulation.cpp"),
++                    Path(__file__), Path(__file__).with_name("native_host.py")]
++    receipt["source_sha256"] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
++    start = time.perf_counter()
++    try:
++        native = load_native(args.binary)
++        rows = {}
++        for name, data in scenarios():
++            case_dir = out / name
++            case_dir.mkdir()
++            (case_dir / "input.json").write_text(json.dumps(data, indent=2), encoding="utf-8")
++            result = native.run(data)
++            (case_dir / "result.json").write_text(json.dumps(result, indent=2, allow_nan=False), encoding="utf-8")
++            audit = audit_result(data, result)
++            (case_dir / "audit.json").write_text(json.dumps(audit, indent=2), encoding="utf-8")
++            (case_dir / "events.jsonl").write_text("".join(json.dumps(e)+"\n" for e in result["receipts"]), encoding="utf-8")
++            receipt["scenarios"].append({"name": name, "audit": audit})
++            rows[name] = result
++        receipt["acceptance"] = check_campaign(rows)
++        receipt["status"] = "passed"
++    except Exception:
++        receipt["status"] = "failed"
++        receipt["exception"] = traceback.format_exc()
++    receipt["wall_seconds"] = time.perf_counter() - start
++    receipt["source_changed"] = [str(p) for p in source_paths if hashlib.sha256(p.read_bytes()).hexdigest() != receipt["source_sha256"][str(p)]]
++    (out / "receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
++    print(json.dumps(receipt.get("acceptance", receipt), indent=2))
++    return 0 if receipt["status"] == "passed" and not receipt["source_changed"] else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tests/test_g31_circulation_input_boundaries.py b/tests/test_g31_circulation_input_boundaries.py
+new file mode 100644
+index 00000000..4a7b488d
+--- /dev/null
++++ b/tests/test_g31_circulation_input_boundaries.py
+@@ -0,0 +1,118 @@
++"""Reject malformed physical numbers before advancing the circulation host."""
++from copy import deepcopy
++import math
++import os
++from pathlib import Path
++
++import pytest
++
++from scripts.experiments.g31_ics_circulation.native_host import audit_result, load_native, tiny_cycle
++
++
++@pytest.fixture(scope='module')
++def native():
++    configured = os.environ.get('G31_CIRCULATION_BINARY')
++    if configured:
++        return load_native(configured)
++    folder = Path(__file__).resolve().parents[1] / 'build_g31_circulation' / 'python'
++    binaries = [*folder.glob('czr005_circulation*.pyd'), *folder.glob('czr005_circulation*.so')]
++    assert len(binaries) == 1, 'Build czr005_circulation or set G31_CIRCULATION_BINARY'
++    return load_native(binaries[0])
++
++
++@pytest.mark.parametrize('service', [-1.0, float('nan'), float('inf')])
++def test_invalid_node_service_is_not_silently_clamped(native, service):
++    data = tiny_cycle()
++    row = list(data['node_records'][0]); row[2] = service
++    data['node_records'][0] = row
++    with pytest.raises(ValueError, match='^circulation:invalid_node_service$'):
++        native.run(data)
++
++
++@pytest.mark.parametrize('length,speed', [(-1.0, 1.0), (float('nan'), 1.0),
++    (float('inf'), 1.0), (1.0, 0.0), (1.0, -1.0), (1.0, float('nan')), (1.0, float('inf'))])
++def test_invalid_edge_geometry_is_not_silently_clamped_or_scored_infinite(native, length, speed):
++    data = tiny_cycle()
++    data['edge_records'][0] = (0, 1, length, speed)
++    with pytest.raises(ValueError, match='^circulation:invalid_edge_geometry$'):
++        native.run(data)
++
++
++def test_finite_edge_components_cannot_overflow_travel_time(native):
++    data = tiny_cycle()
++    data['edge_records'][0] = (0, 1, 1e308, 1e-308)
++    with pytest.raises(ValueError, match='^circulation:invalid_edge_travel$'):
++        native.run(data)
++
++
++@pytest.mark.parametrize('component', ['message', 'load', 'unload_hold', 'fault_notification'])
++def test_finite_times_cannot_overflow_derived_events(native, component):
++    data = tiny_cycle()
++    data['options']['max_simulation_time'] = -1
++    if component == 'message':
++        data['transfers'][0].update(issued_at=1e308, message_delay=1e308)
++    elif component == 'load':
++        data['jobs'][0].update(arrival=1e308, load_seconds=1e308)
++    elif component == 'unload_hold':
++        data['jobs'][0].update(unload_seconds=1e308, hold_seconds=1e308)
++    else:
++        data['faults'] = [dict(**{'from': 0, 'to': 1}, start=1e308,
++                              end=1e308, message_delay=1e308)]
++    with pytest.raises(ValueError, match='^circulation:nonfinite_derived_time$'):
++        native.run(data)
++
++
++@pytest.mark.parametrize('shape', ['few_rows', 'few_columns', 'extra_columns'])
++def test_heuristic_shape_is_rejected_at_binding_boundary(native, shape):
++    data = tiny_cycle()
++    if shape == 'few_rows':
++        data['heuristic_time'] = [[0.0]]
++    elif shape == 'few_columns':
++        data['heuristic_time'][0].pop()
++    else:
++        data['heuristic_time'][0].append(0.0)
++    with pytest.raises(ValueError, match='^circulation:invalid_heuristic_shape$'):
++        native.run(data)
++
++
++@pytest.mark.parametrize('value', [float('nan'), float('inf'), -1.0])
++def test_unqueried_heuristic_values_also_obey_the_physical_input_contract(native, value):
++    data = tiny_cycle()
++    # The old implementation never queried this cell and accepted NaN here.
++    data['heuristic_time'][0][2] = value
++    with pytest.raises(ValueError, match='^circulation:invalid_heuristic_value$'):
++        native.run(data)
++
++
++@pytest.mark.parametrize('kind', ['node', 'edge'])
++def test_duplicate_graph_rows_cannot_be_silently_ignored(native, kind):
++    data = tiny_cycle()
++    data[kind+'_records'].append(deepcopy(data[kind+'_records'][0]))
++    with pytest.raises(ValueError, match='^circulation:invalid_graph_'+kind+'_record$'):
++        native.run(data)
++
++
++@pytest.mark.parametrize('kind', ['node', 'edge'])
++def test_malformed_graph_record_lengths_have_explicit_boundary_reason(native, kind):
++    data = tiny_cycle()
++    data[kind+'_records'][0] = list(data[kind+'_records'][0])[:-1]
++    with pytest.raises(ValueError, match='^circulation:invalid_graph_'+kind+'_record$'):
++        native.run(data)
++
++
++def test_zero_service_and_zero_length_retain_native_minimum_service_contract(native):
++    data = tiny_cycle()
++    row = list(data['node_records'][0]); row[2] = 0.0
++    data['node_records'][0] = row
++    data['edge_records'][0] = (0, 1, 0.0, 1.0)
++    result = native.run(data)
++    audit_result(data, result)
++    assert all(job['status'] == 'completed' for job in result['jobs'])
++    assert math.isfinite(result['physical_clock'])
++    entries = {e['traversal_id']: e for e in result['receipts'] if e['event'] == 'EDGE_ENTER'}
++    used = 0
++    for event in result['receipts']:
++        if event['event'] == 'EDGE_EXIT' and (event['from'], event['to']) == (0, 1):
++            assert event['time']-entries[event['traversal_id']]['time'] == pytest.approx(0.001)
++            used += 1
++    assert used == 2
+diff --git a/tests/test_g31_circulation_native.py b/tests/test_g31_circulation_native.py
+new file mode 100644
+index 00000000..9b764792
+--- /dev/null
++++ b/tests/test_g31_circulation_native.py
+@@ -0,0 +1,106 @@
++"""Regression of the compiled mature G31 circulation host, never a Python simulator."""
++from copy import deepcopy
++import os
++from pathlib import Path
++
++import pytest
++
++from scripts.experiments.g31_ics_circulation.native_host import audit_result, load_native, tiny_cycle
++from scripts.experiments.g31_ics_circulation.validate_native_cycle import check_campaign, scenarios
++
++
++@pytest.fixture(scope="module")
++def native():
++    configured = os.environ.get("G31_CIRCULATION_BINARY")
++    if configured:
++        binary = Path(configured)
++    else:
++        folder = Path(__file__).resolve().parents[1] / "build_g31_circulation" / "python"
++        matches = list(folder.glob("czr005_circulation*.pyd")) + list(folder.glob("czr005_circulation*.so"))
++        assert len(matches) == 1, "Build target czr005_circulation or set G31_CIRCULATION_BINARY"
++        binary = matches[0]
++    return load_native(binary)
++
++
++def test_full_physical_acceptance_matrix(native):
++    rows = {}
++    for name, data in scenarios():
++        rows[name] = native.run(data)
++        audit_result(data, rows[name])
++    assert check_campaign(rows)["scenario_count"] == 13
++
++
++@pytest.mark.parametrize("mutation,reason", [
++    (lambda s: s["trays"].clear(), "empty_fleet"),
++    (lambda s: s["trays"].append(dict(s["trays"][0])), "invalid_tray"),
++    (lambda s: s["jobs"].append(dict(s["jobs"][0])), "invalid_job"),
++    (lambda s: s["node_contracts"].pop(), "node_contract_coverage"),
++    (lambda s: s["edge_contracts"].pop(), "edge_contract_coverage"),
++    (lambda s: s["node_contracts"][0].update(capacity=0), "invalid_node_contract"),
++    (lambda s: s["edge_contracts"][0].update(capacity=0), "invalid_edge_contract"),
++    (lambda s: s["edge_contracts"][0].update(entry_headway=-1), "invalid_edge_contract"),
++    (lambda s: s["jobs"][0].update(storage_node=0), "zero_hop_contract_unsupported"),
++    (lambda s: s["jobs"][0].update(arrival=float("nan")), "invalid_job"),
++    (lambda s: s["jobs"][0].update(unload_seconds=-1), "invalid_job"),
++    (lambda s: s["transfers"][0].update(tray_id="ghost"), "invalid_transfer"),
++    (lambda s: s["transfers"][0].update(message_delay=float("inf")), "invalid_transfer"),
++])
++def test_invalid_physical_contracts_are_rejected(native, mutation, reason):
++    data = tiny_cycle()
++    mutation(data)
++    with pytest.raises(ValueError, match="circulation:" + reason):
++        native.run(data)
++
++
++def test_cross_region_port_cannot_take_over_same_zone_module(native):
++    data = tiny_cycle()
++    data["node_contracts"][4]["zone"] = "A"
++    result = native.run(data)
++    assert result["transfers"][0]["reason"] == "same_zone_transfer_not_authorized"
++    assert result["jobs"][1]["loaded_at"] < 0
++    audit_result(data, result)
++
++
++def test_binding_default_horizon_handles_late_absolute_time(native):
++    data = tiny_cycle()
++    data["options"].pop("max_simulation_time")
++    for job in data["jobs"]:
++        for field in ("arrival", "deadline", "storage_release_at"):
++            job[field] += 90000
++    for request in data["transfers"]:
++        for field in ("issued_at", "earliest_departure", "expiry"):
++            request[field] += 90000
++    result = native.run(data)
++    assert all(j["status"] == "completed" for j in result["jobs"])
++    audit_result(data, result)
++
++
++def test_waiting_bags_use_arrival_fifo_independent_of_input_order(native):
++    data = tiny_cycle()
++    data["trays"][0]["node"] = 4
++    data["jobs"][0]["arrival"] = 0.2
++    data["jobs"][1]["arrival"] = 0.1
++    data["transfers"][0]["issued_at"] = 0.0
++    result = native.run(data)
++    assert result["jobs"][1]["loaded_at"] >= 0
++    assert result["jobs"][0]["loaded_at"] < 0
++    audit_result(data, result)
++
++
++@pytest.mark.parametrize("tamper", ["reuse_traversal", "erase_empty_trip", "shorten_hold", "invent_second_tray"])
++def test_receipt_auditor_rejects_manufactured_cycle(native, tamper):
++    data = tiny_cycle()
++    result = deepcopy(native.run(data))
++    entries = [e for e in result["receipts"] if e["event"] == "EDGE_ENTER"]
++    if tamper == "reuse_traversal":
++        entries[1]["traversal_id"] = entries[0]["traversal_id"]
++    elif tamper == "erase_empty_trip":
++        empty_ids = {r["transport_leg_id"] for r in result["leg_identities"] if r["kind"] == "empty_return"}
++        result["receipts"] = [r for r in result["receipts"] if not (
++            r["transport_leg_id"] in empty_ids and r["event"] in ("EDGE_ENTER", "EDGE_EXIT"))]
++    elif tamper == "shorten_hold":
++        data["jobs"][0]["hold_seconds"] += 2
++    else:
++        result["trays"].append({"tray_id": "invented"})
++    with pytest.raises(AssertionError):
++        audit_result(data, result)
+diff --git a/tests/test_g31_circulation_same_timestamp.py b/tests/test_g31_circulation_same_timestamp.py
+new file mode 100644
+index 00000000..8c7155b9
+--- /dev/null
++++ b/tests/test_g31_circulation_same_timestamp.py
+@@ -0,0 +1,46 @@
++"""Due-now source work retains the returned tray before discretionary export."""
++from copy import deepcopy
++import os
++from pathlib import Path
++
++import pytest
++
++from scripts.experiments.g31_ics_circulation.native_host import audit_result, load_native, tiny_cycle
++
++
++@pytest.fixture(scope='module')
++def native():
++    configured = os.environ.get('G31_CIRCULATION_BINARY')
++    if configured:
++        return load_native(configured)
++    folder = Path(__file__).resolve().parents[1] / 'build_g31_circulation' / 'python'
++    binaries = [*folder.glob('czr005_circulation*.pyd'), *folder.glob('czr005_circulation*.so')]
++    assert len(binaries) == 1, 'Build czr005_circulation or set G31_CIRCULATION_BINARY'
++    return load_native(binaries[0])
++
++
++def test_receive_completion_at_arrival_timestamp_preserves_normal_source_service(native):
++    case = tiny_cycle()
++    case['trays'][0]['node'] = 4
++    case['jobs'] = []
++    case['transfers'][0]['issued_at'] = 0.0
++    case['transfers'].append(dict(request_id='second-export', tray_id='T0', source=0,
++        destination=4, issued_at=0.1, message_delay=0.0, earliest_departure=0.0, expiry=20.0))
++    calibration = native.run(case)
++    arrival = calibration['transfers'][0]['received_at']
++    assert arrival > 0
++    job = dict(tiny_cycle()['jobs'][0])
++    job.update(business_bag_id='due-now-normal', arrival=arrival, storage_node=-1)
++    case['jobs'] = [job]
++    observed = native.run(case)
++    control = deepcopy(case)
++    control['transfers'] = control['transfers'][:1]
++    without_export = native.run(control)
++    for data, result in ((case, observed), (control, without_export)):
++        audit_result(data, result)
++        assert result['jobs'][0]['status'] == 'completed'
++        assert result['jobs'][0]['loaded_at'] == pytest.approx(arrival + job['load_seconds'])
++    assert observed['jobs'][0]['completed_at'] == without_export['jobs'][0]['completed_at']
++    simultaneous = [e['event'] for e in observed['receipts'] if abs(e['time']-arrival) < 1e-9]
++    assert simultaneous.index('BAG_ARRIVAL') < simultaneous.index('LOAD_START')
++    assert 'EXPORT_GRANTED' not in simultaneous

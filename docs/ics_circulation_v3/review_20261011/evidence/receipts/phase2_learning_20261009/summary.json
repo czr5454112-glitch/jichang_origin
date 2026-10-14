@@ -1,0 +1,214 @@
+{
+  "scope": "synthetic_first_safe_prefix_value_learning_with_disjoint_deployment_sources",
+  "source_groups": {
+    "train": 80,
+    "validation": 20,
+    "test": 40,
+    "deployment": 40
+  },
+  "candidate_rows": 560,
+  "paired_branch_rollouts": 1120,
+  "label_stage_forecast_model_rollouts": 560,
+  "deployment_runs": 240,
+  "deployment_nested_forecast_model_rollouts": 320,
+  "invariant_checks": 144255,
+  "feature_count": 23,
+  "selected_alpha": {
+    "direct": 100.0,
+    "residual": 10.0
+  },
+  "label_and_forecast_evaluation_ms": 36713.91630000289,
+  "ridge_fitting_ms": 61.09699999797158,
+  "candidate_test": {
+    "baseline": {
+      "groups": 40,
+      "mean_regret": 0.6375,
+      "max_regret": 5.0,
+      "positive_regret_groups": 13,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": null
+    },
+    "analytic": {
+      "groups": 40,
+      "mean_regret": 0.6375,
+      "max_regret": 5.0,
+      "positive_regret_groups": 13,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": 2.468033123764752
+    },
+    "timed": {
+      "groups": 40,
+      "mean_regret": 0.0875,
+      "max_regret": 1.0,
+      "positive_regret_groups": 4,
+      "mean_gain_over_baseline": 0.55,
+      "delta_rmse": 3.2886072279918133
+    },
+    "direct": {
+      "groups": 40,
+      "mean_regret": 0.1875,
+      "max_regret": 2.5,
+      "positive_regret_groups": 4,
+      "mean_gain_over_baseline": 0.45,
+      "delta_rmse": 2.215077482807918
+    },
+    "residual": {
+      "groups": 40,
+      "mean_regret": 0.1625,
+      "max_regret": 2.5,
+      "positive_regret_groups": 5,
+      "mean_gain_over_baseline": 0.475,
+      "delta_rmse": 2.1688971853900387
+    },
+    "forecast_rollout": {
+      "groups": 40,
+      "mean_regret": 0.05,
+      "max_regret": 1.0,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.5875,
+      "delta_rmse": 1.2637493818000467
+    }
+  },
+  "independent_closed_loop": {
+    "baseline": {
+      "runs": 40,
+      "mean_cost": 14.245,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.55,
+      "wall_ms": {
+        "p50": 27.254999993601814,
+        "p95": 35.090700002911035,
+        "p99": 39.00960000464693,
+        "max": 39.00960000464693,
+        "mean": 27.329782500055444
+      }
+    },
+    "analytic": {
+      "runs": 40,
+      "mean_cost": 14.245,
+      "mean_gain_over_baseline": 0.0,
+      "worse_than_baseline": 0,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.55,
+      "wall_ms": {
+        "p50": 27.973299998848233,
+        "p95": 35.45780000422383,
+        "p99": 39.92899999866495,
+        "max": 39.92899999866495,
+        "mean": 28.27664249962254
+      }
+    },
+    "timed": {
+      "runs": 40,
+      "mean_cost": 13.945,
+      "mean_gain_over_baseline": 0.3,
+      "worse_than_baseline": 1,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.6,
+      "wall_ms": {
+        "p50": 28.033700000378303,
+        "p95": 40.131299996573944,
+        "p99": 41.83080000075279,
+        "max": 41.83080000075279,
+        "mean": 28.990122500363213
+      }
+    },
+    "direct": {
+      "runs": 40,
+      "mean_cost": 14.285,
+      "mean_gain_over_baseline": -0.040000000000000036,
+      "worse_than_baseline": 5,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.75,
+      "wall_ms": {
+        "p50": 30.79960000468418,
+        "p95": 37.96540000621462,
+        "p99": 45.19520000030752,
+        "max": 45.19520000030752,
+        "mean": 30.38169999999809
+      }
+    },
+    "residual": {
+      "runs": 40,
+      "mean_cost": 14.07,
+      "mean_gain_over_baseline": 0.175,
+      "worse_than_baseline": 2,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.675,
+      "wall_ms": {
+        "p50": 30.04720000171801,
+        "p95": 38.860699998622295,
+        "p99": 48.62449999927776,
+        "max": 48.62449999927776,
+        "mean": 30.590789999951085
+      }
+    },
+    "forecast_rollout": {
+      "runs": 40,
+      "mean_cost": 13.945,
+      "mean_gain_over_baseline": 0.3,
+      "worse_than_baseline": 1,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.6,
+      "wall_ms": {
+        "p50": 206.04670000466285,
+        "p95": 265.32489999954123,
+        "p99": 337.22920000582235,
+        "max": 337.22920000582235,
+        "mean": 205.8951775001333
+      }
+    }
+  },
+  "generation_ms": {
+    "p50": 0.6458999996539205,
+    "p95": 1.0485999955562875,
+    "p99": 1.2892000013380311,
+    "max": 1.3277000034577213,
+    "mean": 0.7088342854590987
+  },
+  "features_ms": {
+    "p50": 1.0413999989395961,
+    "p95": 1.5903000021353364,
+    "p99": 1.7833000019891188,
+    "max": 2.032700002018828,
+    "mean": 1.056305714363199
+  },
+  "forecast_scoring_ms": {
+    "p50": 81.28859999851556,
+    "p95": 109.85570000048028,
+    "p99": 122.24170000263257,
+    "max": 144.6386000025086,
+    "mean": 82.01512500012801
+  },
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "scripts/experiments/ics_circulation_v3/audit_nanning.py": "d1f0b87a492b77abee5523f6727e931801a3a0479716a727019596c464c30254",
+    "scripts/experiments/ics_circulation_v3/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "scripts/experiments/ics_circulation_v3/evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "scripts/experiments/ics_circulation_v3/joint_control.py": "4d5f1fcddc72fff8ca9669bfc88825c96000ce458eaa7b5f9fe992168c2f0bda",
+    "scripts/experiments/ics_circulation_v3/learning.py": "e5bc873e0b1ad5347ad66887f239f7281891e2edf08546f54d18f622fc9a326c",
+    "scripts/experiments/ics_circulation_v3/model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "scripts/experiments/ics_circulation_v3/nanning_routing_benchmark.py": "574a2ddb95a3d8a4fed8157ed7875b197a3cf0b566affc391f5114dc1d71c767",
+    "scripts/experiments/ics_circulation_v3/phase2_scenarios.py": "19785d86e2f1a487e3210a61d26bb6afffe526f9360b517454bba304c96941ee",
+    "scripts/experiments/ics_circulation_v3/prebalance.py": "6005b9486570acc13c57778f9eb5d4f85a8a149832b7e6d3ce311fa1116df6ba",
+    "scripts/experiments/ics_circulation_v3/routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "scripts/experiments/ics_circulation_v3/run_joint_control.py": "43deb19d00a35420fe07351f4ccc871c0aef9fb49e8f85f467c32b6fb28edc0a",
+    "scripts/experiments/ics_circulation_v3/run_phase2_learning.py": "29142adf7e9b587141fdad1ffe3fddbc4c7fd487c4e503592137fc3b1e5b67d0",
+    "scripts/experiments/ics_circulation_v3/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "scripts/experiments/ics_circulation_v3/run_prebalance.py": "8a7590fb2f162bb179fbe4a9262f571237e45d69342cc38c26946253e26a6d35",
+    "scripts/experiments/ics_circulation_v3/run_routing_comparison.py": "8d591506e8c3ee438910e36c10f34a7295daecef5bd15b0e0f75c57fda4d4b8b",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "scripts/experiments/ics_circulation_v3/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035"
+  },
+  "limitations": [
+    "Synthetic seven-node family with full visible physical state; no airport-generalization claim",
+    "Linear ridge models only, not a trained MLP or original PPL/DG-PG algorithm",
+    "Candidate interventions stop at the first waitable node; a no-wait chain is an indivisible prefix",
+    "Forecast-rollout reference receives the same published demand forecast and extra compute, not the true tape",
+    "Strict deadline checks for loaded requests are local; future uncertainty can still cause missed service",
+    "No supplier integration and no network end-to-end latency measurement",
+    "Low-sample benefit must be judged from frozen test and independent deployment, not training loss"
+  ]
+}

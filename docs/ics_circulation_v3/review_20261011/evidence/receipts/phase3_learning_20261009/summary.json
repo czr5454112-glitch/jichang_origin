@@ -1,0 +1,444 @@
+{
+  "scope": "same_synthetic_family_fresh_groups_nonlinear_and_input_comparison",
+  "smoke": false,
+  "source_groups": {
+    "train": 80,
+    "validation": 20,
+    "test": 40,
+    "deployment": 40
+  },
+  "reused_training_validation_candidate_rows": 400,
+  "reused_training_validation_paired_branches": 800,
+  "new_candidate_rows": 160,
+  "new_paired_branch_rollouts": 320,
+  "new_label_stage_forecast_rollouts": 160,
+  "deployment_runs": 560,
+  "deployment_nested_forecast_rollouts": 320,
+  "training_fit_count": 48,
+  "total_fit_ms": 9706.135099979292,
+  "fresh_label_and_reference_ms": 11311.537000001408,
+  "test_metrics": {
+    "baseline": {
+      "groups": 40,
+      "mean_regret": 0.5125,
+      "max_regret": 5.5,
+      "positive_regret_groups": 8,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": null
+    },
+    "analytic": {
+      "groups": 40,
+      "mean_regret": 0.5125,
+      "max_regret": 5.5,
+      "positive_regret_groups": 8,
+      "mean_gain_over_baseline": 0.0,
+      "delta_rmse": 3.979400080414132
+    },
+    "timed": {
+      "groups": 40,
+      "mean_regret": 0.1125,
+      "max_regret": 2.5,
+      "positive_regret_groups": 3,
+      "mean_gain_over_baseline": 0.4,
+      "delta_rmse": 4.1025144728568606
+    },
+    "forecast_rollout": {
+      "groups": 40,
+      "mean_regret": 0.05,
+      "max_regret": 1.0,
+      "positive_regret_groups": 2,
+      "mean_gain_over_baseline": 0.4625,
+      "delta_rmse": 2.0522853115490545
+    },
+    "ridge_direct": {
+      "groups": 40,
+      "mean_regret": 0.2375,
+      "max_regret": 4.0,
+      "positive_regret_groups": 4,
+      "mean_gain_over_baseline": 0.275,
+      "delta_rmse": 3.784151852409075
+    },
+    "ridge_residual": {
+      "groups": 40,
+      "mean_regret": 0.2125,
+      "max_regret": 4.0,
+      "positive_regret_groups": 3,
+      "mean_gain_over_baseline": 0.3,
+      "delta_rmse": 3.7295716607295626
+    },
+    "mlp_direct_seed17": {
+      "groups": 40,
+      "mean_regret": 0.1875,
+      "max_regret": 4.0,
+      "positive_regret_groups": 5,
+      "mean_gain_over_baseline": 0.325,
+      "delta_rmse": 4.082695504382498
+    },
+    "mlp_residual_seed17": {
+      "groups": 40,
+      "mean_regret": 0.8575,
+      "max_regret": 5.0,
+      "positive_regret_groups": 11,
+      "mean_gain_over_baseline": -0.34500000000000003,
+      "delta_rmse": 3.751065986847664
+    },
+    "mlp_direct_seed29": {
+      "groups": 40,
+      "mean_regret": 0.4975,
+      "max_regret": 9.4,
+      "positive_regret_groups": 6,
+      "mean_gain_over_baseline": 0.01499999999999999,
+      "delta_rmse": 4.115753657565048
+    },
+    "mlp_residual_seed29": {
+      "groups": 40,
+      "mean_regret": 0.3875,
+      "max_regret": 4.0,
+      "positive_regret_groups": 6,
+      "mean_gain_over_baseline": 0.125,
+      "delta_rmse": 2.769077372209935
+    },
+    "mlp_direct_seed43": {
+      "groups": 40,
+      "mean_regret": 0.1625,
+      "max_regret": 3.0,
+      "positive_regret_groups": 5,
+      "mean_gain_over_baseline": 0.35,
+      "delta_rmse": 4.172553091008262
+    },
+    "mlp_residual_seed43": {
+      "groups": 40,
+      "mean_regret": 0.2875,
+      "max_regret": 5.0,
+      "positive_regret_groups": 4,
+      "mean_gain_over_baseline": 0.225,
+      "delta_rmse": 3.0023458247985024
+    },
+    "mlp_direct_no_analytic_scores": {
+      "groups": 40,
+      "mean_regret": 0.535,
+      "max_regret": 9.4,
+      "positive_regret_groups": 6,
+      "mean_gain_over_baseline": -0.02250000000000001,
+      "delta_rmse": 4.043364361259671
+    },
+    "mlp_direct_route_only": {
+      "groups": 40,
+      "mean_regret": 1.4875,
+      "max_regret": 16.0,
+      "positive_regret_groups": 15,
+      "mean_gain_over_baseline": -0.975,
+      "delta_rmse": 5.618038647066799
+    }
+  },
+  "independent_closed_loop": {
+    "baseline": {
+      "runs": 40,
+      "mean_cost": 15.0525,
+      "mean_delta_from_timed": 0.6499999999999999,
+      "better_than_timed": 0,
+      "worse_than_timed": 10,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 85,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.4,
+      "wall_ms_whole_episode": {
+        "p50": 28.516600003058556,
+        "p95": 37.205599997832906,
+        "p99": 42.695799995271955,
+        "max": 42.695799995271955,
+        "mean": 29.33409249963006
+      }
+    },
+    "analytic": {
+      "runs": 40,
+      "mean_cost": 15.0525,
+      "mean_delta_from_timed": 0.6499999999999999,
+      "better_than_timed": 0,
+      "worse_than_timed": 10,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 85,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.4,
+      "wall_ms_whole_episode": {
+        "p50": 30.07939999952214,
+        "p95": 37.111799996637274,
+        "p99": 39.59290000057081,
+        "max": 39.59290000057081,
+        "mean": 30.155344999366207
+      }
+    },
+    "timed": {
+      "runs": 40,
+      "mean_cost": 14.4025,
+      "mean_delta_from_timed": 0.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 89,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.25,
+      "wall_ms_whole_episode": {
+        "p50": 29.2637000020477,
+        "p95": 40.64569999900414,
+        "p99": 44.50580000411719,
+        "max": 44.50580000411719,
+        "mean": 30.99366250080493
+      }
+    },
+    "forecast_rollout": {
+      "runs": 40,
+      "mean_cost": 14.3775,
+      "mean_delta_from_timed": -0.025,
+      "better_than_timed": 1,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 89,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.25,
+      "wall_ms_whole_episode": {
+        "p50": 206.00019999983488,
+        "p95": 268.7976999950479,
+        "p99": 284.5307000025059,
+        "max": 284.5307000025059,
+        "mean": 215.3748850008924
+      }
+    },
+    "ridge_direct": {
+      "runs": 40,
+      "mean_cost": 14.4025,
+      "mean_delta_from_timed": 0.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 89,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.25,
+      "wall_ms_whole_episode": {
+        "p50": 30.25820000038948,
+        "p95": 42.18810000020312,
+        "p99": 45.489600001019426,
+        "max": 45.489600001019426,
+        "mean": 31.755837500531925
+      }
+    },
+    "ridge_residual": {
+      "runs": 40,
+      "mean_cost": 14.4025,
+      "mean_delta_from_timed": 0.0,
+      "better_than_timed": 0,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 89,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.25,
+      "wall_ms_whole_episode": {
+        "p50": 31.328299999586307,
+        "p95": 43.317399999068584,
+        "p99": 45.409899998048786,
+        "max": 45.409899998048786,
+        "mean": 32.40803249973396
+      }
+    },
+    "mlp_direct_seed17": {
+      "runs": 40,
+      "mean_cost": 14.4775,
+      "mean_delta_from_timed": 0.075,
+      "better_than_timed": 1,
+      "worse_than_timed": 2,
+      "worse_than_baseline": 1,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 89,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.25,
+      "wall_ms_whole_episode": {
+        "p50": 33.501099998829886,
+        "p95": 41.77209999761544,
+        "p99": 43.36029999831226,
+        "max": 43.36029999831226,
+        "mean": 33.471877499141556
+      }
+    },
+    "mlp_residual_seed17": {
+      "runs": 40,
+      "mean_cost": 14.3775,
+      "mean_delta_from_timed": -0.025,
+      "better_than_timed": 1,
+      "worse_than_timed": 0,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 89,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.25,
+      "wall_ms_whole_episode": {
+        "p50": 35.52209999907063,
+        "p95": 42.47790000226814,
+        "p99": 46.10390000016196,
+        "max": 46.10390000016196,
+        "mean": 34.03359249950881
+      }
+    },
+    "mlp_direct_seed29": {
+      "runs": 40,
+      "mean_cost": 14.6025,
+      "mean_delta_from_timed": 0.2,
+      "better_than_timed": 0,
+      "worse_than_timed": 3,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 88,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.35,
+      "wall_ms_whole_episode": {
+        "p50": 34.529899996414315,
+        "p95": 44.25669999909587,
+        "p99": 50.244099998963065,
+        "max": 50.244099998963065,
+        "mean": 34.39678249978897
+      }
+    },
+    "mlp_residual_seed29": {
+      "runs": 40,
+      "mean_cost": 14.4525,
+      "mean_delta_from_timed": 0.05,
+      "better_than_timed": 2,
+      "worse_than_timed": 2,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 89,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.275,
+      "wall_ms_whole_episode": {
+        "p50": 32.18339999875752,
+        "p95": 42.55689999990864,
+        "p99": 44.78750000271248,
+        "max": 44.78750000271248,
+        "mean": 32.80116750029265
+      }
+    },
+    "mlp_direct_seed43": {
+      "runs": 40,
+      "mean_cost": 15.0025,
+      "mean_delta_from_timed": 0.6,
+      "better_than_timed": 0,
+      "worse_than_timed": 6,
+      "worse_than_baseline": 1,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 87,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.45,
+      "wall_ms_whole_episode": {
+        "p50": 31.710000002931338,
+        "p95": 41.2136000013561,
+        "p99": 46.4062000028207,
+        "max": 46.4062000028207,
+        "mean": 32.837337501223374
+      }
+    },
+    "mlp_residual_seed43": {
+      "runs": 40,
+      "mean_cost": 14.4775,
+      "mean_delta_from_timed": 0.075,
+      "better_than_timed": 1,
+      "worse_than_timed": 2,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 88,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.25,
+      "wall_ms_whole_episode": {
+        "p50": 32.995699999446515,
+        "p95": 44.001400005072355,
+        "p99": 47.49650000303518,
+        "max": 47.49650000303518,
+        "mean": 33.106557500286726
+      }
+    },
+    "mlp_direct_no_analytic_scores": {
+      "runs": 40,
+      "mean_cost": 14.5775,
+      "mean_delta_from_timed": 0.175,
+      "better_than_timed": 1,
+      "worse_than_timed": 3,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 88,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.325,
+      "wall_ms_whole_episode": {
+        "p50": 33.13260000140872,
+        "p95": 44.43629999877885,
+        "p99": 47.22860000038054,
+        "max": 47.22860000038054,
+        "mean": 34.006962499370275
+      }
+    },
+    "mlp_direct_route_only": {
+      "runs": 40,
+      "mean_cost": 14.6025,
+      "mean_delta_from_timed": 0.19999999999999996,
+      "better_than_timed": 2,
+      "worse_than_timed": 4,
+      "worse_than_baseline": 0,
+      "completed": 153,
+      "bag_denominator": 153,
+      "on_time": 88,
+      "uncompleted_total": 0,
+      "mean_tray_wait": 1.3,
+      "wall_ms_whole_episode": {
+        "p50": 32.92979999969248,
+        "p95": 40.67819999909261,
+        "p99": 46.56489999615587,
+        "max": 46.56489999615587,
+        "mean": 33.00435000019206
+      }
+    }
+  },
+  "frozen_models_sha256": "66c7c58e1e27e23e6ca61b858582155adb69ec41b75a4010b27869fa353b4c26",
+  "invariant_checks": 93674,
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/__init__.py": "cff657f008664d4b951d3f5b498e16f96bd76cb38d1afaf1f25e8eda13c23d0f",
+    "scripts/experiments/ics_circulation_v3/counterexamples.py": "58f960527493b975ca52a9af984cb3bd0718d8ca65ba17f27ad27d89d174f76e",
+    "scripts/experiments/ics_circulation_v3/evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "scripts/experiments/ics_circulation_v3/learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "scripts/experiments/ics_circulation_v3/model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "scripts/experiments/ics_circulation_v3/nonlinear_learning.py": "63856f7c775d2613b5cb71a8a40dcc2fe558a797e67068c11df0c26f692565f1",
+    "scripts/experiments/ics_circulation_v3/phase2_scenarios.py": "2212c0aab5592acd80b7e0b1b64a667a47555459300eadc1974acf697ba9aeef",
+    "scripts/experiments/ics_circulation_v3/routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224",
+    "scripts/experiments/ics_circulation_v3/run_phase2_learning.py": "2ca3346c80315cfa6bf07e9b906735bf0cb952a780415728e5931f45e64b580e",
+    "scripts/experiments/ics_circulation_v3/run_phase3_learning.py": "5112084ce0a62dcf0218ea777a59dc7ad82bba38002cb5d9859e5be60fa4e9c8",
+    "scripts/experiments/ics_circulation_v3/run_pilot.py": "eb377a4556c218bcc22bff6d0c06fbfeab80a110eab06aaa7896c3befe6cc184",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "scripts/experiments/ics_circulation_v3/scenarios.py": "4676fe6416a8f53f65e9bb8128e197c3e5784963d3df04f2a9c599b0b1ceb035"
+  },
+  "source_changed_during_run": false,
+  "limitations": [
+    "Same seven-node synthetic family, not airport/day generalization.",
+    "Fixed three training seeds are reported individually, never selected on test.",
+    "All input/architecture choices were specified before fresh test labels.",
+    "Route-only/no-score ablations remove input bundles; they do not isolate a single causal mechanism.",
+    "Different ablation input dimensions change parameter count despite identical hidden width.",
+    "Candidate regret is relative to a finite set and two continuation futures, not globally optimal Q.",
+    "Full episode wall time is not a per-request end-to-end contract.",
+    "MLP/rollout approximations do not authorize actions or inherit PPL/DG-PG guarantees."
+  ]
+}

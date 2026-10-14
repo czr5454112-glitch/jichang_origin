@@ -1,0 +1,362 @@
+{
+  "schema": "g31.circulation.input.v1",
+  "model_scope": "synthetic on-carrier Storage, per-berth unloading, fixed module ports",
+  "node_records": [
+    [
+      0,
+      1,
+      0.05,
+      0,
+      0,
+      [
+        1,
+        6
+      ]
+    ],
+    [
+      1,
+      1,
+      0.05,
+      1,
+      0,
+      [
+        2
+      ]
+    ],
+    [
+      2,
+      3,
+      0.05,
+      2,
+      0,
+      [
+        3
+      ]
+    ],
+    [
+      3,
+      1,
+      0.05,
+      3,
+      0,
+      [
+        4
+      ]
+    ],
+    [
+      4,
+      1,
+      0.05,
+      4,
+      0,
+      [
+        5
+      ]
+    ],
+    [
+      5,
+      1,
+      0.05,
+      5,
+      0,
+      [
+        0
+      ]
+    ],
+    [
+      6,
+      1,
+      0.05,
+      6,
+      0,
+      [
+        2,
+        3
+      ]
+    ]
+  ],
+  "edge_records": [
+    [
+      0,
+      1,
+      1.0,
+      1.0
+    ],
+    [
+      0,
+      6,
+      1.2,
+      1.0
+    ],
+    [
+      1,
+      2,
+      1.0,
+      1.0
+    ],
+    [
+      6,
+      2,
+      1.0,
+      1.0
+    ],
+    [
+      6,
+      3,
+      1.0,
+      1.0
+    ],
+    [
+      2,
+      3,
+      1.0,
+      1.0
+    ],
+    [
+      3,
+      4,
+      1.0,
+      1.0
+    ],
+    [
+      4,
+      5,
+      1.0,
+      1.0
+    ],
+    [
+      5,
+      0,
+      1.0,
+      1.0
+    ]
+  ],
+  "node_contracts": [
+    {
+      "node": 0,
+      "zone": "A",
+      "capacity": 2
+    },
+    {
+      "node": 1,
+      "zone": "A",
+      "capacity": 2
+    },
+    {
+      "node": 2,
+      "zone": "A",
+      "capacity": 2
+    },
+    {
+      "node": 3,
+      "zone": "B",
+      "capacity": 2
+    },
+    {
+      "node": 4,
+      "zone": "B",
+      "capacity": 2
+    },
+    {
+      "node": 5,
+      "zone": "A",
+      "capacity": 2
+    },
+    {
+      "node": 6,
+      "zone": "A",
+      "capacity": 2
+    }
+  ],
+  "edge_contracts": [
+    {
+      "from": 0,
+      "to": 1,
+      "capacity": 1,
+      "entry_headway": 0.2
+    },
+    {
+      "from": 0,
+      "to": 6,
+      "capacity": 1,
+      "entry_headway": 0.2
+    },
+    {
+      "from": 1,
+      "to": 2,
+      "capacity": 1,
+      "entry_headway": 0.2
+    },
+    {
+      "from": 6,
+      "to": 2,
+      "capacity": 1,
+      "entry_headway": 0.2
+    },
+    {
+      "from": 6,
+      "to": 3,
+      "capacity": 1,
+      "entry_headway": 0.2
+    },
+    {
+      "from": 2,
+      "to": 3,
+      "capacity": 1,
+      "entry_headway": 0.2
+    },
+    {
+      "from": 3,
+      "to": 4,
+      "capacity": 1,
+      "entry_headway": 0.2
+    },
+    {
+      "from": 4,
+      "to": 5,
+      "capacity": 1,
+      "entry_headway": 0.2
+    },
+    {
+      "from": 5,
+      "to": 0,
+      "capacity": 1,
+      "entry_headway": 0.2
+    }
+  ],
+  "trays": [
+    {
+      "tray_id": "T0",
+      "node": 0
+    },
+    {
+      "tray_id": "T1",
+      "node": 0
+    }
+  ],
+  "jobs": [
+    {
+      "business_bag_id": "B1",
+      "origin": 0,
+      "destination": 4,
+      "arrival": 0.0,
+      "deadline": 40.0,
+      "storage_node": 2,
+      "storage_release_at": 6.0,
+      "storage_min_dwell": 2.0,
+      "load_seconds": 0.1,
+      "unload_seconds": 0.5,
+      "hold_seconds": 1.25
+    },
+    {
+      "business_bag_id": "B2",
+      "origin": 0,
+      "destination": 4,
+      "arrival": 0.2,
+      "deadline": 60.0,
+      "storage_node": 2,
+      "storage_release_at": 6,
+      "storage_min_dwell": 0.25,
+      "load_seconds": 0.1,
+      "unload_seconds": 0.5,
+      "hold_seconds": 1.25
+    }
+  ],
+  "transfers": [
+    {
+      "request_id": "return-T0",
+      "tray_id": "T0",
+      "source": 4,
+      "destination": 0,
+      "issued_at": 0.1,
+      "message_delay": 0.0,
+      "earliest_departure": 0.0,
+      "expiry": 50.0
+    }
+  ],
+  "faults": [],
+  "options": {
+    "max_simulation_time": 80.0
+  },
+  "heuristic_time": [
+    [
+      0.0,
+      1.05,
+      2.0999999999999996,
+      2.3,
+      3.3499999999999996,
+      4.3999999999999995,
+      1.25
+    ],
+    [
+      5.249999999999999,
+      0.0,
+      1.05,
+      2.0999999999999996,
+      3.1499999999999995,
+      4.199999999999999,
+      6.499999999999999
+    ],
+    [
+      4.199999999999999,
+      5.249999999999999,
+      0.0,
+      1.05,
+      2.0999999999999996,
+      3.1499999999999995,
+      5.449999999999999
+    ],
+    [
+      3.1499999999999995,
+      4.199999999999999,
+      5.249999999999999,
+      0.0,
+      1.05,
+      2.0999999999999996,
+      4.3999999999999995
+    ],
+    [
+      2.0999999999999996,
+      3.1499999999999995,
+      4.199999999999999,
+      4.3999999999999995,
+      0.0,
+      1.05,
+      3.3499999999999996
+    ],
+    [
+      1.05,
+      2.0999999999999996,
+      3.1499999999999995,
+      3.3499999999999996,
+      4.3999999999999995,
+      0.0,
+      2.3
+    ],
+    [
+      4.199999999999999,
+      5.249999999999999,
+      1.05,
+      1.05,
+      2.0999999999999996,
+      3.1499999999999995,
+      0.0
+    ]
+  ],
+  "potential_contract": {
+    "mode": "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL",
+    "formula": "H(g,g)=0; H(u,g)=service_duration(u)+min_(u,v)(travel(u,v)+H(v,g))",
+    "service_duration": "max(map_node_service,minimum_service_seconds)",
+    "minimum_service_seconds": 0.001,
+    "candidate_score_identity": "travel(current,candidate)+H(candidate,goal) includes candidate and later non-goal service",
+    "precomputation": "reverse_dijkstra_once_per_goal",
+    "node_count": 7,
+    "directed_edge_count": 9,
+    "unreachable_finite_value_seconds": 10.549999999999999,
+    "runtime_read_scope": "direct_outgoing_candidates_and_one_scalar_each",
+    "runtime_decision_complexity": "O(outdegree)",
+    "runtime_full_astar_required": false,
+    "future_route_materialized": false,
+    "global_reservation_table_required": false
+  }
+}

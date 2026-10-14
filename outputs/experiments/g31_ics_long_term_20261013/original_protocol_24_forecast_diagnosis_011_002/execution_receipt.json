@@ -1,0 +1,23 @@
+{
+  "schema": "g31.tool_execution_receipt.v1",
+  "command": "C:/PROGRAMING/python3.11.9/python.exe outputs/experiments/g31_ics_long_term_20261013/original_protocol_24_forecast_diagnosis_011_002/diagnose.py",
+  "cwd": "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree",
+  "attempts": [
+    {
+      "sandbox_permissions": "use_default",
+      "exit_code": 1,
+      "tool_wall_time_seconds": 1.2221277,
+      "failure": "PermissionError: [WinError 5] at native_host.load_native Path(binary).resolve(strict=True)",
+      "native_simulation_started": false
+    },
+    {
+      "sandbox_permissions": "require_escalated",
+      "exit_code": 0,
+      "tool_wall_time_seconds": 0.7553838,
+      "runner_elapsed_seconds": 0.04266919998917729,
+      "native_simulations": 5,
+      "result": "passed"
+    }
+  ],
+  "interpretation_correction": "The prior strict-before comparison is retained in 001. It distinguishes no original row with earliest execution strictly before physical entry, but does not prove rejection at equal time. Revision 002 separates 10 strictly late rows from 6 exact ties and executes an actual exact-tie synthetic witness."
+}

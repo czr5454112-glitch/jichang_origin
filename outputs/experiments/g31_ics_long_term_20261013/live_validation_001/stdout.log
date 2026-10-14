@@ -1,0 +1,19 @@
+........................................................................ [ 52%]
+....................F............................................        [100%]
+================================== FAILURES ===================================
+____________ test_full_receiving_berth_wakes_after_real_departure _____________
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_full_receiving_berth_wakes_after_real_departure(native):
+        data = receiving_release()
+        result = native.run(data)
+        assert_complete_without_polling(data, result)
+        wakes = [r for r in result["receipts"] if r["event"] == "RESOURCE_WAKE"]
+>       assert any(r["reason"] == "source_berth_departed" and r["time"] >= 10000 for r in wakes)
+E       assert False
+E        +  where False = any(<generator object test_full_receiving_berth_wakes_after_real_departure.<locals>.<genexpr> at 0x00000252C9AF25A0>)
+
+tests\test_g31_circulation_recovery.py:64: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_recovery.py::test_full_receiving_berth_wakes_after_real_departure

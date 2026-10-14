@@ -1,0 +1,460 @@
+{
+  "status": "passed",
+  "schema": "g31.coupled_causal_probe.v1",
+  "cases": {
+    "S4_reactive": {
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 20.610000000000003,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.510000000000003,
+            "completed": true,
+            "completed_at": 10.010000000000003,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "first_hops": {
+        "B1": 1,
+        "B2": 1,
+        "B3": 5
+      },
+      "requests": [
+        {
+          "request": {
+            "request_id": "reactive:B:12:11:T0:B3",
+            "tray_id": "T0",
+            "source": 3,
+            "destination": 4,
+            "issued_at": 6.11,
+            "message_delay": 1.0,
+            "earliest_departure": 6.11,
+            "expiry": 68.51,
+            "forecast_dependency": "T0:empty",
+            "forecast_ledger": "actual_available",
+            "control_reason": "observed_source_queue",
+            "owner_id": "B",
+            "expected_version": 11
+          },
+          "reply": {
+            "status": "pending",
+            "reason": ""
+          }
+        }
+      ],
+      "route_resolution": [],
+      "release_events": [
+        {
+          "time": 5.75,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B1",
+          "transport_leg_id": "",
+          "tray_id": "T0",
+          "traversal_id": 2,
+          "node": 3,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 10.210000000000003,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B3",
+          "transport_leg_id": "",
+          "tray_id": "T0",
+          "traversal_id": 8,
+          "node": 5,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 11.95,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B2",
+          "transport_leg_id": "",
+          "tray_id": "T1",
+          "traversal_id": 5,
+          "node": 3,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        }
+      ]
+    },
+    "S4_predictive": {
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 19.550000000000004,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 5.8500000000000005,
+            "completed": true,
+            "completed_at": 12.05,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 8.150000000000002,
+            "completed": true,
+            "completed_at": 8.650000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "first_hops": {
+        "B1": 1,
+        "B2": 2,
+        "B3": 5
+      },
+      "requests": [
+        {
+          "request": {
+            "request_id": "predictive:B:3:5:T0:B3",
+            "tray_id": "T0",
+            "source": 3,
+            "destination": 4,
+            "issued_at": 1.61,
+            "message_delay": 1.0,
+            "earliest_departure": 1.61,
+            "expiry": 67.15,
+            "forecast_dependency": "T0:B1:loaded",
+            "forecast_ledger": "conditional_release",
+            "control_reason": "observed_source_queue",
+            "owner_id": "B",
+            "expected_version": 5
+          },
+          "reply": {
+            "status": "pending",
+            "reason": ""
+          }
+        }
+      ],
+      "route_resolution": [],
+      "release_events": [
+        {
+          "time": 5.75,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B1",
+          "transport_leg_id": "",
+          "tray_id": "T0",
+          "traversal_id": 2,
+          "node": 3,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 8.850000000000001,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B3",
+          "transport_leg_id": "",
+          "tray_id": "T0",
+          "traversal_id": 7,
+          "node": 5,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 12.25,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B2",
+          "transport_leg_id": "",
+          "tray_id": "T1",
+          "traversal_id": 8,
+          "node": 3,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        }
+      ]
+    },
+    "alternate_reactive": {
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 20.910000000000004,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.85,
+            "completed": true,
+            "completed_at": 5.85,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.510000000000003,
+            "completed": true,
+            "completed_at": 10.010000000000003,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "first_hops": {
+        "B1": 2,
+        "B2": 1,
+        "B3": 5
+      },
+      "requests": [
+        {
+          "request": {
+            "request_id": "reactive:B:12:11:T0:B3",
+            "tray_id": "T0",
+            "source": 3,
+            "destination": 4,
+            "issued_at": 6.11,
+            "message_delay": 1.0,
+            "earliest_departure": 6.11,
+            "expiry": 68.51,
+            "forecast_dependency": "T0:empty",
+            "forecast_ledger": "actual_available",
+            "control_reason": "observed_source_queue",
+            "owner_id": "B",
+            "expected_version": 11
+          },
+          "reply": {
+            "status": "pending",
+            "reason": ""
+          }
+        }
+      ],
+      "route_resolution": [
+        {
+          "request_id": "causal-B1-alternate",
+          "status": "updated",
+          "reason": "allowed"
+        }
+      ],
+      "release_events": [
+        {
+          "time": 6.05,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B1",
+          "transport_leg_id": "",
+          "tray_id": "T0",
+          "traversal_id": 2,
+          "node": 3,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 10.210000000000003,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B3",
+          "transport_leg_id": "",
+          "tray_id": "T0",
+          "traversal_id": 8,
+          "node": 5,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 11.95,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B2",
+          "transport_leg_id": "",
+          "tray_id": "T1",
+          "traversal_id": 5,
+          "node": 3,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        }
+      ]
+    },
+    "alternate_predictive": {
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 20.700000000000003,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.85,
+            "completed": true,
+            "completed_at": 5.85,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.300000000000002,
+            "completed": true,
+            "completed_at": 9.800000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "first_hops": {
+        "B1": 2,
+        "B2": 1,
+        "B3": 5
+      },
+      "requests": [
+        {
+          "request": {
+            "request_id": "predictive:B:3:5:T0:B3",
+            "tray_id": "T0",
+            "source": 3,
+            "destination": 4,
+            "issued_at": 1.61,
+            "message_delay": 1.0,
+            "earliest_departure": 1.61,
+            "expiry": 67.45,
+            "forecast_dependency": "T0:B1:loaded",
+            "forecast_ledger": "conditional_release",
+            "control_reason": "observed_source_queue",
+            "owner_id": "B",
+            "expected_version": 5
+          },
+          "reply": {
+            "status": "pending",
+            "reason": ""
+          }
+        }
+      ],
+      "route_resolution": [
+        {
+          "request_id": "causal-B1-alternate",
+          "status": "updated",
+          "reason": "allowed"
+        }
+      ],
+      "release_events": [
+        {
+          "time": 6.05,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B1",
+          "transport_leg_id": "",
+          "tray_id": "T0",
+          "traversal_id": 2,
+          "node": 3,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 10.000000000000002,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B3",
+          "transport_leg_id": "",
+          "tray_id": "T0",
+          "traversal_id": 8,
+          "node": 5,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 11.95,
+          "event": "HOLD_COMPLETE",
+          "business_bag_id": "B2",
+          "transport_leg_id": "",
+          "tray_id": "T1",
+          "traversal_id": 5,
+          "node": 3,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        }
+      ]
+    }
+  },
+  "binary_sha256": "a5a05762bca414f4d86d2470a823533e47d3f83ed96870d4e62b7437ccc1ada1",
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_coupled_control.py": "e0ba65344e929b7deb4bbae402265b452d2e86e086e05a62ea67630231eb167d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "bce7e85f9caab0fa800d5a075b92ec518558381cac84db001344069a28a4de33",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "36454e8d5583ed27a9c57c3ff0f229c0b6aaffb8240dafe6d913b3dfa36bcd3f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "6d09ed7dadfbf2bd9a47e2b6142318112acb8cff38ad6eb6c81a6b6a9612f6e0"
+  },
+  "scope": "predeclared synthetic causal intervention; same information and physical contract; all negatives retained",
+  "causal_observation": {
+    "route_intent_changed_B1_physical_first_hop": true,
+    "transfer_policy_changed_B2_physical_first_hop": true,
+    "predictive_service_preserved_under_S4": false,
+    "alternate_service_preserved_under_predictive": false,
+    "main_method_novelty": "not_established"
+  },
+  "source_after": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_coupled_control.py": "e0ba65344e929b7deb4bbae402265b452d2e86e086e05a62ea67630231eb167d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "bce7e85f9caab0fa800d5a075b92ec518558381cac84db001344069a28a4de33",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "36454e8d5583ed27a9c57c3ff0f229c0b6aaffb8240dafe6d913b3dfa36bcd3f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "6d09ed7dadfbf2bd9a47e2b6142318112acb8cff38ad6eb6c81a6b6a9612f6e0"
+  },
+  "source_changed": []
+}

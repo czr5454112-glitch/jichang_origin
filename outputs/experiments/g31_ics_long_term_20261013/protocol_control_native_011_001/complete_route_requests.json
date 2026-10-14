@@ -1,0 +1,609 @@
+[
+  {
+    "name": "allowed",
+    "request_id": "live:1:A:full-query",
+    "encoded_route": "{\"business_bag_id\":\"B1\",\"committed_prefix\":[0],\"generation\":1,\"observed_at\":0.11,\"owner_id\":\"A\",\"replaceable_suffix\":[0,1,2],\"schema\":\"g31.route_intent.v1\",\"stage\":\"storage_in\",\"stage_goal\":2,\"traversal_id\":0,\"tray_id\":\"T0\"}",
+    "response": {
+      "sequence": 1,
+      "attempt": 1,
+      "observed_at": 0.12,
+      "delivered_at": 0.13999999999999999,
+      "executed_at": 0.12,
+      "completed_at": 0.12,
+      "status": "updated",
+      "reason": "allowed",
+      "result_id": "live:1:A:full-query"
+    },
+    "advance": {
+      "physical_time": 0.16,
+      "processed_events": 12,
+      "status": "reached",
+      "horizon_complete": true,
+      "wall_seconds": 6.86e-05
+    },
+    "client_state": {
+      "schema": "g31.protocol_client_state.v1",
+      "retry_period": 0.2,
+      "sequences": {},
+      "outbox": {
+        "live:1:A:full-query": {
+          "kind": "route",
+          "payload": {
+            "business_bag_id": "B1",
+            "tray_id": "T0",
+            "from": 0,
+            "next": 1,
+            "expected_generation": 1,
+            "expected_traversal": 0,
+            "expiry": 2.11,
+            "message_delay": 0.01,
+            "request_id": "live:1:A:full-query",
+            "owner_id": "A",
+            "kind": "route"
+          },
+          "terminal": true,
+          "created_at": 0.11,
+          "next_retry": 0.31,
+          "submission_reply": {
+            "status": "pending",
+            "reason": "command_enqueued"
+          },
+          "client_view": {
+            "request_id": "live:1:A:full-query",
+            "status": "acknowledged",
+            "attempt": 1,
+            "kind": "route",
+            "last_delivered_ack": {
+              "sequence": 1,
+              "attempt": 1,
+              "observed_at": 0.12,
+              "delivered_at": 0.13999999999999999,
+              "executed_at": 0.12,
+              "completed_at": 0.12,
+              "status": "updated",
+              "reason": "allowed",
+              "result_id": "live:1:A:full-query"
+            }
+          }
+        }
+      }
+    },
+    "client_calls": [
+      {
+        "at": 0.11,
+        "retry": false,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.01,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "command_enqueued"
+        },
+        "submit_compute_ms": 0.02169999061152339
+      }
+    ],
+    "compute_wall_ms": 0.47389999963343143,
+    "compute_cpu_ms": 0.0,
+    "meets_measured_100ms": true,
+    "physical_started_at": 0.11,
+    "physical_finished_at": 0.16,
+    "complete_100ms_requirement_certified": false,
+    "timing_scope": "observation+conversion+A*+codec+submit+all intervening native events/revalidation/ACK+client retry/response codec; logical wait is simulated, no deployment SLA"
+  },
+  {
+    "name": "stale",
+    "request_id": "live:1:A:full-query",
+    "encoded_route": "{\"business_bag_id\":\"B1\",\"committed_prefix\":[0],\"generation\":1,\"observed_at\":0.11,\"owner_id\":\"A\",\"replaceable_suffix\":[0,1,2],\"schema\":\"g31.route_intent.v1\",\"stage\":\"storage_in\",\"stage_goal\":2,\"traversal_id\":0,\"tray_id\":\"T0\"}",
+    "response": {
+      "sequence": 1,
+      "attempt": 1,
+      "observed_at": 0.31,
+      "delivered_at": 0.33,
+      "executed_at": 0.31,
+      "completed_at": 0.31,
+      "status": "rejected",
+      "reason": "stale_executed_prefix",
+      "result_id": "live:1:A:full-query"
+    },
+    "advance": {
+      "physical_time": 0.36,
+      "processed_events": 1,
+      "status": "reached",
+      "horizon_complete": true,
+      "wall_seconds": 1.8e-06
+    },
+    "client_state": {
+      "schema": "g31.protocol_client_state.v1",
+      "retry_period": 0.2,
+      "sequences": {},
+      "outbox": {
+        "live:1:A:full-query": {
+          "kind": "route",
+          "payload": {
+            "business_bag_id": "B1",
+            "tray_id": "T0",
+            "from": 0,
+            "next": 1,
+            "expected_generation": 1,
+            "expected_traversal": 0,
+            "expiry": 2.11,
+            "message_delay": 0.2,
+            "request_id": "live:1:A:full-query",
+            "owner_id": "A",
+            "kind": "route"
+          },
+          "terminal": true,
+          "created_at": 0.11,
+          "next_retry": 0.51,
+          "submission_reply": {
+            "status": "pending",
+            "reason": "retry_enqueued"
+          },
+          "client_view": {
+            "request_id": "live:1:A:full-query",
+            "status": "pending",
+            "attempt": 2,
+            "kind": "route",
+            "last_delivered_ack": {
+              "sequence": 1,
+              "attempt": 1,
+              "observed_at": 0.31,
+              "delivered_at": 0.33,
+              "executed_at": 0.31,
+              "completed_at": 0.31,
+              "status": "rejected",
+              "reason": "stale_executed_prefix",
+              "result_id": "live:1:A:full-query"
+            }
+          }
+        }
+      }
+    },
+    "client_calls": [
+      {
+        "at": 0.11,
+        "retry": false,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.2,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "command_enqueued"
+        },
+        "submit_compute_ms": 0.019199971575289965
+      },
+      {
+        "at": 0.31,
+        "retry": true,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.2,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "retry_enqueued"
+        },
+        "submit_compute_ms": 0.013199984095990658
+      }
+    ],
+    "compute_wall_ms": 0.4928999696858227,
+    "compute_cpu_ms": 0.0,
+    "meets_measured_100ms": true,
+    "physical_started_at": 0.11,
+    "physical_finished_at": 0.36,
+    "complete_100ms_requirement_certified": false,
+    "timing_scope": "observation+conversion+A*+codec+submit+all intervening native events/revalidation/ACK+client retry/response codec; logical wait is simulated, no deployment SLA"
+  },
+  {
+    "name": "lost_ack",
+    "request_id": "live:1:A:full-query",
+    "encoded_route": "{\"business_bag_id\":\"B1\",\"committed_prefix\":[0],\"generation\":1,\"observed_at\":0.11,\"owner_id\":\"A\",\"replaceable_suffix\":[0,1,2],\"schema\":\"g31.route_intent.v1\",\"stage\":\"storage_in\",\"stage_goal\":2,\"traversal_id\":0,\"tray_id\":\"T0\"}",
+    "response": {
+      "sequence": 2,
+      "attempt": 2,
+      "observed_at": 0.32,
+      "delivered_at": 0.34,
+      "executed_at": 0.12,
+      "completed_at": 0.12,
+      "status": "updated",
+      "reason": "allowed",
+      "result_id": "live:1:A:full-query"
+    },
+    "advance": {
+      "physical_time": 0.36,
+      "processed_events": 2,
+      "status": "reached",
+      "horizon_complete": true,
+      "wall_seconds": 5e-06
+    },
+    "client_state": {
+      "schema": "g31.protocol_client_state.v1",
+      "retry_period": 0.2,
+      "sequences": {},
+      "outbox": {
+        "live:1:A:full-query": {
+          "kind": "route",
+          "payload": {
+            "business_bag_id": "B1",
+            "tray_id": "T0",
+            "from": 0,
+            "next": 1,
+            "expected_generation": 1,
+            "expected_traversal": 0,
+            "expiry": 2.11,
+            "message_delay": 0.01,
+            "request_id": "live:1:A:full-query",
+            "owner_id": "A",
+            "kind": "route"
+          },
+          "terminal": true,
+          "created_at": 0.11,
+          "next_retry": 0.51,
+          "submission_reply": {
+            "status": "pending",
+            "reason": "retry_enqueued"
+          },
+          "client_view": {
+            "request_id": "live:1:A:full-query",
+            "status": "acknowledged",
+            "attempt": 2,
+            "kind": "route",
+            "last_delivered_ack": {
+              "sequence": 2,
+              "attempt": 2,
+              "observed_at": 0.32,
+              "delivered_at": 0.34,
+              "executed_at": 0.12,
+              "completed_at": 0.12,
+              "status": "updated",
+              "reason": "allowed",
+              "result_id": "live:1:A:full-query"
+            }
+          }
+        }
+      }
+    },
+    "client_calls": [
+      {
+        "at": 0.11,
+        "retry": false,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.01,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "command_enqueued"
+        },
+        "submit_compute_ms": 0.01750001683831215
+      },
+      {
+        "at": 0.31,
+        "retry": true,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.01,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "retry_enqueued"
+        },
+        "submit_compute_ms": 0.01309998333454132
+      }
+    ],
+    "compute_wall_ms": 0.45009999303147197,
+    "compute_cpu_ms": 0.0,
+    "meets_measured_100ms": true,
+    "physical_started_at": 0.11,
+    "physical_finished_at": 0.36,
+    "complete_100ms_requirement_certified": false,
+    "timing_scope": "observation+conversion+A*+codec+submit+all intervening native events/revalidation/ACK+client retry/response codec; logical wait is simulated, no deployment SLA"
+  },
+  {
+    "name": "no_ack_within_window",
+    "request_id": "live:1:A:full-query",
+    "encoded_route": "{\"business_bag_id\":\"B1\",\"committed_prefix\":[0],\"generation\":1,\"observed_at\":0.11,\"owner_id\":\"A\",\"replaceable_suffix\":[0,1,2],\"schema\":\"g31.route_intent.v1\",\"stage\":\"storage_in\",\"stage_goal\":2,\"traversal_id\":0,\"tray_id\":\"T0\"}",
+    "response": {
+      "status": "timeout_unknown",
+      "reason": "no_terminal_delivered_ack_in_public_window"
+    },
+    "advance": {
+      "physical_time": 0.41,
+      "processed_events": 0,
+      "status": "reached",
+      "horizon_complete": true,
+      "wall_seconds": 6e-07
+    },
+    "client_state": {
+      "schema": "g31.protocol_client_state.v1",
+      "retry_period": 0.2,
+      "sequences": {},
+      "outbox": {
+        "live:1:A:full-query": {
+          "kind": "route",
+          "payload": {
+            "business_bag_id": "B1",
+            "tray_id": "T0",
+            "from": 0,
+            "next": 1,
+            "expected_generation": 1,
+            "expected_traversal": 0,
+            "expiry": 2.11,
+            "message_delay": 0.01,
+            "request_id": "live:1:A:full-query",
+            "owner_id": "A",
+            "kind": "route"
+          },
+          "terminal": false,
+          "created_at": 0.11,
+          "next_retry": 0.51,
+          "submission_reply": {
+            "status": "pending",
+            "reason": "retry_enqueued"
+          },
+          "client_view": {
+            "request_id": "live:1:A:full-query",
+            "status": "pending",
+            "attempt": 2,
+            "kind": "route"
+          }
+        }
+      }
+    },
+    "client_calls": [
+      {
+        "at": 0.11,
+        "retry": false,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.01,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "command_enqueued"
+        },
+        "submit_compute_ms": 0.016700010746717453
+      },
+      {
+        "at": 0.31,
+        "retry": true,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.01,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "retry_enqueued"
+        },
+        "submit_compute_ms": 0.013000040780752897
+      }
+    ],
+    "compute_wall_ms": 0.4214999498799443,
+    "compute_cpu_ms": 0.0,
+    "meets_measured_100ms": true,
+    "physical_started_at": 0.11,
+    "physical_finished_at": 0.41,
+    "complete_100ms_requirement_certified": false,
+    "timing_scope": "observation+conversion+A*+codec+submit+all intervening native events/revalidation/ACK+client retry/response codec; logical wait is simulated, no deployment SLA"
+  },
+  {
+    "name": "source_unavailable",
+    "request_id": "live:1:A:full-query",
+    "encoded_route": "{\"business_bag_id\":\"B1\",\"committed_prefix\":[0],\"generation\":1,\"observed_at\":0.11,\"owner_id\":\"A\",\"replaceable_suffix\":[0,1,2],\"schema\":\"g31.route_intent.v1\",\"stage\":\"storage_in\",\"stage_goal\":2,\"traversal_id\":0,\"tray_id\":\"T0\"}",
+    "response": {
+      "sequence": 2,
+      "attempt": 3,
+      "observed_at": 0.52,
+      "delivered_at": 0.54,
+      "executed_at": 0.5,
+      "completed_at": 0.5,
+      "status": "rejected",
+      "reason": "stale_executed_prefix",
+      "result_id": "live:1:A:full-query"
+    },
+    "advance": {
+      "physical_time": 0.56,
+      "processed_events": 3,
+      "status": "reached",
+      "horizon_complete": true,
+      "wall_seconds": 6.7e-06
+    },
+    "client_state": {
+      "schema": "g31.protocol_client_state.v1",
+      "retry_period": 0.2,
+      "sequences": {},
+      "outbox": {
+        "live:1:A:full-query": {
+          "kind": "route",
+          "payload": {
+            "business_bag_id": "B1",
+            "tray_id": "T0",
+            "from": 0,
+            "next": 1,
+            "expected_generation": 1,
+            "expected_traversal": 0,
+            "expiry": 2.11,
+            "message_delay": 0.01,
+            "request_id": "live:1:A:full-query",
+            "owner_id": "A",
+            "kind": "route"
+          },
+          "terminal": true,
+          "created_at": 0.11,
+          "next_retry": 0.71,
+          "submission_reply": {
+            "status": "pending",
+            "reason": "retry_enqueued"
+          },
+          "client_view": {
+            "request_id": "live:1:A:full-query",
+            "status": "acknowledged",
+            "attempt": 3,
+            "kind": "route",
+            "last_delivered_ack": {
+              "sequence": 2,
+              "attempt": 3,
+              "observed_at": 0.52,
+              "delivered_at": 0.54,
+              "executed_at": 0.5,
+              "completed_at": 0.5,
+              "status": "rejected",
+              "reason": "stale_executed_prefix",
+              "result_id": "live:1:A:full-query"
+            }
+          }
+        }
+      }
+    },
+    "client_calls": [
+      {
+        "at": 0.11,
+        "retry": false,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.01,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "command_enqueued"
+        },
+        "submit_compute_ms": 0.016000005416572094
+      },
+      {
+        "at": 0.31,
+        "retry": true,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.01,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "retry_enqueued"
+        },
+        "submit_compute_ms": 0.012199976481497288
+      },
+      {
+        "at": 0.51,
+        "retry": true,
+        "kind": "route",
+        "request": {
+          "business_bag_id": "B1",
+          "tray_id": "T0",
+          "from": 0,
+          "next": 1,
+          "expected_generation": 1,
+          "expected_traversal": 0,
+          "expiry": 2.11,
+          "message_delay": 0.01,
+          "request_id": "live:1:A:full-query",
+          "owner_id": "A",
+          "kind": "route"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "retry_enqueued"
+        },
+        "submit_compute_ms": 0.011200027074664831
+      }
+    ],
+    "compute_wall_ms": 0.5174999823793769,
+    "compute_cpu_ms": 0.0,
+    "meets_measured_100ms": true,
+    "physical_started_at": 0.11,
+    "physical_finished_at": 0.56,
+    "complete_100ms_requirement_certified": false,
+    "timing_scope": "observation+conversion+A*+codec+submit+all intervening native events/revalidation/ACK+client retry/response codec; logical wait is simulated, no deployment SLA"
+  }
+]

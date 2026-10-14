@@ -1,0 +1,57 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+__ test_adjacent_float_ack_is_delivered_before_later_physical_service[True] ___
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_013\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+notifications = True
+
+    @pytest.mark.parametrize("notifications", [True, False])
+    def test_adjacent_float_ack_is_delivered_before_later_physical_service(native, notifications):
+        value = scene(); value["owner_notifications"]["enabled"] = notifications
+        value["jobs"] = [dict(value["jobs"][0], load_seconds=0.)]
+        value["node_records"] = [(n, kind, 6.05 if n == 0 else duration, x, y, edges)
+                                 for n, kind, duration, x, y, edges in value["node_records"]]
+        s = native.NativeSession(prepare_input(value)); s.advance_to(0.)
+        before_service = math.nextafter(6.05, -math.inf)
+        request = demand(publication_delay=before_service)
+        s.submit_protocol_command(request)
+        if notifications:
+            rows, cursor = drain(s, horizon=before_service)
+            assert all(r["physical_time"] <= before_service for r in rows)
+        else:
+            assert s.advance_to(before_service)["horizon_complete"]
+        assert s.physical_time == before_service
+>       message, = s.observe_protocol("B")["delivered_messages"]
+        ^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_g31_circulation_owner_notifications.py:223: ValueError
+__ test_adjacent_float_ack_is_delivered_before_later_physical_service[False] __
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_013\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+notifications = False
+
+    @pytest.mark.parametrize("notifications", [True, False])
+    def test_adjacent_float_ack_is_delivered_before_later_physical_service(native, notifications):
+        value = scene(); value["owner_notifications"]["enabled"] = notifications
+        value["jobs"] = [dict(value["jobs"][0], load_seconds=0.)]
+        value["node_records"] = [(n, kind, 6.05 if n == 0 else duration, x, y, edges)
+                                 for n, kind, duration, x, y, edges in value["node_records"]]
+        s = native.NativeSession(prepare_input(value)); s.advance_to(0.)
+        before_service = math.nextafter(6.05, -math.inf)
+        request = demand(publication_delay=before_service)
+        s.submit_protocol_command(request)
+        if notifications:
+            rows, cursor = drain(s, horizon=before_service)
+            assert all(r["physical_time"] <= before_service for r in rows)
+        else:
+            assert s.advance_to(before_service)["horizon_complete"]
+        assert s.physical_time == before_service
+>       message, = s.observe_protocol("B")["delivered_messages"]
+        ^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_g31_circulation_owner_notifications.py:223: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_owner_notifications.py::test_adjacent_float_ack_is_delivered_before_later_physical_service[True]
+FAILED tests/test_g31_circulation_owner_notifications.py::test_adjacent_float_ack_is_delivered_before_later_physical_service[False]

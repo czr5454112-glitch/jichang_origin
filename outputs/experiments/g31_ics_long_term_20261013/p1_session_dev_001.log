@@ -1,0 +1,36 @@
+............F....F.                                                      [100%]
+================================== FAILURES ===================================
+_ test_asynchronous_route_request_obeys_prefix_and_service_permission[True-0.01-allowed] _
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+permission = True, delay = 0.01, reason = 'allowed'
+
+    @pytest.mark.parametrize("permission,delay,reason", [(True,.01,"allowed"),(False,.01,"service_obligation_disallows_reroute"),(True,.2,"stale_executed_prefix")])
+    def test_asynchronous_route_request_obeys_prefix_and_service_permission(native,permission,delay,reason):
+        data=without_return();data["jobs"][0]["allow_suffix_reroute"]=permission
+        s=native.NativeSession(data);s.advance_to(.11)
+        assert s.submit_route_intent(route_request(s.observe("A"),delay))["status"]=="pending"
+        result=s.result_at(30)
+        requests=s.observe("A")["route_requests"]
+        assert requests[0]["reason"]==reason
+        first=next(r for r in result["receipts"] if r["event"]=="EDGE_ENTER")
+>       assert first["to"]==(6 if reason=="allowed" else 1)
+E       assert 1 == 6
+
+tests\test_g31_circulation_session.py:88: AssertionError
+_______________ test_closed_edge_is_preserved_and_never_entered _______________
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_closed_edge_is_preserved_and_never_entered(native):
+        data=tiny_cycle();data["edge_contracts"][0]["capacity"]=0
+        result=native.run(data)
+        assert all(not(r["event"]=="EDGE_ENTER" and (r["from"],r["to"])==(0,1)) for r in result["receipts"])
+>       assert all(j["status"]=="completed" for j in result["jobs"])
+E       assert False
+E        +  where False = all(<generator object test_closed_edge_is_preserved_and_never_entered.<locals>.<genexpr> at 0x0000021E691A42B0>)
+
+tests\test_g31_circulation_session.py:114: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_session.py::test_asynchronous_route_request_obeys_prefix_and_service_permission[True-0.01-allowed]
+FAILED tests/test_g31_circulation_session.py::test_closed_edge_is_preserved_and_never_entered

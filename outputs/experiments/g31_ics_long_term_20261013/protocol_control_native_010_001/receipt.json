@@ -1,0 +1,1557 @@
+{
+  "schema": "g31.protocol_control_campaign.v1",
+  "status": "passed",
+  "cases": [
+    {
+      "name": "ordinary",
+      "policies": {
+        "r1_only": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 0,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "bbff73767c7e97e5b14af29efcf8500dd13c91b49262a3c6fa3d1ebcbe9a61e6",
+          "paired_service_vs_reactive_r2": false
+        },
+        "reactive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.870000000000005,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.220000000000006,
+                "completed": true,
+                "completed_at": 17.420000000000005,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 0,
+            "withdraw_service_forecast": 0
+          },
+          "retry_calls": 5,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "1b57765792798be5731492938cfc1c28b34e2d7475921f08f980c939699977a4",
+          "paired_service_vs_reactive_r2": true
+        },
+        "predictive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.650000000000006,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.000000000000007,
+                "completed": true,
+                "completed_at": 17.200000000000006,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 3,
+            "withdraw_service_forecast": 3
+          },
+          "retry_calls": 10,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "afb333a5c6b57614e2c88103f0554980438aec5f6ad2539ecfb2156c4e563a92",
+          "paired_service_vs_reactive_r2": true
+        },
+        "joint_r1_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.650000000000006,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.000000000000007,
+                "completed": true,
+                "completed_at": 17.200000000000006,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 2,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 3,
+            "withdraw_service_forecast": 3
+          },
+          "retry_calls": 10,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "3aa13d127860458ae4f2527dec604dd85602a670bb4072f79b224e4f9c806e86",
+          "paired_service_vs_reactive_r2": true
+        }
+      }
+    },
+    {
+      "name": "lost_ack",
+      "policies": {
+        "r1_only": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 6,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "8b9916b1be8015ca295f0efb918974aa5db0cd782ca7a1f76a89a4e50a4bf2e9",
+          "paired_service_vs_reactive_r2": false
+        },
+        "reactive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.870000000000005,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.220000000000006,
+                "completed": true,
+                "completed_at": 17.420000000000005,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 0,
+            "withdraw_service_forecast": 0
+          },
+          "retry_calls": 9,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "4e0869d4c0544eb16e591382ac61b7734d363ae4e5870f0a11ff8b6b41734014",
+          "paired_service_vs_reactive_r2": true
+        },
+        "predictive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.650000000000006,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.000000000000007,
+                "completed": true,
+                "completed_at": 17.200000000000006,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 3,
+            "withdraw_service_forecast": 3
+          },
+          "retry_calls": 20,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "6bda8ab5f29e231dab73befe57e0d1d946709a50ea13fbb200afd9a807c9183f",
+          "paired_service_vs_reactive_r2": true
+        },
+        "joint_r1_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.650000000000006,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.000000000000007,
+                "completed": true,
+                "completed_at": 17.200000000000006,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 2,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 3,
+            "withdraw_service_forecast": 3
+          },
+          "retry_calls": 22,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "242ed1538b33d8793f87c435a2ae7c572e9633223b15f4dd9bec3219b4609c17",
+          "paired_service_vs_reactive_r2": true
+        }
+      }
+    },
+    {
+      "name": "duplicate_ack",
+      "policies": {
+        "r1_only": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 0,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "8b11baec371fcdf9dfb3da75d504a1f013407cc5921160ba0dc225a5098389a9",
+          "paired_service_vs_reactive_r2": false
+        },
+        "reactive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.870000000000005,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.220000000000006,
+                "completed": true,
+                "completed_at": 17.420000000000005,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 0,
+            "withdraw_service_forecast": 0
+          },
+          "retry_calls": 5,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "b108caf2c053d4501da34e09da0c8944e34b6cf8247de94f318e5f40b84e6c71",
+          "paired_service_vs_reactive_r2": true
+        },
+        "predictive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.650000000000006,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.000000000000007,
+                "completed": true,
+                "completed_at": 17.200000000000006,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 3,
+            "withdraw_service_forecast": 3
+          },
+          "retry_calls": 10,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "9d0af2bc463f95564f2b39b69c1376bdb499f1b2eb8851e1d1b636b644733159",
+          "paired_service_vs_reactive_r2": true
+        },
+        "joint_r1_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 25.650000000000006,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 17.000000000000007,
+                "completed": true,
+                "completed_at": 17.200000000000006,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 2,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 3,
+            "withdraw_service_forecast": 3
+          },
+          "retry_calls": 10,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "11519661b6a2970bdffa5f7eb72202212089585c30548859d500f82ece6e180d",
+          "paired_service_vs_reactive_r2": true
+        }
+      }
+    },
+    {
+      "name": "source_unavailable",
+      "policies": {
+        "r1_only": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 21,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "c0be451d2289f08153f568592859b4cd5f963078e3584e3b4bf5b5e67e94a8c6",
+          "paired_service_vs_reactive_r2": false
+        },
+        "reactive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 27.870000000000005,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 19.220000000000006,
+                "completed": true,
+                "completed_at": 19.420000000000005,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 0,
+            "withdraw_service_forecast": 0
+          },
+          "retry_calls": 26,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "589a5e224d1bc854c970442758ae5116a07b3ea460e8a30d66050fe623bac207",
+          "paired_service_vs_reactive_r2": true
+        },
+        "predictive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 27.870000000000005,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 19.220000000000006,
+                "completed": true,
+                "completed_at": 19.420000000000005,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 26,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "e68ebfa46c2413faa71be2e607f01145b2bc0b6d2d25a63f8e8c02007f96cb61",
+          "paired_service_vs_reactive_r2": true
+        },
+        "joint_r1_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 27.870000000000005,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 19.220000000000006,
+                "completed": true,
+                "completed_at": 19.420000000000005,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 26,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "b2528a65ef5cc242636bfe5fad890574623047f17a8aae3fe1aefe28481e1f6b",
+          "paired_service_vs_reactive_r2": true
+        }
+      }
+    },
+    {
+      "name": "receiver_unavailable",
+      "policies": {
+        "r1_only": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 0,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "6a03655b90eb7a0f76e5fd117525cdf0a27c117e291883c97c6d71cc84fd8821",
+          "paired_service_vs_reactive_r2": false
+        },
+        "reactive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 27.750000000000007,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 19.100000000000005,
+                "completed": true,
+                "completed_at": 19.300000000000004,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 0,
+            "withdraw_service_forecast": 0
+          },
+          "retry_calls": 9,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "c951882b92676c223c9bc2a2cdec538213d9a869c950a41705f334a8bd9fb4d0",
+          "paired_service_vs_reactive_r2": true
+        },
+        "predictive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 27.750000000000007,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 19.100000000000005,
+                "completed": true,
+                "completed_at": 19.300000000000004,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 15,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "e30d9ba61dfbb1d308f71a2fe6173b1a588d48c05ccc98a940fa0e2bd1a269db",
+          "paired_service_vs_reactive_r2": true
+        },
+        "joint_r1_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 27.750000000000007,
+            "offered": 2,
+            "completed": 2,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 19.100000000000005,
+                "completed": true,
+                "completed_at": 19.300000000000004,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 10,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 1,
+            "demand": 4,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 15,
+          "completed": 2,
+          "offered": 2,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "d531fe59aa4bd14b569b32728d19533960792e6b84177e3f50d160cd4cc55e8e",
+          "paired_service_vs_reactive_r2": true
+        }
+      }
+    },
+    {
+      "name": "receiver_refuses",
+      "policies": {
+        "r1_only": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 0,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "b690e15a70f54232bc5dadd6c4270b4fee2bdab2208d63192ab0608ed817d501",
+          "paired_service_vs_reactive_r2": true
+        },
+        "reactive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 0,
+            "withdraw_service_forecast": 0
+          },
+          "retry_calls": 0,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "1cdc3e7b9a3dc737d1fdc052ee094eba799462d4a6d82af1ad93b66f6fd5d604",
+          "paired_service_vs_reactive_r2": true
+        },
+        "predictive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 0,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "6f5ddfdeabb283d406109091dbc081082f9274e000e3613f661e4bea6384ba63",
+          "paired_service_vs_reactive_r2": true
+        },
+        "joint_r1_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 58.449999999999996,
+            "offered": 2,
+            "completed": 1,
+            "unfinished": 1,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 8.65,
+                "completed": true,
+                "completed_at": 8.65,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.8,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": false,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 4,
+            "open_traversals": 0,
+            "tray_count": 1,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 0,
+            "demand": 3,
+            "service_forecast": 1,
+            "withdraw_service_forecast": 1
+          },
+          "retry_calls": 0,
+          "completed": 1,
+          "offered": 2,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "b690e15a70f54232bc5dadd6c4270b4fee2bdab2208d63192ab0608ed817d501",
+          "paired_service_vs_reactive_r2": true
+        }
+      }
+    },
+    {
+      "name": "known_service_ack_loss",
+      "policies": {
+        "r1_only": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 104.55,
+            "offered": 3,
+            "completed": 1,
+            "unfinished": 2,
+            "failed": 0,
+            "deadline_violations": 2,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 5.55,
+                "completed": true,
+                "completed_at": 5.55,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 49.5,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": true,
+                "status": "in_transit"
+              },
+              {
+                "business_bag_id": "B3",
+                "restricted_time": 49.5,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": true,
+                "status": "waiting_for_tray"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 3,
+            "open_traversals": 0,
+            "tray_count": 2,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 44,
+            "transfer": 0,
+            "demand": 8,
+            "service_forecast": 3,
+            "withdraw_service_forecast": 2
+          },
+          "retry_calls": 56,
+          "completed": 1,
+          "offered": 3,
+          "physical_transfers": 0,
+          "offline_final_state_sha256": "818f195acd14f89fa48be049fd987233260c7431d0cbda49c31bbfba0f9e4f74",
+          "paired_service_vs_reactive_r2": false
+        },
+        "reactive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 26.1,
+            "offered": 3,
+            "completed": 3,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 5.55,
+                "completed": true,
+                "completed_at": 5.55,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 11.25,
+                "completed": true,
+                "completed_at": 11.75,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B3",
+                "restricted_time": 9.300000000000002,
+                "completed": true,
+                "completed_at": 9.800000000000002,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 8,
+            "open_traversals": 0,
+            "tray_count": 2,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 10,
+            "service_forecast": 0,
+            "withdraw_service_forecast": 0
+          },
+          "retry_calls": 15,
+          "completed": 3,
+          "offered": 3,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "7f9c201fa6c3a9592feaa3855601cedd67e85246c2637644d6bd505bd93cff27",
+          "paired_service_vs_reactive_r2": true
+        },
+        "predictive_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 26.1,
+            "offered": 3,
+            "completed": 3,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 5.55,
+                "completed": true,
+                "completed_at": 5.55,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 11.25,
+                "completed": true,
+                "completed_at": 11.75,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B3",
+                "restricted_time": 9.300000000000002,
+                "completed": true,
+                "completed_at": 9.800000000000002,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 8,
+            "open_traversals": 0,
+            "tray_count": 2,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 0,
+            "transfer": 1,
+            "demand": 10,
+            "service_forecast": 2,
+            "withdraw_service_forecast": 2
+          },
+          "retry_calls": 27,
+          "completed": 3,
+          "offered": 3,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "567fca96f9c03d9053e44958fff03c2f18bbae1764d13b310d8015511cdda692",
+          "paired_service_vs_reactive_r2": true
+        },
+        "joint_r1_r2": {
+          "status": "reached",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 50.0,
+            "cost": 26.1,
+            "offered": 3,
+            "completed": 3,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "B1",
+                "restricted_time": 5.55,
+                "completed": true,
+                "completed_at": 5.55,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B2",
+                "restricted_time": 11.25,
+                "completed": true,
+                "completed_at": 11.75,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "B3",
+                "restricted_time": 9.300000000000002,
+                "completed": true,
+                "completed_at": 9.800000000000002,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "audit": {
+            "status": "passed",
+            "completed_traversals": 8,
+            "open_traversals": 0,
+            "tray_count": 2,
+            "optimality": "unknown",
+            "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+          },
+          "requests_by_kind": {
+            "route": 1,
+            "transfer": 1,
+            "demand": 10,
+            "service_forecast": 2,
+            "withdraw_service_forecast": 2
+          },
+          "retry_calls": 28,
+          "completed": 3,
+          "offered": 3,
+          "physical_transfers": 1,
+          "offline_final_state_sha256": "a61d1fd8105a758b56584ba013a83a6d483ff4a37066450ce28e1374f65fc4b0",
+          "paired_service_vs_reactive_r2": true
+        }
+      }
+    }
+  ],
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_protocol_control.py": "b25f3ca1a16f64b0d7062782056a6e821defa4f30ef9523342f3657658124621",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py": "dead96ca5458eb6e3517bc2f366842a197d17b6426d167b682c3d988668e29b3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "c65084b848e918026837301e3be62c94ae91d2c1b627490e337b903a340850fc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "0493b084fe692644f4ad0f885c947bcd69e60d6222008c6b0cd77a295a2b7180",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_known_service_control.py": "ddc472eeb6c740bedcb269684c1bdd7535e0db0313071627c2dd23e3b8e21150",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_coupled_control.py": "e0ba65344e929b7deb4bbae402265b452d2e86e086e05a62ea67630231eb167d"
+  },
+  "binary_sha256": "079eaaeae53671d1a7d2a26437478850b329db80ec8eebc58b1fa70f5f0ddb7f",
+  "scope": "synthetic authorized R1/R2 factors; common native physical and communication contract within each factor",
+  "complete_100ms_requirement_certified": false,
+  "novelty": "engineering integration and strong analytic baselines",
+  "complete_route_sample_count": 5,
+  "complete_route_sample_max_ms": 0.5444000125862658,
+  "source_after": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_protocol_control.py": "b25f3ca1a16f64b0d7062782056a6e821defa4f30ef9523342f3657658124621",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py": "dead96ca5458eb6e3517bc2f366842a197d17b6426d167b682c3d988668e29b3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "c65084b848e918026837301e3be62c94ae91d2c1b627490e337b903a340850fc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "0493b084fe692644f4ad0f885c947bcd69e60d6222008c6b0cd77a295a2b7180",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_known_service_control.py": "ddc472eeb6c740bedcb269684c1bdd7535e0db0313071627c2dd23e3b8e21150",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_coupled_control.py": "e0ba65344e929b7deb4bbae402265b452d2e86e086e05a62ea67630231eb167d"
+  },
+  "source_changed": [],
+  "wall_seconds": 2.5719552999944426
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "time": 10.0,
+    "kind": "initial",
+    "reply": {
+      "status": "pending",
+      "reason": "request_enqueued"
+    },
+    "submit_call_ms": 0.017300015315413475,
+    "client_view": {
+      "request_id": "live:1:B:ledger-return",
+      "status": "pending",
+      "attempt": 1,
+      "physical_resolution": "unknown_without_a_delivered_ack"
+    }
+  },
+  {
+    "time": 11.0,
+    "kind": "before_retry",
+    "client_view": {
+      "request_id": "live:1:B:ledger-return",
+      "status": "acknowledged",
+      "attempt": 1,
+      "physical_resolution": "immutable_delivered_snapshot_not_current_truth",
+      "last_delivered_ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 10.0,
+        "delivered_at": 10.2,
+        "status": "dispatching",
+        "reason": ""
+      }
+    }
+  },
+  {
+    "time": 11.0,
+    "kind": "retry_same_payload",
+    "reply": {
+      "status": "pending",
+      "reason": "retry_enqueued"
+    },
+    "submit_call_ms": 0.006099988240748644,
+    "client_view": {
+      "request_id": "live:1:B:ledger-return",
+      "status": "pending",
+      "attempt": 2,
+      "physical_resolution": "immutable_delivered_snapshot_not_current_truth",
+      "last_delivered_ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 10.0,
+        "delivered_at": 10.2,
+        "status": "dispatching",
+        "reason": ""
+      }
+    }
+  }
+]

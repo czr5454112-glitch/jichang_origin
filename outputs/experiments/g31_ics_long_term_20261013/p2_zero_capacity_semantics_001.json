@@ -1,0 +1,179 @@
+{
+  "source_rows": [
+    {
+      "workbook": "附件：拓扑结构示例1.xlsx",
+      "sheet": "邻接表",
+      "row": 1,
+      "cells": [
+        {
+          "ref": "A1",
+          "value": "上游节点编号",
+          "formula": null
+        },
+        {
+          "ref": "B1",
+          "value": "下游节点编号",
+          "formula": null
+        },
+        {
+          "ref": "C1",
+          "value": "距离（米）",
+          "formula": null
+        },
+        {
+          "ref": "D1",
+          "value": "速度（米每秒）",
+          "formula": null
+        },
+        {
+          "ref": "E1",
+          "value": "系统",
+          "formula": null
+        },
+        {
+          "ref": "F1",
+          "value": "托盘容量（个）",
+          "formula": null
+        }
+      ]
+    },
+    {
+      "workbook": "附件：拓扑结构示例1.xlsx",
+      "sheet": "邻接表",
+      "row": 7,
+      "cells": [
+        {
+          "ref": "A7",
+          "value": "ICS12",
+          "formula": null
+        },
+        {
+          "ref": "B7",
+          "value": "ICS13",
+          "formula": null
+        },
+        {
+          "ref": "C7",
+          "value": "2",
+          "formula": null
+        },
+        {
+          "ref": "D7",
+          "value": "2",
+          "formula": null
+        },
+        {
+          "ref": "E7",
+          "value": "国际=1",
+          "formula": null
+        },
+        {
+          "ref": "F7",
+          "value": "1",
+          "formula": null
+        }
+      ]
+    },
+    {
+      "workbook": "附件：拓扑结构示例2.xlsx",
+      "sheet": "邻接表",
+      "row": 1,
+      "cells": [
+        {
+          "ref": "A1",
+          "value": "上游节点编号",
+          "formula": null
+        },
+        {
+          "ref": "B1",
+          "value": "下游节点编号",
+          "formula": null
+        },
+        {
+          "ref": "C1",
+          "value": "距离（米）",
+          "formula": null
+        },
+        {
+          "ref": "D1",
+          "value": "速度（米每秒）",
+          "formula": null
+        },
+        {
+          "ref": "E1",
+          "value": "系统",
+          "formula": null
+        },
+        {
+          "ref": "F1",
+          "value": "托盘容量（个）",
+          "formula": null
+        }
+      ]
+    },
+    {
+      "workbook": "附件：拓扑结构示例2.xlsx",
+      "sheet": "邻接表",
+      "row": 7,
+      "cells": [
+        {
+          "ref": "A7",
+          "value": "ICS103",
+          "formula": null
+        },
+        {
+          "ref": "B7",
+          "value": "ICS104",
+          "formula": null
+        },
+        {
+          "ref": "C7",
+          "value": "0.6",
+          "formula": null
+        },
+        {
+          "ref": "D7",
+          "value": "2",
+          "formula": null
+        },
+        {
+          "ref": "E7",
+          "value": "国内=0",
+          "formula": null
+        },
+        {
+          "ref": "F7",
+          "value": "0",
+          "formula": null
+        }
+      ]
+    }
+  ],
+  "all_227_capacity_equals_floor_length_over_2m": true,
+  "legacy_adapter_semantics": {
+    "coordinates": "source workbooks contain no x/y coordinates; x=y=0 is a routing-only placeholder and has no layout meaning",
+    "missing_service_time": {
+      "rule": "example1 '/' on type 7 and 11 becomes 0 seconds, matching the numeric values of the same documented types in example2",
+      "node_keys": [
+        "international:ICS52",
+        "international:ICS53",
+        "international:ICS54",
+        "international:ICS55",
+        "international:ICS156",
+        "international:ICS157"
+      ]
+    },
+    "legacy_header": {
+      "agv_length_m": 1.0,
+      "safe_length_m": 0.0,
+      "fault_threshold_seconds": 4.0,
+      "heuristic_base_speed_mps": 2.5,
+      "hcost_file_semantics": "DIRECTED_SHORTEST_DISTANCE_METRES_BEFORE_JAVA_2P5_MPS_NORMALIZATION",
+      "source_status": "NOT_PRESENT_IN_WORKBOOKS_PROVISIONAL_NO_FAULT_ONLY"
+    },
+    "pallet_capacity": "preserved as metadata; the current legacy map text has no per-edge capacity field",
+    "task_data": "NOT_PROVIDED",
+    "fault_scenarios": "NOT_PROVIDED"
+  },
+  "interpretation": "All 227 source counts equal floor(length/2m). The inspected domestic F7 is a numeric 0 with no stored formula. The numeric pattern is consistent with a number-of-tray-spaces calculation but does not establish whether 0.6m links prohibit traversal. The current zero-means-closed native contract is an explicit conservative research interpretation, not verified field closure."
+}

@@ -1,0 +1,216 @@
+{
+  "status": "passed",
+  "rows": [
+    {
+      "case": "free_storage",
+      "version": "old_fifo",
+      "candidates": [],
+      "status": "expansion_budget_exhausted",
+      "expansions": 500,
+      "diagnostics": {
+        "validation_ms": 0.0,
+        "work_units_by_stage": {
+          "topology_edges": 202,
+          "reverse_lower_bound": 205,
+          "storage_product_time_labels": 47,
+          "event_projection": 46
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "storage_mode": "announced_on_carrier_node_proxy",
+        "completeness": "bounded_storage_product_event_time_labels",
+        "missing_candidate_is_not_infeasibility": true,
+        "earliest_arrival_certified": false,
+        "remote_calendar_access": true,
+        "cache_accounting": {
+          "contract": "uncached_storage_graph_v1",
+          "logical_preprocessing": "actual_cold_preprocessing_per_query",
+          "actual_preprocessing_work": {
+            "topology_edges": 202,
+            "reverse_lower_bound": 205
+          },
+          "reused_preprocessing_work": {}
+        },
+        "static_lower_bound": 10001,
+        "storage_already_visited": false,
+        "storage_already_departed": false,
+        "storage_release_at": 10000,
+        "state_label_limit": 1,
+        "storage_capacity": 1,
+        "query_ms": 1.891099993372336,
+        "expansions": 500,
+        "candidate_count": 0,
+        "search_queue_exhausted": false
+      },
+      "query_cpu_seconds": 0.0,
+      "query_wall_seconds": 0.0019499000045470893
+    },
+    {
+      "case": "free_storage",
+      "version": "new_static_remaining",
+      "candidates": [
+        {
+          "candidate_id": "storage:v0:bag:tray:0",
+          "bag_id": "bag",
+          "tray_id": "tray",
+          "legs": [
+            {
+              "edge_id": "z-in",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "z-out",
+              "depart": 10000,
+              "arrive": 10001
+            }
+          ],
+          "unload_complete": 10002,
+          "usable_at": 10002,
+          "dependency_version": 0,
+          "baseline_id": "storage:v0:bag:tray:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ],
+      "status": "candidate_limit_reached",
+      "expansions": 413,
+      "diagnostics": {
+        "validation_ms": 0.10490001295693219,
+        "work_units_by_stage": {
+          "topology_edges": 202,
+          "reverse_lower_bound": 205,
+          "storage_product_time_labels": 3,
+          "event_projection": 2,
+          "storage_full_witness_validation": 1
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "storage_mode": "announced_on_carrier_node_proxy",
+        "completeness": "bounded_storage_product_event_time_labels",
+        "missing_candidate_is_not_infeasibility": true,
+        "earliest_arrival_certified": false,
+        "remote_calendar_access": true,
+        "cache_accounting": {
+          "contract": "uncached_storage_graph_v1",
+          "logical_preprocessing": "actual_cold_preprocessing_per_query",
+          "actual_preprocessing_work": {
+            "topology_edges": 202,
+            "reverse_lower_bound": 205
+          },
+          "reused_preprocessing_work": {}
+        },
+        "static_lower_bound": 10001,
+        "storage_already_visited": false,
+        "storage_already_departed": false,
+        "storage_release_at": 10000,
+        "state_label_limit": 1,
+        "storage_capacity": 1,
+        "heap_priority": "arrival_lower_bound_then_remaining_static_travel_then_visited_then_fifo",
+        "query_ms": 1.5076999843586236,
+        "expansions": 413,
+        "candidate_count": 1,
+        "search_queue_exhausted": false
+      },
+      "query_cpu_seconds": 0.0,
+      "query_wall_seconds": 0.001558100018883124
+    },
+    {
+      "case": "busy_storage",
+      "version": "old_fifo",
+      "candidates": [],
+      "status": "expansion_budget_exhausted",
+      "expansions": 500,
+      "diagnostics": {
+        "validation_ms": 0.0,
+        "work_units_by_stage": {
+          "topology_edges": 203,
+          "reverse_lower_bound": 205,
+          "storage_product_time_labels": 46,
+          "event_projection": 46
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "storage_mode": "announced_on_carrier_node_proxy",
+        "completeness": "bounded_storage_product_event_time_labels",
+        "missing_candidate_is_not_infeasibility": true,
+        "earliest_arrival_certified": false,
+        "remote_calendar_access": true,
+        "cache_accounting": {
+          "contract": "uncached_storage_graph_v1",
+          "logical_preprocessing": "actual_cold_preprocessing_per_query",
+          "actual_preprocessing_work": {
+            "topology_edges": 203,
+            "reverse_lower_bound": 205
+          },
+          "reused_preprocessing_work": {}
+        },
+        "static_lower_bound": 10001,
+        "storage_already_visited": false,
+        "storage_already_departed": false,
+        "storage_release_at": 10000,
+        "state_label_limit": 1,
+        "storage_capacity": 1,
+        "query_ms": 2.0308000093791634,
+        "expansions": 500,
+        "candidate_count": 0,
+        "search_queue_exhausted": false
+      },
+      "query_cpu_seconds": 0.0,
+      "query_wall_seconds": 0.002099000004818663
+    },
+    {
+      "case": "busy_storage",
+      "version": "new_static_remaining",
+      "candidates": [],
+      "status": "expansion_budget_exhausted",
+      "expansions": 500,
+      "diagnostics": {
+        "validation_ms": 0.0,
+        "work_units_by_stage": {
+          "topology_edges": 203,
+          "reverse_lower_bound": 205,
+          "storage_product_time_labels": 61,
+          "event_projection": 31
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "storage_mode": "announced_on_carrier_node_proxy",
+        "completeness": "bounded_storage_product_event_time_labels",
+        "missing_candidate_is_not_infeasibility": true,
+        "earliest_arrival_certified": false,
+        "remote_calendar_access": true,
+        "cache_accounting": {
+          "contract": "uncached_storage_graph_v1",
+          "logical_preprocessing": "actual_cold_preprocessing_per_query",
+          "actual_preprocessing_work": {
+            "topology_edges": 203,
+            "reverse_lower_bound": 205
+          },
+          "reused_preprocessing_work": {}
+        },
+        "static_lower_bound": 10001,
+        "storage_already_visited": false,
+        "storage_already_departed": false,
+        "storage_release_at": 10000,
+        "state_label_limit": 1,
+        "storage_capacity": 1,
+        "heap_priority": "arrival_lower_bound_then_remaining_static_travel_then_visited_then_fifo",
+        "state_label_truncations": 28,
+        "query_ms": 2.685499988729134,
+        "expansions": 500,
+        "candidate_count": 0,
+        "search_queue_exhausted": false
+      },
+      "query_cpu_seconds": 0.0,
+      "query_wall_seconds": 0.0027643999783322215
+    }
+  ],
+  "standalone_queries": 4,
+  "physical_continuations": 0,
+  "cpu_seconds": 0.375,
+  "wall_seconds": 0.5117797999992035,
+  "qualification": "tie-break repairs an equal-f scheduling failure; busy calendar low-f plateau remains bounded unknown"
+}

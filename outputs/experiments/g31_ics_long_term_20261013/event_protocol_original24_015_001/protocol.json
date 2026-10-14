@@ -1,0 +1,68 @@
+{
+  "policies": {
+    "periodic_reactive": [
+      "periodic",
+      {
+        "routes": false,
+        "forecasts": false,
+        "prebalance": true,
+        "predictive": false
+      }
+    ],
+    "periodic_predictive": [
+      "periodic",
+      {
+        "routes": false,
+        "forecasts": true,
+        "prebalance": true,
+        "predictive": true
+      }
+    ],
+    "event_reactive": [
+      "event",
+      {
+        "routes": false,
+        "forecasts": false,
+        "prebalance": true,
+        "predictive": false
+      }
+    ],
+    "event_predictive": [
+      "event",
+      {
+        "routes": false,
+        "forecasts": true,
+        "prebalance": true,
+        "predictive": true
+      }
+    ],
+    "event_joint": [
+      "event",
+      {
+        "routes": true,
+        "forecasts": true,
+        "prebalance": true,
+        "predictive": true
+      }
+    ]
+  },
+  "horizon": 86400.0,
+  "controller": {
+    "control_period": 60.0,
+    "command_delay": 2.0,
+    "publication_delay": 0.5,
+    "retry_period": 60.0,
+    "compact": true,
+    "lease_seconds": 120.0
+  },
+  "cases": [
+    "original24"
+  ],
+  "event_budget_per_advance": 100000,
+  "max_seconds_per_policy": 180.0,
+  "wall_budget_scope": "checked between common one-hour physical segments; no background stop guarantee",
+  "selection": "all cases and policies fixed before executing native; no result selection",
+  "common_contract": "same enabled native notifications, owner messages, physical tasks, tray stock and permissions for every policy",
+  "information_ablation": "event versus periodic compares lawful activation timing; predictive versus reactive also changes allowed forecast use",
+  "timing_scope": "diagnostic wall times; no full request or deployment SLA claim"
+}

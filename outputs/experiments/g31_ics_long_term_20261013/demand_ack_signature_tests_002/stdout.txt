@@ -1,0 +1,40 @@
+F......                                                                  [100%]
+================================== FAILURES ===================================
+__ test_actual_capture_signature_differs_from_submission_and_later_aba_queue __
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_011\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_actual_capture_signature_differs_from_submission_and_later_aba_queue(native):
+        value = scene()
+        value["trays"] = [dict(tray_id="T0", node=5)]
+        # A real cross-owner return: same-zone redistribution is intentionally
+        # outside this controller's authority and must remain rejected.
+        next(n for n in value["node_contracts"] if n["node"] == 5)["zone"] = "B"
+        value["jobs"] = [dict(value["jobs"][0], business_bag_id="Y", arrival=.1)]
+        value["edge_records"] = [(u, v, .25 if (u, v) == (5, 0) else length, speed)
+                                 for u, v, length, speed in value["edge_records"]]
+        value = prepare_input(value)
+        s = native.NativeSession(value); s.advance_to(0.)
+        submitted_signature = s.protocol_demand_signature("A")
+        request = demand(message_delay=.2)
+        s.submit_protocol_command(request)
+        s.submit_protocol_transfer(dict(request_id="live:1:B:real-tray-return", owner_id="B", tray_id="T0",
+            source=5, destination=0, earliest_departure=0., expiry=10., message_delay=0.))
+        s.advance_to(.35)
+        assert submitted_signature == s.protocol_demand_signature("A") == canonical([])
+        ack = known(s, request)
+        message, = s.observe_protocol("B")["delivered_messages"]
+        assert [j["business_bag_id"] for j in message["jobs"]] == ["Y"]
+        assert ack["captured_demand_signature"] == canonical(message["jobs"]) != submitted_signature
+        assert ack["captured_demand_observed_at"] == .2
+        assert ack["captured_demand_publication_sequence"] == message["publication_sequence"]
+>       assert s.result_at(.35)["jobs"][0]["loaded_at"] == pytest.approx(.3)
+E       assert -1.0 == 0.3 ± 3.0e-07
+E         
+E         comparison failed
+E         Obtained: -1.0
+E         Expected: 0.3 ± 3.0e-07
+
+tests\test_g31_circulation_demand_ack_signature.py:71: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_demand_ack_signature.py::test_actual_capture_signature_differs_from_submission_and_later_aba_queue

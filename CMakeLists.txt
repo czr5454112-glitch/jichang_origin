@@ -7,6 +7,22 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 enable_testing()
 
+add_executable(test_circulation_runtime cpp/tests/test_circulation_runtime.cpp)
+target_include_directories(test_circulation_runtime PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cpp)
+target_compile_definitions(test_circulation_runtime PRIVATE CZR005_EVENT_RUNTIME_TESTING=1)
+if(MSVC)
+  target_compile_options(test_circulation_runtime PRIVATE /bigobj)
+endif()
+add_test(NAME circulation_runtime COMMAND test_circulation_runtime)
+
+add_executable(test_circulation_checkpoint cpp/tests/test_circulation_checkpoint.cpp)
+target_include_directories(test_circulation_checkpoint PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cpp)
+target_compile_definitions(test_circulation_checkpoint PRIVATE CZR005_EVENT_RUNTIME_TESTING=1)
+if(MSVC)
+  target_compile_options(test_circulation_checkpoint PRIVATE /bigobj)
+endif()
+add_test(NAME circulation_checkpoint COMMAND test_circulation_checkpoint)
+
 option(CZR005_BUILD_PYBIND "Build Python bindings with pybind11" ON)
 
 add_library(ics_core INTERFACE)
@@ -186,6 +202,16 @@ add_test(
 if(CZR005_BUILD_PYBIND)
   find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
   find_package(pybind11 CONFIG REQUIRED)
+
+  pybind11_add_module(czr005_circulation cpp/ics_core/bindings/circulation.cpp)
+  target_link_libraries(czr005_circulation PRIVATE ics_core)
+  if(MSVC)
+    target_compile_options(czr005_circulation PRIVATE /bigobj /Brepro)
+    target_link_options(czr005_circulation PRIVATE /Brepro)
+  endif()
+  set_target_properties(czr005_circulation PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python)
 
   pybind11_add_module(czr005_cpp cpp/ics_core/bindings/czr005_cpp.cpp)
   target_link_libraries(czr005_cpp PRIVATE ics_core)

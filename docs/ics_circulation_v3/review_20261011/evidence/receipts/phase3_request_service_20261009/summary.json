@@ -1,0 +1,47 @@
+{
+  "schema": "czr005.ics_circulation_v3.request_service.v1",
+  "scope": "LOCAL_OWNER_WITH_SYNTHETIC_TRANSPORT_ACCOUNTING_NOT_DISTRIBUTED_INTEGRATION",
+  "request_count": 51,
+  "unique_request_count": 51,
+  "controlled_case_count": 17,
+  "repeats": 3,
+  "static_cache_policy": "process cache retained; fixture preparation can warm static topology",
+  "outcome_counts": {
+    "new_route_success": 12,
+    "still_valid_old_route": 3,
+    "search_exhausted": 6,
+    "proven_infeasible": 3,
+    "communication_failure": 12,
+    "commit_failure": 12,
+    "local_processing_failure": 3
+  },
+  "denominator_reconciles": true,
+  "all_expected_classifications_match": true,
+  "all_finite_tray_ids_preserved": true,
+  "all_bag_ids_preserved": true,
+  "real_local_over_100ms_count": 0,
+  "accounted_with_synthetic_transport_over_100ms_count": 3,
+  "owner_committed_but_unacknowledged_count": 3,
+  "mean_measured_local_wall_ms": 1.956119607961691,
+  "mean_accounted_end_to_end_ms": 10.191413725608749,
+  "source_sha256": {
+    "request_service.py": "f74e81ac19131d199e38de541008c527f189b44594d16cb1346d44c9fa26f0df",
+    "run_request_service.py": "88b76be1d3bc156c8cad60931175c04640f46a309fbe0f965b8a4595f100f949",
+    "runtime.py": "b737bdd4082992547e28ba82e449e691230d64bbde8977842e59b08d834a8794",
+    "model.py": "b25c342097c17c714f874c865ffa10094737bcfd52e599598fc49af27b529235",
+    "routing.py": "17b3842f133ca0c410bd275fe2a96af3f416add929850529d609326d7feb9224"
+  },
+  "source_changed_during_run": false,
+  "limitations": [
+    "Transport durations/faults are deterministic injected accounting, not measurements of any network.",
+    "Synthetic delays do not advance the physical snapshot tick; this audit does not establish a real-time controller guarantee.",
+    "Complete visible snapshots with dependency digests are used; private regional state and authenticated distributed RPC are not implemented.",
+    "Success-path generation, features, scoring, owner revalidation and commit are separately timed with perf_counter.",
+    "Successful snapshot receipt also represents an owner-receipt query; it can recover an accepted request after an acknowledgement loss.",
+    "owner_committed means this request_id has an accepted new-route receipt; old-route fallback is separately identified.",
+    "Full committed old-route fallback checks future owned reservations and physical state; entered prefixes and bare proposals do not qualify.",
+    "Only a revalidated complete-graph static no-path certificate yields proven_infeasible; search truncation never does.",
+    "The six specified business outcomes plus explicit local_processing_failure retain broken extensions in the denominator.",
+    "Controlled fault cases are coverage examples, not an operational failure distribution or airport benchmark."
+  ]
+}

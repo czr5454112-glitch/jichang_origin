@@ -1,0 +1,120 @@
+{
+  "status": "failed",
+  "receipts": [
+    {
+      "path": "outputs\\experiments\\ics_circulation_v3\\phase4_round10_storage_search_20261011\\baseline_001\\result.json",
+      "sha256": "928cf73a8f9ced9ca95441be64dfae1714cacb9bb3dc2c35c305319f8f6dbab6",
+      "cpu_seconds": 3.421875,
+      "wall_seconds": 3.463506000000052,
+      "status": "passed",
+      "source_stable": true,
+      "standalone_queries": 3,
+      "physical_continuations": 1,
+      "scope": "source/input freeze + one partial physical checkpoint continuation + three queries; nested CPU is not additive",
+      "failed_attempt_retained": false,
+      "unresolved_real_query_retained": false
+    },
+    {
+      "path": "outputs\\experiments\\ics_circulation_v3\\phase4_round10_storage_search_20261011\\authoring_001\\result.json",
+      "sha256": "859fbb08f85b75d7448dd0373cd6ea51132b47e28e699c1bc51468c8a23df9a2",
+      "cpu_seconds": 1.265625,
+      "wall_seconds": 1.38495150001836,
+      "status": "failed",
+      "source_stable": true,
+      "standalone_queries": 0,
+      "physical_continuations": 0,
+      "scope": "in-process pytest import/execution; excludes source capture and report writes; fixture physics, if any, remain test calls",
+      "failed_attempt_retained": true,
+      "unresolved_real_query_retained": false
+    },
+    {
+      "path": "outputs\\experiments\\ics_circulation_v3\\phase4_round10_storage_search_20261011\\comparison_001\\result.json",
+      "sha256": "07753d0fedcbff42a997425a51ce3da51010e68c81acb62e2b7d0041a1839038",
+      "cpu_seconds": 0.3125,
+      "wall_seconds": 0.32357930002035573,
+      "status": "passed",
+      "source_stable": true,
+      "standalone_queries": 3,
+      "physical_continuations": 0,
+      "scope": "imports, unpickle, three queries and common validator recheck; query timings are nested",
+      "failed_attempt_retained": false,
+      "unresolved_real_query_retained": true
+    },
+    {
+      "path": "outputs\\experiments\\ics_circulation_v3\\phase4_round10_storage_search_20261011\\authoring_002\\result.json",
+      "sha256": "e162aa7ce631dcbc9f09e28e1435a193b9f4256fc1f83350a85cdc8d1fe95f3e",
+      "cpu_seconds": 1.03125,
+      "wall_seconds": 1.169987500004936,
+      "status": "passed",
+      "source_stable": true,
+      "standalone_queries": 0,
+      "physical_continuations": 0,
+      "scope": "in-process pytest import/execution; excludes source capture and report writes; fixture physics, if any, remain test calls",
+      "failed_attempt_retained": false,
+      "unresolved_real_query_retained": false
+    },
+    {
+      "path": "outputs\\experiments\\ics_circulation_v3\\phase4_round10_storage_search_20261011\\comparison_002\\result.json",
+      "sha256": "1258072d347e3f0858542c279f233d3c75b6b7f5a805d0f147c9a5643f2dc56d",
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 0.11220380000304431,
+      "status": "passed",
+      "source_stable": true,
+      "standalone_queries": 3,
+      "physical_continuations": 0,
+      "scope": "imports, unpickle, three queries and common validator recheck; query timings are nested",
+      "failed_attempt_retained": false,
+      "unresolved_real_query_retained": false
+    },
+    {
+      "path": "outputs\\experiments\\ics_circulation_v3\\phase4_round10_storage_search_20261011\\authoring_003\\result.json",
+      "sha256": "aaa5773e14d41c6c7e210a879bcc8364d6627da6f58d68b064133663de116e0a",
+      "cpu_seconds": 0.984375,
+      "wall_seconds": 1.0236518000019714,
+      "status": "passed",
+      "source_stable": true,
+      "standalone_queries": 0,
+      "physical_continuations": 0,
+      "scope": "in-process pytest import/execution; excludes source capture and report writes; fixture physics, if any, remain test calls",
+      "failed_attempt_retained": false,
+      "unresolved_real_query_retained": false
+    },
+    {
+      "path": "outputs\\experiments\\ics_circulation_v3\\phase4_round10_storage_search_20261011\\comparison_003\\result.json",
+      "sha256": "c818d332eb7ad635d9aed47bcd034b52de4b8650a93f2a4b6b9b67132a6d0a25",
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.10258029997930862,
+      "status": "passed",
+      "source_stable": true,
+      "standalone_queries": 3,
+      "physical_continuations": 0,
+      "scope": "imports, unpickle, three queries and common validator recheck; query timings are nested",
+      "failed_attempt_retained": false,
+      "unresolved_real_query_retained": false
+    }
+  ],
+  "physics_calls": 0,
+  "standalone_queries": 0,
+  "checks": 894,
+  "current_source_sha256": {
+    "scripts/experiments/ics_circulation_v3/storage_routing.py": "867018bc951e8afe95840c33dbac42a32f2a2d38e46317e58070534dc502e7e2",
+    "scripts/experiments/ics_circulation_v3/storage_calendar.py": "5b0b5d87aefe954f89d3e00774847a66ef801df49118909624bf2e5fc94f0ed7",
+    "tests/test_ics_circulation_v3_storage_routing.py": "45160a98106d74df8146f92b00a8092d4c8987eb48c04abfd34682fcb6c398da"
+  },
+  "failure": "Traceback (most recent call last):\n  File \"C:\\PROGRAMING\\czr005\\outputs\\experiments\\ics_circulation_v3\\phase4_round10_storage_search_20261011\\audit_receipts.py\", line 56, in <module>\n    check(value==author[key])\n                 ~~~~~~^^^^^\nKeyError: 'scripts/experiments/ics_circulation_v3/storage_routing.py'\n",
+  "cpu_seconds": 0.21875,
+  "wall_seconds": 1.1612450999964494,
+  "audit_script_sha256": "6db6730677129e741460357306f7ed3808d85c7c6ad4b4527ccc079770e24492",
+  "scope": "receipt/source/input hash audit only; no query or physics; report write excluded",
+  "nested_not_additive": [
+    "baseline continuation_cpu_seconds",
+    "all per-query CPU/wall",
+    "author test-internal query/physics"
+  ],
+  "unmetered_auxiliary": [
+    "one ad-hoc diagnostic author query and manual validator checks",
+    "source/topology reading",
+    "web research",
+    "code/docs/tool orchestration"
+  ]
+}

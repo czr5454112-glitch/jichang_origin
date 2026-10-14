@@ -1,0 +1,438 @@
+{
+  "schema": "g31.observed_source_feedback.v1",
+  "status": "passed",
+  "cases": [
+    {
+      "scenario": {
+        "name": "long_2000m",
+        "length": 2000.0,
+        "speed": 5.0,
+        "future_source": false
+      },
+      "policies": [
+        {
+          "policy": "frozen_joint",
+          "cost": 1210.4,
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 1210.4,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 803.3499999999998,
+                "completed": true,
+                "completed_at": 803.3499999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 403.5000000000001,
+                "completed": true,
+                "completed_at": 403.5000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "repair_status": "not_requested",
+          "cancellations": [],
+          "paired_vs_ordinary_all_offered": false
+        },
+        {
+          "policy": "one_round_observed_source_feedback",
+          "cost": 1210.4,
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 1210.4,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 803.3499999999998,
+                "completed": true,
+                "completed_at": 803.3499999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 403.5000000000001,
+                "completed": true,
+                "completed_at": 403.5000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "repair_status": "no_observed_source_change",
+          "cancellations": [],
+          "paired_vs_ordinary_all_offered": false
+        },
+        {
+          "policy": "ordinary_public_windows",
+          "cost": 1210.4,
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 1210.4,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 403.30000000000007,
+                "completed": true,
+                "completed_at": 403.30000000000007,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 803.5499999999998,
+                "completed": true,
+                "completed_at": 803.5499999999998,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "repair_status": "not_requested",
+          "cancellations": [],
+          "paired_vs_ordinary_all_offered": true
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "name": "long_2000m_unknown_source_demand",
+        "length": 2000.0,
+        "speed": 5.0,
+        "future_source": true
+      },
+      "policies": [
+        {
+          "policy": "frozen_joint",
+          "cost": 10406.15,
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 10406.15,
+            "offered": 6,
+            "completed": 4,
+            "unfinished": 2,
+            "failed": 0,
+            "deadline_violations": 2,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 5000.0,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": true,
+                "status": "waiting_for_tray"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 403.5000000000001,
+                "completed": true,
+                "completed_at": 403.5000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time": 4999.1,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": true,
+                "status": "in_transit"
+              }
+            ]
+          },
+          "repair_status": "not_requested",
+          "cancellations": [],
+          "paired_vs_ordinary_all_offered": true
+        },
+        {
+          "policy": "one_round_observed_source_feedback",
+          "cost": 10406.15,
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 10406.15,
+            "offered": 6,
+            "completed": 4,
+            "unfinished": 2,
+            "failed": 0,
+            "deadline_violations": 2,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 5000.0,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": true,
+                "status": "waiting_for_tray"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 403.5000000000001,
+                "completed": true,
+                "completed_at": 403.5000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time": 4999.1,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": true,
+                "status": "in_transit"
+              }
+            ]
+          },
+          "repair_status": "repair_submitted",
+          "cancellations": [
+            {
+              "request_id": "live:joint:s0:d0:t0x1.91b3333333334p+8",
+              "reply": {
+                "status": "cancelled",
+                "reason": ""
+              },
+              "reason": "observed_source_changed"
+            },
+            {
+              "request_id": "live:joint:s1:d1:t0x1.a666666666667p+0",
+              "reply": {
+                "status": "cancelled",
+                "reason": ""
+              },
+              "reason": "retime_same_assignment_after_dependency_changed"
+            }
+          ],
+          "paired_vs_ordinary_all_offered": true
+        },
+        {
+          "policy": "ordinary_public_windows",
+          "cost": 10406.15,
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 10406.15,
+            "offered": 6,
+            "completed": 4,
+            "unfinished": 2,
+            "failed": 0,
+            "deadline_violations": 2,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 5000.0,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": true,
+                "status": "waiting_for_tray"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 403.5000000000001,
+                "completed": true,
+                "completed_at": 403.5000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "UNSEEN",
+                "restricted_time": 4999.1,
+                "completed": false,
+                "completed_at": null,
+                "deadline_violated_by_horizon": true,
+                "status": "in_transit"
+              }
+            ]
+          },
+          "repair_status": "not_requested",
+          "cancellations": [],
+          "paired_vs_ordinary_all_offered": true
+        }
+      ]
+    }
+  ],
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_joint_window_feedback.py": "3400db873f0658eb3f8421578191855b8c8bbeca15cbd0dbd307862775de6fe3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\joint_window_feedback.py": "3659057f6e9b34fbdbd9169d3168ff74d12c9591b3f3de424bdc77692fd0be78",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\joint_window_repair.py": "3af80d58c5635507c998c3401192cedd509d52f9482083a8f226297da971fb85",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "c65084b848e918026837301e3be62c94ae91d2c1b627490e337b903a340850fc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1"
+  },
+  "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+  "source_after": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_joint_window_feedback.py": "3400db873f0658eb3f8421578191855b8c8bbeca15cbd0dbd307862775de6fe3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\joint_window_feedback.py": "3659057f6e9b34fbdbd9169d3168ff74d12c9591b3f3de424bdc77692fd0be78",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\joint_window_repair.py": "3af80d58c5635507c998c3401192cedd509d52f9482083a8f226297da971fb85",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "c65084b848e918026837301e3be62c94ae91d2c1b627490e337b903a340850fc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1"
+  },
+  "source_changed": [],
+  "novelty": "not_established; conventional_one_round_feedback_strong_comparator"
+}

@@ -1,0 +1,151 @@
+{
+  "binary_sha256": "84d99f496972e3b8892d8d4352083a30deff62cf9827a1279e8ba2622acad948",
+  "results": {
+    "finite_message_components_overflow": {
+      "outcome": "accepted",
+      "nonfinite_output": [
+        {
+          "path": "/receipts/0/time",
+          "repr": "inf"
+        },
+        {
+          "path": "/receipts/1/time",
+          "repr": "inf"
+        },
+        {
+          "path": "/transfers/0/delivered_at",
+          "repr": "inf"
+        },
+        {
+          "path": "/physical_clock",
+          "repr": "inf"
+        }
+      ],
+      "jobs": [],
+      "physical_clock": "inf"
+    },
+    "negative_edge_length": {
+      "outcome": "accepted",
+      "nonfinite_output": [],
+      "jobs": [
+        {
+          "business_bag_id": "B1",
+          "status": "completed",
+          "tray": 0,
+          "loaded_at": 0.1,
+          "storage_entered_at": 1.2510000000000001,
+          "storage_released_at": 6.0,
+          "completed_at": 8.65,
+          "deadline_met": true
+        },
+        {
+          "business_bag_id": "B2",
+          "status": "completed",
+          "tray": 0,
+          "loaded_at": 12.150000000000002,
+          "storage_entered_at": 13.301000000000004,
+          "storage_released_at": 13.551000000000004,
+          "completed_at": 16.201000000000008,
+          "deadline_met": true
+        }
+      ],
+      "physical_clock": "50.00000001"
+    },
+    "zero_edge_speed": {
+      "outcome": "accepted",
+      "nonfinite_output": [
+        {
+          "path": "/decisions/0/candidates/0/model_score",
+          "repr": "inf"
+        },
+        {
+          "path": "/decisions/6/candidates/0/model_score",
+          "repr": "inf"
+        }
+      ],
+      "jobs": [
+        {
+          "business_bag_id": "B1",
+          "status": "completed",
+          "tray": 0,
+          "loaded_at": 0.1,
+          "storage_entered_at": 2.45,
+          "storage_released_at": 6.0,
+          "completed_at": 8.65,
+          "deadline_met": true
+        },
+        {
+          "business_bag_id": "B2",
+          "status": "completed",
+          "tray": 0,
+          "loaded_at": 12.150000000000002,
+          "storage_entered_at": 14.500000000000004,
+          "storage_released_at": 14.750000000000004,
+          "completed_at": 17.400000000000006,
+          "deadline_met": true
+        }
+      ],
+      "physical_clock": "50.00000001"
+    },
+    "negative_service_time": {
+      "outcome": "accepted",
+      "nonfinite_output": [],
+      "jobs": [
+        {
+          "business_bag_id": "B1",
+          "status": "completed",
+          "tray": 0,
+          "loaded_at": 0.1,
+          "storage_entered_at": 2.2009999999999996,
+          "storage_released_at": 6.0,
+          "completed_at": 8.65,
+          "deadline_met": true
+        },
+        {
+          "business_bag_id": "B2",
+          "status": "completed",
+          "tray": 0,
+          "loaded_at": 12.101,
+          "storage_entered_at": 14.202000000000002,
+          "storage_released_at": 14.452000000000002,
+          "completed_at": 17.102000000000004,
+          "deadline_met": true
+        }
+      ],
+      "physical_clock": "50.00000001"
+    },
+    "wrong_matrix_dimensions": {
+      "outcome": "rejected",
+      "error_type": "IndexError",
+      "message": "invalid vector subscript"
+    },
+    "nan_matrix_used_entry": {
+      "outcome": "accepted",
+      "nonfinite_output": [],
+      "jobs": [
+        {
+          "business_bag_id": "B1",
+          "status": "completed",
+          "tray": 0,
+          "loaded_at": 0.1,
+          "storage_entered_at": 2.25,
+          "storage_released_at": 6.0,
+          "completed_at": 8.65,
+          "deadline_met": true
+        },
+        {
+          "business_bag_id": "B2",
+          "status": "completed",
+          "tray": 0,
+          "loaded_at": 12.150000000000002,
+          "storage_entered_at": 14.300000000000004,
+          "storage_released_at": 14.550000000000004,
+          "completed_at": 17.200000000000006,
+          "deadline_met": true
+        }
+      ],
+      "physical_clock": "50.00000001"
+    }
+  },
+  "raw_nonfinite_policy": "JSON raw files use Python NaN/Infinity to preserve observed values; receipt explicitly identifies every nonfinite output"
+}

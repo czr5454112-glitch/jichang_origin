@@ -1,0 +1,84 @@
+{
+  "status": "verified_complete_execution",
+  "audit": {
+    "status": "passed",
+    "completed_traversals": 4,
+    "open_traversals": 0,
+    "tray_count": 1,
+    "optimality": "unknown",
+    "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+  },
+  "completion": {
+    "status": "reached",
+    "problems": [],
+    "evidence": {
+      "requested_horizon": 50.0,
+      "result_horizon": 50.0,
+      "physical_clock": 50.0,
+      "advance_physical_time": 50.0,
+      "branch_physical_time": 50.0,
+      "controller_requested_horizon": 50.0,
+      "controller_physical_time": 50.0
+    },
+    "advance_status": "reached",
+    "outer_status": "reached"
+  },
+  "metrics": {
+    "objective": "sum_restricted_arrival_to_unload_time",
+    "horizon": 50.0,
+    "cost": 58.449999999999996,
+    "offered": 2,
+    "completed": 1,
+    "unfinished": 1,
+    "failed": 0,
+    "deadline_violations": 0,
+    "per_job": [
+      {
+        "business_bag_id": "B1",
+        "restricted_time": 8.65,
+        "completed": true,
+        "completed_at": 8.65,
+        "deadline_violated_by_horizon": false,
+        "status": "completed"
+      },
+      {
+        "business_bag_id": "B2",
+        "restricted_time": 49.8,
+        "completed": false,
+        "completed_at": null,
+        "deadline_violated_by_horizon": false,
+        "status": "waiting_for_tray"
+      }
+    ]
+  },
+  "controller_status": "reached",
+  "wall_seconds": 0.037553500034846365,
+  "control_record_count": 101,
+  "owner_activation_count": 202,
+  "ledger_summary": {
+    "request_count": 3,
+    "retry_calls": 0,
+    "requests_by_kind": {
+      "demand": 3
+    },
+    "submission_status_counts": {
+      "pending": 3
+    },
+    "last_delivered_ack_status_counts": {
+      "delivered": 3
+    },
+    "requests_without_delivered_ack": 0,
+    "scope": "client immutable requests and actually delivered ACK snapshots; not unacknowledged native truth"
+  },
+  "forecast_final_status": {
+    "delivered": 0,
+    "rejected": 0,
+    "unknown": 0
+  },
+  "offline_final_state_sha256": "2506beb579e72897343c98ebb4364b33b9c8aaff88de0bb092d62ed9947d8604",
+  "declared_business_ids": [
+    "B1",
+    "B2"
+  ],
+  "declared_offered": 2
+}

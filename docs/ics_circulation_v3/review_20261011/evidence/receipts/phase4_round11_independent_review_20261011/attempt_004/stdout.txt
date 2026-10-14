@@ -1,0 +1,66 @@
+................................................................F....... [ 81%]
+......F.........                                                         [100%]
+================================== FAILURES ===================================
+_____________ test_implicit_k_preserves_storage_delegate_default ______________
+
+    def test_implicit_k_preserves_storage_delegate_default():
+        case = fixture(capacity=3)
+        for i in range(3):
+            node = "N" + str(i)
+            case.state.network.nodes[node] = Node(node, "z", "p")
+            case.state.network.edges["en" + str(i)] = Edge("en" + str(i), "E", node, 1)
+            case.state.network.edges["nd" + str(i)] = Edge("nd" + str(i), node, "D", 1)
+        original, screened = planner(), StorageTerminalScreenGenerator(planner())
+        AUDIT_COUNTERS["production_queries"] += 3
+        assert len(original.generate(case.state, "b", "t", 4)) == 4
+        expected = original.generate(case.state, "b", "t")
+        assert len(expected) == 3
+>       assert screened.generate(case.state, "b", "t") == expected
+E       AssertionError: assert (RouteCandida...ination=None)) == (RouteCandida...ination=None))
+E         
+E         Left contains one more item: RouteCandidate(candidate_id='storage:v0:b:t:3', bag_id='b', tray_id='t', legs=(Leg(edge_id='ae', depart=0, arrive=1), ...eline_id='storage:v0:b:t:0', is_baseline=False, destination_node='D', prefix_only=False, continuation_destination=None)
+E         Use -v to get more diff
+
+tests\test_ics_v3_storage_terminal_screen_audit.py:218: AssertionError
+_ test_checkpoint_factory_and_explicit_cache_preserve_screen_and_sibling_isolation _
+
+    def test_checkpoint_factory_and_explicit_cache_preserve_screen_and_sibling_isolation():
+        case = fixture(capacity=2)
+        engine = Simulation(case.state, generator_factory=factory(), search_horizon=12,
+                            reactive_empty_dispatch=False)
+        ledger = install_storage_terminal_screen(engine)
+        call(engine._generator, engine.state)
+        before = routing_cache_state(engine)
+        checkpoint, cache = engine.checkpoint(), capture_routing_cache(engine)
+        branch, sibling = Simulation.from_checkpoint(checkpoint), Simulation.from_checkpoint(checkpoint)
+        assert type(branch._generator) is type(branch._make_generator()) is StorageTerminalScreenGenerator
+        assert branch._generator.generator is branch._generator.inner.generator
+        assert branch._generator.accounting is not sibling._generator.accounting is not ledger
+        call(branch._generator, branch.state)
+        assert len(branch._generator.accounting.rows) == 2
+        assert len(sibling._generator.accounting.rows) == len(ledger.rows) == 1
+        branch._generator.generator._owned_topology_cache.entries.clear()
+        assert routing_cache_state(sibling) == before
+        restore_routing_cache(branch, cache)
+        assert routing_cache_state(branch) == before
+        a, b = branch.generator_factory(), branch.generator_factory()
+        assert a.accounting is not b.accounting and not a.accounting.rows and not b.accounting.rows
+        assert not a.generator._owned_topology_cache.entries and not b.generator._owned_topology_cache.entries
+        actual, restored = engine.advance(10), sibling.advance(10)
+        AUDIT_COUNTERS["physical_runs"] += 2
+        def physical(result):
+            value = asdict(result)
+            value.pop("policy_ms", None)
+            return value
+>       assert physical(actual) == physical(restored)
+E       AssertionError: assert {'cost_compon...ids': (), ...} == {'cost_compon...ids': (), ...}
+E         
+E         Omitting 9 identical items, use -vv to show
+E         Differing items:
+E         {'policy_stats': {'generation_calls': 1.0, 'generation_ms': 0.674600014463067, 'selection_calls': 0.0, 'selection_ms': 0.0, ...}} != {'policy_stats': {'generation_calls': 1.0, 'generation_ms': 0.9053000248968601, 'selection_calls': 0.0, 'selection_ms': 0.0, ...}}
+E         Use -v to get more diff
+
+tests\test_ics_v3_storage_terminal_screen_audit.py:318: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_ics_v3_storage_terminal_screen_audit.py::test_implicit_k_preserves_storage_delegate_default
+FAILED tests/test_ics_v3_storage_terminal_screen_audit.py::test_checkpoint_factory_and_explicit_cache_preserve_screen_and_sibling_isolation

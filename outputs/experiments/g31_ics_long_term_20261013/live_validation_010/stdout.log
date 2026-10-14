@@ -1,0 +1,25 @@
+........................................................................ [ 18%]
+........................................................................ [ 36%]
+........................................................................ [ 55%]
+...............................................................F........ [ 73%]
+........................................................................ [ 92%]
+...............................                                          [100%]
+================================== FAILURES ===================================
+_ test_later_soft_retime_can_harm_other_service_despite_local_capacity_feasibility _
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_015\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_later_soft_retime_can_harm_other_service_despite_local_capacity_feasibility(native):
+        data = circulation_factor_input(SCENARIOS[3])
+        one, _ = execute_branch(native, data, "ordinary_public_windows", "source_only_with_publication")
+        two, raw = execute_branch(native, data, "ordinary_public_windows", "two_boundary_dependency")
+        assert one["audit"]["status"] == two["audit"]["status"] == "passed"
+        assert one["metrics"]["completed"] == two["metrics"]["completed"] == 6
+        assert two["resource_repair_status"] == "repair_submitted"
+        jobs = lambda r: {j["business_bag_id"]: j for j in r["metrics"]["per_job"]}
+>       assert jobs(two)["D0"]["completed_at"] > jobs(one)["D0"]["completed_at"] + 399
+E       assert 803.3499999999998 > (803.3499999999998 + 399)
+
+tests\test_g31_circulation_p5_dependency_repair.py:89: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_p5_dependency_repair.py::test_later_soft_retime_can_harm_other_service_despite_local_capacity_feasibility

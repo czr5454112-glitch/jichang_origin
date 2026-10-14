@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="6" time="0.672" timestamp="2026-10-13T14:23:10.031132+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_finite_reference_native" name="test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers[envelope-20.0]" time="0.009" /><testcase classname="tests.test_g31_circulation_finite_reference_native" name="test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers[envelope-0.1]" time="0.003"><failure message="Failed: native truncated prefix was incorrectly sent for full-horizon audit">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_005\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+horizon = 0.1, wrapper = 'envelope'
+
+    @pytest.mark.parametrize("horizon", [20., .1])
+    @pytest.mark.parametrize("wrapper", ["envelope", "raw_result", "metadata_stripped"])
+    def test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers(native, horizon, wrapper):
+        data = tiny_cycle()
+        data["transfers"] = []
+        data["options"]["max_events"] = 5
+        source = native.NativeSession(data)
+        def continuation(branch, target):
+            run = run_online_matching(branch, ["A", "B"], horizon=target, predictive=False, publish=False)
+            if wrapper == "envelope":
+                return run
+            if wrapper == "metadata_stripped":
+                run["result"].pop("control_continuation")
+            return run["result"]
+&gt;       reference = enumerate_interventions(source, [Intervention("WAIT", "wait"), Intervention("second", "wait")],
+            horizon=horizon, job_contracts=data["jobs"], continuation=continuation,
+            validate=lambda result, action: pytest.fail("native truncated prefix was incorrectly sent for full-horizon audit"))
+
+tests\test_g31_circulation_finite_reference_native.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\finite_reference.py:183: in enumerate_interventions
+    audit = validate(result, action) if validate else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+result = {'schema': 'g31.circulation.live_result.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [], ...}
+action = Intervention(action_id='WAIT', kind='wait', request=None)
+
+&gt;   validate=lambda result, action: pytest.fail("native truncated prefix was incorrectly sent for full-horizon audit"))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: native truncated prefix was incorrectly sent for full-horizon audit
+
+tests\test_g31_circulation_finite_reference_native.py:32: Failed</failure></testcase><testcase classname="tests.test_g31_circulation_finite_reference_native" name="test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers[raw_result-20.0]" time="0.004" /><testcase classname="tests.test_g31_circulation_finite_reference_native" name="test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers[raw_result-0.1]" time="0.002"><failure message="Failed: native truncated prefix was incorrectly sent for full-horizon audit">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_005\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+horizon = 0.1, wrapper = 'raw_result'
+
+    @pytest.mark.parametrize("horizon", [20., .1])
+    @pytest.mark.parametrize("wrapper", ["envelope", "raw_result", "metadata_stripped"])
+    def test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers(native, horizon, wrapper):
+        data = tiny_cycle()
+        data["transfers"] = []
+        data["options"]["max_events"] = 5
+        source = native.NativeSession(data)
+        def continuation(branch, target):
+            run = run_online_matching(branch, ["A", "B"], horizon=target, predictive=False, publish=False)
+            if wrapper == "envelope":
+                return run
+            if wrapper == "metadata_stripped":
+                run["result"].pop("control_continuation")
+            return run["result"]
+&gt;       reference = enumerate_interventions(source, [Intervention("WAIT", "wait"), Intervention("second", "wait")],
+            horizon=horizon, job_contracts=data["jobs"], continuation=continuation,
+            validate=lambda result, action: pytest.fail("native truncated prefix was incorrectly sent for full-horizon audit"))
+
+tests\test_g31_circulation_finite_reference_native.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\finite_reference.py:183: in enumerate_interventions
+    audit = validate(result, action) if validate else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+result = {'schema': 'g31.circulation.live_result.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [], ...}
+action = Intervention(action_id='WAIT', kind='wait', request=None)
+
+&gt;   validate=lambda result, action: pytest.fail("native truncated prefix was incorrectly sent for full-horizon audit"))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: native truncated prefix was incorrectly sent for full-horizon audit
+
+tests\test_g31_circulation_finite_reference_native.py:32: Failed</failure></testcase><testcase classname="tests.test_g31_circulation_finite_reference_native" name="test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers[metadata_stripped-20.0]" time="0.003" /><testcase classname="tests.test_g31_circulation_finite_reference_native" name="test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers[metadata_stripped-0.1]" time="0.002"><failure message="Failed: native truncated prefix was incorrectly sent for full-horizon audit">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_005\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+horizon = 0.1, wrapper = 'metadata_stripped'
+
+    @pytest.mark.parametrize("horizon", [20., .1])
+    @pytest.mark.parametrize("wrapper", ["envelope", "raw_result", "metadata_stripped"])
+    def test_actual_native_exhaustion_remains_unknown_through_continuation_wrappers(native, horizon, wrapper):
+        data = tiny_cycle()
+        data["transfers"] = []
+        data["options"]["max_events"] = 5
+        source = native.NativeSession(data)
+        def continuation(branch, target):
+            run = run_online_matching(branch, ["A", "B"], horizon=target, predictive=False, publish=False)
+            if wrapper == "envelope":
+                return run
+            if wrapper == "metadata_stripped":
+                run["result"].pop("control_continuation")
+            return run["result"]
+&gt;       reference = enumerate_interventions(source, [Intervention("WAIT", "wait"), Intervention("second", "wait")],
+            horizon=horizon, job_contracts=data["jobs"], continuation=continuation,
+            validate=lambda result, action: pytest.fail("native truncated prefix was incorrectly sent for full-horizon audit"))
+
+tests\test_g31_circulation_finite_reference_native.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\finite_reference.py:183: in enumerate_interventions
+    audit = validate(result, action) if validate else None
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+result = {'schema': 'g31.circulation.live_result.v1', 'mode': 'circulation', 'optimality': 'unknown', 'native_event_ms': [], ...}
+action = Intervention(action_id='WAIT', kind='wait', request=None)
+
+&gt;   validate=lambda result, action: pytest.fail("native truncated prefix was incorrectly sent for full-horizon audit"))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: native truncated prefix was incorrectly sent for full-horizon audit
+
+tests\test_g31_circulation_finite_reference_native.py:32: Failed</failure></testcase></testsuite></testsuites>

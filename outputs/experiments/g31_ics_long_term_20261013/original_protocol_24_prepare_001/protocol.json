@@ -1,0 +1,86 @@
+{
+  "schema": "g31.original_protocol_comparison_plan.v1",
+  "count": 24,
+  "horizon": 86400.0,
+  "communication": {
+    "enabled": true,
+    "timeout": 5.0,
+    "ack_delay": 0.2,
+    "drop_ack_packets": 0,
+    "duplicate_acks": false,
+    "duplicate_ack_delay": 0.0,
+    "owner_outages": []
+  },
+  "controller": {
+    "control_period": 60.0,
+    "command_delay": 2.0,
+    "publication_delay": 0.5,
+    "retry_period": 60.0,
+    "compact": true,
+    "lease_seconds": 120.0
+  },
+  "policies": {
+    "reactive_r2": {
+      "routes": false,
+      "forecasts": false,
+      "prebalance": true,
+      "predictive": false
+    },
+    "predictive_r2": {
+      "routes": false,
+      "forecasts": true,
+      "prebalance": true,
+      "predictive": true
+    },
+    "joint_r1_r2": {
+      "routes": true,
+      "forecasts": true,
+      "prebalance": true,
+      "predictive": true
+    }
+  },
+  "owners": [
+    "owner:system_domestic",
+    "owner:system_international"
+  ],
+  "r1_original_permissions": {
+    "allowed_business_ids": [],
+    "protected_business_ids": [
+      "projected:1x:2",
+      "projected:1x:6",
+      "projected:1x:23",
+      "projected:1x:81",
+      "projected:1x:118",
+      "projected:1x:126",
+      "projected:1x:153",
+      "projected:1x:172",
+      "projected:1x:214",
+      "projected:1x:237",
+      "projected:1x:261",
+      "projected:1x:266",
+      "projected:1x:277",
+      "projected:1x:303",
+      "projected:1x:388",
+      "projected:1x:399",
+      "projected:1x:423",
+      "projected:1x:443",
+      "projected:1x:446",
+      "projected:1x:495",
+      "projected:1x:550",
+      "projected:1x:553",
+      "projected:1x:557",
+      "projected:1x:579"
+    ],
+    "permission_fields_changed": false,
+    "missing_allow_suffix_reroute_means_false": true
+  },
+  "segment_seconds": 3600.0,
+  "max_seconds_per_policy": 180.0,
+  "event_budget_per_native_advance": 100000,
+  "wall_budget_scope": "checked between one-hour physical segments; possible one-segment overrun is recorded",
+  "input_selection": "existing static select_input(24) rule before any simulation; all outcomes retained",
+  "strong_reference": "reactive and predictive R2 analytic baselines with actual owner protocol; no full optimization claim",
+  "information_difference": "predictive methods use legal release/service forecasts; reactive method is explicit information/mechanism ablation",
+  "scope": "original entire directed graph, selected 24-job same-loader witness and one retained real tray; not full mother workload",
+  "complete_100ms_requirement_certified": false
+}

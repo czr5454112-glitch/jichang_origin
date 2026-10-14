@@ -1,0 +1,2895 @@
+{
+  "status": "complete_finite_public_domain",
+  "actions": [
+    {
+      "action_id": "WAIT",
+      "candidates": [],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 0,
+      "completion_sum": 0,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "b80702fee6c88dd714a4acca7032911d8713a9785278827f4a508acb535216b1",
+      "candidates": [
+        {
+          "candidate_id": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+          "supply": 2,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 80.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "edge:2:3",
+              "start": 0.86,
+              "end": 50.86,
+              "amount": 1
+            },
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "headway:2:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 51.059999999999995,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 50.91,
+          "predicted_completion": 51.61,
+          "individual_conflicts": [
+            {
+              "resource": "node:3",
+              "start": 8.05,
+              "end": 10.100000000000001,
+              "used": 2,
+              "capacity": 1,
+              "tasks": [
+                "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+                "service:C:A:service:1"
+              ]
+            }
+          ],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 50.91,
+      "completion_sum": 51.61,
+      "conditional_conflicts": [
+        {
+          "resource": "node:3",
+          "start": 8.05,
+          "end": 10.100000000000001,
+          "used": 2,
+          "capacity": 1,
+          "tasks": [
+            "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+            "service:C:A:service:1"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "aa0d62aded64e34faa4f0dc481d7791866196588ea8cc278343204ce58df69a3",
+      "candidates": [
+        {
+          "candidate_id": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+          "supply": 2,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 10.100001,
+            "expiry": 90.20000099999999,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "edge:2:3",
+              "start": 10.150001000000001,
+              "end": 60.150001,
+              "amount": 1
+            },
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "headway:2:3",
+              "start": 10.150001000000001,
+              "end": 10.350001,
+              "amount": 1
+            },
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "node:3",
+              "start": 10.100001,
+              "end": 60.35000099999999,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 60.20000099999999,
+          "predicted_completion": 60.900000999999996,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 60.20000099999999,
+      "completion_sum": 60.900000999999996,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "df7d4e09a4836ec5774ad931e2d838fa333892bba93693904617f0052c819bcc",
+      "candidates": [
+        {
+          "candidate_id": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+          "supply": 2,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 32.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "edge:2:4",
+              "start": 0.86,
+              "end": 2.86,
+              "amount": 1
+            },
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "headway:2:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 3.0599999999999996,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 2.9099999999999997,
+          "predicted_completion": 10.6,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 2.9099999999999997,
+      "completion_sum": 10.6,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "936cfb97bdab3b70358ae7736107f987da3a408662aaf9b5c2a49f566fff92ea",
+      "candidates": [
+        {
+          "candidate_id": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+          "supply": 1,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+            "tray_id": "T1",
+            "source": 1,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 31.81,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            1,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "edge:1:3",
+              "start": 0.86,
+              "end": 1.76,
+              "amount": 1
+            },
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "headway:1:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 1.9600000000000002,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 1.81,
+          "predicted_completion": 2.5100000000000002,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T1",
+              "node": 1,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T1:U1:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 1.81,
+      "completion_sum": 2.5100000000000002,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "a87d588823075e1afdc85feac7fd8be00ca99b76f86f4d955d5cf2002b2c88bc",
+      "candidates": [
+        {
+          "candidate_id": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+          "supply": 1,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+            "tray_id": "T1",
+            "source": 1,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 31.81,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            1,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "edge:1:3",
+              "start": 0.86,
+              "end": 1.76,
+              "amount": 1
+            },
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "headway:1:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 1.9600000000000002,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 1.81,
+          "predicted_completion": 2.5100000000000002,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T1",
+              "node": 1,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T1:U1:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        },
+        {
+          "candidate_id": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+          "supply": 2,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 32.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "edge:2:4",
+              "start": 0.86,
+              "end": 2.86,
+              "amount": 1
+            },
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "headway:2:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 3.0599999999999996,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 2.9099999999999997,
+          "predicted_completion": 10.6,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 4.72,
+      "completion_sum": 13.11,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "9f905299cadb00735e9bfb7f12d89292b968ca8332206ffdc33c8959db3d9783",
+      "candidates": [
+        {
+          "candidate_id": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+          "supply": 1,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+            "tray_id": "T1",
+            "source": 1,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 31.01,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            1,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "edge:1:4",
+              "start": 0.86,
+              "end": 0.96,
+              "amount": 1
+            },
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "headway:1:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 1.1600000000000001,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 1.01,
+          "predicted_completion": 10.6,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T1",
+              "node": 1,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T1:U1:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 1.01,
+      "completion_sum": 10.6,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "03d08d4ac9a155f03259d64640db5ff552a5990259fbc1e03b3493b20697b535",
+      "candidates": [
+        {
+          "candidate_id": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+          "supply": 1,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+            "tray_id": "T1",
+            "source": 1,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 31.01,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            1,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "edge:1:4",
+              "start": 0.86,
+              "end": 0.96,
+              "amount": 1
+            },
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "headway:1:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 1.1600000000000001,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 1.01,
+          "predicted_completion": 10.6,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T1",
+              "node": 1,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T1:U1:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        },
+        {
+          "candidate_id": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+          "supply": 2,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 80.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "edge:2:3",
+              "start": 0.86,
+              "end": 50.86,
+              "amount": 1
+            },
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "headway:2:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 51.059999999999995,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 50.91,
+          "predicted_completion": 51.61,
+          "individual_conflicts": [
+            {
+              "resource": "node:3",
+              "start": 8.05,
+              "end": 10.100000000000001,
+              "used": 2,
+              "capacity": 1,
+              "tasks": [
+                "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+                "service:C:A:service:1"
+              ]
+            }
+          ],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 51.919999999999995,
+      "completion_sum": 62.21,
+      "conditional_conflicts": [
+        {
+          "resource": "node:3",
+          "start": 8.05,
+          "end": 10.100000000000001,
+          "used": 2,
+          "capacity": 1,
+          "tasks": [
+            "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+            "service:C:A:service:1"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "3757707425313a4120d169f765710b7b8af887e7eca9917a6bc0779c9b32442f",
+      "candidates": [
+        {
+          "candidate_id": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+          "supply": 1,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+            "tray_id": "T1",
+            "source": 1,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 31.01,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            1,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "edge:1:4",
+              "start": 0.86,
+              "end": 0.96,
+              "amount": 1
+            },
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "headway:1:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 1.1600000000000001,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 1.01,
+          "predicted_completion": 10.6,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T1",
+              "node": 1,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T1:U1:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        },
+        {
+          "candidate_id": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+          "supply": 2,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 10.100001,
+            "expiry": 90.20000099999999,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "edge:2:3",
+              "start": 10.150001000000001,
+              "end": 60.150001,
+              "amount": 1
+            },
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "headway:2:3",
+              "start": 10.150001000000001,
+              "end": 10.350001,
+              "amount": 1
+            },
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "node:3",
+              "start": 10.100001,
+              "end": 60.35000099999999,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 60.20000099999999,
+          "predicted_completion": 60.900000999999996,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 61.21000099999999,
+      "completion_sum": 71.500001,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "06ef6405258565b5b7ea2165e197cc2bca0e1a6c4585fca78768e92735dc6eae",
+      "candidates": [
+        {
+          "candidate_id": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+          "supply": 0,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+            "tray_id": "T0",
+            "source": 0,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 32.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            0,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "edge:0:3",
+              "start": 0.86,
+              "end": 2.86,
+              "amount": 1
+            },
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "headway:0:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 3.0599999999999996,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 2.9099999999999997,
+          "predicted_completion": 3.61,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T0",
+              "node": 0,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T0:U0:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 2.9099999999999997,
+      "completion_sum": 3.61,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "be4fd5fc0e42a35e33a7bfd5b997d9d9700c884d8840bd60242b9712dca38b69",
+      "candidates": [
+        {
+          "candidate_id": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+          "supply": 0,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+            "tray_id": "T0",
+            "source": 0,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 32.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            0,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "edge:0:3",
+              "start": 0.86,
+              "end": 2.86,
+              "amount": 1
+            },
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "headway:0:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 3.0599999999999996,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 2.9099999999999997,
+          "predicted_completion": 3.61,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T0",
+              "node": 0,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T0:U0:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        },
+        {
+          "candidate_id": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+          "supply": 2,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 32.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "edge:2:4",
+              "start": 0.86,
+              "end": 2.86,
+              "amount": 1
+            },
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "headway:2:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "1706a735f4fb6f5a5294e918d2eaf9eee0d520f426bbc791e67b71c1de822a05",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 3.0599999999999996,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 2.9099999999999997,
+          "predicted_completion": 10.6,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 5.819999999999999,
+      "completion_sum": 14.209999999999999,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "d8e1d7fcad01d1d294079fa9cdca3fc0e001e6e8978f5ad723d5d03a5a9bcd1b",
+      "candidates": [
+        {
+          "candidate_id": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+          "supply": 0,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+            "tray_id": "T0",
+            "source": 0,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 32.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            0,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "edge:0:3",
+              "start": 0.86,
+              "end": 2.86,
+              "amount": 1
+            },
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "headway:0:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "c7c31c7187610e8cc678c5509e56f3fbbe6c5d8bbaaf1663da76dfbc4b90ca32",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 3.0599999999999996,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 2.9099999999999997,
+          "predicted_completion": 3.61,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T0",
+              "node": 0,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T0:U0:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        },
+        {
+          "candidate_id": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+          "supply": 1,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+            "tray_id": "T1",
+            "source": 1,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 31.01,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            1,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "edge:1:4",
+              "start": 0.86,
+              "end": 0.96,
+              "amount": 1
+            },
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "headway:1:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "642623b8ac46da37d24b3190fe6f27a3d5f95ff74813fa0e0d2baac9f756c8e7",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 1.1600000000000001,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 1.01,
+          "predicted_completion": 10.6,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T1",
+              "node": 1,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T1:U1:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 3.92,
+      "completion_sum": 14.209999999999999,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "998a76735771f6e41ddf2d3991215e5b0da84825a55aa58335ad35d202067d8e",
+      "candidates": [
+        {
+          "candidate_id": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+          "supply": 0,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+            "tray_id": "T0",
+            "source": 0,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 130.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            0,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "edge:0:4",
+              "start": 0.86,
+              "end": 100.86,
+              "amount": 1
+            },
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "headway:0:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 101.05999999999999,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 100.91,
+          "predicted_completion": 102.20999999999998,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T0",
+              "node": 0,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T0:U0:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 100.91,
+      "completion_sum": 102.20999999999998,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "0674742948c20700ddd5f718540f9cb82a0b006d9690d7cdd4206bdc899e709c",
+      "candidates": [
+        {
+          "candidate_id": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+          "supply": 0,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+            "tray_id": "T0",
+            "source": 0,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 130.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            0,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "edge:0:4",
+              "start": 0.86,
+              "end": 100.86,
+              "amount": 1
+            },
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "headway:0:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 101.05999999999999,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 100.91,
+          "predicted_completion": 102.20999999999998,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T0",
+              "node": 0,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T0:U0:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        },
+        {
+          "candidate_id": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+          "supply": 2,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 80.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "edge:2:3",
+              "start": 0.86,
+              "end": 50.86,
+              "amount": 1
+            },
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "headway:2:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 51.059999999999995,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 50.91,
+          "predicted_completion": 51.61,
+          "individual_conflicts": [
+            {
+              "resource": "node:3",
+              "start": 8.05,
+              "end": 10.100000000000001,
+              "used": 2,
+              "capacity": 1,
+              "tasks": [
+                "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+                "service:C:A:service:1"
+              ]
+            }
+          ],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 151.82,
+      "completion_sum": 153.82,
+      "conditional_conflicts": [
+        {
+          "resource": "node:3",
+          "start": 8.05,
+          "end": 10.100000000000001,
+          "used": 2,
+          "capacity": 1,
+          "tasks": [
+            "82404c4d5a0e3378a370515e0577f64dae0ca26e97f96c1d9f5ee73e6eda0dad",
+            "service:C:A:service:1"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "a848ff71bfc3b2001b153f48be2b624eb97733973dbfb96ce2a51ecf9e31286b",
+      "candidates": [
+        {
+          "candidate_id": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+          "supply": 0,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+            "tray_id": "T0",
+            "source": 0,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 130.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            0,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "edge:0:4",
+              "start": 0.86,
+              "end": 100.86,
+              "amount": 1
+            },
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "headway:0:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 101.05999999999999,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 100.91,
+          "predicted_completion": 102.20999999999998,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T0",
+              "node": 0,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T0:U0:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        },
+        {
+          "candidate_id": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+          "supply": 2,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+            "tray_id": "T2",
+            "source": 2,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 10.100001,
+            "expiry": 90.20000099999999,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            2,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "edge:2:3",
+              "start": 10.150001000000001,
+              "end": 60.150001,
+              "amount": 1
+            },
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "headway:2:3",
+              "start": 10.150001000000001,
+              "end": 10.350001,
+              "amount": 1
+            },
+            {
+              "task": "5711f4269a33d748f0bdac1e93f928181a495199c6030196f65df4d072783cff",
+              "resource": "node:3",
+              "start": 10.100001,
+              "end": 60.35000099999999,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 60.20000099999999,
+          "predicted_completion": 60.900000999999996,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T2",
+              "node": 2,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T2:U2:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 161.11000099999998,
+      "completion_sum": 163.11000099999998,
+      "conditional_conflicts": []
+    },
+    {
+      "action_id": "8320bb6a812f374a39a96226903a6e0ee66f98d812ef174c20baac937a8e5c2f",
+      "candidates": [
+        {
+          "candidate_id": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+          "supply": 0,
+          "demand": 1,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+            "tray_id": "T0",
+            "source": 0,
+            "destination": 4,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 130.91,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            0,
+            4
+          ],
+          "footprint": [
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "edge:0:4",
+              "start": 0.86,
+              "end": 100.86,
+              "amount": 1
+            },
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "headway:0:4",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "013139c07de44194dec1f752f110ce55a819689c1c97c848cf37073f7d1ac2fb",
+              "resource": "node:4",
+              "start": 0.8099999999999999,
+              "end": 101.05999999999999,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 100.91,
+          "predicted_completion": 102.20999999999998,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T0",
+              "node": 0,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T0:U0:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D1",
+              "origin": 4,
+              "destination": 13,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": 6,
+              "storage_release_at": 10.0,
+              "storage_min_dwell": 0.1,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        },
+        {
+          "candidate_id": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+          "supply": 1,
+          "demand": 0,
+          "request": {
+            "request_id": "live:handoff:8b68bd06b0bb366121b6:ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+            "tray_id": "T1",
+            "source": 1,
+            "destination": 3,
+            "issued_at": 0.11,
+            "message_delay": 0.1,
+            "earliest_departure": 0.8099999999999999,
+            "expiry": 31.81,
+            "owner_id": "A",
+            "expected_version": 15
+          },
+          "path": [
+            1,
+            3
+          ],
+          "footprint": [
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "edge:1:3",
+              "start": 0.86,
+              "end": 1.76,
+              "amount": 1
+            },
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "headway:1:3",
+              "start": 0.86,
+              "end": 1.06,
+              "amount": 1
+            },
+            {
+              "task": "ba23404b8151f1035e114065024d9a40e975e3f6721bbc28be2265466b74214b",
+              "resource": "node:3",
+              "start": 0.8099999999999999,
+              "end": 1.9600000000000002,
+              "amount": 1
+            }
+          ],
+          "predicted_arrival": 1.81,
+          "predicted_completion": 2.5100000000000002,
+          "individual_conflicts": [],
+          "read_set": {
+            "owner": "A",
+            "version": 15,
+            "supply": {
+              "tray_id": "T1",
+              "node": 1,
+              "earliest": 0.11,
+              "estimate": 0.8099999999999999,
+              "ledger": "conditional_release",
+              "owner_id": "A",
+              "version": 15,
+              "dependency": "T1:U1:loaded",
+              "latest": null
+            },
+            "local_job_contract": {
+              "business_bag_id": "D0",
+              "origin": 3,
+              "destination": 5,
+              "arrival": 0.0,
+              "deadline": 150.0,
+              "storage_node": -1,
+              "storage_release_at": 0.0,
+              "storage_min_dwell": 0.0,
+              "load_seconds": 0.1,
+              "unload_seconds": 0.1,
+              "hold_seconds": 0.1,
+              "protected_service": true,
+              "allow_suffix_reroute": false,
+              "status": "waiting_for_tray",
+              "storage_entered_at": -1.0,
+              "storage_released_at": -1.0,
+              "loaded_at": -1.0
+            },
+            "delivered_windows": [
+              {
+                "kind": "service_forecast",
+                "message_id": "C:A:service:1",
+                "source_owner": "C",
+                "target_owner": "A",
+                "business_bag_id": "P",
+                "tray_id": "TP",
+                "from": 7,
+                "next": 3,
+                "generation": 1,
+                "traversal_id": 0,
+                "observed_at": 0.05,
+                "delivered_at": 0.07,
+                "entry_estimate": 8.05,
+                "release_estimate": 10.100000000000001,
+                "status": "conditional",
+                "publication_sequence": 1,
+                "supersedes": "",
+                "estimate_scope": "next_node_service_completion"
+              }
+            ],
+            "static_contract_sha256": "f402d75b1a4528d4ee39427bb2806b3b85aec95070b82b9fb715a9ab11237e4a"
+          }
+        }
+      ],
+      "public_read_sha256": "8b68bd06b0bb366121b6199fc994bf57b426b28e701398bee6660672d832fea6",
+      "arrival_sum": 102.72,
+      "completion_sum": 104.71999999999998,
+      "conditional_conflicts": []
+    }
+  ],
+  "base": {
+    "policy": "analytic_predictive_matching",
+    "now": 0.11,
+    "version": 15,
+    "forecasts": [
+      {
+        "tray_id": "T0",
+        "node": 0,
+        "earliest": 0.11,
+        "estimate": 0.8099999999999999,
+        "ledger": "conditional_release",
+        "owner_id": "A",
+        "version": 15,
+        "dependency": "T0:U0:loaded",
+        "latest": null
+      },
+      {
+        "tray_id": "T1",
+        "node": 1,
+        "earliest": 0.11,
+        "estimate": 0.8099999999999999,
+        "ledger": "conditional_release",
+        "owner_id": "A",
+        "version": 15,
+        "dependency": "T1:U1:loaded",
+        "latest": null
+      },
+      {
+        "tray_id": "T2",
+        "node": 2,
+        "earliest": 0.11,
+        "estimate": 0.8099999999999999,
+        "ledger": "conditional_release",
+        "owner_id": "A",
+        "version": 15,
+        "dependency": "T2:U2:loaded",
+        "latest": null
+      }
+    ],
+    "pool": [
+      {
+        "supply": 0,
+        "demand": 0,
+        "predicted_arrival": 2.9099999999999997,
+        "assignment_cost": 2.8,
+        "predicted_wait": 2.9099999999999997,
+        "path": [
+          0,
+          3
+        ],
+        "service_window": {
+          "earliest_departure": 0.11,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        }
+      },
+      {
+        "supply": 0,
+        "demand": 1,
+        "predicted_arrival": 100.91,
+        "assignment_cost": 100.8,
+        "predicted_wait": 100.91,
+        "path": [
+          0,
+          4
+        ],
+        "service_window": {
+          "earliest_departure": 0.11,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        }
+      },
+      {
+        "supply": 1,
+        "demand": 0,
+        "predicted_arrival": 1.81,
+        "assignment_cost": 1.7,
+        "predicted_wait": 1.81,
+        "path": [
+          1,
+          3
+        ],
+        "service_window": {
+          "earliest_departure": 0.11,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        }
+      },
+      {
+        "supply": 1,
+        "demand": 1,
+        "predicted_arrival": 1.01,
+        "assignment_cost": 0.9,
+        "predicted_wait": 1.01,
+        "path": [
+          1,
+          4
+        ],
+        "service_window": {
+          "earliest_departure": 0.11,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        }
+      },
+      {
+        "supply": 2,
+        "demand": 0,
+        "predicted_arrival": 50.91,
+        "assignment_cost": 50.8,
+        "predicted_wait": 50.91,
+        "path": [
+          2,
+          3
+        ],
+        "service_window": {
+          "earliest_departure": 0.11,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        }
+      },
+      {
+        "supply": 2,
+        "demand": 1,
+        "predicted_arrival": 2.9099999999999997,
+        "assignment_cost": 2.8,
+        "predicted_wait": 2.9099999999999997,
+        "path": [
+          2,
+          4
+        ],
+        "service_window": {
+          "earliest_departure": 0.11,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        }
+      }
+    ],
+    "supplies": [
+      {
+        "tray_id": "T0",
+        "node": 0,
+        "earliest": 0.11,
+        "estimate": 0.8099999999999999,
+        "ledger": "conditional_release",
+        "owner_id": "A",
+        "version": 15,
+        "dependency": "T0:U0:loaded",
+        "latest": null
+      },
+      {
+        "tray_id": "T1",
+        "node": 1,
+        "earliest": 0.11,
+        "estimate": 0.8099999999999999,
+        "ledger": "conditional_release",
+        "owner_id": "A",
+        "version": 15,
+        "dependency": "T1:U1:loaded",
+        "latest": null
+      },
+      {
+        "tray_id": "T2",
+        "node": 2,
+        "earliest": 0.11,
+        "estimate": 0.8099999999999999,
+        "ledger": "conditional_release",
+        "owner_id": "A",
+        "version": 15,
+        "dependency": "T2:U2:loaded",
+        "latest": null
+      }
+    ],
+    "demands": [
+      {
+        "business_bag_id": "D0",
+        "origin": 3,
+        "destination": 5,
+        "arrival": 0.0,
+        "deadline": 150.0,
+        "storage_node": -1,
+        "storage_release_at": 0.0,
+        "storage_min_dwell": 0.0,
+        "load_seconds": 0.1,
+        "unload_seconds": 0.1,
+        "hold_seconds": 0.1,
+        "protected_service": true,
+        "allow_suffix_reroute": false,
+        "status": "waiting_for_tray",
+        "storage_entered_at": -1.0,
+        "storage_released_at": -1.0,
+        "loaded_at": -1.0,
+        "demand_observed_at": 0.11,
+        "demand_kind": "observed_source_queue"
+      },
+      {
+        "business_bag_id": "D1",
+        "origin": 4,
+        "destination": 13,
+        "arrival": 0.0,
+        "deadline": 150.0,
+        "storage_node": 6,
+        "storage_release_at": 10.0,
+        "storage_min_dwell": 0.1,
+        "load_seconds": 0.1,
+        "unload_seconds": 0.1,
+        "hold_seconds": 0.1,
+        "protected_service": true,
+        "allow_suffix_reroute": false,
+        "status": "waiting_for_tray",
+        "storage_entered_at": -1.0,
+        "storage_released_at": -1.0,
+        "loaded_at": -1.0,
+        "demand_observed_at": 0.11,
+        "demand_kind": "observed_source_queue"
+      }
+    ],
+    "exact_waiting_count": 2,
+    "exact_demand_count": 2,
+    "demand_identity_scope": "all_visible_uncovered",
+    "assignment_demand_count": 2,
+    "equivalent_column_compression": true,
+    "clearing_pressure_without_available_source": 0,
+    "intents": [
+      {
+        "request_id": "live:handoff-base:15:T0:D0",
+        "tray_id": "T0",
+        "source": 0,
+        "destination": 3,
+        "issued_at": 0.11,
+        "message_delay": 0.1,
+        "earliest_departure": 0.11,
+        "expiry": 62.91,
+        "forecast_dependency": "T0:U0:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 0.11,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        },
+        "owner_id": "A",
+        "expected_version": 15
+      },
+      {
+        "request_id": "live:handoff-base:15:T1:D1",
+        "tray_id": "T1",
+        "source": 1,
+        "destination": 4,
+        "issued_at": 0.11,
+        "message_delay": 0.1,
+        "earliest_departure": 0.11,
+        "expiry": 61.01,
+        "forecast_dependency": "T1:U1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 0.11,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        },
+        "owner_id": "A",
+        "expected_version": 15
+      }
+    ],
+    "includes_wait": true,
+    "optimality": "minimum_cost_maximum_cardinality_in_declared_assignment_only",
+    "physical_optimality": "unknown"
+  },
+  "selected": {
+    "ordinary_arrival_assignment": "d8e1d7fcad01d1d294079fa9cdca3fc0e001e6e8978f5ad723d5d03a5a9bcd1b",
+    "one_round_receiving_retime": "d8e1d7fcad01d1d294079fa9cdca3fc0e001e6e8978f5ad723d5d03a5a9bcd1b",
+    "strong_service_assignment": "a87d588823075e1afdc85feac7fd8be00ca99b76f86f4d955d5cf2002b2c88bc",
+    "joint_handoff": "a87d588823075e1afdc85feac7fd8be00ca99b76f86f4d955d5cf2002b2c88bc",
+    "WAIT": "WAIT"
+  },
+  "compute_ms": 6.49379997048527,
+  "hard_feasibility_certified": false,
+  "unclosed_dependencies": [
+    "all future/local congestion may extend receiving lease beyond point estimate",
+    "ordinary path choice and transit footprints are not globally frozen",
+    "no multi-owner atomic grant or universal all-business protection"
+  ],
+  "domain_scope": "at most 3 lawful next-release sources, 2 current local demands, static paths and 2 derived departure choices; fixed no-further-control continuation"
+}

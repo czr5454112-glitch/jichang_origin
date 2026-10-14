@@ -1,0 +1,78 @@
+{
+  "schema": "g31.circulation.execution.v1",
+  "mode": "circulation",
+  "optimality": "unknown",
+  "native_event_ms": [
+    0.0121
+  ],
+  "native_summary": {
+    "event_count": 1,
+    "completed_count": 0,
+    "failed_count": 0,
+    "runtime_seconds": 9.03e-05,
+    "edge_enter_event_count": 0,
+    "edge_exit_event_count": 0,
+    "reservation_conflicts": 0,
+    "physical_fault_edge_entry_violation_count": 0,
+    "merge_grant_timing_mode": "jit_fair_aging_deadline",
+    "g4irsf20_event_hotpath_policy": "E2",
+    "local_queue_capacity": 0
+  },
+  "transport_legs": [],
+  "native_events": [],
+  "decisions": [],
+  "receipts": [
+    {
+      "time": Infinity,
+      "event": "MODULE_REQUEST_DELIVERED",
+      "business_bag_id": "",
+      "transport_leg_id": "",
+      "tray_id": "T0",
+      "traversal_id": 0,
+      "node": 4,
+      "from": 4,
+      "to": 0,
+      "reason": "return-T0"
+    },
+    {
+      "time": Infinity,
+      "event": "TRANSFER_REJECTED",
+      "business_bag_id": "",
+      "transport_leg_id": "",
+      "tray_id": "T0",
+      "traversal_id": 0,
+      "node": 4,
+      "from": 4,
+      "to": 0,
+      "reason": "departure_lease_expired"
+    }
+  ],
+  "jobs": [],
+  "trays": [
+    {
+      "tray_id": "T0",
+      "node": 4,
+      "mode": "empty",
+      "job": -1,
+      "active_leg": -1,
+      "edge_from": -1,
+      "edge_to": -1,
+      "reception_node": -1,
+      "available_at": 0.0,
+      "traversal_id": 0
+    }
+  ],
+  "transfers": [
+    {
+      "request_id": "return-T0",
+      "status": "rejected",
+      "reason": "departure_lease_expired",
+      "tray": 0,
+      "delivered_at": Infinity,
+      "departed_at": -1.0,
+      "received_at": -1.0
+    }
+  ],
+  "leg_identities": [],
+  "physical_clock": Infinity
+}

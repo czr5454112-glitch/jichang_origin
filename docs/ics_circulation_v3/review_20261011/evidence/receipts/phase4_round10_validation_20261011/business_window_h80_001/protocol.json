@@ -1,0 +1,25 @@
+{
+  "scale": 1,
+  "window_rule": "first exact source arrival <= arrival_seconds < first + 3600 seconds",
+  "burn_in": "advance from source epoch 0 with no clock jump; all earlier tasks retained (none by this window rule)",
+  "tail_cap_rule": "max included deadline tick + 3600",
+  "cpu_cap_seconds": 600,
+  "wall_cap_seconds": 900,
+  "search_horizon": 80,
+  "route_mode": "whole_route",
+  "scope": "fixed research proxy development; source 1x only; no independent day or throughput claim",
+  "input_contract": "runtime_input_contract_002.json",
+  "runtime_contract": "runtime_proxy_contract_002.json",
+  "only_variant": "Round10 frozen search; h80 vs h21600 under original source window; no destination projection",
+  "matched_stop_ticks": [
+    10080,
+    11760
+  ],
+  "actual_default_generator_request_k": 1,
+  "remove_unreachable": false,
+  "initial_carriers": 11,
+  "storage_slots": 1,
+  "physics_started": false,
+  "outer_advance_chunk_ticks": 60,
+  "budget_check_boundary": "between chunks; at most 60 physical ticks overshoot"
+}

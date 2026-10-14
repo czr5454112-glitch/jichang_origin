@@ -1,0 +1,229 @@
+{
+  "schema": "g31.joint_window_repair.v1",
+  "status": "passed",
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_joint_window_repair.py": "7edd57d80a0824ee5f44aba516b4c78f3e197b7e9f90fadff694ad815decf207",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\joint_window_repair.py": "1fc8fce364e6a89cd1540d0bdeacbfb026674192ec16812e3c4e55e6d5258360",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "c65084b848e918026837301e3be62c94ae91d2c1b627490e337b903a340850fc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\boundary_reference.py": "537c7849dfd6890c6abc2f200869765149844a0cb3f3d0bf15b6e4d4b92ca025",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd"
+  },
+  "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+  "cases": [
+    {
+      "scenario": {
+        "name": "short_shared_receiving",
+        "length": 0.4,
+        "speed": 1.0,
+        "future_source": false
+      },
+      "domain_size": 31,
+      "evaluated": 31,
+      "exhaustive": true,
+      "finite_optimality": "optimal_in_enumerated_domain",
+      "global_optimality": "unknown",
+      "protected_candidates": 8,
+      "distinct_physical_outcomes": 15,
+      "conditional_joint_conflicts": 18,
+      "statuses": {
+        "verified": 31
+      },
+      "policies": {
+        "ordinary_public_windows": {
+          "action_id": "s0:d0:t1.65|s1:d1:t1.65",
+          "status": "verified",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 11.6,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 3.6999999999999997,
+                "completed": true,
+                "completed_at": 3.6999999999999997,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 4.349999999999999,
+                "completed": true,
+                "completed_at": 4.349999999999999,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "paired_service_preserved": true
+        },
+        "one_round_same_assignment": {
+          "action_id": "s0:d0:t1.65|s1:d1:t2.1",
+          "status": "verified",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 11.6,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 3.6999999999999997,
+                "completed": true,
+                "completed_at": 3.6999999999999997,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 4.349999999999999,
+                "completed": true,
+                "completed_at": 4.349999999999999,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "paired_service_preserved": true
+        },
+        "joint_conditional_repair": {
+          "action_id": "s0:d0:t1.65|s1:d1:t2.1",
+          "status": "verified",
+          "metrics": {
+            "objective": "sum_restricted_arrival_to_unload_time",
+            "horizon": 5000,
+            "cost": 11.6,
+            "offered": 5,
+            "completed": 5,
+            "unfinished": 0,
+            "failed": 0,
+            "deadline_violations": 0,
+            "per_job": [
+              {
+                "business_bag_id": "U0",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "U1",
+                "restricted_time": 0.7000000000000001,
+                "completed": true,
+                "completed_at": 0.7000000000000001,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D0",
+                "restricted_time": 3.6999999999999997,
+                "completed": true,
+                "completed_at": 3.6999999999999997,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "D1",
+                "restricted_time": 4.349999999999999,
+                "completed": true,
+                "completed_at": 4.349999999999999,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              },
+              {
+                "business_bag_id": "P",
+                "restricted_time": 2.15,
+                "completed": true,
+                "completed_at": 2.15,
+                "deadline_violated_by_horizon": false,
+                "status": "completed"
+              }
+            ]
+          },
+          "paired_service_preserved": true
+        }
+      },
+      "best_action_id": "s0:d0:t0.81|s1:d1:t0.81",
+      "reference_headroom": 0.0,
+      "stale_read_set_actual_reply": {
+        "status": "stale_read_set",
+        "submissions": [],
+        "reason": "source_owner_version_changed"
+      },
+      "public_compute_ms": 2.735299989581108,
+      "native_reference_seconds": 0.4462444999953732
+    }
+  ],
+  "novelty": "not_established",
+  "P5_gate": "research_candidate",
+  "atomic_multi_owner_commit": false,
+  "global_native_optimality": "unknown",
+  "source_after": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_joint_window_repair.py": "7edd57d80a0824ee5f44aba516b4c78f3e197b7e9f90fadff694ad815decf207",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\joint_window_repair.py": "1fc8fce364e6a89cd1540d0bdeacbfb026674192ec16812e3c4e55e6d5258360",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "c65084b848e918026837301e3be62c94ae91d2c1b627490e337b903a340850fc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\boundary_reference.py": "537c7849dfd6890c6abc2f200869765149844a0cb3f3d0bf15b6e4d4b92ca025",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd"
+  },
+  "source_changed": []
+}

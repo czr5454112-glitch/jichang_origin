@@ -1,0 +1,226 @@
+{
+  "scenario": {
+    "name": "long_2000m_unknown_source_demand",
+    "length": 2000.0,
+    "speed": 5.0,
+    "future_source": true
+  },
+  "domain_size": 31,
+  "evaluated": 31,
+  "exhaustive": true,
+  "finite_optimality": "optimal_in_enumerated_domain",
+  "global_optimality": "unknown",
+  "protected_candidates": 5,
+  "distinct_physical_outcomes": 9,
+  "conditional_joint_conflicts": 18,
+  "statuses": {
+    "asynchronous_rejected": 20,
+    "verified": 11
+  },
+  "policies": {
+    "ordinary_public_windows": {
+      "action_id": "s0:d0:t1.65|s1:d1:t1.65",
+      "status": "asynchronous_rejected",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 5000,
+        "cost": 10406.15,
+        "offered": 6,
+        "completed": 4,
+        "unfinished": 2,
+        "failed": 0,
+        "deadline_violations": 2,
+        "per_job": [
+          {
+            "business_bag_id": "U0",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "U1",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "D0",
+            "restricted_time": 5000.0,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "waiting_for_tray"
+          },
+          {
+            "business_bag_id": "D1",
+            "restricted_time": 403.5000000000001,
+            "completed": true,
+            "completed_at": 403.5000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "P",
+            "restricted_time": 2.15,
+            "completed": true,
+            "completed_at": 2.15,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "UNSEEN",
+            "restricted_time": 4999.1,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "in_transit"
+          }
+        ]
+      },
+      "paired_service_preserved": true
+    },
+    "one_round_same_assignment": {
+      "action_id": "s0:d0:t1.65|s1:d1:t401.7",
+      "status": "asynchronous_rejected",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 5000,
+        "cost": 15002.65,
+        "offered": 6,
+        "completed": 3,
+        "unfinished": 3,
+        "failed": 0,
+        "deadline_violations": 3,
+        "per_job": [
+          {
+            "business_bag_id": "U0",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "U1",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "D0",
+            "restricted_time": 5000.0,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "waiting_for_tray"
+          },
+          {
+            "business_bag_id": "D1",
+            "restricted_time": 5000.0,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "waiting_for_tray"
+          },
+          {
+            "business_bag_id": "P",
+            "restricted_time": 2.15,
+            "completed": true,
+            "completed_at": 2.15,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "UNSEEN",
+            "restricted_time": 4999.1,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "in_transit"
+          }
+        ]
+      },
+      "paired_service_preserved": false
+    },
+    "joint_conditional_repair": {
+      "action_id": "s0:d0:t1.65|s1:d1:t401.7",
+      "status": "asynchronous_rejected",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 5000,
+        "cost": 15002.65,
+        "offered": 6,
+        "completed": 3,
+        "unfinished": 3,
+        "failed": 0,
+        "deadline_violations": 3,
+        "per_job": [
+          {
+            "business_bag_id": "U0",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "U1",
+            "restricted_time": 0.7000000000000001,
+            "completed": true,
+            "completed_at": 0.7000000000000001,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "D0",
+            "restricted_time": 5000.0,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "waiting_for_tray"
+          },
+          {
+            "business_bag_id": "D1",
+            "restricted_time": 5000.0,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "waiting_for_tray"
+          },
+          {
+            "business_bag_id": "P",
+            "restricted_time": 2.15,
+            "completed": true,
+            "completed_at": 2.15,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "UNSEEN",
+            "restricted_time": 4999.1,
+            "completed": false,
+            "completed_at": null,
+            "deadline_violated_by_horizon": true,
+            "status": "in_transit"
+          }
+        ]
+      },
+      "paired_service_preserved": false
+    }
+  },
+  "best_action_id": "s0:d0:t0.81|s1:d1:t1.65",
+  "reference_headroom": 4196.65,
+  "stale_read_set_actual_reply": {
+    "status": "stale_read_set",
+    "submissions": [],
+    "reason": "source_owner_version_changed"
+  },
+  "public_compute_ms": 1.9264000002294779,
+  "native_reference_seconds": 0.3911365999956615
+}

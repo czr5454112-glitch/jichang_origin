@@ -1,0 +1,105 @@
+{
+  "experiment": "Continuous two-owner fast/slow shared-clock development scenarios",
+  "run_count": 16,
+  "fixture_count": 4,
+  "modes": [
+    "none",
+    "reactive",
+    "predictive",
+    "both"
+  ],
+  "same_input_hash_and_all_bag_denominator_per_fixture": true,
+  "all_checkpoints_exact": true,
+  "aggregates": {
+    "none": {
+      "bag_count": 20,
+      "completed_count": 20,
+      "on_time_count": 16,
+      "request_count": 20,
+      "empty_request_count": 0,
+      "empty_commit_count": 0,
+      "owner_commit_count": 20,
+      "total_cost": 242.0,
+      "outcome_counts": {
+        "new_route_success": 20
+      }
+    },
+    "reactive": {
+      "bag_count": 20,
+      "completed_count": 20,
+      "on_time_count": 15,
+      "request_count": 28,
+      "empty_request_count": 8,
+      "empty_commit_count": 3,
+      "owner_commit_count": 23,
+      "total_cost": 234.39999999999998,
+      "outcome_counts": {
+        "commit_failure": 4,
+        "empty_transfer_success": 3,
+        "new_route_success": 20,
+        "cancelled_before_commit": 1
+      }
+    },
+    "predictive": {
+      "bag_count": 20,
+      "completed_count": 20,
+      "on_time_count": 14,
+      "request_count": 30,
+      "empty_request_count": 9,
+      "empty_commit_count": 5,
+      "owner_commit_count": 25,
+      "total_cost": 301.0,
+      "outcome_counts": {
+        "empty_transfer_success": 5,
+        "new_route_success": 20,
+        "cancelled_before_commit": 2,
+        "commit_failure": 3
+      }
+    },
+    "both": {
+      "bag_count": 20,
+      "completed_count": 20,
+      "on_time_count": 14,
+      "request_count": 30,
+      "empty_request_count": 9,
+      "empty_commit_count": 5,
+      "owner_commit_count": 25,
+      "total_cost": 301.0,
+      "outcome_counts": {
+        "empty_transfer_success": 5,
+        "new_route_success": 20,
+        "cancelled_before_commit": 2,
+        "commit_failure": 3
+      }
+    }
+  },
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/distributed_clock.py": "90b8514f2eefa41021d7522c42a05023c26751e0c46528e33c9fe0472ace47c3",
+    "scripts/experiments/ics_circulation_v3/run_distributed_clock.py": "9877732b0d5cba4f5d648822698f8f2436da3257b3936596ee24c5d8727cf7c5",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "scripts/experiments/ics_circulation_v3/model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "scripts/experiments/ics_circulation_v3/partition_observation.py": "0b9c925eb3316e0d5ecb10b61f80372fabaa1dc635bab2b78cc8abea65229d77",
+    "scripts/experiments/ics_circulation_v3/request_service.py": "8d2c540b65e2e888c5688149c54455dc5c135178135a6e7556b501b12fa81d62",
+    "scripts/experiments/ics_circulation_v3/routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "tests/test_ics_circulation_v3_distributed_clock.py": "21a194cb2798d97b2e53607ef0c1596061de3419d8ab03a6399e2700658075f5",
+    "scripts/experiments/ics_circulation_v3/run_distributed_slow.py": "f8ecf2a2cf83c38bc47c02b9ad4f7f8a23dccbe9951717b55a121e442c162858",
+    "scripts/experiments/ics_circulation_v3/distributed_slow.py": "98be1a295b497ab109a5b79722959d777ff4a8bb345a46176a5e85b0c3e9ab93",
+    "tests/test_ics_circulation_v3_distributed_slow.py": "21e0b703e8ff35140ed827923b3c5230e50e0e6631c7f9fcf1c828c65f9ca6d5"
+  },
+  "limitations": [
+    "Four constructed development fixtures reused across four modes; not unseen generalization.",
+    "Initial stock/capacity differ between fixtures; within each fixture mode inputs are identical.",
+    "Source protection uses the same published demand stream in all transfer modes; none disables all slow actions.",
+    "Source donor guard preserves directed local same-zone unit matching at demand prefixes; this is not a congestion/timing service guarantee.",
+    "Predictions are demand only, never fabricated available stock; latest revisions and expiry gate visibility.",
+    "Conflicting content at the same forecast version blocks new slow exports until a higher version; delivered loading identities never expire.",
+    "Initial old transit/completed identities enter origin owners through explicit TASK_STATE messages; unseen ledger bags are not assumed waiting.",
+    "Whole-route physical arbiter is centralized and explicitly distinguished from partition-local planning.",
+    "Local source-only waiting search is incomplete; failures and uncompleted bags remain in the denominator.",
+    "Prepared claims suppress duplicate attempts but are not committed supply; accepted empty transfers are irrevocable.",
+    "Named accepted-demand stock cannot be re-exported until FIFO consumes it, the unit is loaded, or delivered cancellation/explicit request TTL releases the claim; fixed FIFO itself is unchanged.",
+    "Synthetic endpoint failures/message clocks; zero simulated CPU duration; no actual network or latency guarantee.",
+    "No learning/fitting/parameter selection; fixed period 3, status period 2 and declared lead by transport setting.",
+    "Remote owner summaries have timestamps but are asynchronous, so forecasting can produce unnecessary transfers."
+  ]
+}

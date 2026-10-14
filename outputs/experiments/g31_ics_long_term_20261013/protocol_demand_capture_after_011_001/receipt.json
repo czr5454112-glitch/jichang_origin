@@ -1,0 +1,152 @@
+{
+  "schema": "g31.protocol_demand_capture_probe.v1",
+  "status": "passed",
+  "controller_source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py",
+  "source_before": "07d396d69b819b685c551d45454319bf52978edb686e54633a3ece7f358ba3dc",
+  "probe_sha256": "0d3f512358a2ee3861167782697c419060eff59e43bd23db17b8c35310ca9e8d",
+  "binary_sha256": "19b55703676810bacc156e474aac364e4016dda2d2fa7b4fa315a3237a1bdbec",
+  "case": {
+    "name": "delayed_capture_transient_queue",
+    "fixture_valid": true,
+    "fixed": true,
+    "receiver_corrected_after_real_load": true,
+    "source_sampled_signatures": [
+      {
+        "at": 0.02,
+        "owner": "A",
+        "signature": {
+          "schema": "g31.demand_signature.v1",
+          "sha256": "44c997f3132f7afa3085b402729c247737e2d08a5d612e30ca7868451c4691c3",
+          "waiting_count": 0
+        }
+      },
+      {
+        "at": 1.02,
+        "owner": "A",
+        "signature": {
+          "schema": "g31.demand_signature.v1",
+          "sha256": "44c997f3132f7afa3085b402729c247737e2d08a5d612e30ca7868451c4691c3",
+          "waiting_count": 0
+        }
+      },
+      {
+        "at": 2.02,
+        "owner": "A",
+        "signature": {
+          "schema": "g31.demand_signature.v1",
+          "sha256": "44c997f3132f7afa3085b402729c247737e2d08a5d612e30ca7868451c4691c3",
+          "waiting_count": 0
+        }
+      }
+    ],
+    "actual_y_load": [
+      {
+        "time": 0.36,
+        "event": "LOAD_START",
+        "business_bag_id": "Y",
+        "transport_leg_id": "",
+        "tray_id": "T0",
+        "traversal_id": 1,
+        "node": 0,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      }
+    ],
+    "transient_receiver_messages": [
+      {
+        "kind": "demand",
+        "message_id": "A:B:1",
+        "source_owner": "A",
+        "target_owner": "B",
+        "publication_sequence": 1,
+        "observed_at": 0.22,
+        "delivered_at": 0.24,
+        "jobs": [],
+        "projection_jobs_omitted": true,
+        "snapshot_waiting_count": 1
+      }
+    ],
+    "final_receiver_message": {
+      "kind": "demand",
+      "message_id": "A:B:2",
+      "source_owner": "A",
+      "target_owner": "B",
+      "publication_sequence": 2,
+      "observed_at": 1.22,
+      "delivered_at": 1.24,
+      "jobs": []
+    },
+    "final_source_signature": {
+      "schema": "g31.demand_signature.v1",
+      "sha256": "44c997f3132f7afa3085b402729c247737e2d08a5d612e30ca7868451c4691c3",
+      "waiting_count": 0
+    },
+    "demand_calls": [
+      {
+        "at": 0.02,
+        "retry": false,
+        "kind": "demand",
+        "request": {
+          "target_owner": "B",
+          "message_delay": 0.2,
+          "publication_delay": 0.02,
+          "request_id": "live:1:A:demand:0",
+          "owner_id": "A",
+          "kind": "demand"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "command_enqueued"
+        },
+        "submit_compute_ms": 0.03600004129111767
+      },
+      {
+        "at": 0.02,
+        "retry": false,
+        "kind": "demand",
+        "request": {
+          "target_owner": "A",
+          "message_delay": 0.2,
+          "publication_delay": 0.02,
+          "request_id": "live:1:B:demand:0",
+          "owner_id": "B",
+          "kind": "demand"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "command_enqueued"
+        },
+        "submit_compute_ms": 0.021300045773386955
+      },
+      {
+        "at": 1.02,
+        "retry": false,
+        "kind": "demand",
+        "request": {
+          "target_owner": "B",
+          "message_delay": 0.2,
+          "publication_delay": 0.02,
+          "request_id": "live:1:A:demand:1",
+          "owner_id": "A",
+          "kind": "demand"
+        },
+        "reply": {
+          "status": "pending",
+          "reason": "command_enqueued"
+        },
+        "submit_compute_ms": 0.02139998832717538
+      }
+    ],
+    "audit": {
+      "status": "passed",
+      "completed_traversals": 1,
+      "open_traversals": 0,
+      "tray_count": 1,
+      "optimality": "unknown",
+      "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+    }
+  },
+  "source_after": "07d396d69b819b685c551d45454319bf52978edb686e54633a3ece7f358ba3dc",
+  "source_changed": []
+}

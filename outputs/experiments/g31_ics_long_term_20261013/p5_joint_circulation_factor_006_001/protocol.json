@@ -1,0 +1,46 @@
+{
+  "schema": "g31.joint_circulation_factor_protocol.v1",
+  "scenarios": [
+    {
+      "name": "long_2000m",
+      "length": 2000.0,
+      "speed": 5.0,
+      "future_source": false
+    },
+    {
+      "name": "long_2000m_unknown_source_demand",
+      "length": 2000.0,
+      "speed": 5.0,
+      "future_source": true
+    }
+  ],
+  "new_shared_edge": {
+    "from": 10,
+    "to": 7,
+    "length": 0.5,
+    "speed": 1.0,
+    "capacity": 1,
+    "entry_headway": 0.2
+  },
+  "initial_domain": "same 31 public initial actions; all conditional conflicts still run natively",
+  "continuation": {
+    "controller": "strong analytic predictive public windows",
+    "owners": [
+      "A",
+      "B",
+      "C"
+    ],
+    "phase": 0.11,
+    "first_post_intervention_tick": 10.11,
+    "period": 10.0,
+    "command_delay": 0.1,
+    "demand_delay": 0.02,
+    "compact_projection": false
+  },
+  "horizon": 2000.0,
+  "max_seconds_per_case": 180,
+  "max_events": 100000,
+  "protection": "all offered vs ordinary and WAIT, plus prefix P/U0/U1 vs WAIT",
+  "comparison_scope": "within this new shared synthetic graph/H only; no subtraction from old absorbing graph",
+  "novelty": "not_established; no training; all negative outcomes retained"
+}

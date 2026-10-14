@@ -1,0 +1,47 @@
+F...F..                                                                  [100%]
+================================== FAILURES ===================================
+__ test_actual_capture_signature_differs_from_submission_and_later_aba_queue __
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_011\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_actual_capture_signature_differs_from_submission_and_later_aba_queue(native):
+        value = scene()
+        value["trays"] = [dict(tray_id="T0", node=5)]
+        value["jobs"] = [dict(value["jobs"][0], business_bag_id="Y", arrival=.1)]
+        value["edge_records"] = [(u, v, .25 if (u, v) == (5, 0) else length, speed)
+                                 for u, v, length, speed in value["edge_records"]]
+        value = prepare_input(value)
+        s = native.NativeSession(value); s.advance_to(0.)
+        submitted_signature = s.protocol_demand_signature("A")
+        request = demand(message_delay=.2)
+        s.submit_protocol_command(request)
+        s.submit_protocol_transfer(dict(request_id="live:1:A:real-tray-return", owner_id="A", tray_id="T0",
+            source=5, destination=0, earliest_departure=0., expiry=10., message_delay=0.))
+        s.advance_to(.35)
+>       assert submitted_signature == s.protocol_demand_signature("A") == canonical([])
+E       AssertionError: assert {'schema': 'g...ing_count': 0} == {'schema': 'g...ing_count': 1}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'waiting_count': 0} != {'waiting_count': 1}
+E         {'sha256': '44c997f3132f7afa3085b402729c247737e2d08a5d612e30ca7868451c4691c3'} != {'sha256': '822f8fdd27abb41131ec01c7a0e3ce48d57a7eb908a036793c4a1f59edb900ca'}
+E         Use -v to get more diff
+
+tests\test_g31_circulation_demand_ack_signature.py:61: AssertionError
+_____ test_canonical_unicode_order_and_signed_zero_match_local_signature ______
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_011\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_canonical_unicode_order_and_signed_zero_match_local_signature(native):
+        value = scene(); value["trays"] = []
+        template = value["jobs"][0]
+        value["jobs"] = [dict(template, business_bag_id=name, arrival=-0. if i % 2 else 0., deadline=40.)
+                         for i, name in enumerate(["z", "托盘", "a", "é", "😀"])]
+>       s = native.NativeSession(value); s.advance_to(.01)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: circulation:empty_fleet
+
+tests\test_g31_circulation_demand_ack_signature.py:117: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_demand_ack_signature.py::test_actual_capture_signature_differs_from_submission_and_later_aba_queue
+FAILED tests/test_g31_circulation_demand_ack_signature.py::test_canonical_unicode_order_and_signed_zero_match_local_signature

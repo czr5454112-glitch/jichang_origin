@@ -1,0 +1,63 @@
+{
+  "schema": "g31.protocol_controller_probes.v1",
+  "status": "passed",
+  "controller_source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py",
+  "source_before": "dead96ca5458eb6e3517bc2f366842a197d17b6426d167b682c3d988668e29b3",
+  "binary_sha256": "079eaaeae53671d1a7d2a26437478850b329db80ec8eebc58b1fa70f5f0ddb7f",
+  "cases": [
+    {
+      "name": "budget_cut",
+      "fixed": true,
+      "status": "budget_exhausted",
+      "cut_state": "dbd9138db71620c7cc84cf33a827cd5c8956efdb1945b179afd0d8ea21ebfc58",
+      "returned_state": "dbd9138db71620c7cc84cf33a827cd5c8956efdb1945b179afd0d8ea21ebfc58",
+      "extra_result_calls": 0
+    },
+    {
+      "name": "same_stage_forecast_recovery",
+      "fixed": true,
+      "publication_times": [
+        0.11,
+        2.11
+      ],
+      "withdrawal_times": [
+        1.11
+      ],
+      "late_publication_ids": [
+        "live:1:A:service_forecast:3"
+      ]
+    },
+    {
+      "name": "same_stage_route_public_path_change",
+      "fixed": true,
+      "routes": [
+        {
+          "at": 0.11,
+          "next": 1,
+          "reply": {
+            "status": "pending",
+            "reason": "command_enqueued"
+          }
+        },
+        {
+          "at": 0.61,
+          "next": 6,
+          "reply": {
+            "status": "pending",
+            "reason": "command_enqueued"
+          }
+        },
+        {
+          "at": 1.11,
+          "next": 1,
+          "reply": {
+            "status": "pending",
+            "reason": "command_enqueued"
+          }
+        }
+      ]
+    }
+  ],
+  "source_after": "dead96ca5458eb6e3517bc2f366842a197d17b6426d167b682c3d988668e29b3",
+  "source_changed": []
+}

@@ -1,0 +1,786 @@
+{
+  "observation": {
+    "schema": "g31.regional_observation.v1",
+    "now": 1.6,
+    "owner_id": "B",
+    "version": 6,
+    "node_records": [
+      [
+        0,
+        1,
+        0.05,
+        0,
+        0,
+        [
+          1,
+          2
+        ]
+      ],
+      [
+        1,
+        1,
+        0.05,
+        1,
+        0,
+        [
+          3,
+          4
+        ]
+      ],
+      [
+        2,
+        1,
+        0.05,
+        2,
+        0,
+        [
+          3
+        ]
+      ],
+      [
+        3,
+        1,
+        0.05,
+        3,
+        0,
+        [
+          6
+        ]
+      ],
+      [
+        4,
+        1,
+        0.05,
+        4,
+        0,
+        [
+          5
+        ]
+      ],
+      [
+        5,
+        1,
+        0.05,
+        5,
+        0,
+        [
+          0
+        ]
+      ],
+      [
+        6,
+        1,
+        0.05,
+        6,
+        0,
+        [
+          1
+        ]
+      ]
+    ],
+    "edge_records": [
+      [
+        0,
+        1,
+        1.0,
+        1.0
+      ],
+      [
+        1,
+        3,
+        4.0,
+        1.0
+      ],
+      [
+        0,
+        2,
+        1.3,
+        1.0
+      ],
+      [
+        2,
+        3,
+        4.0,
+        1.0
+      ],
+      [
+        3,
+        6,
+        0.4,
+        1.0
+      ],
+      [
+        6,
+        1,
+        0.4,
+        1.0
+      ],
+      [
+        1,
+        4,
+        0.4,
+        1.0
+      ],
+      [
+        4,
+        5,
+        1.0,
+        1.0
+      ],
+      [
+        5,
+        0,
+        1.0,
+        1.0
+      ]
+    ],
+    "node_contracts": [
+      {
+        "node": 0,
+        "zone": "A",
+        "logistics_zone": "A",
+        "control_partition": "A",
+        "resource_owner": "A",
+        "capacity": 2,
+        "export_min_stock": 1,
+        "allow_export": true,
+        "allow_receive": true
+      },
+      {
+        "node": 1,
+        "zone": "B",
+        "logistics_zone": "B",
+        "control_partition": "B",
+        "resource_owner": "B",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true,
+        "occupancy": 0,
+        "actual_available": 0
+      },
+      {
+        "node": 2,
+        "zone": "B",
+        "logistics_zone": "B",
+        "control_partition": "B",
+        "resource_owner": "B",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true,
+        "occupancy": 0,
+        "actual_available": 0
+      },
+      {
+        "node": 3,
+        "zone": "B",
+        "logistics_zone": "B",
+        "control_partition": "B",
+        "resource_owner": "B",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true,
+        "occupancy": 1,
+        "actual_available": 0
+      },
+      {
+        "node": 4,
+        "zone": "C",
+        "logistics_zone": "C",
+        "control_partition": "C",
+        "resource_owner": "C",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true
+      },
+      {
+        "node": 5,
+        "zone": "C",
+        "logistics_zone": "C",
+        "control_partition": "C",
+        "resource_owner": "C",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true
+      },
+      {
+        "node": 6,
+        "zone": "B",
+        "logistics_zone": "B",
+        "control_partition": "B",
+        "resource_owner": "B",
+        "capacity": 1,
+        "export_min_stock": 0,
+        "allow_export": true,
+        "allow_receive": true,
+        "occupancy": 0,
+        "actual_available": 0
+      }
+    ],
+    "edge_contracts": [
+      {
+        "from": 0,
+        "to": 1,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 1,
+        "to": 3,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 0,
+        "to": 2,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 3,
+        "to": 6,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 6,
+        "to": 1,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 1,
+        "to": 4,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "capacity": 1,
+        "entry_headway": 0.2
+      },
+      {
+        "from": 5,
+        "to": 0,
+        "capacity": 1,
+        "entry_headway": 0.2
+      }
+    ],
+    "trays": [
+      {
+        "tray_id": "T0",
+        "node": 1,
+        "mode": "loaded",
+        "edge_from": 1,
+        "edge_to": 3,
+        "available_at": 0.0,
+        "reception_node": -1,
+        "generation": 1,
+        "traversal_id": 2,
+        "business_bag_id": "B1",
+        "committed_prefix": [
+          0,
+          1
+        ],
+        "edge_exit_at": 5.2
+      }
+    ],
+    "jobs": [
+      {
+        "business_bag_id": "B1",
+        "origin": 0,
+        "destination": 3,
+        "arrival": 0.0,
+        "deadline": 40.0,
+        "storage_node": -1,
+        "storage_release_at": 0.0,
+        "storage_min_dwell": 0.0,
+        "load_seconds": 0.1,
+        "unload_seconds": 0.3,
+        "hold_seconds": 0.2,
+        "protected_service": true,
+        "allow_suffix_reroute": true,
+        "status": "in_transit",
+        "storage_entered_at": -1.0,
+        "storage_released_at": -1.0,
+        "loaded_at": 0.1
+      }
+    ],
+    "transfers": [],
+    "delivered_messages": [
+      {
+        "kind": "demand",
+        "message_id": "A:B:1",
+        "source_owner": "A",
+        "target_owner": "B",
+        "publication_sequence": 1,
+        "observed_at": 0.11,
+        "delivered_at": 0.31,
+        "jobs": []
+      },
+      {
+        "kind": "demand",
+        "message_id": "C:B:2",
+        "source_owner": "C",
+        "target_owner": "B",
+        "publication_sequence": 2,
+        "observed_at": 0.61,
+        "delivered_at": 0.81,
+        "jobs": [
+          {
+            "business_bag_id": "B3",
+            "origin": 4,
+            "arrival": 0.5,
+            "deadline": 40.0,
+            "status": "waiting_for_tray"
+          }
+        ]
+      },
+      {
+        "kind": "service_forecast",
+        "message_id": "A:B:service:2",
+        "source_owner": "A",
+        "target_owner": "B",
+        "business_bag_id": "B2",
+        "tray_id": "T1",
+        "from": 0,
+        "next": 1,
+        "generation": 1,
+        "traversal_id": 0,
+        "observed_at": 0.61,
+        "delivered_at": 0.81,
+        "entry_estimate": 6.35,
+        "release_estimate": 7.3999999999999995,
+        "status": "conditional",
+        "publication_sequence": 2,
+        "supersedes": "",
+        "estimate_scope": "next_node_service_completion"
+      }
+    ],
+    "known_faults": [],
+    "route_requests": [],
+    "recovery_requests": []
+  },
+  "point": {
+    "policy": "analytic_predictive_matching",
+    "now": 1.6,
+    "version": 6,
+    "forecasts": [
+      {
+        "tray_id": "T0",
+        "node": 3,
+        "earliest": 1.6,
+        "estimate": 5.75,
+        "ledger": "conditional_release",
+        "owner_id": "B",
+        "version": 6,
+        "dependency": "T0:B1:loaded",
+        "latest": null
+      }
+    ],
+    "pool": [
+      {
+        "supply": 0,
+        "demand": 0,
+        "predicted_arrival": 7.15,
+        "assignment_cost": 5.550000000000001,
+        "predicted_wait": 6.65,
+        "path": [
+          3,
+          6,
+          1,
+          4
+        ],
+        "service_window": null
+      }
+    ],
+    "supplies": [
+      {
+        "tray_id": "T0",
+        "node": 3,
+        "earliest": 1.6,
+        "estimate": 5.75,
+        "ledger": "conditional_release",
+        "owner_id": "B",
+        "version": 6,
+        "dependency": "T0:B1:loaded",
+        "latest": null
+      }
+    ],
+    "demands": [
+      {
+        "business_bag_id": "B3",
+        "origin": 4,
+        "arrival": 0.5,
+        "deadline": 40.0,
+        "status": "waiting_for_tray",
+        "demand_observed_at": 0.61,
+        "demand_kind": "observed_source_queue"
+      }
+    ],
+    "assignment_demand_count": 1,
+    "equivalent_column_compression": true,
+    "clearing_pressure_without_available_source": 0,
+    "intents": [
+      {
+        "request_id": "live:finite-point:6:T0:B3",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 1.6,
+        "expiry": 67.15,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": null,
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    ],
+    "includes_wait": true,
+    "optimality": "minimum_cost_maximum_cardinality_in_declared_assignment_only",
+    "physical_optimality": "unknown"
+  },
+  "public_window": {
+    "policy": "analytic_predictive_matching",
+    "now": 1.6,
+    "version": 6,
+    "forecasts": [
+      {
+        "tray_id": "T0",
+        "node": 3,
+        "earliest": 1.6,
+        "estimate": 5.75,
+        "ledger": "conditional_release",
+        "owner_id": "B",
+        "version": 6,
+        "dependency": "T0:B1:loaded",
+        "latest": null
+      }
+    ],
+    "pool": [
+      {
+        "supply": 0,
+        "demand": 0,
+        "predicted_arrival": 8.299999999999999,
+        "assignment_cost": 6.699999999999999,
+        "predicted_wait": 7.799999999999999,
+        "path": [
+          3,
+          6,
+          1,
+          4
+        ],
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        }
+      }
+    ],
+    "supplies": [
+      {
+        "tray_id": "T0",
+        "node": 3,
+        "earliest": 1.6,
+        "estimate": 5.75,
+        "ledger": "conditional_release",
+        "owner_id": "B",
+        "version": 6,
+        "dependency": "T0:B1:loaded",
+        "latest": null
+      }
+    ],
+    "demands": [
+      {
+        "business_bag_id": "B3",
+        "origin": 4,
+        "arrival": 0.5,
+        "deadline": 40.0,
+        "status": "waiting_for_tray",
+        "demand_observed_at": 0.61,
+        "demand_kind": "observed_source_queue"
+      }
+    ],
+    "assignment_demand_count": 1,
+    "equivalent_column_compression": true,
+    "clearing_pressure_without_available_source": 0,
+    "intents": [
+      {
+        "request_id": "live:finite-window:6:T0:B3",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 6.8999999999999995,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    ],
+    "includes_wait": true,
+    "optimality": "minimum_cost_maximum_cardinality_in_declared_assignment_only",
+    "physical_optimality": "unknown"
+  },
+  "actions": [
+    {
+      "action_id": "WAIT",
+      "kind": "wait",
+      "request": null
+    },
+    {
+      "action_id": "point",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-point:6:T0:B3",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 1.6,
+        "expiry": 67.15,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": null,
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    },
+    {
+      "action_id": "public-window",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-window:6:T0:B3",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 6.8999999999999995,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    },
+    {
+      "action_id": "window-offset--1.0",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-window:6:T0:B3:offset:-1.0",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 5.8999999999999995,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    },
+    {
+      "action_id": "window-offset--0.5",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-window:6:T0:B3:offset:-0.5",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 6.3999999999999995,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    },
+    {
+      "action_id": "window-offset--0.25",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-window:6:T0:B3:offset:-0.25",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 6.6499999999999995,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    },
+    {
+      "action_id": "window-offset-0.25",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-window:6:T0:B3:offset:0.25",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 7.1499999999999995,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    },
+    {
+      "action_id": "window-offset-0.5",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-window:6:T0:B3:offset:0.5",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 7.3999999999999995,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    },
+    {
+      "action_id": "window-offset-1.0",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-window:6:T0:B3:offset:1.0",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 7.8999999999999995,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    },
+    {
+      "action_id": "window-offset-2.0",
+      "kind": "transfer",
+      "request": {
+        "request_id": "live:finite-window:6:T0:B3:offset:2.0",
+        "tray_id": "T0",
+        "source": 3,
+        "destination": 4,
+        "issued_at": 1.6,
+        "message_delay": 1.0,
+        "earliest_departure": 8.899999999999999,
+        "expiry": 68.3,
+        "forecast_dependency": "T0:B1:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 6.8999999999999995,
+          "conditional_dependencies": [
+            "A:B:service:2"
+          ],
+          "hard_guarantee": false
+        },
+        "owner_id": "B",
+        "expected_version": 6
+      }
+    }
+  ]
+}

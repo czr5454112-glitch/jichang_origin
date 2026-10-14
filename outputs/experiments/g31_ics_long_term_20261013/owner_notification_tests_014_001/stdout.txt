@@ -1,0 +1,21 @@
+..............F...........                                               [100%]
+================================== FAILURES ===================================
+____ test_preinitialized_fault_heap_is_rebuilt_for_strict_circulation_time ____
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_014\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_preinitialized_fault_heap_is_rebuilt_for_strict_circulation_time(native):
+        value = scene(quiet=True)
+        later = math.nextafter(1., math.inf)
+        # initialize() enqueues the fault tape before circulation is configured.
+        # Input sequence deliberately opposes exact numeric time by one ULP.
+        value["faults"] = [dict(**{"from": 0, "to": 1}, start=later, end=3., message_delay=0.),
+                           dict(**{"from": 0, "to": 6}, start=1., end=2., message_delay=0.)]
+        s = native.NativeSession(value)
+        first = advance(s, ("A",), horizon=later)
+>       assert first["physical_time"] == 1. and not first["horizon_complete"]
+E       assert (1.0000000000000002 == 1.0)
+
+tests\test_g31_circulation_owner_notifications.py:200: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_owner_notifications.py::test_preinitialized_fault_heap_is_rebuilt_for_strict_circulation_time

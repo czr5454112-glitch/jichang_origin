@@ -1,0 +1,58 @@
+.F.F.FF................                                                  [100%]
+================================== FAILURES ===================================
+___________ test_ordinary_bag_and_empty_delegate_exactly[<lambda>] ____________
+
+factory = <function <lambda> at 0x0000017BBB5BC2C0>
+
+    @pytest.mark.parametrize("factory", [CandidateGenerator, lambda: RegionalCandidateGenerator(deadline_ms=None)])
+    def test_ordinary_bag_and_empty_delegate_exactly(factory):
+        state = case()
+        state.bags["bag"] = Bag("bag", "S", "G", 0, 30)
+        wrapped = StorageCandidateGenerator(factory())
+        plain = deepcopy(wrapped.generator)
+        assert wrapped.generate(state, "bag", "tray", 2) == plain.generate(state, "bag", "tray", 2)
+        assert wrapped.last_search_status == plain.last_search_status
+>       assert wrapped.last_expansions == plain.last_expansions
+E       assert 15 == 5
+E        +  where 15 = <scripts.experiments.ics_circulation_v3.storage_routing.StorageCandidateGenerator object at 0x0000017BBA0B8B50>.last_expansions
+E        +  and   5 = <scripts.experiments.ics_circulation_v3.routing.RegionalCandidateGenerator object at 0x0000017BBAC95E90>.last_expansions
+
+tests\test_ics_circulation_v3_storage_routing.py:48: AssertionError
+____ test_full_storage_requires_delayed_ingress_and_real_node_reservation _____
+
+    def test_full_storage_requires_delayed_ingress_and_real_node_reservation():
+        state = case()
+        state.reservations = (Reservation("node:E", 0, 4, "occupant"),)
+>       candidate, = generator().generate(state, "bag", "tray", 1)
+        ^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_ics_circulation_v3_storage_routing.py:73: ValueError
+_____ test_one_free_storage_slot_is_sufficient_without_unbounded_capacity _____
+
+    def test_one_free_storage_slot_is_sufficient_without_unbounded_capacity():
+        state = case(capacity=2)
+        state.reservations = (Reservation("node:E", 0, INFINITY, "occupant"),)
+>       candidate, = generator().generate(state, "bag", "tray", 1)
+        ^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_ics_circulation_v3_storage_routing.py:91: ValueError
+___ test_reception_calendar_projects_delay_through_downstream_no_wait_node ____
+
+    def test_reception_calendar_projects_delay_through_downstream_no_wait_node():
+        state = case()
+        state.network.nodes["N"] = Node("N", "zone", "other_owner", can_wait=False)
+        state.network.edges.pop("egress")
+        state.network.edges.update({"E-N": Edge("E-N", "E", "N", 1), "N-G": Edge("N-G", "N", "G", 1)})
+        state.reservations = (Reservation("reception:G", 0, 9, "receiver"),)
+>       candidate, = generator().generate(state, "bag", "tray", 1)
+        ^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_ics_circulation_v3_storage_routing.py:103: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_ics_circulation_v3_storage_routing.py::test_ordinary_bag_and_empty_delegate_exactly[<lambda>]
+FAILED tests/test_ics_circulation_v3_storage_routing.py::test_full_storage_requires_delayed_ingress_and_real_node_reservation
+FAILED tests/test_ics_circulation_v3_storage_routing.py::test_one_free_storage_slot_is_sufficient_without_unbounded_capacity
+FAILED tests/test_ics_circulation_v3_storage_routing.py::test_reception_calendar_projects_delay_through_downstream_no_wait_node

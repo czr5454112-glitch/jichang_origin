@@ -1,0 +1,52 @@
+{
+  "P01_storage_integer_oracle": {
+    "returned_count": 0,
+    "search_status": "bounded_no_candidate",
+    "witness_validation": {
+      "accepted": true,
+      "reason": "accepted"
+    },
+    "defect_observed": true,
+    "scope": "Direct FullGraphReferenceGenerator Storage call. Not claiming latest business runner calls this oracle."
+  },
+  "P02_ordinary_screen_default_k": {
+    "unwrapped_count": 3,
+    "wrapped_count": 4,
+    "defect_observed": true,
+    "scope": "omitted-k API only; latest explicit-k1 Storage result is not invalidated."
+  },
+  "P03_ordinary_factory_checkpoint_alias": {
+    "checkpoint_counts_before": [
+      0,
+      0
+    ],
+    "checkpoint_counts_after_original_factory_query": [
+      0,
+      1
+    ],
+    "defect_observed": true,
+    "scope": "ordinary screen accounting checkpoint contamination, not evidence of physical trajectory contamination."
+  },
+  "P04_storage_can_have_slow_callback": {
+    "completed": {
+      "b": 4
+    },
+    "slow_calls": 6.0,
+    "scope": "no-op slow callback compatibility only, not predictive balancing evidence."
+  },
+  "P05_partition_storage_guard": {
+    "observed": "partition_observation:storage_contract_not_supported"
+  },
+  "P05_joint_storage_guard": {
+    "observed": "joint_reference:storage_contract_not_supported"
+  },
+  "P06_protected_replacement": {
+    "refusal": "protected_itinerary_irrevocable",
+    "scope": "intentional contract limitation; no assertion of causality for 0/44."
+  },
+  "P07_terminal_actual_empty_occupancy": {
+    "completed": {
+      "b": 2
+    }
+  }
+}

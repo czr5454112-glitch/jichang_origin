@@ -1,0 +1,54 @@
+{
+  "schema": "g31.p5_dependency_repair_protocol.v1",
+  "scenarios": [
+    {
+      "name": "long_2000m",
+      "length": 2000.0,
+      "speed": 5.0,
+      "future_source": false
+    },
+    {
+      "name": "long_2000m_unknown_source_demand",
+      "length": 2000.0,
+      "speed": 5.0,
+      "future_source": true
+    }
+  ],
+  "physical_contract": "EXACT existing independent circulation factor; no edge/task/capacity/tray changes",
+  "initial_policies": [
+    "ordinary_public_windows",
+    "joint_conditional_repair"
+  ],
+  "policies": [
+    "continuous_strong",
+    "source_only_without_publication",
+    "source_only_with_publication",
+    "two_boundary_dependency"
+  ],
+  "first_boundary": {
+    "observed": 0.91,
+    "publication_delay": 0.02,
+    "decision": 0.93,
+    "scope": "actual local loaded service to lawful next resource owner; source change repair"
+  },
+  "second_boundary": {
+    "observed": 10.11,
+    "scope": "already common control epoch; actual local in-flight minimum occupancy repair"
+  },
+  "continuation": "same existing A/B/C strong public-window continuation, first decision10.11, period10",
+  "candidate_budget": "two owned soft dependencies; same incumbent assignments; no new native authority",
+  "reference": "all four predetermined interventions per initial policy; same finite budget, offline only",
+  "information_ablation": "source_only_without_publication has less information; never claim it is the matched-info strongest comparator",
+  "matched_information": [
+    "continuous_strong",
+    "source_only_with_publication",
+    "two_boundary_dependency"
+  ],
+  "horizon": 2000.0,
+  "max_seconds": 180.0,
+  "max_events": 100000,
+  "planned_branches": 16,
+  "protection": "all offered vs frozen factor ordinary and WAIT; precommitted P/U0/U1",
+  "global_optimality": "unknown",
+  "novelty": "not_established; bounded dependency repair is a hypothesis"
+}

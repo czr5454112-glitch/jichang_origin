@@ -1,0 +1,55 @@
+{
+  "schema": "ics_v3_nanning_projected_task_full_audit_v1",
+  "raw_task_count": 28506,
+  "expanded_segment_count": 43603,
+  "direct_raw_task_count": 13409,
+  "early_split_raw_task_count": 15097,
+  "files": {
+    "raw": {
+      "path": "C:\\PROGRAMING\\czr005\\.g4irsf24_worktree\\artifacts\\tasks\\g4irsf31_nanning\\nanning_1x_raw.txt",
+      "sha256": "5fc1a834f1cf03d28417d3e5a6c16114967a7f9f352af9b795f25a00df983ae6",
+      "bytes": 1150753
+    },
+    "canonical": {
+      "path": "C:\\PROGRAMING\\czr005\\.g4irsf24_worktree\\artifacts\\tasks\\g4irsf31_nanning\\nanning_1x_canonical.jsonl",
+      "sha256": "f167648ca524770b48465c66eaa7a548390f31e35815fb9c73accff68520c3a1",
+      "bytes": 12345197
+    },
+    "manifest": {
+      "path": "C:\\PROGRAMING\\czr005\\.g4irsf24_worktree\\artifacts\\tasks\\g4irsf31_nanning\\nanning_1x_manifest.json",
+      "sha256": "6d097ca9ddf6975dd79fdaa04d5e68276864bbdc790ac67a947ffc24f5d13de1",
+      "bytes": 4715
+    }
+  },
+  "flight_count_recorded_in_manifest": 360,
+  "flight_identity_not_present_in_raw_rows": true,
+  "topology_class_counts_all_original_bags": {
+    "outbound_unreachable": 4001,
+    "directed_cycle_available": 21833,
+    "return_unreachable": 2672
+  },
+  "lifecycle_counts_all_original_bags": {
+    "unsupported_early_bag_storage_lifecycle": 15097,
+    "supported_direct_bag": 13409
+  },
+  "source_protocol": "FLIGHT_TIMETABLE_PRESERVING_NANNING_OD_PROJECTION_1X",
+  "projection_rule": {
+    "destinations": "each original flight manifest is assigned atomically and greedily balanced over Nanning type-2 unloader nodes",
+    "ebs": "one graph-derived storage pair is frozen from the 1x projected workload and reused by both algorithms and both scales",
+    "non_transfer_sources": "atomic original (Loader,start) lanes greedily balanced over Nanning standard loader nodes",
+    "transfer_sources": "atomic original flights greedily balanced over Nanning GTC loaders"
+  },
+  "full_input_denominator_preserved": true,
+  "all_original_tasks_simulated": false,
+  "qualification": "Existing timetable-preserving projection from a different map; not observed Nanning operating history. Early-bag storage remains unsupported, not converted to direct bags.",
+  "storage_proxy": {
+    "mean_free_flow_seconds": 366.24360760415897,
+    "role_status": "EMPTY_PALLET_STORAGE_EBS_PROXY_CANDIDATE",
+    "storage_alias": "IDK1",
+    "storage_external_id": "ICS54",
+    "storage_in_goal": 53,
+    "storage_out_start": 53,
+    "system_key": "international"
+  },
+  "original_task_identity_sha256": "c7d0f6dfb1511b3c13c22d1f44669deb9394ea8a476a92f688233a2ff3367387"
+}

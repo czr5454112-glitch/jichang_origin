@@ -1,0 +1,90 @@
+...F...............FFF                                                   [100%]
+================================== FAILURES ===================================
+_____ test_partial_timestamp_budget_withholds_notifications_then_restores _____
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_012\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+
+    def test_partial_timestamp_budget_withholds_notifications_then_restores(native):
+        s = native.NativeSession(scene())
+        row = advance(s, budget=1)
+>       assert row["status"] == "budget_exhausted" and not row["timestamp_complete"]
+E       AssertionError: assert ('notified' == 'budget_exhausted'
+E         
+E         - budget_exhausted
+E         + notified)
+
+tests\test_g31_circulation_owner_notifications.py:89: AssertionError
+__ test_forecast_uses_committed_remaining_service_and_exact_tie[2.0-0.0-2.0] __
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_012\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+service = 2.0, load = 0.0, expected = 2.0
+
+    @pytest.mark.parametrize("service,load,expected", [(2., 0., 2.), (3., 0., 3.), (.001, 3., 3.001)])
+    def test_forecast_uses_committed_remaining_service_and_exact_tie(native, service, load, expected):
+        value = scene(); value["jobs"] = [dict(value["jobs"][0], load_seconds=load)]
+        value["node_records"] = [tuple([n, kind, service if n == 0 else duration, x, y, edges])
+                                 for n, kind, duration, x, y, edges in value["node_records"]]
+        next(n for n in value["node_contracts"] if n["node"] == 1)["resource_owner"] = "B"
+        value = prepare_input(value)
+        s = native.NativeSession(value); advance(s, horizon=0.)
+        request = dict(request_id="live:1:A:forecast", owner_id="A", kind="service_forecast",
+                       target_owner="B", tray_id="T0", next=1, message_delay=2., publication_delay=.5)
+        s.submit_protocol_command(request); drain(s, horizon=4.)
+        ack = s.protocol_command("A", request["request_id"])["last_delivered_ack"]
+        assert ack["status"] == "delivered"
+>       forecasts = s.observe_protocol("B")["delivered_service_forecasts"]
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'delivered_service_forecasts'
+
+tests\test_g31_circulation_owner_notifications.py:211: KeyError
+__ test_forecast_uses_committed_remaining_service_and_exact_tie[3.0-0.0-3.0] __
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_012\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+service = 3.0, load = 0.0, expected = 3.0
+
+    @pytest.mark.parametrize("service,load,expected", [(2., 0., 2.), (3., 0., 3.), (.001, 3., 3.001)])
+    def test_forecast_uses_committed_remaining_service_and_exact_tie(native, service, load, expected):
+        value = scene(); value["jobs"] = [dict(value["jobs"][0], load_seconds=load)]
+        value["node_records"] = [tuple([n, kind, service if n == 0 else duration, x, y, edges])
+                                 for n, kind, duration, x, y, edges in value["node_records"]]
+        next(n for n in value["node_contracts"] if n["node"] == 1)["resource_owner"] = "B"
+        value = prepare_input(value)
+        s = native.NativeSession(value); advance(s, horizon=0.)
+        request = dict(request_id="live:1:A:forecast", owner_id="A", kind="service_forecast",
+                       target_owner="B", tray_id="T0", next=1, message_delay=2., publication_delay=.5)
+        s.submit_protocol_command(request); drain(s, horizon=4.)
+        ack = s.protocol_command("A", request["request_id"])["last_delivered_ack"]
+        assert ack["status"] == "delivered"
+>       forecasts = s.observe_protocol("B")["delivered_service_forecasts"]
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'delivered_service_forecasts'
+
+tests\test_g31_circulation_owner_notifications.py:211: KeyError
+_ test_forecast_uses_committed_remaining_service_and_exact_tie[0.001-3.0-3.001] _
+
+native = <module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_012\\python\\czr005_circulation.cp311-win_amd64.pyd'>
+service = 0.001, load = 3.0, expected = 3.001
+
+    @pytest.mark.parametrize("service,load,expected", [(2., 0., 2.), (3., 0., 3.), (.001, 3., 3.001)])
+    def test_forecast_uses_committed_remaining_service_and_exact_tie(native, service, load, expected):
+        value = scene(); value["jobs"] = [dict(value["jobs"][0], load_seconds=load)]
+        value["node_records"] = [tuple([n, kind, service if n == 0 else duration, x, y, edges])
+                                 for n, kind, duration, x, y, edges in value["node_records"]]
+        next(n for n in value["node_contracts"] if n["node"] == 1)["resource_owner"] = "B"
+        value = prepare_input(value)
+        s = native.NativeSession(value); advance(s, horizon=0.)
+        request = dict(request_id="live:1:A:forecast", owner_id="A", kind="service_forecast",
+                       target_owner="B", tray_id="T0", next=1, message_delay=2., publication_delay=.5)
+        s.submit_protocol_command(request); drain(s, horizon=4.)
+        ack = s.protocol_command("A", request["request_id"])["last_delivered_ack"]
+        assert ack["status"] == "delivered"
+>       forecasts = s.observe_protocol("B")["delivered_service_forecasts"]
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'delivered_service_forecasts'
+
+tests\test_g31_circulation_owner_notifications.py:211: KeyError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_owner_notifications.py::test_partial_timestamp_budget_withholds_notifications_then_restores
+FAILED tests/test_g31_circulation_owner_notifications.py::test_forecast_uses_committed_remaining_service_and_exact_tie[2.0-0.0-2.0]
+FAILED tests/test_g31_circulation_owner_notifications.py::test_forecast_uses_committed_remaining_service_and_exact_tie[3.0-0.0-3.0]
+FAILED tests/test_g31_circulation_owner_notifications.py::test_forecast_uses_committed_remaining_service_and_exact_tie[0.001-3.0-3.001]

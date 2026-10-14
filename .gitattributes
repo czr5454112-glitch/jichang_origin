@@ -1,6 +1,13 @@
 # G4IRSF14 frozen evidence uses physical byte hashes. Keep these exact
 # checkout encodings independent of each contributor's core.autocrlf setting.
 .gitattributes text eol=lf
+
+# Retain the audited V3 namespace as exact-byte reference assets on G31.
+scripts/experiments/ics_circulation_v3/** -text
+tests/test_ics_circulation_v3_*.py -text
+tests/test_ics_v3_*.py -text
+docs/ics_circulation_v3/** -text
+docs/external_review/g31_v3_20261011/** -text
 data/processed/maps/map2.json text eol=crlf
 artifacts/models/g4e_risk_calibrated_policy.json text eol=crlf
 legacy/jichang_origin_readonly/inputdata.txt text eol=crlf
@@ -95,3 +102,17 @@ src/czr005/g4irsf16/** text eol=lf
 src/czr005/policies/g4irsf16_*.py text eol=lf
 tests/test_g4irsf16_*.py text eol=lf
 cpp/**/g4irsf16_*.hpp text eol=lf
+
+# G31 circulation publication: author receipts bind exact bytes. Retain both
+# historical CRLF dependencies and new LF sources, without checkout conversion.
+CMakeLists.txt -text
+cpp/**/*.hpp -text
+cpp/**/*.cpp -text
+scripts/experiments/g31_ics_circulation/** -text
+tests/test_g31_circulation_*.py -text
+tests/test_g31_fixed_blocking_certificate.py -text
+tests/test_g31_original_mechanism.py -text
+docs/g31_ics_circulation/** -text
+docs/external_review/g31_ics_long_term_20261013/** -text
+outputs/experiments/** -text
+map_nanning/*.xlsx -text

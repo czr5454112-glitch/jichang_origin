@@ -1,0 +1,134 @@
+{
+  "scenarios": [
+    {
+      "name": "ordinary",
+      "protocol": {},
+      "retry_at": []
+    },
+    {
+      "name": "lost_first_ack",
+      "protocol": {
+        "drop_ack_packets": 1
+      },
+      "retry_at": [
+        11.0
+      ]
+    },
+    {
+      "name": "lost_ack_late_retry",
+      "protocol": {
+        "drop_ack_packets": 1
+      },
+      "retry_at": [
+        65.0
+      ]
+    },
+    {
+      "name": "duplicate_ack",
+      "protocol": {
+        "duplicate_acks": true,
+        "duplicate_ack_delay": 5.0
+      },
+      "retry_at": [
+        11.0
+      ]
+    },
+    {
+      "name": "source_unavailable",
+      "protocol": {
+        "owner_outages": [
+          {
+            "owner": "B",
+            "start": 9.0,
+            "end": 20.0
+          }
+        ]
+      },
+      "retry_at": [
+        11.0
+      ]
+    },
+    {
+      "name": "receiver_unavailable",
+      "protocol": {
+        "owner_outages": [
+          {
+            "owner": "A",
+            "start": 9.0,
+            "end": 20.0
+          }
+        ]
+      },
+      "retry_at": [
+        11.0
+      ]
+    },
+    {
+      "name": "adjacent_outages",
+      "protocol": {
+        "owner_outages": [
+          {
+            "owner": "A",
+            "start": 9.0,
+            "end": 20.0
+          },
+          {
+            "owner": "A",
+            "start": 20.0,
+            "end": 30.0
+          }
+        ]
+      },
+      "retry_at": [
+        11.0
+      ]
+    },
+    {
+      "name": "inflight_commitment",
+      "protocol": {
+        "owner_outages": [
+          {
+            "owner": "A",
+            "start": 10.2,
+            "end": 40.0
+          },
+          {
+            "owner": "B",
+            "start": 10.2,
+            "end": 40.0
+          }
+        ]
+      },
+      "retry_at": []
+    },
+    {
+      "name": "duplicate_wire_on_recovery",
+      "protocol": {
+        "owner_outages": [
+          {
+            "owner": "A",
+            "start": 9.0,
+            "end": 20.0
+          }
+        ]
+      },
+      "retry_at": [
+        19.8,
+        19.8
+      ],
+      "message_delay": 0.2
+    },
+    {
+      "name": "refusal_ack_lost",
+      "protocol": {
+        "drop_ack_packets": 1
+      },
+      "retry_at": [
+        11.0
+      ],
+      "receiver_refuses": true
+    }
+  ],
+  "horizon": 70.0,
+  "physics": "single mature native G31"
+}

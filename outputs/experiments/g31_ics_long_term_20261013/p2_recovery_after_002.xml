@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="8" time="0.636" timestamp="2026-10-13T13:52:54.406366+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_recovery" name="test_full_receiving_berth_wakes_after_real_departure" time="0.010"><failure message="assert False&#10; +  where False = any(&lt;generator object test_full_receiving_berth_wakes_after_real_departure.&lt;locals&gt;.&lt;genexpr&gt; at 0x000001F5ED3AB030&gt;)">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+
+    def test_full_receiving_berth_wakes_after_real_departure(native):
+        data = receiving_release()
+        result = native.run(data)
+        assert_complete_without_polling(data, result)
+        wakes = [r for r in result["receipts"] if r["event"] == "RESOURCE_WAKE"]
+&gt;       assert any(r["reason"] == "source_berth_departed" and r["time"] &gt;= 10000 for r in wakes)
+E       assert False
+E        +  where False = any(&lt;generator object test_full_receiving_berth_wakes_after_real_departure.&lt;locals&gt;.&lt;genexpr&gt; at 0x000001F5ED3AB030&gt;)
+
+tests\test_g31_circulation_recovery.py:64: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_recovery" name="test_committed_headway_expiry_does_not_poll" time="0.001" /><testcase classname="tests.test_g31_circulation_recovery" name="test_inflight_capacity_wakes_on_real_edge_exit" time="0.001" /><testcase classname="tests.test_g31_circulation_recovery" name="test_preferred_resource_wait_does_not_poll_an_unused_alternative" time="0.002" /><testcase classname="tests.test_g31_circulation_recovery" name="test_candidate_queue_change_recomputes_preferred_wait" time="0.002" /><testcase classname="tests.test_g31_circulation_recovery" name="test_static_closed_domain_retains_unserved_bags_without_polling" time="0.001" /><testcase classname="tests.test_g31_circulation_recovery" name="test_pending_wait_checkpoint_and_sibling_continuation[receiving_release]" time="0.005" /><testcase classname="tests.test_g31_circulation_recovery" name="test_pending_wait_checkpoint_and_sibling_continuation[edge_release]" time="0.005" /></testsuite></testsuites>

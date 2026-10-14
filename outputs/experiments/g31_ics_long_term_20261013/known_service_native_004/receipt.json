@@ -1,0 +1,1163 @@
+{
+  "schema": "g31.known_service_control.v1",
+  "status": "passed",
+  "cases": {
+    "reactive": {
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.310000000000002,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.25,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.510000000000003,
+            "completed": true,
+            "completed_at": 10.010000000000003,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "requests": [
+        {
+          "request": {
+            "request_id": "live:reactive:B:12:12:T0:B3",
+            "tray_id": "T0",
+            "source": 3,
+            "destination": 4,
+            "issued_at": 6.11,
+            "message_delay": 1.0,
+            "earliest_departure": 6.11,
+            "expiry": 68.51,
+            "forecast_dependency": "T0:empty",
+            "forecast_ledger": "actual_available",
+            "control_reason": "observed_source_queue",
+            "service_window": null,
+            "owner_id": "B",
+            "expected_version": 12
+          },
+          "reply": {
+            "status": "pending",
+            "reason": ""
+          }
+        }
+      ],
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 8,
+        "open_traversals": 0,
+        "tray_count": 2,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "service_preserved_vs_reactive": true
+    },
+    "predictive": {
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 25.250000000000004,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.55,
+            "completed": true,
+            "completed_at": 12.05,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 8.150000000000002,
+            "completed": true,
+            "completed_at": 8.650000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "requests": [
+        {
+          "request": {
+            "request_id": "live:predictive:B:3:6:T0:B3",
+            "tray_id": "T0",
+            "source": 3,
+            "destination": 4,
+            "issued_at": 1.61,
+            "message_delay": 1.0,
+            "earliest_departure": 1.61,
+            "expiry": 67.15,
+            "forecast_dependency": "T0:B1:loaded",
+            "forecast_ledger": "conditional_release",
+            "control_reason": "observed_source_queue",
+            "service_window": null,
+            "owner_id": "B",
+            "expected_version": 6
+          },
+          "reply": {
+            "status": "pending",
+            "reason": ""
+          }
+        }
+      ],
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 8,
+        "open_traversals": 0,
+        "tray_count": 2,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "service_preserved_vs_reactive": false
+    },
+    "predictive_public_windows": {
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.1,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.25,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.300000000000002,
+            "completed": true,
+            "completed_at": 9.800000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "requests": [
+        {
+          "request": {
+            "request_id": "live:predictive:B:3:6:T0:B3",
+            "tray_id": "T0",
+            "source": 3,
+            "destination": 4,
+            "issued_at": 1.61,
+            "message_delay": 1.0,
+            "earliest_departure": 6.8999999999999995,
+            "expiry": 68.3,
+            "forecast_dependency": "T0:B1:loaded",
+            "forecast_ledger": "conditional_release",
+            "control_reason": "observed_source_queue",
+            "service_window": {
+              "earliest_departure": 6.8999999999999995,
+              "conditional_dependencies": [
+                "A:B:service:2"
+              ],
+              "hard_guarantee": false
+            },
+            "owner_id": "B",
+            "expected_version": 6
+          },
+          "reply": {
+            "status": "pending",
+            "reason": ""
+          }
+        }
+      ],
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 8,
+        "open_traversals": 0,
+        "tray_count": 2,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "service_preserved_vs_reactive": true
+    }
+  },
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_known_service_control.py": "ddc472eeb6c740bedcb269684c1bdd7535e0db0313071627c2dd23e3b8e21150",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_coupled_control.py": "e0ba65344e929b7deb4bbae402265b452d2e86e086e05a62ea67630231eb167d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd"
+  },
+  "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+  "scope": "synthetic separate known-demand contract factor; same observations for all policies; no original-map claim",
+  "novelty": "not_established; ordinary public point-window baseline",
+  "normal_service_scope": "post-run per-job paired check under one common future; no universal guarantee",
+  "finite_reference": {
+    "schema": "g31.finite_intervention_reference.v1",
+    "domain_size": 10,
+    "evaluated": 10,
+    "exhaustive": true,
+    "best_action_id": "public-window",
+    "best_cost": 26.1,
+    "optimality": "optimal_in_enumerated_domain",
+    "global_native_optimality": "unknown",
+    "elapsed_seconds": 0.348466900002677,
+    "distinct_verified_physical_outcomes": 10,
+    "information_track": "offline_common_real_future_diagnostic",
+    "strict_paired_service": true,
+    "domain": "one intervention at this checkpoint; supplied finite actions; fixed continuation and future"
+  },
+  "headroom": {
+    "status": "finite_domain_comparison",
+    "verified_candidate_count": 5,
+    "deployment_candidate_count": 1,
+    "reference_headroom": 0.0,
+    "pool_loss": 0.0,
+    "ranking_loss": 0.0,
+    "complete_reference_domain": true,
+    "global_lower_bound": null
+  },
+  "finite_candidates": [
+    {
+      "action": {
+        "action_id": "WAIT",
+        "kind": "wait",
+        "request": null
+      },
+      "reply": {
+        "status": "accepted",
+        "reason": "wait"
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "wait",
+        "reason": "no_intervention"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "b30977496bec3004456901fb4b9457b4ab387ee15a8d3406d6d804d55b2e8447",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.310000000000002,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.25,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.510000000000003,
+            "completed": true,
+            "completed_at": 10.010000000000003,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.035317600006237626,
+      "paired_service_preserved": true
+    },
+    {
+      "action": {
+        "action_id": "point",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-point:6:T0:B3",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 1.6,
+          "expiry": 67.15,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": null,
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-point:6:T0:B3"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "9ce4d3d4e2e30f9f095aeb5ea7d32915cb92aad53502d2bbb3824c283223032e",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 25.250000000000004,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.55,
+            "completed": true,
+            "completed_at": 12.05,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 8.150000000000002,
+            "completed": true,
+            "completed_at": 8.650000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.038464600045699626,
+      "paired_service_preserved": false
+    },
+    {
+      "action": {
+        "action_id": "public-window",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-window:6:T0:B3",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 6.8999999999999995,
+          "expiry": 68.3,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": {
+            "earliest_departure": 6.8999999999999995,
+            "conditional_dependencies": [
+              "A:B:service:2"
+            ],
+            "hard_guarantee": false
+          },
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-window:6:T0:B3"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "59eef5e2000919c2e2bea694b3062386f591770690d082f0bc3f07fe54546966",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.1,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.25,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.300000000000002,
+            "completed": true,
+            "completed_at": 9.800000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.03151220001745969,
+      "paired_service_preserved": true
+    },
+    {
+      "action": {
+        "action_id": "window-offset--0.25",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-window:6:T0:B3:offset:-0.25",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 6.6499999999999995,
+          "expiry": 68.3,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": {
+            "earliest_departure": 6.8999999999999995,
+            "conditional_dependencies": [
+              "A:B:service:2"
+            ],
+            "hard_guarantee": false
+          },
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-window:6:T0:B3:offset:-0.25"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "50f2b42a02f029eaf6e4759464f8f5846a7511e5c5bed91b7c6071b94558c48f",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.1,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.25,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.300000000000002,
+            "completed": true,
+            "completed_at": 9.800000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.03475830005481839,
+      "paired_service_preserved": true
+    },
+    {
+      "action": {
+        "action_id": "window-offset--0.5",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-window:6:T0:B3:offset:-0.5",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 6.3999999999999995,
+          "expiry": 68.3,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": {
+            "earliest_departure": 6.8999999999999995,
+            "conditional_dependencies": [
+              "A:B:service:2"
+            ],
+            "hard_guarantee": false
+          },
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-window:6:T0:B3:offset:-0.5"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "4d15df2e09a4b5fc05ce740ecaeadb979ebc8169fdc74624733b9d12ec6e0bfa",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.1,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.25,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.300000000000002,
+            "completed": true,
+            "completed_at": 9.800000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.03571010002633557,
+      "paired_service_preserved": true
+    },
+    {
+      "action": {
+        "action_id": "window-offset--1.0",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-window:6:T0:B3:offset:-1.0",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 5.8999999999999995,
+          "expiry": 68.3,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": {
+            "earliest_departure": 6.8999999999999995,
+            "conditional_dependencies": [
+              "A:B:service:2"
+            ],
+            "hard_guarantee": false
+          },
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-window:6:T0:B3:offset:-1.0"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "c11a7fcf84812469dfbf4b081dce9bbe67bada3fe5460bb7447722a6284d76ec",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.1,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.25,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.300000000000002,
+            "completed": true,
+            "completed_at": 9.800000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.031783899990841746,
+      "paired_service_preserved": true
+    },
+    {
+      "action": {
+        "action_id": "window-offset-0.25",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-window:6:T0:B3:offset:0.25",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 7.1499999999999995,
+          "expiry": 68.3,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": {
+            "earliest_departure": 6.8999999999999995,
+            "conditional_dependencies": [
+              "A:B:service:2"
+            ],
+            "hard_guarantee": false
+          },
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-window:6:T0:B3:offset:0.25"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "e5104f0f62c86ef47a76c92bdac9478623833ee8db9305c712d41943f8fceca8",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.35,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.25,
+            "completed": true,
+            "completed_at": 11.75,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.550000000000002,
+            "completed": true,
+            "completed_at": 10.050000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.03415119997225702,
+      "paired_service_preserved": false
+    },
+    {
+      "action": {
+        "action_id": "window-offset-0.5",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-window:6:T0:B3:offset:0.5",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 7.3999999999999995,
+          "expiry": 68.3,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": {
+            "earliest_departure": 6.8999999999999995,
+            "conditional_dependencies": [
+              "A:B:service:2"
+            ],
+            "hard_guarantee": false
+          },
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-window:6:T0:B3:offset:0.5"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "4e841eacdc0f90e5febd14bc8c412aa9141a2ae91797205f2b24dbe8fdac2d0f",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 26.650000000000006,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.3,
+            "completed": true,
+            "completed_at": 11.8,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 9.800000000000002,
+            "completed": true,
+            "completed_at": 10.300000000000002,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.035394700011238456,
+      "paired_service_preserved": false
+    },
+    {
+      "action": {
+        "action_id": "window-offset-1.0",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-window:6:T0:B3:offset:1.0",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 7.8999999999999995,
+          "expiry": 68.3,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": {
+            "earliest_departure": 6.8999999999999995,
+            "conditional_dependencies": [
+              "A:B:service:2"
+            ],
+            "hard_guarantee": false
+          },
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-window:6:T0:B3:offset:1.0"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "1cf1d8a3b6382eb8d4f965bceb6b645da7ece953b3f5495c301616ac461b8dc4",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 27.650000000000006,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 11.8,
+            "completed": true,
+            "completed_at": 12.3,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 10.300000000000004,
+            "completed": true,
+            "completed_at": 10.800000000000004,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.03698330000042915,
+      "paired_service_preserved": false
+    },
+    {
+      "action": {
+        "action_id": "window-offset-2.0",
+        "kind": "transfer",
+        "request": {
+          "request_id": "live:finite-window:6:T0:B3:offset:2.0",
+          "tray_id": "T0",
+          "source": 3,
+          "destination": 4,
+          "issued_at": 1.6,
+          "message_delay": 1.0,
+          "earliest_departure": 8.899999999999999,
+          "expiry": 68.3,
+          "forecast_dependency": "T0:B1:loaded",
+          "forecast_ledger": "conditional_release",
+          "control_reason": "observed_source_queue",
+          "service_window": {
+            "earliest_departure": 6.8999999999999995,
+            "conditional_dependencies": [
+              "A:B:service:2"
+            ],
+            "hard_guarantee": false
+          },
+          "owner_id": "B",
+          "expected_version": 6
+        }
+      },
+      "reply": {
+        "status": "pending",
+        "reason": ""
+      },
+      "status": "verified",
+      "execution_resolution": {
+        "status": "received",
+        "reason": "",
+        "request_id": "live:finite-window:6:T0:B3:offset:2.0"
+      },
+      "completion": {
+        "status": "reached",
+        "problems": [],
+        "evidence": {
+          "requested_horizon": 40,
+          "result_horizon": 40.0,
+          "physical_clock": 40.0,
+          "advance_physical_time": 40.0,
+          "branch_physical_time": 40.0,
+          "controller_requested_horizon": 40,
+          "controller_physical_time": 40.0
+        },
+        "advance_status": "reached",
+        "outer_status": null
+      },
+      "physical_outcome_sha256": "411fe7e0a67f4bebded7ce1d53a6c933867e9bed49100c567b7743a01566c42f",
+      "metrics": {
+        "objective": "sum_restricted_arrival_to_unload_time",
+        "horizon": 40,
+        "cost": 29.650000000000006,
+        "offered": 3,
+        "completed": 3,
+        "unfinished": 0,
+        "failed": 0,
+        "deadline_violations": 0,
+        "per_job": [
+          {
+            "business_bag_id": "B1",
+            "restricted_time": 5.55,
+            "completed": true,
+            "completed_at": 5.55,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B2",
+            "restricted_time": 12.8,
+            "completed": true,
+            "completed_at": 13.3,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          },
+          {
+            "business_bag_id": "B3",
+            "restricted_time": 11.300000000000004,
+            "completed": true,
+            "completed_at": 11.800000000000004,
+            "deadline_violated_by_horizon": false,
+            "status": "completed"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.0342848000000231,
+      "paired_service_preserved": false
+    }
+  ],
+  "source_after": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_known_service_control.py": "ddc472eeb6c740bedcb269684c1bdd7535e0db0313071627c2dd23e3b8e21150",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\finite_reference.py": "3be0198c943d4c2eb520ef258e270146dfafe9709d360d13b67551e86616efe1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_coupled_control.py": "e0ba65344e929b7deb4bbae402265b452d2e86e086e05a62ea67630231eb167d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "dc5711a873941218933225591f818ee7fb051fa7239198f44dca0ddf082c46bd"
+  },
+  "source_changed": []
+}

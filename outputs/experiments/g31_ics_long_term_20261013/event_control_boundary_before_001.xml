@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.759" timestamp="2026-10-13T20:01:01.866262+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_event_control" name="test_owner_budget_after_zero_delay_submit_does_not_claim_complete_native_timestamp" time="0.007"><failure message="assert not True">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_012\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+
+    def test_owner_budget_after_zero_delay_submit_does_not_claim_complete_native_timestamp(native):
+        session = native.NativeSession(scene({"ack_delay": 0.}))
+        run = run_event_protocol_control(session, ["A", "B"], horizon=1.,
+            command_delay=0., publication_delay=0., max_activations=1)
+        assert run["status"] == "control_budget_exhausted"
+        assert run["controller_state"]["pending_owners"] == ["B"]
+        with pytest.raises(ValueError, match="notification_timestamp_incomplete"):
+            session.owner_notifications(["A", "B"])
+&gt;       assert not run["controller_state"]["native_timestamp_complete"]
+E       assert not True
+
+tests\test_g31_circulation_event_control.py:116: AssertionError</failure></testcase></testsuite></testsuites>

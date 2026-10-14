@@ -1,0 +1,114 @@
+{
+  "schema": "ics_same_zone_source_diagnostic_v1",
+  "new_physical_simulations": 0,
+  "new_candidate_searches": 0,
+  "pickle_loads": 0,
+  "checks": 10,
+  "failed_checks": 0,
+  "check_results": {
+    "exact_publication": true,
+    "published_before_current_fast_decision": true,
+    "current_time126_next_slow127": true,
+    "same_zone": true,
+    "different_owner": true,
+    "static_path13": true,
+    "static_positive_capacities": true,
+    "warm_tray_available": true,
+    "warm_tray_uncommitted": true,
+    "prior_mechanism_audit_passed": true
+  },
+  "forecast": [
+    {
+      "forecast_id": "counterflow:round2:flow1",
+      "node": "26",
+      "destination": "114",
+      "at": 156,
+      "deadline": 271,
+      "count": 1,
+      "published_at": 116,
+      "unit_ids": []
+    }
+  ],
+  "decision_time": 126,
+  "actual_next_slow": 127,
+  "cursor_stage_index": 1,
+  "warm_tray": {
+    "tray_id": "warm_tray",
+    "node": "46",
+    "mode": "empty",
+    "bag_id": null,
+    "available_at": 87
+  },
+  "selected_nodes": {
+    "26": {
+      "node_id": "26",
+      "logistics_zone": "international",
+      "control_partition": "synthetic:00",
+      "capacity": 2,
+      "can_wait": true
+    },
+    "46": {
+      "node_id": "46",
+      "logistics_zone": "international",
+      "control_partition": "synthetic:05",
+      "capacity": 2,
+      "can_wait": true
+    },
+    "114": {
+      "node_id": "114",
+      "logistics_zone": "domestic",
+      "control_partition": "synthetic:04",
+      "capacity": 2,
+      "can_wait": true
+    }
+  },
+  "static_edges": [
+    {
+      "edge_id": "46->39",
+      "source": "46",
+      "target": "39",
+      "travel_time": 2,
+      "capacity": 14
+    },
+    {
+      "edge_id": "39->40",
+      "source": "39",
+      "target": "40",
+      "travel_time": 2,
+      "capacity": 11
+    },
+    {
+      "edge_id": "40->52",
+      "source": "40",
+      "target": "52",
+      "travel_time": 6,
+      "capacity": 54
+    },
+    {
+      "edge_id": "52->26",
+      "source": "52",
+      "target": "26",
+      "travel_time": 3,
+      "capacity": 29
+    }
+  ],
+  "source_sha256": {
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_role_labels_parallel_20261009\\counterflow\\counterflow_input.json": "7eed6196181402bb8add12e860bc96b785a296c8eed73c1b86fee124aa8b05bc",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_opportunities_repaired_20261010\\collections\\counterflow\\d0040.json": "e1957a8dec7a3dd523a924a4454aa2a65b198fd7c9256422d84da93a55e22895",
+    "outputs\\experiments\\ics_circulation_v3\\phase4_w3_network_nominal_analysis_20261010\\mechanisms.json": "9cbcde584b6ac743ab6e81cc784b891f72405a93444ec6458ad39a8f42ed0fcb",
+    "scripts\\experiments\\ics_circulation_v3\\prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+    "scripts\\experiments\\ics_circulation_v3\\runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "scripts\\experiments\\ics_circulation_v3\\distributed_local.py": "100e01b817d30f7015a48ba2ddebded62eb58d078f353d0ef7d213df57a28d64",
+    "scripts\\experiments\\ics_circulation_v3\\distributed_slow.py": "7629e4350a58c76300b720e5f49e0e52bd96d84c6c1a471a289045a85618b5cf",
+    "scripts\\experiments\\ics_circulation_v3\\phase4_control.py": "70597fe1bce15a2f69d033aa389f0f68833b460a40ec2281b90599f36f475094",
+    "scripts\\experiments\\ics_circulation_v3\\phase4_network_workloads.py": "bcefc238fb255f116ea6d2571dc82b6d03f37d0d4d3dfe8fb5e747a37e18ba93"
+  },
+  "changed_inputs": [],
+  "read_only_forecast_scope": "Freeze input forecast tuple only; engine-only future is not used in selected evidence or candidate construction. No candidate construction performed.",
+  "limitation": "Static positive-capacity 13tick route is not a timing-feasibility certificate for any new slow checkpoint.",
+  "cpu_seconds": 0.046875,
+  "wall_seconds": 0.046383800014154986,
+  "resource_scope": "Pure-file extraction and SHA verification; final serialization and preceding ad hoc shell reads excluded.",
+  "script_sha256": "26307b0205011e65f7a69fd15637ca43e61acb3a824567d8a9c8073087fde9ea",
+  "notes_sha256": "009ee2b80755c57bf0e1f02ea4ef8eefbd2599b470260e45f25b04b88673953c"
+}

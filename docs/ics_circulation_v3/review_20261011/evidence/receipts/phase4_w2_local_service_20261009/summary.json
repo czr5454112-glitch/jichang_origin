@@ -1,0 +1,63 @@
+{
+  "experiment": "Opt-in same-owner different-node empty service on the shared physical/message clock",
+  "run_count": 7,
+  "fixture_count": 5,
+  "mixed_continuous_runs": 4,
+  "regression_runs": 3,
+  "same_input_hash_per_local_switch_pair": true,
+  "all_checkpoints_exact": true,
+  "mixed_aggregates": {
+    "local_off": {
+      "bag_count": 12,
+      "completed_count": 12,
+      "on_time_count": 7,
+      "request_count": 21,
+      "owner_commit_count": 20,
+      "empty_commit_count": 8,
+      "local_empty_commit_count": 0,
+      "cross_owner_empty_commit_count": 8,
+      "total_cost": 416.20000000000005
+    },
+    "local_on": {
+      "bag_count": 12,
+      "completed_count": 12,
+      "on_time_count": 12,
+      "request_count": 26,
+      "owner_commit_count": 22,
+      "empty_commit_count": 10,
+      "local_empty_commit_count": 3,
+      "cross_owner_empty_commit_count": 7,
+      "total_cost": 31.200000000000003
+    }
+  },
+  "source_sha256": {
+    "scripts/experiments/ics_circulation_v3/distributed_clock.py": "44d15967d9c957b4b98fdbbc264ca705f192507aec0028ed4744b371ab489f4b",
+    "scripts/experiments/ics_circulation_v3/run_distributed_clock.py": "6d5943bdf8bc51206f29cce58763c1de863d35efcaa2f29a077c6b6004546ca4",
+    "scripts/experiments/ics_circulation_v3/runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "scripts/experiments/ics_circulation_v3/model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "scripts/experiments/ics_circulation_v3/partition_observation.py": "0b9c925eb3316e0d5ecb10b61f80372fabaa1dc635bab2b78cc8abea65229d77",
+    "scripts/experiments/ics_circulation_v3/request_service.py": "8d2c540b65e2e888c5688149c54455dc5c135178135a6e7556b501b12fa81d62",
+    "scripts/experiments/ics_circulation_v3/routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "tests/test_ics_circulation_v3_distributed_clock.py": "21a194cb2798d97b2e53607ef0c1596061de3419d8ab03a6399e2700658075f5",
+    "scripts/experiments/ics_circulation_v3/run_distributed_slow.py": "c62071f2fe61f9802433aba69d7edb1f52a21524e2e845b608e55f0cea7d9a8a",
+    "scripts/experiments/ics_circulation_v3/distributed_slow.py": "7629e4350a58c76300b720e5f49e0e52bd96d84c6c1a471a289045a85618b5cf",
+    "tests/test_ics_circulation_v3_distributed_slow.py": "4843246b055e99521c2d9cedc43698b2adc767827e2fe8079c15314c7eb63d89",
+    "scripts/experiments/ics_circulation_v3/run_distributed_local.py": "579142e3cd019525036d0a350030583e3d6a08e15f0271197795f378f9fd0416",
+    "scripts/experiments/ics_circulation_v3/distributed_local.py": "100e01b817d30f7015a48ba2ddebded62eb58d078f353d0ef7d213df57a28d64",
+    "tests/test_ics_circulation_v3_distributed_local.py": "a88674faefcd68ea84c50f28784d6e8e81030918b3817fc5a78328ff18dddf29"
+  },
+  "limitations": [
+    "Two constructed development fixtures reused for the local off/on comparison, plus three mechanism regressions; no held-out claim or strategy fitting.",
+    "Both switches use mode=both, period1, identical publications, message faults and external bag tape; only local service capability changes.",
+    "Reactive/both may serve any observed actual local queue; predictive only serves published identities and their observed real continuation, exactly as the frozen remote controller does.",
+    "Local target credit exists only in admission arithmetic at or after the validated usable tick. It is never firm inventory or a fabricated Bag.",
+    "Every other same-zone prefix separately preserves directed unit matching after donor removal; target credit cannot cancel another unit's loss, even at the same tick.",
+    "This is a conservative donor filter, not a congestion-aware service-time guarantee for other demands; it may reject feasible sequential reuse and starve undersupplied simultaneous demands.",
+    "Source owners repeat checks at prepare and authorize using delivered information only; the earlier frozen distributed protocol and physical arbiter are unchanged.",
+    "Same-owner cross-zone movement retains frozen export floor/source protection. Every crossed resource owner must lease its local capacity; global arbiter performs final atomic physical validation.",
+    "Fixed FIFO loading can consume a delivered tray for another earlier real queue unit; named forecast claims do not override FIFO.",
+    "Path search remains bounded and incomplete; probe failures issue no request but actual unserved bags remain in the task denominator. All submitted requests including pending/unknown are recorded.",
+    "Synthetic integer message delays and centralized final physical arbitration, not deployed networking or measured latency.",
+    "Prior 23-request and 16-run W2 artifacts and their source snapshots remain unchanged; this capability extension does not establish complete W2 or airport integration."
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "schema": "ics_business_workload_contract_design_v1",
+  "status": "DESIGN_NOT_EXECUTABLE_REQUIRED_FIELDS_UNRESOLVED",
+  "evidence_mode": "proxy_research_or_confirmed_must_be_explicit",
+  "input": {
+    "business_records": "business_tasks_1x.jsonl.gz",
+    "business_identity": "raw input SHA plus task ID, with parent source SHA/ID retained",
+    "canonical_leg_count_is_not_business_count": true,
+    "new_projection_allowed_only_as_new_version": true,
+    "independent_operating_day": false
+  },
+  "time_contract": {
+    "original_units": "seconds",
+    "tick_seconds": null,
+    "arrival_rounding": "ceil_never_early",
+    "travel_service_rounding": "ceil",
+    "hard_deadline_rounding": "floor_never_relaxed",
+    "publication_rounding": "ceil_never_early",
+    "final_deadline_policy": null,
+    "protected_identity_rule": null
+  },
+  "topology": {
+    "base_profile_path": "scripts/experiments/ics_circulation_v3/fixtures/nanning_airport_profile.json",
+    "base_profile_sha256": null,
+    "physical_edge_additions": 0,
+    "physical_direction_changes": 0,
+    "length_overlay_domain": "exact five cross-system source-workbook system=/ edges",
+    "predeclared_length_modes_metres": ["original", 2000, 5000],
+    "speed_policy": null,
+    "occupancy_capacity_policy": null,
+    "entry_headway_policy": null,
+    "entry_headway_supported_by_current_Edge": false,
+    "edge_mode_permission_source": null,
+    "no_wait_permission_source": null
+  },
+  "finite_inventory": {
+    "initial_tray_manifest": null,
+    "allow_auto_tray_per_bag": false,
+    "allow_teleport_or_tray_duplication": false,
+    "initial_storage_manifest": null,
+    "external_initialization_before_burn_in_explicit": true
+  },
+  "modules": {
+    "node_capacities": null,
+    "loading_services": null,
+    "unloading_services": null,
+    "reception_capacities": null,
+    "hold_rules": null,
+    "export_minima": null,
+    "owner_partition_contract": null,
+    "local_empty_module": null,
+    "preserve_actual_supplier_module_if_provided": true,
+    "proxy_module_must_not_be_claimed_supplier_equivalent": true
+  },
+  "early_storage": {
+    "source_early_threshold_seconds": 4800,
+    "source_nominal_release_lead_seconds": 2700,
+    "node_53_is_only_declared_empty_tray_storage_proxy": true,
+    "storage_node_permission": null,
+    "carrier_policy": null,
+    "allowed_explicit_carrier_policies": ["on_carrier", "off_carrier"],
+    "storage_capacity": null,
+    "transfer_retrieval_service": null,
+    "release_authorization_stream": null,
+    "lightweight_on_carrier_subcontract": {
+      "eligible_only_if_release_already_public": true,
+      "uses_existing_node_waiting_capacity_as_proxy": true,
+      "unchanged_final_Bag_destination": true,
+      "mandatory_waypoint_and_no_early_departure_checked_by_owner": true,
+      "checkpoint_includes_actual_visited_released_milestones": true,
+      "not_equivalent_to_dynamic_release_or_dedicated_storage_module": true
+    },
+    "off_carrier_second_leg_eligibility": "max(actual_ingress_service_complete, scheduled_release, authorized_release)",
+    "off_carrier_departure_requires_real_available_tray_and_service": true,
+    "final_business_completion_only_after_final_unload": true
+  },
+  "information": {
+    "environment_actual_future_tape_private": true,
+    "forecast_publication_stream": null,
+    "release_publication_revision_ttl_contract": null,
+    "fault_publication_stream": null,
+    "observed_actual_identity_precedes_forecast": true,
+    "W2_owner_information_contract_separate_from_central_W3": true
+  },
+  "scope": {
+    "selection_rule": "first complete hourly arrival window containing source tasks, predeclared before outcomes; then predeclared full-day development",
+    "all_source_rows_inventory_preserved": true,
+    "window_scope_and_prefix_tail_scopes_separate": true,
+    "legal_burn_in_includes_all_preceding_source_tasks": true,
+    "physical_tail_cap": null,
+    "wall_cpu_search_guard_budgets": null,
+    "failure_or_budget_stop_keeps_all_business_denominators": true
+  },
+  "objectives_and_reporting": {
+    "change_existing_weight_values": false,
+    "business_completion_tardiness_backlog_count_parent_bag_once": true,
+    "waiting_subtypes": ["eligible_loading_wait", "prescribed_storage_dwell", "storage_capacity_wait", "reception_wait", "retrieval_wait"],
+    "current_empty_distance_unit": "travel_ticks_not_metres",
+    "report_task_earlier_same_later_even_when_J_ties": true,
+    "old_segment_J_and_new_business_J_not_cross_compared_as_algorithm_gain": true,
+    "independent_routing_and_prebalance_acceptance_required": true
+  },
+  "fail_closed": {
+    "unset_operational_fields": "contract_incomplete",
+    "unknown_role_or_mode_permission": "permission_unknown",
+    "unreachable_static_candidate": "static_domain_infeasible_only_for_declared_contract",
+    "search_or_assignment_budget": "budget_unknown_not_infeasible",
+    "unavailable_supplier_module": "proxy_only_no_field_integration_claim"
+  }
+}

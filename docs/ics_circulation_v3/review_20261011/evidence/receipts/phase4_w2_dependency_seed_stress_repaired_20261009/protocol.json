@@ -1,0 +1,141 @@
+{
+  "source_sha256": {
+    "run_joint_seed_stress.py": "9f2a511257458613a85b4ef8cbc7fb7703ee0f9f74e1841793025f11e5acba41",
+    "joint_bundle_reference.py": "46870cb05417213c04fb736d1e35a6d4c02b4bc692cb420d7e92b98cec7620ba",
+    "joint_reference.py": "456a865c5d49b6f272c565072968c6629d1bffdb0b365ac835001142b3a20e1e",
+    "dependency_admission.py": "ffb9e05b07e53c588affbf941d3a9de9113a3ef8a8b3d10e9bf9317c5535c9bf",
+    "joint_transactions.py": "67d69a5fc106aefb81c1c46457515970270e6fd8379391d528f797d6c43ad430",
+    "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "learning.py": "024b79b8df4a01e2104a465aba9d85c2d5779d19164c9134d9e4eefcee01b3b4",
+    "evaluation.py": "9e5defba24c21e8c1dd23f2c044524996a1acf1ebfb0bf356916d2be3216efee",
+    "prebalance.py": "a10ac0b1cd5bcf0a6c6d540549d2b3f54201d60aab6c1c615dc3b1e242ec2b15",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3"
+  },
+  "development_only": true,
+  "tiny_only": false,
+  "tiny_grid": {
+    "size": [
+      2,
+      3,
+      4
+    ],
+    "horizon": 2,
+    "budget": [
+      40,
+      80,
+      160,
+      320
+    ],
+    "dependency_seed": [
+      false,
+      true
+    ]
+  },
+  "tiny_calls": 24,
+  "planned_rolling_episodes": 36,
+  "rolling_configs": [
+    [
+      false,
+      false,
+      500
+    ],
+    [
+      false,
+      false,
+      2000
+    ],
+    [
+      false,
+      true,
+      500
+    ],
+    [
+      false,
+      true,
+      2000
+    ],
+    [
+      true,
+      false,
+      500
+    ],
+    [
+      true,
+      false,
+      2000
+    ],
+    [
+      true,
+      true,
+      500
+    ],
+    [
+      true,
+      true,
+      2000
+    ]
+  ],
+  "rolling_scenes": [
+    {
+      "name": "cycle3_travel1_capacity1_missingFalse",
+      "tray_count": 3,
+      "node_capacity": 1,
+      "travel_ticks": 1,
+      "waves": 4,
+      "missing_initial_loaded_participant": false,
+      "source_protection_contract": "module_only",
+      "synthetic_development_only": true,
+      "horizon": 16
+    },
+    {
+      "name": "cycle3_travel3_capacity1_missingFalse",
+      "tray_count": 3,
+      "node_capacity": 1,
+      "travel_ticks": 3,
+      "waves": 4,
+      "missing_initial_loaded_participant": false,
+      "source_protection_contract": "module_only",
+      "synthetic_development_only": true,
+      "horizon": 30
+    },
+    {
+      "name": "cycle3_travel1_capacity2_missingFalse",
+      "tray_count": 3,
+      "node_capacity": 2,
+      "travel_ticks": 1,
+      "waves": 4,
+      "missing_initial_loaded_participant": false,
+      "source_protection_contract": "module_only",
+      "synthetic_development_only": true,
+      "horizon": 16
+    },
+    {
+      "name": "cycle3_travel1_capacity1_missingTrue",
+      "tray_count": 3,
+      "node_capacity": 1,
+      "travel_ticks": 1,
+      "waves": 4,
+      "missing_initial_loaded_participant": true,
+      "source_protection_contract": "module_only",
+      "synthetic_development_only": true,
+      "horizon": 16
+    }
+  ],
+  "rolling_horizon": 12,
+  "route_tail": "one maximum edge",
+  "whole_route": true,
+  "source_protection_contract": "module_only",
+  "real_future_access": "evaluation kernel only; MPC takes published forecasts",
+  "seed_protocol": "independent optional SCC feasible seed; ordinary-reactive and SCC seeds each receive at most quarter of global work; all charged; no candidate-domain truncation",
+  "same_algorithm_permission_ablation": true,
+  "cheap_baseline": "fixed-witness SCC loading routes each tick, no forecast optimization or empty moves; same physical atomic permissions",
+  "limits": [
+    "Repeated synthetic circulation, not independent deployment confirmation.",
+    "Budget exhaustion gives no nontrivial gap bound.",
+    "A zero-cost incumbent proves its nonnegative proxy objective lower bound only.",
+    "SCC witness failure can miss empty-participant cycles and other route witnesses; exhaustive domain remains independent.",
+    "Root's separate label replay is concurrent: process CPU retained; wall times are not exclusive-machine latency claims."
+  ]
+}

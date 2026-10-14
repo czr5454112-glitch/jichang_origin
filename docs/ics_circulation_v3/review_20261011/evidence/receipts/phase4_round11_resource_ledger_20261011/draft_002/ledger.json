@@ -1,0 +1,443 @@
+{
+  "schema": "ics_round11_resource_ledger_v1",
+  "status": "provisional",
+  "known_invocation_cpu_seconds": 295.4375,
+  "group_subtotals": {
+    "phase4_round11_headway_design_20261011": 3.84375,
+    "phase4_round11_independent_review_20261011": 94.03125,
+    "phase4_round11_projection_runtime_20261011": 197.4375,
+    "prior_round11_ledger_builds": 0.125
+  },
+  "known_explicit_physical_runs": 20,
+  "exact_total_cpu_seconds": null,
+  "exact_total_physical_runs": null,
+  "known_standalone_queries": 0,
+  "bridge_physical_runs": 16,
+  "mechanism_physical_runs": 0,
+  "mechanisms": [],
+  "headway_prototypes": [
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/prototype_001/result.json",
+      "checks": 55279,
+      "oracle_cases": 55245,
+      "physical_runs": 0,
+      "qualification": "Ledger prototype/oracle checks only; not an integrated business-physics deployment."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/prototype_002/result.json",
+      "checks": 55289,
+      "oracle_cases": 55245,
+      "physical_runs": 0,
+      "qualification": "Ledger prototype/oracle checks only; not an integrated business-physics deployment."
+    }
+  ],
+  "resource_rows": [
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/clock_probe_001/result.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.00014139999984763563,
+      "group": "phase4_round11_headway_design_20261011",
+      "status": "failed",
+      "physical_runs": 0,
+      "source_changed": null,
+      "standalone_queries": 0,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "explicit receipt interval"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/clock_probe_002/result.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.00011699998867698014,
+      "group": "phase4_round11_headway_design_20261011",
+      "status": "passed",
+      "physical_runs": 0,
+      "source_changed": null,
+      "standalone_queries": 0,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "explicit receipt interval"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/prototype_001/result.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 1.78125,
+      "wall_seconds": 1.8816695999994408,
+      "group": "phase4_round11_headway_design_20261011",
+      "status": "passed",
+      "physical_runs": 0,
+      "source_changed": [],
+      "standalone_queries": 0,
+      "prototype_checks": 55279,
+      "prototype_oracle_cases": 55245,
+      "scope": "prototype imports, exhaustive pure ledger oracle checks, serialization; no ICS Simulation or route search"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/prototype_002/result.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 2.046875,
+      "wall_seconds": 2.09401989998878,
+      "group": "phase4_round11_headway_design_20261011",
+      "status": "passed",
+      "physical_runs": 0,
+      "source_changed": [],
+      "standalone_queries": 0,
+      "prototype_checks": 55289,
+      "prototype_oracle_cases": 55245,
+      "scope": "prototype imports, exhaustive pure ledger oracle checks, serialization; no ICS Simulation or route search"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/source_capture_001/result.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.01012520000222139,
+      "group": "phase4_round11_headway_design_20261011",
+      "status": "passed",
+      "physical_runs": 0,
+      "source_changed": null,
+      "standalone_queries": 0,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "source read, SHA check, OOXML text extraction only"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_001/results.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": null,
+      "wall_seconds": null,
+      "group": "phase4_round11_independent_review_20261011",
+      "status": "startup_failure",
+      "physical_runs": 0,
+      "source_changed": null,
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "explicit receipt interval"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_002/results.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 4.25,
+      "wall_seconds": 4.620350499986671,
+      "group": "phase4_round11_independent_review_20261011",
+      "status": "passed",
+      "physical_runs": 2,
+      "source_changed": [],
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "Source hashing/copy, imports, pytest and all independent oracle/physical calls. pytest interval nested; initial imports/final write excluded. Full source/test snapshot retained."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/bridge_round11_current.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 0.296875,
+      "wall_seconds": 0.2962265000096522,
+      "group": "phase4_round11_independent_review_20261011",
+      "status": "receipt_without_explicit_status",
+      "physical_runs": 8,
+      "source_changed": null,
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "Four fixed ordinary direct-bag cases plus four checkpoint continuations; no EBS physics. Timing fields ending _ms excluded; other state, summary, objective, trace and counter fields compared."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/bridge_round8_frozen.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 0.28125,
+      "wall_seconds": 0.29670679999981076,
+      "group": "phase4_round11_independent_review_20261011",
+      "status": "receipt_without_explicit_status",
+      "physical_runs": 8,
+      "source_changed": null,
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "Four fixed ordinary direct-bag cases plus four checkpoint continuations; no EBS physics. Timing fields ending _ms excluded; other state, summary, objective, trace and counter fields compared."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/results.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 88.875,
+      "wall_seconds": 92.96096140000736,
+      "group": "phase4_round11_independent_review_20261011",
+      "status": "passed",
+      "physical_runs": 2,
+      "source_changed": [],
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "Source hashing/copy, imports, pytest and all independent oracle/physical calls. pytest interval nested; initial imports/final write excluded. Full source/test snapshot retained."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/baseline.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 0.328125,
+      "wall_seconds": 0.40212819998851046,
+      "group": "phase4_round11_independent_review_20261011",
+      "status": "passed",
+      "physical_runs": 0,
+      "source_changed": null,
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "Read/hash/copy 206 prior frozen files and git HEAD; initial imports and final writes excluded."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/author_tests_001/resource.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 3.515625,
+      "wall_seconds": 3.714686999999685,
+      "group": "phase4_round11_projection_runtime_20261011",
+      "status": "passed",
+      "physical_runs": 0,
+      "source_changed": false,
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "Same process pytest interval includes pytest; imports, initial source snapshot and final writes excluded."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/full_adapter_001/resource.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 5.9375,
+      "wall_seconds": 6.113817500008736,
+      "group": "phase4_round11_projection_runtime_20261011",
+      "status": "failed",
+      "physical_runs": 0,
+      "source_changed": false,
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "Single process parent includes both source loaders, both projection recomputations, baseline adapters, all comparisons/exports and nested per-scale CPU."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/full_adapter_002/resource.json",
+      "field": "cpu_seconds",
+      "cpu_seconds": 187.984375,
+      "wall_seconds": 191.62237430000096,
+      "group": "phase4_round11_projection_runtime_20261011",
+      "status": "passed",
+      "physical_runs": 0,
+      "source_changed": false,
+      "standalone_queries": null,
+      "prototype_checks": null,
+      "prototype_oracle_cases": null,
+      "scope": "Single process parent includes both source loaders, both projection recomputations, baseline adapters, all comparisons/exports and nested per-scale CPU."
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_resource_ledger_20261011/draft_001/ledger.json",
+      "field": "ledger_build_cpu_seconds",
+      "cpu_seconds": 0.125,
+      "wall_seconds": 0.12441710001439787,
+      "group": "prior_round11_ledger_builds",
+      "status": "provisional",
+      "physical_runs": 0,
+      "source_changed": null,
+      "standalone_queries": 0,
+      "scope": "Prior ledger construction interval only; its upstream sum is excluded."
+    }
+  ],
+  "nested_or_duplicate_values_not_added": [
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_002/results.json",
+      "field": "pytest_cpu_seconds",
+      "value": 3.609375,
+      "reason": "included in same process parent CPU"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/results.json",
+      "field": "pytest_cpu_seconds",
+      "value": 87.796875,
+      "reason": "included in same process parent CPU"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/results.json",
+      "field": "bridge_child_cpu_seconds",
+      "value": 0.578125,
+      "reason": "aggregate of separately counted raw process receipts, not additional CPU"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/full_adapter_002/resource.json",
+      "field": "scales[0].cpu_seconds",
+      "value": 64.5625,
+      "reason": "nested interval already included in this process CPU"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/full_adapter_002/resource.json",
+      "field": "scales[1].cpu_seconds",
+      "value": 123.40625,
+      "reason": "nested interval already included in this process CPU"
+    },
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_resource_ledger_20261011/draft_001/ledger.json",
+      "field": "known_invocation_cpu_seconds",
+      "value": 105.28125,
+      "reason": "duplicate prior ledger total"
+    }
+  ],
+  "windows": [
+    {
+      "name": "original_h21600_001",
+      "status": "pending",
+      "measured_cpu_seconds": null,
+      "kind": "original_fixed_budget_deployment",
+      "original_run": null,
+      "original_stop": null,
+      "checkpoint_tick": null,
+      "declared_cpu_cap": 600,
+      "cap_is_not_consumption": true
+    },
+    {
+      "name": "original_h80_001",
+      "status": "pending",
+      "measured_cpu_seconds": null,
+      "kind": "original_fixed_budget_deployment",
+      "original_run": null,
+      "original_stop": null,
+      "checkpoint_tick": null,
+      "declared_cpu_cap": 600,
+      "cap_is_not_consumption": true
+    },
+    {
+      "name": "projected_h21600_001",
+      "status": "pending",
+      "measured_cpu_seconds": null,
+      "kind": "original_fixed_budget_deployment",
+      "original_run": null,
+      "original_stop": null,
+      "checkpoint_tick": null,
+      "declared_cpu_cap": 600,
+      "cap_is_not_consumption": true
+    },
+    {
+      "name": "projected_h80_001",
+      "status": "pending",
+      "measured_cpu_seconds": null,
+      "kind": "original_fixed_budget_deployment",
+      "original_run": null,
+      "original_stop": null,
+      "checkpoint_tick": null,
+      "declared_cpu_cap": 600,
+      "cap_is_not_consumption": true
+    }
+  ],
+  "pending_entries": [
+    {
+      "kind": "window_pending",
+      "path": "outputs/experiments/ics_circulation_v3/phase4_round11_validation_20261011/original_h21600_001/results.json"
+    },
+    {
+      "kind": "window_pending",
+      "path": "outputs/experiments/ics_circulation_v3/phase4_round11_validation_20261011/original_h80_001/results.json"
+    },
+    {
+      "kind": "window_pending",
+      "path": "outputs/experiments/ics_circulation_v3/phase4_round11_validation_20261011/projected_h21600_001/results.json"
+    },
+    {
+      "kind": "window_pending",
+      "path": "outputs/experiments/ics_circulation_v3/phase4_round11_validation_20261011/projected_h80_001/results.json"
+    }
+  ],
+  "pending_count": 4,
+  "unknown_entries": [
+    {
+      "kind": "receipt_declared_auxiliary",
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/prototype_001/result.json",
+      "details": [
+        "source reading",
+        "web research",
+        "design/code editing",
+        "tool orchestration",
+        "source snapshot capture"
+      ]
+    },
+    {
+      "kind": "receipt_declared_auxiliary",
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/prototype_002/result.json",
+      "details": [
+        "source reading",
+        "web research",
+        "design/code editing",
+        "tool orchestration",
+        "source snapshot capture"
+      ]
+    },
+    {
+      "kind": "receipt_cpu_unknown",
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_001/results.json",
+      "explanation": "Failed or unmetered invocation explicitly reports null CPU; retained without replacing it with zero."
+    },
+    {
+      "kind": "additional_test_physics_unknown",
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/results.json",
+      "explanation": "Explicit calls instrumented in independent projection-runtime audit only; other selected tests may run uncounted physics. Bridge child calls are separate."
+    },
+    {
+      "kind": "receipt_declared_auxiliary",
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/author_tests_001/resource.json",
+      "details": "Initial source reads/snapshot/imports and final seal writes; no physics anywhere in this test suite."
+    },
+    {
+      "kind": "receipt_declared_auxiliary",
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/full_adapter_001/resource.json",
+      "details": "Interpreter startup/imports and final resource/manifest writes; reading/editing auxiliary commands unknown."
+    },
+    {
+      "kind": "receipt_declared_auxiliary",
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/full_adapter_002/resource.json",
+      "details": "Interpreter startup/imports and final resource/manifest writes; reading/editing auxiliary commands unknown."
+    },
+    {
+      "kind": "general_auxiliary_cpu_unknown",
+      "explanation": "Reading, editing, communication, discovery failures, py_compile/imports, final documentation/Git/SHA inspection and final writes were not fully metered. Do not fill missing CPU with zero."
+    },
+    {
+      "kind": "concurrent_wall_not_summed",
+      "explanation": "Wall intervals overlap and are not an additive total."
+    }
+  ],
+  "full_regressions": [
+    {
+      "receipt": "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/results.json",
+      "outcomes": {
+        "passed": 1399,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0
+      },
+      "source_changed": [],
+      "cpu_seconds": 88.875,
+      "bridge_child_cpu_seconds": 0.578125
+    }
+  ],
+  "ledger_build_cpu_seconds": 0.109375,
+  "ledger_build_wall_seconds": 0.10259629998472519,
+  "ledger_scope": "Current process after imports; final output writes excluded; separate from upstream sum.",
+  "input_sha256": {
+    "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/clock_probe_001/result.json": "81346a8344f0eef482d22a0f66131676223ce3ae7afdb99fbb6bfb7a1be0df09",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/clock_probe_002/result.json": "1d649ecdb71cccfa7851d41d054d8b24e1d53244d98273c2d949dc9c9a737bee",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/prototype_001/result.json": "fa958d56a8a5034aa4259b111f92a80261094ba187de74ec77cb305e0e8a4a3a",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/prototype_002/result.json": "97a457b8d69e90d07fdadf8918f8088b4cd958b15156d460c93fec7a271651bd",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_headway_design_20261011/source_capture_001/result.json": "f74e420c1fc2d36dfd168d1fc945a7ec3fba0c41f98662aa65a0d98ca822adb5",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_001/results.json": "ca85a10b03132775630fcfd8d01706b96292e85e35cbf1f545df933cfde288b4",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_002/results.json": "8c5ae4830f06e16e3769f62f59001e10733f310670488b9dfa1c56bff508f8dc",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/bridge_round11_current.json": "5394fee73044d9b28ffc8ba7214c8e9b765aae09b8148b3dcbf868d6d248e38a",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/bridge_round8_frozen.json": "75ca6fac494358c3a194460174ca1d16d835a99a9c706277177793e9f4cd7060",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/attempt_003/results.json": "1c5443ffc237ea6620e07cff36c2d50cfd0b46f96807df9f5df6eb5365899091",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_independent_review_20261011/baseline.json": "e708099fea9bfb42d61487f4b0813e71a1507f3909dc2c3a92dda28871b6ca76",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/author_tests_001/resource.json": "14d44a59b5d688b95730df931672a0071fa596a62fc42fac3d86c9a52d8a9327",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/full_adapter_001/resource.json": "025672fd4c575b4c23dd5e0609f5fcb290d5bc0a4dbcb530963884495d561a17",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_projection_runtime_20261011/full_adapter_002/resource.json": "4a9f065095ffcafdb41bf0adaf493bb6aff0595f5914fd301a5aac5b55688c98",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_validation_20261011/original_h21600_001/protocol.json": "b610fdcf93412bfb9bfb104dcf7e8ef608d89a07b6c413ec2c555320da52a049",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_validation_20261011/original_h80_001/protocol.json": "88065d2568811ca58e22bfcd3672d8b155da8f5cf559739e8b7f0483222e0ecd",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_validation_20261011/projected_h21600_001/protocol.json": "2e0f36d828896ec211e7216562f74164934046b1b88c2680c428ff1bcd2b8fe9",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_validation_20261011/projected_h80_001/protocol.json": "26c5d4db580099cc64f1aac73d7704400e21f0d8c122f34b3e13e618b11c673d",
+    "outputs/experiments/ics_circulation_v3/phase4_round11_resource_ledger_20261011/draft_001/ledger.json": "3bf0392eb5afd61df6897320439a225fb2b966de29319bea0caf5db9c34d4c46"
+  },
+  "source_sha256": "93e5b090cac7dc7e9629bc2dee4499a4e7ac54bd9a052d367c4c8df086c078f7"
+}

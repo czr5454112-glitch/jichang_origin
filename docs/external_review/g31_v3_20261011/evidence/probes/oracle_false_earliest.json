@@ -1,0 +1,417 @@
+{
+  "snapshot": {
+    "now": 0,
+    "network": {
+      "nodes": {
+        "S": {
+          "node_id": "S",
+          "logistics_zone": "Z",
+          "control_partition": "P",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "A": {
+          "node_id": "A",
+          "logistics_zone": "Z",
+          "control_partition": "P",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "W": {
+          "node_id": "W",
+          "logistics_zone": "Z",
+          "control_partition": "P",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "X": {
+          "node_id": "X",
+          "logistics_zone": "Z",
+          "control_partition": "P",
+          "capacity": 4,
+          "can_wait": true
+        },
+        "G": {
+          "node_id": "G",
+          "logistics_zone": "Z",
+          "control_partition": "P",
+          "capacity": 4,
+          "can_wait": true
+        }
+      },
+      "edges": {
+        "a-SA": {
+          "edge_id": "a-SA",
+          "source": "S",
+          "target": "A",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "b-SW": {
+          "edge_id": "b-SW",
+          "source": "S",
+          "target": "W",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "c-AX": {
+          "edge_id": "c-AX",
+          "source": "A",
+          "target": "X",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "d-WX": {
+          "edge_id": "d-WX",
+          "source": "W",
+          "target": "X",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "e-XG": {
+          "edge_id": "e-XG",
+          "source": "X",
+          "target": "G",
+          "travel_time": 1,
+          "capacity": 1
+        },
+        "f-WG": {
+          "edge_id": "f-WG",
+          "source": "W",
+          "target": "G",
+          "travel_time": 4,
+          "capacity": 1
+        }
+      }
+    },
+    "trays": {
+      "t": {
+        "tray_id": "t",
+        "node": "S",
+        "mode": "loaded",
+        "bag_id": "b",
+        "available_at": 0
+      }
+    },
+    "bags": {
+      "b": {
+        "bag_id": "b",
+        "origin": "S",
+        "destination": "G",
+        "arrival": 0,
+        "deadline": 20,
+        "protected": true,
+        "storage": {
+          "node_id": "W",
+          "release_at": 0,
+          "published_at": 0,
+          "evidence_status": "proxy",
+          "carrier_policy": "on_carrier"
+        }
+      }
+    },
+    "reservations": [],
+    "version": 0,
+    "old_in_transit": [],
+    "module": {
+      "unload_ticks": 1,
+      "hold_by_node": {},
+      "export_min_stock": 0,
+      "reception_capacity": 1
+    },
+    "plans": {},
+    "completed": {},
+    "load_times": {},
+    "empty_targets": {},
+    "conditional_forecasts": {},
+    "forecast_history": [],
+    "replaceable_trays": [],
+    "storage_progress": {}
+  },
+  "hand_witness": {
+    "candidate_id": "hand",
+    "bag_id": "b",
+    "tray_id": "t",
+    "legs": [
+      {
+        "edge_id": "b-SW",
+        "depart": 0,
+        "arrive": 1
+      },
+      {
+        "edge_id": "d-WX",
+        "depart": 1,
+        "arrive": 2
+      },
+      {
+        "edge_id": "e-XG",
+        "depart": 2,
+        "arrive": 3
+      }
+    ],
+    "unload_complete": 4,
+    "usable_at": 4,
+    "dependency_version": 0,
+    "baseline_id": "hand",
+    "is_baseline": true,
+    "destination_node": "G",
+    "prefix_only": false,
+    "continuation_destination": null
+  },
+  "hand_validation": {
+    "accepted": true,
+    "reason": "accepted"
+  },
+  "results": [
+    {
+      "k": 1,
+      "candidates": [
+        {
+          "candidate_id": "full_graph:v0:b:t:0",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "b-SW",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "f-WG",
+              "depart": 1,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 6,
+          "usable_at": 6,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:b:t:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ],
+      "diagnostics": {
+        "validation_ms": 0.074682000104076,
+        "work_units_by_stage": {
+          "topology_edges": 6,
+          "reverse_lower_bound": 6,
+          "full_graph_time_labels": 18
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "completeness": "finite_integer_earliest",
+        "earliest_arrival_certified": true,
+        "finite_horizon_exhausted": false,
+        "missing_candidate_is_not_infeasibility": true,
+        "cold_topology": true,
+        "static_lower_bound": 3,
+        "state_label_truncations": 5,
+        "query_ms": 0.2829060000522077,
+        "expansions": 30,
+        "candidate_count": 1,
+        "search_queue_exhausted": false
+      },
+      "status": "candidate_limit_reached"
+    },
+    {
+      "k": 2,
+      "candidates": [
+        {
+          "candidate_id": "full_graph:v0:b:t:0",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "b-SW",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "d-WX",
+              "depart": 1,
+              "arrive": 2
+            },
+            {
+              "edge_id": "e-XG",
+              "depart": 2,
+              "arrive": 3
+            }
+          ],
+          "unload_complete": 4,
+          "usable_at": 4,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:b:t:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "full_graph:v0:b:t:1",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "b-SW",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "d-WX",
+              "depart": 1,
+              "arrive": 2
+            },
+            {
+              "edge_id": "e-XG",
+              "depart": 3,
+              "arrive": 4
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 5,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:b:t:0",
+          "is_baseline": false,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ],
+      "diagnostics": {
+        "validation_ms": 0.08701999990989862,
+        "work_units_by_stage": {
+          "topology_edges": 6,
+          "reverse_lower_bound": 6,
+          "full_graph_time_labels": 13
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "completeness": "finite_integer_earliest",
+        "earliest_arrival_certified": true,
+        "finite_horizon_exhausted": false,
+        "missing_candidate_is_not_infeasibility": true,
+        "cold_topology": true,
+        "static_lower_bound": 3,
+        "query_ms": 0.2297460000590945,
+        "expansions": 25,
+        "candidate_count": 2,
+        "search_queue_exhausted": false
+      },
+      "status": "candidate_limit_reached"
+    },
+    {
+      "k": 3,
+      "candidates": [
+        {
+          "candidate_id": "full_graph:v0:b:t:0",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "b-SW",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "d-WX",
+              "depart": 1,
+              "arrive": 2
+            },
+            {
+              "edge_id": "e-XG",
+              "depart": 2,
+              "arrive": 3
+            }
+          ],
+          "unload_complete": 4,
+          "usable_at": 4,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:b:t:0",
+          "is_baseline": true,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "full_graph:v0:b:t:1",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "b-SW",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "d-WX",
+              "depart": 1,
+              "arrive": 2
+            },
+            {
+              "edge_id": "e-XG",
+              "depart": 3,
+              "arrive": 4
+            }
+          ],
+          "unload_complete": 5,
+          "usable_at": 5,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:b:t:0",
+          "is_baseline": false,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        },
+        {
+          "candidate_id": "full_graph:v0:b:t:2",
+          "bag_id": "b",
+          "tray_id": "t",
+          "legs": [
+            {
+              "edge_id": "b-SW",
+              "depart": 0,
+              "arrive": 1
+            },
+            {
+              "edge_id": "f-WG",
+              "depart": 1,
+              "arrive": 5
+            }
+          ],
+          "unload_complete": 6,
+          "usable_at": 6,
+          "dependency_version": 0,
+          "baseline_id": "full_graph:v0:b:t:0",
+          "is_baseline": false,
+          "destination_node": "G",
+          "prefix_only": false,
+          "continuation_destination": null
+        }
+      ],
+      "diagnostics": {
+        "validation_ms": 0.09896999995362421,
+        "work_units_by_stage": {
+          "topology_edges": 6,
+          "reverse_lower_bound": 6,
+          "full_graph_time_labels": 22
+        },
+        "preprocessing_budget_included": true,
+        "route_mode": "whole_route",
+        "completeness": "finite_integer_earliest",
+        "earliest_arrival_certified": true,
+        "finite_horizon_exhausted": false,
+        "missing_candidate_is_not_infeasibility": true,
+        "cold_topology": true,
+        "static_lower_bound": 3,
+        "state_label_truncations": 3,
+        "query_ms": 0.28490900001543196,
+        "expansions": 34,
+        "candidate_count": 3,
+        "search_queue_exhausted": false
+      },
+      "status": "candidate_limit_reached"
+    }
+  ]
+}

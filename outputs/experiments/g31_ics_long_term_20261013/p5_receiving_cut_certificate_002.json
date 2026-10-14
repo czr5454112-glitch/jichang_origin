@@ -1,0 +1,78 @@
+{
+  "status": "proved_target_intersection_impossible_under_declared_contract",
+  "scope": "fixed circulation_factor_006_001 directed graph and finite trays; two baseline target intersection only",
+  "online_use": false,
+  "global_scheduling_optimality": "unknown",
+  "checks": {
+    "capacity_one_shared_receiving": true,
+    "positive_fixed_edges": true,
+    "every_fixed_tray_in_active_prefix_service": true,
+    "protected_direct_prefix_contracts": true,
+    "target_demand_not_already_served_at_boundary": true,
+    "cut_exists": true,
+    "every_future_available_tray_needs_cut_to_D1_origin": true,
+    "UNSEEN_loaded_service_needs_cut": true,
+    "direct_distinct_service_identities": true,
+    "UNSEEN_release_cannot_supply_D1_without_second_cut": true,
+    "nonnegative_physical_origin": true,
+    "target_reference_tasks_completed": true
+  },
+  "contract_assumptions": [
+    "one business bag per tray",
+    "no unloading before that job's declared destination",
+    "no creation or teleportation of trays",
+    "incoming reservation of capacity1 begins at edge entry and lasts at least until arrival",
+    "preserve the already loaded protected prefix jobs; no business cancellation"
+  ],
+  "active_prefix_bags": {
+    "T0": "U0",
+    "T1": "U1",
+    "TP": "P"
+  },
+  "mandatory_next_release_nodes": {
+    "T0": 0,
+    "T1": 1,
+    "TP": 10
+  },
+  "cut_edges": [
+    [
+      0,
+      2,
+      2000.0,
+      5.0
+    ],
+    [
+      1,
+      2,
+      2000.0,
+      5.0
+    ]
+  ],
+  "cut_free_reachability_scope": "all directed paths, not just current S4 or candidate shortest paths",
+  "required_distinct_crossings": [
+    "empty supply before D1 loading",
+    "loaded UNSEEN service"
+  ],
+  "distinctness_reason": "after UNSEEN unloading its tray still needs another cut to D1 origin; if D1 is first, UNSEEN's loaded service separately needs its cut",
+  "minimum_exclusive_time_per_crossing": 400.0,
+  "minimum_total_exclusive_time": 800.0,
+  "paired_completion_targets": {
+    "D1": 403.5000000000001,
+    "UNSEEN": 480.71100000000007
+  },
+  "available_physical_time_until_both_targets": 480.71100000000007,
+  "strict_positive_deficit": 319.28899999999993,
+  "not_claimed": [
+    "general circulation infeasibility",
+    "impossibility of improving a specified single baseline",
+    "permission to relax protection",
+    "online access to future targets",
+    "new algorithmic contribution"
+  ],
+  "source_sha256": "f928409ce514ac88727e6bcb5c0873cc842d5ed05064a221dcdb3977a66a405d",
+  "input_sha256": {
+    "outputs\\experiments\\g31_ics_long_term_20261013\\p5_joint_circulation_factor_006_001\\long_2000m_unknown_source_demand\\input.json": "09fef109cb184aee6c99f2ddc916c005b6a4820b66b59b0c0d28c46252a68e05",
+    "outputs\\experiments\\g31_ics_long_term_20261013\\p5_joint_circulation_factor_006_001\\long_2000m_unknown_source_demand\\summary.json": "a97216a70c595f276881f27d1ae58b1c61a65c733851dcbb29a8304befb19ff8",
+    "outputs\\experiments\\g31_ics_long_term_20261013\\p5_joint_circulation_factor_006_001\\long_2000m_unknown_source_demand\\branch_002.json.gz": "863b294e133a3074df191d58ebbd8ab167c39237b5b7e191e2aab5ec67def30d"
+  }
+}

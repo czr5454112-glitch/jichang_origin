@@ -1,0 +1,41 @@
+{
+  "factors": [
+    {
+      "name": "storage_slack_alternative_supply",
+      "storage_release": 10.0,
+      "p_load": 2.0,
+      "reserve_third": false
+    },
+    {
+      "name": "no_storage_slack",
+      "storage_release": 0.0,
+      "p_load": 2.0,
+      "reserve_third": false
+    },
+    {
+      "name": "third_source_reserve",
+      "storage_release": 10.0,
+      "p_load": 2.0,
+      "reserve_third": true
+    },
+    {
+      "name": "no_simultaneous_receiving_window",
+      "storage_release": 10.0,
+      "p_load": 8.0,
+      "reserve_third": false
+    }
+  ],
+  "horizon": 160.0,
+  "max_actions_per_factor": 64,
+  "max_seconds": 180.0,
+  "per_branch_native_events": 100000,
+  "continuation": "unchanged native S4; no later external controller decisions",
+  "information": "A local business contracts and source release projections plus actual delayed C to A next-node forecast",
+  "native_interface": "legacy owner-restricted live endpoints; owner_protocol not enabled",
+  "protection": "all six offered jobs against ordinary, strong service assignment, and WAIT separately",
+  "postrun_reference": "all finite proposals physically executed including conditional conflicts and partial matchings",
+  "nearest_neighbors": [
+    "https://arxiv.org/abs/2110.14891",
+    "https://arxiv.org/abs/2603.28968"
+  ]
+}

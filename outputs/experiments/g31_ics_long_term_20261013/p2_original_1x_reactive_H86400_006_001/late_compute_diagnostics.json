@@ -1,0 +1,204 @@
+{
+  "schema": "g31.original_late_load_check.v1",
+  "scope": "fixed-budget recheck of previously observed late compute hotspot, not method evidence or full100ms certification",
+  "source_control_log_sha256": "894db003d1fce0c0094b37ad99285974cb9519cde48e26d27c91dd4d7777a9f0",
+  "receipt": {
+    "schema": "g31.original_online_control.v1",
+    "status": "reached",
+    "source_before": {
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\run_original_control.py": "776cacfe0b4e272bdd1e0586281198c39939221726e0d51ccb856c8929ca7636",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "35d06c712c7cb24958dacab5b82099d7b7dcd23315a914f25908c12288f05a1a",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\original_workload.py": "10ebfd04d614c5d77c467efa89549bbad78eec3080b60bb642d5b5185b9d99dc"
+    },
+    "binary_sha256": "0bdd31835d8e9b7269bb2d45e14484054aad73abf3a10dc989f3574230b16190",
+    "predictive": false,
+    "respect_service_forecasts": false,
+    "control_period": 900.0,
+    "horizon": 86400.0,
+    "wall_budget_seconds": 120.0,
+    "max_events": 100000,
+    "scope": "same native original-map input and lawful owner observations; analytic R2 baseline, no R1 protection certificate or main-method innovation",
+    "complete_100ms_requirement_certified": false,
+    "stop_reason": "common_horizon_reached",
+    "offline_final_state_sha256": "40465bb90fa7866778e8760dc2d75dcf3f8d9fb56e1e07d511f7497ccd6e748b",
+    "control_compute_ms": {
+      "count": 194,
+      "max": 211.261700023897,
+      "sum": 15724.672399577685,
+      "scope": "observation+prediction+assignment+submit-call; serial owner calls; logical delay separate"
+    },
+    "continuation_boundary": {
+      "physical_time": 86400.0,
+      "native_session_persisted": false,
+      "rerun_required_after_process_exit": true
+    },
+    "wall_seconds": 72.14208180003334,
+    "source_changed": []
+  },
+  "summary": {
+    "offered": 28506,
+    "observed": 28506,
+    "not_yet_observed": 0,
+    "loaded": 18,
+    "completed": 0,
+    "on_time": 0,
+    "uncompleted": 28506,
+    "job_status_counts": {
+      "in_transit": 18,
+      "waiting_for_tray": 28488
+    },
+    "unfinished_past_deadline": 28506,
+    "tray_mode_counts": {
+      "loaded": 18,
+      "empty_transit": 3,
+      "quarantined": 1
+    },
+    "trays_with_receiving_lease": 3,
+    "physical_clock": 86400.0,
+    "declared_horizon": 86400.0,
+    "horizon_reached": true,
+    "event_budget_reached": false,
+    "leg_failure_reasons": {
+      "departure_lease_expired_before_physical_entry": 1
+    },
+    "budget_finalization_censored_legs": 0,
+    "budget_failure_semantics": "event_limit_reached is computational censoring; native finalize quarantines active legs, not proof of physical impossibility",
+    "restricted_sojourn_sum_seconds_at_actual_clock": 1211842730.2130573,
+    "warning": "different observed clocks are censored and must not be ranked by aggregate objective",
+    "native_summary": {
+      "event_count": 31276,
+      "completed_count": 6,
+      "failed_count": 1,
+      "runtime_seconds": 0.0,
+      "edge_enter_event_count": 210,
+      "edge_exit_event_count": 210,
+      "reservation_conflicts": 0,
+      "physical_fault_edge_entry_violation_count": 0,
+      "merge_grant_timing_mode": "jit_fair_aging_deadline",
+      "g4irsf20_event_hotpath_policy": "E2",
+      "local_queue_capacity": 0
+    },
+    "optimality": "unknown"
+  },
+  "complete_population_rows": 28506,
+  "unique_business_ids": 28506,
+  "peak_all_day": {
+    "time": 83700.0,
+    "tick": 93,
+    "owner_id": "owner:system_domestic",
+    "compute_ms": 211.261700023897,
+    "compute_parts_ms": {
+      "observe": 87.0802000281401,
+      "initial_prediction_and_assignment": 124.17809996986762,
+      "submit": 0.0,
+      "residual_observe_and_replan": 0.0
+    },
+    "candidate_pairs": 0,
+    "supplies": 0,
+    "demands": 28485,
+    "intents": 0,
+    "forecast_ledgers": {},
+    "reply_statuses": {}
+  },
+  "peak_at_or_after76500": {
+    "time": 83700.0,
+    "tick": 93,
+    "owner_id": "owner:system_domestic",
+    "compute_ms": 211.261700023897,
+    "compute_parts_ms": {
+      "observe": 87.0802000281401,
+      "initial_prediction_and_assignment": 124.17809996986762,
+      "submit": 0.0,
+      "residual_observe_and_replan": 0.0
+    },
+    "candidate_pairs": 0,
+    "supplies": 0,
+    "demands": 28485,
+    "intents": 0,
+    "forecast_ledgers": {},
+    "reply_statuses": {}
+  },
+  "at_old_peak_time76500": [
+    {
+      "time": 76500.0,
+      "tick": 85,
+      "owner_id": "owner:system_domestic",
+      "compute_ms": 200.6371000315994,
+      "compute_parts_ms": {
+        "observe": 84.01440002489835,
+        "initial_prediction_and_assignment": 116.61979998461902,
+        "submit": 0.0,
+        "residual_observe_and_replan": 0.0
+      },
+      "candidate_pairs": 0,
+      "supplies": 0,
+      "demands": 27894,
+      "intents": 0,
+      "forecast_ledgers": {},
+      "reply_statuses": {}
+    },
+    {
+      "time": 76500.0,
+      "tick": 85,
+      "owner_id": "owner:system_international",
+      "compute_ms": 136.72489998862147,
+      "compute_parts_ms": {
+        "observe": 43.40379999484867,
+        "initial_prediction_and_assignment": 93.31680001923814,
+        "submit": 0.0,
+        "residual_observe_and_replan": 0.0
+      },
+      "candidate_pairs": 0,
+      "supplies": 0,
+      "demands": 27975,
+      "intents": 0,
+      "forecast_ledgers": {},
+      "reply_statuses": {}
+    }
+  ],
+  "owner_calls_over100ms": 75,
+  "owner_calls_total": 194,
+  "original_peak": {
+    "time": 76500.0,
+    "tick": 85,
+    "owner_id": "owner:system_international",
+    "compute_ms": 818.2002999819815,
+    "candidate_pairs": 0,
+    "supplies": 0,
+    "demands": 27975,
+    "intents": 0,
+    "forecast_ledgers": {},
+    "reply_statuses": {}
+  },
+  "original_peak_source": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_1x_reactive_001\\control_steps.jsonl",
+  "event_counts": {
+    "BAG_ARRIVAL": 28506,
+    "LOAD_START": 18,
+    "LOAD_COMPLETE": 18,
+    "LEG_START": 28,
+    "EDGE_ENTER": 210,
+    "EDGE_EXIT": 210,
+    "LEG_COMPLETE": 6,
+    "STORAGE_ENTER": 4,
+    "RESOURCE_WAIT": 41,
+    "RESOURCE_WAKE": 18,
+    "MODULE_REQUEST_DELIVERED": 6,
+    "EXPORT_GRANTED": 6,
+    "EMPTY_RECEIVED": 2,
+    "UNUSED_RECEIVING_RELEASED": 1,
+    "LEG_FAILED": 1,
+    "STORAGE_RELEASE": 4
+  },
+  "uncontrolled_full_day_comparison": {
+    "path": "outputs\\experiments\\g31_ics_long_term_20261013\\p2_original_offline005_001",
+    "same_horizon": true,
+    "same_source_population": true,
+    "no_control_loaded": 22,
+    "reactive_loaded": 18,
+    "no_control_completed": 0,
+    "reactive_completed": 0,
+    "scope": "different control policies and native versions; no assertion of equal trajectories or benchmark speedup ratio"
+  },
+  "complete_100ms_requirement": "not_met_even_by_measured_owner_subset",
+  "interpretation": "The earlier compute hotspot is smaller, but remaining O(visible waiting population) observation/projection and prediction work exceeds100ms without any supply or candidate. Do not certify100ms using H21600 early-window timings."
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="7" time="0.726" timestamp="2026-10-13T17:44:04.523613+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_actual_capture_signature_differs_from_submission_and_later_aba_queue" time="0.006"><failure message="assert [0.35] == approx([0.3 ± 3.0e-07])&#10;  &#10;  comparison failed. Mismatched elements: 1 / 1:&#10;  Max absolute difference: 0.04999999999999999&#10;  Max relative difference: 0.14285714285714282&#10;  Index | Obtained | Expected     &#10;  0     | 0.35     | 0.3 ± 3.0e-07">native = &lt;module 'czr005_circulation' from 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_011\\python\\czr005_circulation.cp311-win_amd64.pyd'&gt;
+
+    def test_actual_capture_signature_differs_from_submission_and_later_aba_queue(native):
+        value = scene()
+        value["trays"] = [dict(tray_id="T0", node=5)]
+        # A real cross-owner return: same-zone redistribution is intentionally
+        # outside this controller's authority and must remain rejected.
+        next(n for n in value["node_contracts"] if n["node"] == 5)["zone"] = "B"
+        value["jobs"] = [dict(value["jobs"][0], business_bag_id="Y", arrival=.1)]
+        value["edge_records"] = [(u, v, .25 if (u, v) == (5, 0) else length, speed)
+                                 for u, v, length, speed in value["edge_records"]]
+        value = prepare_input(value)
+        s = native.NativeSession(value); s.advance_to(0.)
+        submitted_signature = s.protocol_demand_signature("A")
+        request = demand(message_delay=.2)
+        s.submit_protocol_command(request)
+        s.submit_protocol_transfer(dict(request_id="live:1:B:real-tray-return", owner_id="B", tray_id="T0",
+            source=5, destination=0, earliest_departure=0., expiry=10., message_delay=0.))
+        s.advance_to(.35)
+        assert submitted_signature == s.protocol_demand_signature("A") == canonical([])
+        ack = known(s, request)
+        message, = s.observe_protocol("B")["delivered_messages"]
+        assert [j["business_bag_id"] for j in message["jobs"]] == ["Y"]
+        assert ack["captured_demand_signature"] == canonical(message["jobs"]) != submitted_signature
+        assert ack["captured_demand_observed_at"] == .2
+        assert ack["captured_demand_publication_sequence"] == message["publication_sequence"]
+        prefix = s.result_at(.35)
+        assert prefix["jobs"][0]["status"] == "loading"
+&gt;       assert [r["time"] for r in prefix["receipts"] if r["event"] == "LOAD_START" and
+                r["business_bag_id"] == "Y"] == pytest.approx([.3])
+E       assert [0.35] == approx([0.3 ± 3.0e-07])
+E         
+E         comparison failed. Mismatched elements: 1 / 1:
+E         Max absolute difference: 0.04999999999999999
+E         Max relative difference: 0.14285714285714282
+E         Index | Obtained | Expected     
+E         0     | 0.35     | 0.3 ± 3.0e-07
+
+tests\test_g31_circulation_demand_ack_signature.py:73: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_old_pending_ack_never_gains_the_later_final_capture_fields" time="0.002" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_lost_final_ack_hides_capture_until_actual_retry_ack_arrives" time="0.001" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_recipient_outage_preserves_actual_source_capture_identity" time="0.001" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_canonical_unicode_order_and_signed_zero_match_local_signature" time="0.002" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_snapshot_digest_cache_is_readonly_and_rebuilt_after_restore" time="0.004" /><testcase classname="tests.test_g31_circulation_demand_ack_signature" name="test_historical_ack_matches_its_message_after_a_newer_snapshot" time="0.001" /></testsuite></testsuites>

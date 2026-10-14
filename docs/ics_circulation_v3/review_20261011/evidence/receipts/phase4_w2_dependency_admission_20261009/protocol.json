@@ -1,0 +1,33 @@
+{
+  "scope": "structural_admission_development_counterexamples_not_airport_distribution",
+  "source_sha256": {
+    "run_dependency_admission.py": "2fc48a689702dffd7c3ea89d348ee3b37bd60d91b99c10f4aebe61a9748e2b96",
+    "dependency_admission.py": "ffb9e05b07e53c588affbf941d3a9de9113a3ef8a8b3d10e9bf9317c5535c9bf",
+    "joint_transactions.py": "67d69a5fc106aefb81c1c46457515970270e6fd8379391d528f797d6c43ad430",
+    "runtime.py": "7de9af66b0fbadd3309a75ef7763957b42b662cc91a78e6b786525eb0c7a0cd8",
+    "model.py": "e513e9b2a269f2499fe69a451bcc5a87e63dbc5e9ccc633d2eaa379c8ece4471",
+    "routing.py": "13ce1e3f76068b8e2ab31ff8c51dabc563570c0b1990b0645a2c529722c08878",
+    "routing_reference.py": "0fa5bf23396196a8a31d62a903dd3b2ad4b2e64aebe553bea4d89bf1d132430c",
+    "experiment_protocol.py": "663bdf3d0ba82bcfbc3a70c18abc1ade22b1cde3c04118922934bec4936410a3",
+    "run_joint_feedback.py": "4fe2063745147b5ba5621fce9e76746cfdc00b914d04ee9e1ad11c517a448848"
+  },
+  "cases": [
+    "ring2_capacity1",
+    "ring2_capacity2",
+    "ring3_capacity1",
+    "ring3_capacity2",
+    "ring4_capacity1",
+    "ring4_capacity2",
+    "ring6_capacity1",
+    "ring6_capacity2",
+    "nonparticipating_held_blocker",
+    "incompatible_supplied_departure_windows",
+    "protected_deadline_cannot_be_relaxed",
+    "closed_edge_not_reopened"
+  ],
+  "horizon": 5,
+  "permissions_comparison": "same physical rules; sequential-only vs explicitly added atomic bundle admission",
+  "not_claimed": "No advantage from route search or scoring is inferred from enabling the new admission operator.",
+  "failure_semantics": "Rejected supplied proposal set is not proof of global physical infeasibility.",
+  "future_visibility": "no future bags in these structural fixtures"
+}
