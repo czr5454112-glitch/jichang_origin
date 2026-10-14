@@ -1,0 +1,92 @@
+{
+  "schema": "g31.fresh_source_archive_validation.v1",
+  "commit": "89c2935ef2963d769ab6ca75764009b2b3e9365f",
+  "scope": "Fresh git archive; same author Windows Python toolchain and explicitly restored author precompiled native artifacts. Not an independent rebuild or external review.",
+  "prior_failed_attempt": "execution_receipt.json",
+  "diagnosis": "extraction_diagnosis.json",
+  "workaround": "Use the Windows extended-length path prefix for the same owned fresh checkout; all source bytes still come exclusively from the exact git archive.",
+  "checkout": "\\\\?\\C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_long_term_20261013\\publication_20261014_001\\clean_checkout_001",
+  "commands": [
+    {
+      "name": "long_path_restore",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "docs/g31_ics_circulation/publication_20261014/restore_author_artifacts.py",
+        "--root",
+        "\\\\?\\C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_long_term_20261013\\publication_20261014_001\\clean_checkout_001"
+      ],
+      "cwd": "\\\\?\\C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_long_term_20261013\\publication_20261014_001\\clean_checkout_001",
+      "exit_code": 0,
+      "wall_seconds": 0.31185009999899194
+    },
+    {
+      "name": "long_path_validate_live",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "-m",
+        "scripts.experiments.g31_ics_circulation.validate_live",
+        "--binary",
+        "build_lt_session_016/python/czr005_circulation.cp311-win_amd64.pyd",
+        "--build-receipt",
+        "outputs/experiments/g31_ics_long_term_20261013/p1_build_016/receipt.json",
+        "--output",
+        "\\\\?\\C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_long_term_20261013\\publication_20261014_001\\fresh_checkout_validation\\fresh_check_live"
+      ],
+      "cwd": "\\\\?\\C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_long_term_20261013\\publication_20261014_001\\clean_checkout_001",
+      "exit_code": 0,
+      "wall_seconds": 43.79154040000867
+    }
+  ],
+  "status": "passed",
+  "archive": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_long_term_20261013\\publication_20261014_001\\fresh_checkout_validation\\source_commit_A.tar",
+    "bytes": 1090867200,
+    "sha256": "53033ce9a21e642747e2376a3814c869aef63d7a2655643a0a9df94628d84135"
+  },
+  "archive_file_counts": {
+    "existing_exact": 970,
+    "restored_from_archive": 7661
+  },
+  "source_manifest": {
+    "sha256": "dbfde8bc261d76f794d4f7008c32448742d0fe472534bc31eefb0fb41ffbe1d7",
+    "files": 5831,
+    "mismatches": []
+  },
+  "wall_seconds": 84.72976110002492,
+  "regression": {
+    "status": "passed",
+    "counts": {
+      "tests": 407,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "current_native_and_python_test_count": 401,
+    "source_changed": [],
+    "compiled_source_mismatch": [],
+    "binary_sha256": "af34df38784eb2524fceb84311ed26a749f404e8877699c62c354ad0cd64fcb0",
+    "historical_order_regression": {
+      "binary": "\\\\?\\C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_long_term_20261013\\publication_20261014_001\\clean_checkout_001\\build_lt_session_011\\python\\czr005_circulation.cp311-win_amd64.pyd",
+      "expected_sha256": "19b55703676810bacc156e474aac364e4016dda2d2fa7b4fa315a3237a1bdbec",
+      "scope": "One retained historical epsilon-order counterexample runs frozen011. The separately listed native identity checks also exercise pinned historical binaries in isolated child processes. Current strict-order protection has a separate regression using the supplied current artifact. No skip or fallback.",
+      "current_model_claim": false,
+      "actual_sha256": "19b55703676810bacc156e474aac364e4016dda2d2fa7b4fa315a3237a1bdbec",
+      "test_names": [
+        "test_historical_epsilon_order_scope_later_soft_retime_can_harm_other_service"
+      ],
+      "test_count": 1
+    },
+    "native_identity_regression": {
+      "test_names": [
+        "test_repeated_loading_of_identical_artifact_is_supported",
+        "test_cached_native_version_switch_is_rejected_in_both_directions[015-011]",
+        "test_cached_native_version_switch_is_rejected_in_both_directions[011-015]",
+        "test_fresh_process_uses_actual_requested_historical_behavior[011]",
+        "test_fresh_process_uses_actual_requested_historical_behavior[015]"
+      ],
+      "test_count": 5,
+      "scope": "Pinned native011/native015 identity and distinct historical behavior checked in isolated child processes; not current-model physical validation.",
+      "current_model_claim": false
+    }
+  }
+}
